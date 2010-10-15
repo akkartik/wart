@@ -1,0 +1,18 @@
+#!/usr/bin/env zsh
+
+if [ $# -eq 0 ]
+then
+  echo "ctrl-d to quit"
+  rlwrap sbcl --noinform --userinit sbclrc
+elif [ $# -eq 1 ]
+then
+  echo "ctrl-d to quit"
+  rlwrap sbcl --noinform --userinit sbclrc --load $*
+else
+  (
+    for i in $*
+    do
+      echo "(load \"$i\")"
+    done
+  ) | rlwrap sbcl --noinform --noprint --userinit sbclrc
+fi
