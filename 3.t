@@ -39,6 +39,30 @@
   :valueof (foo7 3 4)
   :should be '(4))
 
+(test "wc-destructuring-bind handles plain vars"
+  :valueof (wc-destructuring-bind a 1 a)
+  :should be 1)
+
+(test "wc-destructuring-bind handles nested lists"
+  :valueof (wc-destructuring-bind (a) '(1) a)
+  :should be 1)
+
+(test "wc-destructuring-bind handles empty lists"
+  :valueof (wc-destructuring-bind (a) '() a)
+  :should be nil)
+
+(test "wc-destructuring-bind handles lists"
+  :valueof (wc-destructuring-bind ((a b) (c d)) '((1 2) (3 4)) c)
+  :should be 3)
+
+(test "wc-destructuring-bind handles &rest"
+  :valueof (wc-destructuring-bind (&rest b) '(1) b)
+  :should be '(1))
+
+(test "wc-destructuring-bind handles destructured args + rest"
+  :valueof (wc-destructuring-bind ((a b) (c d) &rest e) '((1 2) (3 4) 5 6 7) (cons c e))
+  :should be '(3 5 6 7))
+
 (eval (wc '(def foo8((a b)) b)))
 (test "destructured args"
   :valueof (foo8 '(3 4))

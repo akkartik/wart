@@ -19,9 +19,6 @@
   (or (gethash (car sexp) *wc-special-form-handlers*)
       (gethash (type-of (car sexp)) *wc-type-handlers*)))
 
-(defmacro wc-let(var val &body body)
-  `(funcall (lambda(,var) ,@body) ,val))
-
 
 
 (defmacro def(name args &rest body)
@@ -30,7 +27,8 @@
 (defmacro mac(name args &rest body)
   `(defmacro ,name ,@(compile-args args body)))
 
-
+(defmacro wc-let(var val &body body)
+  `(funcall (lambda(,var) ,@body) ,val))
 
 (defmacro wc-destructuring-bind(vars vals &body body)
   (wc-let gval (gensym)
@@ -39,6 +37,8 @@
 (defmacro wc-destructuring-bind-1(vars vals &body body)
   (cond ((null vars)  `(progn ,@body))
         ((atom vars)  `(wc-let ,vars ,vals ,@body))
+        ((equal (car vars) '&rest)  `(wc-destructuring-bind-1 ,(cadr vars) ,vals
+                                       ,@body))
         (t `(wc-destructuring-bind-1 ,(car vars) (car ,vals)
                   (wc-destructuring-bind-1 ,(cdr vars) (cdr ,vals)
                         ,@body)))))
@@ -48,20 +48,12 @@
 ; (cltl2, 5.2.2)
 (defun compile-args(args body)
   (wc-let args (wc-restify args)
-    (if (flatp (subseq args 0 (or (position '&optional args) (length args))))
-        `(,args ,@body)
-        (wc-let gargs (gensym)
-          `((&rest ,gargs)
-             (wc-destructuring-bind ,args ,gargs
-               ,@body))))))
+    (wc-let gargs (gensym)
+      `((&rest ,gargs)
+         (wc-destructuring-bind ,args ,gargs
+           ,@body)))))
 
 
-
-(defun flatp(xs)
-  (or (null xs)
-      (and (consp xs)
-           (atom (car xs))
-           (flatp (cdr xs)))))
 
 (defun wc-restify (arglist)
   (if (null arglist)

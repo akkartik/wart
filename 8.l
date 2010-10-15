@@ -24,9 +24,6 @@
           (or (gethash (car sexp) *wc-special-form-handlers*)
               (gethash (type-of (car sexp)) *wc-type-handlers*)))))
 
-(defmacro wc-let(var val &body body)
-  `(funcall (lambda(,var) ,@body) ,val))
-
 
 
 (defmacro def(name args &rest body)
@@ -38,12 +35,13 @@
 (defmacro fn(args &rest body)
   `(lambda ,@(compile-args args body)))
 
-
+(defmacro wc-let(var val &body body)
+  `(funcall (lambda(,var) ,@body) ,val))
 
 (defmacro wc-complex-bind(vars vals &body body)
   `(destructuring-bind (normal-vals keyword-vals) (partition-keywords ,vals)
      (wc-destructuring-bind ,vars
-                            (merge-keyword-vars normal-vals keyword-vals ',vars)
+                            (merge-keyword-vars normal-vals keyword-vals (strip-lambda-keywords ',vars))
         ,@body)))
 
 (defmacro wc-destructuring-bind(vars vals &body body)
@@ -64,15 +62,10 @@
 ; (cltl2, 5.2.2)
 (defun compile-args(args body)
   (wc-let args (wc-restify args)
-    (if (flatp (subseq args 0 (or (position '&optional args) (length args))))
-        `(,args ,@body)
-        (compile-complex-args args body))))
-
-(defun compile-complex-args(args body)
-  (wc-let gargs (gensym)
-    `((&rest ,gargs)
-       (wc-complex-bind ,args ,gargs
-         ,@body))))
+    (wc-let gargs (gensym)
+      `((&rest ,gargs)
+         (wc-complex-bind ,args ,gargs
+           ,@body)))))
 
 (defun partition-keywords(vals)
   (list vals ()))
@@ -80,13 +73,17 @@
 (defun merge-keyword-vars(normal-vals keyword-alist args)
   normal-vals)
 
-
+(defun strip-lambda-keywords(args)
+  (remove-if-cons (lambda(arg) (find arg '(&rest &optional &key))) args))
 
-(defun flatp(xs)
-  (or (null xs)
-      (and (consp xs)
-           (atom (car xs))
-           (flatp (cdr xs)))))
+(defun remove-if-cons(f l)
+  (cond ((null l)   nil)
+        ((atom l)   (if (not (funcall f l)) l))
+        (t  (if (funcall f (car l))
+              (remove-if-cons f (cdr l))
+              (cons (car l) (remove-if-cons f (cdr l)))))))
+
+
 
 (defun wc-restify (arglist)
   (if (null arglist)

@@ -94,6 +94,22 @@
   :valueof ([+ _ 1] 3)
   :should be 4)
 
+(test "remove-if-cons works"
+  :valueof (remove-if-cons #'oddp '(1 2 3 4))
+  :should be '(2 4))
+
+(test "remove-if-cons works on dotted lists"
+  :valueof (remove-if-cons #'oddp '(1 2 3 . 4))
+  :should be '(2 . 4))
+
+(test "remove-if-cons works on dotted lists with passing rest"
+  :valueof (remove-if-cons #'evenp '(1 2 3 . 4))
+  :should be '(1 3))
+
+(test "remove-if-cons works on dotted lists with nil rest"
+  :valueof (remove-if-cons #'evenp '(1 2 3 . nil))
+  :should be '(1 3))
+
 (test "wc-complex-bind handles simple args"
   :valueof (wc-complex-bind (a b) '(1 2) b)
   :should be 2)
@@ -109,6 +125,10 @@
 (test "wc-complex-bind handles destructured args + dotted rest"
   :valueof (wc-complex-bind ((a b) . c) '((1 2) 3) (cons b c))
   :should be '(2 3))
+
+(test "strip-lambda-keywords works"
+  :valueof (strip-lambda-keywords '(a &rest b))
+  :should be '(a b))
 
 (test "partition-keywords siphons keyword-arg val pairs into a hash table"
   :valueof (partition-keywords '(1 2 :c 3))
@@ -129,3 +149,21 @@
 (test "wc-complex-bind handles an optional keyword param"
   :valueof (wc-complex-bind (a) '(:a 1) a)
   :should be 1)
+
+(eval (wc '(def foo10(a b) (- a b))))
+(test "allow param names"
+  :valueof (foo10 :a 3 :b 4)
+  :should be -1)
+
+(test "allow just some param names"
+  :valueof (foo10 :a 3 4)
+  :should be -1)
+
+(test "allow args in any order when giving param names"
+  :valueof (foo10 :b 3 :a 4)
+  :should be 1)
+
+(test "take positional args in order after keyword args have been matched"
+  :valueof (foo10 3 :a 4)
+  :should be 1)
+
