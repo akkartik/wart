@@ -39,10 +39,11 @@
   `(funcall (lambda(,var) ,@body) ,val))
 
 (defmacro wc-complex-bind(vars vals &body body)
-  `(destructuring-bind (normal-vals keyword-vals) (partition-keywords ,vals)
-     (wc-destructuring-bind ,vars
-                            (merge-keyword-vars normal-vals keyword-vals (strip-lambda-keywords ',vars))
-        ,@body)))
+  `(destructuring-bind (positional-vals keyword-alist) (partition-keywords ,vals)
+    (wc-destructuring-bind ,vars
+        (merge-keyword-vars positional-vals keyword-alist
+                            (strip-lambda-keywords ',vars))
+      ,@body)))
 
 (defmacro wc-destructuring-bind(vars vals &body body)
   (wc-let gval (gensym)
@@ -84,14 +85,14 @@
 (defun keyword->symbol(k)
   (intern (symbol-name k)))
 
-(defun merge-keyword-vars(normal-vals keyword-alist args)
+(defun merge-keyword-vars(positional-vals keyword-alist args)
   (if (consp args)
     (if (alref (car args) keyword-alist)
       (cons (alref (car args) keyword-alist)
-            (merge-keyword-vars normal-vals keyword-alist (cdr args)))
-      (cons (car normal-vals)
-            (merge-keyword-vars (cdr normal-vals) keyword-alist (cdr args))))
-    normal-vals))
+            (merge-keyword-vars positional-vals keyword-alist (cdr args)))
+      (cons (car positional-vals)
+            (merge-keyword-vars (cdr positional-vals) keyword-alist (cdr args))))
+    positional-vals))
 
 (defun alref(key alist)
   (cdr (assoc key alist)))

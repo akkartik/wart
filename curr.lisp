@@ -39,10 +39,15 @@
   `(funcall (lambda(,var) ,@body) ,val))
 
 (defmacro wc-complex-bind(vars vals &body body)
-  `(destructuring-bind (positional-vals keyword-alist) (partition-keywords ,vals)
-    (wc-destructuring-bind ,vars
+;?   (let ((real-vars (simplify-arg-list vars)))
+;?     (destructuring-bind (positional-vals keyword-alist) (deduce-vals vars vals)
+;?       `(wc-destructuring-bind ,real-vars ,(merge-keyword-vars positional-vals keyword-alist real-vars)
+;?         ,@body))))
+
+  `(destructuring-bind (positional-vals keyword-alist) (deduce-vals ',vars ,vals)
+    (wc-destructuring-bind (simplify-arg-list ',vars)
         (merge-keyword-vars positional-vals keyword-alist
-                            (strip-lambda-keywords ',vars))
+                            (simplify-arg-list ',vars))
       ,@body)))
 
 (defmacro wc-destructuring-bind(vars vals &body body)
@@ -68,11 +73,65 @@
          (wc-complex-bind ,args ,gargs
            ,@body)))))
 
-(defun partition-keywords(vals)
-  (list vals ()))
+(defun deduce-vals(vars vals)
+  (destructuring-bind (positional-vals keyword-alist) (partition-keywords vals)
+    (list positional-vals (add-optional-vars vars keyword-alist))))
+
+(defun simplify-arg-list(args)
+  (strip-optional-keywords (strip-lambda-keywords args)))
+
+(defun partition-keywords(vals &optional alist)
+  (if (consp vals)
+    (if (keywordp (car vals))
+      (destructuring-bind (var val &rest rest) vals
+        (destructuring-bind (new-vals new-alist) (partition-keywords rest alist)
+          (list new-vals
+                (cons (cons (keyword->symbol var) val) new-alist))))
+      (destructuring-bind (new-vals new-alist)
+                          (partition-keywords (cdr vals) alist)
+        (list (cons (car vals) new-vals)
+              new-alist)))
+    (list () alist)))
+
+; strip the colon
+(defun keyword->symbol(k)
+  (intern (symbol-name k)))
 
 (defun merge-keyword-vars(positional-vals keyword-alist args)
-  positional-vals)
+  (if (consp args)
+    (if (alref (car args) keyword-alist)
+      (cons (alref (car args) keyword-alist)
+            (merge-keyword-vars positional-vals keyword-alist (cdr args)))
+      (cons (car positional-vals)
+            (merge-keyword-vars (cdr positional-vals) keyword-alist (cdr args))))
+    positional-vals))
+
+(defun alref(key alist)
+  (cdr (assoc key alist)))
+
+(defun add-optional-vars(vars vals-alist)
+  (if (consp vars)
+    (if (optional-var (car vars))
+      (destructuring-bind (sym val) (car vars)
+        (cons (cons sym val)
+              (add-optional-vars (cdr vars) vals-alist)))
+      (add-optional-vars (cdr vars) vals-alist))
+    vals-alist))
+
+(defun strip-optional-keywords(args)
+  (if (consp args)
+    (cons (if (optional-var (car args))
+            (caar args)
+            (car args))
+          (strip-optional-keywords (cdr args)))))
+
+(defun optional-var(var)
+  (if (consp var)
+    (destructuring-bind (sym val &rest rest) var
+      (and (symbolp sym)
+           (atom val)
+           (not (symbolp val))
+           (null rest)))))
 
 (defun strip-lambda-keywords(args)
   (remove-if-cons (lambda(arg) (find arg '(&rest &optional &key))) args))

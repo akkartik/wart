@@ -39,10 +39,11 @@
   `(funcall (lambda(,var) ,@body) ,val))
 
 (defmacro wc-complex-bind(vars vals &body body)
-  `(destructuring-bind (normal-vals keyword-vals) (partition-keywords ,vals)
-     (wc-destructuring-bind ,vars
-                            (merge-keyword-vars normal-vals keyword-vals (strip-lambda-keywords ',vars))
-        ,@body)))
+  `(destructuring-bind (positional-vals keyword-alist) (partition-keywords ,vals)
+    (wc-destructuring-bind ,vars
+        (merge-keyword-vars positional-vals keyword-alist
+                            (strip-lambda-keywords ',vars))
+      ,@body)))
 
 (defmacro wc-destructuring-bind(vars vals &body body)
   (wc-let gval (gensym)
@@ -84,8 +85,8 @@
 (defun keyword->symbol(k)
   (intern (symbol-name k)))
 
-(defun merge-keyword-vars(normal-vals keyword-alist args)
-  normal-vals)
+(defun merge-keyword-vars(positional-vals keyword-alist args)
+  positional-vals)
 
 (defun strip-lambda-keywords(args)
   (remove-if-cons (lambda(arg) (find arg '(&rest &optional &key))) args))
