@@ -142,9 +142,13 @@
   :valueof (merge-keyword-vars '(1 2 3) () '(a b c))
   :should be '(1 2 3))
 
+(test "merge-keyword-vars is idempotent with non-keyword dotted args"
+  :valueof (merge-keyword-vars '(1 2) () '(a . b))
+  :should be '(1 2))
+
 (test "merge-keyword-vars is idempotent with non-keyword rest args"
-  :valueof (merge-keyword-vars '(1 2 3) () '(a . b))
-  :should be '(1 2 3))
+  :valueof (merge-keyword-vars '(1 2) () '(a &rest b))
+  :should be '(1 2))
 
 (test "wc-complex-bind handles an optional keyword param"
   :valueof (wc-complex-bind (a) '(:a 1) a)

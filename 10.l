@@ -86,13 +86,17 @@
   (intern (symbol-name k)))
 
 (defun merge-keyword-vars(positional-vals keyword-alist args)
-  (if (consp args)
-    (if (alref (car args) keyword-alist)
-      (cons (alref (car args) keyword-alist)
-            (merge-keyword-vars positional-vals keyword-alist (cdr args)))
-      (cons (car positional-vals)
-            (merge-keyword-vars (cdr positional-vals) keyword-alist (cdr args))))
-    positional-vals))
+  (cond
+    ((null args)  nil)
+    ((atom args)   positional-vals) ; dotted rest
+    ((equal (car args) '&rest)   positional-vals)
+    ((alref (car args) keyword-alist)  (cons (alref (car args) keyword-alist)
+                                             (merge-keyword-vars positional-vals
+                                                                 keyword-alist
+                                                                 (cdr args))))
+    (t  (cons (car positional-vals)
+              (merge-keyword-vars (cdr positional-vals) keyword-alist
+                                  (cdr args))))))
 
 (defun alref(key alist)
   (cdr (assoc key alist)))
