@@ -1,9 +1,7 @@
-;; handlers are functions of the input s-expr
-(defvar *wc-special-form-handlers* (make-hash-table))
-(defvar *wc-type-handlers* (make-hash-table))
-
 (defmacro wc-let(var val &body body)
   `(funcall (lambda(,var) ,@body) ,val))
+
+
 
 (defun wrepl()
   (loop
@@ -19,6 +17,10 @@
 (defun lookup-handler(sexp)
   (or (gethash (car sexp) *wc-special-form-handlers*)
       (gethash (type-of (car sexp)) *wc-type-handlers*)))
+
+;; handlers are functions of the input s-expr
+(defvar *wc-special-form-handlers* (make-hash-table))
+(defvar *wc-type-handlers* (make-hash-table))
 
 (setf (gethash 'def *wc-special-form-handlers*)
       (lambda(sexp)

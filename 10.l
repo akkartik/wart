@@ -1,11 +1,9 @@
-;; handlers are functions of the input s-expr
-(defvar *wc-special-form-handlers* (make-hash-table))
-(defvar *wc-type-handlers* (make-hash-table))
-
 (defun prn(x &optional (msg "")) (format t "~a- ~a~%" msg x) x)
 
 (defmacro wc-let(var val &body body)
   `(funcall (lambda(,var) ,@body) ,val))
+
+
 
 (defun wrepl()
   (loop
@@ -26,6 +24,10 @@
         (t
           (or (gethash (car sexp) *wc-special-form-handlers*)
               (gethash (type-of (car sexp)) *wc-type-handlers*)))))
+
+;; handlers are functions of the input s-expr
+(defvar *wc-special-form-handlers* (make-hash-table))
+(defvar *wc-type-handlers* (make-hash-table))
 
 
 
@@ -134,20 +136,14 @@
 
 
 ; [..] => (lambda(_) (..))
-(defmacro defdelim (left right parms &body body)
-  `(ddfn ,left ,right #'(lambda ,parms ,@body)))
-
-(wc-let rpar (get-macro-character #\))
-  (defun ddfn (left right fn)
-    (set-macro-character right rpar)
-    (set-macro-character left
-                         #'(lambda (stream char)
-                             (declare (ignore char))
-                             (apply fn
-                                    (read-delimited-list right stream t))))))
-
-(defdelim #\[ #\] (&rest args)
-  `(fn(_) (,@args)))
+; http://arclanguage.org/item?id=11551
+(set-macro-character #\] (get-macro-character #\)))
+(set-macro-character #\[
+  #'(lambda(stream char)
+      (declare (ignore char))
+      (apply #'(lambda(&rest args)
+                 `(fn(_) (,@args)))
+             (read-delimited-list #\] stream t))))
 
 
 
