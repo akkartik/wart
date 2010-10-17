@@ -108,9 +108,6 @@
               (merge-keyword-vars (cdr positional-vals) keyword-alist
                                   (cdr args))))))
 
-(defun alref(key alist)
-  (cdr (assoc key alist)))
-
 (defun add-optional-vars(vars vals-alist)
   (if (consp vars)
     (if (optional-var (car vars) vals-alist)
@@ -136,16 +133,15 @@
            (not (and val (symbolp val)))
            (null rest)))))
 
-(defun strip-lambda-keywords(args)
-  (remove-if-cons (lambda(arg) (find arg '(&rest &optional &key)))
-                  (wc-restify args)))
-
 (defun remove-if-cons(f l)
   (cond ((null l)   nil)
         ((atom l)   (if (not (funcall f l)) l))
         (t  (if (funcall f (car l))
               (remove-if-cons f (cdr l))
               (cons (car l) (remove-if-cons f (cdr l)))))))
+
+(defun alref(key alist)
+  (cdr (assoc key alist)))
 
 
 

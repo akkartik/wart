@@ -24,6 +24,11 @@
   :valueof (foo4)
   :should be 34)
 
+(eval (wc '(def foofoo(n) (+ n 1))))
+(test "def1"
+  :valueof (foofoo 32)
+  :should be 33)
+
 (eval (wc '(mac foo5(n) `(+ ,n 1))))
 (test "simple mac"
   :valueof (foo5 32)
@@ -38,6 +43,10 @@
 (test "dotted rest"
   :valueof (foo7 3 4)
   :should be '(4))
+
+(test "rest args are optional"
+  :valueof (foo7 3)
+  :should be nil)
 
 (test "wc-destructuring-bind handles plain vars"
   :valueof (wc-destructuring-bind a 1 a)
@@ -134,28 +143,36 @@
   :valueof (wc-complex-bind ((a b) . c) '((1 2) 3) (cons b c))
   :should be '(2 3))
 
-(test "strip-lambda-keywords works"
-  :valueof (strip-lambda-keywords '(a &rest b))
-  :should be '(a b))
-
 (test "partition-keywords siphons keyword-arg val pairs into a hash table"
   :valueof (partition-keywords '(1 2 :c 3))
   :should be (list '(1 2) '((c . 3))))
 
-(test "merge-keyword-vars takes args first from list giving priority to hash"
-  :valueof (merge-keyword-vars '(1 3) '((b . 2)) '(a b c))
+(test "merge-keyword-vars takes args from list giving priority to keyword hash"
+  :valueof (merge-keyword-vars '(1 3) '((b . 2)) () '(a b c))
   :should be '(1 2 3))
 
+(test "merge-keyword-vars takes args from optional hash"
+  :valueof (merge-keyword-vars '(1 3) '((b . 2)) '((d . 1)) '(a b c d))
+  :should be '(1 2 3 1))
+
+(test "merge-keyword-vars lets args from keyword hash override optional args"
+  :valueof (merge-keyword-vars '(1 3) '((b . 2) (d . 3)) '((d . 1)) '(a b c d))
+  :should be '(1 2 3 3))
+
+(test "merge-keyword-vars lets args from list override optional args"
+  :valueof (merge-keyword-vars '(1 3 4) '((b . 2)) '((d . 1)) '(a b c d))
+  :should be '(1 2 3 4))
+
 (test "merge-keyword-vars is idempotent with non-keyword args"
-  :valueof (merge-keyword-vars '(1 2 3) () '(a b c))
+  :valueof (merge-keyword-vars '(1 2 3) () () '(a b c))
   :should be '(1 2 3))
 
 (test "merge-keyword-vars is idempotent with non-keyword dotted args"
-  :valueof (merge-keyword-vars '(1 2) () '(a . b))
+  :valueof (merge-keyword-vars '(1 2) () () '(a . b))
   :should be '(1 2))
 
 (test "merge-keyword-vars is idempotent with non-keyword rest args"
-  :valueof (merge-keyword-vars '(1 2) () '(a &rest b))
+  :valueof (merge-keyword-vars '(1 2) () () '(a &rest b))
   :should be '(1 2))
 
 (test "wc-complex-bind handles an optional keyword param"
@@ -203,14 +220,6 @@
   :valueof (simplify-arg-list '(a . b))
   :should be '(a &rest b))
 
-(test "add-optional-vars works"
-  :valueof (add-optional-vars '(a (b 2)) ())
-  :should be '((b . 2)))
-
-(test "add-optional-vars doesn't override existing vals"
-  :valueof (add-optional-vars '(a (b 2)) '((b . 1)))
-  :should be '((b . 1)))
-
 (eval (wc '(def foo12(a (b nil)) (cons a b))))
 (test "optional param"
   :valueof (foo12 3)
@@ -249,75 +258,68 @@
   :valueof (foo13 3 nil)
   :should be '(3))
 
-(test "allow optional params to refer to variables"
+(pending-test "allow optional params to refer to variables"
   :valueof (let ((a 2)) (funcall (fn((x a)) x)))
   :should be 3)
 
-(test "require non-optional param"
-  :given (def foo(a (o b 4)) (cons a b))
-  :valueof (foo :b 3)
-  :should die)
-
+(eval '(wc (def foo14(a (b 4) (c nil)) (cons b c))))
 (test "multiple optional args"
-  :given (def foo(a (o b 4) (o c)) (cons b c))
-  :valueof (foo 3)
+  :valueof (foo14 3)
   :should be '(4))
 
 (test "allow optional named args out of order"
-  :given (def foo(a (o b 4) (o c)) (cons b c))
-  :valueof (foo 3 :c 2 :b nil)
+  :valueof (foo14 3 :c 2 :b nil)
   :should be '(nil . 2))
 
 (test "allow optional args in order without naming"
-  :given (def foo(a (o b 4) (o c)) (cons b c))
-  :valueof (foo 3 nil 2)
+  :valueof (foo14 3 nil 2)
   :should be '(nil . 2))
 
-(test "rest/body args"
-  :given (def foo(a . b) b)
-  :valueof (foo 3 4)
-  :should be 4)
+(test "remove-keywords returns input by default"
+  :valueof (remove-keywords '(a b c))
+  :should be '(a b c))
 
-(test "rest/body args are optional"
-  :given (def foo(a . b) b)
-  :valueof (foo 3)
-  :should be nil)
+(test "remove-keywords removes keyword symbols"
+  :valueof (remove-keywords '(:a 3 4 5))
+  :should be '(3 4 5))
 
-(test "rest/body args can be named"
-  :given (def foo(a . b) b)
-  :valueof (foo 3 :b 4 5)
+(test "remove-keywords works on dotted lists"
+  :value (remove-keywords '(:a (3 . 2)))
+  :should be '((3 . 2)))
+
+(eval '(wc (def foo15(a . b) b)))
+(test "rest args can be named"
+  :valueof (foo15 3 :b 4 5)
   :should be '(4 5))
 
-(test "body args can come after :do"
-  :given (def foo(a . b) b)
-  :valueof (foo 3 :do 4 5)
-  :should be '(4 5))
-
-(test "rest args can come after ::"
-  :given (def foo(a . b) b)
-  :valueof (foo 3 :: 4 5)
-  :should be '(4 5))
-
-(test "optional and rest params together"
-  :given (def foo(a (o b) . body) (cons b body))
-  :valueof (foo 3 :do 4 5)
-  :should be '(nil 4 5))
-
-(test "call with both optional and rest args without naming"
-  :given (def foo(a (o b) . body) (cons b body))
-  :valueof (foo 3 4 :do 4 5)
-  :should be '(4 4 5))
-
-(test "call with some optional and rest args without naming"
-  :given (def foo(a (o b) (o c) . body) (cons b body))
-  :valueof (foo 3 4 :do 4 5)
-  :should be '(4 4 5))
-
-(test "call with some named optional and rest args"
-  :given (def foo(a (o b) (o c) . body) (cons c body))
-  :valueof (foo 3 :c 4 :do 4 5)
-  :should be '(4 4 5))
-
-; destructured keyword args?
-
-; Plan: with, let, if, map
+;? (test "body args can come after :do"
+;?   :given (def foo(a . b) b)
+;?   :valueof (foo 3 :do 4 5)
+;?   :should be '(4 5))
+;? 
+;? (test "rest args can come after ::"
+;?   :given (def foo(a . b) b)
+;?   :valueof (foo 3 :: 4 5)
+;?   :should be '(4 5))
+;? 
+;? (test "optional and rest params together"
+;?   :given (def foo(a (o b) . body) (cons b body))
+;?   :valueof (foo 3 :do 4 5)
+;?   :should be '(nil 4 5))
+;? 
+;? (test "call with both optional and rest args without naming"
+;?   :given (def foo(a (o b) . body) (cons b body))
+;?   :valueof (foo 3 4 :do 4 5)
+;?   :should be '(4 4 5))
+;? 
+;? (test "call with some optional and rest args without naming"
+;?   :given (def foo(a (o b) (o c) . body) (cons b body))
+;?   :valueof (foo 3 4 :do 4 5)
+;?   :should be '(4 4 5))
+;? 
+;? (test "call with some named optional and rest args"
+;?   :given (def foo(a (o b) (o c) . body) (cons c body))
+;?   :valueof (foo 3 :c 4 :do 4 5)
+;?   :should be '(4 4 5))
+;? 
+;? ; Plan: with, let, if, map
