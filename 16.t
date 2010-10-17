@@ -337,11 +337,3 @@
 (test "new keyword - with"
   :valueof (with (a 3) a)
   :should be 3)
-
-(test "combine all these keywords"
-  :valueof (let a 3 (if (> a 5) 5
-                        (> a 4) 4
-                        (> a 3) 3
-                        (> a 2) "correct"
-                                "Default"))
-  :should be "correct")

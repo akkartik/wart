@@ -11,9 +11,6 @@
     (format t "~a~%" (eval (wc (read))))))
 
 (defun wc(sexp)
-  (apply-to-all-subtrees #'wc-1 sexp))
-
-(defun wc-1(sexp)
   (if (consp sexp)
     (wc-let handler (lookup-handler sexp)
       (if handler
@@ -233,35 +230,3 @@
   (if (or (= n 0) (null xs))
       nil
       (cons (car xs) (firstn (1- n) (cdr xs)))))
-
-(defun apply-to-all-subtrees(f sexp)
-  (if (consp sexp)
-    (funcall f (apply-to-all-leaves (lambda(_) (apply-to-all-subtrees f _)) sexp))
-    sexp))
-
-(defun apply-to-all-leaves(f sexp)
-  (cond
-    ((null sexp)  nil)
-    ((atom sexp)  (funcall f sexp))
-    ; consp sexp
-    (t   (cons (funcall f (car sexp))
-              (apply-to-all-leaves f (cdr sexp))))))
-
-
-
-(defmacro synonym(&rest args)
-  `(setf ,@(mapcar (lambda (x)
-                     `(symbol-function ',x))
-                   args)))
-
-(synonym no null
-         trunc truncate
-         len length
-         uniq gensym
-         cut subseq
-         rev reverse
-         is equal
-         macex macroexpand
-         macex1 macroexpand-1
-         err error
-         keep remove-if-not)

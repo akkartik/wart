@@ -246,22 +246,3 @@
     ; consp sexp
     (t   (cons (funcall f (car sexp))
               (apply-to-all-leaves f (cdr sexp))))))
-
-
-
-(defmacro synonym(&rest args)
-  `(setf ,@(mapcar (lambda (x)
-                     `(symbol-function ',x))
-                   args)))
-
-(synonym no null
-         trunc truncate
-         len length
-         uniq gensym
-         cut subseq
-         rev reverse
-         is equal
-         macex macroexpand
-         macex1 macroexpand-1
-         err error
-         keep remove-if-not)
