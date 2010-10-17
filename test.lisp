@@ -345,3 +345,16 @@
                         (> a 2) "correct"
                                 "Default"))
   :should be "correct")
+
+(test "wc works through defuns"
+  :valueof (wc '(defun foo18(n) (let it n (+ it 1))))
+  :should be '(defun foo18(n) (wc-let it n (+ it 1))))
+
+(test "wc works through defmacro"
+  :valueof (wc '(defmacro foo18(n) `(let it ,n (+ it 1))))
+  :should be '(defmacro foo18(n) `(wc-let it ,n (+ it 1))))
+
+(eval '(wc (mac aand(a b) `(let it ,a (and it ,b)))))
+(test "macro bodies should pass through the compiler"
+  :valueof (let x 3 (aand (- x 1) (> it 1)))
+  :should be t)

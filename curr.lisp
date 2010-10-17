@@ -14,12 +14,16 @@
   (apply-to-all-subtrees #'wc-1 sexp))
 
 (defun wc-1(sexp)
+  (prn sexp)
+(prn
   (if (consp sexp)
     (wc-let handler (lookup-handler sexp)
       (if handler
         (funcall handler sexp)
         sexp))
-    sexp))
+    sexp)
+"=>")
+)
 
 (defun lookup-handler(sexp)
   (cond ((function-name (car sexp))   (lambda(sexp) (cons 'funcall sexp)))
@@ -38,7 +42,7 @@
   `(defun ,name ,@(compile-args args body)))
 
 (defmacro mac(name args &rest body)
-  `(defmacro ,name ,@(compile-args args body)))
+  (wc `(defmacro ,name ,@(compile-args args body))))
 
 (defmacro fn(args &rest body)
   `(lambda ,@(compile-args args body)))
@@ -265,3 +269,5 @@
          macex1 macroexpand-1
          err error
          keep remove-if-not)
+
+(prn (wc '(defmacro foo18(n) `(let it ,n (+ it 1)))))
