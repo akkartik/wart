@@ -95,9 +95,9 @@
   :should be 5)
 
 (test "non-top-level calls require funcall"
-  :valueof (let ((a 1)) (funcall (fn() a)))
+  :valueof (wc-let a 1 (funcall (fn() a)))
   :should be 1)
 
 (pending-test "no need for funcall with non-top-level function forms"
-  :valueof (let ((a 1)) ((fn() a)))
+  :valueof (wc-let a 1 ((fn() a)))
   :should be 1)

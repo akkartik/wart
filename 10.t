@@ -95,11 +95,11 @@
   :should be 5)
 
 (test "non-top-level calls require funcall"
-  :valueof (let ((a 1)) (funcall (fn() a)))
+  :valueof (wc-let a 1 (funcall (fn() a)))
   :should be 1)
 
 (pending-test "no need for funcall with non-top-level function forms"
-  :valueof (let ((a 1)) ((fn() a)))
+  :valueof (wc-let a 1 ((fn() a)))
   :should be 1)
 
 (test "remove-if-cons works"
@@ -142,7 +142,7 @@
   :valueof (partition-keywords '(1 2 :c 3))
   :should be (list '(1 2) '((c . 3))))
 
-(test "merge-keyword-vars takes args first from list giving priority to hash"
+(test "merge-keyword-vars takes args from list giving priority to hash"
   :valueof (merge-keyword-vars '(1 3) '((b . 2)) '(a b c))
   :should be '(1 2 3))
 

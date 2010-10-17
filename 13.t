@@ -24,11 +24,6 @@
   :valueof (foo4)
   :should be 34)
 
-(eval (wc '(def foofoo(n) (+ n 1))))
-(test "def1"
-  :valueof (foofoo 32)
-  :should be 33)
-
 (eval (wc '(mac foo5(n) `(+ ,n 1))))
 (test "simple mac"
   :valueof (foo5 32)
@@ -104,11 +99,11 @@
   :should be 5)
 
 (test "non-top-level calls require funcall"
-  :valueof (let ((a 1)) (funcall (fn() a)))
+  :valueof (wc-let a 1 (funcall (fn() a)))
   :should be 1)
 
 (pending-test "no need for funcall with non-top-level function forms"
-  :valueof (let ((a 1)) ((fn() a)))
+  :valueof (wc-let a 1 ((fn() a)))
   :should be 1)
 
 (test "remove-if-cons works"
@@ -259,7 +254,7 @@
   :should be '(3))
 
 (pending-test "allow optional params to refer to variables"
-  :valueof (let ((a 2)) (funcall (fn((x a)) x)))
+  :valueof (wc-let a 2 (funcall (fn((x a)) x)))
   :should be 3)
 
 (eval '(wc (def foo14(a (b 4) (c nil)) (cons b c))))

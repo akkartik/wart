@@ -104,28 +104,12 @@
   :should be 5)
 
 (test "non-top-level calls require funcall"
-  :valueof (let ((a 1)) (funcall (fn() a)))
+  :valueof (wc-let a 1 (funcall (fn() a)))
   :should be 1)
 
 (pending-test "no need for funcall with non-top-level function forms"
-  :valueof (let ((a 1)) ((fn() a)))
+  :valueof (wc-let a 1 ((fn() a)))
   :should be 1)
-
-(test "remove-if-cons works"
-  :valueof (remove-if-cons #'oddp '(1 2 3 4))
-  :should be '(2 4))
-
-(test "remove-if-cons works on dotted lists"
-  :valueof (remove-if-cons #'oddp '(1 2 3 . 4))
-  :should be '(2 . 4))
-
-(test "remove-if-cons works on dotted lists with passing rest"
-  :valueof (remove-if-cons #'evenp '(1 2 3 . 4))
-  :should be '(1 3))
-
-(test "remove-if-cons works on dotted lists with nil rest"
-  :valueof (remove-if-cons #'evenp '(1 2 3 . nil))
-  :should be '(1 3))
 
 (test "wc-complex-bind handles simple args"
   :valueof (wc-complex-bind (a b) '(1 2) b)
@@ -162,6 +146,10 @@
 (test "merge-keyword-vars lets args from list override optional args"
   :valueof (merge-keyword-vars '(1 3 4) '((b . 2)) '((d . 1)) '(a b c d))
   :should be '(1 2 3 4))
+
+(test "merge-keyword-vars works in the presence of optional and rest args"
+  :valueof (merge-keyword-vars '(2) '((c 4)) '((b . 3)) '(a b &rest c))
+  :should be '(2 3 4))
 
 (test "merge-keyword-vars is idempotent with non-keyword args"
   :valueof (merge-keyword-vars '(1 2 3) () () '(a b c))
@@ -259,7 +247,7 @@
   :should be '(3))
 
 (pending-test "allow optional params to refer to variables"
-  :valueof (let ((a 2)) (funcall (fn((x a)) x)))
+  :valueof (wc-let a 2 (funcall (fn((x a)) x)))
   :should be 3)
 
 (eval '(wc (def foo14(a (b 4) (c nil)) (cons b c))))
@@ -275,51 +263,33 @@
   :valueof (foo14 3 nil 2)
   :should be '(nil . 2))
 
-(test "remove-keywords returns input by default"
-  :valueof (remove-keywords '(a b c))
-  :should be '(a b c))
-
-(test "remove-keywords removes keyword symbols"
-  :valueof (remove-keywords '(:a 3 4 5))
-  :should be '(3 4 5))
-
-(test "remove-keywords works on dotted lists"
-  :value (remove-keywords '(:a (3 . 2)))
-  :should be '((3 . 2)))
-
 (eval '(wc (def foo15(a . b) b)))
 (test "rest args can be named"
   :valueof (foo15 3 :b 4 5)
   :should be '(4 5))
 
-;? (test "body args can come after :do"
-;?   :given (def foo(a . b) b)
-;?   :valueof (foo 3 :do 4 5)
-;?   :should be '(4 5))
-;? 
-;? (test "rest args can come after ::"
-;?   :given (def foo(a . b) b)
-;?   :valueof (foo 3 :: 4 5)
-;?   :should be '(4 5))
-;? 
-;? (test "optional and rest params together"
-;?   :given (def foo(a (o b) . body) (cons b body))
-;?   :valueof (foo 3 :do 4 5)
-;?   :should be '(nil 4 5))
-;? 
-;? (test "call with both optional and rest args without naming"
-;?   :given (def foo(a (o b) . body) (cons b body))
-;?   :valueof (foo 3 4 :do 4 5)
-;?   :should be '(4 4 5))
-;? 
-;? (test "call with some optional and rest args without naming"
-;?   :given (def foo(a (o b) (o c) . body) (cons b body))
-;?   :valueof (foo 3 4 :do 4 5)
-;?   :should be '(4 4 5))
-;? 
-;? (test "call with some named optional and rest args"
-;?   :given (def foo(a (o b) (o c) . body) (cons c body))
-;?   :valueof (foo 3 :c 4 :do 4 5)
-;?   :should be '(4 4 5))
-;? 
-;? ; Plan: with, let, if, map
+(eval '(wc (def foo16(a (b 3) . c) (cons b c))))
+(test "optional + named rest args"
+  :valueof (foo16 2 :c 3)
+  :should be '(3 3))
+
+(test "optional + named rest args - 2"
+  :valueof (foo16 2 4 :c 3)
+  :should be '(4 3))
+
+(test "optional + named rest args - 3"
+  :valueof (foo16 2 4 3 1)
+  :should be '(4 3 1))
+
+(test "optional + named rest args - 3"
+  :valueof (foo16 2 :b 4 3)
+  :should be '(4 3))
+
+(eval '(wc (def foo17(a (b nil) (c 3) . body) (list b c body))))
+(test "call with some optional and rest args without naming"
+  :valueof (foo17 3 4 :body 4 5)
+  :should be '(4 3 (4 5)))
+
+(test "call with some named optional and rest args"
+  :valueof (foo17 3 :c 4 :body 4 5)
+  :should be '(nil 4 (4 5)))
