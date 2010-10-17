@@ -207,17 +207,18 @@
   :valueof (add-optional-vars '(a (b 2)) ())
   :should be '((b . 2)))
 
-(eval (wc '(def foo12(a (b 2)) (cons a b))))
+(eval (wc '(def foo12(a (b nil)) (cons a b))))
 (test "optional param"
   :valueof (foo12 3)
-  :should be '(3 . 2))
+  :should be '(3))
 
-(test "allow optional params to refer to variables"
-  :valueof (let ((a 2)) (funcall (fn((x 3)) x)))
-  :should be 3)
+(eval (wc '(def foo13(a (b 4)) (cons a b))))
+(test "optional param with a default"
+  :valueof (foo13 3)
+  :should be '(3 . 4))
 
-(test "args should override optional params"
-  :valueof (foo12 3 4)
+(test "optional named arg"
+  :valueof (foo13 :a 3)
   :should be '(3 . 4))
 
 (test "distinguish destructured from optional params"
@@ -228,25 +229,17 @@
   :valueof ((fn((a (b))) (list a b)) '(1 (2)))
   :should be '(1 2))
 
-(test "optional param must come at the end"
-  :given (def foo(a :o b c) (cons a b))
-  :valueof (foo 3)
-  :should die)
-
-(test "optional param with a default"
-  :given (def foo(a (o b 4)) (cons a b))
-  :valueof (foo 3)
-  :should be '(3 . 4))
+(test "args should override optional params"
+  :valueof (foo13 3 :b 2)
+  :should be '(3 . 2))
 
 (test "optional arg without naming"
-  :given (def foo(a (o b 4)) (cons a b))
-  :valueof (foo 3 nil)
+  :valueof (foo13 3 nil)
   :should be '(3))
 
-(test "optional named arg"
-  :given (def foo(a (o b 4)) (cons a b))
-  :valueof (foo :a 3)
-  :should be '(3 . 4))
+(test "allow optional params to refer to variables"
+  :valueof (let ((a 2)) (funcall (fn((x a)) x)))
+  :should be 3)
 
 (test "require non-optional param"
   :given (def foo(a (o b 4)) (cons a b))

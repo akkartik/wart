@@ -211,3 +211,20 @@
 (test "optional param"
   :valueof (foo12 3)
   :should be '(3 . 2))
+
+(eval (wc '(def foo13(a (b 4)) (cons a b))))
+(test "optional param with a default"
+  :valueof (foo13 3)
+  :should be '(3 . 4))
+
+(test "optional named arg"
+  :valueof (foo13 :a 3)
+  :should be '(3 . 4))
+
+(test "distinguish destructured from optional params"
+  :valueof ((fn((a b)) (list a b)) '(1 (2)))
+  :should be '(1 (2)))
+
+(test "distinguish destructured from optional params - 2"
+  :valueof ((fn((a (b))) (list a b)) '(1 (2)))
+  :should be '(1 2))

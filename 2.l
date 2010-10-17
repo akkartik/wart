@@ -2,6 +2,9 @@
 (defvar *wc-special-form-handlers* (make-hash-table))
 (defvar *wc-type-handlers* (make-hash-table))
 
+(defmacro wc-let(var val &body body)
+  `(funcall (lambda(,var) ,@body) ,val))
+
 (defun wrepl()
   (loop
     (format t "w> ")(finish-output)
@@ -9,7 +12,7 @@
 
 (defun wc(sexp)
   (if (consp sexp)
-    (let ((handler (lookup-handler sexp)))
+    (wc-let handler (lookup-handler sexp)
       (if handler
         (funcall handler sexp)
         sexp))
@@ -46,7 +49,7 @@
               (compile-dots _)
               _))
           (append (butlast xs)
-                  (let ((x (last xs)))
+                  (wc-let x (last xs)
                     (if (cdr x)
                         `(,(car x) &rest ,(cdr x))
                         x)))))

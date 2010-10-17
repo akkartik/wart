@@ -4,6 +4,9 @@
 
 (defun prn(x &optional (msg "")) (format t "~a- ~a~%" msg x) x)
 
+(defmacro wc-let(var val &body body)
+  `(funcall (lambda(,var) ,@body) ,val))
+
 (defun wrepl()
   (loop
     (format t "w> ")(finish-output)
@@ -11,7 +14,7 @@
 
 (defun wc(sexp)
   (if (consp sexp)
-    (let ((handler (lookup-handler sexp)))
+    (wc-let handler (lookup-handler sexp)
       (if handler
         (funcall handler sexp)
         sexp))
@@ -31,9 +34,6 @@
 
 (defmacro fn(args &rest body)
   `(lambda ,@(compile-args args body)))
-
-(defmacro wc-let(var val &body body)
-  `(funcall (lambda(,var) ,@body) ,val))
 
 (defmacro wc-destructuring-bind(vars vals &body body)
   (wc-let gval (gensym)
@@ -73,7 +73,7 @@
               (compile-dots _)
               _))
           (append (butlast xs)
-                  (let ((x (last xs)))
+                  (wc-let x (last xs)
                     (if (cdr x)
                         `(,(car x) &rest ,(cdr x))
                         x)))))
@@ -84,7 +84,7 @@
 (defmacro defdelim (left right parms &body body)
   `(ddfn ,left ,right #'(lambda ,parms ,@body)))
 
-(let ((rpar (get-macro-character #\) )))
+(wc-let rpar (get-macro-character #\))
   (defun ddfn (left right fn)
     (set-macro-character right rpar)
     (set-macro-character left
