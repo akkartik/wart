@@ -113,7 +113,7 @@
 
 (defun add-optional-vars(vars vals-alist)
   (if (consp vars)
-    (if (optional-var (car vars))
+    (if (optional-var (car vars) vals-alist)
       (destructuring-bind (sym val) (car vars)
         (cons (cons sym val)
               (add-optional-vars (cdr vars) vals-alist)))
@@ -127,8 +127,9 @@
             (car args))
           (strip-default-values (cdr args)))))
 
-(defun optional-var(var)
-  (if (consp var)
+(defun optional-var(var &optional alist)
+  (if (and (consp var)
+           (not (alref (car var) alist)))
     (destructuring-bind (sym val &rest rest) var
       (and (symbolp sym)
            (atom val)

@@ -207,10 +207,14 @@
   :valueof (add-optional-vars '(a (b 2)) ())
   :should be '((b . 2)))
 
-(eval (wc '(def foo12(a (b 2)) (cons a b))))
+(test "add-optional-vars doesn't override existing vals"
+  :valueof (add-optional-vars '(a (b 2)) '((b . 1)))
+  :should be '((b . 1)))
+
+(eval (wc '(def foo12(a (b nil)) (cons a b))))
 (test "optional param"
   :valueof (foo12 3)
-  :should be '(3 . 2))
+  :should be '(3))
 
 (eval (wc '(def foo13(a (b 4)) (cons a b))))
 (test "optional param with a default"
