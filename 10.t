@@ -19,19 +19,6 @@
   :valueof (foo3 2)
   :should be 4)
 
-(setq foofoo (lambda() 3))
-(test "no need for funcall on function atoms"
-  :valueof (foofoo)
-  :should be 3)
-
-(test "no need for funcall on function forms"
-  :valueof ((lambda() 3))
-  :should be 3)
-
-(test "no need for funcall on function forms with args"
-  :valueof ((lambda(a) (+ a 3)) 2)
-  :should be 5)
-
 (eval (wc '(def foo4() 34)))
 (test "simple def"
   :valueof (foo4)
@@ -94,6 +81,27 @@
   :valueof ([+ _ 1] 3)
   :should be 4)
 
+(setq foo10 (lambda() 3))
+(test "no need for funcall on function atoms"
+  :valueof (foo10)
+  :should be 3)
+
+(test "no need for funcall on function forms"
+  :valueof ((lambda() 3))
+  :should be 3)
+
+(test "no need for funcall on function forms with args"
+  :valueof ((lambda(a) (+ a 3)) 2)
+  :should be 5)
+
+(test "non-top-level calls require funcall"
+  :valueof (let ((a 1)) (funcall (fn() a)))
+  :should be 1)
+
+(pending-test "no need for funcall with non-top-level function forms"
+  :valueof (let ((a 1)) ((fn() a)))
+  :should be 1)
+
 (test "remove-if-cons works"
   :valueof (remove-if-cons #'oddp '(1 2 3 4))
   :should be '(2 4))
@@ -154,20 +162,19 @@
   :valueof (wc-complex-bind (a) '(:a 1) a)
   :should be 1)
 
-(eval (wc '(def foo10(a b) (- a b))))
+(eval (wc '(def foo11(a b) (- a b))))
 (test "allow param names"
-  :valueof (foo10 :a 3 :b 4)
+  :valueof (foo11 :a 3 :b 4)
   :should be -1)
 
 (test "allow just some param names"
-  :valueof (foo10 :a 3 4)
+  :valueof (foo11 :a 3 4)
   :should be -1)
 
 (test "allow args in any order when giving param names"
-  :valueof (foo10 :b 3 :a 4)
+  :valueof (foo11 :b 3 :a 4)
   :should be 1)
 
 (test "take positional args in order after keyword args have been matched"
-  :valueof (foo10 3 :a 4)
+  :valueof (foo11 3 :a 4)
   :should be 1)
-

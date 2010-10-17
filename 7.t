@@ -19,19 +19,6 @@
   :valueof (foo3 2)
   :should be 4)
 
-(setq foofoo (lambda() 3))
-(test "no need for funcall on function atoms"
-  :valueof (foofoo)
-  :should be 3)
-
-(test "no need for funcall on function forms"
-  :valueof ((lambda() 3))
-  :should be 3)
-
-(test "no need for funcall on function forms with args"
-  :valueof ((lambda(a) (+ a 3)) 2)
-  :should be 5)
-
 (eval (wc '(def foo4() 34)))
 (test "simple def"
   :valueof (foo4)
@@ -93,3 +80,24 @@
 (test "alternative syntax for fn"
   :valueof ([+ _ 1] 3)
   :should be 4)
+
+(setq foo10 (lambda() 3))
+(test "no need for funcall on function atoms"
+  :valueof (foo10)
+  :should be 3)
+
+(test "no need for funcall on function forms"
+  :valueof ((lambda() 3))
+  :should be 3)
+
+(test "no need for funcall on function forms with args"
+  :valueof ((lambda(a) (+ a 3)) 2)
+  :should be 5)
+
+(test "non-top-level calls require funcall"
+  :valueof (let ((a 1)) (funcall (fn() a)))
+  :should be 1)
+
+(pending-test "no need for funcall with non-top-level function forms"
+  :valueof (let ((a 1)) ((fn() a)))
+  :should be 1)

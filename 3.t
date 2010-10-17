@@ -67,3 +67,8 @@
 (test "destructured args"
   :valueof (foo8 '(3 4))
   :should be 4)
+
+(eval (wc '(def foo9((a b) . c) b)))
+(test "destructured args + dotted rest"
+  :valueof (foo9 '(3 4) 5)
+  :should be 4)

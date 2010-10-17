@@ -137,3 +137,77 @@
 (test "strip-lambda-keywords works"
   :valueof (strip-lambda-keywords '(a &rest b))
   :should be '(a b))
+
+(test "partition-keywords siphons keyword-arg val pairs into a hash table"
+  :valueof (partition-keywords '(1 2 :c 3))
+  :should be (list '(1 2) '((c . 3))))
+
+(test "merge-keyword-vars takes args first from list giving priority to hash"
+  :valueof (merge-keyword-vars '(1 3) '((b . 2)) '(a b c))
+  :should be '(1 2 3))
+
+(test "merge-keyword-vars is idempotent with non-keyword args"
+  :valueof (merge-keyword-vars '(1 2 3) () '(a b c))
+  :should be '(1 2 3))
+
+(test "merge-keyword-vars is idempotent with non-keyword dotted args"
+  :valueof (merge-keyword-vars '(1 2) () '(a . b))
+  :should be '(1 2))
+
+(test "merge-keyword-vars is idempotent with non-keyword rest args"
+  :valueof (merge-keyword-vars '(1 2) () '(a &rest b))
+  :should be '(1 2))
+
+(test "wc-complex-bind handles an optional keyword param"
+  :valueof (wc-complex-bind (a) '(:a 1) a)
+  :should be 1)
+
+(eval (wc '(def foo11(a b) (- a b))))
+(test "allow param names"
+  :valueof (foo11 :a 3 :b 4)
+  :should be -1)
+
+(test "allow just some param names"
+  :valueof (foo11 :a 3 4)
+  :should be -1)
+
+(test "allow args in any order when giving param names"
+  :valueof (foo11 :b 3 :a 4)
+  :should be 1)
+
+(test "take positional args in order after keyword args have been matched"
+  :valueof (foo11 3 :a 4)
+  :should be 1)
+
+(test "strip-default-values works"
+  :valueof (strip-default-values '(a (b 2)))
+  :should be '(a b))
+
+(test "strip-default-values works when the default val is nil"
+  :valueof (strip-default-values '(a (b nil)))
+  :should be '(a b))
+
+(test "strip-default-values passes through expressions needing destructuring"
+  :valueof (strip-default-values '(a (b c)))
+  :should be '(a (b c)))
+
+(test "simplify-arg-list passes lists through by default"
+  :valueof (simplify-arg-list '(a b))
+  :should be '(a b))
+
+(test "simplify-arg-list strips default values"
+  :valueof (simplify-arg-list '(a (b 2)))
+  :should be '(a b))
+
+(test "simplify-arg-list works on dotted lists"
+  :valueof (simplify-arg-list '(a . b))
+  :should be '(a &rest b))
+
+(test "add-optional-vars works"
+  :valueof (add-optional-vars '(a (b 2)) ())
+  :should be '((b . 2)))
+
+(eval (wc '(def foo12(a (b 2)) (cons a b))))
+(test "optional param"
+  :valueof (foo12 3)
+  :should be '(3 . 2))

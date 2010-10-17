@@ -19,19 +19,6 @@
   :valueof (foo3 2)
   :should be 4)
 
-(setq foofoo (lambda() 3))
-(test "no need for funcall on function atoms"
-  :valueof (foofoo)
-  :should be 3)
-
-(test "no need for funcall on function forms"
-  :valueof ((lambda() 3))
-  :should be 3)
-
-(test "no need for funcall on function forms with args"
-  :valueof ((lambda(a) (+ a 3)) 2)
-  :should be 5)
-
 (eval (wc '(def foo4() 34)))
 (test "simple def"
   :valueof (foo4)
@@ -94,6 +81,27 @@
   :valueof ([+ _ 1] 3)
   :should be 4)
 
+(setq foo10 (lambda() 3))
+(test "no need for funcall on function atoms"
+  :valueof (foo10)
+  :should be 3)
+
+(test "no need for funcall on function forms"
+  :valueof ((lambda() 3))
+  :should be 3)
+
+(test "no need for funcall on function forms with args"
+  :valueof ((lambda(a) (+ a 3)) 2)
+  :should be 5)
+
+(test "non-top-level calls require funcall"
+  :valueof (let ((a 1)) (funcall (fn() a)))
+  :should be 1)
+
+(pending-test "no need for funcall with non-top-level function forms"
+  :valueof (let ((a 1)) ((fn() a)))
+  :should be 1)
+
 (test "remove-if-cons works"
   :valueof (remove-if-cons #'oddp '(1 2 3 4))
   :should be '(2 4))
@@ -142,53 +150,75 @@
   :valueof (merge-keyword-vars '(1 2 3) () '(a b c))
   :should be '(1 2 3))
 
+(test "merge-keyword-vars is idempotent with non-keyword dotted args"
+  :valueof (merge-keyword-vars '(1 2) () '(a . b))
+  :should be '(1 2))
+
 (test "merge-keyword-vars is idempotent with non-keyword rest args"
-  :valueof (merge-keyword-vars '(1 2 3) () '(a . b))
-  :should be '(1 2 3))
+  :valueof (merge-keyword-vars '(1 2) () '(a &rest b))
+  :should be '(1 2))
 
 (test "wc-complex-bind handles an optional keyword param"
   :valueof (wc-complex-bind (a) '(:a 1) a)
   :should be 1)
 
-(eval (wc '(def foo10(a b) (- a b))))
+(eval (wc '(def foo11(a b) (- a b))))
 (test "allow param names"
-  :valueof (foo10 :a 3 :b 4)
+  :valueof (foo11 :a 3 :b 4)
   :should be -1)
 
 (test "allow just some param names"
-  :valueof (foo10 :a 3 4)
+  :valueof (foo11 :a 3 4)
   :should be -1)
 
 (test "allow args in any order when giving param names"
-  :valueof (foo10 :b 3 :a 4)
+  :valueof (foo11 :b 3 :a 4)
   :should be 1)
 
 (test "take positional args in order after keyword args have been matched"
-  :valueof (foo10 3 :a 4)
+  :valueof (foo11 3 :a 4)
   :should be 1)
 
-(test "1"
-  :valueof (add-optional-vars '(a (b 2)) ())
-  :should be '((b . 2)))
-
-(test "2"
-  :valueof (strip-optional-keywords '(a (b 2)))
+(test "strip-default-values works"
+  :valueof (strip-default-values '(a (b 2)))
   :should be '(a b))
 
-(test "3"
+(test "strip-default-values works when the default val is nil"
+  :valueof (strip-default-values '(a (b nil)))
+  :should be '(a b))
+
+(test "strip-default-values passes through expressions needing destructuring"
+  :valueof (strip-default-values '(a (b c)))
+  :should be '(a (b c)))
+
+(test "simplify-arg-list passes lists through by default"
+  :valueof (simplify-arg-list '(a b))
+  :should be '(a b))
+
+(test "simplify-arg-list strips default values"
   :valueof (simplify-arg-list '(a (b 2)))
   :should be '(a b))
 
-(test "4"
-  :valueof (deduce-vals '(a (b 2)) '(3))
-  :should be '((3) ((b . 2))))
+(test "simplify-arg-list works on dotted lists"
+  :valueof (simplify-arg-list '(a . b))
+  :should be '(a &rest b))
 
-(eval (wc '(def foo11(a (b 2)) (cons a b))))
+(test "add-optional-vars works"
+  :valueof (add-optional-vars '(a (b 2)) ())
+  :should be '((b . 2)))
+
+(eval (wc '(def foo12(a (b 2)) (cons a b))))
 (test "optional param"
-  :valueof (foo11 3)
+  :valueof (foo12 3)
   :should be '(3 . 2))
 
-"args should override optional params"
+(test "allow optional params to refer to variables"
+  :valueof (let ((a 2)) (funcall (fn((x 3)) x)))
+  :should be 3)
+
+(test "args should override optional params"
+  :valueof (foo12 3 4)
+  :should be '(3 . 4))
 
 (test "distinguish destructured from optional params"
   :valueof ((fn((a b)) (list a b)) '(1 (2)))
@@ -197,10 +227,6 @@
 (test "distinguish destructured from optional params - 2"
   :valueof ((fn((a (b))) (list a b)) '(1 (2)))
   :should be '(1 2))
-
-(test "allow optional params to refer to variables"
-  :valueof (let ((a 2)) ((fn((x 3)) x)))
-  :should be 3)
 
 (test "optional param must come at the end"
   :given (def foo(a :o b c) (cons a b))
