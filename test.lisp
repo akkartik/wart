@@ -238,6 +238,14 @@
   :should be '(3 . 2))
 
 (test "optional arg without naming"
+  :valueof (foo13 3 2)
+  :should be '(3 . 2))
+
+(test "nil overrides default for optional arg"
+  :valueof (foo13 3 :b nil)
+  :should be '(3))
+
+(test "nil overrides default for optional arg without naming"
   :valueof (foo13 3 nil)
   :should be '(3))
 

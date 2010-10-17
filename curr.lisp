@@ -129,7 +129,7 @@
 
 (defun optional-var(var &optional alist)
   (if (and (consp var)
-           (not (alref (car var) alist)))
+           (not (assoc (car var) alist)))
     (destructuring-bind (sym val &rest rest) var
       (and (symbolp sym)
            (atom val)
