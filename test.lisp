@@ -350,6 +350,10 @@
   :valueof (wc '(defun foo18(n) (let it n (+ it 1))))
   :should be '(defun foo18(n) (wc-let it n (+ it 1))))
 
+(test "wc works through backquote"
+  :valueof (wc '`(let it ,n (+ it 1)))
+  :should be '`(wc-let it ,n (+ it 1)))
+
 (test "wc works through defmacro"
   :valueof (wc '(defmacro foo18(n) `(let it ,n (+ it 1))))
   :should be '(defmacro foo18(n) `(wc-let it ,n (+ it 1))))
