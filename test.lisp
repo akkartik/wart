@@ -250,7 +250,7 @@
   :valueof (wc-let a 2 (funcall (fn((x a)) x)))
   :should be 3)
 
-(eval '(wc (def foo15(a (b 4) (c nil)) (cons b c))))
+(eval (wc '(def foo15(a (b 4) (c nil)) (cons b c))))
 (test-wc "multiple optional args"
   :valueof (foo15 3)
   :should be '(4))
@@ -263,12 +263,12 @@
   :valueof (foo15 3 nil 2)
   :should be '(nil . 2))
 
-(eval '(wc (def foo16(a . b) b)))
+(eval (wc '(def foo16(a . b) b)))
 (test-wc "rest args can be named"
   :valueof (foo16 3 :b 4 5)
   :should be '(4 5))
 
-(eval '(wc (def foo17(a (b 3) . c) (cons b c))))
+(eval (wc '(def foo17(a (b 3) . c) (cons b c))))
 (test-wc "optional + named rest args"
   :valueof (foo17 2 :c 3)
   :should be '(3 3))
@@ -285,7 +285,7 @@
   :valueof (foo17 2 :b 4 3)
   :should be '(4 3))
 
-(eval '(wc (def foo18(a (b nil) (c 3) . body) (list b c body))))
+(eval (wc '(def foo18(a (b nil) (c 3) . body) (list b c body))))
 (test-wc "call with some optional and rest args without naming"
   :valueof (foo18 3 4 :body 4 5)
   :should be '(4 3 (4 5)))
@@ -356,13 +356,9 @@
   :valueof (wc '(defun foo(n) (let it n (+ it 1))))
   :should be '(defun foo(n) (wc-let it n (+ it 1))))
 
-(test "lookup-quoted-handler handles function-names"
+(test-wc "lookup-quoted-handler handles function-names"
   :valueof (lookup-quoted-handler 'let)
   :should be 'wc-let)
-
-(test "lookup-handler handles quoted special names"
-  :valueof (lookup-handler '(quote let))
-  :should be '(quote wc-let))
 
 (test "wc-1 handles quoted special names"
   :valueof (wc-1 '(quote let))
@@ -380,7 +376,7 @@
   :valueof (wc '(defmacro foo(n) `(let it ,n (+ it 1))))
   :should be '(defmacro foo(n) `(wc-let it ,n (+ it 1))))
 
-(eval '(wc (mac aand(a b) `(let it ,a (and it ,b)))))
+(eval (wc '(mac aand(a b) `(let it ,a (and it ,b)))))
 (test-wc "macro bodies should pass through the compiler"
   :valueof (let x 3 (aand (- x 1) (> it 1)))
   :should be t)

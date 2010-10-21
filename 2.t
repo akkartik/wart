@@ -34,7 +34,12 @@
   :valueof (foo6)
   :should be (cons 3 4))
 
-(eval (wc '(def foo7(a . b) b)))
+(eval (wc '(def foo7 args args)))
+(test-wc "just a rest arg without parens"
+    :valueof (foo7 3 4 5)
+    :should be '(3 4 5))
+
+(eval (wc '(def foo8(a . b) b)))
 (test-wc "dotted rest"
-  :valueof (foo7 3 4)
+  :valueof (foo8 3 4)
   :should be '(4))

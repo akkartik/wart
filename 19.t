@@ -111,22 +111,6 @@
   :valueof (wc-let a 1 ((fn() a)))
   :should be 1)
 
-(test-wc "remove-if-cons works"
-  :valueof (remove-if-cons #'oddp '(1 2 3 4))
-  :should be '(2 4))
-
-(test-wc "remove-if-cons works on dotted lists"
-  :valueof (remove-if-cons #'oddp '(1 2 3 . 4))
-  :should be '(2 . 4))
-
-(test-wc "remove-if-cons works on dotted lists with passing rest"
-  :valueof (remove-if-cons #'evenp '(1 2 3 . 4))
-  :should be '(1 3))
-
-(test-wc "remove-if-cons works on dotted lists with nil rest"
-  :valueof (remove-if-cons #'evenp '(1 2 3 . nil))
-  :should be '(1 3))
-
 (test-wc "wc-complex-bind handles simple args"
   :valueof (wc-complex-bind (a b) '(1 2) b)
   :should be 2)
@@ -147,20 +131,36 @@
   :valueof (partition-keywords '(1 2 :c 3))
   :should be (list '(1 2) '((c . 3))))
 
-(test-wc "merge-keyword-vars takes args from list giving priority to hash"
-  :valueof (merge-keyword-vars '(1 3) '((b . 2)) '(a b c))
+(test-wc "merge-keyword-vars takes args from list giving priority to keyword hash"
+  :valueof (merge-keyword-vars '(1 3) '((b . 2)) () '(a b c))
   :should be '(1 2 3))
 
+(test-wc "merge-keyword-vars takes args from optional hash"
+  :valueof (merge-keyword-vars '(1 3) '((b . 2)) '((d . 1)) '(a b c d))
+  :should be '(1 2 3 1))
+
+(test-wc "merge-keyword-vars lets args from keyword hash override optional args"
+  :valueof (merge-keyword-vars '(1 3) '((b . 2) (d . 3)) '((d . 1)) '(a b c d))
+  :should be '(1 2 3 3))
+
+(test-wc "merge-keyword-vars lets args from list override optional args"
+  :valueof (merge-keyword-vars '(1 3 4) '((b . 2)) '((d . 1)) '(a b c d))
+  :should be '(1 2 3 4))
+
+(test-wc "merge-keyword-vars works in the presence of optional and rest args"
+  :valueof (merge-keyword-vars '(2) '((c 4)) '((b . 3)) '(a b &rest c))
+  :should be '(2 3 4))
+
 (test-wc "merge-keyword-vars is idempotent with non-keyword args"
-  :valueof (merge-keyword-vars '(1 2 3) () '(a b c))
+  :valueof (merge-keyword-vars '(1 2 3) () () '(a b c))
   :should be '(1 2 3))
 
 (test-wc "merge-keyword-vars is idempotent with non-keyword dotted args"
-  :valueof (merge-keyword-vars '(1 2) () '(a . b))
+  :valueof (merge-keyword-vars '(1 2) () () '(a . b))
   :should be '(1 2))
 
 (test-wc "merge-keyword-vars is idempotent with non-keyword rest args"
-  :valueof (merge-keyword-vars '(1 2) () '(a &rest b))
+  :valueof (merge-keyword-vars '(1 2) () () '(a &rest b))
   :should be '(1 2))
 
 (test-wc "wc-complex-bind handles an optional keyword param"
@@ -208,14 +208,6 @@
   :valueof (simplify-arg-list '(a . b))
   :should be '(a &rest b))
 
-(test-wc "add-optional-vars works"
-  :valueof (add-optional-vars '(a (b 2)) ())
-  :should be '((b . 2)))
-
-(test-wc "add-optional-vars doesn't override existing vals"
-  :valueof (add-optional-vars '(a (b 2)) '((b . 1)))
-  :should be '((b . 1)))
-
 (eval (wc '(def foo13(a (b nil)) (cons a b))))
 (test-wc "optional param"
   :valueof (foo13 3)
@@ -237,3 +229,154 @@
 (test-wc "distinguish destructured from optional params - 2"
   :valueof ((fn((a (b))) (list a b)) '(1 (2)))
   :should be '(1 2))
+
+(test-wc "args should override optional params"
+  :valueof (foo14 3 :b 2)
+  :should be '(3 . 2))
+
+(test-wc "optional arg without naming"
+  :valueof (foo14 3 2)
+  :should be '(3 . 2))
+
+(test-wc "nil overrides default for optional arg"
+  :valueof (foo14 3 :b nil)
+  :should be '(3))
+
+(test-wc "nil overrides default for optional arg without naming"
+  :valueof (foo14 3 nil)
+  :should be '(3))
+
+(pending-test-wc "allow optional params to refer to variables"
+  :valueof (wc-let a 2 (funcall (fn((x a)) x)))
+  :should be 3)
+
+(eval (wc '(def foo15(a (b 4) (c nil)) (cons b c))))
+(test-wc "multiple optional args"
+  :valueof (foo15 3)
+  :should be '(4))
+
+(test-wc "allow optional named args out of order"
+  :valueof (foo15 3 :c 2 :b nil)
+  :should be '(nil . 2))
+
+(test-wc "allow optional args in order without naming"
+  :valueof (foo15 3 nil 2)
+  :should be '(nil . 2))
+
+(eval (wc '(def foo16(a . b) b)))
+(test-wc "rest args can be named"
+  :valueof (foo16 3 :b 4 5)
+  :should be '(4 5))
+
+(eval (wc '(def foo17(a (b 3) . c) (cons b c))))
+(test-wc "optional + named rest args"
+  :valueof (foo17 2 :c 3)
+  :should be '(3 3))
+
+(test-wc "optional + named rest args - 2"
+  :valueof (foo17 2 4 :c 3)
+  :should be '(4 3))
+
+(test-wc "optional + named rest args - 3"
+  :valueof (foo17 2 4 3 1)
+  :should be '(4 3 1))
+
+(test-wc "optional + named rest args - 3"
+  :valueof (foo17 2 :b 4 3)
+  :should be '(4 3))
+
+(eval (wc '(def foo18(a (b nil) (c 3) . body) (list b c body))))
+(test-wc "call with some optional and rest args without naming"
+  :valueof (foo18 3 4 :body 4 5)
+  :should be '(4 3 (4 5)))
+
+(test-wc "call with some named optional and rest args"
+  :valueof (foo18 3 :c 4 :body 4 5)
+  :should be '(nil 4 (4 5)))
+
+(format t "~%")
+(test-wc "new redefined let"
+  :valueof (let a 3 a)
+  :should be 3)
+
+(test-wc "tuples works"
+  :valueof (tuples '(1 2 3 4 5 6) 3)
+  :should be '((1 2 3) (4 5 6)))
+
+(test-wc "tuples works with unbalanced lists"
+  :valueof (tuples '(1 2 3 4 5) 3)
+  :should be '((1 2 3) (4 5)))
+
+(test-wc "tuples works with n 1"
+  :valueof (tuples '(1 2 3 4 5) 1)
+  :should be (map 'list #'list '(1 2 3 4 5)))
+
+(test-wc "new redefined if with one branch"
+  :valueof (if nil 3)
+  :should be nil)
+
+(test-wc "new redefined if with one branch - 2"
+  :valueof (if t 3)
+  :should be 3)
+
+(test-wc "new redefined if with two branches"
+  :valueof (if t 3 4)
+  :should be 3)
+
+(test-wc "new redefined if with two branches - 2"
+  :valueof (if nil 3 4)
+  :should be 4)
+
+(test-wc "new redefined if with three branches"
+  :valueof (if (> 3 2) 3 (> 3 4) 5 6)
+  :should be 3)
+
+(test-wc "new redefined if with three branches - 2"
+  :valueof (if (< 3 2) 3 (< 3 4) 5 6)
+  :should be 5)
+
+(test-wc "new redefined if with three branches - 3"
+  :valueof (if (< 3 2) 3 (< 3 3) 5 6)
+  :should be 6)
+
+(test-wc "combine all these keywords"
+  :valueof (let a 3 (if (> a 5) 5
+                        (> a 4) 4
+                        (> a 3) 3
+                        (> a 2) "correct"
+                                "Default"))
+  :should be "correct")
+
+(test-wc "new keyword - with"
+  :valueof (with (a 3) a)
+  :should be 3)
+
+(format t "~%")
+(test-wc "wc works through defuns"
+  :valueof (wc '(defun foo(n) (let it n (+ it 1))))
+  :should be '(defun foo(n) (wc-let it n (+ it 1))))
+
+(test-wc "lookup-quoted-handler handles function-names"
+  :valueof (lookup-quoted-handler 'let)
+  :should be 'wc-let)
+
+(test "wc-1 handles quoted special names"
+  :valueof (wc-1 '(quote let))
+  :should be '(quote wc-let))
+
+(test "wc handles quoted special names"
+  :valueof (wc '(backq-list* 'let))
+  :should be '(backq-list* 'wc-let))
+
+(test-wc "wc works through backquote"
+  :valueof (wc-let n 3 `(let it ,n (+ it 1)))
+  :should be '(wc-let it 3 (+ it 1)))
+
+(test "wc works through defmacro"
+  :valueof (wc '(defmacro foo(n) `(let it ,n (+ it 1))))
+  :should be '(defmacro foo(n) `(wc-let it ,n (+ it 1))))
+
+(eval (wc '(mac aand(a b) `(let it ,a (and it ,b)))))
+(test-wc "macro bodies should pass through the compiler"
+  :valueof (let x 3 (aand (- x 1) (> it 1)))
+  :should be t)

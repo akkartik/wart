@@ -34,13 +34,18 @@
   :valueof (foo6)
   :should be (cons 3 4))
 
-(eval (wc '(def foo7(a . b) b)))
+(eval (wc '(def foo7 args args)))
+(test-wc "just a rest arg without parens"
+    :valueof (foo7 3 4 5)
+    :should be '(3 4 5))
+
+(eval (wc '(def foo8(a . b) b)))
 (test-wc "dotted rest"
-  :valueof (foo7 3 4)
+  :valueof (foo8 3 4)
   :should be '(4))
 
 (test-wc "rest args are optional"
-  :valueof (foo7 3)
+  :valueof (foo8 3)
   :should be nil)
 
 (test-wc "wc-destructuring-bind handles plain vars"
@@ -67,14 +72,14 @@
   :valueof (wc-destructuring-bind ((a b) (c d) &rest e) '((1 2) (3 4) 5 6 7) (cons c e))
   :should be '(3 5 6 7))
 
-(eval (wc '(def foo8((a b)) b)))
+(eval (wc '(def foo9((a b)) b)))
 (test-wc "destructured args"
-  :valueof (foo8 '(3 4))
+  :valueof (foo9 '(3 4))
   :should be 4)
 
-(eval (wc '(def foo9((a b) . c) b)))
+(eval (wc '(def foo10((a b) . c) b)))
 (test-wc "destructured args + dotted rest"
-  :valueof (foo9 '(3 4) 5)
+  :valueof (foo10 '(3 4) 5)
   :should be 4)
 
 (test-wc "destructured args + dotted rest for fn"
@@ -85,9 +90,9 @@
   :valueof ([+ _ 1] 3)
   :should be 4)
 
-(setq foo10 (lambda() 3))
+(setq foo11 (lambda() 3))
 (test-wc "no need for funcall on function atoms"
-  :valueof (foo10)
+  :valueof (foo11)
   :should be 3)
 
 (test-wc "no need for funcall on function forms"
@@ -162,21 +167,21 @@
   :valueof (wc-complex-bind (a) '(:a 1) a)
   :should be 1)
 
-(eval (wc '(def foo11(a b) (- a b))))
+(eval (wc '(def foo12(a b) (- a b))))
 (test-wc "allow param names"
-  :valueof (foo11 :a 3 :b 4)
+  :valueof (foo12 :a 3 :b 4)
   :should be -1)
 
 (test-wc "allow just some param names"
-  :valueof (foo11 :a 3 4)
+  :valueof (foo12 :a 3 4)
   :should be -1)
 
 (test-wc "allow args in any order when giving param names"
-  :valueof (foo11 :b 3 :a 4)
+  :valueof (foo12 :b 3 :a 4)
   :should be 1)
 
 (test-wc "take positional args in order after keyword args have been matched"
-  :valueof (foo11 3 :a 4)
+  :valueof (foo12 3 :a 4)
   :should be 1)
 
 (test-wc "strip-default-values works"
@@ -203,18 +208,18 @@
   :valueof (simplify-arg-list '(a . b))
   :should be '(a &rest b))
 
-(eval (wc '(def foo12(a (b nil)) (cons a b))))
+(eval (wc '(def foo13(a (b nil)) (cons a b))))
 (test-wc "optional param"
-  :valueof (foo12 3)
+  :valueof (foo13 3)
   :should be '(3))
 
-(eval (wc '(def foo13(a (b 4)) (cons a b))))
+(eval (wc '(def foo14(a (b 4)) (cons a b))))
 (test-wc "optional param with a default"
-  :valueof (foo13 3)
+  :valueof (foo14 3)
   :should be '(3 . 4))
 
 (test-wc "optional named arg"
-  :valueof (foo13 :a 3)
+  :valueof (foo14 :a 3)
   :should be '(3 . 4))
 
 (test-wc "distinguish destructured from optional params"
@@ -226,67 +231,67 @@
   :should be '(1 2))
 
 (test-wc "args should override optional params"
-  :valueof (foo13 3 :b 2)
+  :valueof (foo14 3 :b 2)
   :should be '(3 . 2))
 
 (test-wc "optional arg without naming"
-  :valueof (foo13 3 2)
+  :valueof (foo14 3 2)
   :should be '(3 . 2))
 
 (test-wc "nil overrides default for optional arg"
-  :valueof (foo13 3 :b nil)
+  :valueof (foo14 3 :b nil)
   :should be '(3))
 
 (test-wc "nil overrides default for optional arg without naming"
-  :valueof (foo13 3 nil)
+  :valueof (foo14 3 nil)
   :should be '(3))
 
 (pending-test-wc "allow optional params to refer to variables"
   :valueof (wc-let a 2 (funcall (fn((x a)) x)))
   :should be 3)
 
-(eval '(wc (def foo14(a (b 4) (c nil)) (cons b c))))
+(eval (wc '(def foo15(a (b 4) (c nil)) (cons b c))))
 (test-wc "multiple optional args"
-  :valueof (foo14 3)
+  :valueof (foo15 3)
   :should be '(4))
 
 (test-wc "allow optional named args out of order"
-  :valueof (foo14 3 :c 2 :b nil)
+  :valueof (foo15 3 :c 2 :b nil)
   :should be '(nil . 2))
 
 (test-wc "allow optional args in order without naming"
-  :valueof (foo14 3 nil 2)
+  :valueof (foo15 3 nil 2)
   :should be '(nil . 2))
 
-(eval '(wc (def foo15(a . b) b)))
+(eval (wc '(def foo16(a . b) b)))
 (test-wc "rest args can be named"
-  :valueof (foo15 3 :b 4 5)
+  :valueof (foo16 3 :b 4 5)
   :should be '(4 5))
 
-(eval '(wc (def foo16(a (b 3) . c) (cons b c))))
+(eval (wc '(def foo17(a (b 3) . c) (cons b c))))
 (test-wc "optional + named rest args"
-  :valueof (foo16 2 :c 3)
+  :valueof (foo17 2 :c 3)
   :should be '(3 3))
 
 (test-wc "optional + named rest args - 2"
-  :valueof (foo16 2 4 :c 3)
+  :valueof (foo17 2 4 :c 3)
   :should be '(4 3))
 
 (test-wc "optional + named rest args - 3"
-  :valueof (foo16 2 4 3 1)
+  :valueof (foo17 2 4 3 1)
   :should be '(4 3 1))
 
 (test-wc "optional + named rest args - 3"
-  :valueof (foo16 2 :b 4 3)
+  :valueof (foo17 2 :b 4 3)
   :should be '(4 3))
 
-(eval '(wc (def foo17(a (b nil) (c 3) . body) (list b c body))))
+(eval (wc '(def foo18(a (b nil) (c 3) . body) (list b c body))))
 (test-wc "call with some optional and rest args without naming"
-  :valueof (foo17 3 4 :body 4 5)
+  :valueof (foo18 3 4 :body 4 5)
   :should be '(4 3 (4 5)))
 
 (test-wc "call with some named optional and rest args"
-  :valueof (foo17 3 :c 4 :body 4 5)
+  :valueof (foo18 3 :c 4 :body 4 5)
   :should be '(nil 4 (4 5)))
 
 (format t "~%")

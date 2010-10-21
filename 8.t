@@ -34,10 +34,19 @@
   :valueof (foo6)
   :should be (cons 3 4))
 
-(eval (wc '(def foo7(a . b) b)))
+(eval (wc '(def foo7 args args)))
+(test-wc "just a rest arg without parens"
+    :valueof (foo7 3 4 5)
+    :should be '(3 4 5))
+
+(eval (wc '(def foo8(a . b) b)))
 (test-wc "dotted rest"
-  :valueof (foo7 3 4)
+  :valueof (foo8 3 4)
   :should be '(4))
+
+(test-wc "rest args are optional"
+  :valueof (foo8 3)
+  :should be nil)
 
 (test-wc "wc-destructuring-bind handles plain vars"
   :valueof (wc-destructuring-bind a 1 a)
@@ -63,14 +72,14 @@
   :valueof (wc-destructuring-bind ((a b) (c d) &rest e) '((1 2) (3 4) 5 6 7) (cons c e))
   :should be '(3 5 6 7))
 
-(eval (wc '(def foo8((a b)) b)))
+(eval (wc '(def foo9((a b)) b)))
 (test-wc "destructured args"
-  :valueof (foo8 '(3 4))
+  :valueof (foo9 '(3 4))
   :should be 4)
 
-(eval (wc '(def foo9((a b) . c) b)))
+(eval (wc '(def foo10((a b) . c) b)))
 (test-wc "destructured args + dotted rest"
-  :valueof (foo9 '(3 4) 5)
+  :valueof (foo10 '(3 4) 5)
   :should be 4)
 
 (test-wc "destructured args + dotted rest for fn"
@@ -81,9 +90,9 @@
   :valueof ([+ _ 1] 3)
   :should be 4)
 
-(setq foo10 (lambda() 3))
+(setq foo11 (lambda() 3))
 (test-wc "no need for funcall on function atoms"
-  :valueof (foo10)
+  :valueof (foo11)
   :should be 3)
 
 (test-wc "no need for funcall on function forms"

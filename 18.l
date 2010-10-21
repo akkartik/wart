@@ -186,11 +186,6 @@
 
 
 
-; Beware of cycles. Handler output goes back into the compiler.
-
-; We're hosed if we ever need to macroexpand during compilation.
-; We won't be able to use any common lisp libraries that use let, if, etc.
-
 (defmacro special-form(name var &body body)
   `(setf (gethash ',name *wc-special-form-handlers*)
     (lambda(,var)
@@ -208,11 +203,6 @@
   (if (and (consp sexp) (null (cdr sexp)))
     (cons t sexp)
     (cons (car sexp) (insert-t-in-penultimate-position (cdr sexp)))))
-
-; with can be a macro since we aren't overriding an existing keyword
-(defmacro with(binds &body body)
-  `(let ,(tuples binds 2)
-     ,@body))
 
 
 
@@ -248,6 +238,11 @@
               (apply-to-all-leaves f (cdr sexp))))))
 
 
+
+; with can be a macro since we aren't overriding an existing keyword
+(defmacro with(binds &body body)
+  `(let ,(tuples binds 2)
+     ,@body))
 
 (defmacro synonym(&rest args)
   `(setf ,@(mapcar (lambda (x)

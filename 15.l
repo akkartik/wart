@@ -183,11 +183,6 @@
 
 
 
-; Beware of cycles. Handler output goes back into the compiler.
-
-; We're hosed if we ever need to macroexpand during compilation.
-; We won't be able to use any common lisp libraries that use let, if, etc.
-
 (defmacro special-form(name var &body body)
   `(setf (gethash ',name *wc-special-form-handlers*)
     (lambda(,var)
