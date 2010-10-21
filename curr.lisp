@@ -14,15 +14,15 @@
   (apply-to-all-subtrees #'wc-1 sexp))
 
 (defun wc-1(sexp)
-  (prn sexp)
-(prn
+;?   (prn sexp)
+;? (prn
   (if (consp sexp)
     (wc-let handler (lookup-handler sexp)
       (if handler
         (funcall handler sexp)
         sexp))
     sexp)
-"=>")
+;? "=>")
 )
 
 (defun lookup-handler(sexp)
@@ -208,6 +208,9 @@
     (setq sexp (insert-t-in-penultimate-position sexp)))
   `(cond ,@(tuples (cdr sexp) 2)))
 
+(special-form backquote sexp
+  (format t "backquote~%"))
+
 (defun insert-t-in-penultimate-position(sexp)
   (if (and (consp sexp) (null (cdr sexp)))
     (cons t sexp)
@@ -239,9 +242,20 @@
       (cons (car xs) (firstn (1- n) (cdr xs)))))
 
 (defun apply-to-all-subtrees(f sexp)
+(prn sexp "aa")
+(when (consp sexp)
+  (prn (car sexp) "ab")
+  (prn (symbol-name (car sexp)) "ab")
+  (prn (equal (car sexp) 'BACKQ-LIST*) "ac")
+  (prn (equal (symbol-name (car sexp)) "BACKQ-LIST*") "ad"))
+(prn
   (if (consp sexp)
-    (funcall f (apply-to-all-leaves (lambda(_) (apply-to-all-subtrees f _)) sexp))
-    sexp))
+    (if (equal (symbol-name (car sexp)) "BACKQ-LIST*")
+      (cons 'backq-list* (apply-to-all-leaves f (cdr sexp)))
+      (funcall f (apply-to-all-leaves (lambda(_) (apply-to-all-subtrees f _)) sexp)))
+    sexp)
+"=>")
+)
 
 (defun apply-to-all-leaves(f sexp)
   (cond
@@ -270,4 +284,9 @@
          err error
          keep remove-if-not)
 
-(prn (wc '(defmacro foo18(n) `(let it ,n (+ it 1)))))
+;? (let ((n 3))
+;?   (prn (wc `(let it ,n it))))
+;? (format t "~%")
+(prn (wc '`(let it ,n it)))
+;? (format t "~%")
+;? (prn (wc '(defmacro foo18(n) `(let it ,n it))))
