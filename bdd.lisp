@@ -9,13 +9,3 @@
 
 (defmacro be(&rest args)
   `(equal ,@args))
-
-(defun bdd1() 3)
-(test "test framework works"
-  :valueof (bdd1)
-  :should be 3)
-
-(defun bdd1() 4)
-(test "test framework reloads functions"
-  :valueof (bdd1)
-  :should > 3)

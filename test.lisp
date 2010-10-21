@@ -354,11 +354,11 @@
   :valueof (wc '`(let it ,n (+ it 1)))
   :should be '`(wc-let it ,n (+ it 1)))
 
-(test "wc works through defmacro"
+(pending-test "wc works through defmacro"
   :valueof (wc '(defmacro foo18(n) `(let it ,n (+ it 1))))
   :should be '(defmacro foo18(n) `(wc-let it ,n (+ it 1))))
 
 (eval '(wc (mac aand(a b) `(let it ,a (and it ,b)))))
-(test "macro bodies should pass through the compiler"
+(pending-test "macro bodies should pass through the compiler"
   :valueof (let x 3 (aand (- x 1) (> it 1)))
   :should be t)
