@@ -16,21 +16,34 @@
 (defun wc-1(sexp)
   (if (consp sexp)
     (wc-let handler (lookup-handler sexp)
-      (if handler
-        (funcall handler sexp)
-        sexp))
+      (cond ((null handler)   sexp)
+            ((functionp handler)  (funcall handler sexp))
+            (t  handler)))
     sexp))
 
 (defun lookup-handler(sexp)
+  (if (and (equal (car sexp) 'quote) (null (cddr sexp)))
+    (list 'quote (lookup-quoted-handler (cadr sexp)))
+    (lookup-unquoted-handler sexp)))
+
+(defun lookup-unquoted-handler(sexp)
   (cond ((function-name (car sexp))   (lambda(sexp) (cons 'funcall sexp)))
         ((function-form (car sexp))   (lambda(sexp) (cons 'funcall sexp)))
         (t
           (or (gethash (car sexp) *wc-special-form-handlers*)
               (gethash (type-of (car sexp)) *wc-type-handlers*)))))
 
+(defun lookup-quoted-handler(name)
+  (or (gethash name *wc-special-form-quoted-handlers*)
+      (gethash (type-of name) *wc-type-quoted-handlers*)
+      name))
+
 ;; handlers are functions of the input s-expr
 (defvar *wc-special-form-handlers* (make-hash-table))
 (defvar *wc-type-handlers* (make-hash-table))
+;; quoted handlers are names of the handlers; all handlers must be named
+(defvar *wc-special-form-quoted-handlers* (make-hash-table))
+(defvar *wc-type-quoted-handlers* (make-hash-table))
 
 
 
@@ -198,6 +211,7 @@
 
 (special-form let sexp
   (cons 'wc-let (cdr sexp)))
+(setf (gethash 'let *wc-special-form-quoted-handlers*) 'wc-let)
 
 (special-form if sexp
   (when (evenp (length sexp)) ; else
