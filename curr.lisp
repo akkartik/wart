@@ -54,14 +54,15 @@
   `(lambda ,@(compile-args args body)))
 
 (defmacro wc-complex-bind(vars vals &body body)
-  (wc-let simplified-vars (simplify-arg-list vars)
-    `(destructuring-bind (positional-vals keyword-alist)
-                         (partition-keywords ,vals (rest-var (wc-restify ',vars)))
-      (wc-let optional-alist (optional-vars ',vars)
-        (wc-destructuring-bind ,simplified-vars
-            (merge-keyword-vars positional-vals keyword-alist optional-alist
-                                ',simplified-vars)
-          ,@body)))))
+  (wc-let restified-vars (wc-restify vars)
+    (wc-let simplified-vars (strip-default-values restified-vars)
+      `(destructuring-bind (positional-vals keyword-alist)
+                           (partition-keywords ,vals (rest-var ',restified-vars))
+        (wc-let optional-alist (optional-vars ',restified-vars)
+          (wc-destructuring-bind ,simplified-vars
+              (merge-keyword-vars positional-vals keyword-alist optional-alist
+                                  ',simplified-vars)
+            ,@body))))))
 
 (defmacro wc-destructuring-bind(vars vals &body body)
   (wc-let gval (gensym)
@@ -85,9 +86,6 @@
       `((&rest ,gargs)
          (wc-complex-bind ,args ,gargs
            ,@body)))))
-
-(defun simplify-arg-list(args)
-  (strip-default-values (wc-restify args)))
 
 (defun partition-keywords(vals &optional rest-var alist)
   (if (consp vals)

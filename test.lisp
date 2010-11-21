@@ -196,17 +196,9 @@
   :valueof (strip-default-values '(a (b c)))
   :should be '(a (b c)))
 
-(test-wc "simplify-arg-list passes lists through by default"
-  :valueof (simplify-arg-list '(a b))
+(test-wc "strip-default-values passes lists through by default"
+  :valueof (strip-default-values '(a b))
   :should be '(a b))
-
-(test-wc "simplify-arg-list strips default values"
-  :valueof (simplify-arg-list '(a (b 2)))
-  :should be '(a b))
-
-(test-wc "simplify-arg-list works on dotted lists"
-  :valueof (simplify-arg-list '(a . b))
-  :should be '(a &rest b))
 
 (eval (wc '(def foo13(a (b nil)) (cons a b))))
 (test-wc "optional param"
