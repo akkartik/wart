@@ -107,7 +107,7 @@
   :valueof (wc-let a 1 (funcall (fn() a)))
   :should be 1)
 
-(pending-test-wc "no need for funcall with non-top-level function forms"
+(test-wc "no need for funcall with non-top-level function forms"
   :valueof (wc-let a 1 ((fn() a)))
   :should be 1)
 
