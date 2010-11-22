@@ -327,6 +327,10 @@
   :valueof (let a 3 a)
   :should be 3)
 
+(test-wc "let destructures"
+  :valueof (let (a b) '(3 4) a)
+  :should be 3)
+
 (test-wc "tuples works"
   :valueof (tuples '(1 2 3 4 5 6) 3)
   :should be '((1 2 3) (4 5 6)))
@@ -382,27 +386,27 @@
 (format t "~%")
 (test-wc "wc works through defuns"
   :valueof (wc '(defun foo(n) (let it n (+ it 1))))
-  :should be '(defun foo(n) (wc-let it n (+ it 1))))
+  :should be '(defun foo(n) (wc-let2 it n (+ it 1))))
 
 (test-wc "lookup-quoted-handler handles function-names"
   :valueof (lookup-quoted-handler 'let)
-  :should be 'wc-let)
+  :should be 'wc-let2)
 
 (test "wc-1 handles quoted special names"
   :valueof (wc-1 '(quote let))
-  :should be '(quote wc-let))
+  :should be '(quote wc-let2))
 
 (test "wc handles quoted special names"
   :valueof (wc '(backq-list* 'let))
-  :should be '(backq-list* 'wc-let))
+  :should be '(backq-list* 'wc-let2))
 
 (test-wc "wc works through backquote"
   :valueof (wc-let n 3 `(let it ,n (+ it 1)))
-  :should be '(wc-let it 3 (+ it 1)))
+  :should be '(wc-let2 it 3 (+ it 1)))
 
 (test "wc works through defmacro"
   :valueof (wc '(defmacro foo(n) `(let it ,n (+ it 1))))
-  :should be '(defmacro foo(n) `(wc-let it ,n (+ it 1))))
+  :should be '(defmacro foo(n) `(wc-let2 it ,n (+ it 1))))
 
 (eval (wc '(mac aand(a b) `(let it ,a (and it ,b)))))
 (test-wc "macro bodies should pass through the compiler"

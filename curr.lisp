@@ -193,7 +193,9 @@
      (setf (gethash ',name *wc-special-form-quoted-handlers*)
            ',new-name)))
 
-(special-form let wc-let)
+(defmacro wc-let2(var val &body body)
+  `(funcall (fn(,var) ,@body) ,val))
+(special-form let wc-let2)
 
 (defmacro wc-if(&rest args)
   (if (oddp (length args)) ; there's an else
