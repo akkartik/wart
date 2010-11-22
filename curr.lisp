@@ -8,7 +8,10 @@
 (defun wrepl()
   (loop
     (format t "w> ")(finish-output)
-    (format t "~a~%" (eval (wc (read))))))
+    (format t "~a~%" (wc-eval (read)))))
+
+(defun wc-eval(sexp)
+  (eval (wc sexp)))
 
 (defun wc(sexp)
   (apply-to-all-subtrees #'wc-1 sexp))
@@ -312,3 +315,17 @@
          macex1 macroexpand-1
          err error
          keep remove-if-not)
+
+(defun wload(file)
+  (with-open-file (f (merge-pathnames file))
+    (loop with form = (read f)
+          and eof = (gensym)
+      do
+        (prn form)
+        (wc-eval form)
+        (setq form (read f nil eof))
+      until (eq form eof))))
+;?     (let ((eof (gensym)))
+;?       (do ((form (read f) (read f nil eof)))
+;?           ((eq form eof) nil)
+;?        (wc-eval form)))))
