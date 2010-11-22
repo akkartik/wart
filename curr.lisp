@@ -135,27 +135,15 @@
 
 (defun optional-vars(vars)
   (if (consp vars)
-    (if (optional-var (car vars))
-      (destructuring-bind (sym val) (car vars)
-        (cons (cons sym val)
-              (optional-vars (cdr vars))))
-      (optional-vars (cdr vars)))))
+    (alist (cdr (cut-at vars '(? &rest))))))
 
 (defun strip-default-values(args)
   (if (consp args)
-    (cons (if (optional-var (car args))
-            (caar args)
-            (car args))
-          (strip-default-values (cdr args)))))
-
-(defun optional-var(var &optional alist)
-  (if (and (consp var)
-           (not (assoc (car var) alist)))
-    (destructuring-bind (sym val &rest rest) var
-      (and (symbolp sym)
-           (atom val)
-           (not (and val (symbolp val)))
-           (null rest)))))
+    (destructuring-bind (required optional rest) (partition args '(? &rest))
+      (if rest
+        (append required (map 'list #'car (tuples optional 2)) '(&rest) rest)
+        (append required (map 'list #'car (tuples optional 2)))))
+    args))
 
 (defun alref(key alist)
   (cdr (assoc key alist)))
@@ -233,10 +221,58 @@
     (nreverse acc)
     (tuples (nthcdr n xs) n (cons (firstn n xs) acc))))
 
+(defun alist(xs &optional acc)
+  (if (null xs)
+    acc
+    (alist (cddr xs) (cons (cons (car xs) (cadr xs))
+                            acc))))
+
 (defun firstn (n xs)
   (if (or (= n 0) (null xs))
       nil
       (cons (car xs) (firstn (1- n) (cdr xs)))))
+
+(defun cut-at(s delims)
+  (wc-let positions (map (type-of s) (lambda(x) (position x s)) delims)
+    (if (car positions)
+      (apply #'cut s positions))))
+
+(defmacro each(var vals &body body)
+  `(loop for ,var in ,vals do ,@body))
+
+(defun partition(s delims)
+  (destructuring-bind (x xs) (cut-at-first-available s delims)
+    (cons x
+          (partition-after xs delims))))
+
+(defun partition-after(s delims)
+  (if (consp delims)
+    (if (eq (car s) (car delims))
+      (destructuring-bind (x xs) (cut-at-first-available (cdr s) (cdr delims))
+        (cons x
+              (partition-after xs (cdr delims))))
+      (cons nil (partition-after s (cdr delims))))))
+
+(defun cut-at-first-available(s delims)
+  (wc-let pos (position-first-available s delims)
+    (if pos
+      (list (cut s 0 pos) (cut s pos))
+      (list s nil))))
+
+(defun position-first-available(s elems)
+  (if (consp elems)
+    (wc-let pos (position (car elems) s)
+      (if pos
+        pos
+        (position-first-available s (cdr elems))))))
+
+(defun pos(test s)
+  (if (isa test 'function)
+    (position-if test s)
+    (position test s)))
+
+(defun isa(elem type)
+  (eq (type-of elem) type))
 
 (defun apply-to-all-subtrees(f sexp)
   (if (consp sexp)

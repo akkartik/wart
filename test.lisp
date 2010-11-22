@@ -185,27 +185,63 @@
   :should be 1)
 
 (test-wc "strip-default-values works"
-  :valueof (strip-default-values '(a (b 2)))
+  :valueof (strip-default-values '(a ? b 2))
   :should be '(a b))
 
-(test-wc "strip-default-values works when the default val is nil"
-  :valueof (strip-default-values '(a (b nil)))
-  :should be '(a b))
-
-(test-wc "strip-default-values passes through expressions needing destructuring"
-  :valueof (strip-default-values '(a (b c)))
-  :should be '(a (b c)))
+(test-wc "strip-default-values works on non-lists"
+  :valueof (strip-default-values 'a)
+  :should be 'a)
 
 (test-wc "strip-default-values passes lists through by default"
   :valueof (strip-default-values '(a b))
   :should be '(a b))
 
-(eval (wc '(def foo13(a (b nil)) (cons a b))))
+(test "partition works on no delims"
+  :valueof (partition '(1 2 3) ())
+  :should be '((1 2 3)))
+
+(test "partition works on one delim"
+  :valueof (partition '(1 2 3) '(2))
+  :should be '((1) (3)))
+
+(test "partition works on multiple delims"
+  :valueof (partition '(1 2 3 4 5) '(2 4))
+  :should be '((1) (3) (5)))
+
+(test "partition works on multiple delims - 2"
+  :valueof (partition '(1 2 3 4 5 6 7 8) '(2 4 6))
+  :should be '((1) (3) (5) (7 8)))
+
+(test "partition - missing leading delim"
+  :valueof (partition '(1 3 4 5 6 7 8) '(2 4 6))
+  :should be '((1 3) nil (5) (7 8)))
+
+(test "partition - multiple leading delims missing"
+  :valueof (partition '(1 3 5 6 7 8) '(2 4 6))
+  :should be '((1 3 5) nil nil (7 8)))
+
+(test "partition - all delims missing"
+  :valueof (partition '(1 3 5 7 8) '(2 4 6))
+  :should be '((1 3 5 7 8) nil nil nil))
+
+(test "partition - intermediate delim missing"
+  :valueof (partition '(1 2 3 5 6 7 8) '(2 4 6))
+  :should be '((1) (3 5) nil (7 8)))
+
+(test "partition - multiple delims missing"
+  :valueof (partition '(1 2 3 5 7 8) '(2 4 6))
+  :should be '((1) (3 5 7 8) nil nil))
+
+(test "partition - multiple delims missing - 2"
+  :valueof (partition '(1 3 4 5 7 8) '(2 4 6))
+  :should be '((1 3) nil (5 7 8) nil))
+
+(eval (wc '(def foo13(a ? b nil) (cons a b))))
 (test-wc "optional param"
   :valueof (foo13 3)
   :should be '(3))
 
-(eval (wc '(def foo14(a (b 4)) (cons a b))))
+(eval (wc '(def foo14(a ? b 4) (cons a b))))
 (test-wc "optional param with a default"
   :valueof (foo14 3)
   :should be '(3 . 4))
@@ -238,11 +274,11 @@
   :valueof (foo14 3 nil)
   :should be '(3))
 
-(pending-test-wc "allow optional params to refer to variables"
-  :valueof (wc-let a 2 (funcall (fn((x a)) x)))
+(test-wc "allow optional params to refer to variables"
+  :valueof (wc-let a 2 (funcall (fn(? x a) x)))
   :should be 3)
 
-(eval (wc '(def foo15(a (b 4) (c nil)) (cons b c))))
+(eval (wc '(def foo15(a ? b 4 c nil) (cons b c))))
 (test-wc "multiple optional args"
   :valueof (foo15 3)
   :should be '(4))
@@ -260,7 +296,7 @@
   :valueof (foo16 3 :b 4 5)
   :should be '(4 5))
 
-(eval (wc '(def foo17(a (b 3) . c) (cons b c))))
+(eval (wc '(def foo17(a ? b 3 . c) (cons b c))))
 (test-wc "optional + named rest args"
   :valueof (foo17 2 :c 3)
   :should be '(3 3))
@@ -277,7 +313,7 @@
   :valueof (foo17 2 :b 4 3)
   :should be '(4 3))
 
-(eval (wc '(def foo18(a (b nil) (c 3) . body) (list b c body))))
+(eval (wc '(def foo18(a ? b nil c 3 . body) (list b c body))))
 (test-wc "call with some optional and rest args without naming"
   :valueof (foo18 3 4 :body 4 5)
   :should be '(4 3 (4 5)))
