@@ -185,24 +185,26 @@
 
 
 
-; Override internal lisp keywords
-(defmacro special-form(name args &body body)
-  (wc-let new-name (gensym)
-    `(progn
-       (defmacro ,new-name ,args ,@body)
-       (setf (gethash ',name *wc-special-form-handlers*)
-             (lambda(_)
-               (cons ',new-name (cdr _))))
-       (setf (gethash ',name *wc-special-form-quoted-handlers*)
-             ',new-name))))
+; To add a special form, write it as a macro with a different name, then
+; register the macro with the right name.
 
-(special-form let(var val &body body)
+(defmacro special-form(name new-name)
+  `(progn
+     (setf (gethash ',name *wc-special-form-handlers*)
+           (lambda(_)
+             (cons ',new-name (cdr _))))
+     (setf (gethash ',name *wc-special-form-quoted-handlers*)
+           ',new-name)))
+
+(defmacro wc-let2(var val &body body)
   `(funcall (fn(,var) ,@body) ,val))
+(special-form let wc-let2)
 
-(special-form if(&rest args)
+(defmacro wc-if(&rest args)
   (if (oddp (length args)) ; there's an else
     `(cond ,@(tuples (insert-t-in-penultimate-position args) 2))
     `(cond ,@(tuples args 2))))
+(special-form if wc-if)
 
 (defun insert-t-in-penultimate-position(sexp)
   (if (and (consp sexp) (null (cdr sexp)))
