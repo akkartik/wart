@@ -14,9 +14,11 @@
   (eval (wc sexp)))
 
 (defun wc(sexp)
+  (prn sexp "0")
   (apply-to-all-subtrees #'wc-1 sexp))
 
 (defun wc-1(sexp)
+  (prn sexp "1")
   (cond
     ((null sexp)  sexp)
     ((atom sexp)  sexp)
@@ -28,12 +30,36 @@
 (defun complex-unportable-backquoted-function-expr(sexp)
   ; `(a b ,c d) => (backq-list 'a 'b c 'd)
   (destructuring-bind (backquote-marker &rest piecewise-quoted-form) sexp
+    (prn backquote-marker "backquote-marker")
     (when (and (isa backquote-marker 'symbol) (equal "BACKQ-LIST" (symbol-name backquote-marker)))
+;?                                                   (equal "BACKQ-LIST*" (symbol-name backquote-marker))))
+      (prn "aa")
       ; ('(fn ..) ...) => ('funcall '(fn ..) ..)
       (destructuring-bind (function-marker &rest args) piecewise-quoted-form
-        (when (pairp function-marker)
-          (destructuring-bind (quote-marker form) function-marker
+        (prn function-marker "function-marker")
+        (prn (len function-marker))
+        (if (pairp function-marker)
+          (destructuring-bind (quote-marker &rest form) function-marker
+            (prn quote-marker "quote-marker")
             (when (equal quote-marker 'quote)
+              (prn "ac")
+              (or (function-form form)
+                  (function-name form))))
+          (destructuring-bind (bqmarker (quote-marker form)) function-marker
+
+
+            (prn (car form) "2")
+            (cond
+              ((equal 'quote quote-marker)   (or (function-form form)
+                                                 (function-name form)))
+              ((and (equal "BACKQ-LIST*" (symbol-name quote-marker))
+                    (equal 
+            (case quote-marker
+              (quote (or (function-form form)
+                         (function-name form)))
+              (
+            (when (equal quote-marker 'quote)
+              (prn "ac")
               (or (function-form form)
                   (function-name form)))))))))
 
@@ -47,12 +73,9 @@
 ; In return for being able to override keywords you can't use keywords anywhere
 ; in the program. Not even inside quoted expressions.
 (defun lookup-quoted-handler(name)
-  (cond ((function-name name)   name) ;(lambda(sexp) (cons 'funcall name)))
-        ((function-form name)   name) ;(lambda(sexp) (cons 'funcall name)))
-        (t
-          (or (gethash name *wc-special-form-quoted-handlers*)
-              (gethash (type-of name) *wc-type-quoted-handlers*)
-              name))))
+  (or (gethash name *wc-special-form-quoted-handlers*)
+      (gethash (type-of name) *wc-type-quoted-handlers*)
+      name))
 
 ;; handlers are functions of the input s-expr
 (defvar *wc-special-form-handlers* (make-hash-table))

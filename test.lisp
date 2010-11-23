@@ -422,3 +422,8 @@
 (test "no need for funcall inside mac - 2"
   :valueof (foo20 4)
   :should be 5)
+
+(wc-eval '(mac foo21 args `((fn() ,@args)))
+(test "no need for funcall inside mac - 3"
+  :valueof (let n 3 (foo21 (setf n (1+ n)) (setf n (+ 2 n))))
+  :should be 6)
