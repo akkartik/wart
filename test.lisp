@@ -19,27 +19,27 @@
   :valueof (foo3 2)
   :should be 4)
 
-(eval (wc '(def foo4() 34)))
+(wc-eval '(def foo4() 34))
 (test-wc "simple def"
   :valueof (foo4)
   :should be 34)
 
-(eval (wc '(mac foo5(n) `(+ ,n 1))))
+(wc-eval '(mac foo5(n) `(+ ,n 1)))
 (test-wc "simple mac"
   :valueof (foo5 32)
   :should be 33)
 
-(eval (wc '(def foo6() (cons 3 4))))
+(wc-eval '(def foo6() (cons 3 4)))
 (test-wc "def 2"
   :valueof (foo6)
   :should be (cons 3 4))
 
-(eval (wc '(def foo7 args args)))
+(wc-eval '(def foo7 args args))
 (test-wc "just a rest arg without parens"
     :valueof (foo7 3 4 5)
     :should be '(3 4 5))
 
-(eval (wc '(def foo8(a . b) b)))
+(wc-eval '(def foo8(a . b) b))
 (test-wc "dotted rest"
   :valueof (foo8 3 4)
   :should be '(4))
@@ -72,12 +72,12 @@
   :valueof (wc-destructuring-bind ((a b) (c d) &rest e) '((1 2) (3 4) 5 6 7) (cons c e))
   :should be '(3 5 6 7))
 
-(eval (wc '(def foo9((a b)) b)))
+(wc-eval '(def foo9((a b)) b))
 (test-wc "destructured args"
   :valueof (foo9 '(3 4))
   :should be 4)
 
-(eval (wc '(def foo10((a b) . c) b)))
+(wc-eval '(def foo10((a b) . c) b))
 (test-wc "destructured args + dotted rest"
   :valueof (foo10 '(3 4) 5)
   :should be 4)
@@ -167,7 +167,7 @@
   :valueof (wc-complex-bind (a) '(:a 1) a)
   :should be 1)
 
-(eval (wc '(def foo12(a b) (- a b))))
+(wc-eval '(def foo12(a b) (- a b)))
 (test-wc "allow param names"
   :valueof (foo12 :a 3 :b 4)
   :should be -1)
@@ -236,12 +236,12 @@
   :valueof (partition '(1 3 4 5 7 8) '(2 4 6))
   :should be '((1 3) nil (5 7 8) nil))
 
-(eval (wc '(def foo13(a ? b nil) (cons a b))))
+(wc-eval '(def foo13(a ? b nil) (cons a b)))
 (test-wc "optional param"
   :valueof (foo13 3)
   :should be '(3))
 
-(eval (wc '(def foo14(a ? b 4) (cons a b))))
+(wc-eval '(def foo14(a ? b 4) (cons a b)))
 (test-wc "optional param with a default"
   :valueof (foo14 3)
   :should be '(3 . 4))
@@ -278,7 +278,7 @@
   :valueof (wc-let a 2 (funcall (fn(? x a) x)))
   :should be 3)
 
-(eval (wc '(def foo15(a ? b 4 c nil) (cons b c))))
+(wc-eval '(def foo15(a ? b 4 c nil) (cons b c)))
 (test-wc "multiple optional args"
   :valueof (foo15 3)
   :should be '(4))
@@ -291,12 +291,12 @@
   :valueof (foo15 3 nil 2)
   :should be '(nil . 2))
 
-(eval (wc '(def foo16(a . b) b)))
+(wc-eval '(def foo16(a . b) b))
 (test-wc "rest args can be named"
   :valueof (foo16 3 :b 4 5)
   :should be '(4 5))
 
-(eval (wc '(def foo17(a ? b 3 . c) (cons b c))))
+(wc-eval '(def foo17(a ? b 3 . c) (cons b c)))
 (test-wc "optional + named rest args"
   :valueof (foo17 2 :c 3)
   :should be '(3 3))
@@ -313,7 +313,7 @@
   :valueof (foo17 2 :b 4 3)
   :should be '(4 3))
 
-(eval (wc '(def foo18(a ? b nil c 3 . body) (list b c body))))
+(wc-eval '(def foo18(a ? b nil c 3 . body) (list b c body)))
 (test-wc "call with some optional and rest args without naming"
   :valueof (foo18 3 4 :body 4 5)
   :should be '(4 3 (4 5)))
@@ -408,17 +408,17 @@
   :valueof (wc '(defmacro foo(n) `(let it ,n (+ it 1))))
   :should be '(defmacro foo(n) `(wc-let2 it ,n (+ it 1))))
 
-(eval (wc '(mac aand(a b) `(let it ,a (and it ,b)))))
+(wc-eval '(mac aand(a b) `(let it ,a (and it ,b))))
 (test-wc "macro bodies should pass through the compiler"
   :valueof (let x 3 (aand (- x 1) (> it 1)))
   :should be t)
 
-(eval (wc '(mac foo() ([+ _ 1] 3))))
+(wc-eval '(mac foo19() ([+ _ 1] 3)))
 (test "no need for funcall inside mac"
-  :valueof (foo)
+  :valueof (foo19)
   :should be 4)
 
-(eval (wc '(mac foo(x) `([+ _ 1] ,x))))
+(wc-eval '(mac foo20(x) `([+ _ 1] ,x)))
 (test "no need for funcall inside mac - 2"
-  :valueof (foo 4)
+  :valueof (foo20 4)
   :should be 5)
