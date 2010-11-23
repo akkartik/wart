@@ -412,3 +412,13 @@
 (test-wc "macro bodies should pass through the compiler"
   :valueof (let x 3 (aand (- x 1) (> it 1)))
   :should be t)
+
+(eval (wc '(mac foo() ([+ _ 1] 3))))
+(test "no need for funcall inside mac"
+  :valueof (foo)
+  :should be 4)
+
+(eval (wc '(mac foo(x) `([+ _ 1] ,x))))
+(test "no need for funcall inside mac - 2"
+  :valueof (foo 4)
+  :should be 5)
