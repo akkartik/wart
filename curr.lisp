@@ -14,61 +14,19 @@
   (eval (wc sexp)))
 
 (defun wc(sexp)
-  (prn sexp "0")
   (apply-to-all-subtrees #'wc-1 sexp))
 
 (defun wc-1(sexp)
-  (prn sexp "1")
   (cond
     ((null sexp)  sexp)
     ((atom sexp)  sexp)
     ((and (equal (car sexp) 'quote) (null (caddr sexp)))  (list 'quote (lookup-quoted-handler (cadr sexp))))
-    ((complex-unportable-backquoted-function-expr sexp)   (cons (car sexp) (cons ''funcall (cdr sexp))))
     ((lookup-unquoted-handler sexp)   (funcall (lookup-unquoted-handler sexp) sexp))
     (t sexp)))
 
-(defun complex-unportable-backquoted-function-expr(sexp)
-  ; `(a b ,c d) => (backq-list 'a 'b c 'd)
-  (destructuring-bind (backquote-marker &rest piecewise-quoted-form) sexp
-    (prn backquote-marker "backquote-marker")
-    (when (and (isa backquote-marker 'symbol) (equal "BACKQ-LIST" (symbol-name backquote-marker)))
-;?                                                   (equal "BACKQ-LIST*" (symbol-name backquote-marker))))
-      (prn "aa")
-      ; ('(fn ..) ...) => ('funcall '(fn ..) ..)
-      (destructuring-bind (function-marker &rest args) piecewise-quoted-form
-        (prn function-marker "function-marker")
-        (prn (len function-marker))
-        (if (pairp function-marker)
-          (destructuring-bind (quote-marker &rest form) function-marker
-            (prn quote-marker "quote-marker")
-            (when (equal quote-marker 'quote)
-              (prn "ac")
-              (or (function-form form)
-                  (function-name form))))
-          (destructuring-bind (bqmarker (quote-marker form)) function-marker
-
-
-            (prn (car form) "2")
-            (cond
-              ((equal 'quote quote-marker)   (or (function-form form)
-                                                 (function-name form)))
-              ((and (equal "BACKQ-LIST*" (symbol-name quote-marker))
-                    (equal 
-            (case quote-marker
-              (quote (or (function-form form)
-                         (function-name form)))
-              (
-            (when (equal quote-marker 'quote)
-              (prn "ac")
-              (or (function-form form)
-                  (function-name form)))))))))
-
 (defun lookup-unquoted-handler(sexp)
-  (cond ((function-name (car sexp))   (lambda(sexp) (cons 'funcall sexp)))
-        ((function-form (car sexp))   (lambda(sexp) (cons 'funcall sexp)))
-        (t
-          (or (gethash (car sexp) *wc-special-form-handlers*)
-              (gethash (type-of (car sexp)) *wc-type-handlers*)))))
+  (or (gethash (car sexp) *wc-special-form-handlers*)
+      (gethash (type-of (car sexp)) *wc-type-handlers*)))
 
 ; In return for being able to override keywords you can't use keywords anywhere
 ; in the program. Not even inside quoted expressions.
@@ -353,6 +311,7 @@
                    args)))
 
 (synonym no null
+         call funcall
          trunc truncate
          len length
          uniq gensym

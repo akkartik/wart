@@ -83,33 +83,12 @@
   :should be 4)
 
 (test-wc "destructured args + dotted rest for fn"
-  :valueof ((fn ((a b) . c) b) '(3 4) 5)
+  :valueof (call (fn ((a b) . c) b) '(3 4) 5)
   :should be 4)
 
 (test-wc "alternative syntax for fn"
-  :valueof ([+ _ 1] 3)
+  :valueof (call [+ _ 1] 3)
   :should be 4)
-
-(setq foo11 (lambda() 3))
-(test-wc "no need for funcall on function atoms"
-  :valueof (foo11)
-  :should be 3)
-
-(test-wc "no need for funcall on function forms"
-  :valueof ((lambda() 3))
-  :should be 3)
-
-(test-wc "no need for funcall on function forms with args"
-  :valueof ((lambda(a) (+ a 3)) 2)
-  :should be 5)
-
-(test-wc "non-top-level calls require funcall"
-  :valueof (wc-let a 1 (funcall (fn() a)))
-  :should be 1)
-
-(test-wc "no need for funcall with non-top-level function forms"
-  :valueof (wc-let a 1 ((fn() a)))
-  :should be 1)
 
 (test-wc "wc-complex-bind handles simple args"
   :valueof (wc-complex-bind (a b) '(1 2) b)
@@ -251,11 +230,11 @@
   :should be '(3 . 4))
 
 (test-wc "distinguish destructured from optional params"
-  :valueof ((fn((a b)) (list a b)) '(1 (2)))
+  :valueof (call (fn((a b)) (list a b)) '(1 (2)))
   :should be '(1 (2)))
 
 (test-wc "distinguish destructured from optional params - 2"
-  :valueof ((fn((a (b))) (list a b)) '(1 (2)))
+  :valueof (call (fn((a (b))) (list a b)) '(1 (2)))
   :should be '(1 2))
 
 (test-wc "args should override optional params"
@@ -275,7 +254,7 @@
   :should be '(3))
 
 (test-wc "allow optional params to refer to variables"
-  :valueof (wc-let a 2 (funcall (fn(? x a) x)))
+  :valueof (wc-let a 2 (call (fn(? x a) x)))
   :should be 3)
 
 (wc-eval '(def foo15(a ? b 4 c nil) (cons b c)))
@@ -412,18 +391,3 @@
 (test-wc "macro bodies should pass through the compiler"
   :valueof (let x 3 (aand (- x 1) (> it 1)))
   :should be t)
-
-(wc-eval '(mac foo19() ([+ _ 1] 3)))
-(test "no need for funcall inside mac"
-  :valueof (foo19)
-  :should be 4)
-
-(wc-eval '(mac foo20(x) `([+ _ 1] ,x)))
-(test "no need for funcall inside mac - 2"
-  :valueof (foo20 4)
-  :should be 5)
-
-(wc-eval '(mac foo21 args `((fn() ,@args)))
-(test "no need for funcall inside mac - 3"
-  :valueof (let n 3 (foo21 (setf n (1+ n)) (setf n (+ 2 n))))
-  :should be 6)
