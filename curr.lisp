@@ -118,16 +118,16 @@
   (cond
     ((null args)  nil)
     ; dotted rest
-    ((atom args)   (or positional-vals (alref args optional-alist)))
+    ((atom args)   (or positional-vals (eval (alref args optional-alist))))
     ((equal (car args) '&rest)   (or positional-vals
                                      (alref (cadr args) keyword-alist)
-                                     (alref (cadr args) optional-alist)))
+                                     (eval (alref (cadr args) optional-alist))))
     ((assoc (car args) keyword-alist)  (cons (alref (car args) keyword-alist)
                                              (merge-keyword-vars positional-vals
                                                                  keyword-alist
                                                                  optional-alist
                                                                  (cdr args))))
-    ((null positional-vals)  (cons (alref (car args) optional-alist)
+    ((null positional-vals)  (cons (eval (alref (car args) optional-alist))
                                    (merge-keyword-vars nil keyword-alist optional-alist (cdr args))))
     (t  (cons (car positional-vals)
               (merge-keyword-vars (cdr positional-vals) keyword-alist optional-alist
