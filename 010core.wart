@@ -32,13 +32,8 @@
          keep remove-if-not)
 
 (mac wc-map(f . seqs)
-  `(map ',(_type-specifier (car seqs)) ,f ,@seqs)) ; recursive map won't be transformed
+  `(map 'list ,f ,@seqs)) ; recursive map won't be transformed
 (special-form map wc-map)
-
-(def _type-specifier(x)
-  (if (isa x 'cons)
-    'list
-    (type x)))
 
 (def pair(xs ? f #'list)
   (if (no xs)
