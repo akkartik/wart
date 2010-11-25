@@ -8,6 +8,10 @@
 ; To add a special form, write it as a macro with a different name, then
 ; register the macro with the right name.
 
+; In return for being able to override keywords you can't use keywords anywhere
+; in the program. Not even inside quoted expressions. Otherwise we can't
+; handle backquoted expressions.
+
 (defmacro special-form(name new-name)
   `(progn
      (setf (gethash ',name *wc-special-form-handlers*)
@@ -40,8 +44,6 @@
   (or (gethash (car sexp) *wc-special-form-handlers*)
       (gethash (type-of (car sexp)) *wc-type-handlers*)))
 
-; In return for being able to override keywords you can't use keywords anywhere
-; in the program. Not even inside quoted expressions.
 (defun lookup-quoted-handler(name)
   (or (gethash name *wc-special-form-quoted-handlers*)
       (gethash (type-of name) *wc-type-quoted-handlers*)
@@ -63,14 +65,5 @@
   (cond
     ((no sexp)  nil)
     ((atom sexp)  (call f sexp))
-    ; consp sexp
     (t   (cons (call f (car sexp))
                (apply-to-all-leaves f (cdr sexp))))))
-
-(defun function-name(f)
-  (and (atom f)
-       (ignore-errors (eval `(functionp ,f)))))
-
-(defun function-form(s)
-  (and (consp s)
-       (find (car s) '(fn lambda))))
