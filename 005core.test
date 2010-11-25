@@ -1,0 +1,47 @@
+(test-wc "new redefined let"
+  :valueof (let a 3 a)
+  :should be 3)
+
+(test-wc "let destructures"
+  :valueof (let (a b) '(3 4) a)
+  :should be 3)
+
+(test-wc "new redefined if with one branch"
+  :valueof (if nil 3)
+  :should be nil)
+
+(test-wc "new redefined if with one branch - 2"
+  :valueof (if t 3)
+  :should be 3)
+
+(test-wc "new redefined if with two branches"
+  :valueof (if t 3 4)
+  :should be 3)
+
+(test-wc "new redefined if with two branches - 2"
+  :valueof (if nil 3 4)
+  :should be 4)
+
+(test-wc "new redefined if with three branches"
+  :valueof (if (> 3 2) 3 (> 3 4) 5 6)
+  :should be 3)
+
+(test-wc "new redefined if with three branches - 2"
+  :valueof (if (< 3 2) 3 (< 3 4) 5 6)
+  :should be 5)
+
+(test-wc "new redefined if with three branches - 3"
+  :valueof (if (< 3 2) 3 (< 3 3) 5 6)
+  :should be 6)
+
+(test-wc "new keyword - with"
+  :valueof (with (a 3) a)
+  :should be 3)
+
+(test-wc "combine all these keywords"
+  :valueof (let a 3 (if (> a 5) 5
+                        (> a 4) 4
+                        (> a 3) 3
+                        (> a 2) "correct"
+                                "Default"))
+  :should be "correct")

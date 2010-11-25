@@ -1,0 +1,34 @@
+(special-form type type-of)
+
+(def id(? x nil) x)
+
+(defun isa(elem type)
+  (eq (type elem) type))
+
+(def isnt (x y) (no (is x y)))
+
+(def pos(test s)
+  (if (isa test 'function)
+    (position-if test s)
+    (position test s)))
+
+(def singlep(x)
+  (and (isa x 'cons)
+       (no (cdr x))))
+
+(def pairp(x)
+  (and (isa x 'cons)
+       (isa (cdr x) 'cons)
+       (no (cddr x))))
+
+(synonym trunc truncate
+         len length
+         uniq gensym
+         cut subseq
+         rev reverse
+         macex macroexpand
+         macex1 macroexpand-1
+         err error
+         keep remove-if-not)
+
+(mac aand(a b) `(let it ,a (and it ,b)))

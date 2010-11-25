@@ -2,17 +2,13 @@
 
 if [ $# -eq 0 ]
 then
-  echo "ctrl-d to quit"
-  rlwrap sbcl --noinform --userinit sbclrc
-elif [ $# -eq 1 ]
-then
-  echo "ctrl-d to quit"
-  rlwrap sbcl --noinform --userinit sbclrc --load $*
+  rlwrap sbcl --noinform --userinit sbclrc --load boot
 else
   (
     for i in $*
     do
       echo "(load \"$i\")"
     done
-  ) | rlwrap sbcl --noinform --noprint --userinit sbclrc
+    echo "(quit)"
+  ) | rlwrap sbcl --noinform --noprint --userinit sbclrc --load boot
 fi
