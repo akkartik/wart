@@ -1,13 +1,13 @@
 ;; Functions support complex arg lists in wart
 
-(defmacro def(name args &rest body)
-  `(defun ,name ,@(compile-args args body)))
+(defmacro def(name params &rest body)
+  `(defun ,name ,@(compile-params params body)))
 
-(defmacro mac(name args &rest body)
-  (wc `(defmacro ,name ,@(compile-args args body))))
+(defmacro mac(name params &rest body)
+  (wc `(defmacro ,name ,@(compile-params params body))))
 
-(defmacro fn(args &rest body)
-  `(lambda ,@(compile-args args body)))
+(defmacro fn(params &rest body)
+  `(lambda ,@(compile-params params body)))
 
 (synonym cut subseq)
 
@@ -58,11 +58,11 @@
 ; handles destructuring, . for rest
 ; returns a list whose first element is a common lisp lambda-list
 ; (cltl2, 5.2.2)
-(defun compile-args(args body)
-  (let ((args   (wc-restify args))
-        (gargs  (uniq)))
-    `((&rest ,gargs)
-       (wc-complex-bind ,args ,gargs
+(defun compile-params(params body)
+  (let ((params   (wc-restify params))
+        (gparams  (uniq)))
+    `((&rest ,gparams)
+       (wc-complex-bind ,params ,gparams
          ,@body))))
 
 (defun partition-keywords(vals &optional rest-var alist)
@@ -92,36 +92,36 @@
 (defun keyword->symbol(k)
   (intern (symbol-name k)))
 
-(defun merge-keyword-vars(positional-vals keyword-alist optional-alist args)
+(defun merge-keyword-vars(positional-vals keyword-alist optional-alist params)
   (cond
-    ((no args)  nil)
+    ((no params)  nil)
     ; dotted rest
-    ((atom args)   (or positional-vals (eval (alref args optional-alist))))
-    ((is '&rest (car args))   (or positional-vals
-                                  (alref (cadr args) keyword-alist)
-                                  (eval (alref (cadr args) optional-alist))))
-    ((assoc (car args) keyword-alist)  (cons (alref (car args) keyword-alist)
+    ((atom params)   (or positional-vals (eval (alref params optional-alist))))
+    ((is '&rest (car params))   (or positional-vals
+                                  (alref (cadr params) keyword-alist)
+                                  (eval (alref (cadr params) optional-alist))))
+    ((assoc (car params) keyword-alist)  (cons (alref (car params) keyword-alist)
                                              (merge-keyword-vars positional-vals
                                                                  keyword-alist
                                                                  optional-alist
-                                                                 (cdr args))))
-    ((no positional-vals)  (cons (eval (alref (car args) optional-alist))
-                                 (merge-keyword-vars nil keyword-alist optional-alist (cdr args))))
+                                                                 (cdr params))))
+    ((no positional-vals)  (cons (eval (alref (car params) optional-alist))
+                                 (merge-keyword-vars nil keyword-alist optional-alist (cdr params))))
     (t  (cons (car positional-vals)
               (merge-keyword-vars (cdr positional-vals) keyword-alist optional-alist
-                                  (cdr args))))))
+                                  (cdr params))))))
 
 (defun optional-vars(vars)
   (if (consp vars)
     (alist (cdr (cut-at vars '(? &rest))))))
 
-(defun strip-default-values(args)
-  (if (consp args)
-    (destructuring-bind (required optional rest) (_partition args '(? &rest))
+(defun strip-default-values(params)
+  (if (consp params)
+    (destructuring-bind (required optional rest) (_partition params '(? &rest))
       (if rest
         (append required (map 'list #'car (tuples optional 2)) '(&rest) rest)
         (append required (map 'list #'car (tuples optional 2)))))
-    args))
+    params))
 
 (defun alref(key alist)
   (cdr (assoc key alist)))
