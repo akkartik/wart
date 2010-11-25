@@ -1,0 +1,38 @@
+(test-wc "new redefined let"
+  :valueof (let a 3 a)
+  :should be 3)
+
+(test-wc "let destructures"
+  :valueof (let (a b) '(3 4) a)
+  :should be 3)
+
+(test-wc "new keyword - with"
+  :valueof (with (a 3) a)
+  :should be 3)
+
+(test-wc "map works"
+  :valueof (map #'1+ '(2 3 4))
+  :should be '(3 4 5))
+
+(test "w/uniq works with single var"
+  :valueof (macex1 '(w/uniq a 3))
+  :should be '(wc-let a (uniq) 3))
+
+(test "w/uniq works with multiple vars"
+  :valueof (macex1 '(w/uniq (a b) 3))
+  :should be '(with (a (uniq) b (uniq)) 3))
+
+(test-wc "in works - 1"
+  :valueof (let a 3 (in a 1 2 3))
+  :should be t)
+
+(test-wc "in works - 2"
+  :valueof (let a 1 (in a 2 3))
+  :should be nil)
+
+(test-wc "caselet works"
+  :valueof (caselet x 'b
+             a 1
+             b 2
+               3)
+  :should be 2)

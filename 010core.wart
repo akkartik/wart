@@ -21,15 +21,16 @@
        (isa (cdr x) 'cons)
        (no (cddr x))))
 
-(synonym trunc truncate
-         len length
+(synonym len length
          uniq gensym
          cut subseq
          rev reverse
          macex macroexpand
          macex1 macroexpand-1
          err error
-         keep remove-if-not)
+         join append ; todo: make generic
+         keep remove-if-not
+         trunc truncate)
 
 (mac wc-map(f . seqs)
   `(map 'list ,f ,@seqs)) ; recursive map won't be transformed
@@ -61,11 +62,67 @@
 (mac each(var vals . body)
   `(loop for ,var in ,vals do ,@body))
 
-(mac aand(a b) `(let it ,a (and it ,b)))
-
 (mac w/uniq(names . body)
   (if (consp names)
-      `(with ,(apply #'append (map (fn(n) (list n '(uniq)))
-                                   names))
+      `(with ,(apply #'join nil (map (fn(n) (list n '(uniq)))
+                                     names))
          ,@body)
       `(let ,names (uniq) ,@body)))
+
+(mac iflet(var expr then . rest)
+  (w/uniq gv
+    `(let ,gv ,expr
+       (if ,gv (let ,var ,gv ,then) ,@rest))))
+
+(mac whenlet(var expr . body)
+  `(iflet ,var ,expr (do ,@body)))
+
+(mac aif(expr . body)
+  `(let it ,expr
+     (if it
+         ,@(if (cddr body)
+               `(,(car body) (aif ,@(cdr body)))
+               body))))
+
+(mac awhen(expr . body)
+  `(let it ,expr (if it (do ,@body))))
+
+(mac aand args
+  (if (no args)
+      't
+      (no (cdr args))
+       (car args)
+      `(let it ,(car args) (and it (aand ,@(cdr args))))))
+
+(mac ret(var val . body)
+  `(let ,var ,val ,@body ,var))
+
+(mac rfn(name parms . body)
+  `(labels ((,name ,parms ,@body))
+     #',name))
+
+(mac afn(parms . body)
+  `(rfn self ,parms ,@body))
+
+(mac in(x . choices)
+  (w/uniq g
+    `(let ,g ,x
+       (or ,@(map (fn (c) `(is ,g ,c)) choices)))))
+
+(mac caselet(var expr . args)
+  (let ex (afn(args)
+            (if (no (cdr args))
+                (car args)
+                `(if (iso ,var ',(car args))
+                     ,(cadr args)
+                     ,(self (cddr args)))))
+    `(let ,var ,expr ,(call ex args))))
+
+(mac wc-case(expr . args)
+  `(caselet ,(uniq) ,expr ,@args))
+(special-form case wc-case)
+
+;? (def match(a b)
+;?   (if (is b _)
+;?     t
+;?     (all (match
