@@ -1,5 +1,8 @@
 ; testing 001wrepl.lisp requires more than just 001wrepl.lisp
 
+(defmacro _let(var val &body body)
+  `(call (lambda(,var) ,@body) ,val))
+
 (test-wc "wc works through defuns"
   :valueof (wc '(defun foo(n) (let it n (+ it 1))))
   :should be '(defun foo(n) (wc-let it n (+ it 1))))

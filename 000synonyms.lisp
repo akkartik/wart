@@ -6,5 +6,6 @@
 
 (synonym no null
          call funcall
+         uniq gensym
          is eq
          iso equal)

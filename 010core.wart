@@ -22,7 +22,6 @@
        (no (cddr x))))
 
 (synonym len length
-         uniq gensym
          cut subseq
          rev reverse
          macex macroexpand

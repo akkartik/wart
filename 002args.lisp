@@ -31,28 +31,24 @@
 
 ;; Internals
 
-; Don't risk using CL let anywhere in this file; we're about to override it.
-(defmacro _let(var val &body body)
-  `(call (lambda(,var) ,@body) ,val))
-
 (defmacro wc-complex-bind(vars vals &body body)
-  (_let restified-vars (wc-restify vars)
-    (_let simplified-vars (strip-default-values restified-vars)
-      `(destructuring-bind (positional-vals keyword-alist)
-                           (partition-keywords ,vals (rest-var ',restified-vars))
-        (_let optional-alist (optional-vars ',restified-vars)
-          (wc-destructuring-bind ,simplified-vars
-              (merge-keyword-vars positional-vals keyword-alist optional-alist
-                                  ',simplified-vars)
-            ,@body))))))
+  (let* ((restified-vars (wc-restify vars))
+        (simplified-vars (strip-default-values restified-vars)))
+    `(destructuring-bind (positional-vals keyword-alist)
+                         (partition-keywords ,vals (rest-var ',restified-vars))
+      (let ((optional-alist (optional-vars ',restified-vars)))
+        (wc-destructuring-bind ,simplified-vars
+            (merge-keyword-vars positional-vals keyword-alist optional-alist
+                                ',simplified-vars)
+          ,@body)))))
 
 (defmacro wc-destructuring-bind(vars vals &body body)
-  (_let gval (gensym)
-    `(_let ,gval ,vals
+  (let ((gval (uniq)))
+    `(let ((,gval ,vals))
        (wc-destructuring-bind-1 ,vars ,gval ,@body))))
 (defmacro wc-destructuring-bind-1(vars vals &body body)
   (cond ((no vars)  `(progn ,@body))
-        ((atom vars)  `(_let ,vars ,vals ,@body))
+        ((atom vars)  `(let ((,vars ,vals)) ,@body))
         ((is '&rest (car vars))  `(wc-destructuring-bind-1 ,(cadr vars) ,vals
                                      ,@body))
         (t `(wc-destructuring-bind-1 ,(car vars) (car ,vals)
@@ -63,11 +59,11 @@
 ; returns a list whose first element is a common lisp lambda-list
 ; (cltl2, 5.2.2)
 (defun compile-args(args body)
-  (_let args (wc-restify args)
-    (_let gargs (gensym)
-      `((&rest ,gargs)
-         (wc-complex-bind ,args ,gargs
-           ,@body)))))
+  (let ((args   (wc-restify args))
+        (gargs  (uniq)))
+    `((&rest ,gargs)
+       (wc-complex-bind ,args ,gargs
+         ,@body))))
 
 (defun partition-keywords(vals &optional rest-var alist)
   (if (consp vals)
@@ -143,7 +139,7 @@
               (compile-dots _)
               _))
           (append (butlast xs)
-                  (_let x (last xs)
+                  (let ((x (last xs)))
                     (if (cdr x)
                         `(,(car x) &rest ,(cdr x))
                         x)))))
@@ -162,19 +158,19 @@
       (cons nil (_partition-after s (cdr delims))))))
 
 (defun cut-at-first-available(s delims)
-  (_let pos (position-first-available s delims)
+  (let ((pos (position-first-available s delims)))
     (if pos
       (list (cut s 0 pos) (cut s pos))
       (list s nil))))
 
 (defun position-first-available(s elems)
   (if (consp elems)
-    (_let pos (position (car elems) s)
+    (let ((pos (position (car elems) s)))
       (if pos
         pos
         (position-first-available s (cdr elems))))))
 
 (defun cut-at(s delims)
-  (_let positions (map (type-of s) (lambda(x) (position x s)) delims)
+  (let ((positions (map (type-of s) (lambda(x) (position x s)) delims)))
     (if (car positions)
       (apply #'cut s positions))))
