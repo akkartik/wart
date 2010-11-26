@@ -43,6 +43,7 @@
          (rest-param  (rest-param params))
          (z   (wc-getargs-exprs params-without-? non-keyword-args keyword-alist optional-alist)))
     `((&rest ,ra)
+      ; let* because wart will soon override let
       (let* ((,non-keyword-args  (strip-keyword-args ,ra ',rest-param))
              (,keyword-alist   (keyword-args ,ra ',rest-param)))
           (let* ,z
@@ -56,10 +57,10 @@
                      ,(alref param optional-alist))))
        (vars-in-paramlist params)))
 
-; 'first available' - like or, but uses value to indicate unavailable
+; 'first available' - like or, but a uses multiple values to indicate unavailable
 (defmacro fa(a b)
-  (let* ((val (uniq))
-         (empty (uniq)))
+  (let ((val (uniq))
+        (empty (uniq)))
     `(multiple-value-bind (,val ,empty) ,a
       (if ,empty
         ,b
