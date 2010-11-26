@@ -1,13 +1,15 @@
+(setf *test-failures* 0)
+
 (defmacro test(msg Valueof expr Should &rest predicate)
   `(let ((got ,expr))
-     (if (,(car predicate) got ,@(cdr predicate))
-       (format t ". ~a~%" ,msg)
+     (unless (,(car predicate) got ,@(cdr predicate))
+       (incf *test-failures*)
        (format t "F ~a~%  got ~a~%" ,msg got))))
 
 (defmacro test-wc(msg Valueof expr Should &rest predicate)
   `(let ((got (eval (wc ',expr))))
-     (if (,(car predicate) got ,@(cdr predicate))
-       (format t ". ~a~%" ,msg)
+     (unless (,(car predicate) got ,@(cdr predicate))
+       (incf *test-failures*)
        (format t "F ~a~%  got ~a~%" ,msg got))))
 
 (defmacro pending-test(msg Valueof expr Should &rest predicate)
@@ -24,6 +26,8 @@
 
 
 
+(format t "~%")
+
 (loop for path in (directory "./*.*") do
   (let ((file (file-namestring path)))
     (when (and (string< "" file)
@@ -33,3 +37,11 @@
              (ext (subseq file (- len 4))))
         (cond
           ((iso ext "test") (load file)))))))
+
+(cond
+  ((> *test-failures* 1)
+    (format t "~%~a failures~%" *test-failures*))
+  ((> *test-failures* 0)
+    (format t "~%~a failure~%" *test-failures*))
+  (t
+    (format t "~%")))

@@ -1,11 +1,14 @@
-;; Simple transformer that allows us to override lisp keywords.
+;; Wart transformer lets us override lisp keywords.
 
 (defun wrepl()
   (loop
-    (format t "w> ")(finish-output)
+    (unless *batch-mode*
+      (format t "wart> ")(finish-output))
     (format t "~a~%" (wc-eval (read)))))
 
-; To add a special form, write it as a macro with a different name, then
+(setf *batch-mode* nil)
+
+; To override a lisp keyword, write it as a macro with a different name, then
 ; register the macro with the right name.
 
 ; In return for being able to override keywords you can't use keywords anywhere
@@ -20,6 +23,15 @@
      (setf (gethash ',name *wc-special-form-quoted-handlers*)
            ',new-name)))
 
+(defun wload(file)
+  (with-open-file (f (merge-pathnames file))
+    (loop with form = (read f)
+          and eof = (gensym)
+      do
+        (wc-eval form)
+        (setq form (read f nil eof))
+      until (is form eof))))
+
 
 
 ;; Internals
@@ -32,8 +44,8 @@
 
 (defun wc-1(sexp)
   (cond
-    ((no sexp)  sexp)
-    ((atom sexp)  sexp)
+    ((no sexp)                        sexp)
+    ((atom sexp)                      sexp)
     ((and (is 'quote (car sexp))
           (no (caddr sexp)))
                                       (list 'quote (lookup-quoted-handler (cadr sexp))))

@@ -1,4 +1,4 @@
-;; Functions support complex arg lists in wart
+;; Functions support complex arg lists in wart.
 
 (defmacro def(name params &rest body)
   `(defun ,name ,@(compile-params params body)))

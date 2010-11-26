@@ -1,0 +1,3 @@
+(test-wc "pairp works"
+  :valueof (pairp '(1 2))
+  :should be t)

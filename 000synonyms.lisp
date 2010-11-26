@@ -1,4 +1,4 @@
-;; Better names for existing lisp primitives
+;; Shorter names for some lisp primitives.
 
 (defmacro synonym(&rest args)
   `(setf ,@(mapcar (lambda (x) `(symbol-function ',x))
@@ -6,6 +6,9 @@
 
 (synonym no null
          call funcall
-         uniq gensym
          is eq
-         iso equal)
+         iso equal
+         uniq gensym
+         macex macroexpand
+         macex1 macroexpand-1
+         err error)

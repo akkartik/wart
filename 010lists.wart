@@ -1,0 +1,15 @@
+(def pos(test s)
+  (if (functionp test)
+    (position-if test s)
+    (position test s)))
+
+(synonym len length
+         rev reverse
+         join append
+         keep remove-if-not
+         trunc truncate)
+
+(def pairp(x)
+  (and (consp x)
+       (consp (cdr x))
+       (no (cddr x))))

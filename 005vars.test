@@ -1,0 +1,15 @@
+(test-wc "new redefined let"
+  :valueof (let a 3 a)
+  :should be 3)
+
+(test-wc "let destructures"
+  :valueof (let (a b) '(3 4) a)
+  :should be 3)
+
+(test-wc "new keyword - with"
+  :valueof (with (a 3) a)
+  :should be 3)
+
+(test-wc "map works"
+  :valueof (map #'1+ '(2 3 4))
+  :should be '(3 4 5))

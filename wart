@@ -5,6 +5,7 @@ then
   rlwrap sbcl --noinform --userinit sbclrc --load boot
 else
   (
+    echo "(setf *batch-mode* t)"
     for i in $*
     do
       echo "(load \"$i\")"
