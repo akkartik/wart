@@ -52,19 +52,28 @@
   (map 'list
        (lambda(param)
           (list param
-                `(or (get-arg ',param ',params ,non-keyword-args ,keyword-alist)
+                `(fa (get-arg ',param ',params ,non-keyword-args ,keyword-alist)
                      ,(alref param optional-alist))))
        (vars-in-paramlist params)))
+
+; 'first available' - like or, but uses value to indicate unavailable
+(defmacro fa(a b)
+  (let* ((val (uniq))
+         (empty (uniq)))
+    `(multiple-value-bind (,val ,empty) ,a
+      (if ,empty
+        ,b
+        ,val))))
 
 (defun get-arg(var params arglist keyword-alist)
   (cond
     ((assoc var keyword-alist)  (alref var keyword-alist))
-    ((no params)  nil)
+    ((no params)  (values nil 'no-arg))
     ((iso params var)  arglist)
-    ((not (consp params))   nil)
+    ((not (consp params))   (values nil 'no-arg))
     ((assoc (car params) keyword-alist)  (get-arg var (cdr params) arglist keyword-alist))
-    ((no arglist)  nil)
-    (t   (or (get-arg var (car params) (car arglist) keyword-alist)
+    ((no arglist)  (values nil 'no-arg))
+    (t   (fa (get-arg var (car params) (car arglist) keyword-alist)
              (get-arg var (cdr params) (cdr arglist) keyword-alist)))))
 
 (defun keyword-args(args rest-param)
