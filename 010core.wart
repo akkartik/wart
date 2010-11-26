@@ -58,9 +58,6 @@
       `(let ,(car parms) ,(cadr parms)
          (withs ,(cddr parms) ,@body))))
 
-(mac each(var vals . body)
-  `(loop for ,var in ,vals do ,@body))
-
 (mac w/uniq(names . body)
   (if (consp names)
       `(with ,(apply #'join nil (map (fn(n) (list n '(uniq)))
@@ -120,8 +117,3 @@
 (mac wc-case(expr . args)
   `(caselet ,(uniq) ,expr ,@args))
 (special-form case wc-case)
-
-;? (def match(a b)
-;?   (if (is b _)
-;?     t
-;?     (all (match
