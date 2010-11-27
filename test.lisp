@@ -26,8 +26,6 @@
 
 
 
-(format t "~%")
-
 (loop for path in (directory "./*.*") do
   (let ((file (file-namestring path)))
     (when (and (string< "" file)
@@ -42,6 +40,4 @@
   ((> *test-failures* 1)
     (format t "~%~a failures~%" *test-failures*))
   ((> *test-failures* 0)
-    (format t "~%~a failure~%" *test-failures*))
-  (t
-    (format t "~%")))
+    (format t "~%~a failure~%" *test-failures*)))

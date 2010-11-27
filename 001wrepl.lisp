@@ -6,7 +6,8 @@
       (format t "wart> ")(finish-output))
     (format t "~a~%" (wc-eval (read)))))
 
-(setf *batch-mode* nil)
+(unless (boundp '*batch-mode*)
+  (setf *batch-mode* nil))
 
 ; To override a lisp keyword, write it as a macro with a different name, then
 ; register the macro with the right name.

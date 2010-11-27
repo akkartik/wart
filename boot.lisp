@@ -9,4 +9,5 @@
           ((equal ext "lisp") (load file))
           ((equal ext "wart") (wload file)))))))
 
-(wrepl)
+(unless *batch-mode*
+  (wrepl))
