@@ -1,0 +1,43 @@
+(test-wc "alternative syntax for fn"
+  :valueof (call [+ _ 1] 3)
+  :should be 4)
+
+(test "ssyntax-char works on final position"
+  :valueof (ssyntax-char "a@")
+  :should satisfy true_value)
+
+(test "ssyntax-char returns index of rightmost ssyntax"
+  :valueof (ssyntax-char "a@b@cd")
+  :should be 3)
+
+(test "ssyntax-char takes starting index"
+  :valueof (ssyntax-char "a@b@cd" 2)
+  :should be 1)
+
+(test "ssyntaxp works"
+  :valueof (ssyntaxp 'a+b)
+  :should satisfy true_value)
+
+(test "ssyntaxp ignores ordinary lisp tokens"
+  :valueof (ssyntaxp 'a-b-c)
+  :should be nil)
+
+(test "expand-ssyntax translates ^ to compose"
+  :valueof (expand-ssyntax 'a^b)
+  :should be '(compose a b))
+
+(test "expand-ssyntax translates ~ to complement"
+  :valueof (expand-ssyntax '~b)
+  :should be '(complement b))
+
+(test "expand-ssyntax translates . to just a call"
+  :valueof (expand-ssyntax 'a.b)
+  :should be '(call a b))
+
+(test "expand-ssyntax translates ! to just a call"
+  :valueof (expand-ssyntax 'a!b)
+  :should be '(call-quoted a b))
+
+(test ". and ! are left-associative"
+  :valueof (expand-ssyntax 'a.b!c.d)
+  :should be '(call (call-quoted (call a b) c) d))

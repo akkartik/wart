@@ -21,8 +21,11 @@
 (defmacro be(&rest args)
   `(iso ,@args))
 
-(defun satisfy(x f)
-  (call f x))
+(defmacro satisfy(x f)
+  `(call (function ,f) ,x))
+
+(defun true_value(x)
+  x)
 
 
 

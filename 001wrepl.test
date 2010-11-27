@@ -30,4 +30,4 @@
 (wc-eval '(mac aand(a b) `(let it ,a (and it ,b))))
 (test-wc "macro bodies should pass through the compiler"
   :valueof (let x 3 (aand (- x 1) (> it 1)))
-  :should be t)
+  :should satisfy true_value)

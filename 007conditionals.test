@@ -8,7 +8,7 @@
 
 (test-wc "in works - 1"
   :valueof (let a 3 (in a 1 2 3))
-  :should be t)
+  :should satisfy true_value)
 
 (test-wc "in works - 2"
   :valueof (let a 1 (in a 2 3))

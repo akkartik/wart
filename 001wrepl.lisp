@@ -46,6 +46,7 @@
 (defun wc-1(sexp)
   (cond
     ((no sexp)                        sexp)
+    ((ssyntaxp sexp)                  (expand-ssyntax sexp))
     ((atom sexp)                      sexp)
     ((and (is 'quote (car sexp))
           (no (caddr sexp)))
