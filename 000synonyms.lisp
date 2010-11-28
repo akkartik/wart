@@ -9,9 +9,11 @@
          is eq
          iso equal
          uniq gensym
+         macp macro-function
          macex macroexpand
          macex1 macroexpand-1
-         err error)
+         err error
+         errsafe ignore-errors)
 
 (defun pr(arg)
   (format t "~a" arg))
