@@ -15,11 +15,11 @@
   :should be 1)
 
 (test "ssyntaxp works"
-  :valueof (ssyntaxp 'a+b)
+  :valueof (ssyntaxp 'a@b)
   :should satisfy true_value)
 
 (test "ssyntaxp ignores ordinary lisp tokens"
-  :valueof (ssyntaxp 'a-b-c)
+  :valueof (ssyntaxp 'a+b-c)
   :should be nil)
 
 (test "expand-ssyntax translates ^ to compose"
