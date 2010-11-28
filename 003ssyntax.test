@@ -1,7 +1,3 @@
-(test-wart "alternative syntax for fn"
-  :valueof (call [+ _ 1] 3)
-  :should be 4)
-
 (test "ssyntax-char works on final position"
   :valueof (ssyntax-char "a@")
   :should satisfy true_value)

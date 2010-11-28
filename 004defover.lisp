@@ -17,8 +17,9 @@
 ;; Internals
 
 (defun lookup-unquoted-handler(sexp)
-  (or (gethash (car sexp) *wart-special-form-handlers*)
-      (gethash (type-of (car sexp)) *wart-type-handlers*)))
+  (and (consp sexp)
+       (or (gethash (car sexp) *wart-special-form-handlers*)
+           (gethash (type-of (car sexp)) *wart-type-handlers*))))
 
 (defun lookup-quoted-handler(name)
   (or (gethash name *wart-special-form-quoted-handlers*)

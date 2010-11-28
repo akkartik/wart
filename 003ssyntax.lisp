@@ -1,24 +1,19 @@
 ;; Simple syntax shortcuts that expand to s-expressions.
 
-; [..] => (lambda(_) (..))
-; http://arclanguage.org/item?id=11551
-(set-macro-character #\] (get-macro-character #\)))
-(set-macro-character #\[
-  #'(lambda(stream char)
-      (declare (ignore char))
-      (apply #'(lambda(&rest args)
-                 `(lambda(_) (,@args)))
-             (read-delimited-list #\] stream t))))
-
 (defun def-ssyntax(char handler-name)
   (setf (gethash char *wart-ssyntax-handler*)
         handler-name))
 
+(defvar *wart-ssyntax-handler* (make-hash-table))
+
+(def-ssyntax #\^ 'compose)
+(def-ssyntax #\~ 'complement)
+(def-ssyntax #\. 'call)
+(def-ssyntax #\! 'call-quoted)
+
 
 
 ;; Internals
-
-(defvar *wart-ssyntax-handler* (make-hash-table))
 
 (defun ssyntaxp(x)
   (and (symbolp x)
@@ -29,6 +24,8 @@
     (if (> (len symname) 1)
       (expand-ssyntax-string symname)
       sym)))
+
+(add-wart-transformer #'ssyntaxp #'expand-ssyntax)
 
 (defun expand-ssyntax-string(s &optional (idx (1- (len s)))) ; left-associative
   (let ((ssyntax-idx  (ssyntax-char s idx)))
@@ -48,11 +45,3 @@
                          '(#\~ #\! #\@ #\$ #\% #\^ #\. #\< #\>)) ; & _ +
              idx)
            (ssyntax-char s (1- idx)))))
-
-(add-wart-transformer #'ssyntaxp #'expand-ssyntax)
-(add-wart-transformer #'atom #'idfn)
-
-(def-ssyntax #\^ 'compose)
-(def-ssyntax #\~ 'complement)
-(def-ssyntax #\. 'call)
-(def-ssyntax #\! 'call-quoted)
