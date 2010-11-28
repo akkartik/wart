@@ -1,29 +1,5 @@
 ; testing 001wrepl.lisp requires more than just 001wrepl.lisp
 
-(test-wart "wt-transform works through defuns"
-  :valueof (wt-transform '(defun foo(n) (let it n (+ it 1))))
-  :should be '(defun foo(n) (wart-let it n (+ it 1))))
-
-(test-wart "lookup-quoted-handler handles function-names"
-  :valueof (lookup-quoted-handler 'let)
-  :should be 'wart-let)
-
-(test "wt-transform-1 handles quoted special names"
-  :valueof (wt-transform-1 '(quote let))
-  :should be '(quote wart-let))
-
-(test "wt-transform handles quoted special names"
-  :valueof (wt-transform '(backq-list* 'let))
-  :should be '(backq-list* 'wart-let))
-
-(test-wart "wt-transform works through backquote"
-  :valueof (_let n 3 `(let it ,n (+ it 1)))
-  :should be '(wart-let it 3 (+ it 1)))
-
-(test "wt-transform works through defmacro"
-  :valueof (wt-transform '(defmacro foo(n) `(let it ,n (+ it 1))))
-  :should be '(defmacro foo(n) `(wart-let it ,n (+ it 1))))
-
 (wt-eval '(mac aand(a b) `(let it ,a (and it ,b))))
 (test-wart "macro bodies should pass through the compiler"
   :valueof (let x 3 (aand (- x 1) (> it 1)))

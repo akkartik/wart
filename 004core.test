@@ -1,3 +1,33 @@
+(test "wt-transform works on if"
+  :valueof (wt-transform '(if a b c))
+  :should be '(wart-if a b c))
+
+(test-wart "wt-transform works through defuns"
+  :valueof (wt-transform '(defun foo(n) (if a b c)))
+  :should be '(defun foo(n) (wart-if a b c)))
+
+(test-wart "lookup-quoted-handler handles function-names"
+  :valueof (lookup-quoted-handler 'if)
+  :should be 'wart-if)
+
+(test "wt-transform-1 handles quoted special names"
+  :valueof (wt-transform-1 '(quote if))
+  :should be '(quote wart-if))
+
+(test "wt-transform handles quoted special names"
+  :valueof (wt-transform '(backq-list* 'if))
+  :should be '(backq-list* 'wart-if))
+
+(test-wart "wt-transform works through backquote"
+  :valueof (_let a 3 `(if ,a b c))
+  :should be '(wart-if 3 b c))
+
+(test "wt-transform works through defmacro"
+  :valueof (wt-transform '(defmacro foo(n) `(if ,n b c d e)))
+  :should be '(defmacro foo(n) `(wart-if ,n b c d e)))
+
+
+
 (test-wart "new redefined if with one branch"
   :valueof (if nil 3)
   :should be nil)
