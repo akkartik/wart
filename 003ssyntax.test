@@ -28,7 +28,7 @@
 
 (test "expand-ssyntax translates . to just a call"
   :valueof (expand-ssyntax 'a.b)
-  :should be '(call a b))
+  :should be '(call* a b))
 
 (test "expand-ssyntax translates ! to just a call"
   :valueof (expand-ssyntax 'a!b)
@@ -36,4 +36,14 @@
 
 (test ". and ! are left-associative"
   :valueof (expand-ssyntax 'a.b!c.d)
-  :should be '(call (call-quoted (call a b) c) d))
+  :should be '(call* (call-quoted (call* a b) c) d))
+
+(test "expand numbers correctly"
+  :valueof (expand-ssyntax 'a.3)
+  :should be '(call* a 3))
+
+(defmacro ssyntax-bar(&rest x) x)
+(defover ssyntax-foo ssyntax-bar)
+(test "expand-syntax goes through wt-transform"
+  :valueof (expand-ssyntax 'ssyntax-foo.3)
+  :should be '(call* ssyntax-bar 3))

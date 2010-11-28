@@ -8,7 +8,7 @@
 
 (def-ssyntax #\^ 'compose)
 (def-ssyntax #\~ 'complement)
-(def-ssyntax #\. 'call)
+(def-ssyntax #\. 'call*)
 (def-ssyntax #\! 'call-quoted)
 
 
@@ -22,7 +22,7 @@
 (defun expand-ssyntax(sym)
   (let ((symname (symbol-name sym)))
     (if (> (len symname) 1)
-      (expand-ssyntax-string symname)
+      (wt-transform (expand-ssyntax-string symname))
       sym)))
 
 (add-wart-transformer #'ssyntaxp #'expand-ssyntax)
@@ -36,7 +36,7 @@
           (list handler (intern (cut s 1))) ; unary
           (list handler
                 (expand-ssyntax-string (cut s 0 ssyntax-idx))
-                (intern (cut s (1+ ssyntax-idx))))))
+                (ssyntax-parse-string (cut s (1+ ssyntax-idx))))))
       (intern s))))
 
 (defun ssyntax-char(s &optional (idx (1- (len s))))
@@ -45,3 +45,19 @@
                          '(#\~ #\! #\@ #\$ #\% #\^ #\. #\< #\>)) ; & _ +
              idx)
            (ssyntax-char s (1- idx)))))
+
+(defun ssyntax-parse-string(s)
+  (if (all-digits s)
+    (parse-integer s)
+    (intern s)))
+
+(defun all-digits(s)
+  (no (position-if (lambda(x) (no (digit-char-p x))) s)))
+
+(defmacro call*(a b)
+  (if (macp a)
+    `(,a ,b)
+    `(call (function ,a) ,b)))
+
+(defmacro call-quoted(a b)
+  `(call* ,a ',b))
