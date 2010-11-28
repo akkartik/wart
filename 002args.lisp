@@ -41,7 +41,7 @@
          (optional-alist  (optional-params params))
          (params-without-?  (params-without-defaults params))
          (rest-param  (rest-param params))
-         (z   (wc-getargs-exprs params-without-? non-keyword-args keyword-alist optional-alist)))
+         (z   (getargs-exprs params-without-? non-keyword-args keyword-alist optional-alist)))
     `((&rest ,ra)
       ; let* because wart will soon override let
       (let* ((,non-keyword-args  (strip-keyword-args ,ra ',rest-param))
@@ -49,7 +49,7 @@
           (let* ,z
             ,@body)))))
 
-(defun wc-getargs-exprs(params non-keyword-args keyword-alist optional-alist)
+(defun getargs-exprs(params non-keyword-args keyword-alist optional-alist)
   (map 'list
        (lambda(param)
           (list param
@@ -182,9 +182,9 @@
               (vars-in-optional-paramlist (cddr params)))))) ; skip default
 
 (defun alref(key alist)
-  (let ((foo (assoc key alist)))
-    (if (consp foo)
-      (cdr foo)
+  (let ((tmp (assoc key alist)))
+    (if (consp tmp)
+      (cdr tmp)
       ())))
 
 ; strip the colon
@@ -206,7 +206,7 @@
 (defun alref(key alist)
   (cdr (assoc key alist)))
 
-(defun wc-restify(arglist)
+(defun restify(arglist)
   (if (no arglist)
       '()
       (if (atom arglist)
