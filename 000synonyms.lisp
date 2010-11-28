@@ -48,3 +48,5 @@
   (if (functionp test)
     (position-if test s)
     (position test s)))
+
+(synonym table make-hash-table)

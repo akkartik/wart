@@ -25,9 +25,9 @@
       name))
 
 ; handlers are functions of the input s-expr
-(defvar *wart-special-form-handlers* (make-hash-table))
+(defvar *wart-special-form-handlers* (table))
 ; quoted handlers are names of the handlers; all handlers must be named
-(defvar *wart-special-form-quoted-handlers* (make-hash-table))
+(defvar *wart-special-form-quoted-handlers* (table))
 
 (add-wart-transformer
   [and (pairp _)

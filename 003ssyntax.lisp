@@ -4,7 +4,7 @@
   (setf (gethash char *wart-ssyntax-handler*)
         handler-name))
 
-(defvar *wart-ssyntax-handler* (make-hash-table))
+(defvar *wart-ssyntax-handler* (table))
 
 (def-ssyntax #\^ 'compose)
 (def-ssyntax #\~ 'complement)
