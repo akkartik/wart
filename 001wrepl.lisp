@@ -42,7 +42,7 @@
   (eval (wt-transform sexp)))
 
 (defun wt-transform(sexp)
-  (apply-to-all-subtrees #'wt-transform-1 sexp))
+  (apply-to-all #'wt-transform-1 sexp))
 
 (defun wt-transform-1(sexp)
   (cond
@@ -71,14 +71,10 @@
 (defvar *wart-special-form-quoted-handlers* (make-hash-table))
 (defvar *wart-type-quoted-handlers* (make-hash-table))
 
-(defun apply-to-all-subtrees(f sexp)
-  (if (consp sexp)
-    (call f (apply-to-all-leaves (lambda(_) (apply-to-all-subtrees f _)) sexp))
-    sexp))
-
-(defun apply-to-all-leaves(f sexp)
+(defun apply-to-all(f sexp)
   (cond
     ((no sexp)  nil)
     ((atom sexp)  (call f sexp))
-    (t   (cons (call f (car sexp))
-               (apply-to-all-leaves f (cdr sexp))))))
+    (t   (call f
+               (cons (apply-to-all f (car sexp))
+                     (apply-to-all f (cdr sexp)))))))
