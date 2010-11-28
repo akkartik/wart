@@ -13,7 +13,8 @@
          macex macroexpand
          macex1 macroexpand-1
          err error
-         errsafe ignore-errors)
+         errsafe ignore-errors
+         spawn sb-thread:make-thread)
 
 (defun pr(arg)
   (format t "~a" arg))
