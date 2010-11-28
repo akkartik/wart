@@ -18,20 +18,16 @@
 
 (defun lookup-unquoted-handler(sexp)
   (and (consp sexp)
-       (or (gethash (car sexp) *wart-special-form-handlers*)
-           (gethash (type-of (car sexp)) *wart-type-handlers*))))
+       (gethash (car sexp) *wart-special-form-handlers*)))
 
 (defun lookup-quoted-handler(name)
   (or (gethash name *wart-special-form-quoted-handlers*)
-      (gethash (type-of name) *wart-type-quoted-handlers*)
       name))
 
 ; handlers are functions of the input s-expr
 (defvar *wart-special-form-handlers* (make-hash-table))
-(defvar *wart-type-handlers* (make-hash-table))
 ; quoted handlers are names of the handlers; all handlers must be named
 (defvar *wart-special-form-quoted-handlers* (make-hash-table))
-(defvar *wart-type-quoted-handlers* (make-hash-table))
 
 (add-wart-transformer
   [and (pairp _)
