@@ -1,0 +1,21 @@
+(test-wart "old coercions continue to work"
+  :valueof (call (coerce 'car 'function) '(3))
+  :should be 3)
+
+(setf h (make-hash-table))
+(setf (gethash 0 h) 34)
+(test-wart "coercing hash tables to functions works"
+  :valueof (type (coerce h 'function))
+  :should be 'function)
+
+(test-wart "new expansion for call* works"
+  :valueof (macex1 '(call* h 0))
+  :should be '(funcall (wart-coerce h 'function) 0))
+
+(test-wart "call* on hash tables works"
+  :valueof (call* h 0)
+  :should be 34)
+
+(test-wart "coercing hash tables to functions in read position"
+  :valueof h.0
+  :should be 34)
