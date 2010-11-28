@@ -1,3 +1,2 @@
 (declaim (sb-ext:muffle-conditions warning))
-(declaim (sb-ext:muffle-conditions sb-ext:compiler-note))
 (setf *print-case* :downcase)
