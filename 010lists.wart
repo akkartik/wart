@@ -8,8 +8,3 @@
          join append
          keep remove-if-not
          trunc truncate)
-
-(def pairp(x)
-  (and (consp x)
-       (consp (cdr x))
-       (no (cddr x))))

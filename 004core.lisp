@@ -9,10 +9,6 @@
 (mac wc-do args `(call (fn() ,@args)))
 (special-form do wc-do)
 
-(def singlep(x)
-  (and (consp x)
-       (no (cdr x))))
-
 
 
 ;; Internals
