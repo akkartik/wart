@@ -23,10 +23,14 @@
 
 (defun idfn(x) x)
 
+(defun isnt(x y) (no (is x y)))
+
 (synonym len length
          rev reverse
          cut subseq
-         join append)
+         join append
+         keep remove-if-not
+         trunc truncate)
 
 (defun singlep(x)
   (and (consp x)
@@ -36,3 +40,8 @@
   (and (consp x)
        (consp (cdr x))
        (no (cddr x))))
+
+(defun pos(test s)
+  (if (functionp test)
+    (position-if test s)
+    (position test s)))

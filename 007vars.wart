@@ -29,3 +29,13 @@
        (list (list (car xs)))
       (cons (call f (car xs) (cadr xs))
             (pair (cddr xs) f))))
+
+(def isa(elem type)
+  (is (type elem) type))
+
+(mac w/uniq(names . body)
+  (if (consp names)
+      `(with ,(apply #'join nil (map (fn(n) (list n '(uniq)))
+                                     names))
+         ,@body)
+      `(let ,names (uniq) ,@body)))

@@ -9,8 +9,6 @@
 (defmacro fn(params &rest body)
   `(lambda ,@(compile-params params body)))
 
-(synonym cut subseq)
-
 (defun tuples(xs n &optional acc)
   (if (no xs)
     (nreverse acc)

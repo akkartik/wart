@@ -13,3 +13,11 @@
 (test-wart "map works"
   :valueof (map #'1+ '(2 3 4))
   :should be '(3 4 5))
+
+(test "w/uniq works with single var"
+  :valueof (macex1 '(w/uniq a 3))
+  :should be '(wart-let a (uniq) 3))
+
+(test "w/uniq works with multiple vars"
+  :valueof (macex1 '(w/uniq (a b) 3))
+  :should be '(with (a (uniq) b (uniq)) 3))
