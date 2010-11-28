@@ -49,6 +49,9 @@
              idx)
            (ssyntax-char s (1- idx)))))
 
+(add-wart-transformer #'ssyntaxp #'expand-ssyntax)
+(add-wart-transformer #'atom #'idfn)
+
 (def-ssyntax #\^ 'compose)
 (def-ssyntax #\~ 'complement)
 (def-ssyntax #\. 'call)

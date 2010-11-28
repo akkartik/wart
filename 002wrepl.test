@@ -1,0 +1,27 @@
+(test "generate-wart-transform works initially"
+  :valueof (let ((cases ())) (generate-wart-transform cases))
+  :should be '(defun wt-transform-1(sexp)
+                (cond
+                  ((no sexp) nil)
+                  (t sexp))))
+
+(test "generate-wart-transform works as we add to cases"
+  :valueof (let ((cases '((#'a #'b)))) (generate-wart-transform cases))
+  :should be '(defun wt-transform-1(sexp)
+                (cond
+                  ((no sexp) nil)
+                  ((funcall #'a sexp) (funcall #'b sexp))
+                  (t sexp))))
+
+(test "generate-wart-transform works with code cases"
+  :valueof (let ((cases '(((lambda(x) 34) (lambda(x) 35))))) (generate-wart-transform cases))
+  :should be '(defun wt-transform-1(sexp)
+                (cond
+                  ((no sexp) nil)
+                  ((funcall (lambda(x) 34) sexp) (funcall (lambda(x) 35) sexp))
+                  (t sexp))))
+
+(wt-eval '(mac aand(a b) `(let it ,a (and it ,b))))
+(test-wart "macro bodies should pass through the compiler"
+  :valueof (let x 3 (aand (- x 1) (> it 1)))
+  :should satisfy true_value)

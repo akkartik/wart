@@ -1,6 +1,0 @@
-; testing 001wrepl.lisp requires more than just 001wrepl.lisp
-
-(wt-eval '(mac aand(a b) `(let it ,a (and it ,b))))
-(test-wart "macro bodies should pass through the compiler"
-  :valueof (let x 3 (aand (- x 1) (> it 1)))
-  :should satisfy true_value)
