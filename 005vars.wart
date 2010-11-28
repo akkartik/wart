@@ -2,7 +2,7 @@
 
 (mac wart-map(f . seqs)
   `(map 'list ,f ,@seqs)) ; recursive map won't be transformed
-(special-form map wart-map)
+(defover map wart-map)
 
 (mac with(parms . body)
   `(call (fn ,(map #'car (pair parms))
@@ -11,7 +11,7 @@
 
 (mac wart-let(var val . body)
   `(with (,var ,val) ,@body))
-(special-form let wart-let)
+(defover let wart-let)
 
 (mac ret(var val . body)
   `(let ,var ,val ,@body ,var))

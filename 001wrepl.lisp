@@ -16,7 +16,8 @@
 ; in the program. Not even inside quoted expressions. Otherwise we can't
 ; handle backquoted expressions.
 
-(defmacro special-form(name new-name)
+; intentionally ugly name; minimize its use
+(defmacro defover(name new-name)
   `(progn
      (setf (gethash ',name *wart-special-form-handlers*)
            (lambda(_)

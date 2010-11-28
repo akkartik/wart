@@ -46,4 +46,4 @@
 
 (mac wart-case(expr . args)
   `(caselet ,(uniq) ,expr ,@args))
-(special-form case wart-case)
+(defover case wart-case)
