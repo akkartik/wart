@@ -10,18 +10,16 @@
   `(let it ,expr
      (if it
          ,@(if (cddr body)
-               `(,(car body) (aif ,@(cdr body)))
+               `(,car.body (aif ,@cdr.body))
                body))))
 
 (mac awhen(expr . body)
   `(let it ,expr (if it (do ,@body))))
 
 (mac aand args
-  (if (no args)
-      't
-      (no (cdr args))
-       (car args)
-      `(let it ,(car args) (and it (aand ,@(cdr args))))))
+  (if (no args)   t
+      (no cdr.args)   (car args)
+      `(let it ,car.args (and it (aand ,@cdr.args)))))
 
 (mac rfn(name parms . body)
   `(labels ((,name ,parms ,@body))
@@ -33,15 +31,15 @@
 (mac in(x . choices)
   (w/uniq g
     `(let ,g ,x
-       (or ,@(map (fn (c) `(is ,g ,c)) choices)))))
+       (or ,@(map (fn(c) `(is ,g ,c)) choices)))))
 
 (mac caselet(var expr . args)
   (let ex (afn(args)
-            (if (no (cdr args))
+            (if (no cdr.args)
                 (car args)
                 `(if (iso ,var ',(car args))
                      ,(cadr args)
-                     ,(self (cddr args)))))
+                     ,(self cddr.args))))
     `(let ,var ,expr ,(call ex args))))
 
 (mac wart-case(expr . args)
