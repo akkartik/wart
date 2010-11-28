@@ -1,20 +1,20 @@
-(test-wc "iflet works"
+(test-wart "iflet works"
   :valueof (iflet a 34 a 253)
   :should be 34)
 
-(test-wc "iflet works - 2"
+(test-wart "iflet works - 2"
   :valueof (iflet a nil a 253)
   :should be 253)
 
-(test-wc "in works - 1"
+(test-wart "in works - 1"
   :valueof (let a 3 (in a 1 2 3))
   :should satisfy true_value)
 
-(test-wc "in works - 2"
+(test-wart "in works - 2"
   :valueof (let a 1 (in a 2 3))
   :should be nil)
 
-(test-wc "caselet works"
+(test-wart "caselet works"
   :valueof (caselet x 'b
              a 1
              b 2

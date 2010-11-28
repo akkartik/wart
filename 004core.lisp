@@ -1,13 +1,13 @@
 (special-form type type-of) ; reserved keyword. bad dog in the manger CL!
 
-(mac wc-if args
+(mac wart-if args
   (if (oddp (length args)) ; there's an else
     `(cond ,@(tuples (insert-t-in-penultimate-position args) 2))
     `(cond ,@(tuples args 2))))
-(special-form if wc-if)
+(special-form if wart-if)
 
-(mac wc-do args `(call (fn() ,@args)))
-(special-form do wc-do)
+(mac wart-do args `(call (fn() ,@args)))
+(special-form do wart-do)
 
 
 

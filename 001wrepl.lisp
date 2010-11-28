@@ -4,7 +4,7 @@
   (loop
     (unless *batch-mode*
       (format t "wart> ")(finish-output))
-    (format t "~a~%" (wc-eval (read)))))
+    (format t "~a~%" (wt-eval (read)))))
 
 (unless (boundp '*batch-mode*)
   (setf *batch-mode* nil))
@@ -18,10 +18,10 @@
 
 (defmacro special-form(name new-name)
   `(progn
-     (setf (gethash ',name *wc-special-form-handlers*)
+     (setf (gethash ',name *wart-special-form-handlers*)
            (lambda(_)
              (cons ',new-name (cdr _))))
-     (setf (gethash ',name *wc-special-form-quoted-handlers*)
+     (setf (gethash ',name *wart-special-form-quoted-handlers*)
            ',new-name)))
 
 (defun wload(file)
@@ -29,7 +29,7 @@
     (loop with form = (read f)
           and eof = (gensym)
       do
-        (wc-eval form)
+        (wt-eval form)
         (setq form (read f nil eof))
       until (is form eof))))
 
@@ -37,13 +37,13 @@
 
 ;; Internals
 
-(defun wc-eval(sexp)
-  (eval (wc sexp)))
+(defun wt-eval(sexp)
+  (eval (wt-transform sexp)))
 
-(defun wc(sexp)
-  (apply-to-all-subtrees #'wc-1 sexp))
+(defun wt-transform(sexp)
+  (apply-to-all-subtrees #'wt-transform-1 sexp))
 
-(defun wc-1(sexp)
+(defun wt-transform-1(sexp)
   (cond
     ((no sexp)                        sexp)
     ((ssyntaxp sexp)                  (expand-ssyntax sexp))
@@ -55,20 +55,20 @@
     (t sexp)))
 
 (defun lookup-unquoted-handler(sexp)
-  (or (gethash (car sexp) *wc-special-form-handlers*)
-      (gethash (type-of (car sexp)) *wc-type-handlers*)))
+  (or (gethash (car sexp) *wart-special-form-handlers*)
+      (gethash (type-of (car sexp)) *wart-type-handlers*)))
 
 (defun lookup-quoted-handler(name)
-  (or (gethash name *wc-special-form-quoted-handlers*)
-      (gethash (type-of name) *wc-type-quoted-handlers*)
+  (or (gethash name *wart-special-form-quoted-handlers*)
+      (gethash (type-of name) *wart-type-quoted-handlers*)
       name))
 
 ; handlers are functions of the input s-expr
-(defvar *wc-special-form-handlers* (make-hash-table))
-(defvar *wc-type-handlers* (make-hash-table))
+(defvar *wart-special-form-handlers* (make-hash-table))
+(defvar *wart-type-handlers* (make-hash-table))
 ; quoted handlers are names of the handlers; all handlers must be named
-(defvar *wc-special-form-quoted-handlers* (make-hash-table))
-(defvar *wc-type-quoted-handlers* (make-hash-table))
+(defvar *wart-special-form-quoted-handlers* (make-hash-table))
+(defvar *wart-type-quoted-handlers* (make-hash-table))
 
 (defun apply-to-all-subtrees(f sexp)
   (if (consp sexp)

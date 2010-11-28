@@ -1,17 +1,17 @@
 ;; Primitives for binding variables
 
-(mac wc-map(f . seqs)
+(mac wart-map(f . seqs)
   `(map 'list ,f ,@seqs)) ; recursive map won't be transformed
-(special-form map wc-map)
+(special-form map wart-map)
 
 (mac with(parms . body)
   `(call (fn ,(map #'car (pair parms))
            ,@body)
          ,@(map #'cadr (pair parms))))
 
-(mac wc-let(var val . body)
+(mac wart-let(var val . body)
   `(with (,var ,val) ,@body))
-(special-form let wc-let)
+(special-form let wart-let)
 
 (mac ret(var val . body)
   `(let ,var ,val ,@body ,var))

@@ -44,6 +44,6 @@
                      ,(self (cddr args)))))
     `(let ,var ,expr ,(call ex args))))
 
-(mac wc-case(expr . args)
+(mac wart-case(expr . args)
   `(caselet ,(uniq) ,expr ,@args))
-(special-form case wc-case)
+(special-form case wart-case)

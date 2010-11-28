@@ -1,6 +1,6 @@
 (test "w/uniq works with single var"
   :valueof (macex1 '(w/uniq a 3))
-  :should be '(wc-let a (uniq) 3))
+  :should be '(wart-let a (uniq) 3))
 
 (test "w/uniq works with multiple vars"
   :valueof (macex1 '(w/uniq (a b) 3))

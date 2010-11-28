@@ -4,19 +4,19 @@
   `(let ((got ,expr))
      (unless (,(car predicate) got ,@(cdr predicate))
        (incf *test-failures*)
-       (format t "F ~a~%  got ~a~%" ,msg got))))
+       (prn "F " ,msg #\newline "  got " got))))
 
-(defmacro test-wc(msg Valueof expr Should &rest predicate)
-  `(let ((got (eval (wc ',expr))))
+(defmacro test-wart(msg Valueof expr Should &rest predicate)
+  `(let ((got (wt-eval ',expr)))
      (unless (,(car predicate) got ,@(cdr predicate))
        (incf *test-failures*)
-       (format t "F ~a~%  got ~a~%" ,msg got))))
+       (prn "F " ,msg #\newline "  got " got))))
 
 (defmacro pending-test(msg Valueof expr Should &rest predicate)
-  `(format t "X ~a~%" ,msg))
+  `(prn "X " ,msg))
 
-(defmacro pending-test-wc(msg Valueof expr Should &rest predicate)
-  `(format t "X ~a~%" ,msg))
+(defmacro pending-test-wart(msg Valueof expr Should &rest predicate)
+  `(pending-test ,msg ,Valueof ,expr ,Should ,@predicate))
 
 (defmacro be(&rest args)
   `(iso ,@args))
@@ -26,6 +26,10 @@
 
 (defun true_value(x)
   x)
+
+; Use this in tests rather than let or let*, they will be overridden
+(defmacro _let(var val &body body)
+  `(call (lambda(,var) ,@body) ,val))
 
 
 
