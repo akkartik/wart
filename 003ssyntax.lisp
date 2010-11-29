@@ -9,7 +9,7 @@
 (def-ssyntax #\^ 'compose)
 (def-ssyntax #\~ 'complement)
 (def-ssyntax #\. 'call*)
-(def-ssyntax #\! 'call-quoted)
+(def-ssyntax #\! 'call*-quoted)
 
 
 
@@ -55,9 +55,7 @@
   (no (position-if (lambda(x) (no (digit-char-p x))) s)))
 
 (defmacro call*(a b)
-  (if (macp a)
-    `(,a ,b)
-    `(call (function ,a) ,b)))
+  `(call ',a ,b))
 
-(defmacro call-quoted(a b)
+(defmacro call*-quoted(a b)
   `(call* ,a ',b))

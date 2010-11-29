@@ -5,7 +5,6 @@
                    args)))
 
 (synonym no null
-         call funcall
          is eq
          iso equal
          uniq gensym
@@ -19,6 +18,12 @@
 (defmacro ignore-redef(&body body)
   `(handler-bind (#+sbcl(sb-kernel:redefinition-warning 'muffle-warning))
      ,@body))
+
+(defun call(f &rest args)
+  (cond
+    ((and (symbolp f) (macp f))   (eval (macex `(,f ,@args))))
+    ((functionp f)  (apply f args))
+    (t  (apply (coerce f 'function) args))))
 
 (defun pr(arg)
   (format t "~a" arg))

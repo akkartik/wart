@@ -32,11 +32,11 @@
 
 (test "expand-ssyntax translates ! to just a call"
   :valueof (expand-ssyntax 'a!b)
-  :should be '(call-quoted a b))
+  :should be '(call*-quoted a b))
 
 (test ". and ! are left-associative"
   :valueof (expand-ssyntax 'a.b!c.d)
-  :should be '(call* (call-quoted (call* a b) c) d))
+  :should be '(call* (call*-quoted (call* a b) c) d))
 
 (test "expand numbers correctly"
   :valueof (expand-ssyntax 'a.3)
