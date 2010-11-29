@@ -4,19 +4,19 @@
   (setf (gethash char *wart-ssyntax-handler*)
         handler-name))
 
+; Standard ssyntax
 (defvar *wart-ssyntax-handler* (table))
 
-(def-ssyntax #\^ 'compose)
-(def-ssyntax #\~ 'complement)
+(def-ssyntax #\^ 'compose*)
+(def-ssyntax #\~ 'complement*)
 (def-ssyntax #\. 'call*)
 (def-ssyntax #\! 'call*-quoted)
 
-(defmacro compose(f g)
-  `(compose-fn (function ,f) (function ,g)))
+(defmacro compose*(f g)
+  `(compose (function ,f) (function ,g)))
 
-(defun compose-fn(f g)
-  (lambda(&rest args)
-    (funcall f (apply g args))))
+(defmacro complement*(f)
+  `(complement (function ,f)))
 
 (defmacro call*(a b)
   (cond
@@ -73,3 +73,7 @@
 (defun function-name-p(f)
   (and (atom f)
        (eval `(fboundp ',f))))
+
+(defun compose(f g)
+  (lambda(&rest args)
+    (call f (apply g args))))

@@ -20,11 +20,11 @@
 
 (test "expand-ssyntax translates ^ to compose"
   :valueof (expand-ssyntax 'a^b)
-  :should be '(compose a b))
+  :should be '(compose* a b))
 
 (test "expand-ssyntax translates ~ to complement"
   :valueof (expand-ssyntax '~b)
-  :should be '(complement b))
+  :should be '(complement* b))
 
 (test "expand-ssyntax translates . to just a call"
   :valueof (expand-ssyntax 'a.b)
@@ -69,3 +69,7 @@
 (test-wart "compose works"
   :valueof (call 1+^1+ 3)
   :should be 5)
+
+(test-wart "complement works"
+  :valueof (call ~oddp 3)
+  :should be nil)
