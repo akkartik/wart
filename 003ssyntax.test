@@ -47,3 +47,21 @@
 (test "expand-syntax goes through wt-transform"
   :valueof (expand-ssyntax 'ssyntax-foo.3)
   :should be '(call* ssyntax-bar 3))
+
+(defmacro macfoo(a) `(+ 1 ,a))
+(test-wart "call* handles macros"
+  :valueof (call* macfoo 3)
+  :should be 4)
+
+(setf a 2)
+(test-wart "call* handles macros with global bindings"
+  :valueof (call* macfoo a)
+  :should be 3)
+
+(test-wart "call* handles macros with bindings"
+  :valueof (_let a 3 (call* macfoo a))
+  :should be 4)
+
+(test-wart "call* handles incf macro"
+  :valueof (_let a 32 (call* incf a))
+  :should be 33)

@@ -5,6 +5,7 @@
                    args)))
 
 (synonym no null
+         call funcall ; bootstrap version
          is eq
          iso equal
          uniq gensym
@@ -14,16 +15,6 @@
          err error
          errsafe ignore-errors
          spawn sb-thread:make-thread)
-
-(defmacro ignore-redef(&body body)
-  `(handler-bind (#+sbcl(sb-kernel:redefinition-warning 'muffle-warning))
-     ,@body))
-
-(defun call(f &rest args)
-  (cond
-    ((and (symbolp f) (macp f))   (eval (macex `(,f ,@args))))
-    ((functionp f)  (apply f args))
-    (t  (apply (coerce f 'function) args))))
 
 (defun pr(arg)
   (format t "~a" arg))
@@ -59,3 +50,7 @@
     (position test s)))
 
 (synonym table make-hash-table)
+
+(defmacro ignore-redef(&body body)
+  `(handler-bind (#+sbcl(sb-kernel:redefinition-warning 'muffle-warning))
+     ,@body))
