@@ -31,3 +31,7 @@
 (test-wart "call handles macros with bindings"
   :valueof (_let a 3 (call 'macfoo a))
   :should be 4)
+
+(test-wart "call handles incf macro"
+  :valueof (_let a 32 (call incf a))
+  :should be 33)
