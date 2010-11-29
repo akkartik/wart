@@ -1,11 +1,18 @@
 (= *wart-coercions* (table))
 
+; No ssyntax in wart-coerce or you'll get an infinite loop.
 (def wart-coerce(val dest)
   (or (aand (gethash dest *wart-coercions*)
-            (gethash type.val it)
-            (call it val))
-      (call #'coerce val dest)))
+            (gethash (type val) it)
+            (funcall it val))
+      (funcall #'coerce val dest)))
 (defover coerce wart-coerce)
+
+(ignore-redef
+  (def call(f . args)
+    (if (functionp f)
+      (apply f args)
+      (apply (wart-coerce f 'function) args))))
 
 ; hash.key => (call (coerce hash 'function) key) => (call [gethash _ hash] key)
 (= (gethash 'function *wart-coercions*) (table))

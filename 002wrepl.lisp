@@ -63,7 +63,7 @@
 (defun apply-to-all(f sexp)
   (cond
     ((no sexp)  nil)
-    ((atom sexp)  (call f sexp))
+    ((atom sexp)  (funcall f sexp))
     (t   (call f
                (cons (apply-to-all f (car sexp))
                      (apply-to-all f (cdr sexp)))))))
