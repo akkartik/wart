@@ -41,9 +41,3 @@
 (test "expand numbers correctly"
   :valueof (expand-ssyntax 'a.3)
   :should be '(call* a 3))
-
-(defmacro ssyntax-bar(&rest x) x)
-(defover ssyntax-foo ssyntax-bar)
-(test "expand-syntax goes through wt-transform"
-  :valueof (expand-ssyntax 'ssyntax-foo.3)
-  :should be '(call* ssyntax-bar 3))
