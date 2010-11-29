@@ -65,4 +65,4 @@
 
 (defun function-name-p(f)
   (and (atom f)
-       (eval `(functionp ',f))))
+       (eval `(fboundp ',f))))
