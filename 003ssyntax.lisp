@@ -11,6 +11,41 @@
 (def-ssyntax #\. 'call*)
 (def-ssyntax #\! 'call*-quoted)
 
+(defmacro compose(f g)
+  `(compose-fn (function ,f) (function ,g)))
+
+(defun compose-fn(f g)
+  (lambda(&rest args)
+    (funcall f (apply g args))))
+;?   (let ((args (uniq)))
+;?     `(lambda(&rest ,args)
+;?       (funcall (function ',f)
+;?                (apply (function ',g)
+;?                       ,args)))))
+
+;? (defmacro compose(&rest args)
+;?   (let ((g (uniq)))
+;?     `(lambda(&rest args)
+;?        ,(labels ((self (fs)
+;?                    (if (cdr fs)
+;?                        (list (car fs) (self (cdr fs)))
+;?                        `(apply ,(if (car fs)
+;?                                   (if (function-name-p (car fs))
+;?                                     `(function ,(car fs))
+;?                                     (car fs))
+;?                                   'idfn)
+;?                                ,g)))))
+;?           (self args))))
+
+(defmacro call*(a b)
+  (cond
+    ((macp a)   `(,a ,b))
+    ((function-name-p a)  `(call (function ,a) ,b))
+    (t  `(call ',a ,b))))
+
+(defmacro call*-quoted(a b)
+  `(call* ,a ',b))
+
 
 
 ;; Internals
@@ -53,15 +88,6 @@
 
 (defun all-digits(s)
   (no (position-if (lambda(x) (no (digit-char-p x))) s)))
-
-(defmacro call*(a b)
-  (cond
-    ((macp a)   `(,a ,b))
-    ((function-name-p a)  `(call (function ,a) ,b))
-    (t  `(call ',a ,b))))
-
-(defmacro call*-quoted(a b)
-  `(call* ,a ',b))
 
 (defun function-name-p(f)
   (and (atom f)
