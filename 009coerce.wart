@@ -3,7 +3,7 @@
 ; No ssyntax in wart-coerce or you'll get an infinite loop.
 (def wart-coerce(val dest)
   (or (aand (gethash dest *wart-coercions*)
-            (gethash (type val) it)
+            (gethash (type* val) it)
             (funcall it val))
       (funcall #'coerce val dest)))
 (defover coerce wart-coerce)
@@ -17,4 +17,14 @@
 ; hash.key => (call (coerce hash 'function) key) => (call [gethash _ hash] key)
 (= (gethash 'function *wart-coercions*) (table))
 (setf (gethash 'hash-table (gethash 'function *wart-coercions*))
-      (fn(table) [gethash _ table]))
+      (fn(table) [gethash _ val*.table]))
+
+(def type*(val)
+  (if (and (isa val 'symbol) (not (fboundp val)))
+    (type* (eval val))
+    (type val)))
+
+(def val*(val)
+  (if (isa val 'symbol)
+    (val* (eval val))
+    val))
