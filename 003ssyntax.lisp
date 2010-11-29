@@ -55,9 +55,14 @@
   (no (position-if (lambda(x) (no (digit-char-p x))) s)))
 
 (defmacro call*(a b)
-  (if (macp a)
-    `(,a ,b)
-    `(call (function ,a) ,b)))
+  (cond
+    ((macp a)   `(,a ,b))
+    ((function-name-p a)  `(call (function ,a) ,b))
+    (t  `(call ',a ,b))))
 
 (defmacro call*-quoted(a b)
   `(call* ,a ',b))
+
+(defun function-name-p(f)
+  (and (atom f)
+       (eval `(functionp ',f))))
