@@ -16,6 +16,10 @@
          errsafe ignore-errors
          spawn sb-thread:make-thread)
 
+(defmacro ignore-redef(&body body)
+  `(handler-bind (#+sbcl(sb-kernel:redefinition-warning 'muffle-warning))
+     ,@body))
+
 (defun pr(arg)
   (format t "~a" arg))
 

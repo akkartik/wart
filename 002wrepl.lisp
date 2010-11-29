@@ -17,7 +17,7 @@
 
 ; Insert a case into the wart cond.
 (defmacro add-wart-transformer(check trans)
-  `(handler-bind (#+sbcl(sb-kernel:redefinition-warning #'muffle-warning))
+  `(ignore-redef
       (setf *wart-cases* (append *wart-cases* (list (list ',check ',trans))))
       (build-wart-transform)))
 
