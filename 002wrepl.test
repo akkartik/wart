@@ -1,12 +1,12 @@
 (test "generate-wart-transform works initially"
-  :valueof (let ((cases ())) (generate-wart-transform cases))
+  :valueof (_let cases () (generate-wart-transform cases))
   :should be '(defun wt-transform-1(sexp)
                 (cond
                   ((no sexp) nil)
                   (t sexp))))
 
 (test "generate-wart-transform works as we add to cases"
-  :valueof (let ((cases '((#'a #'b)))) (generate-wart-transform cases))
+  :valueof (_let cases '((#'a #'b)) (generate-wart-transform cases))
   :should be '(defun wt-transform-1(sexp)
                 (cond
                   ((no sexp) nil)
@@ -14,7 +14,7 @@
                   (t sexp))))
 
 (test "generate-wart-transform works with code cases"
-  :valueof (let ((cases '(((lambda(x) 34) (lambda(x) 35))))) (generate-wart-transform cases))
+  :valueof (_let cases '(((lambda(x) 34) (lambda(x) 35))) (generate-wart-transform cases))
   :should be '(defun wt-transform-1(sexp)
                 (cond
                   ((no sexp) nil)
