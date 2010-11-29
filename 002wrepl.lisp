@@ -1,6 +1,7 @@
 ;; Extensible wart transformer
 ;; Inspired by http://awwx.posterous.com/how-to-future-proof-your-code
 
+; read transform macroexpand eval print
 (defun wrepl()
   (loop
     (wt-prompt)
@@ -18,7 +19,7 @@
 ; Insert a case into the wart cond.
 (defmacro add-wart-transformer(check trans)
   `(ignore-redef
-      (setf *wart-cases* (append *wart-cases* (list (list ',check ',trans))))
+      (setf *wart-cases* (append *wart-cases* (list (list ,check ,trans))))
       (build-wart-transform)))
 
 
