@@ -1,0 +1,3 @@
+(test-wart "old coercions continue to work"
+  :valueof (call (coerce 'car 'function) '(3))
+  :should be 3)

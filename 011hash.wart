@@ -1,0 +1,4 @@
+; hash.key => (call (coerce hash 'function) key) => (call [gethash _ hash] key)
+(= (gethash 'function *wart-coercions*) (table))
+(setf (gethash 'hash-table (gethash 'function *wart-coercions*))
+      (fn(table) [gethash _ val*.table]))
