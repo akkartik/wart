@@ -183,7 +183,7 @@
   (let ((tmp (assoc key alist)))
     (if (consp tmp)
       (cdr tmp)
-      ())))
+      nil)))
 
 ; strip the colon
 (defun keyword->symbol(k)
@@ -203,24 +203,6 @@
 
 (defun alref(key alist)
   (cdr (assoc key alist)))
-
-(defun restify(arglist)
-  (if (no arglist)
-      '()
-      (if (atom arglist)
-          `(&rest ,arglist)
-          (compile-dots arglist))))
-
-(defun compile-dots(xs)
-  (mapcar (lambda(_)
-            (if (consp _)
-              (compile-dots _)
-              _))
-          (append (butlast xs)
-                  (let ((x (last xs)))
-                    (if (cdr x)
-                        `(,(car x) &rest ,(cdr x))
-                        x)))))
 
 (defun _partition(s delims)
   (destructuring-bind (x xs) (cut-at-first-available s delims)
