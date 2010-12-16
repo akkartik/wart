@@ -27,6 +27,13 @@
 (defun true_value(x)
   x)
 
+(defun match(a b)
+  (or (is a b)
+      (is a '_)
+      (and (consp a) (consp b)
+           (match (car a) (car b))
+           (match (cdr a) (cdr b)))))
+
 ; Use this in tests rather than let or let*, they will be overridden
 (defmacro _let(var val &body body)
   `(call (lambda(,var) ,@body) ,val))

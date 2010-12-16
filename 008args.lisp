@@ -27,6 +27,114 @@
 
 
 
+;? (def foo(a b c ? d nil e 3 f (+ e 1) . rest) body)
+;? =>
+;? (defun foo(&rest args)
+;?   (destructuring-bind (a b c &optional d (e 3) (f (+ e 1)) &rest rest) (reorder-keyword-args args)
+;?     ..))
+
+(defun compile-params2(params body)
+  (if (or (not (consp params))
+          singlep.params)
+    ; only one kind of param; no need for distinguishing keyword args
+    `(,params ,@body)
+    (let* ((ra (uniq))
+           (converted-params (convert-params params))
+           (enumerated-params (enumerate-params converted-params)))
+    `((&rest ,ra)
+      (destructuring-bind ,converted-params (reorg-args ,ra ,enumerated-params)
+        ,@body)))))
+
+(defun convert-params(params)
+  (cond
+    ((no params)  nil)
+    ((rest-param-p params)   (list '&rest params))
+    ((is '? (car params))   (cons '&optional
+                                  (convert-optional-params (cdr params))))
+    (t  (cons (car params)
+              (convert-params (cdr params))))))
+
+; like convert-params, but pair optionals with defaults
+(defun convert-optional-params(params)
+  (cond
+    ((no params)  nil)
+    ((rest-param-p params)   (list '&rest params))
+    (t  (cons (list (car params) (cadr params))
+              (convert-optional-params (cddr params))))))
+
+(defun enumerate-params(params)
+  (cond
+    ((no params)  nil)
+    ((vararg-param-p params)   (list params))
+    ((is '&optional (car params))   (enumerate-optional-params (cdr params)))
+    ((is '&rest (car params))   (cdr params)) ; shortcut without error-checking
+    (t  (cons (car params)
+              (enumerate-params (cdr params))))))
+
+(defun enumerate-optional-params(params)
+  (cond
+    ((no params)  nil)
+    ((is '&rest (car params))   (cdr params)) ; shortcut without error-checking
+    ((consp (car params))   (cons (caar params) ; strip defaults
+                                  (enumerate-optional-params (cdr params))))
+    (t  (cons (car params)
+              (enumerate-optional-params (cdr params))))))
+
+(defun rest-param-p(params)
+  (not (consp params)))
+
+(defun vararg-param-p(params)
+  (not (consp params)))
+
+(defun reorg-args(args params)
+  (if (no-keywords args)
+    args
+    (destructuring-bind (nonkeyword keyword) (parse-args args)
+      (generate-args required optional rest nonkeyword keyword))))
+
+(defun no-keywords(args)
+  (not (some #'keywordp args)))
+
+(defun parse-params(params)
+  (let ((optional-index (position '? params))
+        (rest-index (position '&rest params))
+        (len (length params)))
+    (list (subseq params 0 (or optional-index rest-index len))
+          (if optional-index
+            (pair (subseq params (1+ optional-index) (or rest-index len))))
+          (if rest-index
+            (elt params (1+ rest-index))))))
+
+(defun generate-args(req opt rest nonk key)
+  (append (generate-required-args req nonk key)
+          (generate-optional-args opt nonk key)
+          rest))
+
+(defun generate-required-args(req nonk key)
+  (if req
+    (if (alref key car.req)
+      (cons (alref key car.req)
+            (generate-required-args cdr.req nonk key))
+      (cons car.nonk
+            (generate-required-args cdr.req cdr.nonk key)))))
+
+(defun generate-optional-args(opt nonk key)
+  (if opt
+    (destructuring-bind (var default) car.opt
+      (if (alref key var)
+        (cons (alref key var)
+              (generate-optional-args cdr.opt nonk key))
+        (if nonk
+          (cons car.nonk
+                (generate-optional-args cdr.opt cdr.nonk key))
+          (cons (eval default)
+                (generate-optional-args cdr.opt nil key)))))))
+
+;? ; this won't work because the arg list is quoted. perhaps we can just eval?
+;? (defun foo(&rest args)
+;?   (destructuring-bind (a b c d e f &rest rest) (reorg-args args '(a b c ? d nil e 3 f (+ e 1)))
+;?     ..))
+
 ;; Internals
 
 ; handles destructuring, . for rest

@@ -1,21 +1,159 @@
 (defun foo() 34)
-(test-wart "simple defun"
+(test-wart "simple defun works as before"
   :valueof (foo)
   :should be 34)
 
 (progn
   (defun foo0() 3)
   (defun foo1() (+ 1 (foo0))))
-(test-wart "nested defuns"
+(test-wart "nested defuns work as before"
   :valueof (foo1)
   :should be 4)
 
 (progn
   (defmacro foo2(n) `(+ 1 ,n))
   (defmacro foo3(n) `(+ 1 (foo2 ,n))))
-(test-wart "nested macros"
+(test-wart "nested macros work as before"
   :valueof (foo3 2)
   :should be 4)
+
+(test "match"
+  :valueof (match 3 3)
+  :should be t)
+
+(test "match"
+  :valueof (match 3 4)
+  :should be nil)
+
+(test "match"
+  :valueof (match '(1 (2 3)) '(1 (2 3)))
+  :should be t)
+
+(test "match"
+  :valueof (match '(2 (2 3)) '(1 (2 3)))
+  :should be nil)
+
+(test "match"
+  :valueof (match '_ 3)
+  :should be t)
+
+(test "match"
+  :valueof (match '(1 (_ 3)) '(1 (2 3)))
+  :should be t)
+
+(test "match"
+  :valueof (match '(2 (_ 3)) '(1 (2 3)))
+  :should be nil)
+
+(test "convert-params passes through by default"
+  :valueof (convert-params '(a b c d))
+  :should be '(a b c d))
+
+(test "convert-params handles varargs"
+  :valueof (convert-params 'a)
+  :should be '(&rest a))
+
+(test "convert-params translates optional syntax"
+  :valueof (convert-params '(a b ? c 1 d 2))
+  :should be '(a b &optional (c 1) (d 2)))
+
+(test "convert-params translates rest syntax"
+  :valueof (convert-params '(a b ? c 1 d 2 . e))
+  :should be '(a b &optional (c 1) (d 2) &rest e))
+
+(test "enumerate-params passes through by default - 1"
+  :valueof (enumerate-params '(a b c d))
+  :should be '(a b c d))
+
+(test "enumerate-params passes through by default - 2"
+  :valueof (enumerate-params 'a)
+  :should be '(a))
+
+(test "enumerate-params filters &optional and defaults"
+  :valueof (enumerate-params '(a b &optional c (d 2)))
+  :should be '(a b c d))
+
+(test "enumerate-params filters &rest"
+  :valueof (enumerate-params '(a b &optional (c 2) (d 3) &rest e))
+  :should be '(a b c d e))
+
+(test "0"
+  :valueof (no-keywords '())
+  :should be t)
+
+(test "0"
+  :valueof (no-keywords '(1 2 3 a b "def"))
+  :should be t)
+
+(test "0"
+  :valueof (no-keywords '(1 2 3 a b "def" :z))
+  :should be nil)
+
+(test "0"
+  :valueof (parse-params '(a b c))
+  :should be '((a b c) nil nil))
+
+(test "0"
+  :valueof (parse-params '(a ? b 3 c 4))
+  :should be '((a) ((b 3) (c 4)) nil))
+
+(test "0"
+  :valueof (parse-params '(a ? b 3 c 4 &rest d))
+  :should be '((a) ((b 3) (c 4)) d))
+
+
+(test "0"
+  :valueof (parse-args '())
+  :should be '(() ()))
+
+(test "0"
+  :valueof (parse-args '(a b c))
+  :should be '((a b c) ()))
+
+(test "0"
+  :valueof (parse-args '(a b :f c))
+  :should be '((a b) ((f c))))
+
+
+(test "0"
+  :valueof (reorg-args '(3 4) '(a b))
+  :should be '(3 4))
+
+(test "0"
+  :valueof (reorg-args '(:a 3 4) '(a b))
+  :should be '(3 4))
+
+(test "0"
+  :valueof (reorg-args '(:b 3 4) '(a b))
+  :should be '(4 3))
+
+(test "0"
+  :valueof (reorg-args '(:b 3 4) '(a ? b 5))
+  :should be '(4 3))
+
+(test "0"
+  :valueof (reorg-args '(4) '(a ? b 5))
+  :should be '(4 5))
+
+(test "0"
+  :valueof (reorg-args '() '(a ? b 5))
+  :should be "missing arg: a")
+
+(test "compile-params expands right for simple case - 1"
+  :valueof (macex1 '(compile-params2 args (args)))
+  :should be '(args args))
+
+(test "compile-params expands right for simple case - 2"
+  :valueof (macex1 '(compile-params2 (a) (a)))
+  :should be '((a) a))
+
+(test "compile-params works"
+  :valueof (macex1 '(compile-params2 (a b ? c . body) (list a b c body)))
+  :should match '((&rest _)
+                  (destructuring-bind (a b &optional c &rest body) (reorg-args _)
+                    (list a b c body))))
+
+
 
 (test "vars-in-paramlist returns simple params"
   :valueof (vars-in-paramlist '(a b c))
@@ -236,39 +374,27 @@
   :should be '(3))
 
 (wt-eval '(def foo14(a ? b 4) (cons a b)))
-(test-wart "optional param with a default"
-  :valueof (foo14 3)
-  :should be '(3 . 4))
-
-(test-wart "optional named arg"
+(test-wart "named arg around optional params"
   :valueof (foo14 :a 3)
   :should be '(3 . 4))
 
-(test-wart "distinguish destructured from optional params"
-  :valueof (call (fn((a b)) (list a b)) '(1 (2)))
-  :should be '(1 (2)))
-
-(test-wart "distinguish destructured from optional params - 2"
-  :valueof (call (fn((a (b))) (list a b)) '(1 (2)))
-  :should be '(1 2))
-
-(test-wart "args should override optional params"
-  :valueof (foo14 3 :b 2)
-  :should be '(3 . 2))
-
-(test-wart "optional arg without naming"
+(test-wart "optional args should override defaults"
   :valueof (foo14 3 2)
   :should be '(3 . 2))
 
-(test-wart "nil overrides default for optional arg"
+(test-wart "named optional args should override defaults"
+  :valueof (foo14 3 :b 2)
+  :should be '(3 . 2))
+
+(test-wart "nil optional arg overrides default"
   :valueof (foo14 3 :b nil)
   :should be '(3))
 
-(test-wart "nil overrides default for optional arg without naming"
+(test-wart "nil optional arg overrides default without naming"
   :valueof (foo14 3 nil)
   :should be '(3))
 
-(test-wart "allow optional params to refer to variables"
+(test-wart "defaults can be variables"
   :valueof (_let a 3 (call (fn(? x a) x)))
   :should be 3)
 
@@ -276,14 +402,6 @@
 (test-wart "multiple optional params"
   :valueof (foo15 3)
   :should be '(4))
-
-(test-wart "allow optional named args out of order"
-  :valueof (foo15 3 :c 2 :b nil)
-  :should be '(nil . 2))
-
-(test-wart "allow optional args in order without naming"
-  :valueof (foo15 3 nil 2)
-  :should be '(nil . 2))
 
 (wt-eval '(def foo16(a . b) b))
 (test-wart "rest args can be named"
@@ -300,29 +418,20 @@
   :should be '(3 4 5))
 
 (test-wart "optional + named rest args - 2"
-  :valueof (foo17 2 4 :c 3)
-  :should be '(4 3))
+  :valueof (foo17 2 4 :c 5)
+  :should be '(4 5))
 
 (test-wart "optional + named rest args - 3"
   :valueof (foo17 2 4 1)
   :should be '(3 4 1))
 
-(test-wart "optional + named rest args - 3"
+(test-wart "optional + named rest args - 4"
   :valueof (foo17 2 :b 4 3)
   :should be '(4 3))
-
-(wt-eval '(def foo18(a ? b nil c 3 . body) (list b c body)))
-(test-wart "call with some optional and rest args without naming"
-  :valueof (foo18 3 4 :body 4 5)
-  :should be '(4 3 (4 5)))
 
 (test-wart "convention: :do => :body"
   :valueof (foo18 3 4 :do 4 5)
   :should be '(4 3 (4 5)))
-
-(test-wart "call with some named optional and rest args"
-  :valueof (foo18 3 :c 4 :body 4 5)
-  :should be '(nil 4 (4 5)))
 
 (test-wart "tuples works"
   :valueof (tuples '(1 2 3 4 5 6) 3)
