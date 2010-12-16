@@ -195,6 +195,10 @@
   :valueof (foo8 3)
   :should be nil)
 
+(test-wart "'required' params are really just optional"
+  :valueof (foo8)
+  :should be nil)
+
 (wt-eval '(def foo9((a b)) b))
 (test-wart "destructured args"
   :valueof (foo9 '(3 4))
@@ -291,13 +295,17 @@
   :valueof (foo17 2 :c 3)
   :should be '(3 3))
 
+(test-wart "rest args take precedence over optionals"
+  :valueof (foo17 1 4 5)
+  :should be '(3 4 5))
+
 (test-wart "optional + named rest args - 2"
   :valueof (foo17 2 4 :c 3)
   :should be '(4 3))
 
 (test-wart "optional + named rest args - 3"
-  :valueof (foo17 2 4 3 1)
-  :should be '(4 3 1))
+  :valueof (foo17 2 4 1)
+  :should be '(3 4 1))
 
 (test-wart "optional + named rest args - 3"
   :valueof (foo17 2 :b 4 3)
