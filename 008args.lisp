@@ -187,7 +187,9 @@
 
 ; strip the colon
 (defun keyword->symbol(k)
-  (intern (symbol-name k)))
+  (if (is k ':do)
+    'body
+    (intern (symbol-name k))))
 
 (defun optional-vars(vars)
   (if (consp vars)

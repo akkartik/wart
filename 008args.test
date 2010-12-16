@@ -308,6 +308,10 @@
   :valueof (foo18 3 4 :body 4 5)
   :should be '(4 3 (4 5)))
 
+(test-wart "convention: :do => :body"
+  :valueof (foo18 3 4 :do 4 5)
+  :should be '(4 3 (4 5)))
+
 (test-wart "call with some named optional and rest args"
   :valueof (foo18 3 :c 4 :body 4 5)
   :should be '(nil 4 (4 5)))
