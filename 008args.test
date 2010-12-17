@@ -73,18 +73,6 @@
   :valueof (no-keywords '(1 2 3 a b "def" :z))
   :should be nil)
 
-(test "0"
-  :valueof (parse-params '(a b c))
-  :should be '((a b c) nil nil))
-
-(test "0"
-  :valueof (parse-params '(a ? b 3 c 4))
-  :should be '((a) ((b 3) (c 4)) nil))
-
-(test "0"
-  :valueof (parse-params '(a ? b 3 c 4 &rest d))
-  :should be '((a) ((b 3) (c 4)) d))
-
 (test "1"
   :valueof (reorg-args '(3 4) '(a b))
   :should be '(3 4))
@@ -116,7 +104,8 @@
 (test "compile-params works"
   :valueof (compile-params2 '(a b ? c 3 . body) '((list a b c body)))
   :should match '((&rest _)
-                  (destructuring-bind (a b &optional (c 3) &rest body) (reorg-args _ (a b &optional (c 3) &rest body))
+                  (destructuring-bind (a b &optional (c 3) &rest body)
+                                      (reorg-args _ (a b &optional (c 3) &rest body))
                     (list a b c body))))
 
 

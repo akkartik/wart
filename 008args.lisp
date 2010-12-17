@@ -78,23 +78,21 @@
 (defun no-keywords(args)
   (not (some #'keywordp args)))
 
-(defun parse-params(params)
-  (let ((optional-index (position '? params))
-        (rest-index (position '&rest params))
-        (len (length params)))
-    (list (subseq params 0 (or optional-index rest-index len))
-          (if optional-index
-            (pair (subseq params (1+ optional-index) (or rest-index len))))
-          (if rest-index
-            (elt params (1+ rest-index))))))
-
 (defun generate-args(req nonk key)
-  (when req
-    (if (alref (car req) key)
-      (cons (alref (car req) key)
-            (generate-args (cdr req) nonk key))
-      (cons (car nonk)
-            (generate-args (cdr req) (cdr nonk) key)))))
+  (cond
+    ((no req)   nil)
+    ((is '&optional (car req))  (generate-optional-args (cdr req) nonk key))
+    ((alref (car req) key)  (cons (alref (car req) key)
+                                  (generate-args (cdr req) nonk key)))
+    (t  (cons (car nonk)
+              (generate-args (cdr req) (cdr nonk) key)))))
+
+(defun generate-optional-args(req nonk key)
+  (cond
+    ((no req)   nil)
+    ((alref (car req) key)  (cons (alref (car req) key)
+                                  (generate-optional-args (cdr req) nonk key)))
+    (t nil))) ; optional args have their defaults already
 
 ;? ; this won't work because the arg list is quoted. perhaps we can just eval?
 ;? (defun foo(&rest args)
