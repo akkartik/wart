@@ -28,9 +28,6 @@
       (cons (call f car.xs cadr.xs)
             (pair cddr.xs f))))
 
-(def isa(elem typ)
-  (is typ type.elem))
-
 (mac w/uniq(names . body)
   (if (consp names)
       `(with ,(apply #'join nil (map [list _ '(uniq)]

@@ -22,6 +22,9 @@
      (setf (gethash ,src (gethash ,dest *wart-coercions*))
            ,converter)))
 
+(defun isa(elem typ)
+  (is typ (type-of elem)))
+
 
 
 ;; Internals
