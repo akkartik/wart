@@ -73,6 +73,25 @@
   :valueof (no-keywords '(1 2 3 a b "def" :z))
   :should be nil)
 
+(test "0"
+  :valueof (generate-rest-args nil '(a b c) '((a . 2) (b . 3)))
+  :should be nil)
+
+(test "0"
+  :valueof (generate-rest-args 'a '(1 2 3) nil)
+  :should be '(1 2 3))
+
+(test "0"
+  :valueof (generate-rest-args 'a '(4 5) '((a 1 2 3)))
+  :should be '(1 2 3))
+
+(test "0"
+  :valueof (generate-optional-args '((a 3) (b 4)) nil (4 5) nil)
+  :should be '(3 4))
+
+(test "0"
+  :valueof (generate-optional-args '((a 3
+
 (test "1"
   :valueof (reorg-args '(3 4) '(a b))
   :should be '(3 4))

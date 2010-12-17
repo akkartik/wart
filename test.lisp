@@ -2,6 +2,7 @@
 
 (defmacro test(msg Valueof expr Should &rest predicate)
   `(let ((got ,expr))
+     (prn ,msg)
      (unless (,(car predicate) got ,@(cdr predicate))
        (incf *test-failures*)
        (prn "F " ,msg #\newline "  got " got))))

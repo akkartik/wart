@@ -27,21 +27,23 @@
 
 
 
-;? (def foo(a b c ? d nil e 3 f (+ e 1) . rest) body)
-;? =>
-;? (defun foo(&rest args)
-;?   (destructuring-bind (a b c &optional d (e 3) (f (+ e 1)) &rest rest) (reorder-keyword-args args)
-;?     ..))
+; (def foo(a b c ? d nil e 3 f (+ e 1) . rest) body)
+; =>
+; (defun foo(&rest args)
+;   (destructuring-bind (a b c d e f &rest rest) (reorg-args args '(a b c ? d nil e 3 f (+ e 1) . rest))
+;     ..))
+; or
+;   (destructuring-bind (a b c d e f &rest rest) (reorg-args args '(a b c &optional (d nil) (e 3) (f (+ e 1)) &rest rest))
+;   but how to give that (+ e 1)?
 
 (defun compile-params2(params body)
   (if (or (not (consp params))
           (singlep params))
     ; only one kind of param; no need for distinguishing keyword args
     `(,params ,@body)
-    (let ((ra (uniq))
-          (converted-params (convert-params params)))
+    (let ((ra (uniq)))
     `((&rest ,ra)
-      (destructuring-bind ,converted-params (reorg-args ,ra ,converted-params)
+      (destructuring-bind ,converted-params (reorg-args ,ra ,params)
         ,@body)))))
 
 (defun convert-params(params)
@@ -70,29 +72,36 @@
 (defun reorg-args(args params)
   (if (no-keywords args)
     args
-    (let* ((rest-param (rest-param params))
-           (keyword (keyword-args args rest-param))
-           (nonkeyword (strip-keyword-args args rest-param)))
-      (generate-args params nonkeyword keyword))))
+    (destructuring-bind (req opt rest) (parse-params (convert-params params))
+      (let* ((keyword (keyword-args args rest))
+             (nonkeyword (strip-keyword-args args rest)))
+        (generate-args req opt rest nonkeyword keyword)))))
 
 (defun no-keywords(args)
   (not (some #'keywordp args)))
 
-(defun generate-args(req nonk key)
+(defun generate-args(req opt rest nonk key)
   (cond
-    ((no req)   nil)
-    ((is '&optional (car req))  (generate-optional-args (cdr req) nonk key))
+    ((no req)   (generate-optional-args req opt rest nonk key))
     ((alref (car req) key)  (cons (alref (car req) key)
-                                  (generate-args (cdr req) nonk key)))
+                                  (generate-args (cdr req) opt rest nonk key)))
     (t  (cons (car nonk)
-              (generate-args (cdr req) (cdr nonk) key)))))
+              (generate-args (cdr req) opt rest (cdr nonk) key)))))
 
-(defun generate-optional-args(req nonk key)
-  (cond
-    ((no req)   nil)
-    ((alref (car req) key)  (cons (alref (car req) key)
-                                  (generate-optional-args (cdr req) nonk key)))
-    (t nil))) ; optional args have their defaults already
+(defun generate-optional-args(opt rest nonk key)
+  (if (no opt)
+    (generate-rest-args rest nonk key)
+    (cons
+      (if (consp (car opt))
+        (foo (caar opt) (eval (cadr opt)) key)
+        (foo (car opt) nil key))
+      (generate-optional-args (cdr opt) rest nonk key))))
+
+(defun generate-rest-args(rest nonk key)
+  (if rest
+    (if (assoc rest key)
+      (alref rest key)
+      nonk)))
 
 ;? ; this won't work because the arg list is quoted. perhaps we can just eval?
 ;? (defun foo(&rest args)
