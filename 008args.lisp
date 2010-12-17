@@ -28,20 +28,31 @@
 
 
 ;; Internals
+;; Use let* everywhere here because wart will soon override let
 
-; handles destructuring, . for rest
-; returns a list whose first element is a common lisp lambda-list
-; (cltl2, 5.2.2)
+; 'first available' - like or, but a uses multiple values to indicate unavailable
+(defmacro fa(a b)
+  (let* ((val (uniq))
+         (empty (uniq)))
+    `(multiple-value-bind (,val ,empty) ,a
+      (if ,empty
+        ,b
+        ,val))))
+
+; returns arglist and body suitable for insertion into defun or lambda
+; new body understands keyword args
+; params format (optionals* ? lazy-optionals* . rest)
+; optionals can be destructured
+; lazy optionals require keywords if rest is present
 (defun compile-params(params body)
   (let* ((ra  (uniq))
          (non-keyword-args  (uniq))
          (keyword-alist   (uniq))
-         (optional-alist  (optional-params params))
+         (optional-alist  (optional-alist params))
          (params-without-?  (params-without-defaults params))
          (rest-param  (rest-param params))
          (z   (getargs-exprs params-without-? non-keyword-args keyword-alist optional-alist)))
     `((&rest ,ra)
-      ; let* because wart will soon override let
       (let* ((,non-keyword-args  (strip-keyword-args ,ra ',rest-param))
              (,keyword-alist   (keyword-args ,ra ',rest-param)))
           (let* ,z
@@ -54,15 +65,6 @@
                 `(fa (get-arg ',param ',params ,non-keyword-args ,keyword-alist)
                      ,(alref param optional-alist))))
        (vars-in-paramlist params)))
-
-; 'first available' - like or, but a uses multiple values to indicate unavailable
-(defmacro fa(a b)
-  (let ((val (uniq))
-        (empty (uniq)))
-    `(multiple-value-bind (,val ,empty) ,a
-      (if ,empty
-        ,b
-        ,val))))
 
 (defun get-arg(var params arglist keyword-alist)
   (cond
@@ -79,25 +81,13 @@
   (cond
     ((no args)  ())
     ((not (consp args))  ())
-    ((keywordp (car args))  (let ((param (keyword->symbol (car args))))
+    ((keywordp (car args))  (let* ((param (keyword->symbol (car args))))
                               (cons (cons param
                                           (if (iso param rest-param)
                                             (cdr args)
                                             (cadr args)))
                                     (keyword-args (cddr args) rest-param))))
     (t   (keyword-args (cdr args) rest-param))))
-
-(defun rest-param(params)
-  (cond
-    ((no params)  ())
-    ((not (consp params))   params)
-    (t   (rest-param (cdr params)))))
-
-(defun optional-params(params)
-  (partition-optional-params (extract-optional-params params)))
-
-(defun extract-optional-params(params)
-  (strip-required (strip-rest params)))
 
 (defun strip-keyword-args(args rest-param)
   (cond
@@ -107,6 +97,80 @@
                               (strip-keyword-args (cddr args) rest-param)))
     (t   (cons (car args) (strip-keyword-args (cdr args) rest-param)))))
 
+(defun optional-alist(params)
+  (partition-optional-params (strip-required (strip-rest params))))
+
+
+
+;; Slicing and dicing params
+
+(defun strip-required(params)
+  (if (consp params)
+    (let* ((optargs (member '? params)))
+      (if optargs
+        (cdr optargs)
+        ()))
+    params))
+
+(defun rest-param(params)
+  (cond
+    ((no params)  ())
+    ((rest-param-p params)  params)
+    (t   (rest-param (cdr params)))))
+
+(defun strip-rest(params)
+  (cond
+    ((no params) ())
+    ((rest-param-p params)  ())
+    (t   (cons (car params)
+               (strip-rest (cdr params))))))
+
+(defun undot(params)
+  (cond
+    ((no params)  ())
+    ((rest-param-p params)  (list params)) ; undot
+    (t (cons (car params)
+             (undot (cdr params))))))
+
+(defun strip-defaults(params)
+  (cond
+    ((no params)  ())
+    ((rest-param-p params)  params)
+    ((is '? (car params))   (really-strip-defaults (cdr params)))
+    (t  (strip-defaults (cdr params)))))
+
+; strip '? and defaults, undot rest args
+(defun vars-in-paramlist(params)
+  (cond
+    ((no params)  ())
+    ((rest-param-p params)  (list params))
+    ((iso (car params) '?)   (vars-in-optional-paramlist (cdr params)))
+    (t   (append (vars-in-paramlist (car params))
+                 (vars-in-paramlist (cdr params))))))
+
+(defun vars-in-optional-paramlist(params)
+  (cond
+    ((no params)  ())
+    ((rest-param-p params)  (list params))
+    (t (cons (car params)
+             (vars-in-optional-paramlist (cddr params))))))
+
+; like vars-in-paramlist, but don't undot rest args
+(defun params-without-defaults(params)
+  (cond
+    ((no params)  ())
+    ((rest-param-p params)  params)
+    ((iso (car params) '?)   (optional-params-without-defaults (cdr params)))
+    (t   (cons (car params)
+               (params-without-defaults (cdr params))))))
+
+(defun optional-params-without-defaults(params)
+  (cond
+    ((no params)  ())
+    ((rest-param-p params)  params)
+    (t  (cons (car params)
+              (optional-params-without-defaults (cddr params))))))
+
 (defun partition-optional-params(oparams)
   (cond
     ((not (consp oparams))  ())
@@ -115,75 +179,22 @@
                      (cadr oparams))
                (partition-optional-params (cddr oparams))))))
 
-(defun strip-required(params)
-  (if (consp params)
-    (let ((optargs (member '? params)))
-      (if optargs
-        (cdr optargs)
-        ()))
-    params))
+(defun rest-param-p(params)
+  (not (consp params)))
 
-(defun strip-rest(params)
+(defun vararg-param-p(params)
+  (not (consp params)))
+
+(defun really-strip-defaults(params)
   (cond
-    ((no params) ())
-    ((not (consp params))   ())
-    (t   (cons (car params)
-               (strip-rest (cdr params))))))
+    ((no params)   ())
+    ((rest-param-p params)  params)
+    ((not (consp (car params)))   (cons (car params)
+                                        (really-strip-defaults (cdr params))))
+    (t  (cons (caar params)
+              (really-strip-defaults (cdr params))))))
 
-(defun vars-in-paramlist(params)
-  (cond
-    ((no params)  ())
-    ((not (consp params))   (list params)) ; rest
-    ((iso (car params) '?)   (vars-in-optional-paramlist (cdr params)))
-    (t   (append (vars-in-paramlist (car params))
-                 (vars-in-paramlist (cdr params))))))
-
-(defun vars-in-optional-paramlist(params)
-  (cond
-    ((no params)  ())
-    ((not (consp params))   (list params)) ; rest
-    (t (cons (car params)
-             (vars-in-optional-paramlist (cddr params)))))) ; skip default
-
-; like vars-in-paramlist, but don't undot rest args
-(defun params-without-defaults(params)
-  (cond
-    ((no params)  ())
-    ((not (consp params))   params) ; rest
-    ((iso (car params) '?)   (optional-params-without-defaults (cdr params)))
-    (t   (cons (car params)
-               (params-without-defaults (cdr params))))))
-
-(defun optional-params-without-defaults(params)
-  (cond
-    ((no params)  ())
-    ((not (consp params))   params) ; rest
-    (t  (cons (car params)
-              (optional-params-without-defaults (cddr params)))))) ; skip default
-
-; like vars-in-paramlist, but stop at param
-(defun prior-params(param params)
-  (cond
-    ((no params)  ())
-    ((not (consp params))   (list params)) ; rest
-    ((iso param (car params))  ())
-    ((iso (car params) '?)   (prior-optional-params param (cdr params)))
-    (t   (append (prior-params param (car params))
-                 (prior-params param (cdr params))))))
-
-(defun prior-optional-params(param params)
-  (cond
-    ((no params)  ())
-    ((not (consp params))   (list params)) ; rest
-    ((iso param (car params))  ())
-    (t  (cons (car params)
-              (vars-in-optional-paramlist (cddr params)))))) ; skip default
-
-(defun alref(key alist)
-  (let ((tmp (assoc key alist)))
-    (if (consp tmp)
-      (cdr tmp)
-      nil)))
+
 
 ; strip the colon
 (defun keyword->symbol(k)
@@ -191,48 +202,5 @@
     'body
     (intern (symbol-name k))))
 
-(defun optional-vars(vars)
-  (if (consp vars)
-    (alist (cdr (cut-at vars '(? &rest))))))
-
-(defun strip-default-values(params)
-  (if (consp params)
-    (destructuring-bind (required optional rest) (_partition params '(? &rest))
-      (if rest
-        (append required (map 'list #'car (tuples optional 2)) '(&rest) rest)
-        (append required (map 'list #'car (tuples optional 2)))))
-    params))
-
 (defun alref(key alist)
   (cdr (assoc key alist)))
-
-(defun _partition(s delims)
-  (destructuring-bind (x xs) (cut-at-first-available s delims)
-    (cons x
-          (_partition-after xs delims))))
-
-(defun _partition-after(s delims)
-  (if (consp delims)
-    (if (is (car s) (car delims))
-      (destructuring-bind (x xs) (cut-at-first-available (cdr s) (cdr delims))
-        (cons x
-              (_partition-after xs (cdr delims))))
-      (cons nil (_partition-after s (cdr delims))))))
-
-(defun cut-at-first-available(s delims)
-  (let ((pos (position-first-available s delims)))
-    (if pos
-      (list (cut s 0 pos) (cut s pos))
-      (list s nil))))
-
-(defun position-first-available(s elems)
-  (if (consp elems)
-    (let ((pos (position (car elems) s)))
-      (if pos
-        pos
-        (position-first-available s (cdr elems))))))
-
-(defun cut-at(s delims)
-  (let ((positions (map (type-of s) (lambda(x) (position x s)) delims)))
-    (if (car positions)
-      (apply #'cut s positions))))

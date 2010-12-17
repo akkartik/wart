@@ -49,23 +49,23 @@
   :valueof (strip-keyword-args '(1 2 :a 3 4) 'a)
   :should be '(1 2))
 
-(test "optional-params works - 1"
-  :valueof (optional-params 'a)
+(test "optional-alist works - 1"
+  :valueof (optional-alist 'a)
   :should be nil)
-(test "optional-params 1"
-  :valueof (optional-params '(a b c))
+(test "optional-alist 1"
+  :valueof (optional-alist '(a b c))
   :should be nil)
-(test "optional-params 2"
-  :valueof (optional-params '(a b c ? d e))
+(test "optional-alist 2"
+  :valueof (optional-alist '(a b c ? d e))
   :should be '((d . e)))
-(test "optional-params 3"
-  :valueof (optional-params '(a b c ? d e f))
+(test "optional-alist 3"
+  :valueof (optional-alist '(a b c ? d e f))
   :should be '((d . e) (f)))
-(test "optional-params 4"
-  :valueof (optional-params '(a b c ? d e f nil))
+(test "optional-alist 4"
+  :valueof (optional-alist '(a b c ? d e f nil))
   :should be '((d . e) (f . nil)))
-(test "optional-params 5"
-  :valueof (optional-params '(a b c ? d e f nil . g))
+(test "optional-alist 5"
+  :valueof (optional-alist '(a b c ? d e f nil . g))
   :should be '((d . e) (f . nil)))
 
 (test "get-arg works for missing arg"
