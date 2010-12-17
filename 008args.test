@@ -34,15 +34,15 @@
   :should be nil)
 
 (test "match"
-  :valueof (match '_ 3)
+  :valueof (match 3 '_)
   :should be t)
 
 (test "match"
-  :valueof (match '(1 (_ 3)) '(1 (2 3)))
+  :valueof (match '(1 (2 3)) '(1 (_ 3)))
   :should be t)
 
 (test "match"
-  :valueof (match '(2 (_ 3)) '(1 (2 3)))
+  :valueof (match '(2 (2 3)) '(1 (_ 3)))
   :should be nil)
 
 (test "convert-params passes through by default"
@@ -101,21 +101,7 @@
   :valueof (parse-params '(a ? b 3 c 4 &rest d))
   :should be '((a) ((b 3) (c 4)) d))
 
-
-(test "0"
-  :valueof (parse-args '())
-  :should be '(() ()))
-
-(test "0"
-  :valueof (parse-args '(a b c))
-  :should be '((a b c) ()))
-
-(test "0"
-  :valueof (parse-args '(a b :f c))
-  :should be '((a b) ((f c))))
-
-
-(test "0"
+(test "1"
   :valueof (reorg-args '(3 4) '(a b))
   :should be '(3 4))
 
@@ -128,29 +114,25 @@
   :should be '(4 3))
 
 (test "0"
-  :valueof (reorg-args '(:b 3 4) '(a ? b 5))
+  :valueof (reorg-args '(:b 3 4) '(a b))
   :should be '(4 3))
 
 (test "0"
-  :valueof (reorg-args '(4) '(a ? b 5))
-  :should be '(4 5))
-
-(test "0"
-  :valueof (reorg-args '() '(a ? b 5))
-  :should be "missing arg: a")
+  :valueof (reorg-args '(4) '(a b))
+  :should be '(4))
 
 (test "compile-params expands right for simple case - 1"
-  :valueof (macex1 '(compile-params2 args (args)))
+  :valueof (compile-params2 'args '(args))
   :should be '(args args))
 
 (test "compile-params expands right for simple case - 2"
-  :valueof (macex1 '(compile-params2 (a) (a)))
+  :valueof (compile-params2 '(a) '(a))
   :should be '((a) a))
 
 (test "compile-params works"
-  :valueof (macex1 '(compile-params2 (a b ? c . body) (list a b c body)))
+  :valueof (compile-params2 '(a b ? c 3 . body) '((list a b c body)))
   :should match '((&rest _)
-                  (destructuring-bind (a b &optional c &rest body) (reorg-args _)
+                  (destructuring-bind (a b &optional (c 3) &rest body) (reorg-args _ (a b c body))
                     (list a b c body))))
 
 
@@ -429,6 +411,7 @@
   :valueof (foo17 2 :b 4 3)
   :should be '(4 3))
 
+(wt-eval '(def foo18(a ? b nil c 3 . body) (list b c body)))
 (test-wart "convention: :do => :body"
   :valueof (foo18 3 4 :do 4 5)
   :should be '(4 3 (4 5)))

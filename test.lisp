@@ -29,7 +29,7 @@
 
 (defun match(a b)
   (or (is a b)
-      (is a '_)
+      (is b '_)
       (and (consp a) (consp b)
            (match (car a) (car b))
            (match (cdr a) (cdr b)))))

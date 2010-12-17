@@ -35,7 +35,7 @@
 
 (defun compile-params2(params body)
   (if (or (not (consp params))
-          singlep.params)
+          (singlep params))
     ; only one kind of param; no need for distinguishing keyword args
     `(,params ,@body)
     (let* ((ra (uniq))
@@ -89,8 +89,10 @@
 (defun reorg-args(args params)
   (if (no-keywords args)
     args
-    (destructuring-bind (nonkeyword keyword) (parse-args args)
-      (generate-args required optional rest nonkeyword keyword))))
+    (let* ((rest-param (rest-param params))
+           (keyword (keyword-args args rest-param))
+           (nonkeyword (strip-keyword-args args rest-param)))
+      (generate-args params nonkeyword keyword))))
 
 (defun no-keywords(args)
   (not (some #'keywordp args)))
@@ -105,30 +107,13 @@
           (if rest-index
             (elt params (1+ rest-index))))))
 
-(defun generate-args(req opt rest nonk key)
-  (append (generate-required-args req nonk key)
-          (generate-optional-args opt nonk key)
-          rest))
-
-(defun generate-required-args(req nonk key)
-  (if req
-    (if (alref key car.req)
-      (cons (alref key car.req)
-            (generate-required-args cdr.req nonk key))
-      (cons car.nonk
-            (generate-required-args cdr.req cdr.nonk key)))))
-
-(defun generate-optional-args(opt nonk key)
-  (if opt
-    (destructuring-bind (var default) car.opt
-      (if (alref key var)
-        (cons (alref key var)
-              (generate-optional-args cdr.opt nonk key))
-        (if nonk
-          (cons car.nonk
-                (generate-optional-args cdr.opt cdr.nonk key))
-          (cons (eval default)
-                (generate-optional-args cdr.opt nil key)))))))
+(defun generate-args(req nonk key)
+  (when req
+    (if (alref (car req) key)
+      (cons (alref (car req) key)
+            (generate-args (cdr req) nonk key))
+      (cons (car nonk)
+            (generate-args (cdr req) (cdr nonk) key)))))
 
 ;? ; this won't work because the arg list is quoted. perhaps we can just eval?
 ;? (defun foo(&rest args)
