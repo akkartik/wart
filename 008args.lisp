@@ -38,11 +38,10 @@
           (singlep params))
     ; only one kind of param; no need for distinguishing keyword args
     `(,params ,@body)
-    (let* ((ra (uniq))
-           (converted-params (convert-params params))
-           (enumerated-params (enumerate-params converted-params)))
+    (let ((ra (uniq))
+          (converted-params (convert-params params)))
     `((&rest ,ra)
-      (destructuring-bind ,converted-params (reorg-args ,ra ,enumerated-params)
+      (destructuring-bind ,converted-params (reorg-args ,ra ,converted-params)
         ,@body)))))
 
 (defun convert-params(params)
@@ -61,24 +60,6 @@
     ((rest-param-p params)   (list '&rest params))
     (t  (cons (list (car params) (cadr params))
               (convert-optional-params (cddr params))))))
-
-(defun enumerate-params(params)
-  (cond
-    ((no params)  nil)
-    ((vararg-param-p params)   (list params))
-    ((is '&optional (car params))   (enumerate-optional-params (cdr params)))
-    ((is '&rest (car params))   (cdr params)) ; shortcut without error-checking
-    (t  (cons (car params)
-              (enumerate-params (cdr params))))))
-
-(defun enumerate-optional-params(params)
-  (cond
-    ((no params)  nil)
-    ((is '&rest (car params))   (cdr params)) ; shortcut without error-checking
-    ((consp (car params))   (cons (caar params) ; strip defaults
-                                  (enumerate-optional-params (cdr params))))
-    (t  (cons (car params)
-              (enumerate-optional-params (cdr params))))))
 
 (defun rest-param-p(params)
   (not (consp params)))
