@@ -51,6 +51,13 @@
 
 (synonym table make-hash-table)
 
+(defun match(a b)
+  (or (is a b)
+      (is b '_)
+      (and (consp a) (consp b)
+           (match (car a) (car b))
+           (match (cdr a) (cdr b)))))
+
 (defmacro ignore-redef(&body body)
   `(handler-bind (#+sbcl(sb-kernel:redefinition-warning 'muffle-warning))
      ,@body))

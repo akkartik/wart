@@ -2,7 +2,6 @@
 
 (defmacro test(msg Valueof expr Should &rest predicate)
   `(let ((got ,expr))
-     (prn ,msg)
      (unless (,(car predicate) got ,@(cdr predicate))
        (incf *test-failures*)
        (prn "F " ,msg #\newline "  got " got))))
@@ -27,13 +26,6 @@
 
 (defun true_value(x)
   x)
-
-(defun match(a b)
-  (or (is a b)
-      (is b '_)
-      (and (consp a) (consp b)
-           (match (car a) (car b))
-           (match (cdr a) (cdr b)))))
 
 ; Use this in tests rather than let or let*, they will be overridden
 (defmacro _let(var val &body body)
