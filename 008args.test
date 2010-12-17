@@ -17,22 +17,6 @@
   :valueof (foo3 2)
   :should be 4)
 
-(test "vars-in-paramlist returns simple params"
-  :valueof (vars-in-paramlist '(a b c))
-  :should be '(a b c))
-
-(test "vars-in-paramlist returns varargs param"
-  :valueof (vars-in-paramlist 'a)
-  :should be '(a))
-
-(test "vars-in-paramlist returns rest param"
-  :valueof (vars-in-paramlist '(a b c . d))
-  :should be '(a b c d))
-
-(test "vars-in-paramlist returns optional params"
-  :valueof (vars-in-paramlist '(a ? b 2 c 3 . d))
-  :should be '(a b c d))
-
 (test "keyword-args works"
   :valueof (keyword-args '(1 2 :a 3) ())
   :should be '((a . 3)))

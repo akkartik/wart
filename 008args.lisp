@@ -48,10 +48,10 @@
   (let* ((ra  (uniq))
          (non-keyword-args  (uniq))
          (keyword-alist   (uniq))
-         (optional-alist  (optional-alist params))
-         (params-without-?  (params-without-defaults params))
          (rest-param  (rest-param params))
-         (z   (getargs-exprs params-without-? non-keyword-args keyword-alist optional-alist)))
+         (z   (getargs-exprs (strip-defaults params)
+                             non-keyword-args keyword-alist
+                             (optional-alist params))))
     `((&rest ,ra)
       (let* ((,non-keyword-args  (strip-keyword-args ,ra ',rest-param))
              (,keyword-alist   (keyword-args ,ra ',rest-param)))
@@ -64,7 +64,7 @@
           (list param
                 `(fa (get-arg ',param ',params ,non-keyword-args ,keyword-alist)
                      ,(alref param optional-alist))))
-       (vars-in-paramlist params)))
+       (flatten (undot params))))
 
 (defun get-arg(var params arglist keyword-alist)
   (cond
@@ -136,40 +136,16 @@
   (cond
     ((no params)  ())
     ((rest-param-p params)  params)
-    ((is '? (car params))   (really-strip-defaults (cdr params)))
-    (t  (strip-defaults (cdr params)))))
-
-; strip '? and defaults, undot rest args
-(defun vars-in-paramlist(params)
-  (cond
-    ((no params)  ())
-    ((rest-param-p params)  (list params))
-    ((iso (car params) '?)   (vars-in-optional-paramlist (cdr params)))
-    (t   (append (vars-in-paramlist (car params))
-                 (vars-in-paramlist (cdr params))))))
-
-(defun vars-in-optional-paramlist(params)
-  (cond
-    ((no params)  ())
-    ((rest-param-p params)  (list params))
-    (t (cons (car params)
-             (vars-in-optional-paramlist (cddr params))))))
-
-; like vars-in-paramlist, but don't undot rest args
-(defun params-without-defaults(params)
-  (cond
-    ((no params)  ())
-    ((rest-param-p params)  params)
-    ((iso (car params) '?)   (optional-params-without-defaults (cdr params)))
+    ((iso (car params) '?)   (really-strip-defaults (cdr params)))
     (t   (cons (car params)
-               (params-without-defaults (cdr params))))))
+               (strip-defaults (cdr params))))))
 
-(defun optional-params-without-defaults(params)
+(defun really-strip-defaults(params)
   (cond
     ((no params)  ())
     ((rest-param-p params)  params)
     (t  (cons (car params)
-              (optional-params-without-defaults (cddr params))))))
+              (really-strip-defaults (cddr params))))))
 
 (defun partition-optional-params(oparams)
   (cond
@@ -185,14 +161,14 @@
 (defun vararg-param-p(params)
   (not (consp params)))
 
-(defun really-strip-defaults(params)
-  (cond
-    ((no params)   ())
-    ((rest-param-p params)  params)
-    ((not (consp (car params)))   (cons (car params)
-                                        (really-strip-defaults (cdr params))))
-    (t  (cons (caar params)
-              (really-strip-defaults (cdr params))))))
+(defun flatten (tree)
+  (let ((result '()))
+    (labels ((scan (item)
+               (if (listp item)
+                 (map nil #'scan item)
+                 (push item result))))
+      (scan tree))
+    (nreverse result)))
 
 
 
