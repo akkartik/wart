@@ -40,3 +40,10 @@
 (mac wart-case(expr . args)
   `(caselet ,(uniq) ,expr ,@args))
 (defover case wart-case)
+
+(mac check(expr test ? alt nil)
+  (w/uniq x
+    `(let ,x ,expr
+       (if (call #',test ,x)
+         ,x
+         ,alt))))
