@@ -20,3 +20,7 @@
              b 2
                3)
   :should be 2)
+
+(test-wart "andf works"
+  :valueof (call (andf #'consp #'car) '(3 4))
+  :should be 3)

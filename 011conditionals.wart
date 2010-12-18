@@ -47,3 +47,20 @@
        (if (call #',test ,x)
          ,x
          ,alt))))
+
+(def orf fns
+  (fn args
+    (call (afn(fs)
+            (and fs
+                 (or (apply car.fs args)
+                     (self cdr.fs))))
+          fns)))
+
+(def andf fns
+  (fn args
+    (call (afn(fs)
+            (if (no fs)   t
+                (no cdr.fs)   (apply car.fs args)
+                              (and (apply car.fs args)
+                                   (self cdr.fs))))
+          fns)))
