@@ -2,8 +2,8 @@
 
 (mac wart-if args
   (if (oddp (length args)) ; there's an else
-    `(cond ,@(tuples (insert-t-in-penultimate-position args) 2))
-    `(cond ,@(tuples args 2))))
+    `(cond ,@(tuples 2 (insert-t-in-penultimate-position args)))
+    `(cond ,@(tuples 2 args))))
 (defover if wart-if)
 
 (mac wart-do args `(call (fn() ,@args)))

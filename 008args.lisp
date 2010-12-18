@@ -9,16 +9,10 @@
 (defmacro fn(params &rest body)
   `(lambda ,@(compile-params params body)))
 
-(defun tuples(xs n &optional acc)
+(defun tuples(n xs &optional acc)
   (if (no xs)
     (nreverse acc)
-    (tuples (nthcdr n xs) n (cons (firstn n xs) acc))))
-
-(defun alist(xs &optional acc)
-  (if (no xs)
-    acc
-    (alist (cddr xs) (cons (cons (car xs) (cadr xs))
-                            acc))))
+    (tuples n (nthcdr n xs) (cons (firstn n xs) acc))))
 
 (defun firstn(n xs)
   (if (or (= n 0) (no xs))
@@ -174,7 +168,7 @@
 
 (defun optional-params(params)
   (map 'list #'car
-       (tuples (strip-required (strip-rest params)) 2)))
+       (tuples 2 (strip-required (strip-rest params)))))
 
 (defun optional-alist(params)
   (partition-optional-params (strip-required (strip-rest params))))

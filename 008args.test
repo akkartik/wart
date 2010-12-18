@@ -301,13 +301,13 @@
   :should be '(4 3 (4 5)))
 
 (test-wart "tuples works"
-  :valueof (tuples '(1 2 3 4 5 6) 3)
+  :valueof (tuples 3 '(1 2 3 4 5 6))
   :should be '((1 2 3) (4 5 6)))
 
 (test-wart "tuples works with unbalanced lists"
-  :valueof (tuples '(1 2 3 4 5) 3)
+  :valueof (tuples 3 '(1 2 3 4 5))
   :should be '((1 2 3) (4 5)))
 
 (test-wart "tuples works with n 1"
-  :valueof (tuples '(1 2 3 4 5) 1)
+  :valueof (tuples 1 '(1 2 3 4 5))
   :should be (map 'list #'list '(1 2 3 4 5)))
