@@ -265,12 +265,15 @@
   :valueof (foo15 3)
   :should be '(4))
 
+(test-wart "optional params without rest can be positionally filled"
+  :valueof (foo15 3 7 3)
+  :should be '(7 . 3))
+
 (wt-eval '(def foo16(a . b) b))
 (test-wart "rest args can be named"
   :valueof (foo16 3 :b 4 5)
   :should be '(4 5))
 
-(prn (macex1 '(def foo17(a ? b 3 . c) (cons b c))))
 (wt-eval '(def foo17(a ? b 3 . c) (cons b c)))
 (test-wart "optional + named rest args"
   :valueof (foo17 2 :c 3)

@@ -83,7 +83,9 @@
     (map 'list
          (lambda(param)
            (list param
-                 `(fa (get-optional-arg ',param ',optional-params ,non-keyword-args ,keyword-alist)
+                 `(fa (if (assoc ',rest-param ,keyword-alist)
+                        (get-arg ',param ',(strip-defaults params) ,non-keyword-args ,keyword-alist)
+                        (get-lazy-optional-arg ',param ,keyword-alist))
                       ,(alref param optional-alist))))
          optional-params)
     (list (list rest-param `(get-rest-args ',rest-param ',params ,non-keyword-args ,keyword-alist)))))
@@ -99,11 +101,10 @@
     (t   (fa (get-arg var (car params) (car arglist) keyword-alist)
              (get-arg var (cdr params) (cdr arglist) keyword-alist)))))
 
-(defun get-optional-arg(var params arglist keyword-alist)
-  (cond
-    ((assoc var keyword-alist)  (alref var keyword-alist))
-    ((iso params var)  arglist)
-    (t  (values nil 'no-arg))))
+(defun get-lazy-optional-arg(var keyword-alist)
+  (if (assoc var keyword-alist)
+    (alref var keyword-alist)
+    (values nil 'no-arg)))
 
 (defun get-rest-args(var params arglist keyword-alist)
   (cond
