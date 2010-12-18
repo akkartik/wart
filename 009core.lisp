@@ -12,7 +12,7 @@
 (defover = setf)
 (defover ++ incf)
 
-(defover load wt-load)
+(defover load wart-load)
 
 
 

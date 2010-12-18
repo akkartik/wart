@@ -7,7 +7,7 @@
     (wt-prompt)
     (format t "~a~%" (wt-eval (read)))))
 
-(defun wload(file)
+(defun wt-load(file)
   (with-open-file (f (merge-pathnames file))
     (loop with form = (read f)
           and eof = (gensym)
