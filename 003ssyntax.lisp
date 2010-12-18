@@ -37,7 +37,7 @@
 (defun ssyntax-char(s &optional (idx (1- (len s))))
   (and (>= idx 0)
        (or (if (position (char s idx)
-                         '(#\~ #\! #\@ #\$ #\% #\^ #\. #\< #\>)) ; & _ +
+                         '(#\~ #\! #\@ #\$ #\% #\^ #\. #\{ #\} #\[ #\])) ; & _ + < >
              idx)
            (ssyntax-char s (1- idx)))))
 
