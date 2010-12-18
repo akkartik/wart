@@ -24,15 +24,6 @@
 ;; Internals
 ;; Use let* everywhere here because wart will soon override let
 
-; 'first available' - like or, but a uses multiple values to indicate unavailable
-(defmacro fa(a b)
-  (let* ((val (uniq))
-         (empty (uniq)))
-    `(multiple-value-bind (,val ,empty) ,a
-      (if ,empty
-        ,b
-        ,val))))
-
 ; returns arglist and body suitable for insertion into defun or lambda
 ; new body understands keyword args
 ; params format (optionals* ? lazy-optionals* . rest)
@@ -57,6 +48,15 @@
     (lazy-getargs-exprs params (required-params params) (optional-params params) (rest-param params)
                         non-keyword-args keyword-alist optional-alist)
     (greedy-getargs-exprs (strip-defaults params) non-keyword-args keyword-alist optional-alist)))
+
+; 'first available' - like or, but a uses multiple values to indicate unavailable
+(defmacro fa(a b)
+  (let* ((val (uniq))
+         (empty (uniq)))
+    `(multiple-value-bind (,val ,empty) ,a
+      (if ,empty
+        ,b
+        ,val))))
 
 (defun greedy-getargs-exprs(params non-keyword-args keyword-alist optional-alist)
   (map 'list
@@ -108,26 +108,6 @@
     ((assoc (car params) keyword-alist)  (get-rest-args var (cdr params) arglist keyword-alist))
     (t   (get-rest-args var (cdr params) (cdr arglist) keyword-alist))))
 
-(defun keyword-args(args rest-param)
-  (cond
-    ((no args)  ())
-    ((not (consp args))  ())
-    ((keywordp (car args))  (let* ((param (keyword->symbol (car args))))
-                              (cons (cons param
-                                          (if (iso param rest-param)
-                                            (cdr args)
-                                            (cadr args)))
-                                    (keyword-args (cddr args) rest-param))))
-    (t   (keyword-args (cdr args) rest-param))))
-
-(defun strip-keyword-args(args rest-param)
-  (cond
-    ((no args)  ())
-    ((keywordp (car args))  (if (iso (keyword->symbol (car args)) rest-param)
-                              ()
-                              (strip-keyword-args (cddr args) rest-param)))
-    (t   (cons (car args) (strip-keyword-args (cdr args) rest-param)))))
-
 
 
 ;; Slicing and dicing params
@@ -166,6 +146,27 @@
     (t (cons (car params)
              (undot (cdr params))))))
 
+(defun keyword-args(args rest-param)
+  (cond
+    ((no args)  ())
+    ((not (consp args))  ())
+    ((keywordp (car args))  (let* ((param (keyword->symbol (car args))))
+                              (cons (cons param
+                                          (if (iso param rest-param)
+                                            (cdr args)
+                                            (cadr args)))
+                                    (keyword-args (cddr args) rest-param))))
+    (t   (keyword-args (cdr args) rest-param))))
+
+(defun strip-keyword-args(args rest-param)
+  (cond
+    ((no args)  ())
+    ((keywordp (car args))  (if (iso (keyword->symbol (car args)) rest-param)
+                              ()
+                              (strip-keyword-args (cddr args) rest-param)))
+    (t   (cons (car args)
+               (strip-keyword-args (cdr args) rest-param)))))
+
 (defun optional-params(params)
   (map 'list #'car
        (tuples 2 (strip-required (strip-rest params)))))
@@ -196,6 +197,8 @@
                      (cadr oparams))
                (partition-optional-params (cddr oparams))))))
 
+
+
 (defun rest-param-p(params)
   (not (consp params)))
 
@@ -210,8 +213,6 @@
                  (push item result))))
       (scan tree))
     (nreverse result)))
-
-
 
 ; strip the colon
 (defun keyword->symbol(k)
