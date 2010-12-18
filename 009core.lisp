@@ -12,6 +12,8 @@
 (defover = setf)
 (defover ++ incf)
 
+(defover load wt-load)
+
 
 
 ;; Internals
