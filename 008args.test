@@ -148,6 +148,22 @@
   :valueof (multiple-value-list (get-arg 'e '(a b c e f . d) '(1 2 3) ()))
   :should be (list nil 'no-arg))
 
+(test "get-rest-args works without keyword args"
+  :valueof (multiple-value-list (get-rest-args 'c '(a b . c) '(1 2 3) ()))
+  :should be (list '(3)))
+
+(test "get-rest-args works with keyword args"
+  :valueof (multiple-value-list (get-rest-args 'c '(a b . c) '(1 2) '((b . 3))))
+  :should be (list '(2)))
+
+(test "get-rest-args works around optional args"
+  :valueof (multiple-value-list (get-rest-args 'd '(a b ? c 67 . d) '(1 2 4 5 6) '((b . 3))))
+  :should be (list '(2 4 5 6)))
+
+(test "get-rest-args works around degenerate optional args"
+  :valueof (multiple-value-list (get-rest-args 'd '(a b ? . d) '(1 2 4 5 6) '((b . 3))))
+  :should be (list '(2 4 5 6)))
+
 
 
 (wt-eval '(def foo4() 34))
@@ -254,6 +270,7 @@
   :valueof (foo16 3 :b 4 5)
   :should be '(4 5))
 
+(prn (macex1 '(def foo17(a ? b 3 . c) (cons b c))))
 (wt-eval '(def foo17(a ? b 3 . c) (cons b c)))
 (test-wart "optional + named rest args"
   :valueof (foo17 2 :c 3)
