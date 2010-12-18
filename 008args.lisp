@@ -33,12 +33,19 @@
         ,b
         ,val))))
 
+(defun compile-params(params body)
+  (cond
+    ((no params)  `(() ,@body))
+    ((not (consp params))  `((&rest ,params) ,@body))
+    ((and (singlep params) (symbolp (car params)))  `(,params ,@body))
+    (t  (compile-complex-params params body))))
+
 ; returns arglist and body suitable for insertion into defun or lambda
 ; new body understands keyword args
 ; params format (optionals* ? lazy-optionals* . rest)
 ; optionals can be destructured
 ; lazy optionals require keywords if rest is present
-(defun compile-params(params body)
+(defun compile-complex-params(params body)
   (let* ((ra  (uniq))
          (non-keyword-args  (uniq))
          (keyword-alist   (uniq))
