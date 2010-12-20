@@ -45,3 +45,35 @@
 (test "match"
   :valueof (match '(2 (2 3)) '(1 (_ 3)))
   :should be nil)
+
+(test "fa picks first available"
+  :valueof (fa 3 4)
+  :should be 3)
+
+(test "fa falls through first arg"
+  :valueof (fa (values nil 34) 4)
+  :should be 4)
+
+(test "fa falls through unavailable args"
+  :valueof (fa (values nil 34) (values nil 'not-found) (values 4 nil))
+  :should be 4)
+
+(test "la returns nil without args"
+  :valueof (la)
+  :should be nil)
+
+(test "la returns single arg"
+  :valueof (la 34)
+  :should be 34)
+
+(test "la returns single arg - 2"
+  :valueof (la (values 34 'no-arg))
+  :should be 34)
+
+(test "la falls through available args"
+  :valueof (la (values 3 'available) (values 4 'available))
+  :should be 4)
+
+(test "la falls through available args - 2"
+  :valueof (multiple-value-list (la (values 34 'available) (values 16 'available) 27))
+  :should be (list 16 'available))

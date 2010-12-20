@@ -1,5 +1,3 @@
-;; Shorter names for some lisp primitives.
-
 (defmacro synonym(&rest args)
   `(setf ,@(mapcar (lambda (x) `(symbol-function ',x))
                    args)))
@@ -61,3 +59,31 @@
 (defmacro ignore-redef(&body body)
   `(handler-bind (#+sbcl(sb-kernel:redefinition-warning 'muffle-warning))
      ,@body))
+
+(defmacro aand(&rest args)
+  (cond
+    ((no args)   t)
+    ((no (cdr args))   (car args))
+    (`(let ((it ,(car args)))   (and it (aand ,@(cdr args)))))))
+
+; 'first available' - like or, but uses multiple values to indicate unavailable
+(defmacro fa(&rest args)
+  (cond
+    ((no (cdr args))  (car args))
+    (t  (let* ((val (uniq))
+               (unavailable (uniq)))
+           `(multiple-value-bind (,val ,unavailable) ,(car args)
+             (if ,unavailable
+               (fa ,@(cdr args))
+               ,val))))))
+
+; 'last available' - like and, but uses multiple values to indicate available
+(defmacro la(&rest args)
+  (cond
+    ((no (cdr args))  (car args))
+    (t  (let* ((next-val (uniq))
+               (next-available (uniq)))
+          `(multiple-value-bind (,next-val ,next-available) ,(cadr args)
+            (if ,next-available
+              (la ,@(cdr args))
+              ,(car args)))))))

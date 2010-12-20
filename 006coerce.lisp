@@ -2,12 +2,6 @@
 
 (setf *wart-coercions* (table))
 
-(defmacro aand(&rest args)
-  (cond
-    ((no args)   t)
-    ((no (cdr args))   (car args))
-    (`(let ((it ,(car args)))   (and it (aand ,@(cdr args)))))))
-
 (defun wart-coerce(val dest)
   (or (aand (gethash dest *wart-coercions*)
             (gethash (type* val) it)

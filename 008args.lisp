@@ -49,15 +49,6 @@
                         non-keyword-args keyword-alist optional-alist)
     (greedy-getargs-exprs (strip-defaults params) non-keyword-args keyword-alist optional-alist)))
 
-; 'first available' - like or, but a uses multiple values to indicate unavailable
-(defmacro fa(a b)
-  (let* ((val (uniq))
-         (empty (uniq)))
-    `(multiple-value-bind (,val ,empty) ,a
-      (if ,empty
-        ,b
-        ,val))))
-
 (defun greedy-getargs-exprs(params non-keyword-args keyword-alist optional-alist)
   (map 'list
        (lambda(param)
