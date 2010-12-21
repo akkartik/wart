@@ -77,3 +77,7 @@
 (test "la falls through available args - 2"
   :valueof (multiple-value-list (la (values 34 'available) (values 16 'available) 27))
   :should be (list 16 'available))
+
+(test "la binds it"
+  :valueof (la (values 34 'available) (values (+ it 1) t))
+  :should be 35)

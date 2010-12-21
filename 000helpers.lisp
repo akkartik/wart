@@ -83,7 +83,8 @@
     ((no (cdr args))  (car args))
     (t  (let* ((next-val (uniq))
                (next-available (uniq)))
-          `(multiple-value-bind (,next-val ,next-available) ,(cadr args)
-            (if ,next-available
-              (la ,@(cdr args))
-              ,(car args)))))))
+          `(let* ((it ,(car args)))
+            (multiple-value-bind (,next-val ,next-available) ,(cadr args)
+              (if ,next-available
+                (la ,@(cdr args))
+                ,(car args))))))))
