@@ -108,47 +108,47 @@
              counter)
   :should be 2)
 
-(test "refxy expands correctly"
-  :valueof (macex1 '(refxy foo-table (x y z)
+(test "indexing expands correctly"
+  :valueof (macex1 '(indexing foo-table (x y z)
                       (+ it 1)))
   :should be '(la (gethash x foo-table)
                   (gethash y it)
                   (gethash z it)
-                  (values it t)
+                  (values it 'never-returned)
                   (values (+ it 1) t)))
 
-(test "refxy expands correctly - 2"
-  :valueof (macex1 '(refxy foo-table (x)
+(test "indexing expands correctly - 2"
+  :valueof (macex1 '(indexing foo-table (x)
                       (+ it 1)))
   :should be '(la (gethash x foo-table)
-                  (values it t)
+                  (values it 'never-returned)
                   (values (+ it 1) t)))
 
-(test "refxy works"
+(test "indexing works"
   :valueof (let ((x (table)))
              (setf (gethash 0 x) (table))
              (setf (gethash 1 (gethash 0 x)) (table))
              (setf (gethash 2 (gethash 1 (gethash 0 x))) 34)
-             (refxy x (0 1 2)
+             (indexing x (0 1 2)
                (* it 2)))
   :should be 68)
 
-(test "refxy sets second value on bailing"
+(test "indexing sets second value on bailing"
   :valueof (multiple-value-list
              (let ((x (table)))
                (setf (gethash 0 x) (table))
                (setf (gethash 1 (gethash 0 x)) (table))
                (setf (gethash 2 (gethash 1 (gethash 0 x))) 34)
-               (refxy x (0 1 3)
+               (indexing x (0 1 3)
                  (* it 2))))
   :should match '(_ t))
 
-(test "refxy sets second value on bailing - 2"
+(test "indexing sets second value on bailing - 2"
   :valueof (multiple-value-list
              (let ((x (table)))
                (setf (gethash 0 x) (table))
                (setf (gethash 1 (gethash 0 x)) (table))
                (setf (gethash 2 (gethash 1 (gethash 0 x))) 34)
-               (refxy x (911)
+               (indexing x (911)
                  (* it 2))))
   :should match '(_ t))

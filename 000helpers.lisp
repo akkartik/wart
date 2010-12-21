@@ -93,8 +93,8 @@
             ((not ,next-available)  (values it ,available))
             (t  (la ,@(cdr args)))))))))
 
-(defmacro refxy(tab inds expr)
+(defmacro indexing(tab inds expr)
   `(la (gethash ,(car inds) ,tab)
        ,@(map 'list (lambda(x) `(gethash ,x it)) (cdr inds))
-       (values it t) ; never returned; sentinel la can evaluate
+       (values it 'never-returned) ; sentinel la can always evaluate
        (values ,expr t)))
