@@ -5,11 +5,18 @@
 
 (defcoerce 'hash-table 'cons
   (fn(table)
-    (prn "aaa")
     (ret ans '()
-      (maphash #'(lambda(k v) (prn k) (push (list k v) ans)) table))))
+      (maphash #'(lambda(k v) (push (list k v) ans)) table))))
 
-;? (mac obj args
-;?   `(listtab (list ,@(map (fn ((k v))
-;?                            `(list ',k ,v))
-;?                          (pair args)))))
+(defcoerce 'cons 'hash-table
+  (fn(l)
+    (ret ans (table)
+      (map (fn((a b))
+             (setf (gethash a ans) b))
+           l))))
+
+(mac obj args
+  `(coerce (list ,@(map (fn ((k v))
+                           `(list ',k ,v))
+                         (pair args)))
+           'hash-table))

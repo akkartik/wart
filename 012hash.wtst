@@ -23,3 +23,20 @@
 (test-wart "coercing hash tables to functions in read position"
   :valueof h.0
   :should be 34)
+
+(test-wart "coercing hash to list works"
+  :valueof (coerce (ret x (table)
+                     (setf (gethash 1 x) 2)
+                     (setf (gethash 2 x) 3))
+                   'cons)
+  :should be '((2 3) (1 2)))
+
+(test-wart "coercing list to hash works"
+  :valueof (let x (wart-coerce '((1 2) (2 3)) 'hash-table)
+             (gethash 1 x))
+  :should be 2)
+
+(test-wart "coercing list to hash works - 2"
+  :valueof (let x (wart-coerce '((1 2) (2 3)) 'hash-table)
+             (gethash 2 x))
+  :should be 3)
