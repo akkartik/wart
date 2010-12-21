@@ -93,8 +93,12 @@
             ((not ,next-available)  (values it ,available))
             (t  (la ,@(cdr args)))))))))
 
+(defmacro guarded-gethash(key table)
+  `(if ,table
+    (gethash ,key ,table)))
+
 (defmacro indexing(tab inds expr)
-  `(la (gethash ,(car inds) ,tab)
-       ,@(map 'list (lambda(x) `(gethash ,x it)) (cdr inds))
+  `(la (guarded-gethash ,(car inds) ,tab)
+       ,@(map 'list (lambda(x) `(guarded-gethash ,x it)) (cdr inds))
        (values it 'never-returned) ; sentinel la can always evaluate
        (values ,expr t)))

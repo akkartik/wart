@@ -1,3 +1,15 @@
 (test-wart "old coercions continue to work"
   :valueof (call (coerce 'car 'function) '(3))
   :should be 3)
+
+(test-wart "call works on simple functions"
+  :valueof (call #'car '(1))
+  :should be 1)
+
+(test-wart "call works on simple functions"
+  :valueof (call #'car '(1))
+  :should be 1)
+
+(test-wart "call coerces to function when necessary"
+  :valueof (call 'car '(1))
+  :should be 1)

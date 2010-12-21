@@ -1,22 +1,6 @@
-(test-wart "pairp works"
+(test "pairp works"
   :valueof (pairp '(1 2))
   :should satisfy true_value)
-
-(test-wart "call works on simple functions"
-  :valueof (call #'car '(1))
-  :should be 1)
-
-(test-wart "call works on simple functions"
-  :valueof (call #'car '(1))
-  :should be 1)
-
-(test-wart "call coerces to function when necessary"
-  :valueof (call 'car '(1))
-  :should be 1)
-
-(test-wart "call works on lambdas"
-  :valueof (call [+ _ 1] 3)
-  :should be 4)
 
 (test "match"
   :valueof (match 3 3)
@@ -111,16 +95,16 @@
 (test "indexing expands correctly"
   :valueof (macex1 '(indexing foo-table (x y z)
                       (+ it 1)))
-  :should be '(la (gethash x foo-table)
-                  (gethash y it)
-                  (gethash z it)
+  :should be '(la (guarded-gethash x foo-table)
+                  (guarded-gethash y it)
+                  (guarded-gethash z it)
                   (values it 'never-returned)
                   (values (+ it 1) t)))
 
 (test "indexing expands correctly - 2"
   :valueof (macex1 '(indexing foo-table (x)
                       (+ it 1)))
-  :should be '(la (gethash x foo-table)
+  :should be '(la (guarded-gethash x foo-table)
                   (values it 'never-returned)
                   (values (+ it 1) t)))
 
@@ -150,5 +134,19 @@
                (setf (gethash 1 (gethash 0 x)) (table))
                (setf (gethash 2 (gethash 1 (gethash 0 x))) 34)
                (indexing x (911)
+                 (* it 2))))
+  :should match '(_ t))
+
+(test "indexing handles missing tables"
+  :valueof (multiple-value-list
+             (let ((x nil))
+               (indexing x (911)
+                 (* it 2))))
+  :should match '(_ t))
+
+(test "indexing handles missing tables - 2"
+  :valueof (multiple-value-list
+             (let ((x (table)))
+               (indexing x (911 2)
                  (* it 2))))
   :should match '(_ t))

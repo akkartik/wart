@@ -3,6 +3,10 @@
   :valueof (call* macfoo 3)
   :should be 4)
 
+(test-wart "call* works"
+  :valueof (call* oddp 3)
+  :should be t)
+
 (setf a 2)
 (test-wart "call* handles macros with global bindings"
   :valueof (call* macfoo a)
@@ -16,6 +20,8 @@
   :valueof (_let a 32 (call* incf a))
   :should be 33)
 
+
+
 (test-wart "compose works"
   :valueof (call 1+^1+ 3)
   :should be 5)
@@ -23,3 +29,31 @@
 (test-wart "complement works"
   :valueof (call ~oddp 3)
   :should be nil)
+
+(test "expand-ssyntax translates ^ to compose"
+  :valueof (expand-ssyntax 'a^b)
+  :should be '(compose* a b))
+
+(test "expand-ssyntax translates ~ to complement"
+  :valueof (expand-ssyntax '~b)
+  :should be '(complement* b))
+
+(test "expand-ssyntax translates . to just a call"
+  :valueof (expand-ssyntax 'a.b)
+  :should be '(call* a b))
+
+(test "expand-ssyntax translates ! to just a call"
+  :valueof (expand-ssyntax 'a!b)
+  :should be '(call*-quoted a b))
+
+(test ". and ! are left-associative"
+  :valueof (expand-ssyntax 'a.b!c.d)
+  :should be '(call* (call*-quoted (call* a b) c) d))
+
+(test "expand numbers correctly"
+  :valueof (expand-ssyntax 'a.3)
+  :should be '(call* a 3))
+
+(test-wart ". works"
+  :valueof oddp.3
+  :should be t)

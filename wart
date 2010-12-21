@@ -3,6 +3,9 @@
 if [ $# -eq 0 ]
 then
   rlwrap sbcl --noinform --userinit sbclrc --load boot
+elif [[ $1 == 'test' ]]
+then
+  rlwrap sbcl --noinform --userinit sbclrc --load test --eval '(quit)'
 else
   (
     for i in $*

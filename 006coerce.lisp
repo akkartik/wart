@@ -22,6 +22,8 @@
 
 ;; Internals
 
+(setf (gethash 'symbol *wart-coercions*) (table))
+
 (defun type*(val)
   (if (and (isa val 'symbol) (not (fboundp val)))
     (type* (eval val))

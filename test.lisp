@@ -41,7 +41,10 @@
       (let* ((len (length file))
              (ext (subseq file (- len 4))))
         (cond
-          ((iso ext "test") (load file)))))))
+          ((equalp ext "lisp") (load file))
+          ((equalp ext "wart") (wt-load file))
+          ((equalp ext "test") (load file))
+          ((equalp ext "wtst") (load file)))))))
 
 (cond
   ((> *test-failures* 1)

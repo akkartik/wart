@@ -17,27 +17,3 @@
 (test "ssyntaxp ignores ordinary lisp tokens"
   :valueof (ssyntaxp 'a+b-c)
   :should be nil)
-
-(test "expand-ssyntax translates ^ to compose"
-  :valueof (expand-ssyntax 'a^b)
-  :should be '(compose* a b))
-
-(test "expand-ssyntax translates ~ to complement"
-  :valueof (expand-ssyntax '~b)
-  :should be '(complement* b))
-
-(test "expand-ssyntax translates . to just a call"
-  :valueof (expand-ssyntax 'a.b)
-  :should be '(call* a b))
-
-(test "expand-ssyntax translates ! to just a call"
-  :valueof (expand-ssyntax 'a!b)
-  :should be '(call*-quoted a b))
-
-(test ". and ! are left-associative"
-  :valueof (expand-ssyntax 'a.b!c.d)
-  :should be '(call* (call*-quoted (call* a b) c) d))
-
-(test "expand numbers correctly"
-  :valueof (expand-ssyntax 'a.3)
-  :should be '(call* a 3))

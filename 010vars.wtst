@@ -21,3 +21,11 @@
 (test "w/uniq works with multiple vars"
   :valueof (macex1 '(w/uniq (a b) 3))
   :should be '(with (a (uniq) b (uniq)) 3))
+
+
+
+; integration test: wrepl + mac + let
+(wt-eval '(mac aand(a b) `(let it ,a (and it ,b))))
+(test-wart "macro bodies should pass through the compiler"
+  :valueof (let x 3 (aand (- x 1) (> it 1)))
+  :should satisfy true_value)

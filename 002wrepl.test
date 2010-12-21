@@ -20,8 +20,3 @@
                   ((no sexp) nil)
                   ((funcall (lambda(x) 34) sexp) (funcall (lambda(x) 35) sexp))
                   (t sexp))))
-
-(wt-eval '(mac aand(a b) `(let it ,a (and it ,b))))
-(test-wart "macro bodies should pass through the compiler"
-  :valueof (let x 3 (aand (- x 1) (> it 1)))
-  :should satisfy true_value)
