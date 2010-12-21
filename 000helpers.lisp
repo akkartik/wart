@@ -78,20 +78,23 @@
                ,val))))))
 
 ; 'last available' - like and, but uses multiple values to indicate available
+; Returns multiple values to indicate all args not eval'd.
+; Currently only makes sense to combine as (fa (la ..) (la ..) (la ..)). Do we need and-of-ors?
 (defmacro la(&rest args)
-  (cond
-    ((no (cdr args))  (car args))
-    (t  (let* ((next-val (uniq))
-               (next-available (uniq)))
-          `(let* ((it ,(car args)))
-            (multiple-value-bind (,next-val ,next-available) ,(cadr args)
-              (if ,next-available
-                (la ,@(cdr args))
-                ,(car args))))))))
+  (if (no (cdr args))
+    (car args)
+    (let* ((available (uniq))
+           (next-val (uniq))
+           (next-available (uniq)))
+      `(multiple-value-bind (it ,available) ,(car args)
+        (multiple-value-bind (,next-val ,next-available) ,(cadr args)
+          (cond
+            ((not ,available)   (values nil t))
+            ((not ,next-available)  (values it ,available))
+            (t  (la ,@(cdr args)))))))))
 
 (defmacro refxy(tab inds expr)
   `(la (gethash ,(car inds) ,tab)
        ,@(map 'list (lambda(x) `(gethash ,x it)) (cdr inds))
-       (values it t) ; never returned; sentinel la can evaluate
        (values it t) ; never returned; sentinel la can evaluate
        (values ,expr t)))
