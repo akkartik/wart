@@ -1,31 +1,25 @@
 (setf h (table))
 (setf (gethash 0 h) 34)
-(prn "A")
-(prn (la (gethash 'function *wart-coercions*)
-         (gethash 'hash-table it)
-         (values (funcall it h) t)))
-(wart-coerce h 'function)
-(prn "Z")
-;? (test-wart "coercing hash tables to functions works"
-;?   :valueof (type (coerce h 'function))
-;?   :should be 'function)
-;? 
-;? (test-wart "coercing reaches through symbols"
-;?   :valueof (type (coerce 'h 'function))
-;?   :should be 'function)
-;? 
-;? (test-wart "call on hash table works"
-;?   :valueof (call h 0)
-;?   :should be 34)
-;? 
-;? (test-wart "call on quoted sym operates like call on symbol"
-;?   :valueof (call 'h 0)
-;?   :should be 34)
-;? 
-;? (test-wart "call* on hash tables works"
-;?   :valueof (call* h 0)
-;?   :should be 34)
-;? 
-;? (test-wart "coercing hash tables to functions in read position"
-;?   :valueof h.0
-;?   :should be 34)
+(test-wart "coercing hash tables to functions works"
+  :valueof (type (coerce h 'function))
+  :should be 'function)
+
+(test-wart "coercing reaches through symbols"
+  :valueof (type (coerce 'h 'function))
+  :should be 'function)
+
+(test-wart "call on hash table works"
+  :valueof (call h 0)
+  :should be 34)
+
+(test-wart "call on quoted sym operates like call on symbol"
+  :valueof (call 'h 0)
+  :should be 34)
+
+(test-wart "call* on hash tables works"
+  :valueof (call* h 0)
+  :should be 34)
+
+(test-wart "coercing hash tables to functions in read position"
+  :valueof h.0
+  :should be 34)

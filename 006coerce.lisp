@@ -3,11 +3,8 @@
 (setf *wart-coercions* (table))
 
 (defun wart-coerce(val dest)
-  (prn val " " dest)
-  (fa (la (prn (gethash dest *wart-coercions*) "-<")
-          (prn (gethash (prn (type* val) ":") it) "<-")
-          (prn (values (prn it " <=") t) "<--")
-          (values (funcall it (val* val)) t))
+  (fa (indexing *wart-coercions* (dest (type* val))
+        (funcall it (val* val)))
       (funcall #'coerce val dest)))
 (defover coerce wart-coerce)
 

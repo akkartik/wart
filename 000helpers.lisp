@@ -82,7 +82,7 @@
 ; Currently only makes sense to combine as (fa (la ..) (la ..) (la ..)). Do we need and-of-ors?
 (defmacro la(&rest args)
   (if (no (cdr args))
-    (car args)
+    `(values ,(car args) nil)
     (let* ((available (uniq))
            (next-val (uniq))
            (next-available (uniq)))
