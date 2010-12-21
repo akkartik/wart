@@ -58,6 +58,17 @@
   :valueof (fa (values nil 34) (values nil 'not-found) (values 4 nil))
   :should be 4)
 
+(test "fa doesn't over-evaluate"
+  :valueof (let ((counter 0))
+             (fa (progn (incf counter)
+                        (values 0 'not-found))
+                 (progn (incf counter)
+                        34)
+                 (progn (incf counter)
+                        27))
+             counter)
+  :should be 2)
+
 (test "la returns nil without args"
   :valueof (la)
   :should be nil)
@@ -81,3 +92,75 @@
 (test "la binds it"
   :valueof (la (values 34 'available) (values (+ it 1) t))
   :should be 35)
+
+(test "la evals one past the last-available value, no more"
+  :valueof (let ((counter 0))
+             (la (progn (incf counter)
+                        (values 34 'available))
+                 (progn (incf counter)
+                        34)
+                 (progn (incf counter)
+                        34)
+                 (progn (incf counter)
+                        34)
+                 (progn (incf counter)
+                        (values 678 t)))
+             counter)
+  :should be 2)
+
+(test "refxy expands correctly"
+  :valueof (macex1 '(refxy foo-table (x y z)
+                      (+ it 1)))
+  :should be '(la (gethash x foo-table)
+                  (gethash y it)
+                  (gethash z it)
+                  (values it t)
+                  (values (+ it 1) t)))
+
+(test "refxy expands correctly - 2"
+  :valueof (macex1 '(refxy foo-table (x)
+                      (+ it 1)))
+  :should be '(la (gethash x foo-table)
+                  (values it t)
+                  (values (+ it 1) t)))
+
+(test "refxy works"
+  :valueof (let ((x (table)))
+             (setf (gethash 0 x) (table))
+             (setf (gethash 1 (gethash 0 x)) (table))
+             (setf (gethash 2 (gethash 1 (gethash 0 x))) 34)
+             (refxy x (0 1 2)
+               (* it 2)))
+  :should be 68)
+
+(test "refxy sets second value on success"
+  :valueof (multiple-value-list
+             (let ((x (table)))
+               (setf (gethash 0 x) (table))
+               (setf (gethash 1 (gethash 0 x)) (table))
+               (setf (gethash 2 (gethash 1 (gethash 0 x))) 34)
+               (refxy x (0 1 2)
+                 (* it 2))))
+  :should be '(68 t))
+
+(test "refxy - nil second value on bailing"
+  :valueof (multiple-value-list
+             (let ((x (table)))
+               (setf (gethash 0 x) (table))
+               (setf (gethash 1 (gethash 0 x)) (table))
+               (setf (gethash 2 (gethash 1 (gethash 0 x))) 34)
+               (refxy x (0 1 3)
+                 (* it 2))))
+  :should be '(nil nil))
+
+(test "refxy - nil second value on bailing - 2"
+  :valueof (multiple-value-list
+             (let ((x (table)))
+               (setf (gethash 0 x) (table))
+               (setf (gethash 1 (gethash 0 x)) (table))
+               (setf (gethash 2 (gethash 1 (gethash 0 x))) 34)
+;?                (la (gethash 911 x)
+;?                    (
+               (refxy x (911)
+                 (* it 2))))
+  :should be '(nil nil))

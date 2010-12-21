@@ -2,3 +2,14 @@
 (defcoerce 'hash-table 'function
   (fn(table)
     [gethash _ table]))
+
+(defcoerce 'hash-table 'cons
+  (fn(table)
+    (prn "aaa")
+    (ret ans '()
+      (maphash #'(lambda(k v) (prn k) (push (list k v) ans)) table))))
+
+;? (mac obj args
+;?   `(listtab (list ,@(map (fn ((k v))
+;?                            `(list ',k ,v))
+;?                          (pair args)))))

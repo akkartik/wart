@@ -88,3 +88,10 @@
               (if ,next-available
                 (la ,@(cdr args))
                 ,(car args))))))))
+
+(defmacro refxy(tab inds expr)
+  `(la (gethash ,(car inds) ,tab)
+       ,@(map 'list (lambda(x) `(gethash ,x it)) (cdr inds))
+       (values it t) ; never returned; sentinel la can evaluate
+       (values it t) ; never returned; sentinel la can evaluate
+       (values ,expr t)))
