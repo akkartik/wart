@@ -10,5 +10,7 @@ else
       echo "(load \"$i\")"
     done
     echo "(quit)"
-  ) | rlwrap sbcl --noinform --noprint --userinit sbclrc --eval '(setf *batch-mode* t)' --load boot
+  ) > .wartbatch
+  rlwrap sbcl --noinform --userinit sbclrc --eval '(setf *batch-mode* t)' --load boot --load .wartbatch
+  rm .wartbatch
 fi
