@@ -6,7 +6,9 @@
 (defcoerce 'hash-table 'cons
   (fn(table)
     (ret ans '()
-      (maphash #'(lambda(k v) (push (list k v) ans)) table))))
+      (maphash #'(lambda(k v)
+                   (push (list k v) ans))
+               table))))
 
 (defcoerce 'cons 'hash-table
   (fn(l)
@@ -14,6 +16,9 @@
       (map (fn((a b))
              (setf (gethash a ans) b))
            l))))
+
+(defcoerce 'null 'hash-table
+  [table])
 
 (mac obj args
   `(coerce (list ,@(map (fn ((k v))

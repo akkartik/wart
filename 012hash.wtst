@@ -37,3 +37,12 @@
   :valueof (let x (wart-coerce '((1 2) (2 3)) 'hash-table)
              (gethash 2 x))
   :should be 3)
+
+(test-wart "coerce nil to hash works"
+  :valueof (hash-table-count (coerce nil 'hash-table))
+  :should be 0)
+
+(test-wart "obj works"
+  :valueof (let x (obj a 1 b 2)
+             x!a)
+  :should be 1)
