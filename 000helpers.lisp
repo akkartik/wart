@@ -1,3 +1,7 @@
+(defmacro ignore-redef(&body body)
+  `(handler-bind (#+sbcl(sb-kernel:redefinition-warning 'muffle-warning))
+     ,@body))
+
 (defmacro synonym(&rest args)
   `(setf ,@(mapcar (lambda (x) `(symbol-function ',x))
                    args)))
@@ -42,12 +46,29 @@
        (consp (cdr x))
        (no (cddr x))))
 
+(defun tuples(n xs &optional acc)
+  (if (no xs)
+    (nreverse acc)
+    (tuples n (nthcdr n xs) (cons (firstn n xs) acc))))
+
+(defun pair(xs)
+  (tuples 2 xs))
+
 (defun pos(test s)
   (if (functionp test)
     (position-if test s)
     (position test s)))
 
-(synonym table make-hash-table)
+(defun firstn(n xs)
+  (if (or (= n 0) (no xs))
+      nil
+      (cons (car xs) (firstn (1- n) (cdr xs)))))
+
+(defmacro aand(&rest args)
+  (cond
+    ((no args)   t)
+    ((no (cdr args))   (car args))
+    (`(let ((it ,(car args)))   (and it (aand ,@(cdr args)))))))
 
 (defun match(a b)
   (or (is a b)
@@ -56,15 +77,9 @@
            (match (car a) (car b))
            (match (cdr a) (cdr b)))))
 
-(defmacro ignore-redef(&body body)
-  `(handler-bind (#+sbcl(sb-kernel:redefinition-warning 'muffle-warning))
-     ,@body))
+
 
-(defmacro aand(&rest args)
-  (cond
-    ((no args)   t)
-    ((no (cdr args))   (car args))
-    (`(let ((it ,(car args)))   (and it (aand ,@(cdr args)))))))
+(synonym table make-hash-table)
 
 ; 'first available' - like or, but uses multiple values to indicate unavailable
 (defmacro fa(&rest args)

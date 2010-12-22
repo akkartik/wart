@@ -16,6 +16,11 @@
   :valueof h.0
   :should be 34)
 
+(pending-test "coercing hash tables to functions in write position"
+  :valueof (ret h (table)
+             (= h.0 34))
+  :should be (obj 0 34))
+
 (test-wart "coercing hash to list works"
   :valueof (coerce (ret x (table)
                      (setf (gethash 1 x) 2)

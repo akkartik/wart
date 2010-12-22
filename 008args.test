@@ -300,20 +300,6 @@
   :valueof (foo18 3 4 :do 4 5)
   :should be '(4 3 (4 5)))
 
-(test-wart "tuples works"
-  :valueof (tuples 3 '(1 2 3 4 5 6))
-  :should be '((1 2 3) (4 5 6)))
-
-(test-wart "tuples works with unbalanced lists"
-  :valueof (tuples 3 '(1 2 3 4 5))
-  :should be '((1 2 3) (4 5)))
-
-(test-wart "tuples works with n 1"
-  :valueof (tuples 1 '(1 2 3 4 5))
-  :should be (map 'list #'list '(1 2 3 4 5)))
-
-
-
 ; integration test: bracket + fn + call
 (test-wart "call works on lambdas"
   :valueof (call [+ _ 1] 3)

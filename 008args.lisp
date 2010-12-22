@@ -9,16 +9,6 @@
 (defmacro fn(params &rest body)
   `(lambda ,@(compile-params params body)))
 
-(defun tuples(n xs &optional acc)
-  (if (no xs)
-    (nreverse acc)
-    (tuples n (nthcdr n xs) (cons (firstn n xs) acc))))
-
-(defun firstn(n xs)
-  (if (or (= n 0) (no xs))
-      nil
-      (cons (car xs) (firstn (1- n) (cdr xs)))))
-
 
 
 ;; Internals

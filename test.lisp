@@ -12,11 +12,7 @@
        (incf *test-failures*)
        (prn "F " ,msg #\newline "  got " got))))
 
-(defmacro pending-test(msg Valueof expr Should &rest predicate)
-  `(prn "X " ,msg))
-
-(defmacro pending-test-wart(msg Valueof expr Should &rest predicate)
-  `(pending-test ,msg ,Valueof ,expr ,Should ,@predicate))
+(defmacro pending-test(msg Valueof expr Should &rest predicate))
 
 (defmacro be(&rest args)
   `(iso ,@args))
