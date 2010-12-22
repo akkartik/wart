@@ -57,3 +57,8 @@
 (test-wart ". works"
   :valueof oddp.3
   :should be t)
+
+; integration test: defover + ssyntax
+(test "expand-ssyntax goes through wt-transform"
+  :valueof (expand-ssyntax 'defover-foo.3)
+  :should be '(call* defover-bar 3))
