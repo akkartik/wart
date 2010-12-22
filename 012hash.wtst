@@ -12,6 +12,10 @@
   :valueof (call* h 0)
   :should be 34)
 
+(test-wart "apply on hash tables works"
+  :valueof (apply h '(0))
+  :should be 34)
+
 (test-wart "coercing hash tables to functions in read position"
   :valueof h.0
   :should be 34)

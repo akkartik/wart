@@ -1,8 +1,39 @@
-;; call uses extensible coerce.
+;; Override call and apply using extensible coerce
+
+; Because (coerce x 'function) evals x
+(defmacro fslot(f)
+  (if (and (atom f) (fboundp f))
+    `(function ,f)
+    f))
 
 (ignore-redef
   (defun call(f &rest args)
-    (if (or (functionp f)
-            (and (symbolp f) (fboundp f)))
-      (apply f args)
-      (apply (wart-coerce f 'function) args))))
+    (apply (wart-coerce (fslot f) 'function)
+           args)))
+
+(defmacro wart-apply(f &rest args)
+  `(call (apply-fn (wart-coerce (fslot ,f) 'function))
+         ,@args))
+(defover apply wart-apply)
+
+(defmacro call*(f &rest args)
+  (if (macp f)
+    `(,f ,@args)
+    `(call (fslot ,f) ,@args)))
+
+
+
+;; Internals
+
+(defun apply-fn(f)
+  (lambda(&rest args)
+    (apply f (flatten-last args))))
+
+(defun flatten-last(xs)
+  (if (not (consp xs))
+    xs
+    (if (cdr xs)
+      (cons (car xs) (flatten-last (cdr xs)))
+      (if (consp (car xs))
+        (car xs)
+        xs))))

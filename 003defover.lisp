@@ -1,4 +1,4 @@
-;; Override lisp keywords.
+;; Override lisp keywords
 
 ; In return for being able to override keywords you can't use keywords anywhere
 ; in the program. Not even inside quoted expressions. Otherwise we can't

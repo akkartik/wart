@@ -13,3 +13,27 @@
 (test-wart "call coerces to function when necessary"
   :valueof (call 'car '(1))
   :should be 1)
+
+(test "flatten-last works"
+  :valueof (flatten-last '(1 2 (3 4 5)))
+  :should be '(1 2 3 4 5))
+
+(test "flatten-last works on nil"
+  :valueof (flatten-last nil)
+  :should be nil)
+
+(test "flatten-last works on non-lists"
+  :valueof (flatten-last 3)
+  :should be 3)
+
+(test "flatten-last works on singleton"
+  :valueof (flatten-last '(1))
+  :should be '(1))
+
+(test "flatten-last works on flat list"
+  :valueof (flatten-last '(1 2 3))
+  :should be '(1 2 3))
+
+(test "flatten-last works on nested list"
+  :valueof (flatten-last '(1 2 (3) 4 (5 6 (7))))
+  :should be '(1 2 (3) 4 5 6 (7)))
