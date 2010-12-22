@@ -3,7 +3,10 @@
 (defun wart-type(x)
   (if (match x '(tagged _ _))
     (cadr x)
-    (type-of x)))
+    (let ((full-type (type-of x)))
+      (if (consp full-type)
+        (car full-type)
+        full-type))))
 (defover type wart-type) ; reserved keyword. bad dog in the manger CL!
 
 (defun annotate(type val)
@@ -13,6 +16,8 @@
   (if (match x '(tagged _ _))
     (elt x 2)
     x))
+
+
 
 (setf *wart-coercions* (table))
 

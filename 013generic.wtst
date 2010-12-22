@@ -1,0 +1,10 @@
+(wt-eval '(defgeneric genericfoo(x) x))
+(test-wart "defgeneric works"
+  :valueof (genericfoo 3)
+  :should be 3)
+
+(wt-eval '(defmethod genericfoo(x) integer
+            (1+ x)))
+(test-wart "defmethod works"
+  :valueof (genericfoo 3)
+  :should be 4)
