@@ -14,7 +14,7 @@
   (cond
     ((macp a)   `(,a ,b))
     ((function-name-p a)  `(call (function ,a) ,b))
-    (t  `(call ',a ,b))))
+    (t  `(call ,a ,b))))
 
 (defmacro call*-quoted(a b)
   `(call* ,a ',b))

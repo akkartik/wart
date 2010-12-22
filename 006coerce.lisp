@@ -3,8 +3,8 @@
 (setf *wart-coercions* (table))
 
 (defun wart-coerce(val dest)
-  (fa (indexing *wart-coercions* (dest (type* val))
-        (funcall it (val* val)))
+  (fa (indexing *wart-coercions* (dest (type-of val))
+        (funcall it val))
       (funcall #'coerce val dest)))
 (defover coerce wart-coerce)
 
@@ -17,19 +17,3 @@
 
 (defun isa(elem typ)
   (is typ (type-of elem)))
-
-
-
-;; Internals
-
-(setf (gethash 'symbol *wart-coercions*) (table))
-
-(defun type*(val)
-  (if (and (isa val 'symbol) (not (fboundp val)))
-    (type* (eval val))
-    (type-of val)))
-
-(defun val*(val)
-  (if (isa val 'symbol)
-    (val* (eval val))
-    val))

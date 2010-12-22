@@ -4,6 +4,9 @@
   `(map 'list ,f ,@seqs)) ; recursive map won't be transformed
 (defover map wart-map)
 
+(defun pair(xs)
+  (tuples 2 xs))
+
 (mac with(parms . body)
   `(call (fn ,(map #'car pair.parms)
            ,@body)
@@ -21,12 +24,6 @@
       `(do ,@body)
       `(let ,(car parms) ,(cadr parms)
          (withs ,(cddr parms) ,@body))))
-
-(def pair(xs ? f #'list)
-  (if (no xs)   nil
-      (no cdr.xs)   (call list^list car.xs)
-      (cons (call f car.xs cadr.xs)
-            (pair cddr.xs f))))
 
 (mac w/uniq(names . body)
   (if (consp names)

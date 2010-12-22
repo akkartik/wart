@@ -4,16 +4,8 @@
   :valueof (type (coerce h 'function))
   :should be 'function)
 
-(test-wart "coercing reaches through symbols"
-  :valueof (type (coerce 'h 'function))
-  :should be 'function)
-
 (test-wart "call on hash table works"
   :valueof (call h 0)
-  :should be 34)
-
-(test-wart "call on quoted sym operates like call on symbol"
-  :valueof (call 'h 0)
   :should be 34)
 
 (test-wart "call* on hash tables works"

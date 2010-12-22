@@ -1,6 +1,6 @@
 (defcoerce 'ratio 'integer
   (lambda(x) 15))
 
-(test "0"
+(test "wart-coerce works"
   :valueof (wart-coerce 1/2 'integer)
   :should be 15)
