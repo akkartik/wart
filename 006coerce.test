@@ -4,3 +4,10 @@
 (test "wart-coerce works"
   :valueof (wart-coerce 1/2 'integer)
   :should be 15)
+
+(defcoerce 'foo 'bar
+  [annotate 'bar (1+ (rep _))])
+
+(test "wart-coerce works on user-defined types"
+  :valueof (wart-coerce (annotate 'foo 34) 'bar)
+  :should be '(tagged bar 35))

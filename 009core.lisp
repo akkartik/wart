@@ -1,5 +1,3 @@
-(defover type type-of) ; reserved keyword. bad dog in the manger CL!
-
 (mac wart-if args
   (if (oddp (length args)) ; there's an else
     `(cond ,@(tuples 2 (insert-t-in-penultimate-position args)))

@@ -1,9 +1,23 @@
 ;; Extensible coercion
 
+(defun wart-type(x)
+  (if (match x '(tagged _ _))
+    (cadr x)
+    (type-of x)))
+(defover type wart-type) ; reserved keyword. bad dog in the manger CL!
+
+(defun annotate(type val)
+  (list 'tagged type val))
+
+(defun rep(x)
+  (if (match x '(tagged _ _))
+    (elt x 2)
+    x))
+
 (setf *wart-coercions* (table))
 
 (defun wart-coerce(val dest)
-  (fa (indexing *wart-coercions* (dest (type-of val))
+  (fa (indexing *wart-coercions* (dest (wart-type val))
         (funcall it val))
       (funcall #'coerce val dest)))
 (defover coerce wart-coerce)
@@ -16,4 +30,4 @@
            ,converter)))
 
 (defun isa(elem typ)
-  (is typ (type-of elem)))
+  (is typ (wart-type elem)))
