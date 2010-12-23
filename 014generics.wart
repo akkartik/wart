@@ -1,0 +1,28 @@
+(ignore-redef
+  (defgeneric len(x)
+    (length x)))
+
+(defmethod len(x) hash-table
+  (hash-table-count x))
+
+
+
+(ignore-redef
+  (defgeneric* iso(x y)
+    (or (is x y)
+        (and (consp x)
+             (consp y)
+             (iso car.x car.y)
+             (iso cdr.x cdr.y)))))
+
+(defgeneric all(f xs)
+  (if
+    (no xs)   t
+    (call f (car xs))   (all cdr.xs)))
+
+(defmethod iso(x y) hash-table
+  (and (is (len keys.x) (len keys.y))
+       (all
+         (fn((k v))
+           (iso y.k v))
+         (coerce x 'cons))))

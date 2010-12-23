@@ -1,0 +1,31 @@
+(test "len works by default"
+  :valueof (len nil)
+  :should be 0)
+
+(test "len works by default - 2"
+  :valueof (len '(1 2 3))
+  :should be 3)
+
+(test "len works on hash tables"
+  :valueof (len (obj 1 2 3 4))
+  :should be 2)
+
+(test "iso works like equal by default"
+  :valueof (iso nil nil)
+  :should be t)
+
+(wt-eval '(defmethod iso(x y) footype
+            (and (position 3 rep.x)
+                 (position 3 rep.y))))
+
+(test-wart "defmethod for iso takes"
+  :valueof (annotate 'footype '(1 2 3))
+  :should be (annotate 'footype '(3 4 5)))
+
+(test-wart "iso works by coercing empty tables"
+  :valueof (table)
+  :should be (table))
+
+(test-wart "iso works on tables using defmethod"
+  :valueof (obj 1 2 3 4)
+  :should be (obj 3 4 1 2))

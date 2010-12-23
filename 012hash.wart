@@ -6,8 +6,8 @@
 (defcoerce 'hash-table 'cons
   (fn(table)
     (ret ans '()
-      (maphash #'(lambda(k v)
-                   (push (list k v) ans))
+      (maphash (fn(k v)
+                 (push (list k v) ans))
                table))))
 
 (defcoerce 'cons 'hash-table
@@ -25,3 +25,9 @@
                            `(list ',k ,v))
                          (pair args)))
            'hash-table))
+
+(def keys(table)
+  (ret ans ()
+    (maphash (fn(k v)
+               (push k ans))
+             table)))

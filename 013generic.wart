@@ -15,13 +15,13 @@
         ,@body)))
 (defover defmethod wart-defmethod)
 
-
-
 (def wart-last(xs)
   (if (cdr xs)
-    (last cdr.xs)
+    (wart-last cdr.xs)
     (car xs)))
 (defover last wart-last)
+
+
 
 (def transform-last (f xs)
   (if (cdr xs)
@@ -35,13 +35,16 @@
       (= (gethash ',name vtables*)
         (let ,basefn (fn ,args ,@body)
            ; Assume body handles primitives by default. Can be overridden.
-           (obj () ,basefn
+           (obj null ,basefn
+                boolean ,basefn
                 symbol ,basefn
                 standard-char ,basefn
+                bit ,basefn
                 integer ,basefn
                 cons ,basefn)))
       (def ,name ,allargs
-        (aif (aand (gethash ',name vtables*) (call it^type^last ,allargs))
+        (aif (aand (gethash ',name vtables*)
+                   (call it^type^last ,allargs))
           (apply it ,allargs)
           ,(with (last-coercer `(apply ,name (transform-last [coerce _ 'cons] ,allargs))
                   all-coercer `(apply ,name (map [coerce _ 'cons] ,allargs)))

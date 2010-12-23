@@ -3,8 +3,16 @@
   :valueof (genericfoo 3)
   :should be 3)
 
+(test-wart "defgeneric handles #$%# bit type"
+  :valueof (genericfoo 1)
+  :should be 1)
+
 (wt-eval '(defmethod genericfoo(x) integer
             (1+ x)))
 (test-wart "defmethod works"
   :valueof (genericfoo 3)
   :should be 4)
+
+(test-wart "last has arc semantics rather than common lisp semantics"
+  :valueof (last '(1 2 3))
+  :should be 3)
