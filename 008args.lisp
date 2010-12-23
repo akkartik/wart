@@ -69,7 +69,7 @@
   (cond
     ((assoc var keyword-alist)  (alref var keyword-alist))
     ((no params)  (values nil 'no-arg))
-    ((iso params var)  arglist)
+    ((is params var)  arglist)
     ((not (consp params))   (values nil 'no-arg))
     ((assoc (car params) keyword-alist)  (get-arg var (cdr params) arglist keyword-alist))
     ((no arglist)  (values nil 'no-arg))
@@ -84,7 +84,7 @@
 (defun get-rest-args(var params arglist keyword-alist)
   (cond
     ((assoc var keyword-alist)  (alref var keyword-alist))
-    ((iso params var)  arglist)
+    ((is params var)  arglist)
     ((is '? (car params))   arglist)
     ((assoc (car params) keyword-alist)  (get-rest-args var (cdr params) arglist keyword-alist))
     (t   (get-rest-args var (cdr params) (cdr arglist) keyword-alist))))
@@ -133,7 +133,7 @@
     ((not (consp args))  ())
     ((keywordp (car args))  (let* ((param (keyword->symbol (car args))))
                               (cons (cons param
-                                          (if (iso param rest-param)
+                                          (if (is param rest-param)
                                             (cdr args)
                                             (cadr args)))
                                     (keyword-args (cddr args) rest-param))))
@@ -142,7 +142,7 @@
 (defun strip-keyword-args(args rest-param)
   (cond
     ((no args)  ())
-    ((keywordp (car args))  (if (iso (keyword->symbol (car args)) rest-param)
+    ((keywordp (car args))  (if (is rest-param (keyword->symbol (car args)))
                               ()
                               (strip-keyword-args (cddr args) rest-param)))
     (t   (cons (car args)
@@ -159,7 +159,7 @@
   (cond
     ((no params)  ())
     ((rest-param-p params)  params)
-    ((iso (car params) '?)   (really-strip-defaults (cdr params)))
+    ((is (car params) '?)   (really-strip-defaults (cdr params)))
     (t   (cons (car params)
                (strip-defaults (cdr params))))))
 
