@@ -2,8 +2,8 @@
 (defcall hash-table table
   [gethash _ table])
 
-(defset hash-table(table index value)
-  (setf (gethash index table)
+(defset hash-table(table key value)
+  (setf (gethash key table)
         value))
 
 (defcoerce 'hash-table 'cons
