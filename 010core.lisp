@@ -7,7 +7,6 @@
 (mac wart-do args `(call (fn() ,@args)))
 (defover do wart-do)
 
-(defover = setf)
 (defover ++ incf)
 
 (defover load wart-load)
