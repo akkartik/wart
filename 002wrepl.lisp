@@ -42,9 +42,7 @@
 
 ; code-generate wt-transform-1
 (defun build-wart-transform()
-  (locally
-    (declare (sb-ext:muffle-conditions style-warning))
-    (eval (generate-wart-transform *wart-cases*))))
+  (eval (generate-wart-transform *wart-cases*)))
 
 (defvar *wart-cases* ())
 
