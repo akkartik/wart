@@ -5,9 +5,9 @@
 (defover map wart-map)
 
 (mac with(parms . body)
-  `(call (fn ,(map #'car pair.parms)
+  `(call (fn ,(map 'car pair.parms)
            ,@body)
-         ,@(map #'cadr pair.parms)))
+         ,@(map 'cadr pair.parms)))
 
 (mac wart-let(var val . body)
   `(with (,var ,val) ,@body))
@@ -24,7 +24,7 @@
 
 (mac w/uniq(names . body)
   (if (consp names)
-      `(with ,(apply #'join nil (map [list _ '(uniq)]
-                                     names))
+      `(with ,(apply 'join nil (map [list _ '(uniq)]
+                                    names))
          ,@body)
       `(let ,names (uniq) ,@body)))

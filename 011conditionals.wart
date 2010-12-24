@@ -44,7 +44,7 @@
 (mac check(expr test ? alt nil)
   (w/uniq x
     `(let ,x ,expr
-       (if (call #',test ,x)
+       (if (call ',test ,x)
          ,x
          ,alt))))
 

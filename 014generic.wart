@@ -1,24 +1,24 @@
 (mac wart-defgeneric(name args . body)
   (w/uniq allargs
     `(generic-expander ,name ,allargs ,args ,body
-       (apply #',name (transform-last [coerce _ 'cons] ,allargs)))))
+       (apply ',name (transform-last [coerce _ 'cons] ,allargs)))))
 (defover defgeneric wart-defgeneric)
 
 (mac defgeneric*(name args . body)
   (w/uniq allargs
     `(generic-expander ,name ,allargs ,args ,body
-       (apply #',name (map [coerce _ 'cons] ,allargs)))))
+       (apply ',name (map [coerce _ 'cons] ,allargs)))))
 
 (mac deftransform(name args . body)
   (w/uniq allargs
     `(generic-expander ,name ,allargs ,args ,body
-       (coerce (apply #',name (transform-last [coerce _ 'cons] ,allargs))
+       (coerce (apply ',name (transform-last [coerce _ 'cons] ,allargs))
                (type (last ,allargs))))))
 
 (mac deftransform*(name args . body)
   (w/uniq allargs
     `(generic-expander ,name ,allargs ,args ,body
-       (coerce (apply #',name (map [coerce _ 'cons] ,allargs))
+       (coerce (apply ',name (map [coerce _ 'cons] ,allargs))
                (type (last ,allargs))))))
 
 (mac wart-defmethod(name args type . body)
