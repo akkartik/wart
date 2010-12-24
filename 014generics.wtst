@@ -34,6 +34,14 @@
 
 
 
+(test-wart "all works"
+  :valueof (all 'idfn '(1 2 3))
+  :should be t)
+
+(test-wart "all works"
+  :valueof (all 'idfn '(1 nil 3))
+  :should be nil)
+
 (test-wart "cut works on strings"
   :valueof (cut "abc" 1)
   :should be "bc")

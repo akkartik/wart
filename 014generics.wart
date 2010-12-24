@@ -27,7 +27,7 @@
 (defgeneric all(f xs)
   (if
     (no xs)   t
-    (call f (car xs))   (all cdr.xs)))
+    (call f (car xs))   (all f cdr.xs)))
 
 (ignore-redef
   (defgeneric* join args
