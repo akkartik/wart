@@ -104,6 +104,13 @@
              counter)
   :should be 2)
 
+(test "la doesn't redundantly eval args"
+  :valueof (let ((counter 0))
+             (la (values 1 t)
+                 (values (incf counter) t))
+             counter)
+  :should be 1)
+
 (test "indexing expands correctly"
   :valueof (macex1 '(indexing foo-table (x y z)
                       (+ it 1)))
@@ -162,3 +169,12 @@
                (indexing x (911 2)
                  (* it 2))))
   :should match '(_ t))
+
+(test "indexing doesn't redundantly eval its expr"
+  :valueof (let ((counter 0)
+                 (tab (table)))
+             (setf (gethash 0 tab) 34)
+             (indexing tab (0)
+               (incf counter))
+             counter)
+  :should be 1)

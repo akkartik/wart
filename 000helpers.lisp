@@ -106,7 +106,8 @@
           (cond
             ((not ,available)   (values nil t))
             ((not ,next-available)  (values it ,available))
-            (t  (la ,@(cdr args)))))))))
+            (t  (la (values ,next-val ,next-available)
+                    ,@(cddr args)))))))))
 
 (defmacro guarded-gethash(key table)
   `(if ,table
