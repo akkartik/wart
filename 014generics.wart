@@ -15,14 +15,20 @@
              (iso car.x car.y)
              (iso cdr.x cdr.y)))))
 
-(defgeneric all(f xs)
-  (if
-    (no xs)   t
-    (call f (car xs))   (all cdr.xs)))
-
 (defmethod iso(x y) hash-table
   (and (is (len keys.x) (len keys.y))
        (all
          (fn((k v))
            (iso y.k v))
          (coerce x 'cons))))
+
+
+
+(defgeneric all(f xs)
+  (if
+    (no xs)   t
+    (call f (car xs))   (all cdr.xs)))
+
+(ignore-redef
+  (defgeneric* join args
+    (apply #'concatenate (type (car args)) args)))

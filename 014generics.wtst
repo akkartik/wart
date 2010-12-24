@@ -37,3 +37,11 @@
 (test-wart "cut works on strings"
   :valueof (cut "abc" 1)
   :should be "bc")
+
+(test-wart "join still works"
+  :valueof (join '(1) '(2 3))
+  :should be '(1 2 3))
+
+(test-wart "join works on strings"
+  :valueof (join "abc" "def")
+  :should be "abcdef")
