@@ -3,10 +3,7 @@
 (defun wart-type(x)
   (if (match x '(tagged _ _))
     (cadr x)
-    (let ((full-type (type-of x)))
-      (if (consp full-type)
-        (car full-type)
-        full-type))))
+    (generalized-common-lisp-type-specifier (type-of x))))
 (defover type wart-type) ; reserved keyword. bad dog in the manger CL!
 
 (defun annotate(type val)
@@ -36,3 +33,13 @@
 
 (defun isa(elem typ)
   (is typ (wart-type elem)))
+
+; add to this as we run into issues
+(defun generalized-common-lisp-type-specifier(full-type)
+  (cond
+    ((match full-type '(integer))  'integer)
+    ((match full-type '(integer _))  'integer)
+    ((match full-type '(integer _ _))  'integer)
+    ((match full-type '(simple-array character))  'string)
+    ((match full-type '(simple-array character _))  'string)
+    (t  full-type)))

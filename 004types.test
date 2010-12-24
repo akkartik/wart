@@ -1,6 +1,10 @@
-(test "wart-type strips out overspecification in types"
+(test "wart-type handles integer types"
   :valueof (wart-type 3)
   :should be 'integer)
+
+(test "wart-type handles string types"
+  :valueof (wart-type "abc")
+  :should be 'string)
 
 (defcoerce 'ratio 'integer
   (lambda(x) 15))
