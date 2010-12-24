@@ -31,4 +31,4 @@
 
 (ignore-redef
   (defgeneric* join args
-    (apply #'concatenate (type (car args)) args)))
+    (apply 'concatenate (type (car args)) args)))

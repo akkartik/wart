@@ -22,7 +22,7 @@
   (format t "~a" arg))
 
 (defun prn(&rest args)
-  (map 'list #'pr args)
+  (map 'list 'pr args)
   (format t "~%")
   (car args))
 

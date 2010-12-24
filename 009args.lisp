@@ -149,7 +149,7 @@
                (strip-keyword-args (cdr args) rest-param)))))
 
 (defun optional-params(params)
-  (map 'list #'car
+  (map 'list 'car
        (tuples 2 (strip-required (strip-rest params)))))
 
 (defun optional-alist(params)

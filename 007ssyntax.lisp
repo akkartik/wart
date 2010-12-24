@@ -20,7 +20,7 @@
       (wt-transform (expand-ssyntax-string symname))
       sym)))
 
-(add-wart-transformer #'ssyntaxp #'expand-ssyntax)
+(add-wart-transformer ssyntaxp expand-ssyntax)
 
 (defun expand-ssyntax-string(s &optional (idx (1- (len s)))) ; left-associative
   (let ((ssyntax-idx  (ssyntax-char s idx)))

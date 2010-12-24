@@ -6,11 +6,11 @@
                   (t sexp))))
 
 (test "generate-wart-transform works as we add to cases"
-  :valueof (_let cases '((#'a #'b)) (generate-wart-transform cases))
+  :valueof (_let cases '(('a 'b)) (generate-wart-transform cases))
   :should be '(defun wt-transform-1(sexp)
                 (cond
                   ((no sexp) nil)
-                  ((funcall #'a sexp) (funcall #'b sexp))
+                  ((funcall 'a sexp) (funcall 'b sexp))
                   (t sexp))))
 
 (test "generate-wart-transform works with code cases"

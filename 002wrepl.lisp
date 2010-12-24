@@ -19,7 +19,8 @@
 ; Insert a case into the wart cond.
 (defmacro add-wart-transformer(check trans)
   `(ignore-redef
-      (setf *wart-cases* (append *wart-cases* (list (list ,check ,trans))))
+      (setf *wart-cases* (append *wart-cases* (list (list (function ,check)
+                                                          (function ,trans)))))
       (build-wart-transform)))
 
 
@@ -37,7 +38,7 @@
   (eval (wt-transform sexp)))
 
 (defun wt-transform(sexp)
-  (apply-to-all #'wt-transform-1 sexp))
+  (apply-to-all 'wt-transform-1 sexp))
 
 ; code-generate wt-transform-1
 (defun build-wart-transform()

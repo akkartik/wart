@@ -28,7 +28,7 @@
 (defun wart-coerce(val dest)
   (fa (indexing *wart-coercions* (dest (wart-type val))
         (funcall it val))
-      (funcall #'coerce val dest)))
+      (funcall 'coerce val dest)))
 (defover coerce wart-coerce)
 
 (defmacro defcoerce(src dest converter)

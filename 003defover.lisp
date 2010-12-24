@@ -35,5 +35,5 @@
   [list 'quote (lookup-quoted-handler (cadr _))])
 
 (add-wart-transformer
-  #'lookup-unquoted-handler
+  lookup-unquoted-handler
   [call (lookup-unquoted-handler _) _])
