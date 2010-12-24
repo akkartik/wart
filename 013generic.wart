@@ -1,57 +1,64 @@
-(mac wart-defgeneric (name args . body)
-  `(genericexpander nil nil ,name ,args ,@body))
-(defover defgeneric wart-defgeneric)
-(mac defgeneric* (name args . body)
-  `(genericexpander t nil ,name ,args ,@body))
-
-(mac deftransform (name args . body)
-  `(genericexpander nil t ,name ,args ,@body))
-(mac deftransform* (name args . body)
-  `(genericexpander t t ,name ,args ,@body))
-
-(mac wart-defmethod (name args type . body)
-  `(= (gethash ',type (gethash ',name vtables*))
-      (fn ,args
-        ,@body)))
-(defover defmethod wart-defmethod)
-
 (def wart-last(xs)
   (if (cdr xs)
     (wart-last cdr.xs)
     (car xs)))
 (defover last wart-last)
 
+(mac wart-defgeneric(name args . body)
+  (w/uniq allargs
+    `(generic-expander ,name ,allargs ,args ,body
+       (apply #',name (transform-last [coerce _ 'cons] ,allargs)))))
+(defover defgeneric wart-defgeneric)
+
+(mac defgeneric*(name args . body)
+  (w/uniq allargs
+    `(generic-expander ,name ,allargs ,args ,body
+       (apply #',name (map [coerce _ 'cons] ,allargs)))))
+
+(mac deftransform(name args . body)
+  (w/uniq allargs
+    `(generic-expander ,name ,allargs ,args ,body
+       (coerce (apply #',name (transform-last [coerce _ 'cons] ,allargs))
+               (type (last ,allargs))))))
+
+(mac deftransform*(name args . body)
+  (w/uniq allargs
+    `(generic-expander ,name ,allargs ,args ,body
+       (coerce (apply #',name (map [coerce _ 'cons] ,allargs))
+               (type (last ,allargs))))))
+
+(mac wart-defmethod(name args type . body)
+  `(= (gethash ',type (gethash ',name vtables*))
+      (fn ,args
+        ,@body)))
+(defover defmethod wart-defmethod)
+
 
 
-(def transform-last (f xs)
+(def transform-last(f xs)
   (if (cdr xs)
     (cons car.xs (transform-last f cdr.xs))
     (call list^f car.xs)))
 
-(mac genericexpander(coerce-all coerce-back
-                     name args . body)
-  (w/uniq (allargs basefn)
-    `(do
-      (= (gethash ',name vtables*)
-        (let ,basefn (fn ,args ,@body)
-           ; Assume body handles primitives by default. Can be overridden.
-           (obj null ,basefn
-                boolean ,basefn
-                symbol ,basefn
-                standard-char ,basefn
-                bit ,basefn
-                integer ,basefn
-                cons ,basefn)))
-      (def ,name ,allargs
-        (aif (aand (gethash ',name vtables*)
-                   (call it^type^last ,allargs))
-          (apply it ,allargs)
-          ,(with (last-coercer `(apply ,name (transform-last [coerce _ 'cons] ,allargs))
-                  all-coercer `(apply ,name (map [coerce _ 'cons] ,allargs)))
-             (case (list coerce-all coerce-back)
-               (nil nil)  last-coercer
-               (t nil)  all-coercer
-               (nil t)    `(coerce ,last-coercer (type (last ,allargs)))
-               (t t)  `(coerce ,all-coercer (type (last ,allargs))))))))))
+(mac generic-expander(name allargs args body not-found)
+  `(do
+     (init-vtable ,name ,args ,@body)
+     (defun ,name(&rest ,allargs)
+       (aif (aand (gethash ',name vtables*)
+                  (call it^type^last ,allargs))
+         (apply it ,allargs)
+         ,not-found))))
 
 (= vtables* (table))
+(mac init-vtable(name args . body)
+  (w/uniq basefn
+    `(= (gethash ',name vtables*)
+       (let ,basefn (fn ,args ,@body)
+          ; Assume body handles primitives by default. Can be overridden.
+          (obj null ,basefn
+               boolean ,basefn
+               symbol ,basefn
+               standard-char ,basefn
+               bit ,basefn
+               integer ,basefn
+               cons ,basefn)))))

@@ -7,11 +7,20 @@
   :valueof (genericfoo 1)
   :should be 1)
 
+(test-wart "defgeneric works on strings"
+  :valueof (genericfoo "abc")
+  :should be '(#\a #\b #\c))
+
 (wt-eval '(defmethod genericfoo(x) integer
             (1+ x)))
 (test-wart "defmethod works"
   :valueof (genericfoo 3)
   :should be 4)
+
+(wt-eval '(deftransform genericfoo2(x) (cons #\0 x)))
+(test-wart "deftransform works"
+  :valueof (genericfoo2 "abc")
+  :should be "0abc")
 
 (test-wart "last has arc semantics rather than common lisp semantics"
   :valueof (last '(1 2 3))
