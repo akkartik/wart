@@ -116,5 +116,5 @@
 (defmacro indexing(tab inds expr)
   `(la (guarded-gethash ,(car inds) ,tab)
        ,@(map 'list (lambda(x) `(guarded-gethash ,x it)) (cdr inds))
-       (values it 'never-returned) ; sentinel la can always evaluate
+       (values it 'never-returned) ; just a sentinel la can safely evaluate
        (values ,expr t)))

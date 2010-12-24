@@ -41,6 +41,10 @@
 (defun isa(elem typ)
   (is typ (wart-type elem)))
 
+
+
+;; Internals
+
 ; add to this as we run into issues
 (defun generalized-common-lisp-type-specifier(full-type)
   (cond
