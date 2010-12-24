@@ -1,0 +1,9 @@
+(def wart-last(xs)
+  (if (cdr xs)
+    (wart-last cdr.xs)
+    (car xs)))
+(defover last wart-last)
+
+(defcoerce 'cons 'function
+  (fn(l)
+    [elt l _]))

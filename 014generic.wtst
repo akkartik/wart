@@ -21,7 +21,3 @@
 (test-wart "deftransform works"
   :valueof (genericfoo2 "abc")
   :should be "0abc")
-
-(test-wart "last has arc semantics rather than common lisp semantics"
-  :valueof (last '(1 2 3))
-  :should be 3)

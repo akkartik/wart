@@ -1,0 +1,7 @@
+(test-wart "last has arc semantics rather than common lisp semantics"
+  :valueof (last '(1 2 3))
+  :should be 3)
+
+(test-wart "list indexing works"
+  :valueof (call '(1 2 3) 2)
+  :should be 3)

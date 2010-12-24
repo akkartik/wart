@@ -1,9 +1,3 @@
-(def wart-last(xs)
-  (if (cdr xs)
-    (wart-last cdr.xs)
-    (car xs)))
-(defover last wart-last)
-
 (mac wart-defgeneric(name args . body)
   (w/uniq allargs
     `(generic-expander ,name ,allargs ,args ,body
