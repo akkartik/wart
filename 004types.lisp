@@ -14,6 +14,13 @@
     (elt x 2)
     x))
 
+(defun setrep(x y)
+  (if (match x '(tagged _ _))
+    (setf (elt x 2) y)
+    (setf x y)))
+
+(defsetf rep setrep)
+
 
 
 (setf *wart-coercions* (table))

@@ -1,0 +1,26 @@
+(wt-eval '(= x 3))
+(test "= works like setf by default"
+  :valueof x
+  :should be 3)
+
+(wt-eval '(progn
+            (= y nil)
+            (push 13 y)
+            (= (car y) 47)))
+(test "= works like setf on lists"
+  :valueof y
+  :should be '(47))
+
+(defset footype(f index value)
+  (push (+ index value) (rep f)))
+
+(test "defset augments setf behavior for new types"
+  :valueof (let ((f (annotate 'footype nil)))
+             (setf (call f 3) 4)
+             f)
+  :should be '(tagged footype (7)))
+
+(test "set after defset returns rhs"
+  :valueof (let ((f (annotate 'footype nil)))
+             (setf (call f 3) 4))
+  :should be '(7))
