@@ -50,3 +50,9 @@
   :valueof (let x (obj a 1 b 2)
              x!a)
   :should be 1)
+
+(test-wart "assigning to hash works"
+  :valueof (let ans (table)
+             (= ans.0 3)
+             ans.0)
+  :should be 3) ; (obj 0 3))

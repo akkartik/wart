@@ -1,6 +1,10 @@
 (defcall cons l
   [elt l _])
 
+(defset cons(l index val)
+  (setf (elt l index)
+        val))
+
 (def wart-last(xs)
   (if (cdr xs)
     (wart-last cdr.xs)
