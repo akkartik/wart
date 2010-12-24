@@ -10,6 +10,8 @@
   :valueof (len (obj 1 2 3 4))
   :should be 2)
 
+
+
 (test "iso works like equal by default"
   :valueof (iso nil nil)
   :should be t)
@@ -29,3 +31,9 @@
 (test-wart "iso works on tables using defmethod"
   :valueof (obj 1 2 3 4)
   :should be (obj 3 4 1 2))
+
+
+
+(test-wart "cut works on strings"
+  :valueof (cut "abc" 1)
+  :should be "bc")
