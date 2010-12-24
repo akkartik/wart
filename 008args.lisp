@@ -186,7 +186,7 @@
 (defun vararg-param-p(params)
   (not (consp params)))
 
-(defun flatten (tree)
+(defun flatten(tree)
   (let ((result '()))
     (labels ((scan (item)
                (if (listp item)
