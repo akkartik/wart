@@ -21,6 +21,11 @@
     `(,f ,@args)
     `(call (fslot ,f) ,@args)))
 
+(defmacro defcall(type arg &rest body)
+  `(defcoerce ',type 'function
+     (lambda(,arg)
+       ,@body)))
+
 
 
 ;; Internals
