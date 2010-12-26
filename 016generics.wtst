@@ -53,3 +53,11 @@
 (test-wart "join works on strings"
   :valueof (join "abc" "def")
   :should be "abcdef")
+
+
+
+; integration test: obj + set + iso
+(test-wart "setting inside compound structures works"
+  :valueof (ret aa (obj a '(1 2) b 3)
+             (= aa!a.1 34))
+  :should be (obj a '(1 34) b 3))

@@ -17,7 +17,7 @@
 (defover apply wart-apply)
 
 (defmacro call*(f &rest args)
-  (if (macp f)
+  (if (and (atom f) (macp f))
     `(,f ,@args)
     `(call (fslot ,f) ,@args)))
 
