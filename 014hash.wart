@@ -17,11 +17,13 @@
   (fn(l)
     (ret ans (table)
       (map (fn((a b))
-             (setf (gethash a ans) b))
+             (= ans.a b))
            l))))
 
 (defcoerce 'null 'hash-table
   [table])
+
+
 
 (mac obj args
   `(coerce (list ,@(map (fn ((k v))

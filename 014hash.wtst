@@ -55,4 +55,4 @@
   :valueof (let ans (table)
              (= ans.0 3)
              ans.0)
-  :should be 3) ; (obj 0 3))
+  :should be 3)
