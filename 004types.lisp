@@ -1,9 +1,10 @@
 ;; Extensible coercion
 
 (defun wart-type(x)
-  (if (match x '(tagged _ _))
-    (cadr x)
-    (generalized-common-lisp-type-specifier (type-of x))))
+  (cond
+    ((and (symbolp x) (macp x))  'macro)
+    ((match x '(tagged _ _))  (cadr x))
+    (t  (generalized-common-lisp-type-specifier (type-of x)))))
 (defover type wart-type) ; reserved keyword. bad dog in the manger CL!
 
 (defun annotate(type val)
@@ -40,6 +41,9 @@
 
 (defun isa(elem typ)
   (is typ (wart-type elem)))
+
+(defcoerce 'macro 'function
+  'idfn)
 
 
 
