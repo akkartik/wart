@@ -32,13 +32,13 @@
 
 (defun apply-fn(f)
   (lambda(&rest args)
-    (apply f (flatten-last args))))
+    (apply f (inline-last args))))
 
-(defun flatten-last(xs)
+(defun inline-last(xs)
   (if (not (consp xs))
     xs
     (if (cdr xs)
-      (cons (car xs) (flatten-last (cdr xs)))
+      (cons (car xs) (inline-last (cdr xs)))
       (if (consp (car xs))
         (car xs)
         xs))))
