@@ -12,8 +12,10 @@
        (incf *test-failures*)
        (prn "F " ,msg #\newline "  got " got))))
 
-(defmacro pending-test(&rest args))
-(defmacro pending-test-wart(&rest args))
+(defmacro pending-test(msg &rest args)
+  (prn "X " msg))
+(defmacro pending-test-wart(msg &rest args)
+  (prn "X " msg))
 
 (defmacro be(&rest args)
   `(iso ,@args))

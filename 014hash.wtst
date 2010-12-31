@@ -57,3 +57,14 @@
   :valueof (let h (obj 1 3)
              1+^h.1)
   :should be 4)
+
+; for now use (++ h.1)
+;(call* (compose* macro fn) arg) => (macro (call fn arg))
+;(call* (compose* fn macro) arg) => (call fn (macro arg))
+;(call* (compose* f1 f2) arg) => (call (compose f1 f2) arg)
+;(call* (compose* m1 m2) arg) => (m1 (m2 arg))
+(pending-test-wart "compose works with macros"
+  :valueof (let h (obj 1 3)
+             ++^h.1
+             h.1)
+  :should be 4)
