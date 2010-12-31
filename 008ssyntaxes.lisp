@@ -4,6 +4,11 @@
 (def-ssyntax #\. 'call*)
 (def-ssyntax #\! 'call*-quoted)
 
+(defmacro fslot(f)
+  (if (and (atom f) (fboundp f))
+    `(function ,f)
+    f))
+
 (defmacro compose*(f g)
   `(compose (fslot ,f) (fslot ,g)))
 

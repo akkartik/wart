@@ -15,38 +15,14 @@
      (lambda(,arg)
        ,@body)))
 
-
-
-; Because (coerce x 'function) evals x
-(defmacro fslot(f)
-;?   (if (and (atom f) (fboundp f))
-;?     `(function ,f)
-  (or
-    (if (atom f)
-      (cond
-        ((macp f)   `(macro-wrapper ',f))
-        ((fboundp f)  `(function ,f))))
-    f))
-
 (defmacro call*(f &rest args)
-  `(call (fslot ,f) ,@args))
-;?   (cond
-;?     ((and (atom f) (macp f))  `(,f ,@args))
-;?     ((and (atom f) (fboundp f))   `(call (function ,f) ,@args))
-;?     (t  `(call ,f ,@args))))
-;? ;?   (if (and (atom f) (macp f))
-;? ;?     `(,f ,@args)
-;? ;?     `(call (fslot ,f) ,@args)))
-
-(defun call-macro(macro &rest args)
-  (eval (macex `(,macro ,@args))))
-
-(defun macro-wrapper(macro)
-  (lambda(&rest args)
-    (eval (macex `(,macro ,@args)))))
+  (cond
+    ((and (atom f) (macp f))  `(,f ,@args))
+    ((and (atom f) (fboundp f))  `(call (function ,f) ,@args))
+    (t  `(call ,f ,@args))))
 
 (defcoerce 'macro 'function
-  [macro-wrapper _])
+  'idfn)
 
 
 
