@@ -52,12 +52,13 @@
              ans.0)
   :should be 3)
 
-; integration test: ssyntax + hash + assignment
+; integration test: ssyntax + hash
 (test-wart "compose works with hash tables"
   :valueof (let h (obj 1 3)
              1+^h.1)
   :should be 4)
 
+; integration test: ssyntax + hash + assignment
 ; for now use (++ h.1)
 ;(call* (compose* macro fn) arg) => (macro (call fn arg))
 ;(call* (compose* fn macro) arg) => (call fn (macro arg))

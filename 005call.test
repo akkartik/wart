@@ -78,5 +78,17 @@
 
 (setf a 37)
 (test "macro-wrapper returns something that can be called"
-  :valueof (call (macro-wrapper 'incf 'a))
+  :valueof (call (macro-wrapper 'incf) 'a)
   :should be 38)
+
+(setf a 33)
+(test "wart-coerce works on macros"
+  :valueof (call (wart-coerce 'incf 'function) 'a)
+  :should be 34)
+(test "wart-coerce works on macros - II"
+  :valueof a
+  :should be 34)
+
+(test "call can handle macros"
+  :valueof (call 'incf 'a)
+  :should be 35)

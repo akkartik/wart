@@ -31,9 +31,12 @@
 (defun call-macro(macro &rest args)
   (eval (macex `(,macro ,@args))))
 
-(defun macro-wrapper(macro &rest args)
-  (lambda()
+(defun macro-wrapper(macro)
+  (lambda(&rest args)
     (eval (macex `(,macro ,@args)))))
+
+(defcoerce 'macro 'function
+  [macro-wrapper _])
 
 
 

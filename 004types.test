@@ -23,7 +23,3 @@
 (test "wart-coerce works on user-defined types"
   :valueof (wart-coerce (annotate 'foo 34) 'bar)
   :should be '(tagged bar 35))
-
-(test "wart-coerce works on macros"
-  :valueof (wart-coerce 'incf 'function)
-  :should be 'incf)

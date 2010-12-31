@@ -42,9 +42,6 @@
 (defun isa(elem typ)
   (is typ (wart-type elem)))
 
-(defcoerce 'macro 'function
-  'idfn)
-
 
 
 ;; Internals

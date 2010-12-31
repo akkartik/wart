@@ -34,6 +34,12 @@
   :valueof oddp.3
   :should be t)
 
+; integration test: macros + call + ssyntax
+(setf a 3)
+(test-wart ". works with macros"
+  :valueof incf.a
+  :should be 4)
+
 ; integration test: defover + ssyntax
 (test "expand-ssyntax goes through wt-transform"
   :valueof (expand-ssyntax 'defover-foo.3)
