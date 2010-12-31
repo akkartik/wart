@@ -1,18 +1,12 @@
 ;; Override call and apply using extensible coerce
 
-; Because (coerce x 'function) evals x
-(defmacro fslot(f)
-  (if (and (atom f) (fboundp f))
-    `(function ,f)
-    f))
-
 (ignore-redef
   (defun call(f &rest args)
-    (apply (wart-coerce (fslot f) 'function)
+    (apply (wart-coerce f 'function)
            args)))
 
 (defmacro wart-apply(f &rest args)
-  `(call (apply-fn (wart-coerce (fslot ,f) 'function))
+  `(call (apply-fn (wart-coerce ,f 'function))
          ,@args))
 (defover apply wart-apply)
 
@@ -23,10 +17,26 @@
 
 
 
+; Because (coerce x 'function) evals x
+(defmacro fslot(f)
+;?   (if (and (atom f) (fboundp f))
+;?     `(function ,f)
+  (or
+    (if (atom f)
+      (cond
+        ((macp f)   `(macro-wrapper ',f))
+        ((fboundp f)  `(function ,f))))
+    f))
+
 (defmacro call*(f &rest args)
-  (if (and (atom f) (macp f))
-    `(,f ,@args)
-    `(call (fslot ,f) ,@args)))
+  `(call (fslot ,f) ,@args))
+;?   (cond
+;?     ((and (atom f) (macp f))  `(,f ,@args))
+;?     ((and (atom f) (fboundp f))   `(call (function ,f) ,@args))
+;?     (t  `(call ,f ,@args))))
+;? ;?   (if (and (atom f) (macp f))
+;? ;?     `(,f ,@args)
+;? ;?     `(call (fslot ,f) ,@args)))
 
 (defun call-macro(macro &rest args)
   (eval (macex `(,macro ,@args))))
