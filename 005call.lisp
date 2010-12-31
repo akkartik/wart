@@ -31,6 +31,10 @@
 (defun call-macro(macro &rest args)
   (eval (macex `(,macro ,@args))))
 
+(defun macro-wrapper(macro &rest args)
+  (lambda()
+    (eval (macex `(,macro ,@args)))))
+
 
 
 ;; Internals

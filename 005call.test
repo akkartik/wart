@@ -75,3 +75,8 @@
 (pending-test "call-macro works on lexical vars"
   :valueof (_let a 3 (call-macro 'incf 'a))
   :should be 4)
+
+(setf a 37)
+(test "macro-wrapper returns something that can be called"
+  :valueof (call (macro-wrapper 'incf 'a))
+  :should be 38)
