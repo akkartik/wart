@@ -16,15 +16,20 @@
          ,@args))
 (defover apply wart-apply)
 
+(defmacro defcall(type arg &rest body)
+  `(defcoerce ',type 'function
+     (lambda(,arg)
+       ,@body)))
+
+
+
 (defmacro call*(f &rest args)
   (if (and (atom f) (macp f))
     `(,f ,@args)
     `(call (fslot ,f) ,@args)))
 
-(defmacro defcall(type arg &rest body)
-  `(defcoerce ',type 'function
-     (lambda(,arg)
-       ,@body)))
+(defun call-macro(macro &rest args)
+  (eval (macex `(,macro ,@args))))
 
 
 

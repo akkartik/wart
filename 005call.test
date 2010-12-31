@@ -66,3 +66,12 @@
 (test-wart "call* nests"
   :valueof (macex '(call* (call* a 3) 4))
   :should be '(call (fslot (call* a 3)) 4))
+
+(setf a 37)
+(test "call-macro works"
+  :valueof (call-macro 'incf 'a)
+  :should be 38)
+
+(pending-test "call-macro works on lexical vars"
+  :valueof (_let a 3 (call-macro 'incf 'a))
+  :should be 4)
