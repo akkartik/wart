@@ -15,12 +15,6 @@
      (lambda(,arg)
        ,@body)))
 
-(defmacro call*(f &rest args)
-  (cond
-    ((and (atom f) (macp f))  `(,f ,@args))
-    ((and (atom f) (fboundp f))  `(call (function ,f) ,@args))
-    (t  `(call ,f ,@args))))
-
 (defcoerce 'macro 'function
   'idfn)
 

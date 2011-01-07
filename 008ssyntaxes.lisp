@@ -15,6 +15,12 @@
 (defmacro complement*(f)
   `(complement (fslot ,f)))
 
+(defmacro call*(f &rest args)
+  (cond
+    ((and (atom f) (macp f))  `(,f ,@args))
+    ((and (atom f) (fboundp f))  `(call (function ,f) ,@args))
+    (t  `(call ,f ,@args))))
+
 (defmacro call*-quoted(a b)
   `(call* ,a ',b))
 

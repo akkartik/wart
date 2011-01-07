@@ -40,33 +40,6 @@
 
 
 
-(defmacro macfoo(a) `(+ 1 ,a))
-(test-wart "call* handles macros"
-  :valueof (call* macfoo 3)
-  :should be 4)
-
-(test-wart "call* works"
-  :valueof (call* oddp 3)
-  :should be t)
-
-(setf a 2)
-(test-wart "call* handles macros with global bindings"
-  :valueof (call* macfoo a)
-  :should be 3)
-
-(test-wart "call* handles macros with bindings"
-  :valueof (_let a 3 (call* macfoo a))
-  :should be 4)
-
-(test-wart "call* handles incf macro"
-  :valueof (_let a 32 (call* incf a))
-  :should be 33)
-
 (test "wart-coerce works on macros"
   :valueof (wart-coerce 'incf 'function)
   :should be 'incf)
-
-; integration test: nested calls
-(test-wart "call* nests"
-  :valueof (macex '(call* (call* a 3) 4))
-  :should be '(call (call* a 3) 4))
