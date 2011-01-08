@@ -11,12 +11,15 @@
          is eq
          iso equal
          uniq gensym
-         macp macro-function
          macex macroexpand
          macex1 macroexpand-1
          err error
          errsafe ignore-errors
          spawn sb-thread:make-thread)
+
+(defun macp(f)
+  (and (symbolp f)
+       (macro-function f)))
 
 (defun pr(arg)
   (format t "~a" arg))
