@@ -71,3 +71,7 @@
 (test "expand-ssyntax goes through wt-transform"
   :valueof (expand-ssyntax 'defover-foo.3)
   :should be '(call* defover-bar 3))
+
+(test "call* expands compositions"
+  :valueof (macex1 '(call* (compose* incf foo) x))
+  :should be '(incf (call* foo x)))

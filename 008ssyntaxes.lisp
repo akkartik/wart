@@ -12,34 +12,20 @@
 (defmacro compose*(f g)
   `(compose (fslot ,f) (fslot ,g)))
 
+(defun compose(f g)
+  (lambda(&rest args)
+    (call f (wart-apply g args))))
+
 (defmacro complement*(f)
   `(complement (fslot ,f)))
 
-(defun macro-or-compose(f)
-  (or (macp f)
-      (and (consp f)
-           (is 'compose* (car f)))))
+
 
 (defmacro macro-composition-p(expr)
   `(and (consp ,expr)
         (is 'compose* (car ,expr))))
 
-; flatten -> process from right to left
-; g is never nested compose
-(defun expand-composition(f g args)
-;?   (if (and (not (macp g))
-;?            (not (macro-composition-p g)))
-;?     (if (macp f)
-;?       `(,f (call (fslot ,g) ,@args))
-  (if (macp f)
-    (if (macp g)
-      `(,f (,g ,@args))
-      `(,f (call (fslot ,g) ,@args)))
-    (if (macp g)
-      `(call (fslot ,f) (,g ,@args))
-      `(call (compose* ,f ,g) ,@args))))
-
-; needs to know about compose*
+; knows about compose*
 ;   1+^h.1 => (call (compose* '1+ 'h) 1)
 ; but
 ;   ++^h.1 => (incf (call h 1))
@@ -48,12 +34,28 @@
   (cond
     ((macp f)  `(,f ,@args))
     ((and (atom f) (fboundp f))  `(call (function ,f) ,@args))
-    ((macro-composition-p f)   (expand-composition (cadr f) (caddr f) args))
+    ((macro-composition-p f)   (expand-composition f args))
     (t  `(call ,f ,@args))))
 
 (defmacro call*-quoted(a b)
   `(call* ,a ',b))
 
-(defun compose(f g)
-  (lambda(&rest args)
-    (call f (wart-apply g args))))
+
+
+;; Internals
+
+; flatten -> process from right to left
+; g is never nested compose
+(defun expand-composition(f args)
+  (apply-nested-calls (compositions f) args))
+
+(defun compositions(f)
+  (if (macro-composition-p f)
+    (append (compositions (cadr f))
+            (compositions (caddr f)))
+    (list f))) ; Assumption: compose* operates only on syms
+
+(defun apply-nested-calls(fs args)
+  (if (singlep fs)
+    `(call* ,(car fs) ,@args)
+    `(,(car fs) ,(apply-nested-calls (cdr fs) args))))

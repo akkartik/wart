@@ -59,20 +59,53 @@
   :should be 4)
 
 ; integration test: ssyntax + hash + assignment
-(format t "~a~%" (wt-transform '++^h.1))
-(format t "~a~%" (macex1 (wt-transform '++^h.1)))
-(test-wart "compose works with macros"
+(test-wart "compose works with assignment"
   :valueof (let h (obj 1 3)
              ++^h.1
              h.1)
   :should be 4)
-(defmacro 2++(place)
-  `(incf (incf ,place)))
-(format t "~a~%" (wt-transform '2++^++^h.1))
-(format t "~a~%" (macex1 (wt-transform '++^2++^++^h.1)))
-;(2++ (incf (h 1)))
-(test-wart "nested compose works with macros"
-  :valueof (let h (obj 1 3)
-             2++^++^h.1
-             h.1)
-  :should be 5)
+
+(setf h 3)
+(prn (macex (wt-transform (quote
+  (incf h)))))
+(incf h)
+(prn h)
+(prn (macex (wt-transform (quote
+  (incf (incf h))))))
+(incf (incf h))
+(prn h)
+
+;? (wt-eval '(= h (obj 1 3)))
+;? (let ((h (table)))
+;?   (format t "~a~%" (macex (wt-transform (quote
+;?     (incf (call* h 1)))))))
+;? (let ((h (table)))
+;?   (format t "~a~%" (macex (wt-transform (quote
+;?     (incf (incf (call* h 1))))))))
+;? 
+;? ;? (test-wart "nested compose works with assignment on global function slots"
+;? ;?   :valueof ++^++^h.1
+;? ;?   :should be 5)
+;? ;? 
+;? ;? (defmacro 2++(place)
+;? ;?   `(incf (incf ,place)))
+;? ;? (format t "~a~%" (wt-transform '2++^++^h.1))
+;? ;? (format t "~a~%" (macex1 (wt-transform '++^2++^++^h.1)))
+;? ;? (format t "~a~%" (wt-transform '(let h (obj 1 3)
+;? ;?   (incf (incf (call* h 1))))))
+;? ;? (format t "~a~%" (macex (wt-transform '(let h (obj 1 3)
+;? ;?   (incf (incf (call* h 1)))))))
+;? ;? (let ((h 3))
+;? ;?   (format t "~a~%" (macex (wt-transform (quote
+;? ;?     (incf (incf h)))))))
+;? ;? (let ((h (table)))
+;? ;?   (format t "~a~%" (macex (wt-transform (quote
+;? ;?     (incf (incf (call* h 1))))))))
+;? ;? 
+;? ;? (prn "=====")
+;? ;? (test-wart "nested compose works with assignment"
+;? ;?   :valueof (let h (obj 1 3)
+;? ;? ;?              ++^++^h.1
+;? ;? (incf (incf (call* h 1)))
+;? ;?              h.1)
+;? ;?   :should be 5)
