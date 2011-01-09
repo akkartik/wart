@@ -19,16 +19,10 @@
 (defmacro complement*(f)
   `(complement (fslot ,f)))
 
-
-
-(defmacro macro-composition-p(expr)
-  `(and (consp ,expr)
-        (is 'compose* (car ,expr))))
-
-; knows about compose*
-;   1+^h.1 => (call (compose* '1+ 'h) 1)
+; knows about compose* so that we can use ssyntax with macros
+;   1+^h.1 => (call* 1+ (call* h 1)
 ; but
-;   ++^h.1 => (incf (call h 1))
+;   ++^h.1 => (incf (call* h 1))
 ; ssyntax doesn't seem a good fit for a lisp-2.
 (defmacro call*(f &rest args)
   (cond
@@ -44,8 +38,10 @@
 
 ;; Internals
 
-; flatten -> process from right to left
-; g is never nested compose
+(defun macro-composition-p(expr)
+  (and (consp expr)
+       (is 'compose* (car expr))))
+
 (defun expand-composition(f args)
   (apply-nested-calls (compositions f) args))
 
