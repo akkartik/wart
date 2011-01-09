@@ -59,8 +59,20 @@
   :should be 4)
 
 ; integration test: ssyntax + hash + assignment
+(format t "~a~%" (wt-transform '++^h.1))
+(format t "~a~%" (macex1 (wt-transform '++^h.1)))
 (test-wart "compose works with macros"
   :valueof (let h (obj 1 3)
              ++^h.1
              h.1)
   :should be 4)
+(defmacro 2++(place)
+  `(incf (incf ,place)))
+(format t "~a~%" (wt-transform '2++^++^h.1))
+(format t "~a~%" (macex1 (wt-transform '++^2++^++^h.1)))
+;(2++ (incf (h 1)))
+(test-wart "nested compose works with macros"
+  :valueof (let h (obj 1 3)
+             2++^++^h.1
+             h.1)
+  :should be 5)
