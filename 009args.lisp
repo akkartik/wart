@@ -46,9 +46,10 @@
       (map 'list
            (lambda(param)
              (list param
-                   `(fa (if (or (no ',rest-param) (assoc ',rest-param ,keyword-alist))
-                          (get-arg ',param ',(strip-defaults params) ,non-keyword-args ,keyword-alist)
-                          (get-arg ',param nil nil ,keyword-alist)) ; only check keyword-alist
+                   `(fa (get-arg ',param
+                                 (if (or (no ',rest-param) (assoc ',rest-param ,keyword-alist))
+                                   ',(strip-defaults params))
+                                 ,non-keyword-args ,keyword-alist)
                         ,(alref param optional-alist))))
            optional-params))))
 
