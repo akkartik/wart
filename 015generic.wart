@@ -53,6 +53,7 @@
                boolean ,basefn
                symbol ,basefn
                standard-char ,basefn
+               string ,basefn
                bit ,basefn
                integer ,basefn
                cons ,basefn)))))

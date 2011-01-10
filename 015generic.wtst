@@ -9,7 +9,7 @@
 
 (test-wart "defgeneric works on strings"
   :valueof (genericfoo "abc")
-  :should be '(#\a #\b #\c))
+  :should be "abc")
 
 (wt-eval '(defmethod genericfoo(x) integer
             (1+ x)))
@@ -19,5 +19,12 @@
 
 (wt-eval '(deftransform genericfoo2(x) (cons #\0 x)))
 (test-wart "deftransform works"
+  :valueof (genericfoo2 '(1 2))
+  :should be '(#\0 1 2))
+(test-wart "deftransform works on strings"
+  :valueof (genericfoo2 "abc")
+  :should be '(#\0 . "abc"))
+(wt-eval '(defmethod genericfoo2(x) string (concatenate 'string "0" x)))
+(test-wart "strings may need a specialcase"
   :valueof (genericfoo2 "abc")
   :should be "0abc")

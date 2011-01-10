@@ -9,7 +9,7 @@
 
 (ignore-redef
   (defgeneric* iso(x y)
-    (or (is x y)
+    (or (equal x y)
         (and (consp x)
              (consp y)
              (iso car.x car.y)
