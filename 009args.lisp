@@ -80,26 +80,11 @@
     (cons (car params)
           (required-params (cdr params)))))
 
-(defun strip-required(params)
-  (if (consp params)
-    (let* ((optargs (member '? params)))
-      (if optargs
-        (cdr optargs)
-        ()))
-    params))
-
 (defun rest-param(params)
   (cond
     ((no params)  ())
     ((rest-param-p params)  params)
     (t   (rest-param (cdr params)))))
-
-(defun strip-rest(params)
-  (cond
-    ((no params) ())
-    ((rest-param-p params)  ())
-    (t   (cons (car params)
-               (strip-rest (cdr params))))))
 
 (defun keyword-args(args rest-param)
   (cond
@@ -123,26 +108,10 @@
                (strip-keyword-args (cdr args) rest-param)))))
 
 (defun optional-params(params)
-  (map 'list 'car
-       (tuples 2 (strip-required (strip-rest params)))))
+  (map 'list 'car (optional-alist params)))
 
 (defun optional-alist(params)
   (partition-optional-params (strip-required (strip-rest params))))
-
-(defun strip-defaults(params)
-  (cond
-    ((no params)  ())
-    ((rest-param-p params)  params)
-    ((is (car params) '?)   (really-strip-defaults (cdr params)))
-    (t   (cons (car params)
-               (strip-defaults (cdr params))))))
-
-(defun really-strip-defaults(params)
-  (cond
-    ((no params)  ())
-    ((rest-param-p params)  params)
-    (t  (cons (car params)
-              (really-strip-defaults (cddr params))))))
 
 (defun partition-optional-params(oparams)
   (cond
@@ -151,6 +120,31 @@
     (t   (cons (cons (car oparams)
                      (cadr oparams))
                (partition-optional-params (cddr oparams))))))
+
+(defun strip-defaults(params &optional past-?)
+  (cond
+    ((no params)  ())
+    ((rest-param-p params)  params)
+    ((is (car params) '?)   (strip-defaults (cdr params) t))
+    (t   (cons (car params)
+               (strip-defaults
+                 (if past-? (cddr params) (cdr params))
+                 past-?)))))
+
+(defun strip-rest(params)
+  (cond
+    ((no params) ())
+    ((rest-param-p params)  ())
+    (t   (cons (car params)
+               (strip-rest (cdr params))))))
+
+(defun strip-required(params)
+  (if (consp params)
+    (let* ((optargs (member '? params))) ; strip-rest has already run
+      (if optargs
+        (cdr optargs)
+        ()))
+    params))
 
 
 
