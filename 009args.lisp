@@ -22,34 +22,49 @@
 (defun compile-params(params body)
   (let* ((ra  (uniq))
          (non-keyword-args  (uniq))
-         (keyword-alist   (uniq))
-         (rest-param  (rest-param params)))
+         (keyword-alist   (uniq)))
     `((&rest ,ra)
-      (let* ((,non-keyword-args  (non-keyword-args ,ra ',rest-param))
-             (,keyword-alist   (keyword-alist ,ra ',rest-param)))
-          (let* ,(getargs-exprs params non-keyword-args keyword-alist)
+      (let* ((,non-keyword-args  (non-keyword-args ,ra ',(rest-param params)))
+             (,keyword-alist   (keyword-alist ,ra ',(rest-param params))))
+          (let* ,(append
+                   (get-required-arg-exprs params non-keyword-args keyword-alist)
+                   (get-rest-arg-expr params non-keyword-args keyword-alist)
+                   (get-optional-arg-exprs params non-keyword-args keyword-alist))
             ,@body)))))
 
-(defun getargs-exprs(params non-keyword-args keyword-alist)
-  (let ((required-params  (required-params params))
-        (rest-param   (rest-param params)))
-    (append
-      (map 'list
-           (lambda(param)
-             (list param
-                   `(get-arg ',param ',required-params ,non-keyword-args ,keyword-alist)))
-           (flatten required-params))
-      (if rest-param
-        (list (list rest-param `(get-greedy-rest-args ',rest-param ',required-params ,non-keyword-args ,keyword-alist))))
-      (map 'list
-           (lambda(param)
-             (list param
-                   `(fa (get-arg ',param
-                                 (if (or (no ',rest-param) (assoc ',rest-param ,keyword-alist))
-                                   ',(strip-defaults params))
-                                 ,non-keyword-args ,keyword-alist)
-                        ,(alref param (optional-alist params)))))
-           (optional-params params)))))
+(defun get-required-arg-exprs(params non-keyword-args keyword-alist)
+  (let ((required-params (required-params params)))
+    (map 'list
+         (lambda(param)
+           (list param
+                 `(get-arg ',param ',required-params ,non-keyword-args ,keyword-alist)))
+         (flatten required-params))))
+
+(defun get-rest-arg-expr(params non-keyword-args keyword-alist)
+  (let ((rest-param (rest-param params)))
+    (if rest-param
+      (list (list rest-param `(get-greedy-rest-args ',rest-param ',(required-params params) ,non-keyword-args ,keyword-alist))))))
+
+(defun get-greedy-rest-args(var params non-keyword-args keyword-alist)
+  (cond
+    ((assoc var keyword-alist)  (alref var keyword-alist))
+    ((is params var)  non-keyword-args)
+    ((no params) non-keyword-args)
+    ((assoc (car params) keyword-alist)  (get-greedy-rest-args var (cdr params) non-keyword-args keyword-alist))
+    (t   (get-greedy-rest-args var (cdr params) (cdr non-keyword-args) keyword-alist))))
+
+(defun get-optional-arg-exprs(params non-keyword-args keyword-alist)
+  (let ((rest-param (rest-param params))
+        (optional-alist (optional-alist params)))
+    (map 'list
+         (lambda(param)
+           (list param
+                 `(fa (get-arg ',param
+                               (if (or (no ',rest-param) (assoc ',rest-param ,keyword-alist))
+                                 ',(strip-defaults params))
+                               ,non-keyword-args ,keyword-alist)
+                      ,(alref param optional-alist))))
+         (map 'list 'car optional-alist))))
 
 (defun get-arg(var params non-keyword-args keyword-alist)
   (cond
@@ -61,14 +76,6 @@
     ((no non-keyword-args)  (values nil 'no-arg))
     (t   (fa (get-arg var (car params) (car non-keyword-args) keyword-alist)
              (get-arg var (cdr params) (cdr non-keyword-args) keyword-alist)))))
-
-(defun get-greedy-rest-args(var params non-keyword-args keyword-alist)
-  (cond
-    ((assoc var keyword-alist)  (alref var keyword-alist))
-    ((is params var)  non-keyword-args)
-    ((no params) non-keyword-args)
-    ((assoc (car params) keyword-alist)  (get-greedy-rest-args var (cdr params) non-keyword-args keyword-alist))
-    (t   (get-greedy-rest-args var (cdr params) (cdr non-keyword-args) keyword-alist))))
 
 
 
@@ -107,8 +114,15 @@
     (t   (cons (car args)
                (non-keyword-args (cdr args) rest-param)))))
 
-(defun optional-params(params)
-  (map 'list 'car (optional-alist params)))
+(defun strip-defaults(params &optional past-?)
+  (cond
+    ((no params)  ())
+    ((rest-param-p params)  params)
+    ((is (car params) '?)   (strip-defaults (cdr params) t))
+    (t   (cons (car params)
+               (strip-defaults
+                 (if past-? (cddr params) (cdr params))
+                 past-?)))))
 
 (defun optional-alist(params)
   (partition-optional-params (strip-required (strip-rest params))))
@@ -120,16 +134,6 @@
     (t   (cons (cons (car oparams)
                      (cadr oparams))
                (partition-optional-params (cddr oparams))))))
-
-(defun strip-defaults(params &optional past-?)
-  (cond
-    ((no params)  ())
-    ((rest-param-p params)  params)
-    ((is (car params) '?)   (strip-defaults (cdr params) t))
-    (t   (cons (car params)
-               (strip-defaults
-                 (if past-? (cddr params) (cdr params))
-                 past-?)))))
 
 (defun strip-rest(params)
   (cond
