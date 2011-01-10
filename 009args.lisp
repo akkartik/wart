@@ -32,8 +32,6 @@
 
 (defun getargs-exprs(params non-keyword-args keyword-alist)
   (let ((required-params  (required-params params))
-        (optional-params  (optional-params params))
-        (optional-alist   (optional-alist params))
         (rest-param   (rest-param params)))
     (append
       (map 'list
@@ -50,8 +48,8 @@
                                  (if (or (no ',rest-param) (assoc ',rest-param ,keyword-alist))
                                    ',(strip-defaults params))
                                  ,non-keyword-args ,keyword-alist)
-                        ,(alref param optional-alist))))
-           optional-params))))
+                        ,(alref param (optional-alist params)))))
+           (optional-params params)))))
 
 (defun get-arg(var params non-keyword-args keyword-alist)
   (cond
