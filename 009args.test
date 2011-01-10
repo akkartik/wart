@@ -17,20 +17,20 @@
   :valueof (foo3 2)
   :should be 4)
 
-(test "keyword-args works"
-  :valueof (keyword-args '(1 2 :a 3) ())
+(test "keyword-alist works"
+  :valueof (keyword-alist '(1 2 :a 3) ())
   :should be '((a . 3)))
 
-(test "keyword-args works with rest args"
-  :valueof (keyword-args '(1 2 :a 3) 'a)
+(test "keyword-alist works with rest args"
+  :valueof (keyword-alist '(1 2 :a 3) 'a)
   :should be '((a 3)))
 
-(test "strip-keyword-args works"
-  :valueof (strip-keyword-args '(1 2 :a 3 4) ())
+(test "non-keyword-args works"
+  :valueof (non-keyword-args '(1 2 :a 3 4) ())
   :should be '(1 2 4))
 
-(test "strip-keyword-args works on rest args"
-  :valueof (strip-keyword-args '(1 2 :a 3 4) 'a)
+(test "non-keyword-args works on rest args"
+  :valueof (non-keyword-args '(1 2 :a 3 4) 'a)
   :should be '(1 2))
 
 (test "optional-alist works - 1"

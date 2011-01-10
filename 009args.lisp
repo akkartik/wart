@@ -25,8 +25,8 @@
          (keyword-alist   (uniq))
          (rest-param  (rest-param params)))
     `((&rest ,ra)
-      (let* ((,non-keyword-args  (strip-keyword-args ,ra ',rest-param))
-             (,keyword-alist   (keyword-args ,ra ',rest-param)))
+      (let* ((,non-keyword-args  (non-keyword-args ,ra ',rest-param))
+             (,keyword-alist   (keyword-alist ,ra ',rest-param)))
           (let* ,(getargs-exprs params non-keyword-args keyword-alist)
             ,@body)))))
 
@@ -86,7 +86,7 @@
     ((rest-param-p params)  params)
     (t   (rest-param (cdr params)))))
 
-(defun keyword-args(args rest-param)
+(defun keyword-alist(args rest-param)
   (cond
     ((no args)  ())
     ((not (consp args))  ())
@@ -95,17 +95,17 @@
                                           (if (is param rest-param)
                                             (cdr args)
                                             (cadr args)))
-                                    (keyword-args (cddr args) rest-param))))
-    (t   (keyword-args (cdr args) rest-param))))
+                                    (keyword-alist (cddr args) rest-param))))
+    (t   (keyword-alist (cdr args) rest-param))))
 
-(defun strip-keyword-args(args rest-param)
+(defun non-keyword-args(args rest-param)
   (cond
     ((no args)  ())
     ((keywordp (car args))  (if (is rest-param (keyword->symbol (car args)))
                               ()
-                              (strip-keyword-args (cddr args) rest-param)))
+                              (non-keyword-args (cddr args) rest-param)))
     (t   (cons (car args)
-               (strip-keyword-args (cdr args) rest-param)))))
+               (non-keyword-args (cdr args) rest-param)))))
 
 (defun optional-params(params)
   (map 'list 'car (optional-alist params)))
