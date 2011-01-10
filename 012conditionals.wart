@@ -64,3 +64,17 @@
                               (and (apply car.fs args)
                                    (self cdr.fs))))
           fns)))
+
+(mac ifcall(var . args)
+  `(when (bound ',var)
+     (call ,var ,@args)))
+
+(mac pushif(elem ls)
+  `(aif ,elem
+     (push it ,ls)))
+
+(mac disabled body
+  `(when nil ,@body))
+
+(mac enabled body
+  `(when t ,@body))
