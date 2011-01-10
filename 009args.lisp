@@ -48,7 +48,7 @@
              (list param
                    `(fa (if (or (no ',rest-param) (assoc ',rest-param ,keyword-alist))
                           (get-arg ',param ',(strip-defaults params) ,non-keyword-args ,keyword-alist)
-                          (get-lazy-optional-arg ',param ,keyword-alist))
+                          (get-arg ',param nil nil ,keyword-alist)) ; only check keyword-alist
                         ,(alref param optional-alist))))
            optional-params))))
 
@@ -62,11 +62,6 @@
     ((no non-keyword-args)  (values nil 'no-arg))
     (t   (fa (get-arg var (car params) (car non-keyword-args) keyword-alist)
              (get-arg var (cdr params) (cdr non-keyword-args) keyword-alist)))))
-
-(defun get-lazy-optional-arg(var keyword-alist)
-  (if (assoc var keyword-alist)
-    (alref var keyword-alist)
-    (values nil 'no-arg)))
 
 (defun get-greedy-rest-args(var params non-keyword-args keyword-alist)
   (cond
