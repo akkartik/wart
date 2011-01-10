@@ -24,7 +24,7 @@
 
 (mac w/uniq(names . body)
   (if (consp names)
-      `(with ,(apply 'join nil (map [list _ '(uniq)]
-                                    names))
+      `(with ,(apply 'join (map [list _ '(uniq)]
+                                names))
          ,@body)
       `(let ,names (uniq) ,@body)))
