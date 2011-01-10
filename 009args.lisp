@@ -101,13 +101,6 @@
     (t   (cons (car params)
                (strip-rest (cdr params))))))
 
-(defun undot(params)
-  (cond
-    ((no params)  ())
-    ((rest-param-p params)  (list params)) ; undot
-    (t (cons (car params)
-             (undot (cdr params))))))
-
 (defun keyword-args(args rest-param)
   (cond
     ((no args)  ())
