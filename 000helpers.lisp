@@ -92,6 +92,18 @@
       nil
       (cons (car xs) (firstn (1- n) (cdr xs)))))
 
+(defun flatten(tree)
+  (let ((result '()))
+    (labels ((scan (item)
+               (if (listp item)
+                 (map nil #'scan item)
+                 (push item result))))
+      (scan tree))
+    (nreverse result)))
+
+(defun alref(key alist)
+  (cdr (assoc key alist)))
+
 
 
 (synonym table make-hash-table)

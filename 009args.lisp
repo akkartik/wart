@@ -48,9 +48,12 @@
 (defun get-greedy-rest-args(var params non-keyword-args keyword-alist)
   (cond
     ((assoc var keyword-alist)  (alref var keyword-alist))
-    ((is params var)  non-keyword-args)
     ((no params) non-keyword-args)
+    ((is params var)  non-keyword-args)
+    ((not (consp params))   (values nil 'no-arg))
     ((assoc (car params) keyword-alist)  (get-greedy-rest-args var (cdr params) non-keyword-args keyword-alist))
+    ((no non-keyword-args)  (values nil 'no-arg))
+    ((is (car params) var)  (car non-keyword-args))
     (t   (get-greedy-rest-args var (cdr params) (cdr non-keyword-args) keyword-alist))))
 
 (defun get-optional-arg-exprs(params non-keyword-args keyword-alist)
@@ -74,6 +77,7 @@
     ((not (consp params))   (values nil 'no-arg))
     ((assoc (car params) keyword-alist)  (get-arg var (cdr params) non-keyword-args keyword-alist))
     ((no non-keyword-args)  (values nil 'no-arg))
+    ((is (car params) var)  (car non-keyword-args))
     (t   (fa (get-arg var (car params) (car non-keyword-args) keyword-alist)
              (get-arg var (cdr params) (cdr non-keyword-args) keyword-alist)))))
 
@@ -155,23 +159,8 @@
 (defun rest-param-p(params)
   (not (consp params)))
 
-(defun vararg-param-p(params)
-  (not (consp params)))
-
-(defun flatten(tree)
-  (let ((result '()))
-    (labels ((scan (item)
-               (if (listp item)
-                 (map nil #'scan item)
-                 (push item result))))
-      (scan tree))
-    (nreverse result)))
-
 ; strip the colon
 (defun keyword->symbol(k)
   (if (is k ':do)
     'body
     (intern (symbol-name k))))
-
-(defun alref(key alist)
-  (cdr (assoc key alist)))

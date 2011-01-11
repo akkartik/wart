@@ -43,8 +43,10 @@
 
 (defun get-greedy-rest-args(var params ra)
   (cond
-    ((is params var)  ra)
     ((no params) ra)
+    ((is params var)  ra)
+    ((no ra)  (values nil 'no-arg))
+    ((is (car params) var)  (car ra))
     (t   (get-greedy-rest-args var (cdr params) (cdr ra)))))
 
 (defun get-optional-arg-exprs(params ra)
@@ -64,6 +66,7 @@
     ((is params var)  ra)
     ((not (consp params))   (values nil 'no-arg))
     ((no ra)  (values nil 'no-arg))
+    ((is (car params) var)  (car ra))
     (t   (fa (get-arg var (car params) (car ra))
              (get-arg var (cdr params) (cdr ra))))))
 
@@ -123,18 +126,3 @@
 
 (defun rest-param-p(params)
   (not (consp params)))
-
-(defun vararg-param-p(params)
-  (not (consp params)))
-
-(defun flatten(tree)
-  (let ((result '()))
-    (labels ((scan (item)
-               (if (listp item)
-                 (map nil #'scan item)
-                 (push item result))))
-      (scan tree))
-    (nreverse result)))
-
-(defun alref(key alist)
-  (cdr (assoc key alist)))

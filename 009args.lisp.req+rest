@@ -42,8 +42,10 @@
 
 (defun get-greedy-rest-args(var params ra)
   (cond
-    ((is params var)  ra)
     ((no params) ra)
+    ((is params var)  ra)
+    ((no ra)  (values nil 'no-arg))
+    ((is (car params) var)  (car ra))
     (t   (get-greedy-rest-args var (cdr params) (cdr ra)))))
 
 (defun get-arg(var params ra)
@@ -53,8 +55,7 @@
     ((not (consp params))   (values nil 'no-arg))
     ((no ra)  (values nil 'no-arg))
     ((is (car params) var)  (car ra))
-    (t   (fa (get-arg var (car params) (car ra))
-             (get-arg var (cdr params) (cdr ra))))))
+    (t   (get-arg var (cdr params) (cdr ra)))))
 
 
 
@@ -74,7 +75,4 @@
 
 
 (defun rest-param-p(params)
-  (not (consp params)))
-
-(defun vararg-param-p(params)
   (not (consp params)))

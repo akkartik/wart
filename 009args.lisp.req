@@ -36,6 +36,6 @@
 (defun get-arg(var params ra)
   (cond
     ((no params)  (values nil 'no-arg))
-    ((is (car params) var)  (car ra))
     ((no ra)  (values nil 'no-arg))
+    ((is (car params) var)  (car ra))
     (t   (get-arg var (cdr params) (cdr ra)))))
