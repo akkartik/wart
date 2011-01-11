@@ -41,14 +41,6 @@
     (if rest-param
       (list (list rest-param `(get-greedy-rest-args ',rest-param ',(required-params params) ,ra))))))
 
-(defun get-greedy-rest-args(var params ra)
-  (cond
-    ((no params) ra)
-    ((is params var)  ra)
-    ((no ra)  (values nil 'no-arg))
-    ((is (car params) var)  (car ra))
-    (t   (get-greedy-rest-args var (cdr params) (cdr ra)))))
-
 (defun get-optional-arg-exprs(params ra)
   (let ((optional-alist (optional-alist params)))
     (map 'list
@@ -69,6 +61,14 @@
     ((is (car params) var)  (car ra))
     (t   (fa (get-arg var (car params) (car ra))
              (get-arg var (cdr params) (cdr ra))))))
+
+(defun get-greedy-rest-args(var params ra)
+  (cond
+    ((no params) ra)
+    ((is params var)  ra)
+    ((no ra)  (values nil 'no-arg))
+    ((is (car params) var)  (car ra))
+    (t   (get-greedy-rest-args var (cdr params) (cdr ra)))))
 
 
 
