@@ -1,0 +1,41 @@
+;; Functions support complex arg lists in wart.
+
+(defmacro def(name params &rest body)
+  `(defun ,name ,@(compile-params params body)))
+
+(defmacro mac(name params &rest body)
+  (wt-transform `(defmacro ,name ,@(compile-params params body))))
+
+(defmacro fn(params &rest body)
+  `(lambda ,@(compile-params params body)))
+
+
+
+;; Internals
+;; Use let* everywhere here because wart will soon override let
+
+; returns arglist and body suitable for insertion into defun or lambda
+; new body understands keyword args
+; params format (optionals* ? lazy-optionals* . rest)
+; optionals can be destructured
+; lazy optionals require keywords if rest is present
+(defun compile-params(params body)
+  (let* ((ra  (uniq)))
+    `((&rest ,ra)
+        (let* ,(append
+                 (get-required-arg-exprs params ra))
+          ,@body))))
+
+(defun get-required-arg-exprs(params ra)
+  (map 'list
+       (lambda(param)
+         (list param
+               `(get-arg ',param ',params ,ra)))
+       params))
+
+(defun get-arg(var params ra)
+  (cond
+    ((no params)  (values nil 'no-arg))
+    ((is (car params) var)  (car ra))
+    ((no ra)  (values nil 'no-arg))
+    (t   (get-arg var (cdr params) (cdr ra)))))

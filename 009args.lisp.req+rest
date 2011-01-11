@@ -1,0 +1,80 @@
+;; Functions support complex arg lists in wart.
+
+(defmacro def(name params &rest body)
+  `(defun ,name ,@(compile-params params body)))
+
+(defmacro mac(name params &rest body)
+  (wt-transform `(defmacro ,name ,@(compile-params params body))))
+
+(defmacro fn(params &rest body)
+  `(lambda ,@(compile-params params body)))
+
+
+
+;; Internals
+;; Use let* everywhere here because wart will soon override let
+
+; returns arglist and body suitable for insertion into defun or lambda
+; new body understands keyword args
+; params format (optionals* ? lazy-optionals* . rest)
+; optionals can be destructured
+; lazy optionals require keywords if rest is present
+(defun compile-params(params body)
+  (let* ((ra  (uniq)))
+    `((&rest ,ra)
+        (let* ,(append
+                 (get-required-arg-exprs params ra)
+                 (get-rest-arg-expr params ra))
+          ,@body))))
+
+(defun get-required-arg-exprs(params ra)
+  (let ((required-params (required-params params)))
+    (map 'list
+         (lambda(param)
+           (list param
+                 `(get-arg ',param ',required-params ,ra)))
+         required-params)))
+
+(defun get-rest-arg-expr(params ra)
+  (let ((rest-param (rest-param params)))
+    (if rest-param
+      (list (list rest-param `(get-greedy-rest-args ',rest-param ',(required-params params) ,ra))))))
+
+(defun get-greedy-rest-args(var params ra)
+  (cond
+    ((is params var)  ra)
+    ((no params) ra)
+    (t   (get-greedy-rest-args var (cdr params) (cdr ra)))))
+
+(defun get-arg(var params ra)
+  (cond
+    ((no params)  (values nil 'no-arg))
+    ((is params var)  ra)
+    ((not (consp params))   (values nil 'no-arg))
+    ((no ra)  (values nil 'no-arg))
+    ((is (car params) var)  (car ra))
+    (t   (fa (get-arg var (car params) (car ra))
+             (get-arg var (cdr params) (cdr ra))))))
+
+
+
+;; Slicing and dicing params
+
+(defun required-params(params)
+  (if (consp params)
+    (cons (car params)
+          (required-params (cdr params)))))
+
+(defun rest-param(params)
+  (cond
+    ((no params)  ())
+    ((rest-param-p params)  params)
+    (t   (rest-param (cdr params)))))
+
+
+
+(defun rest-param-p(params)
+  (not (consp params)))
+
+(defun vararg-param-p(params)
+  (not (consp params)))
