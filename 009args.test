@@ -148,17 +148,21 @@
   :valueof (multiple-value-list (get-arg 'e '(a b c e f . d) '(1 2 3) ()))
   :should be (list nil 'no-arg))
 
-(test "get-greedy-rest-args works without keyword args"
-  :valueof (multiple-value-list (get-greedy-rest-args 'c '(a b . c) '(1 2 3) ()))
-  :should be (list '(3)))
+(test "get-rest-arg works without keyword args"
+  :valueof (get-rest-arg 'c '(a b . c) '(1 2 3) ())
+  :should be '(3))
 
-(test "get-greedy-rest-args works with keyword args"
-  :valueof (multiple-value-list (get-greedy-rest-args 'c '(a b . c) '(1 2) '((b . 3))))
-  :should be (list '(2)))
+(test "get-rest-arg works with keyword args"
+  :valueof (get-rest-arg 'c '(a b . c) '(1 2) '((b . 3)))
+  :should be '(2))
 
-(test "get-greedy-rest-args doesn't need to see past required args"
-  :valueof (multiple-value-list (get-greedy-rest-args 'c '(a b) '(1 2) '((b . 3))))
-  :should be (list '(2)))
+(test "get-rest-arg doesn't need to see past required args"
+  :valueof (get-rest-arg 'c '(a b) '(1 2) '((b . 3)))
+  :should be '(2))
+
+(test "get-rest-arg may return a second value"
+  :valueof (multiple-value-list (get-rest-arg 'c '(a b) '(1 2) '((b . 3))))
+  :should match '((2) _))
 
 
 
