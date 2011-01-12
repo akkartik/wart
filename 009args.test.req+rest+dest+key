@@ -121,11 +121,11 @@
   :valueof (multiple-value-list (get-arg 'b '(a b) '(3 nil) ()))
   :should be (list nil))
 
-(test "get-arg returns an illegal literal for missing, hopefully optional, params - 1"
+(test "get-arg flags missing, hopefully optional, params - 1"
   :valueof (multiple-value-list (get-arg 'a '(a) () ()))
   :should be (list nil 'no-arg))
 
-(test "get-arg returns an illegal literal for missing, hopefully optional, params - 2"
+(test "get-arg flags missing, hopefully optional, params - 2"
   :valueof (multiple-value-list (get-arg 'e '(a b c e f . d) '(1 2 3) ()))
   :should be (list nil 'no-arg))
 
