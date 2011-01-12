@@ -14,12 +14,34 @@
   :valueof (let a 1 (in a 2 3))
   :should be nil)
 
+(test-wart "testify works"
+  :valueof (call testify!oddp 3)
+  :should be t)
+
 (test-wart "caselet works"
   :valueof (caselet x 'b
-             a 1
-             b 2
-               3)
+             'a 1
+             'b 2
+                3)
   :should be 2)
+
+(test-wart "case works"
+  :valueof (with (x 1
+                  y 2
+                  z 3
+                  w 2)
+             (case w
+               x 34
+               y 35
+               z 36))
+  :should be 35)
+
+(test-wart "case uses testify"
+  :valueof (let x 3
+             (case x
+               'oddp 34
+               'evenp 36))
+  :should be 34)
 
 (test-wart "andf works"
   :valueof (call (andf 'consp 'car) '(3 4))

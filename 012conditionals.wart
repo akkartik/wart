@@ -28,11 +28,16 @@
     `(let ,g ,x
        (or ,@(map (fn(c) `(is ,g ,c)) choices)))))
 
+(def testify(x)
+  (if fnp.x
+    x
+    [iso _ x]))
+
 (mac caselet(var expr . args)
   (let ex (afn(args)
             (if (no cdr.args)
                 (car args)
-                `(if (iso ,var ',(car args))
+                `(if (call (testify ,(car args)) ,var)
                      ,(cadr args)
                      ,(self cddr.args))))
     `(let ,var ,expr ,(call ex args))))
