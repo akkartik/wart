@@ -95,8 +95,6 @@
     (t   (cons (car args)
                (positional-args (cdr args) rest-param)))))
 
-
-
 (defun rest-param-p(params)
   (not (consp params)))
 

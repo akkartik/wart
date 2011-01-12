@@ -117,7 +117,5 @@
         ()))
     params))
 
-
-
 (defun rest-param-p(params)
   (not (consp params)))
