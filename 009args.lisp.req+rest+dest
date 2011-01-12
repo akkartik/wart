@@ -36,27 +36,22 @@
          (flatten required-params))))
 
 (defun get-rest-arg-expr(params args)
-  (let ((rest-param (rest-param params)))
+  (let ((rest-param (rest-param params))
+        (required-params (required-params params)))
     (if rest-param
-      (list (list rest-param `(get-greedy-rest-args ',rest-param ',(required-params params) ,args))))))
+      (list (list rest-param
+                  `(get-arg ',rest-param ',required-params ,args :no-params (lambda(x) x)))))))
 
-(defun get-greedy-rest-args(var params args)
+(defun get-arg(var params args &key (no-params (lambda(x) nil)))
   (cond
-    ((no params) args)
-    ((is params var)  args)
-    ((no args)  (values nil 'no-arg))
-    ((is (car params) var)  (car args))
-    (t   (get-greedy-rest-args var (cdr params) (cdr args)))))
-
-(defun get-arg(var params args)
-  (cond
-    ((no params)  (values nil 'no-arg))
+    ((no params)  (values (call no-params args)
+                          'no-arg))
     ((is params var)  args)
     ((not (consp params))   (values nil 'no-arg))
     ((no args)  (values nil 'no-arg))
     ((is (car params) var)  (car args))
-    (t   (fa (get-arg var (car params) (car args))
-             (get-arg var (cdr params) (cdr args))))))
+    (t   (fa (get-arg var (car params) (car args) :no-params no-params)
+             (get-arg var (cdr params) (cdr args) :no-params no-params)))))
 
 
 
@@ -72,8 +67,6 @@
     ((no params)  ())
     ((rest-param-p params)  params)
     (t   (rest-param (cdr params)))))
-
-
 
 (defun rest-param-p(params)
   (not (consp params)))

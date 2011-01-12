@@ -120,9 +120,9 @@
   :valueof (multiple-value-list (get-arg 'e '(a b c e f . d) '(1 2 3)))
   :should be (list nil 'no-arg))
 
-(test "get-greedy-rest-args works without keyword args"
-  :valueof (multiple-value-list (get-greedy-rest-args 'c '(a b . c) '(1 2 3)))
-  :should be (list '(3)))
+(test "get-rest-args works without keyword args"
+  :valueof (get-arg 'c '(a b . c) '(1 2 3) :no-params (lambda(x) x))
+  :should be '(3))
 
 
 
