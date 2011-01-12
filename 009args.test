@@ -17,20 +17,20 @@
   :valueof (foo3 2)
   :should be 4)
 
-(test "keyword-alist works"
-  :valueof (keyword-alist '(1 2 :a 3) ())
+(test "keyword-args works"
+  :valueof (keyword-args '(1 2 :a 3) ())
   :should be '((a . 3)))
 
-(test "keyword-alist works with rest args"
-  :valueof (keyword-alist '(1 2 :a 3) 'a)
+(test "keyword-args works with rest args"
+  :valueof (keyword-args '(1 2 :a 3) 'a)
   :should be '((a 3)))
 
-(test "non-keyword-args works"
-  :valueof (non-keyword-args '(1 2 :a 3 4) ())
+(test "positional-args works"
+  :valueof (positional-args '(1 2 :a 3 4) ())
   :should be '(1 2 4))
 
-(test "non-keyword-args works on rest args"
-  :valueof (non-keyword-args '(1 2 :a 3 4) 'a)
+(test "positional-args works on rest args"
+  :valueof (positional-args '(1 2 :a 3 4) 'a)
   :should be '(1 2))
 
 (test "optional-alist works - 1"
@@ -140,27 +140,27 @@
   :valueof (multiple-value-list (get-arg 'b '(a b) '(3 nil) ()))
   :should be (list nil))
 
-(test "get-arg returns an illegal literal for missing, hopefully optional, params - 1"
+(test "get-arg flags missing, hopefully optional, params - 1"
   :valueof (multiple-value-list (get-arg 'a '(a) () ()))
   :should be (list nil 'no-arg))
 
-(test "get-arg returns an illegal literal for missing, hopefully optional, params - 2"
+(test "get-arg flags missing, hopefully optional, params - 2"
   :valueof (multiple-value-list (get-arg 'e '(a b c e f . d) '(1 2 3) ()))
   :should be (list nil 'no-arg))
 
-(test "get-rest-arg works without keyword args"
+(test "get-rest-args works without keyword args"
   :valueof (get-arg 'c '(a b . c) '(1 2 3) () :no-params (lambda(x) x))
   :should be '(3))
 
-(test "get-rest-arg works with keyword args"
+(test "get-rest-args works with keyword args"
   :valueof (get-arg 'c '(a b . c) '(1 2) '((b . 3)) :no-params (lambda(x) x))
   :should be '(2))
 
-(test "get-rest-arg doesn't need to see past required args"
+(test "get-rest-args doesn't need to see past required args"
   :valueof (get-arg 'c '(a b) '(1 2) '((b . 3)) :no-params (lambda(x) x))
   :should be '(2))
 
-(test "get-rest-arg may return a second value"
+(test "get-rest-args may return a (useless) second value"
   :valueof (multiple-value-list (get-arg 'c '(a b) '(1 2) '((b . 3)) :no-params (lambda(x) x)))
   :should match '((2) _))
 

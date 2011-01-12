@@ -20,56 +20,60 @@
 ; optionals can be destructured
 ; lazy optionals require keywords if rest is present
 (defun compile-params(params body)
-  (let* ((ra  (uniq))
-         (non-keyword-args  (uniq))
-         (keyword-alist   (uniq)))
-    `((&rest ,ra)
-      (let* ((,non-keyword-args  (non-keyword-args ,ra ',(rest-param params)))
-             (,keyword-alist   (keyword-alist ,ra ',(rest-param params))))
+  (let* ((args  (uniq))
+         (positional  (uniq))
+         (keywords   (uniq)))
+    `((&rest ,args)
+      (let* ((,positional  (positional-args ,args ',(rest-param params)))
+             (,keywords   (keyword-args ,args ',(rest-param params))))
           (let* ,(append
-                   (get-required-arg-exprs params non-keyword-args keyword-alist)
-                   (get-rest-arg-expr params non-keyword-args keyword-alist)
-                   (get-optional-arg-exprs params non-keyword-args keyword-alist))
+                   (get-required-arg-exprs params positional keywords)
+                   ; args go to rest before optional
+                   (get-rest-arg-expr params positional keywords)
+                   (get-optional-arg-exprs params positional keywords))
             ,@body)))))
 
-(defun get-required-arg-exprs(params non-keyword-args keyword-alist)
+(defun get-required-arg-exprs(params positional keywords)
   (let ((required-params (required-params params)))
     (map 'list
          (lambda(param)
            (list param
-                 `(get-arg ',param ',required-params ,non-keyword-args ,keyword-alist)))
+                 `(get-arg ',param ',required-params ,positional ,keywords)))
          (flatten required-params))))
 
-(defun get-rest-arg-expr(params non-keyword-args keyword-alist)
-  (let ((rest-param (rest-param params)))
+(defun get-rest-arg-expr(params positional keywords)
+  (let ((rest-param (rest-param params))
+        (required-params (required-params params)))
     (if rest-param
-      (list (list rest-param `(get-arg ',rest-param ',(required-params params) ,non-keyword-args ,keyword-alist :no-params (lambda(x) x)))))))
+      (list (list rest-param
+                  ; return remaining positionals when runs out of params
+                  `(get-arg ',rest-param ',required-params ,positional ,keywords :no-params (lambda(x) x)))))))
 
-(defun get-optional-arg-exprs(params non-keyword-args keyword-alist)
+(defun get-optional-arg-exprs(params positional keywords)
   (let ((rest-param (rest-param params))
         (optional-alist (optional-alist params)))
     (map 'list
          (lambda(param)
            (list param
                  `(fa (get-arg ',param
-                               (if (or (no ',rest-param) (assoc ',rest-param ,keyword-alist))
+                               (if (or (no ',rest-param) (assoc ',rest-param ,keywords))
                                  ',(strip-defaults params))
-                               ,non-keyword-args ,keyword-alist)
+                               ,positional ,keywords)
                       ,(alref param optional-alist))))
          (map 'list 'car optional-alist))))
 
-(defun get-arg(var params non-keyword-args keyword-alist &key (no-params (lambda(x) nil)))
+(defun get-arg(var params positional keywords &key (no-params (lambda(x) nil)))
   (cond
-    ((assoc var keyword-alist)  (alref var keyword-alist))
-    ((no params)  (values (call no-params non-keyword-args)
+    ((assoc var keywords)  (alref var keywords))
+    ((no params)  (values (call no-params positional)
                           'no-arg))
-    ((is params var)  non-keyword-args)
+    ((is params var)  positional)
     ((not (consp params))   (values nil 'no-arg))
-    ((assoc (car params) keyword-alist)  (get-arg var (cdr params) non-keyword-args keyword-alist :no-params no-params))
-    ((no non-keyword-args)  (values nil 'no-arg))
-    ((is (car params) var)  (car non-keyword-args))
-    (t   (fa (get-arg var (car params) (car non-keyword-args) keyword-alist :no-params no-params)
-             (get-arg var (cdr params) (cdr non-keyword-args) keyword-alist :no-params no-params)))))
+    ((assoc (car params) keywords)  (get-arg var (cdr params) positional keywords :no-params no-params))
+    ((no positional)  (values nil 'no-arg))
+    ((is (car params) var)  (car positional))
+    (t   (fa (get-arg var (car params) (car positional) keywords :no-params no-params)
+             (get-arg var (cdr params) (cdr positional) keywords :no-params no-params)))))
 
 
 
@@ -87,7 +91,7 @@
     ((rest-param-p params)  params)
     (t   (rest-param (cdr params)))))
 
-(defun keyword-alist(args rest-param)
+(defun keyword-args(args rest-param)
   (cond
     ((no args)  ())
     ((not (consp args))  ())
@@ -96,17 +100,17 @@
                                           (if (is param rest-param)
                                             (cdr args)
                                             (cadr args)))
-                                    (keyword-alist (cddr args) rest-param))))
-    (t   (keyword-alist (cdr args) rest-param))))
+                                    (keyword-args (cddr args) rest-param))))
+    (t   (keyword-args (cdr args) rest-param))))
 
-(defun non-keyword-args(args rest-param)
+(defun positional-args(args rest-param)
   (cond
     ((no args)  ())
     ((keywordp (car args))  (if (is rest-param (keyword->symbol (car args)))
                               ()
-                              (non-keyword-args (cddr args) rest-param)))
+                              (positional-args (cddr args) rest-param)))
     (t   (cons (car args)
-               (non-keyword-args (cdr args) rest-param)))))
+               (positional-args (cdr args) rest-param)))))
 
 (defun strip-defaults(params &optional past-?)
   (cond
@@ -143,8 +147,6 @@
         (cdr optargs)
         ()))
     params))
-
-
 
 (defun rest-param-p(params)
   (not (consp params)))
