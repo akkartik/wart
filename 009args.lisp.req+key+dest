@@ -35,7 +35,7 @@
        (lambda(param)
          (list param
                `(get-arg ',param ',params ,positional ,keywords)))
-       params))
+       (flatten params)))
 
 (defun get-arg(var params positional keywords &key (no-params (lambda(x) nil)))
   (cond
@@ -47,7 +47,8 @@
     ((assoc (car params) keywords)  (get-arg var (cdr params) positional keywords :no-params no-params))
     ((no positional)  (values nil 'no-arg))
     ((is (car params) var)  (car positional))
-    (t   (get-arg var (cdr params) (cdr positional) keywords :no-params no-params))))
+    (t   (fa (get-arg var (car params) (car positional) keywords :no-params no-params)
+             (get-arg var (cdr params) (cdr positional) keywords :no-params no-params)))))
 
 
 
