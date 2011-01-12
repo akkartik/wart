@@ -21,35 +21,35 @@
 ; lazy optionals require keywords if rest is present
 (defun compile-params(params body)
   (let* ((args  (uniq))
-         (positional  (uniq))
+         (positionals  (uniq))
          (keywords   (uniq)))
     `((&rest ,args)
-      (let* ((,positional  (positional-args ,args ',(rest-param params)))
+      (let* ((,positionals  (positional-args ,args ',(rest-param params)))
              (,keywords   (keyword-args ,args ',(rest-param params))))
         (let* ,(append
-                 (get-required-arg-exprs params positional keywords)
+                 (get-required-arg-exprs params positionals keywords)
                  ; args go to rest before optional
-                 (get-rest-arg-expr params positional keywords)
-                 (get-optional-arg-exprs params positional keywords))
+                 (get-rest-arg-expr params positionals keywords)
+                 (get-optional-arg-exprs params positionals keywords))
           ,@body)))))
 
-(defun get-required-arg-exprs(params positional keywords)
+(defun get-required-arg-exprs(params positionals keywords)
   (let ((required-params (required-params params)))
     (map 'list
          (lambda(param)
            (list param
-                 `(get-arg ',param ',required-params ,positional ,keywords)))
+                 `(get-arg ',param ',required-params ,positionals ,keywords)))
          (flatten required-params))))
 
-(defun get-rest-arg-expr(params positional keywords)
+(defun get-rest-arg-expr(params positionals keywords)
   (let ((rest-param (rest-param params))
         (required-params (required-params params)))
     (if rest-param
       (list (list rest-param
                   ; return remaining positionals when runs out of params
-                  `(get-arg ',rest-param ',required-params ,positional ,keywords :no-params (lambda(x) x)))))))
+                  `(get-arg ',rest-param ',required-params ,positionals ,keywords :no-params (lambda(x) x)))))))
 
-(defun get-optional-arg-exprs(params positional keywords)
+(defun get-optional-arg-exprs(params positionals keywords)
   (let ((rest-param (rest-param params))
         (optional-alist (optional-alist params)))
     (map 'list
@@ -58,26 +58,24 @@
                  `(fa (get-arg ',param
                                (if (or (no ',rest-param) (assoc ',rest-param ,keywords))
                                  ',(strip-defaults params))
-                               ,positional ,keywords)
+                               ,positionals ,keywords)
                       ,(alref param optional-alist))))
          (map 'list 'car optional-alist))))
 
-(defun get-arg(var params positional keywords &key (no-params (lambda(x) nil)))
+(defun get-arg(var params positionals keywords &key (no-params (lambda(x) nil)))
   (cond
     ((assoc var keywords)  (alref var keywords))
-    ((no params)  (values (call no-params positional)
+    ((no params)  (values (call no-params positionals)
                           'no-arg))
-    ((is params var)  positional)
+    ((is params var)  positionals)
     ((not (consp params))   (values nil 'no-arg))
-    ((assoc (car params) keywords)  (get-arg var (cdr params) positional keywords :no-params no-params))
-    ((no positional)  (values nil 'no-arg))
-    ((is (car params) var)  (car positional))
-    (t   (fa (get-arg var (car params) (car positional) keywords :no-params no-params)
-             (get-arg var (cdr params) (cdr positional) keywords :no-params no-params)))))
+    ((assoc (car params) keywords)  (get-arg var (cdr params) positionals keywords :no-params no-params))
+    ((no positionals)  (values nil 'no-arg))
+    ((is (car params) var)  (car positionals))
+    (t   (fa (get-arg var (car params) (car positionals) keywords :no-params no-params)
+             (get-arg var (cdr params) (cdr positionals) keywords :no-params no-params)))))
 
 
-
-;; Slicing and dicing params
 
 (defun required-params(params)
   (if (and (consp params)
@@ -151,8 +149,7 @@
 (defun rest-param-p(params)
   (not (consp params)))
 
-; strip the colon
 (defun keyword->symbol(k)
   (if (is k ':do)
     'body
-    (intern (symbol-name k))))
+    (intern (symbol-name k)))) ; strip the colon
