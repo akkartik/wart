@@ -92,7 +92,6 @@
 (defun strip-defaults(params &optional past-?)
   (cond
     ((no params)  ())
-    ((rest-param-p params)  params)
     ((is (car params) '?)   (strip-defaults (cdr params) t))
     (t   (cons (car params)
                (strip-defaults
@@ -100,7 +99,7 @@
                  past-?)))))
 
 (defun optional-alist(params)
-  (partition-optional-params (strip-required (strip-rest params))))
+  (partition-optional-params (strip-required params)))
 
 (defun partition-optional-params(oparams)
   (cond
@@ -110,23 +109,12 @@
                      (cadr oparams))
                (partition-optional-params (cddr oparams))))))
 
-(defun strip-rest(params)
-  (cond
-    ((no params) ())
-    ((rest-param-p params)  ())
-    (t   (cons (car params)
-               (strip-rest (cdr params))))))
-
 (defun strip-required(params)
-  (if (consp params)
+  (if params
     (let* ((optargs (member '? params))) ; strip-rest has already run
       (if optargs
         (cdr optargs)
-        ()))
-    params))
-
-(defun rest-param-p(params)
-  (not (consp params)))
+        ()))))
 
 ; strip the colon
 (defun keyword->symbol(k)

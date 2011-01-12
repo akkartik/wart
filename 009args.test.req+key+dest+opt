@@ -17,9 +17,6 @@
   :valueof (foo3 2)
   :should be 4)
 
-(test "optional-alist works - 1"
-  :valueof (optional-alist 'a)
-  :should be nil)
 (test "optional-alist 1"
   :valueof (optional-alist '(a b c))
   :should be nil)
