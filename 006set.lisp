@@ -1,3 +1,5 @@
+;; Extensible assignment
+
 (defover = setf)
 
 ; strictly 3 args

@@ -1,3 +1,5 @@
+;; Miscellaneous primitives straddling lisp and wart universes
+
 (mac wart-if args
   (if (oddp (length args)) ; there's an else
     `(cond ,@(tuples 2 (insert-t-in-penultimate-position args)))
@@ -15,7 +17,7 @@
 
 ;; Internals
 
-(defun insert-t-in-penultimate-position(sexp)
+(def insert-t-in-penultimate-position(sexp)
   (if (singlep sexp)
     (cons t sexp)
     (cons (car sexp) (insert-t-in-penultimate-position (cdr sexp)))))
