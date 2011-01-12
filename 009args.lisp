@@ -26,12 +26,12 @@
     `((&rest ,args)
       (let* ((,positional  (positional-args ,args ',(rest-param params)))
              (,keywords   (keyword-args ,args ',(rest-param params))))
-          (let* ,(append
-                   (get-required-arg-exprs params positional keywords)
-                   ; args go to rest before optional
-                   (get-rest-arg-expr params positional keywords)
-                   (get-optional-arg-exprs params positional keywords))
-            ,@body)))))
+        (let* ,(append
+                 (get-required-arg-exprs params positional keywords)
+                 ; args go to rest before optional
+                 (get-rest-arg-expr params positional keywords)
+                 (get-optional-arg-exprs params positional keywords))
+          ,@body)))))
 
 (defun get-required-arg-exprs(params positional keywords)
   (let ((required-params (required-params params)))
