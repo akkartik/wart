@@ -20,22 +20,22 @@
 ; optionals can be destructured
 ; lazy optionals require keywords if rest is present
 (defun compile-params(params body)
-  (let* ((ra  (uniq)))
-    `((&rest ,ra)
+  (let* ((args  (uniq)))
+    `((&rest ,args)
         (let* ,(append
-                 (get-required-arg-exprs params ra))
+                 (get-required-arg-exprs params args))
           ,@body))))
 
-(defun get-required-arg-exprs(params ra)
+(defun get-required-arg-exprs(params args)
   (map 'list
        (lambda(param)
          (list param
-               `(get-arg ',param ',params ,ra)))
+               `(get-arg ',param ',params ,args)))
        params))
 
-(defun get-arg(var params ra)
+(defun get-arg(var params args)
   (cond
     ((no params)  (values nil 'no-arg))
-    ((no ra)  (values nil 'no-arg))
-    ((is (car params) var)  (car ra))
-    (t   (get-arg var (cdr params) (cdr ra)))))
+    ((no args)  (values nil 'no-arg))
+    ((is (car params) var)  (car args))
+    (t   (get-arg var (cdr params) (cdr args)))))

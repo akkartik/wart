@@ -20,55 +20,55 @@
 ; optionals can be destructured
 ; lazy optionals require keywords if rest is present
 (defun compile-params(params body)
-  (let* ((ra  (uniq)))
-    `((&rest ,ra)
+  (let* ((args  (uniq)))
+    `((&rest ,args)
         (let* ,(append
-                 (get-required-arg-exprs params ra)
-                 (get-optional-arg-exprs params ra)
-                 (get-rest-arg-expr params ra))
+                 (get-required-arg-exprs params args)
+                 (get-optional-arg-exprs params args)
+                 (get-rest-arg-expr params args))
           ,@body))))
 
-(defun get-required-arg-exprs(params ra)
+(defun get-required-arg-exprs(params args)
   (let ((required-params (required-params params)))
     (map 'list
          (lambda(param)
            (list param
-                 `(get-arg ',param ',required-params ,ra)))
+                 `(get-arg ',param ',required-params ,args)))
          (flatten required-params))))
 
-(defun get-rest-arg-expr(params ra)
+(defun get-rest-arg-expr(params args)
   (let ((rest-param (rest-param params)))
     (if rest-param
-      (list (list rest-param `(get-greedy-rest-args ',rest-param ',(required-params params) ,ra))))))
+      (list (list rest-param `(get-greedy-rest-args ',rest-param ',(required-params params) ,args))))))
 
-(defun get-optional-arg-exprs(params ra)
+(defun get-optional-arg-exprs(params args)
   (let ((optional-alist (optional-alist params)))
     (map 'list
          (lambda(param)
            (list param
                  `(fa (get-arg ',param
                                ',(strip-defaults params)
-                               ,ra)
+                               ,args)
                       ,(alref param optional-alist))))
          (map 'list 'car optional-alist))))
 
-(defun get-arg(var params ra)
+(defun get-arg(var params args)
   (cond
     ((no params)  (values nil 'no-arg))
-    ((is params var)  ra)
+    ((is params var)  args)
     ((not (consp params))   (values nil 'no-arg))
-    ((no ra)  (values nil 'no-arg))
-    ((is (car params) var)  (car ra))
-    (t   (fa (get-arg var (car params) (car ra))
-             (get-arg var (cdr params) (cdr ra))))))
+    ((no args)  (values nil 'no-arg))
+    ((is (car params) var)  (car args))
+    (t   (fa (get-arg var (car params) (car args))
+             (get-arg var (cdr params) (cdr args))))))
 
-(defun get-greedy-rest-args(var params ra)
+(defun get-greedy-rest-args(var params args)
   (cond
-    ((no params) ra)
-    ((is params var)  ra)
-    ((no ra)  (values nil 'no-arg))
-    ((is (car params) var)  (car ra))
-    (t   (get-greedy-rest-args var (cdr params) (cdr ra)))))
+    ((no params) args)
+    ((is params var)  args)
+    ((no args)  (values nil 'no-arg))
+    ((is (car params) var)  (car args))
+    (t   (get-greedy-rest-args var (cdr params) (cdr args)))))
 
 
 

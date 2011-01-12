@@ -20,12 +20,12 @@
 ; optionals can be destructured
 ; lazy optionals require keywords if rest is present
 (defun compile-params(params body)
-  (let* ((ra  (uniq))
+  (let* ((args  (uniq))
          (non-keyword-args  (uniq))
          (keyword-alist   (uniq)))
-    `((&rest ,ra)
-      (let* ((,non-keyword-args  (non-keyword-args ,ra ',(rest-param params)))
-             (,keyword-alist   (keyword-alist ,ra ',(rest-param params))))
+    `((&rest ,args)
+      (let* ((,non-keyword-args  (non-keyword-args ,args ',(rest-param params)))
+             (,keyword-alist   (keyword-alist ,args ',(rest-param params))))
           (let* ,(append
                    (get-required-arg-exprs params non-keyword-args keyword-alist)
                    (get-rest-arg-expr params non-keyword-args keyword-alist))
