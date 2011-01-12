@@ -50,14 +50,14 @@
 
 (test "get-arg works for keyword args"
   :valueof (multiple-value-list
-             (get-arg 'a '(a (b c (d e f) g))
-                         '((2 3 (4 5 6) 7 8)) '((a . 1))))
+             (get-arg 'a '(a b c d e f g)
+                         '(2 3 4 5 6 7 8) '((a . 1))))
   :should be (list 1))
 
 (test "get-arg works on args with keywords"
   :valueof (multiple-value-list
-             (get-arg 'd '(a (b c (d e f) g))
-                         '((2 3 (4 5 6) 7 8)) '((a . 1))))
+             (get-arg 'd '(a b c d e f g)
+                         '(2 3 4 5 6 7 8) '((a . 1))))
   :should be (list 4))
 
 (test "get-arg works for nil args"
