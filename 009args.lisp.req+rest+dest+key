@@ -44,6 +44,7 @@
         (required-params (required-params params)))
     (if rest-param
       (list (list rest-param
+                  ; return remaining positionals when runs out of params
                   `(get-arg ',rest-param ',required-params ,positional ,keywords :no-params (lambda(x) x)))))))
 
 (defun get-arg(var params positional keywords &key (no-params (lambda(x) nil)))
