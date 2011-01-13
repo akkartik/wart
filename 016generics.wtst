@@ -38,9 +38,33 @@
   :valueof (all 'idfn '(1 2 3))
   :should be t)
 
-(test-wart "all works"
+(test-wart "all works - 2"
   :valueof (all 'idfn '(1 nil 3))
   :should be nil)
+
+(test-wart "all works on strings"
+  :valueof (all #\a "aaa")
+  :should be t)
+
+(test-wart "keep works"
+  :valueof (keep 'oddp '(1 2 3))
+  :should be '(1 3))
+
+(test-wart "keep works on strings"
+  :valueof (keep [is _ #\a] "abc")
+  :should be "a")
+
+(test-wart "rem works"
+  :valueof (rem 'oddp '(1 2 3))
+  :should be '(2))
+
+(test-wart "rem works on strings"
+  :valueof (rem #\a "abracadabra")
+  :should be "brcdbr")
+
+(test-wart "cut works"
+  :valueof (cut '(1 2 3 4) 2)
+  :should be '(3 4))
 
 (test-wart "cut works on strings"
   :valueof (cut "abc" 1)

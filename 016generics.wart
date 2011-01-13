@@ -24,10 +24,40 @@
 
 
 
-(defgeneric all(f xs)
+(defgeneric wart-some(f xs)
   (if
-    (no xs)   t
-    (call f (car xs))   (all f cdr.xs)))
+    (no xs)           nil
+    (call f car.xs)   t
+                      (wart-some f cdr.xs)))
+(defmethod wart-some(f xs) string
+  :coerce-to-cons)
+(defover some wart-some)
+
+(defgeneric all(test xs)
+  (let f testify.test
+    (if
+      (no xs)           t
+      (call f car.xs)   (all f cdr.xs))))
+(defmethod all(f xs) string
+  :coerce-to-cons)
+
+(deftransform wart-keep(f seq)
+  (if (no seq)          nil
+      (call f car.seq)  (cons car.seq (keep f cdr.seq))
+                        (keep f cdr.seq)))
+(defmethod wart-keep(f xs) string
+  :coerce-to-cons)
+(defover keep wart-keep)
+
+(deftransform wart-rem(test seq)
+  (let f testify.test
+    (if
+      (no seq)          nil
+      (call f car.seq)  (wart-rem f cdr.seq)
+                        (cons car.seq (wart-rem f cdr.seq)))))
+(defmethod wart-rem(f xs) string
+  :coerce-to-cons)
+(defover rem wart-rem)
 
 (ignore-redef
   (defgeneric* join args

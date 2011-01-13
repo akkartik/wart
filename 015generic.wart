@@ -22,9 +22,11 @@
                (type (last ,allargs))))))
 
 (mac wart-defmethod(name args type . body)
-  `(= (gethash ',type (gethash ',name vtables*))
-      (fn ,args
-        ,@body)))
+  (if (no body)
+    `(wipe (gethash ',type (gethash ',name vtables*)))
+    `(= (gethash ',type (gethash ',name vtables*))
+        (fn ,args
+          ,@body))))
 (defover defmethod wart-defmethod)
 
 
