@@ -45,10 +45,12 @@
 
 ; decompose lowest precedence first
 (defun ssyntax-chars-in-precedence()
-  (sort (ssyntax-chars)
-        (lambda(a b)
-          (< (gethash a *wart-ssyntax-precedence*)
-             (gethash b *wart-ssyntax-precedence*)))))
+  (group-by (lambda(x)
+              (gethash x *wart-ssyntax-precedence*))
+            (sort (ssyntax-chars)
+                  (lambda(a b)
+                    (< (gethash a *wart-ssyntax-precedence*)
+                       (gethash b *wart-ssyntax-precedence*))))))
 
 (defun ssyntax-chars()
   (let ((ans ()))
@@ -67,8 +69,19 @@
         s)))
 
 ; todo: idiomatic CL
-(defun rpos(s c &optional (idx (1- (len s))))
+(defun rpos(s chars &optional (idx (1- (len s))))
   (if (>= idx 0)
-    (if (eq c (char s idx))
+    (if (position (char s idx) chars)
       idx
-      (rpos s c (1- idx)))))
+      (rpos s chars (1- idx)))))
+
+(defun group-by(f xs &optional acc)
+  (if xs
+    (if (is (call f (car xs))
+            (call f (car (car acc))))
+      (group-by f (cdr xs) (cons (cons (car xs)
+                                       (car acc))
+                                 (cdr acc)))
+      (group-by f (cdr xs) (cons (list (car xs))
+                                 acc)))
+    (nreverse acc)))
