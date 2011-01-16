@@ -1,8 +1,8 @@
 ;; Standard ssyntax
 (def-ssyntax #\^ 'compose*)
-(def-ssyntax #\~ 'complement*)
 (def-ssyntax #\. 'call*)
 (def-ssyntax #\! 'call*-quoted)
+(def-ssyntax #\~ 'complement* -1)
 
 (defmacro fslot(f)
   (if (and (atom f) (fboundp f))

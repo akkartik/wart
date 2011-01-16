@@ -26,6 +26,10 @@
   :valueof (expand-ssyntax 'a.b!c.d)
   :should be '(call* (call*-quoted (call* a b) c) d))
 
+(test "~ has higher precedence"
+  :valueof (expand-ssyntax '~testify.test)
+  :should be '(complement* (call* testify test)))
+
 (test "expand numbers correctly"
   :valueof (expand-ssyntax 'a.3)
   :should be '(call* a 3))
