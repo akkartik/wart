@@ -18,22 +18,18 @@
 (defcoerce 'macro 'function
   'idfn)
 
-(defun function-name-p(f)
-  (and (symbolp f)
-       (eval `(fboundp ',f))))
-
-(defun fnp(f)
-  (or (isa f 'function)
-      (function-name-p f)))
-
 (defun function-value(f)
-  (if (function-name-p f)
-    (eval `(function ,f))
-    f))
+  (cond
+    ((isa f 'function)  f)
+    ((function-name-p f)  (eval `(function ,f)))))
 
 
 
 ;; Internals
+
+(defun function-name-p(f)
+  (and (symbolp f)
+       (eval `(fboundp ',f))))
 
 (defun apply-fn(f)
   (lambda(&rest args)

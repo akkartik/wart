@@ -46,14 +46,14 @@
 
 
 
-(test "fnp works on primitives"
-  :valueof (fnp 'oddp)
-  :should be t)
+(test "function-value works on primitives"
+  :valueof (function-value 'oddp)
+  :should satisfy true_value)
 
-(test "fnp works on lambdas"
-  :valueof (fnp (lambda()))
-  :should be t)
+(test "function-value works on lambdas"
+  :valueof (function-value (lambda()))
+  :should satisfy true_value)
 
-(test "fnp works on non-functions"
-  :valueof (fnp 1)
+(test "function-value works on non-functions"
+  :valueof (function-value 1)
   :should be nil)

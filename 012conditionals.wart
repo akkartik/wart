@@ -29,9 +29,8 @@
        (or ,@(map (fn(c) `(is ,g ,c)) choices)))))
 
 (def testify(x)
-  (if fnp.x
-    (function-value x)
-    [iso _ x]))
+  (or (function-value x)
+      [iso _ x]))
 
 (mac caselet(var expr . args)
   (let ex (afn(args)
