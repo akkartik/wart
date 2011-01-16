@@ -40,13 +40,12 @@
 
 (defun ssyntax-idx(s &optional (chars (ssyntax-chars-in-precedence)))
   (and chars
-       (or (rpos s (car chars))
+       (or (rpos s (car chars)) ; left-associative by default
            (ssyntax-idx s (cdr chars)))))
 
 ; decompose lowest precedence first
 (defun ssyntax-chars-in-precedence()
-  (group-by (lambda(x)
-              (gethash x *wart-ssyntax-precedence*))
+  (group-by [gethash _ *wart-ssyntax-precedence*]
             (sort (ssyntax-chars)
                   (lambda(a b)
                     (< (gethash a *wart-ssyntax-precedence*)
@@ -67,21 +66,3 @@
   (no (position-if
         (lambda(x) (no (digit-char-p x)))
         s)))
-
-; todo: idiomatic CL
-(defun rpos(s chars &optional (idx (1- (len s))))
-  (if (>= idx 0)
-    (if (position (char s idx) chars)
-      idx
-      (rpos s chars (1- idx)))))
-
-(defun group-by(f xs &optional acc)
-  (if xs
-    (if (is (call f (car xs))
-            (call f (car (car acc))))
-      (group-by f (cdr xs) (cons (cons (car xs)
-                                       (car acc))
-                                 (cdr acc)))
-      (group-by f (cdr xs) (cons (list (car xs))
-                                 acc)))
-    (nreverse acc)))

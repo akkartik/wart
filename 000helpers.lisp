@@ -104,6 +104,31 @@
 (defun alref(key alist)
   (cdr (assoc key alist)))
 
+; todo: idiomatic CL
+(defun rpos(s chars &optional (idx (1- (len s))))
+  (if (>= idx 0)
+    (if (position (char s idx) chars)
+      idx
+      (rpos s chars (1- idx)))))
+
+; helper for certain kinds of recursive functions
+(defun append-or-afresh(f x xss)
+  (if (call f x)
+    (cons (cons x (car xss))
+          (cdr xss))
+    (cons (list x)
+          xss)))
+
+(defun group-by(f xs &optional acc)
+  (if xs
+    (group-by f (cdr xs)
+              (append-or-afresh (lambda(x)
+                                  (is (call f x)
+                                      (call f (car (car acc)))))
+                                (car xs)
+                                acc))
+    (nreverse acc)))
+
 
 
 (synonym table make-hash-table)
