@@ -27,12 +27,13 @@
     (if ssyntax-idx
       (let* ((ssyntax-char  (char s ssyntax-idx))
              (handler       (gethash ssyntax-char *wart-ssyntax-handler*)))
-        (if (is 0 ssyntax-idx)
-          (list handler (intern (cut s 1))) ; unary
+        (if (is 0 ssyntax-idx) ; unary
+          (list handler
+                (expand-ssyntax-string (cut s 1)))
           (list handler
                 (expand-ssyntax-string (cut s 0 ssyntax-idx))
-                (ssyntax-parse-string (cut s (1+ ssyntax-idx))))))
-      (intern s))))
+                (expand-ssyntax-string (cut s (1+ ssyntax-idx))))))
+      (ssyntax-parse-string s))))
 
 (defun ssyntax-char(s &optional (idx (1- (len s))))
   (and (>= idx 0)
@@ -47,4 +48,6 @@
     (intern s)))
 
 (defun all-digits(s)
-  (no (position-if (lambda(x) (no (digit-char-p x))) s)))
+  (no (position-if
+        (lambda(x) (no (digit-char-p x)))
+        s)))

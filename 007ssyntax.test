@@ -17,3 +17,18 @@
 (test "ssyntaxp ignores ordinary lisp tokens"
   :valueof (ssyntaxp 'a+b-c)
   :should be nil)
+
+(def-ssyntax #\@ 'foo*)
+(test "expand-ssyntax works"
+  :valueof (expand-ssyntax 'a@b)
+  :should be '(foo* a b))
+
+(def-ssyntax #\@ 'foo*)
+(test "expand-ssyntax works with ints in rhs"
+  :valueof (expand-ssyntax 'a@3)
+  :should be '(foo* a 3))
+
+(def-ssyntax #\@ 'foo*)
+(test "expand-ssyntax works with ints in lhs"
+  :valueof (expand-ssyntax '3@3)
+  :should be '(foo* 3 3))
