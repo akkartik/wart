@@ -30,7 +30,7 @@
 
 (def testify(x)
   (if fnp.x
-    x
+    (function-value x)
     [iso _ x]))
 
 (mac caselet(var expr . args)

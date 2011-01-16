@@ -18,6 +18,10 @@
   :valueof (call testify!oddp 3)
   :should be t)
 
+(test-wart "testify always returns a function"
+  :valueof (call ~testify!oddp 3)
+  :should be nil)
+
 (test-wart "caselet works"
   :valueof (caselet x 'b
              'a 1

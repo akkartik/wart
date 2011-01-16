@@ -26,6 +26,11 @@
   (or (isa f 'function)
       (function-name-p f)))
 
+(defun function-value(f)
+  (if (function-name-p f)
+    (eval `(function ,f))
+    f))
+
 
 
 ;; Internals
