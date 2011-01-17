@@ -29,11 +29,11 @@
   (let ((ssyntax-idx  (ssyntax-idx s)))
     (case ssyntax-idx
       ((nil)  (ssyntax-parse-token s))
-      (0    (list (gethash (char s 0) *wart-ssyntax-handler*)
-                  (expand-ssyntax-string (cut s 1)))) ; unary
-      (t    (list (gethash (char s ssyntax-idx) *wart-ssyntax-handler*)
-                  (expand-ssyntax-string (cut s 0 ssyntax-idx))
-                  (expand-ssyntax-string (cut s (1+ ssyntax-idx))))))))
+      (0  `(,(gethash (char s 0) *wart-ssyntax-handler*)
+            ,(expand-ssyntax-string (cut s 1)))) ; unary
+      (t  `(,(gethash (char s ssyntax-idx) *wart-ssyntax-handler*)
+            ,(expand-ssyntax-string (cut s 0 ssyntax-idx))
+            ,(expand-ssyntax-string (cut s (1+ ssyntax-idx))))))))
 
 (defun ssyntax-idx(s &optional (chars (ssyntax-chars-in-precedence)))
   (and chars
