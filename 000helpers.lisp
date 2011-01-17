@@ -102,13 +102,6 @@
 (defun alref(key alist)
   (cdr (assoc key alist)))
 
-; todo: idiomatic CL
-(defun rpos(s chars &optional (idx (1- (len s))))
-  (if (>= idx 0)
-    (if (position (char s idx) chars)
-      idx
-      (rpos s chars (1- idx)))))
-
 ; helper for certain kinds of recursive functions
 (defun append-or-afresh(f x xss)
   (if (call f x)

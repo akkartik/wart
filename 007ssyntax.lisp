@@ -40,7 +40,8 @@
 
 (defun ssyntax-idx(s &optional (chars (ssyntax-chars-in-precedence)))
   (and chars
-       (or (rpos s (car chars)) ; left-associative by default
+       (or (position-if [position _ (car chars)] s
+                        :from-end t) ; left-associative by default
            (ssyntax-idx s (cdr chars)))))
 
 ; decompose lowest precedence first
