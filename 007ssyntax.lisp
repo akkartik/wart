@@ -27,16 +27,13 @@
 
 (defun expand-ssyntax-string(s)
   (let ((ssyntax-idx  (ssyntax-idx s)))
-    (if ssyntax-idx
-      (let* ((ssyntax-char  (char s ssyntax-idx))
-             (handler       (gethash ssyntax-char *wart-ssyntax-handler*)))
-        (if (is 0 ssyntax-idx) ; unary
-          (list handler
-                (expand-ssyntax-string (cut s 1)))
-          (list handler
-                (expand-ssyntax-string (cut s 0 ssyntax-idx))
-                (expand-ssyntax-string (cut s (1+ ssyntax-idx))))))
-      (ssyntax-parse-string s))))
+    (case ssyntax-idx
+      ((nil)  (ssyntax-parse-token s))
+      (0    (list (gethash (char s 0) *wart-ssyntax-handler*)
+                  (expand-ssyntax-string (cut s 1)))) ; unary
+      (t    (list (gethash (char s ssyntax-idx) *wart-ssyntax-handler*)
+                  (expand-ssyntax-string (cut s 0 ssyntax-idx))
+                  (expand-ssyntax-string (cut s (1+ ssyntax-idx))))))))
 
 (defun ssyntax-idx(s &optional (chars (ssyntax-chars-in-precedence)))
   (and chars
@@ -47,10 +44,8 @@
 ; decompose lowest precedence first
 (defun ssyntax-chars-in-precedence()
   (group-by [gethash _ *wart-ssyntax-precedence*]
-            (sort (ssyntax-chars)
-                  (lambda(a b)
-                    (< (gethash a *wart-ssyntax-precedence*)
-                       (gethash b *wart-ssyntax-precedence*))))))
+            (sort (ssyntax-chars) '<
+                  :key [gethash _ *wart-ssyntax-precedence*])))
 
 (defun ssyntax-chars()
   (let ((ans ()))
@@ -58,7 +53,7 @@
              *wart-ssyntax-precedence*)
     ans))
 
-(defun ssyntax-parse-string(s)
+(defun ssyntax-parse-token(s)
   (if (all-digits s)
     (parse-integer s)
     (intern s)))
