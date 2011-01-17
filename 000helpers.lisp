@@ -80,11 +80,6 @@
 (defun pair(xs)
   (tuples 2 xs))
 
-(defun pos(test s)
-  (if (functionp test)
-    (position-if test s)
-    (position test s)))
-
 (defun firstn(n xs)
   (if (or (= n 0) (no xs))
       nil

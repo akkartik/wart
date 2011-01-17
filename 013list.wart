@@ -10,3 +10,8 @@
     (wart-last cdr.xs)
     (car xs)))
 (defover last wart-last)
+
+(def pos(test s)
+  (position-if testify.test s))
+(def rpos(test s)
+  (position-if testify.test s :from-end t))

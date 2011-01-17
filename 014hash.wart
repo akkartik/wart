@@ -28,7 +28,7 @@
 (mac obj args
   `(coerce (list ,@(map (fn ((k v))
                            `(list ',k ,v))
-                         (pair args)))
+                        pair.args))
            'hash-table))
 
 (def keys(table)
