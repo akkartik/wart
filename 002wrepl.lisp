@@ -5,7 +5,7 @@
 (defun wrepl()
   (loop
     (wt-prompt)
-    (format t "~a~%" (wt-eval (read)))))
+    (format t "~s~%" (wt-eval (read)))))
 
 (defun wt-load(file)
   (with-open-file (f (merge-pathnames file))
