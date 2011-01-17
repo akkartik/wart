@@ -31,8 +31,6 @@
   (and (symbolp f)
        (macro-function f)))
 
-; TODO: bound
-
 (defun idfn(x) x)
 
 (defun isnt(x y) (no (is x y)))

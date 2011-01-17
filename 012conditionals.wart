@@ -70,7 +70,7 @@
           fns)))
 
 (mac ifcall(var . args)
-  `(when (bound ',var)
+  `(when (boundp ',var)
      (call ,var ,@args)))
 
 (mac pushif(elem ls)
