@@ -11,11 +11,11 @@
 (defover apply wart-apply)
 
 (defmacro defcall(type arg &rest body)
-  `(defcoerce ',type 'function
+  `(defcoerce ,type function
      (lambda(,arg)
        ,@body)))
 
-(defcoerce 'macro 'function
+(defcoerce macro function
   'idfn)
 
 (defun function-value(f)

@@ -37,9 +37,9 @@
 
 (defmacro defcoerce(src dest converter)
   `(progn
-     (unless (gethash ,dest *wart-coercions*)
-       (setf (gethash ,dest *wart-coercions*) (table)))
-     (setf (gethash ,src (gethash ,dest *wart-coercions*))
+     (unless (gethash ',dest *wart-coercions*)
+       (setf (gethash ',dest *wart-coercions*) (table)))
+     (setf (gethash ',src (gethash ',dest *wart-coercions*))
            ,converter)))
 
 (defun isa(elem typ)

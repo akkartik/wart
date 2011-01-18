@@ -6,21 +6,21 @@
   (setf (gethash key table)
         value))
 
-(defcoerce 'hash-table 'cons
+(defcoerce hash-table cons
   (fn(table)
     (ret ans '()
       (maphash (fn(k v)
                  (push (list k v) ans))
                table))))
 
-(defcoerce 'cons 'hash-table
+(defcoerce cons hash-table
   (fn(l)
     (ret ans (table)
       (map (fn((a b))
              (= ans.a b))
            l))))
 
-(defcoerce 'null 'hash-table
+(defcoerce null hash-table
   [table])
 
 

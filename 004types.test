@@ -10,14 +10,14 @@
   :valueof (wart-type 'incf)
   :should be 'macro)
 
-(defcoerce 'ratio 'integer
+(defcoerce ratio integer
   (lambda(x) 15))
 
 (test "wart-coerce works"
   :valueof (wart-coerce 1/2 'integer)
   :should be 15)
 
-(defcoerce 'foo 'bar
+(defcoerce foo bar
   [annotate 'bar (1+ (rep _))])
 
 (test "wart-coerce works on user-defined types"

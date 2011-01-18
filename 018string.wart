@@ -1,8 +1,8 @@
-(defcoerce 'symbol 'string
+(defcoerce symbol string
   [cl-map 'string 'char-downcase (symbol-name _)])
-(defcoerce 'symbol 'cons
+(defcoerce symbol cons
   [as cons (as string _)])
-(defcoerce 'cons 'symbol
+(defcoerce cons symbol
   [intern (as string _)])
 
 (defgeneric upcase(s)
