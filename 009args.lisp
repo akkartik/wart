@@ -44,7 +44,7 @@
 (defun get-rest-arg-expr(params positionals keywords)
   (let ((rest-param (rest-param params))
         (required-params (required-params params)))
-    (if rest-param
+    (when rest-param
       (list (list rest-param
                   ; return remaining positionals when runs out of params
                   `(get-arg ',rest-param ',required-params ,positionals ,keywords :no-params (lambda(x) x)))))))
@@ -56,7 +56,7 @@
          (lambda(param)
            (list param
                  `(fa (get-arg ',param
-                               (if (or (no ',rest-param) (assoc ',rest-param ,keywords))
+                               (when (or (no ',rest-param) (assoc ',rest-param ,keywords))
                                  ',(strip-defaults params))
                                ,positionals ,keywords)
                       ,(alref param optional-alist))))
@@ -78,8 +78,8 @@
 
 
 (defun required-params(params)
-  (if (and (consp params)
-           (not (is '? (car params))))
+  (when (and (consp params)
+             (not (is '? (car params))))
     (cons (car params)
           (required-params (cdr params)))))
 
