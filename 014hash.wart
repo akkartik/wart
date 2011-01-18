@@ -23,13 +23,11 @@
 (defcoerce null hash-table
   [table])
 
-
-
 (mac obj args
-  `(coerce (list ,@(map (fn ((k v))
-                           `(list ',k ,v))
-                        pair.args))
-           'hash-table))
+  `(as hash-table
+       (list ,@(map (fn ((k v))
+                       `(list ',k ,v))
+                    pair.args))))
 
 (def keys(table)
   (ret ans ()
