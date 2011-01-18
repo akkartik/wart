@@ -6,16 +6,18 @@
   [intern (as string _)])
 
 (defgeneric upcase(s)
-  (when s
-    (as string (map 'char-upcase s))))
+  (as string (map 'char-upcase s)))
+(defmethod upcase(s) null
+  nil)
 (defmethod upcase(s) symbol
   :coerce-to-cons)
 (defmethod upcase(s) standard-char
   (char-upcase s))
 
 (defgeneric downcase(s)
-  (when s
-    (as string (map 'char-downcase s))))
+  (as string (map 'char-downcase s)))
+(defmethod downcase(s) null
+  nil)
 (defmethod downcase(s) symbol
   :coerce-to-cons)
 (defmethod downcase(s) standard-char
