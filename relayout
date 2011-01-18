@@ -1,0 +1,32 @@
+#!/usr/bin/env zsh
+
+if [ `git diff HEAD |wc -l` -gt 0 ]
+then
+  echo "Uncommitted changes"
+  exit
+fi
+
+ls [0-9]*.(lisp|wart) |perl -pwe 's/\..*//' > .layout
+vi -c "set nu" .layout
+
+root() {
+  echo $1 |perl -pwe 's/^[0-9]*//' |perl -pwe 's/\..*//'
+}
+
+index=0
+cat .layout |
+  while read file
+  do
+    if [ ! -z $file ]
+    then
+      newfile=`printf "%03d" $index``root $file`
+      if [[ $newfile != $file ]]
+      then
+        [[ -f $file.lisp ]] && git mv $file.lisp $newfile.lisp
+        [[ -f $file.test ]] && git mv $file.test $newfile.test
+        [[ -f $file.wart ]] && git mv $file.wart $newfile.wart
+        [[ -f $file.wtst ]] && git mv $file.wtst $newfile.wtst
+      fi
+    fi
+    index=$(($index+1))
+  done
