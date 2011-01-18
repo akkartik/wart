@@ -1,0 +1,39 @@
+(test-wart "symbols can be coerced to string"
+  :valueof (as string 'a)
+  :should be "a")
+
+(test-wart "coercing symbols to string downcases"
+  :valueof (as string 'A)
+  :should be "a")
+
+(test-wart "upcase works"
+  :valueof (upcase "abc")
+  :should be "ABC")
+
+(test-wart "downcase works"
+  :valueof (downcase "ABC")
+  :should be "abc")
+
+(test-wart "upcase works on char"
+  :valueof (upcase #\a)
+  :should be #\A)
+
+(test-wart "downcase works on char"
+  :valueof (downcase #\A)
+  :should be #\a)
+
+(test-wart "upcase returns string for symbol"
+  :valueof (upcase 'a)
+  :should be "A")
+
+(test-wart "downcase returns string for symbol"
+  :valueof (downcase 'a)
+  :should be "a")
+
+(test-wart "upcase doesn't mess with nil"
+  :valueof (upcase nil)
+  :should be nil)
+
+(test-wart "downcase doesn't mess with nil"
+  :valueof (downcase nil)
+  :should be nil)

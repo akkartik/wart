@@ -1,0 +1,22 @@
+(defcoerce 'symbol 'string
+  [cl-map 'string 'char-downcase (symbol-name _)])
+(defcoerce 'symbol 'cons
+  [as cons (as string _)])
+(defcoerce 'cons 'symbol
+  [intern (as string _)])
+
+(defgeneric upcase(s)
+  (when s
+    (as string (map 'char-upcase s))))
+(defmethod upcase(s) symbol
+  :coerce-to-cons)
+(defmethod upcase(s) standard-char
+  (char-upcase s))
+
+(defgeneric downcase(s)
+  (when s
+    (as string (map 'char-downcase s))))
+(defmethod downcase(s) symbol
+  :coerce-to-cons)
+(defmethod downcase(s) standard-char
+  (char-downcase s))

@@ -1,5 +1,6 @@
 ;; Primitives for binding variables
 
+(defover cl-map map) ; keep old version around since ours is weaker for now
 (mac wart-map(f . seqs)
   `(map 'list ,f ,@seqs)) ; recursive map won't be transformed
 (defover map wart-map)

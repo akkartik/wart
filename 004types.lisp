@@ -32,6 +32,9 @@
       (funcall 'coerce val dest)))
 (defover coerce wart-coerce)
 
+(defmacro as(type val)
+  `(wart-coerce ,val ',type))
+
 (defmacro defcoerce(src dest converter)
   `(progn
      (unless (gethash ,dest *wart-coercions*)
