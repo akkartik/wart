@@ -4,13 +4,13 @@
   `(let ((got ,expr))
      (unless (,(car predicate) got ,@(cdr predicate))
        (incf *test-failures*)
-       (prn "F " ,msg #\newline "  got " got))))
+       (pr "F " ,msg #\newline "  got ")(writeln got))))
 
 (defmacro test-wart(msg Valueof expr Should &rest predicate)
   `(let ((got (wt-eval ',expr)))
      (unless (,(car predicate) got ,@(cdr predicate))
        (incf *test-failures*)
-       (prn "F " ,msg #\newline "  got " got))))
+       (pr "F " ,msg #\newline "  got ")(writeln got))))
 
 (defmacro pending-test(msg &rest args)
   (prn "X " msg))

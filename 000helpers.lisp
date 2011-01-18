@@ -2,11 +2,18 @@
   `(handler-bind (#+sbcl(sb-kernel:redefinition-warning 'muffle-warning))
      ,@body))
 
-(defun pr(arg)
+(defun pr1(arg)
   (format t "~a" arg))
-
+(defun pr(&rest args)
+  (map 'list 'pr1 args)
+  (car args))
 (defun prn(&rest args)
-  (map 'list 'pr args)
+  (apply 'pr args)
+  (format t "~%")
+  (car args))
+
+(defun writeln(&rest args)
+  (map 'list 'write args)
   (format t "~%")
   (car args))
 
