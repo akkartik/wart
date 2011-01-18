@@ -54,4 +54,4 @@
 (defun apply-nested-calls(fs args)
   (if (singlep fs)
     `(call* ,(car fs) ,@args)
-    `(,(car fs) ,(apply-nested-calls (cdr fs) args))))
+    `(call* ,(car fs) ,(apply-nested-calls (cdr fs) args))))

@@ -78,4 +78,12 @@
 
 (test "call* expands compositions"
   :valueof (macex1 '(call* (compose* incf foo) x))
-  :should be '(incf (call* foo x)))
+  :should be '(call* incf (call* foo x)))
+
+(test "call* expands compositions - 2"
+  :valueof (macex1 '(call* (compose* 1+ incf) x))
+  :should be '(call* 1+ (call* incf x)))
+
+(test "call* expands compositions - 3"
+  :valueof (let ((a (lambda(x) 34))) (macex1 '(call* (compose* a incf) x)))
+  :should be '(call* a (call* incf x)))
