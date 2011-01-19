@@ -28,7 +28,9 @@
          iso equal
          uniq gensym
          macex macroexpand
-         macex1 macroexpand-1)
+         macex1 macroexpand-1
+         err error
+         errsafe ignore-errors)
 
 (defun match(a b)
   (or (is a b)
