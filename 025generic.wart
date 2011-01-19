@@ -1,25 +1,21 @@
 (mac wart-defgeneric(name args . body)
-  (w/uniq allargs
-    `(generic-expander ,name ,allargs ,args ,body
-       (apply ',name (transform-last [coerce _ 'cons] ,allargs)))))
+  `(generic-expander ,name ,$allargs ,args ,body
+     (apply ',name (transform-last [coerce _ 'cons] ,$allargs))))
 (defover defgeneric wart-defgeneric)
 
 (mac defgeneric*(name args . body)
-  (w/uniq allargs
-    `(generic-expander ,name ,allargs ,args ,body
-       (apply ',name (map [coerce _ 'cons] ,allargs)))))
+  `(generic-expander ,name ,$allargs ,args ,body
+     (apply ',name (map [coerce _ 'cons] ,$allargs))))
 
 (mac deftransform(name args . body)
-  (w/uniq allargs
-    `(generic-expander ,name ,allargs ,args ,body
-       (coerce (apply ',name (transform-last [coerce _ 'cons] ,allargs))
-               (type (last ,allargs))))))
+  `(generic-expander ,name ,$allargs ,args ,body
+     (coerce (apply ',name (transform-last [coerce _ 'cons] ,$allargs))
+             (type (last ,$allargs)))))
 
 (mac deftransform*(name args . body)
-  (w/uniq allargs
-    `(generic-expander ,name ,allargs ,args ,body
-       (coerce (apply ',name (map [coerce _ 'cons] ,allargs))
-               (type (last ,allargs))))))
+  `(generic-expander ,name ,$allargs ,args ,body
+     (coerce (apply ',name (map [coerce _ 'cons] ,$allargs))
+             (type (last ,$allargs)))))
 
 (mac wart-defmethod(name args type . body)
   (if (no body)
@@ -47,15 +43,14 @@
 
 (= vtables* (table))
 (mac init-vtable(name args . body)
-  (w/uniq basefn
-    `(= (gethash ',name vtables*)
-       (let ,basefn (fn ,args ,@body)
-          ; Assume body handles primitives by default. Can be overridden.
-          (obj null ,basefn
-               boolean ,basefn
-               symbol ,basefn
-               standard-char ,basefn
-               string ,basefn
-               bit ,basefn
-               integer ,basefn
-               cons ,basefn)))))
+  `(= (gethash ',name vtables*)
+     (let ,$basefn (fn ,args ,@body)
+        ; Assume body handles primitives by default. Can be overridden.
+        (obj null ,$basefn
+             boolean ,$basefn
+             symbol ,$basefn
+             standard-char ,$basefn
+             string ,$basefn
+             bit ,$basefn
+             integer ,$basefn
+             cons ,$basefn))))

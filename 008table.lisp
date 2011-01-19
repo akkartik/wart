@@ -1,32 +1,27 @@
 (synonym table make-hash-table)
 
 ; 'first available' - like or, but uses multiple values to indicate unavailable
-(defmacro fa(&rest args)
+(defmacro$ fa(&rest args)
   (cond
     ((no (cdr args))  (car args))
-    (t  (let* ((val (uniq))
-               (unavailable (uniq)))
-           `(multiple-value-bind (,val ,unavailable) ,(car args)
-             (if ,unavailable
-               (fa ,@(cdr args))
-               ,val))))))
+    (t  `(multiple-value-bind (,$val ,$unavailable) ,(car args)
+           (if ,$unavailable
+             (fa ,@(cdr args))
+             ,$val)))))
 
 ; 'last available' - like and, but uses multiple values to indicate available
 ; Returns multiple values to indicate all args not eval'd.
 ; Currently only makes sense to combine as (fa (la ..) (la ..) (la ..)). Do we need and-of-ors?
-(defmacro la(&rest args)
+(defmacro$ la(&rest args)
   (if (no (cdr args))
     `(values ,(car args) nil)
-    (let* ((available (uniq))
-           (next-val (uniq))
-           (next-available (uniq)))
-      `(multiple-value-bind (it ,available) ,(car args)
-        (multiple-value-bind (,next-val ,next-available) ,(cadr args)
-          (cond
-            ((not ,available)   (values nil t))
-            ((not ,next-available)  (values it ,available))
-            (t  (la (values ,next-val ,next-available)
-                    ,@(cddr args)))))))))
+    `(multiple-value-bind (it ,$available) ,(car args)
+      (multiple-value-bind (,$next-val ,$next-available) ,(cadr args)
+        (cond
+          ((not ,$available)   (values nil t))
+          ((not ,$next-available)  (values it ,$available))
+          (t  (la (values ,$next-val ,$next-available)
+                  ,@(cddr args))))))))
 
 (defmacro guarded-gethash(key table)
   `(if ,table
