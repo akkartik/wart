@@ -1,13 +1,36 @@
 #!/usr/bin/env zsh
 
-if [ `git diff HEAD |wc -l` -gt 0 ]
+if [[ $# -eq 0 && `git diff HEAD |wc -l` -gt 0 ]]
 then
   echo "Uncommitted changes"
   exit
 fi
 
-ls [0-9]*.(lisp|wart) |perl -pwe 's/\..*//' > .layout
+if [[ $# -gt 0 ]] # dry run
+then
+  git() {
+    echo $*
+  }
+fi
+
+#
+
+i=0
+ls [0-9]*.(lisp|wart) |perl -pwe 's/\..*//' |
+  while read file
+  do
+    while [[ $file != `printf "%03d" $i`* ]]
+    do
+      echo
+      i=$(($i+1))
+    done
+    echo $file
+    i=$(($i+1))
+  done > .layout
+
 vi -c "set nu" .layout
+
+#
 
 root() {
   echo $1 |perl -pwe 's/^[0-9]*//' |perl -pwe 's/\..*//'
