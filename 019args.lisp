@@ -1,37 +1,36 @@
 ;; Functions support complex arg lists in wart.
 
-(defmacro def(name params &rest body)
-  `(defun ,name ,@(compile-params params body)))
+(defmacro$ def(name params &rest body)
+  `(defun ,name(&rest ,$args)
+     ,(compile-params params body $args)))
 
-(defmacro mac(name params &rest body)
-  (wt-transform `(defmacro$ ,name ,@(compile-params params body))))
+(defmacro$ mac(name params &rest body)
+  (wt-transform
+    `(defmacro$ ,name(&rest ,$args)
+       ,(compile-params params body $args))))
 
-(defmacro fn(params &rest body)
-  `(lambda ,@(compile-params params body)))
+(defmacro$ fn(params &rest body)
+  `(lambda(&rest ,$args)
+     ,(compile-params params body $args)))
 
 
 
 ;; Internals
 ;; Use let* everywhere here because wart will soon override let
 
-; returns arglist and body suitable for insertion into defun or lambda
-; new body understands keyword args
-; params format (optionals* ? lazy-optionals* . rest)
+; convert body to parse keyword args and params format (optionals* ? lazy-optionals . rest)
 ; optionals can be destructured
+; lazy optionals alternate var and default
 ; lazy optionals require keywords if rest is present
-(defun compile-params(params body)
-  (let* ((args  (uniq))
-         (positionals  (uniq))
-         (keywords   (uniq)))
-    `((&rest ,args)
-      (let* ((,positionals  (positional-args ,args ',(rest-param params)))
-             (,keywords   (keyword-args ,args ',(rest-param params))))
-        (let* ,(append
-                 (get-required-arg-exprs params positionals keywords)
-                 ; args go to rest before optional
-                 (get-rest-arg-expr params positionals keywords)
-                 (get-optional-arg-exprs params positionals keywords))
-          ,@body)))))
+(defun$ compile-params(params body args)
+  `(let* ((,$positionals  (positional-args ,args ',(rest-param params)))
+          (,$keywords   (keyword-args ,args ',(rest-param params))))
+    (let* ,(append
+             (get-required-arg-exprs params $positionals $keywords)
+             ; args go to rest before optional
+             (get-rest-arg-expr params $positionals $keywords)
+             (get-optional-arg-exprs params $positionals $keywords))
+      ,@body)))
 
 (defun get-required-arg-exprs(params positionals keywords)
   (let ((required-params (required-params params)))

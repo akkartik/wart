@@ -33,3 +33,14 @@
     `(defmacro/$ ,name ,args
        `(let ,(mapcar #'list (list ,@$s) (list ,@os))
           ,(progn ,@body)))))
+
+; Use defun$ to generate expressions for defmacro$ to return
+(defmacro defun$(name args &rest body)
+  (let ((syms (remove-duplicates
+                (remove-if-not #'dollar-symbol-p
+                               (flatten body)))))
+    `(defun ,name ,args
+       (let ,(mapcar (lambda(_)
+                       `(,_   (uniq ,(cut (symbol-name _) 1))))
+                     syms)
+         ,@body))))

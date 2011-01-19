@@ -10,3 +10,15 @@
 (test "defmacro$ handles o$vars - 2"
   :valueof (type-of (caar (cadr (macex1 '(foodollar 3)))))
   :should be 'symbol)
+
+(defun$ foodef$(x)
+  `(let ((,$x ,x))
+    (+ 1 ,$x)))
+
+(defmacro$ foomac$(x)
+  (list 'quote (foodef$ x)))
+
+(test "defmacro$ handles $vars in comma expressions if they're generated using defun$"
+  :valueof (foomac$ 3)
+  :should match '(let ((_ 3))
+                   (+ 1 _)))
