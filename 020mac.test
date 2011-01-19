@@ -1,4 +1,10 @@
+(prn (macex1 '(mac foo5(n) `(+ ,n 1))))
 (wt-eval '(mac foo5(n) `(+ ,n 1)))
+
+(prn (macex1 '(foo5 32)))
+;? (let* ((s928 os929))
+;?   `(+ ,n 1))
+
 (test-wart "simple mac"
   :valueof (foo5 32)
   :should be 33)
@@ -8,3 +14,18 @@
 (test-wart "mac sees $vars inside defs"
   :valueof (foo20 3)
   :should be 4)
+
+(wt-eval '(mac foo21(o$x) `(* ,$x ,$x)))
+(test "mac handles o$vars"
+  :valueof (macex1 '(foo21 3))
+  :should match '(let ((_ 3)) (* _ _)))
+(test "mac handles o$vars - 2"
+  :valueof (type-of (caar (cadr (macex1 '(foo21 3)))))
+  :should be 'symbol)
+
+(test "o$vars eval exactly once"
+  :valueof (_let counter 0
+             (foo21 (progn (incf counter)
+                           3))
+             counter)
+  :should be 1)
