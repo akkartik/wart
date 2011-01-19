@@ -27,9 +27,9 @@
                      syms)
          ,@body))))
 
-(defmacro defmacro$ (name args &rest body)
+(defmacro defmacro$(name args &rest body)
   (let* ((os (remove-if-not #'odollar-symbol-p args))
-         (gs (mapcar #'odollar-symbol-to-dollar-symbol os)))
+         ($s (mapcar #'odollar-symbol-to-dollar-symbol os)))
     `(defmacro/$ ,name ,args
-       `(let ,(mapcar #'list (list ,@gs) (list ,@os))
+       `(let ,(mapcar #'list (list ,@$s) (list ,@os))
           ,(progn ,@body)))))
