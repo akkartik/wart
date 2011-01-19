@@ -1,0 +1,33 @@
+(defmacro macfoo(a) `(+ 1 ,a))
+(test-wart "call handles macros"
+  :valueof (call macfoo 3)
+  :should be 4)
+
+(test-wart "call works"
+  :valueof (call oddp 3)
+  :should be t)
+
+(setf a 2)
+(test-wart "call handles macros with global bindings"
+  :valueof (call macfoo a)
+  :should be 3)
+
+(test-wart "call handles macros with bindings"
+  :valueof (_let a 3 (call macfoo a))
+  :should be 4)
+
+(test-wart "call handles incf macro"
+  :valueof (_let a 32 (call incf a))
+  :should be 33)
+
+(test-wart "call nests"
+  :valueof (macex '(call (call a 3) 4))
+  :should be '(call-fn (call a 3) 4))
+
+(test "call expands compositions"
+  :valueof (macex1 '(call (compose* incf foo) x))
+  :should be '(call incf (call foo x)))
+
+(test "call expands compositions - 2"
+  :valueof (let ((a (lambda(x) 34))) (macex1 '(call (compose* a incf) x)))
+  :should be '(call a (call incf x)))
