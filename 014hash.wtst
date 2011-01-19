@@ -4,7 +4,7 @@
   :valueof (type (coerce h 'function))
   :should be 'function)
 
-(test-wart "call on hash table works"
+(test-wart "call-fn on hash table works"
   :valueof (call h 0)
   :should be 34)
 

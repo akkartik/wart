@@ -6,7 +6,7 @@
     `(cond ,@(tuples 2 args))))
 (defover if wart-if)
 
-(mac wart-do args `(call (fn() ,@args)))
+(mac wart-do args `(call* (fn() ,@args)))
 (defover do wart-do)
 
 (defover ++ incf)

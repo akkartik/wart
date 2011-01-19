@@ -13,10 +13,10 @@
 
 (mac whilet (var test . body)
   (w/uniq (gf gp)
-    `(call (rfn ,gf (,gp)
-             (let ,var ,gp
-               (when ,var ,@body (,gf ,test))))
-           ,test)))
+    `(call* (rfn ,gf (,gp)
+              (let ,var ,gp
+                (when ,var ,@body (,gf ,test))))
+            ,test)))
 
 (mac awhile(expr . body)
   `(whilet it ,expr

@@ -1,9 +1,9 @@
 (test-wart "compose works"
-  :valueof (call 1+^1+ 3)
+  :valueof (call* 1+^1+ 3)
   :should be 5)
 
 (test-wart "complement works"
-  :valueof (call ~oddp 3)
+  :valueof (call* ~oddp 3)
   :should be nil)
 
 (test "expand-ssyntax translates ^ to compose"

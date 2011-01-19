@@ -1,4 +1,3 @@
-; hash.key => (call (coerce hash 'function) key) => (call [gethash _ hash] key)
 (defcall hash-table table
   [gethash _ table])
 

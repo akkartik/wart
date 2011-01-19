@@ -34,14 +34,14 @@
 (def transform-last(f xs)
   (if (cdr xs)
     (cons car.xs (transform-last f cdr.xs))
-    (call list^f car.xs)))
+    (call* list^f car.xs)))
 
 (mac generic-expander(name allargs args body not-found)
   `(do
      (init-vtable ,name ,args ,@body)
      (defun ,name(&rest ,allargs)
        (aif (aand (gethash ',name vtables*)
-                  (call it^type^last ,allargs))
+                  (call* it^type^last ,allargs))
          (apply it ,allargs)
          ,not-found))))
 

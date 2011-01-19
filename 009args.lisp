@@ -65,7 +65,7 @@
 (defun get-arg(var params positionals keywords &key (no-params (lambda(x) nil)))
   (cond
     ((assoc var keywords)  (alref var keywords))
-    ((no params)  (values (call no-params positionals)
+    ((no params)  (values (call* no-params positionals)
                           'no-arg))
     ((is params var)  positionals)
     ((not (consp params))   (values nil 'no-arg))
