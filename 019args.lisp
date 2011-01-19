@@ -1,7 +1,7 @@
 ;; Functions support complex arg lists in wart.
 
 (defmacro$ def(name params &rest body)
-  `(defun ,name(&rest ,$args)
+  `(defun$ ,name(&rest ,$args)
      ,(compile-params params body $args)))
 
 (defmacro$ mac(name params &rest body)

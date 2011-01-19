@@ -27,14 +27,14 @@
       nil
       (cons (car xs) (firstn (1- n) (cdr xs)))))
 
-(defun flatten(tree)
-  (let ((result '()))
-    (labels ((scan (item)
-               (if (listp item)
-                 (map nil #'scan item)
-                 (push item result))))
-      (scan tree))
-    (nreverse result)))
+(defun flatten(x)
+  (labels ((rec(x acc)
+             (cond ((null x) acc)
+                   ((atom x) (cons x acc))
+                   (t (rec
+                        (car x)
+                        (rec (cdr x) acc))))))
+    (rec x nil)))
 
 (defun alref(key alist)
   (cdr (assoc key alist)))

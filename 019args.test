@@ -304,3 +304,9 @@
 (test-wart "call works on lambdas"
   :valueof (call [+ _ 1] 3)
   :should be 4)
+
+(wt-eval '(def foo19(x) `(_let ,$x ,x (+ 1 ,$x))))
+(wt-eval '(mac foo20(x) (foo19 x)))
+(test-wart "mac sees $vars inside defs"
+  :valueof (foo20 3)
+  :should be 4)
