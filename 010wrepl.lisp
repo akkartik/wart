@@ -64,6 +64,6 @@
   (cond
     ((no sexp)  nil)
     ((atom sexp)  (funcall f sexp))
-    (t   (call-fn f
+    (t   (funcall f
                   (cons (apply-to-all f (car sexp))
                         (apply-to-all f (cdr sexp)))))))

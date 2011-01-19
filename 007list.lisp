@@ -41,7 +41,7 @@
 
 ; helper for certain kinds of recursive functions
 (defun append-or-afresh(f x xss)
-  (if (call-fn f x)
+  (if (funcall f x)
     (cons (cons x (car xss))
           (cdr xss))
     (cons (list x)
@@ -50,9 +50,8 @@
 (defun group-by(f xs &optional acc)
   (if xs
     (group-by f (cdr xs)
-              (append-or-afresh (lambda(x)
-                                  (is (call-fn f x)
-                                      (call-fn f (car (car acc)))))
+              (append-or-afresh [is (funcall f _)
+                                    (funcall f (car (car acc)))]
                                 (car xs)
                                 acc))
     (nreverse acc)))

@@ -21,14 +21,14 @@
   `(iso ,@args))
 
 (defmacro satisfy(x f)
-  `(call-fn (function ,f) ,x))
+  `(funcall (function ,f) ,x))
 
 (defun true_value(x)
   x)
 
 ; Use this in tests rather than let or let*, they will be overridden
 (defmacro _let(var val &body body)
-  `(call-fn (lambda(,var) ,@body) ,val))
+  `(funcall (lambda(,var) ,@body) ,val))
 
 
 

@@ -1,9 +1,8 @@
-;; Override call-fn and apply using extensible coerce
+;; call-fn and apply using extensible coerce
 
-(ignore-redef
-  (defun call-fn(f &rest args)
-    (apply (wart-coerce f 'function)
-           args)))
+(defun call-fn(f &rest args)
+  (apply (wart-coerce f 'function)
+         args))
 
 (defmacro wart-apply(f &rest args)
   `(call-fn (apply-fn (wart-coerce ,f 'function))

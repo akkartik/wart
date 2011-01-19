@@ -24,7 +24,6 @@
                    args)))
 
 (synonym no null
-         call-fn funcall ; bootstrap version
          is eq
          iso equal
          uniq gensym
