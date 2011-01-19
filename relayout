@@ -15,17 +15,17 @@ fi
 
 #
 
-i=0
+index=0
 ls [0-9]*.(lisp|wart) |perl -pwe 's/\..*//' |
   while read file
   do
-    while [[ $file != `printf "%03d" $i`* ]]
+    while [[ $file != `printf "%03d" $index`* ]]
     do
       echo
-      i=$(($i+1))
+      index=$(($index+1))
     done
     echo $file
-    i=$(($i+1))
+    index=$(($index+1))
   done > .layout
 
 vi -c "set nu" .layout
@@ -53,3 +53,7 @@ cat .layout |
     fi
     index=$(($index+1))
   done
+
+#
+
+rm .layout
