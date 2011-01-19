@@ -28,7 +28,7 @@ ls [0-9]*.(lisp|wart) |perl -pwe 's/\..*//' |
     index=$(($index+1))
   done > .layout
 
-vi -c "set nu" .layout
+$EDITOR -c "set nu" .layout # Any $EDITOR as long as it's a vi.
 
 #
 
