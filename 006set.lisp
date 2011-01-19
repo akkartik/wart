@@ -18,4 +18,4 @@
 (defun call-setf(&rest args)
   (indexing *wart-coercions* ('function= (wart-type (car args)))
     (apply it args)))
-(defsetf call call-setf)
+(defsetf call-fn call-setf)

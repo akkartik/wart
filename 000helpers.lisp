@@ -24,7 +24,7 @@
 
 
 (synonym no null
-         call funcall ; bootstrap version
+         call-fn funcall ; bootstrap version
          is eq
          iso equal
          uniq gensym
@@ -106,7 +106,7 @@
 
 ; helper for certain kinds of recursive functions
 (defun append-or-afresh(f x xss)
-  (if (call f x)
+  (if (call-fn f x)
     (cons (cons x (car xss))
           (cdr xss))
     (cons (list x)
@@ -116,8 +116,8 @@
   (if xs
     (group-by f (cdr xs)
               (append-or-afresh (lambda(x)
-                                  (is (call f x)
-                                      (call f (car (car acc)))))
+                                  (is (call-fn f x)
+                                      (call-fn f (car (car acc)))))
                                 (car xs)
                                 acc))
     (nreverse acc)))

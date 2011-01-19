@@ -5,7 +5,7 @@
   :should be 'function)
 
 (test-wart "call-fn on hash table works"
-  :valueof (call h 0)
+  :valueof (call-fn h 0)
   :should be 34)
 
 (test-wart "call* on hash tables works"

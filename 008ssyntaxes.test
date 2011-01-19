@@ -63,9 +63,9 @@
 ; integration test: nested calls
 (test-wart "call* nests"
   :valueof (macex '(call* (call* a 3) 4))
-  :should be '(call (call* a 3) 4))
+  :should be '(call-fn (call* a 3) 4))
 
-; integration test: macros + call + ssyntax
+; integration test: macros + call-fn + ssyntax
 (setf a 3)
 (test-wart ". works with macros"
   :valueof incf.a

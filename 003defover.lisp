@@ -36,4 +36,4 @@
 
 (add-wart-transformer
   lookup-unquoted-handler
-  [call (lookup-unquoted-handler _) _])
+  [call-fn (lookup-unquoted-handler _) _])

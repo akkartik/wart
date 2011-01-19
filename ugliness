@@ -1,4 +1,4 @@
-inserting say prn^ requires a call or call*. still a single edit, though.
+inserting say prn^ requires a call-fn or call*. still a single edit, though.
 
 case-insensitive symbols. converting strings to syms loses information.
 

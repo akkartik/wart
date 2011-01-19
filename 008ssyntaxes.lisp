@@ -14,7 +14,7 @@
 
 (defun compose(f g)
   (lambda(&rest args)
-    (call f (wart-apply g args))))
+    (call-fn f (wart-apply g args))))
 
 (defmacro complement*(f)
   `(complement (fslot ,f)))
@@ -27,9 +27,9 @@
 (defmacro call*(f &rest args)
   (cond
     ((macp f)  `(,f ,@args))
-    ((and (atom f) (fboundp f))  `(call (function ,f) ,@args))
+    ((and (atom f) (fboundp f))  `(call-fn (function ,f) ,@args))
     ((macro-composition-p f)   (expand-composition f args))
-    (t  `(call ,f ,@args))))
+    (t  `(call-fn ,f ,@args))))
 
 (defmacro call*-quoted(a b)
   `(call* ,a ',b))
