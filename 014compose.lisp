@@ -1,6 +1,6 @@
-(defun compose(f g)
+(defun compose-fn(f g)
   (lambda(&rest args)
     (call-fn f (wart-apply g args))))
 
-(defmacro compose*(f g)
-  `(compose (fslot ,f) (fslot ,g)))
+(defmacro compose(f g)
+  `(compose-fn (fslot ,f) (fslot ,g)))
