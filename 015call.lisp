@@ -1,3 +1,4 @@
+; like funcall, but can handle macros
 ; knows about compose so that we can use ssyntax with macros
 ;   ++^h.1 => (call incf (call h 1))
 ; ssyntax doesn't seem a good fit for a lisp-2.

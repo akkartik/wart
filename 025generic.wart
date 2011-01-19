@@ -27,6 +27,8 @@
 
 
 
+;; Internals
+
 (def transform-last(f xs)
   (if (cdr xs)
     (cons car.xs (transform-last f cdr.xs))

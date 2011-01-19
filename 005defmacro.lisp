@@ -35,6 +35,7 @@
           ,(progn ,@body)))))
 
 ; Use defun$ to generate expressions for defmacro$ to return
+; Identical to defmacro/$ except we replace defmacro in the body with defun
 (defmacro defun$(name args &rest body)
   (let ((syms (remove-duplicates
                 (remove-if-not #'dollar-symbol-p

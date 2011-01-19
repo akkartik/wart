@@ -2,12 +2,7 @@
 (def-ssyntax #\^ 'compose)
 (def-ssyntax #\. 'call)
 (def-ssyntax #\! 'call-quoted)
-(def-ssyntax #\~ 'complement* -1) ; precedence like arc, but perhaps not best
-
-(defmacro fslot(f)
-  (if (and (atom f) (fboundp f))
-    `(function ,f)
-    f))
+(def-ssyntax #\~ 'complement* -1) ; precedence like arc for now
 
 (defmacro complement*(f)
   `(complement (fslot ,f)))
