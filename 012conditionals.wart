@@ -36,10 +36,10 @@
   (let ex (afn(args)
             (if (no cdr.args)
                 (car args)
-                `(if (call* (testify ,(car args)) ,var)
+                `(if (call (testify ,(car args)) ,var)
                      ,(cadr args)
                      ,(self cddr.args))))
-    `(let ,var ,expr ,(call* ex args))))
+    `(let ,var ,expr ,(call ex args))))
 
 (mac wart-case(expr . args)
   `(caselet ,(uniq) ,expr ,@args))
@@ -48,30 +48,30 @@
 (mac check(expr test ? alt nil)
   (w/uniq x
     `(let ,x ,expr
-       (if (call* ',test ,x)
+       (if (call ',test ,x)
          ,x
          ,alt))))
 
 (def orf fns
   (fn args
-    (call* (afn(fs)
-             (and fs
-                  (or (apply car.fs args)
-                      (self cdr.fs))))
-           fns)))
+    (call (afn(fs)
+            (and fs
+                 (or (apply car.fs args)
+                     (self cdr.fs))))
+          fns)))
 
 (def andf fns
   (fn args
-    (call* (afn(fs)
-             (if (no fs)   t
-                 (no cdr.fs)   (apply car.fs args)
-                               (and (apply car.fs args)
-                                    (self cdr.fs))))
-           fns)))
+    (call (afn(fs)
+            (if (no fs)   t
+                (no cdr.fs)   (apply car.fs args)
+                              (and (apply car.fs args)
+                                   (self cdr.fs))))
+          fns)))
 
 (mac ifcall(var . args)
   `(when (boundp ',var)
-     (call* ,var ,@args)))
+     (call ,var ,@args)))
 
 (mac pushif(elem ls)
   `(aif ,elem

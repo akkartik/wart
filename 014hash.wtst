@@ -8,8 +8,8 @@
   :valueof (call-fn h 0)
   :should be 34)
 
-(test-wart "call* on hash tables works"
-  :valueof (call* h 0)
+(test-wart "call on hash tables works"
+  :valueof (call h 0)
   :should be 34)
 
 (test-wart "apply on hash tables works"

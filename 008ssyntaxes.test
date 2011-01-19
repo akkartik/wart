@@ -1,9 +1,9 @@
 (test-wart "compose works"
-  :valueof (call* 1+^1+ 3)
+  :valueof (call 1+^1+ 3)
   :should be 5)
 
 (test-wart "complement works"
-  :valueof (call* ~oddp 3)
+  :valueof (call ~oddp 3)
   :should be nil)
 
 (test "expand-ssyntax translates ^ to compose"
@@ -16,54 +16,54 @@
 
 (test "expand-ssyntax translates . to just a call"
   :valueof (expand-ssyntax 'a.b)
-  :should be '(call* a b))
+  :should be '(call a b))
 
 (test "expand-ssyntax translates ! to just a call"
   :valueof (expand-ssyntax 'a!b)
-  :should be '(call*-quoted a b))
+  :should be '(call-quoted a b))
 
 (test ". and ! are left-associative"
   :valueof (expand-ssyntax 'a.b!c.d)
-  :should be '(call* (call*-quoted (call* a b) c) d))
+  :should be '(call (call-quoted (call a b) c) d))
 
 (test "~ has higher precedence"
   :valueof (expand-ssyntax '~testify.test)
-  :should be '(complement* (call* testify test)))
+  :should be '(complement* (call testify test)))
 
 (test "expand numbers correctly"
   :valueof (expand-ssyntax 'a.3)
-  :should be '(call* a 3))
+  :should be '(call a 3))
 
 (test-wart ". works"
   :valueof oddp.3
   :should be t)
 
 (defmacro macfoo(a) `(+ 1 ,a))
-(test-wart "call* handles macros"
-  :valueof (call* macfoo 3)
+(test-wart "call handles macros"
+  :valueof (call macfoo 3)
   :should be 4)
 
-(test-wart "call* works"
-  :valueof (call* oddp 3)
+(test-wart "call works"
+  :valueof (call oddp 3)
   :should be t)
 
 (setf a 2)
-(test-wart "call* handles macros with global bindings"
-  :valueof (call* macfoo a)
+(test-wart "call handles macros with global bindings"
+  :valueof (call macfoo a)
   :should be 3)
 
-(test-wart "call* handles macros with bindings"
-  :valueof (_let a 3 (call* macfoo a))
+(test-wart "call handles macros with bindings"
+  :valueof (_let a 3 (call macfoo a))
   :should be 4)
 
-(test-wart "call* handles incf macro"
-  :valueof (_let a 32 (call* incf a))
+(test-wart "call handles incf macro"
+  :valueof (_let a 32 (call incf a))
   :should be 33)
 
 ; integration test: nested calls
-(test-wart "call* nests"
-  :valueof (macex '(call* (call* a 3) 4))
-  :should be '(call-fn (call* a 3) 4))
+(test-wart "call nests"
+  :valueof (macex '(call (call a 3) 4))
+  :should be '(call-fn (call a 3) 4))
 
 ; integration test: macros + call-fn + ssyntax
 (setf a 3)
@@ -74,16 +74,16 @@
 ; integration test: defover + ssyntax
 (test "expand-ssyntax goes through wt-transform"
   :valueof (expand-ssyntax 'defover-foo.3)
-  :should be '(call* defover-bar 3))
+  :should be '(call defover-bar 3))
 
-(test "call* expands compositions"
-  :valueof (macex1 '(call* (compose* incf foo) x))
-  :should be '(call* incf (call* foo x)))
+(test "call expands compositions"
+  :valueof (macex1 '(call (compose* incf foo) x))
+  :should be '(call incf (call foo x)))
 
-(test "call* expands compositions - 2"
-  :valueof (macex1 '(call* (compose* 1+ incf) x))
-  :should be '(call* 1+ (call* incf x)))
+(test "call expands compositions - 2"
+  :valueof (macex1 '(call (compose* 1+ incf) x))
+  :should be '(call 1+ (call incf x)))
 
-(test "call* expands compositions - 3"
-  :valueof (let ((a (lambda(x) 34))) (macex1 '(call* (compose* a incf) x)))
-  :should be '(call* a (call* incf x)))
+(test "call expands compositions - 3"
+  :valueof (let ((a (lambda(x) 34))) (macex1 '(call (compose* a incf) x)))
+  :should be '(call a (call incf x)))
