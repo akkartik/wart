@@ -4,7 +4,7 @@
   `(defun ,name ,@(compile-params params body)))
 
 (defmacro mac(name params &rest body)
-  (wt-transform `(defmacro ,name ,@(compile-params params body))))
+  (wt-transform `(defmacro$ ,name ,@(compile-params params body))))
 
 (defmacro fn(params &rest body)
   `(lambda ,@(compile-params params body)))
