@@ -4,11 +4,6 @@
   `(defun$ ,name(&rest ,$args)
      ,(compile-params params body $args)))
 
-(defmacro$ mac(name params &rest body)
-  (wt-transform
-    `(defmacro$ ,name(&rest ,$args)
-       ,(compile-params params body $args))))
-
 (defmacro$ fn(params &rest body)
   `(lambda(&rest ,$args)
      ,(compile-params params body $args)))

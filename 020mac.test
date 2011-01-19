@@ -1,0 +1,10 @@
+(wt-eval '(mac foo5(n) `(+ ,n 1)))
+(test-wart "simple mac"
+  :valueof (foo5 32)
+  :should be 33)
+
+(wt-eval '(def foo19(x) `(_let ,$x ,x (+ 1 ,$x))))
+(wt-eval '(mac foo20(x) (foo19 x)))
+(test-wart "mac sees $vars inside defs"
+  :valueof (foo20 3)
+  :should be 4)
