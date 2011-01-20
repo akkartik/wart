@@ -7,12 +7,13 @@
 (mac whenlet(var expr . body)
   `(iflet ,var ,expr (do ,@body)))
 
-(mac aif(expr then else . more-branches)
-  `(let it ,expr
-     (if it
-         ,@(if more-branches
-               `(,then (aif `(else ,@more-branches)))
-               `(,then ,else)))))
+(mac aif(expr then . more-branches)
+  (if then
+    `(let it ,expr
+       (if it
+          ,then
+          (aif ,@more-branches)))
+    expr))
 
 (mac awhen(expr . body)
   `(let it ,expr (if it (do ,@body))))
