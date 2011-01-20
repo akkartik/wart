@@ -1,3 +1,4 @@
+(wt-eval '(mac foo5(n) `(+ ,n 1)))
 (test-wart "simple mac"
   :valueof (foo5 32)
   :should be 33)

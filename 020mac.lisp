@@ -6,7 +6,7 @@
 
 (defmacro$ mac(name params &body body)
   (wt-transform
-    (let* (($os   (remove-if-not #'odollar-symbol-p params))
+    (let* (($os   (remove-if-not #'odollar-symbol-p (strip-rest params)))
            ($s  (mapcar #'odollar-symbol-to-dollar-symbol $os)))
       `(mac0 ,name ,params
          `(let ,(mapcar #'list (list ,@$s) (list ,@$os))
@@ -20,8 +20,3 @@
 
 (defun odollar-symbol-to-dollar-symbol(s)
   (intern (cut (symbol-name s) 1)))
-
-(prn (macex1 (macex1 '(mac foofoo(n) `(+ ,n 1)))))
-(prn (macex1 (macex1 '(mac foofoo(o$n) `(+ ,$n 1)))))
-(mac foofoo(n) `(+ ,n 1))
-(prn (macex1 '(foofoo 3)))
