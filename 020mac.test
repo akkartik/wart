@@ -1,10 +1,3 @@
-(prn (macex1 '(mac foo5(n) `(+ ,n 1))))
-(wt-eval '(mac foo5(n) `(+ ,n 1)))
-
-(prn (macex1 '(foo5 32)))
-;? (let* ((s928 os929))
-;?   `(+ ,n 1))
-
 (test-wart "simple mac"
   :valueof (foo5 32)
   :should be 33)

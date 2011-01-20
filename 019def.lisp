@@ -1,10 +1,10 @@
 ;; Functions with complex arg lists
 
-(defmacro$ def(name params &rest body)
+(defmacro$ def(name params &body body)
   `(defun$ ,name(&rest ,$args)
      ,(compile-params params body $args)))
 
-(defmacro$ fn(params &rest body)
+(defmacro$ fn(params &body body)
   `(lambda(&rest ,$args)
      ,(compile-params params body $args)))
 
