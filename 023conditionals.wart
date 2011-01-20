@@ -1,8 +1,10 @@
 (mac iflet(var o$expr then . rest)
-  `(if ,$expr
-     (let ,var ,$expr
-       ,then)
-     ,@rest))
+  (if then
+    `(if ,$expr
+       (let ,var ,$expr
+         ,then)
+       ,@rest)
+    $expr))
 
 (mac whenlet(var expr . body)
   `(iflet ,var ,expr (do ,@body)))

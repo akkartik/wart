@@ -1,4 +1,4 @@
-(test-wart "if with one arg"
+(test-wart "if works with no then"
   :valueof (if 34)
   :should be 34)
 
@@ -10,7 +10,11 @@
   :valueof (iflet a nil a 253)
   :should be 253)
 
-(test-wart "aif with one arg"
+(test-wart "iflet works with no then"
+  :valueof (iflet a 34)
+  :should be 34)
+
+(test-wart "aif works with no then"
   :valueof (aif 34)
   :should be 34)
 
