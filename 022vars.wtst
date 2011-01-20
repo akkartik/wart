@@ -18,8 +18,6 @@
 
 ; integration test: wrepl + mac + let
 (wt-eval '(mac aand(a b) `(let it ,a (and it ,b))))
-(prn (macex1 '(aand (- x 1) (> it 1))))
-(prn (wt-transform `(let x 3 ,(macex1 '(aand (- x 1) (> it 1))))))
 (test-wart "macro bodies should pass through the compiler"
   :valueof (let x 3 (aand (- x 1) (> it 1)))
   :should satisfy true_value)
