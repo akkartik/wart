@@ -2,11 +2,11 @@
 
 (defmacro$ def(name params &body body)
   `(defun$ ,name(&rest ,$args)
-     ,(compile-params params body $args)))
+     ,(compile-params params $args body)))
 
 (defmacro$ fn(params &body body)
   `(lambda(&rest ,$args)
-     ,(compile-params params body $args)))
+     ,(compile-params params $args body)))
 
 
 
@@ -17,7 +17,7 @@
 ; optionals can be destructured
 ; lazy optionals alternate var and default
 ; lazy optionals require keywords if rest is present
-(defun$ compile-params(params body args)
+(defun$ compile-params(params args body)
   `(let* ((,$positionals  (positional-args ,args ',(rest-param params)))
           (,$keywords   (keyword-args ,args ',(rest-param params))))
     (let* ,(append
