@@ -12,7 +12,7 @@
 (wt-eval '(mac foo21(o$x) `(* ,$x ,$x)))
 (test "mac handles o$vars"
   :valueof (macex1 '(foo21 3))
-  :should match '(let ((_ 3)) (* _ _)))
+  :should match '(let* ((_ 3)) (* _ _)))
 (test "mac handles o$vars - 2"
   :valueof (type-of (caar (cadr (macex1 '(foo21 3)))))
   :should be 'symbol)
