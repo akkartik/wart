@@ -21,10 +21,10 @@
 (defun odollar-symbol-to-dollar-symbol(s)
   (intern (cut (symbol-name s) 1)))
 
-(defmacro$ mac(name params &rest body)
-  (wt-transform
-    `(defmacro$ ,name(&rest ,$args)
-       ,(compile-oparams params body $args))))
+;? (defmacro$ mac(name params &rest body)
+;?   (wt-transform
+;?     `(defmacro$ ,name(&rest ,$args)
+;?        ,(compile-oparams params body $args))))
 
 ; like compile-params, but also handles o$vars
 
@@ -96,18 +96,37 @@
 ;? (let* ((s919 os920))
 ;?   `(+ ,$x 1))
 
-(defun$ compile-oparams(params body args)
-  (let* (($os  (remove-if-not #'odollar-symbol-p params))
-         ($s   (mapcar #'odollar-symbol-to-dollar-symbol $os)))
-  `(let* ((,$positionals  (positional-args ,args ',(rest-param params)))
-          (,$keywords   (keyword-args ,args ',(rest-param params))))
-    (let* ,(append
-             (get-required-arg-exprs params $positionals $keywords)
-             ; args go to rest before optional
-             (get-rest-arg-expr params $positionals $keywords)
-             (get-optional-arg-exprs params $positionals $keywords))
-        (cons 'let* (cons ',(mapcar #'list $s $os)
-          ',body))))))
+(defmacro compile-oparams-1(let-exprs body)
+  (prn let-exprs)
+  `(let* ,let-exprs ,@body))
+
+(defmacro$ mac(name params &rest body)
+  (wt-transform
+    (let* (($os  (remove-if-not #'odollar-symbol-p params))
+           ($s   (mapcar #'odollar-symbol-to-dollar-symbol $os)))
+    `(defmacro$ ,name(&rest ,$args)
+      (let* ((,$positionals  (positional-args ,$args ',(rest-param params)))
+             (,$keywords   (keyword-args ,$args ',(rest-param params))))
+        (let* ,(append
+                 (get-required-arg-exprs params $positionals $keywords)
+                 ; args go to rest before optional
+                 (get-rest-arg-expr params $positionals $keywords)
+                 (get-optional-arg-exprs params $positionals $keywords))
+          (compile-oparams-1 ,(mapcar #'list $s $os)
+            ,@body)))))))
+
+;? (defun$ compile-oparams(params body args)
+;?   (let* (($os  (remove-if-not #'odollar-symbol-p params))
+;?          ($s   (mapcar #'odollar-symbol-to-dollar-symbol $os)))
+;?   `(let* ((,$positionals  (positional-args ,args ',(rest-param params)))
+;?           (,$keywords   (keyword-args ,args ',(rest-param params))))
+;?     (let* ,(append
+;?              (get-required-arg-exprs params $positionals $keywords)
+;?              ; args go to rest before optional
+;?              (get-rest-arg-expr params $positionals $keywords)
+;?              (get-optional-arg-exprs params $positionals $keywords))
+;?         (cons 'let* (cons ',(mapcar #'list $s $os)
+;?           ',body))))))
 ; =>
 ;? (defmacro$ foofoo (&rest args911)
 ;?            (let* ((positionals912 (positional-args args911 'nil))
@@ -184,3 +203,4 @@
 ;? ;? (prn (compile-oparams '(o$x) '(`(+ ,$x 1)) 'args))
 ;? ;? (prn (compile-oparams '(n) '(`(+ ,n 1)) 'args))
 (prn (macex1 '(mac foofoo(n) `(+ ,n 1))))
+(prn (macex '(mac foofoo(n) `(+ ,n 1))))
