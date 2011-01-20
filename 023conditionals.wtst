@@ -18,6 +18,10 @@
   :valueof (aif 34)
   :should be 34)
 
+(test-wart "hack: beware of short-circuiting nil thens in aif or iflet"
+  :valueof (aif nil nil 34 35)
+  :should be nil)
+
 (test-wart "in works - 1"
   :valueof (let a 3 (in a 1 2 3))
   :should satisfy true_value)
