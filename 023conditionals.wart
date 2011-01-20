@@ -7,12 +7,12 @@
 (mac whenlet(var expr . body)
   `(iflet ,var ,expr (do ,@body)))
 
-(mac aif(expr . body)
+(mac aif(expr then . else)
   `(let it ,expr
      (if it
-         ,@(if (cddr body)
-               `(,car.body (aif ,@cdr.body))
-               body))))
+         ,@(if (cdr else) ; more conditions
+               `(,then (aif ,@else))
+               `(,then ,@else)))))
 
 (mac awhen(expr . body)
   `(let it ,expr (if it (do ,@body))))
