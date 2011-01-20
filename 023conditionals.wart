@@ -1,6 +1,8 @@
-(mac iflet(var expr then . rest)
-  `(let ,$expr ,expr
-     (if ,$expr (let ,var ,$expr ,then) ,@rest)))
+(mac iflet(var o$expr then . rest)
+  `(if ,$expr
+     (let ,var ,$expr
+       ,then)
+     ,@rest))
 
 (mac whenlet(var expr . body)
   `(iflet ,var ,expr (do ,@body)))
@@ -22,9 +24,9 @@
 (mac afn(parms . body)
   `(rfn self ,parms ,@body))
 
-(mac in(x . choices)
-  `(let ,$x ,x
-     (or ,@(map (fn(c) `(is ,$x ,c)) choices))))
+(mac in(o$x . choices)
+  `(or ,@(map (fn(c) `(is ,$x ,c))
+              choices)))
 
 (def testify(x)
   (or (function-value x)
@@ -43,11 +45,10 @@
   `(caselet ,(uniq) ,expr ,@args))
 (defover case wart-case)
 
-(mac check(expr test ? alt nil)
-  `(let ,$expr ,expr
-     (if (call ',test ,$expr)
-       ,$expr
-       ,alt)))
+(mac check(o$expr test ? alt nil)
+   `(if (call ',test ,$expr)
+     ,$expr
+     ,alt))
 
 (def orf fns
   (fn args
