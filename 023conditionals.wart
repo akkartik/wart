@@ -9,8 +9,8 @@
 (mac whenlet(var expr . body)
   `(iflet ,var ,expr (do ,@body)))
 
-(mac aif(expr then . more-branches)
-  `(iflet it ,expr ,then ,@more-branches))
+(mac aif(expr . branches)
+  `(iflet it ,expr ,@branches))
 
 (mac awhen(expr . body)
   `(let it ,expr (if it (do ,@body))))
