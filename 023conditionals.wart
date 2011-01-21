@@ -49,7 +49,7 @@
 (defover case wart-case)
 
 (mac check(o$expr test ? alt nil)
-   `(if (call ',test ,$expr)
+  `(if (call ',test ,$expr)
      ,$expr
      ,alt))
 
