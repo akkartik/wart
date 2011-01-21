@@ -1,16 +1,16 @@
-(mac iflet(var o$expr then . rest)
-  (if then
+(mac iflet(var o$expr then . more-branches)
+  (if (or then more-branches)
     `(if ,$expr
        (let ,var ,$expr
          ,then)
-       ,@rest)
+       ,@more-branches)
     $expr))
 
 (mac whenlet(var expr . body)
   `(iflet ,var ,expr (do ,@body)))
 
 (mac aif(expr then . more-branches)
-  (if then
+  (if (or then more-branches)
     `(let it ,expr
        (if it
           ,then

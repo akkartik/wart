@@ -14,13 +14,17 @@
   :valueof (iflet a 34)
   :should be 34)
 
+(test-wart "iflet works with nil then"
+  :valueof (iflet a nil nil 34 35)
+  :should be 35)
+
 (test-wart "aif works with no then"
   :valueof (aif 34)
   :should be 34)
 
-(test-wart "hack: beware of short-circuiting nil thens in aif or iflet"
+(test-wart "aif works with nil then"
   :valueof (aif nil nil 34 35)
-  :should be nil)
+  :should be 35)
 
 (test-wart "in works - 1"
   :valueof (let a 3 (in a 1 2 3))
