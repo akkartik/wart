@@ -19,8 +19,20 @@
   :should be 35)
 
 (test-wart "iflet binds multiple conditions"
-  :valueof (iflet a nil 34 35 (+ 1 a))
+  :valueof (iflet a nil 34
+                    35  (+ 1 a))
   :should be 36)
+
+(test-wart "iflet destructures"
+  :valueof (iflet (a b)
+              '(3 4)  42)
+  :should be 42)
+
+(test-wart "iflet destructures - 2"
+  :valueof (iflet (a b)
+              nil   34
+              '(4 5) (cons a b))
+  :should be '(4 . 5))
 
 (test-wart "aif works with no then"
   :valueof (aif 34)
