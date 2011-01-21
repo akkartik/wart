@@ -18,6 +18,10 @@
   :valueof (iflet a nil nil 34 35)
   :should be 35)
 
+(test-wart "iflet binds multiple conditions"
+  :valueof (iflet a nil 34 35 (+ 1 a))
+  :should be 36)
+
 (test-wart "aif works with no then"
   :valueof (aif 34)
   :should be 34)
