@@ -22,6 +22,11 @@
     ((isa f 'function)  f)
     ((function-name-p f)  (eval `(function ,f)))))
 
+(defun idfn(x) x)
+
+(defmacro thunk(&body body)
+  `(lambda() ,@body))
+
 
 
 ;; Internals

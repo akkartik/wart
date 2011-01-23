@@ -22,6 +22,10 @@
 
 (defsetf rep setrep)
 
+(defun macp(f)
+  (and (symbolp f)
+       (macro-function f)))
+
 
 
 (setf *wart-coercions* (table))
