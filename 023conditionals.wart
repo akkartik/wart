@@ -1,11 +1,10 @@
 (mac iflet(var o$expr . branches)
-  `(if ,$expr
-     ,(if branches
-        `(let ,var ,$expr
-          ,(car branches))
-        $expr)
-     ,(if branches
-        `(iflet ,var ,@(cdr branches)))))
+  (if branches
+    `(if ,$expr
+       (let ,var ,$expr
+         ,(car branches))
+       (iflet ,var ,@(cdr branches)))
+    $expr))
 
 (mac whenlet(var expr . body)
   `(iflet ,var ,expr (do ,@body)))
