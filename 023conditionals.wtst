@@ -42,6 +42,10 @@
   :valueof (aif nil nil 34 35)
   :should be 35)
 
+(test-wart "aif works with nil then - 2"
+  :valueof (aif t nil)
+  :should be nil)
+
 (test-wart "in works - 1"
   :valueof (let a 3 (in a 1 2 3))
   :should satisfy true_value)
