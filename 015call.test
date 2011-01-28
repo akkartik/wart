@@ -22,7 +22,7 @@
 
 (test-wart "call nests"
   :valueof (macex '(call (call a 3) 4))
-  :should be '(call-fn (call a 3) 4))
+  :should be '(call-fn (fslot (call a 3)) 4))
 
 (test "call expands compositions"
   :valueof (macex1 '(call (compose incf foo) x))

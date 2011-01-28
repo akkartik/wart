@@ -5,7 +5,7 @@
          args))
 
 (defmacro wart-apply(f &rest args)
-  `(call-fn (apply-fn (wart-coerce ,f 'function))
+  `(call-fn (apply-fn (wart-coerce (fslot ,f) 'function))
             ,@args))
 (defover apply wart-apply)
 
@@ -47,3 +47,8 @@
       (if (consp (car xs))
         (car xs)
         xs))))
+
+(defmacro fslot(f)
+  (if (and (atom f) (fboundp f))
+    `(function ,f)
+    f))

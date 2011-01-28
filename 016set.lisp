@@ -2,9 +2,6 @@
 
 (defover = setf)
 
-(defmacro wipe(x)
-  `(setf ,x nil))
-
 ; strictly 3 args
 (defmacro defset(type args &rest body)
   `(defcoerce ,type function=

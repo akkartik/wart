@@ -4,8 +4,3 @@
 
 (defmacro compose(f g)
   `(compose-fn (fslot ,f) (fslot ,g)))
-
-(defmacro fslot(f)
-  (if (and (atom f) (fboundp f))
-    `(function ,f)
-    f))

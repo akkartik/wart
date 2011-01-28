@@ -1,0 +1,15 @@
+(test-wart "set works"
+  :valueof (let x nil
+             (set x)
+             x)
+  :should be t)
+
+(test-wart "wipe works"
+  :valueof (let x 34
+             (wipe x)
+             x)
+  :should be nil)
+
+(test-wart "wipe works for multiple args"
+  :valueof (do (wipe x y z) (list x y z))
+  :should be '(nil nil nil))

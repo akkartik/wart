@@ -5,23 +5,21 @@
 (defmacro call(f &rest args)
   (cond
     ((macp f)  `(,f ,@args))
-    ((and (atom f) (fboundp f))  `(call-fn (function ,f) ,@args))
-    ((macro-composition-p f)   (expand-composition f args))
-    (t  `(call-fn ,f ,@args))))
+    ((compose-form-p f)   (expand-composition f args))
+    (t  `(call-fn (fslot ,f) ,@args))))
 
 
 
 ;; Internals
 
-(defun macro-composition-p(expr)
-  (and (consp expr)
-       (is 'compose (car expr))))
+(defun compose-form-p(expr)
+  (match expr '(compose _ _)))
 
 (defun expand-composition(f args)
   (apply-nested-calls (compositions f) args))
 
 (defun compositions(f)
-  (if (macro-composition-p f)
+  (if (compose-form-p f)
     (append (compositions (cadr f))
             (compositions (caddr f)))
     (list f))) ; Assumption: compose operates only on syms
