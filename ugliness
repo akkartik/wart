@@ -7,3 +7,5 @@ function that can't handle symbols.
 
 how to make map generic? what should the semantics be? Should it always return a list? The original
 type?
+
+boundp ignores lexical bindings.
