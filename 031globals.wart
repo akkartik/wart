@@ -1,0 +1,11 @@
+;; Defining globals
+
+(mac alias(f g)
+  `(mac ,f args
+     (cons ',g args)))
+
+(alias const =)
+
+(mac init args
+  `(unless (bound ',(car args))
+     (= ,@args)))
