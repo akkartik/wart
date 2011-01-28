@@ -1,3 +1,11 @@
+(test-wart "map works"
+  :valueof (map '1+ '(2 3 4))
+  :should be '(3 4 5))
+
+(test-wart "map works on strings"
+  :valueof (map 'char-upcase "abc")
+  :should be "ABC")
+
 (test-wart "new redefined let"
   :valueof (let a 3 a)
   :should be 3)
@@ -9,10 +17,6 @@
 (test-wart "new keyword - with"
   :valueof (with (a 3) a)
   :should be 3)
-
-(test-wart "map works"
-  :valueof (map '1+ '(2 3 4))
-  :should be '(3 4 5))
 
 
 

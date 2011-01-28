@@ -78,6 +78,22 @@
   :valueof (join "abc" "def")
   :should be "abcdef")
 
+(test-wart "map works"
+  :valueof (map '1+ '(2 3 4))
+  :should be '(3 4 5))
+
+(test-wart "map works on strings"
+  :valueof (map 'char-upcase "abc")
+  :should be "ABC")
+
+(defmethod map(f . seqs) footype2
+  ;(let newseqs (map 'rep seqs)
+    (annotate 'footype2 (map f seqs))) ;newseqs))))
+(test-wart "map works on userdefined types"
+  :valueof (map 'len (list (annotate 'footype '(3 4))
+                           (annotate 'footype '(1 2 3))))
+  :should be (annotate 'footype '(2 3)))
+
 
 
 ; integration test: obj + set + iso
