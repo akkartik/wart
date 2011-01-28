@@ -2,6 +2,15 @@
   :valueof (call-fn (coerce 'car 'function) '(3))
   :should be 3)
 
+(test-wart "wart-apply works"
+  :valueof (wart-apply + '(1 2 3))
+  :should be 6)
+
+(prn (macex1 '(wart-apply incf '(a))))
+(test-wart "wart-apply works on macros"
+  :valueof (_let a 3 (wart-apply incf (a)) a)
+  :should be 4)
+
 (test-wart "call-fn works on simple functions"
   :valueof (call-fn 'car '(1))
   :should be 1)

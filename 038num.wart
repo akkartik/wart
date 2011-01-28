@@ -1,0 +1,2 @@
+(def mapn (f a b)
+  (call rev^accumulate :over a :taking f :next '1+ :until [> _ b]))

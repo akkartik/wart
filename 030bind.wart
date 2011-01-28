@@ -1,8 +1,8 @@
 ;; Primitives for binding variables
 
 (defover cl-map map) ; keep old version around since ours is weaker for now
-(mac wart-map(f . seqs)
-  `(map 'list ,f ,@seqs)) ; recursive map won't be transformed
+(def wart-map(f . seqs)
+  (apply 'map 'list f seqs))
 (defover map wart-map)
 
 (mac with(parms . body)
@@ -22,3 +22,7 @@
       `(do ,@body)
       `(let ,(car parms) ,(cadr parms)
          (withs ,(cddr parms) ,@body))))
+
+(mac alias(f g)
+  `(def ,f args
+     (apply ',g args)))

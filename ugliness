@@ -4,3 +4,6 @@ case-insensitive symbols. converting strings to syms loses information.
 
 can't defover string because it's also a type. so we're stuck with a useless
 function that can't handle symbols.
+
+how to make map generic? what should the semantics be? Should it always return a list? The original
+type?

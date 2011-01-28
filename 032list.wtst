@@ -10,3 +10,7 @@
 (test-wart "last has arc semantics rather than common lisp semantics"
   :valueof (last '(1 2 3))
   :should be 3)
+
+(test-wart "mappend works"
+  :valueof (mappend [list (* _ 10)] '(1 2 3))
+  :should be '(10 20 30))
