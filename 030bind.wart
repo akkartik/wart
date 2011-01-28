@@ -1,8 +1,7 @@
 ;; Primitives for binding variables
 
-(defover cl-map map) ; keep old version around since ours is weaker for now
 (def wart-map(f . seqs)
-  (apply 'map 'list f seqs))
+  (apply 'map (type car.seqs) f seqs))
 (defover map wart-map)
 
 (mac with(parms . body)

@@ -1,5 +1,5 @@
 (defcoerce symbol string
-  [cl-map 'string 'char-downcase (symbol-name _)])
+  [map 'char-downcase (symbol-name _)])
 (defcoerce symbol cons
   [as cons (as string _)])
 (defcoerce cons symbol
