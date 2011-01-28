@@ -5,12 +5,8 @@
          args))
 
 (defmacro wart-apply(f &rest args)
-  (prn f)
-  (prn (symbolp f))
-  (if (macp f)
-    `(,f ,@(inline-last args))
-    `(call-fn (apply-fn (wart-coerce ',f 'function))
-              ,@args)))
+  `(call-fn (apply-fn (wart-coerce ,f 'function))
+            ,@args))
 (defover apply wart-apply)
 
 (defmacro defcall(type arg &rest body)
