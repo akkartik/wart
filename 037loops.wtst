@@ -1,0 +1,4 @@
+(test-wart "drain works"
+  :valueof (let s '(1 2 3)
+             (drain (pop s)))
+  :should be '(1 2 3))

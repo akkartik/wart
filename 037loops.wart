@@ -20,3 +20,19 @@
 (mac awhile(expr . body)
   `(whilet it ,expr
     ,@body))
+
+(mac for(var init term inc . body)
+  `(let ,var ,init
+     (while ,term
+        ,@body
+        ,inc)))
+
+(mac drain(expr ? eof nil)
+  `(with (,$acc nil
+          ,$done nil)
+    (while (no ,$done)
+      (let ,$res ,expr
+        (if (is ,$res ,eof)
+          (= ,$done t)
+          (push ,$res ,$acc))))
+    (rev ,$acc)))

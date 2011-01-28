@@ -19,7 +19,6 @@
   (if (match x '(tagged _ _))
     (setf (elt x 2) y)
     (setf x y)))
-
 (defsetf rep setrep)
 
 (defun macp(f)
