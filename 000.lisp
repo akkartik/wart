@@ -29,8 +29,16 @@
          uniq gensym
          macex macroexpand
          macex1 macroexpand-1
-         err error
-         errsafe ignore-errors)
+         err error)
+
+
+
+(defmacro macro-alias(a b)
+  (let ((args (gensym)))
+    `(defmacro ,a(&rest ,args)
+       (cons ',b ,args))))
+
+(macro-alias errsafe ignore-errors)
 
 (defun match(a b)
   (or (is a b)

@@ -24,5 +24,6 @@
 
 ; bound now recognizes local vars
 ; assumes wiped vars are unbound
-(mac wart-boundp(x) `(ignore-errors ,x))
+(mac wart-boundp(x) `(errsafe ,x))
+;(macro-alias wart-boundp errsafe)
 (defover boundp wart-boundp)
