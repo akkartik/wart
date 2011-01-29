@@ -34,8 +34,9 @@
 
 
 (defmacro macro-alias(a b)
-  `(defmacro ,a(&rest args)
-     `(,',b ,@args)))
+  (let ((args (uniq)))
+    `(defmacro ,a(&rest ,args)
+       `(,',b ,@,args))))
 
 (macro-alias errsafe ignore-errors)
 
