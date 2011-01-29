@@ -1,3 +1,18 @@
+(test "macp recognizes lexicals before macros"
+  :valueof (_let incf 3 (macp incf))
+  :should be nil)
+
+(defun mfoo(x) (macp x))
+(test "macp recognizes macros inside function calls"
+  :valueof (mfoo 'incf)
+  :should satisfy true_value)
+
+(test "macp recognizes lexicals before macros inside function calls"
+  :valueof (_let incf 3 (mfoo incf))
+  :should be nil)
+
+
+
 (test "wart-type handles integer types"
   :valueof (wart-type 3)
   :should be 'integer)

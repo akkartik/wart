@@ -2,9 +2,9 @@ inserting say prn^ requires a call-fn or call. still a single edit, though.
 
 case-insensitive symbols. converting strings to syms loses information.
 
+macp takes unquoted syms but symbolp and functionp take quoted syms.
+
 can't defover string because it's also a type. so we're stuck with a useless
 function that can't handle symbols.
 
 map is not generic.
-
-boundp ignores lexical bindings.
