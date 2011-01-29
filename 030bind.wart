@@ -25,3 +25,8 @@
 (mac alias(f g)
   `(def ,f args
      (apply ',g args)))
+
+; bound now recognizes local vars
+; assumes wiped vars are unbound
+(mac wart-boundp(x) `(ignore-errors ,x))
+(defover boundp wart-boundp)

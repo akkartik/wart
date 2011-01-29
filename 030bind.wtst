@@ -18,6 +18,28 @@
   :valueof (with (a 3) a)
   :should be 3)
 
+(setf a nil)
+(test-wart "boundp assumes wiped vars are unbound"
+  :valueof (boundp a)
+  :should be nil)
+
+(test-wart "boundp works for lexicals"
+  :valueof (let a 3 (boundp a))
+  :should satisfy true_value)
+
+(test-wart "boundp works for lexicals - 2"
+  :valueof (boundp a)
+  :should be nil)
+
+(test-wart "boundp no longer needs quoting"
+  :valueof (let a 3 (boundp a))
+  :should satisfy true_value)
+
+(setf a 3)
+(test-wart "boundp works as before on globals"
+  :valueof (boundp a)
+  :should satisfy true_value)
+
 
 
 ; integration test: wrepl + mac + let
