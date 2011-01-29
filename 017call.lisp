@@ -2,25 +2,9 @@
 ; knows about compose so that we can use ssyntax with macros
 ;   ++^h.1 => (call incf (call h 1))
 ; ssyntax doesn't seem a good fit for a lisp-2.
-
-(defmacro macp*(x)
-  `(and (not (wart-boundp ,`(eval ,x)))
-        (macp ,x)))
 (defmacro call(f &rest args)
-  (prn f)
-  (prn "a")
-  (prn (symbolp 'macfoo))
-  (prn "b")
-  (prn (errsafe macfoo))
-  (prn "c")
-  (prn (wart-boundp macfoo))
-  (prn "m")
-  (prn (macp* f))
-  (prn (wart-boundp f))
-  (prn "zz")
   (cond
-    ((macp* f)   `(,f ,@args))
-;?     ((and (not (boundp f)) (macp f))  `(,f ,@args))
+    ((macp f)   `(,f ,@args))
     ((compose-form-p f)   (expand-composition f args))
     (t  `(call-fn (fslot ,f) ,@args))))
 
