@@ -86,13 +86,6 @@
   :valueof (map 'char-upcase "abc")
   :should be "ABC")
 
-(wt-eval '(defmethod wart-map2(f . seqs) footype2
-            (let newseqs (map 'rep seqs)
-              (annotate 'footype2 (map f newseqs)))))
-(test-wart "map works on userdefined types"
-  :valueof (map 'len (annotate 'footype '(3 4)))
-  :should be (annotate 'footype '(2 3)))
-
 
 
 ; integration test: obj + set + iso
