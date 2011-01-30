@@ -1,14 +1,5 @@
 ;; Extensible coercion
 
-(defun macp-fn(f)
-  (and (symbolp f)
-       (macro-function f)))
-
-(defmacro macp(x)
-  `(and (not (wart-boundp ,`(eval ,x)))
-;?         (not (wart-boundp ,`(eval ',x)))
-        (macp-fn ,x)))
-
 (defun wart-type(x)
   (cond
     ((macp x)   'macro)
@@ -29,6 +20,10 @@
     (setf (elt x 2) y)
     (setf x y)))
 (defsetf rep setrep)
+
+(defun macp(f)
+  (and (symbolp f)
+       (macro-function f)))
 
 
 
