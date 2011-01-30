@@ -22,7 +22,7 @@
         ,inc)))
 
 (mac down(var init min . body)
-  `(for ,var ,init (> ,var ,min) (= ,var (1- ,var))
+  `(for ,var ,init (> ,var ,min) (-- ,var)
      ,@body))
 
 (mac repeat(n . body)

@@ -6,3 +6,11 @@
 (mac wipe places
   `(do ,@(map0 (fn(x) `(= ,x nil))
                places)))
+
+(macro-alias rotate rotatef)
+
+(mac swap(place1 place2)
+  `(rotate ,place1 ,place2))
+
+(mac zap(f place . args)
+  `(= ,place (,f ,place ,@args)))

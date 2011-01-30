@@ -10,6 +10,7 @@
 (macro-alias do1 prog1)
 
 (defover ++ incf)
+(macro-alias -- decf)
 
 (defover load wart-load)
 

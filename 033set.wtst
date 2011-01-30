@@ -13,3 +13,17 @@
 (test-wart "wipe works for multiple args"
   :valueof (do (wipe x y z) (list x y z))
   :should be '(nil nil nil))
+
+(test-wart "swap works"
+  :valueof (with (a 3 b 4) (swap a b) (cons a b))
+  :should be '(4 . 3))
+
+(test-wart "rotate works"
+  :valueof (with (a 3 b 4 c 5) (rotate a b c) (list a b c))
+  :should be '(4 5 3))
+
+(wt-eval '(mac pull(f seq)
+            `(zap [remove-if ,f _] ,seq)))
+(test-wart "zap works"
+  :valueof (let x '(1 100 2 50 3) (pull [< _ 10] x) x)
+  :should be '(100 50))
