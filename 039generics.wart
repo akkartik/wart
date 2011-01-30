@@ -33,30 +33,19 @@
   :coerce-to-cons)
 (defover some wart-some)
 
-(defgeneric all(test xs)
-  (let f testify.test
-    (if
-      (no xs)           t
-      (call f car.xs)   (all f cdr.xs))))
-(defmethod all(f xs) string
-  :coerce-to-cons)
+(def all(test xs)
+  (call ~some ~testify.test xs))
 
 (deftransform wart-keep(f seq)
   (if (no seq)          nil
       (call f car.seq)  (cons car.seq (keep f cdr.seq))
                         (keep f cdr.seq)))
-(defmethod wart-keep(f xs) string
+(defmethod wart-keep(f s) string
   :coerce-to-cons)
 (defover keep wart-keep)
 
-(deftransform wart-rem(test seq)
-  (let f testify.test
-    (if
-      (no seq)          nil
-      (call f car.seq)  (wart-rem f cdr.seq)
-                        (cons car.seq (wart-rem f cdr.seq)))))
-(defmethod wart-rem(f xs) string
-  :coerce-to-cons)
+(def wart-rem(test seq)
+  (keep ~testify.test seq))
 (defover rem wart-rem)
 
 (ignore-redef
