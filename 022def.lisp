@@ -8,6 +8,9 @@
   `(lambda(&rest ,$args)
      ,(compile-params params $args body)))
 
+(defmacro proc(name args . body)
+  `(def ,name ,args ,@body nil))
+
 
 
 ;; Internals

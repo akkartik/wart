@@ -6,8 +6,8 @@
     `(cond ,@(tuples 2 args))))
 (defover if wart-if)
 
-(mac wart-do args `(call (fn() ,@args)))
-(defover do wart-do)
+(defover do progn)
+(macro-alias do1 prog1)
 
 (defover ++ incf)
 
