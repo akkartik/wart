@@ -54,10 +54,6 @@
   (defgeneric* join args
     (apply 'concatenate (type (car args)) args)))
 
-(mac each(var xs . body)
-  `(some (fn(,var) ,@body nil)
-         ,xs))
-
 (defgeneric wart-map(f . seqs)
   (apply 'map0 f seqs))
 (defover map wart-map)

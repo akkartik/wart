@@ -78,24 +78,6 @@
   :valueof (join "abc" "def")
   :should be "abcdef")
 
-(test-wart "each works"
-  :valueof (let counter 0
-             (each x '(1 2 3) ++.counter)
-             counter)
-  :should be 3)
-
-(test-wart "each binds var"
-  :valueof (let counter 0
-             (each x '(1 2 3) (++ counter x))
-             counter)
-  :should be 6)
-
-(test-wart "each works on strings"
-  :valueof (let acc nil
-             (each x "abc" (setf acc (cons x acc)))
-             acc)
-  :should be '(#\c #\b #\a))
-
 (test-wart "map works"
   :valueof (map '1+ '(2 3 4))
   :should be '(3 4 5))
