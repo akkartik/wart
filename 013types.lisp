@@ -6,6 +6,7 @@
 
 (defmacro macp(x)
   `(and (not (wart-boundp ,`(eval ,x)))
+;?         (not (wart-boundp ,`(eval ',x)))
         (macp-fn ,x)))
 
 (defun wart-type(x)

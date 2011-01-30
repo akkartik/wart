@@ -1,7 +1,19 @@
+(test-wart "boundp handles quoted vars like before"
+  :valueof (boundp 'zzzdfewdf)
+  :should be nil)
+
+(test-wart "boundp handles unbound vars without raising an error"
+  :valueof (boundp zzzdfewdf)
+  :should be nil)
+
 (setf a 3)
 (test-wart "boundp needs no quoting"
   :valueof (boundp a)
   :should satisfy true_value)
+
+(test-wart "boundp handles quoted vars just like they weren't quoted"
+  :valueof (boundp 'a)
+  :should be (wart-boundp a))
 
 (setf a nil)
 (test-wart "boundp assumes wiped vars are unbound"
