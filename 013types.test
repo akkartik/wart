@@ -2,11 +2,6 @@
   :valueof (macp 'incf)
   :should satisfy true_value)
 
-(setf a 'incf)
-(test "macp recognizes macros"
-  :valueof (macp a)
-  :should satisfy true_value)
-
 
 
 (test "wart-type handles integer types"
