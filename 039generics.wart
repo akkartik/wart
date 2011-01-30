@@ -24,13 +24,15 @@
 
 
 
-(defgeneric wart-some(f xs)
-  (if
-    (no xs)           nil
-    (call f car.xs)   t
-                      (wart-some f cdr.xs)))
-(defmethod wart-some(f xs) string
+(defgeneric reclist(f xs)
+  (and xs
+       (or (call f xs)
+           (reclist f cdr.xs))))
+(defmethod reclist(f s) string
   :coerce-to-cons)
+
+(def wart-some(f seq)
+  (reclist f^car seq))
 (defover some wart-some)
 
 (def all(test xs)
