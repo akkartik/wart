@@ -33,6 +33,6 @@
     (while (no ,$done)
       (let ,$res ,expr
         (if (is ,$res ,eof)
-          (= ,$done t)
+          (set ,$done)
           (push ,$res ,$acc))))
     (rev ,$acc)))
