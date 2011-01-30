@@ -1,13 +1,12 @@
 ;; Primitives for binding variables
 
-(def wart-map(f . seqs)
+(def map0(f . seqs)
   (apply 'map (type car.seqs) f seqs))
-(defover map wart-map)
 
 (mac with(parms . body)
-  `(call (fn ,(map 'car pair.parms)
+  `(call (fn ,(map0 'car pair.parms)
            ,@body)
-         ,@(map 'cadr pair.parms)))
+         ,@(map0 'cadr pair.parms)))
 
 (mac wart-let(var val . body)
   `(with (,var ,val) ,@body))

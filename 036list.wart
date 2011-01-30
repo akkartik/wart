@@ -28,4 +28,4 @@
         over starting))
 
 (def mappend(f . args)
-  (apply 'join (apply 'map f args)))
+  (apply 'join (apply 'map0 f args)))

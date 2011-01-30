@@ -1,8 +1,8 @@
 (mac wart-set places
-  `(do ,@(map (fn(x) `(= ,x t))
-              places)))
+  `(do ,@(map0 (fn(x) `(= ,x t))
+               places)))
 (defover set wart-set)
 
 (mac wipe places
-  `(do ,@(map (fn(x) `(= ,x nil))
-              places)))
+  `(do ,@(map0 (fn(x) `(= ,x nil))
+               places)))

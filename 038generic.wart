@@ -5,7 +5,7 @@
 
 (mac defgeneric*(name args . body)
   `(generic-expander ,name ,$allargs ,args ,body
-     (apply ',name (map [coerce _ 'cons] ,$allargs))))
+     (apply ',name (map0 [coerce _ 'cons] ,$allargs))))
 
 (mac deftransform(name args . body)
   `(generic-expander ,name ,$allargs ,args ,body
@@ -14,7 +14,7 @@
 
 (mac deftransform*(name args . body)
   `(generic-expander ,name ,$allargs ,args ,body
-     (coerce (apply ',name (map [coerce _ 'cons] ,$allargs))
+     (coerce (apply ',name (map0 [coerce _ 'cons] ,$allargs))
              (type (last ,$allargs)))))
 
 (mac wart-defmethod(name args type . body)

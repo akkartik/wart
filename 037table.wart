@@ -15,18 +15,18 @@
 (defcoerce cons hash-table
   (fn(l)
     (ret ans (table)
-      (map (fn((a b))
-             (= ans.a b))
-           l))))
+      (map0 (fn((a b))
+              (= ans.a b))
+            l))))
 
 (defcoerce null hash-table
   [table])
 
 (mac obj args
   `(as hash-table
-       (list ,@(map (fn ((k v))
-                       `(list ',k ,v))
-                    pair.args))))
+       (list ,@(map0 (fn ((k v))
+                        `(list ',k ,v))
+                     pair.args))))
 
 (def keys(table)
   (ret ans ()
