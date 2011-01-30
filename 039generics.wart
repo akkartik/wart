@@ -55,9 +55,7 @@
     (apply 'concatenate (type (car args)) args)))
 
 (mac each(var xs . body)
-  `(some (fn(,var)
-           ,@body
-           nil)
+  `(some (fn(,var) ,@body nil)
          ,xs))
 
 (defgeneric wart-map(f . seqs)

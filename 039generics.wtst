@@ -104,6 +104,12 @@
   :valueof (map 'char-upcase "abc")
   :should be "ABC")
 
+(wt-eval '(defmethod map(f . seqs) footype
+            (apply 'map0 f (map0 'rep seqs))))
+(test-wart "map works on user-defined types"
+  :valueof (map 'len (annotate 'footype '((2 3) (3 4 4 6))))
+  :should be '(2 4))
+
 
 
 ; integration test: obj + set + iso
