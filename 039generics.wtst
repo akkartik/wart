@@ -104,10 +104,6 @@
   :valueof (map 'char-upcase "abc")
   :should be "ABC")
 
-(test-wart "map-as works on strings"
-  :valueof (map-as cons 'char-upcase "abc")
-  :should be '(#\A #\B #\C))
-
 
 
 ; integration test: obj + set + iso
