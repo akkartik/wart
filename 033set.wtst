@@ -27,3 +27,7 @@
 (test-wart "zap works"
   :valueof (let x '(1 100 2 50 3) (pull [< _ 10] x) x)
   :should be '(100 50))
+
+(test-wart "accum works"
+  :valueof (accum acc (map0 [acc (* _ 10)] '(1 2 3)))
+  :should be '(10 20 30))

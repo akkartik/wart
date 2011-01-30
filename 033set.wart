@@ -14,3 +14,9 @@
 
 (mac zap(f place . args)
   `(= ,place (,f ,place ,@args)))
+
+(mac accum(accfn . body)
+  `(let ,$acc nil
+     (labels ((,accfn(_) (push _ ,$acc)))
+       ,@body)
+     (rev ,$acc)))

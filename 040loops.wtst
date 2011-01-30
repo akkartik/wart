@@ -1,3 +1,10 @@
+(test-wart "whiler works"
+  :valueof (accum acc
+             (with-input-from-string(f "abcdef")
+               (whiler x (read-char f) #\d
+                  (acc x))))
+  :should be '(#\a #\b #\c))
+
 (test-wart "drain works"
   :valueof (let s '(1 2 3)
              (drain (pop s)))

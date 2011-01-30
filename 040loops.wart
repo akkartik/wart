@@ -15,6 +15,11 @@
   `(whilet it ,expr
     ,@body))
 
+(mac whiler(var expr endval . body)
+  `(withs (,var nil ,$f (testify ,endval))
+     (while (no (call ,$f (= ,var ,expr)))
+       ,@body)))
+
 (mac for(var init term inc . body)
   `(let ,var ,init
      (while ,term
