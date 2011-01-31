@@ -2,12 +2,13 @@
   x)
 
 (init-vtable unserialize(x) x)
+(wipe vtables*!unserialize!cons)
 (defun unserialize(x)
   (aif (aand (gethash 'unserialize vtables*)
              (call it type.x))
     (call it x)
     (if (isa x 'cons)
-      (map unserialize x)
+      (map 'unserialize x)
       x)))
 
 

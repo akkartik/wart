@@ -15,3 +15,7 @@
                    hs (tostring write.h))
              (iso h (fromstring hs (read))))
   :should be t)
+
+(test-wart "unserialize nests through lists"
+  :valueof (unserialize `(1 2 ,(annotate 'hash-table nil)))
+  :should be `(1 2 ,(table)))
