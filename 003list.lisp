@@ -50,7 +50,7 @@
 (defun group-by(f xs &optional acc)
   (if xs
     (group-by f (cdr xs)
-              (append-or-afresh [is (funcall f _)
+              (append-or-afresh [eq (funcall f _)
                                     (funcall f (car (car acc)))]
                                 (car xs)
                                 acc))

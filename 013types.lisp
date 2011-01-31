@@ -46,7 +46,7 @@
            ,converter)))
 
 (defun isa(elem typ)
-  (is typ (wart-type elem)))
+  (iso typ (wart-type elem)))
 
 
 

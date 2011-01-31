@@ -64,11 +64,11 @@
     ((assoc var keywords)  (alref var keywords))
     ((no params)  (values (call no-params positionals)
                           'no-arg))
-    ((is params var)  positionals)
+    ((eq params var)  positionals)
     ((not (consp params))   (values nil 'no-arg))
     ((assoc (car params) keywords)  (get-arg var (cdr params) positionals keywords :no-params no-params))
     ((no positionals)  (values nil 'no-arg))
-    ((is (car params) var)  (car positionals))
+    ((eq (car params) var)  (car positionals))
     (t   (fa (get-arg var (car params) (car positionals) keywords :no-params no-params)
              (get-arg var (cdr params) (cdr positionals) keywords :no-params no-params)))))
 
@@ -92,7 +92,7 @@
     ((not (consp args))  ())
     ((keywordp (car args))  (let* ((param (keyword->symbol (car args))))
                               (cons (cons param
-                                          (if (is param rest-param)
+                                          (if (eq param rest-param)
                                             (cdr args)
                                             (cadr args)))
                                     (keyword-args (cddr args) rest-param))))
@@ -101,7 +101,7 @@
 (defun positional-args(args rest-param)
   (cond
     ((no args)  ())
-    ((keywordp (car args))  (if (is rest-param (keyword->symbol (car args)))
+    ((keywordp (car args))  (if (eq rest-param (keyword->symbol (car args)))
                               ()
                               (positional-args (cddr args) rest-param)))
     (t   (cons (car args)
@@ -111,7 +111,7 @@
   (cond
     ((no params)  ())
     ((rest-param-p params)  params)
-    ((is (car params) '?)   (strip-defaults (cdr params) t))
+    ((eq '? (car params))   (strip-defaults (cdr params) t))
     (t   (cons (car params)
                (strip-defaults
                  (if past-? (cddr params) (cdr params))
@@ -147,6 +147,6 @@
   (not (consp params)))
 
 (defun keyword->symbol(k)
-  (if (is k ':do)
+  (if (eq k ':do)
     'body
     (intern (symbol-name k)))) ; strip the colon

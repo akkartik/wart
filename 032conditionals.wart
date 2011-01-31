@@ -23,7 +23,7 @@
   `(rfn self ,parms ,@body))
 
 (mac in(o$x . choices)
-  `(or ,@(map0 (fn(c) `(is ,$x ,c))
+  `(or ,@(map0 (fn(c) `(iso ,$x ,c))
                choices)))
 
 (def testify(x)

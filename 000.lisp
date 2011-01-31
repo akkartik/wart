@@ -24,7 +24,6 @@
                    args)))
 
 (synonym no null
-         is eq
          iso equal
          uniq gensym
          macex macroexpand
@@ -32,7 +31,7 @@
          err error)
 
 (defun isnt(x y)
-  (no (is x y)))
+  (no (eq x y)))
 
 
 
@@ -44,8 +43,8 @@
 (macro-alias errsafe ignore-errors)
 
 (defun match(a b)
-  (or (is a b)
-      (is b '_)
+  (or (eq a b)
+      (eq b '_)
       (and (consp a) (consp b)
            (match (car a) (car b))
            (match (cdr a) (cdr b)))))

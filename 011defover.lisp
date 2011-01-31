@@ -30,8 +30,7 @@
 (defvar *wart-special-form-quoted-handlers* (table))
 
 (add-wart-transformer
-  [and (pairp _)
-       (is 'quote (car _))]
+  [match _ '(quote _)]
   [list 'quote (lookup-quoted-handler (cadr _))])
 
 (add-wart-transformer

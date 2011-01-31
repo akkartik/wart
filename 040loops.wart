@@ -50,7 +50,7 @@
           ,$done nil)
     (while (no ,$done)
       (let ,$res ,expr
-        (if (is ,$res ,eof)
+        (if (iso ,$res ,eof)
           (set ,$done)
           (push ,$res ,$acc))))
     (rev ,$acc)))

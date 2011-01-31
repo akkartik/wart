@@ -14,7 +14,7 @@
       do
         (wt-eval form)
         (setq form (read f nil eof))
-      until (is form eof))))
+      until (iso form eof))))
 
 ; Insert a case into the wart cond.
 (defmacro add-wart-transformer(check trans)
