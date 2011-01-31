@@ -1,0 +1,13 @@
+(test-wart "read works"
+  :valueof (fromstring "34" (read))
+  :should be 34)
+
+(test-wart "read works on strings"
+  :valueof (fromstring "\"abc\"" (read))
+  :should be "abc")
+
+(test-wart "read and write work on tables"
+  :valueof (withs (h  (obj a 1 b 2)
+                   hs (tostring write.h))
+             (iso h (fromstring hs (read))))
+  :should be t)

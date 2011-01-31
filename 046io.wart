@@ -1,2 +1,23 @@
-(defgeneric wart-read(? port stdin*)
-  (read port))
+(defgeneric serialize(x)
+  x)
+(defgeneric unserialize(x)
+  x)
+(defmethod unserialize(x) cons
+  (map unserialize x))
+
+
+
+(def wart-read(? port stdin*)
+  (unserialize read.port))
+(defover read wart-read)
+
+(def wart-write(x ? port stdout*)
+  (write serialize.x :stream port))
+(defover write wart-write)
+
+
+
+(defmethod serialize(x) hash-table
+  (annotate 'hash-table (coerce x 'cons)))
+(defmethod unserialize(x) hash-table
+  (coerce rep.x 'hash-table))
