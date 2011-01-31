@@ -14,30 +14,6 @@
   :valueof (tuples 1 '(1 2 3 4 5))
   :should be (map 'list 'list '(1 2 3 4 5)))
 
-(test "match"
-  :valueof (match 3 3)
-  :should be t)
-
-(test "match"
-  :valueof (match 3 4)
-  :should be nil)
-
-(test "match"
-  :valueof (match '(1 (2 3)) '(1 (2 3)))
-  :should be t)
-
-(test "match"
-  :valueof (match '(2 (2 3)) '(1 (2 3)))
-  :should be nil)
-
-(test "match"
-  :valueof (match 3 '_)
-  :should be t)
-
-(test "match"
-  :valueof (match '(1 (2 3)) '(1 (_ 3)))
-  :should be t)
-
-(test "match"
-  :valueof (match '(2 (2 3)) '(1 (_ 3)))
-  :should be nil)
+(test "flat works"
+  :valueof (flat '(1 2 () (3 4 (5))))
+  :should be '(1 2 3 4 5))

@@ -36,7 +36,7 @@
          (lambda(param)
            (list param
                  `(get-arg ',param ',required-params ,positionals ,keywords)))
-         (flatten required-params))))
+         (flat required-params))))
 
 (defun get-rest-arg-expr(params positionals keywords)
   (let ((rest-param (rest-param params))

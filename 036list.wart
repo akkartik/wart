@@ -11,10 +11,10 @@
     (car xs)))
 (defover last wart-last)
 
-(def pos(test s)
-  (position-if testify.test s))
-(def rpos(test s)
-  (position-if testify.test s :from-end t))
-
 (def mappend(f . args)
   (apply 'join (apply 'map0 f args)))
+
+(def consif (x y)
+  (if x
+    (cons x y)
+    y))

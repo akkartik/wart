@@ -90,3 +90,11 @@
 (test-wart "andf works"
   :valueof (call (andf 'consp 'car) '(3 4))
   :should be 3)
+
+(test-wart "check works"
+  :valueof (check (+ 10 10) evenp)
+  :should be 20)
+
+(test-wart "check works with alternate"
+  :valueof (check (+ 10 10) oddp "foo")
+  :should be "foo")

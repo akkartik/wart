@@ -85,3 +85,8 @@
     (no cdr.args)   car.args
                     `(let it ,(car args)
                        (and it (aand ,@(cdr args))))))
+
+(mac check(o$x test ? alt nil)
+  `(if (,test ,$x)
+     ,$x
+     ,alt))

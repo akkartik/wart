@@ -5,6 +5,9 @@
 (defmethod len(x) hash-table
   (hash-table-count x))
 
+(def empty(x)
+  (is 0 len.x))
+
 
 
 (ignore-redef
@@ -38,6 +41,10 @@
 (def all(test xs)
   (call ~some ~testify.test xs))
 
+(def mem(test seq)
+  (reclist [if (call testify.test car._) _]
+           seq))
+
 (deftransform wart-keep(f seq)
   (if (no seq)          nil
       (call f car.seq)  (cons car.seq (keep f cdr.seq))
@@ -50,9 +57,20 @@
   (keep ~testify.test seq))
 (defover rem wart-rem)
 
+(def trues (f xs)
+  (and xs
+       (iflet fx (call f car.xs)
+          (cons fx (trues f cdr.xs))
+          (trues f cdr.xs))))
+
 (ignore-redef
   (defgeneric* join args
     (apply 'concatenate (type (car args)) args)))
+
+(defgeneric pos(test s ? idx 0)
+  (position-if testify.test s :start idx))
+(defgeneric rpos(test s ? idx 0)
+  (position-if testify.test s :from-end t :start idx))
 
 (defgeneric wart-map(f . seqs)
   (apply 'map0 f seqs))

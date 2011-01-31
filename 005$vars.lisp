@@ -10,7 +10,7 @@
 (defmacro defmacro$(name args &rest body)
   (let ((syms (remove-duplicates
                 (remove-if-not #'dollar-symbol-p
-                               (flatten body)))))
+                               (flat body)))))
     `(defmacro ,name ,args
        (let ,(mapcar (lambda(_)
                        `(,_   (uniq ,(cut (symbol-name _) 1))))
@@ -22,7 +22,7 @@
 (defmacro defun$(name args &rest body)
   (let ((syms (remove-duplicates
                 (remove-if-not #'dollar-symbol-p
-                               (flatten body)))))
+                               (flat body)))))
     `(defun ,name ,args
        (let ,(mapcar (lambda(_)
                        `(,_   (uniq ,(cut (symbol-name _) 1))))

@@ -27,7 +27,7 @@
       nil
       (cons (car xs) (firstn (1- n) (cdr xs)))))
 
-(defun flatten(x)
+(defun flat(x)
   (labels ((rec(x acc)
              (cond ((null x) acc)
                    ((atom x) (cons x acc))
