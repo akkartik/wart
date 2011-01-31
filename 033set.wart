@@ -17,6 +17,8 @@
 
 (mac accum(accfn . body)
   `(let ,$acc nil
+     ; labels => can't use ssyntax like acc.elem
+     ; let => must use call with acc
      (labels ((,accfn(_) (push _ ,$acc)))
        ,@body)
      (rev ,$acc)))
