@@ -1,7 +1,7 @@
 ; http://arclanguage.org/item?id=12878
-(def accumulate(over ? starting nil taking 'car folding-with 'cons next 'cdr until 'no)
+(def accumulate(over ? starting nil taking 'car folding-with 'cons next 'cdr unless 'no)
   (call (afn(xs total)
-          (if (call until xs)
+          (if (call-fn unless xs)
               total
               (self (call next xs)
                     (call folding-with
