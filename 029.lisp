@@ -14,6 +14,13 @@
 
 (defover load wart-load)
 
+(def wart-car(x)
+  (errsafe (car x)))
+(defover car wart-car)
+(def wart-cdr(x)
+  (errsafe (cdr x)))
+(defover cdr wart-cdr)
+
 
 
 ;; Internals
