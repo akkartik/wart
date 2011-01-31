@@ -34,3 +34,7 @@
 (test-wart "strings may need a specialcase"
   :valueof (genericfoo2 "abc")
   :should be "0abc")
+
+(test-wart "defgeneric calls terminate for unknown types"
+  :valueof (genericfoo2 (annotate 'unknowntype1 34))
+  :should be '(#\0 annotate 'unknowntype1 34))

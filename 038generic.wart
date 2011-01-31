@@ -38,10 +38,14 @@
   `(do
      (init-vtable ,name ,args ,@body)
      (defun ,name(&rest ,allargs)
-       (aif (aand (gethash ',name vtables*)
-                  (call it^type^last ,allargs))
-         (apply it ,allargs)
-         ,not-found))))
+       (let ,$lastarg (last ,allargs)
+         (aif (aand (gethash ',name vtables*)
+                    (call it^type^last ,allargs))
+           (apply it ,allargs)
+           (if (isnt ,$lastarg
+                     (as cons ,$lastarg))
+             ,not-found
+             ,$lastarg)))))) ; only a good idea for single-arg generics
 
 (= vtables* (table))
 (mac init-vtable(name args . body)
