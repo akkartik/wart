@@ -1,0 +1,2 @@
+(defgeneric wart-read(? port stdin*)
+  (read port))
