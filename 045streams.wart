@@ -1,3 +1,6 @@
+(defover stdin* *standard-input*)
+(defover stdout* *standard-output*)
+
 (mac w/infile(var fname . body)
   `(with-open-file(,var ,fname)
      ,@body))
@@ -19,11 +22,11 @@
      ,@body))
 
 (mac w/stdin(port . body)
-  `(let *standard-input* ,port
+  `(let stdin* ,port
      ,@body))
 
 (mac w/stdout(port . body)
-  `(let *standard-output* ,port
+  `(let stdout* ,port
      ,@body))
 
 (mac fromstring(str . body)
