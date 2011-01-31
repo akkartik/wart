@@ -1,12 +1,9 @@
-(= stdin* *standard-input*)
-(= stdout* *standard-output*)
-
 (mac w/infile(var fname . body)
   `(with-open-file(,var ,fname)
      ,@body))
 
 (mac w/outfile(var fname . body)
-  `(with-open-file(,var ,fname :direction :output)
+  `(with-open-file(,var ,fname :direction :output :if-exists :supersede)
      ,@body))
 
 (mac w/appendfile(var fname . body)
@@ -16,3 +13,40 @@
 (mac w/instring(var s . body)
   `(with-input-from-string(,var ,s)
      ,@body))
+
+(mac w/outstring(var . body)
+  `(with-output-to-string(,var)
+     ,@body))
+
+(mac w/stdin(port . body)
+  `(let *standard-input* ,port
+     ,@body))
+
+(mac w/stdout(port . body)
+  `(let *standard-output* ,port
+     ,@body))
+
+(mac fromstring(str . body)
+  `(w/instring ,$f ,str
+      (w/stdin ,$f
+        ,@body)))
+
+(mac tostring body
+  `(w/outstring ,$f
+     (w/stdout ,$f
+       ,@body)))
+
+(mac fromfile(f . body)
+  `(w/infile ,$port ,f
+     (w/stdin ,$port
+       ,@body)))
+
+(mac tofile(f . body)
+  `(w/outfile ,$port ,f
+     (w/stdout ,$port
+       ,@body)))
+
+(mac ontofile(f . body)
+  `(w/appendfile ,$port ,f
+     (w/stdout ,$port
+       ,@body)))
