@@ -19,3 +19,29 @@
 (test-wart "unserialize nests through lists"
   :valueof (unserialize `(1 2 ,(annotate 'hash-table nil)))
   :should be `(1 2 ,(table)))
+
+(test-wart "serialize nests though lists"
+  :valueof (serialize (list (table)))
+  :should be '((tagged hash-table nil)))
+
+(test-wart "serialize nests through tables"
+  :valueof (alref 3 (rep (serialize (obj 1 2 3 (annotate 'footype 34)))))
+  :should be '((tagged footype 34)))
+
+(test-wart "unserialize nests through tables"
+  :valueof (type (call (unserialize '(tagged hash-table ((1 2)
+                                                   (3 (tagged footype 34)))))
+                   3))
+  :should be 'footype)
+
+(test-wart "unserialize nests through tables"
+  :valueof (type (call (unserialize
+                         '(tagged hash-table ((1 2) (3 (tagged footype 34)))))
+                   3))
+  :should be 'footype)
+
+(test-wart "unserialize handles nested tables"
+  :valueof (rep (call (unserialize
+                        '(tagged hash-table ((1 2) (3 (tagged hash-table nil)))))
+                   3))
+  :should be (make-hash-table))

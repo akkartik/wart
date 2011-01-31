@@ -1,15 +1,20 @@
-(defgeneric serialize(x)
-  x)
+(init-vtable serialize(x) x)
+(defun serialize(x)
+  (aif (aand (gethash 'serialize vtables*)
+             (call it type.x))
+    (call it x)
+    x))
+(defmethod serialize(x) cons
+  (map 'serialize x))
 
 (init-vtable unserialize(x) x)
-(wipe vtables*!unserialize!cons)
 (defun unserialize(x)
   (aif (aand (gethash 'unserialize vtables*)
              (call it type.x))
     (call it x)
-    (if (isa x 'cons)
-      (map 'unserialize x)
-      x)))
+    x))
+(defmethod unserialize(x) cons
+  (map 'unserialize x))
 
 
 
@@ -24,6 +29,11 @@
 
 
 (defmethod serialize(x) hash-table
-  (annotate 'hash-table (coerce x 'cons)))
+  ; beware: all generics will see this as a hash, but only unserialize can handle it
+  (annotate 'hash-table
+            (map 'serialize (coerce x 'cons))))
+
 (defmethod unserialize(x) hash-table
-  (coerce rep.x 'hash-table))
+  (ret ans (table)
+    (each (k v) (coerce rep.x 'hash-table)
+      (= (call ans unserialize.k) unserialize.v))))
