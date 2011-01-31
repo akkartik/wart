@@ -2,7 +2,6 @@
 
 (defover = setf)
 
-; strictly 3 args
 (defmacro defset(type args &rest body)
   `(defcoerce ,type function=
     (lambda ,args

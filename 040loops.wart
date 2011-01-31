@@ -1,3 +1,14 @@
+; http://arclanguage.org/item?id=12878
+(def accumulate(over ? starting nil taking 'car folding-with 'cons next 'cdr until 'no)
+  (call (afn(xs total)
+          (if (call until xs)
+              total
+              (self (call next xs)
+                    (call folding-with
+                          (call taking xs)
+                          total))))
+        over starting))
+
 (mac until(test . body)
   `(while (not ,test)
       ,@body))

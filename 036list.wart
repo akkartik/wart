@@ -16,16 +16,5 @@
 (def rpos(test s)
   (position-if testify.test s :from-end t))
 
-; http://arclanguage.org/item?id=12878
-(def accumulate(over ? starting nil taking 'car folding-with 'cons next 'cdr until 'no)
-  (call (afn(xs total)
-          (if (call until xs)
-              total
-              (self (call next xs)
-                    (call folding-with
-                          (call taking xs)
-                          total))))
-        over starting))
-
 (def mappend(f . args)
   (apply 'join (apply 'map0 f args)))

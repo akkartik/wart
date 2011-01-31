@@ -52,6 +52,34 @@
              ans.0)
   :should be 3)
 
+(test-wart "keys works"
+  :valueof (keys (obj 1 2 3 4))
+  :should be '(1 3))
+
+(test-wart "fill-table has the right length"
+  :valueof (let tb (obj a 1 b 2)
+             (fill-table tb '(c 3 d 4))
+             (hash-table-count tb))
+  :should be 4)
+
+(test-wart "fill-table contains old keys"
+  :valueof (let tb (obj a 1 b 2)
+             (fill-table tb '(c 3 d 4))
+             tb!a)
+  :should be 1)
+
+(test-wart "fill-table contains new keys"
+  :valueof (let tb (obj a 1 b 2)
+             (fill-table tb '(c 3 d 4))
+             tb!c)
+  :should be 3)
+
+(test-wart "fill-table overrides old keys with new ones"
+  :valueof (let tb (obj a 1 b 2)
+             (fill-table tb '(b 45 c 3 d 4))
+             tb!b)
+  :should be 45)
+
 ; integration test: ssyntax + hash
 (test-wart "compose works with hash tables"
   :valueof (let h (obj 1 3)

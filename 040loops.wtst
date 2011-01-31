@@ -23,7 +23,15 @@
   :should be 6)
 
 (test-wart "each works on strings"
-  :valueof (let acc nil
-             (each x "abc" (setf acc (cons x acc)))
-             acc)
-  :should be '(#\c #\b #\a))
+  :valueof (accum acc
+             (each x "abc" (acc x)))
+  :should be '(#\a #\b #\c))
+
+(test-wart "each works on tables"
+  :valueof (sort
+             (accum acc
+               (let h (table)
+                 (= h.1 2 h.3 4)
+                 (each (k v) h (acc k))))
+             '<)
+  :should be '(1 3))

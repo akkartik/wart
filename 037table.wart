@@ -24,7 +24,7 @@
 
 (mac obj args
   `(as hash-table
-       (list ,@(map0 (fn ((k v))
+       (list ,@(map0 (fn((k v))
                         `(list ',k ,v))
                      pair.args))))
 
@@ -33,3 +33,21 @@
     (maphash (fn(k v)
                (push k ans))
              table)))
+
+(def keys(table)
+  (accum a
+    (maphash (fn(k v)
+               (a k))
+             table)))
+
+(def vals(table)
+  (accum a
+    (maphash (fn(k v)
+               (a v))
+             table)))
+
+(def fill-table(tb data)
+  (map0 (fn((k v))
+          (= tb.k v))
+        pair.data)
+  tb)
