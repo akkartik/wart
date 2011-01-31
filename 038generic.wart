@@ -45,7 +45,9 @@
            (if (isnt ,$lastarg
                      (as cons ,$lastarg))
              ,not-found
-             `(coerce-to-cons-error ,',name ,(type ,$lastarg))))))))
+             (apply (fn ,args
+                      ,@body)
+                    ,allargs)))))))
 
 (= vtables* (table))
 (mac init-vtable(name args . body)

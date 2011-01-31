@@ -37,4 +37,4 @@
 
 (test-wart "defgeneric calls flag unknown types"
   :valueof (genericfoo2 (annotate 'unknowntype1 34))
-  :should be '(coerce-to-cons-error genericfoo2 unknowntype1))
+  :should be '(#\0 tagged unknowntype1 34))
