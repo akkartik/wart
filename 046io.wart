@@ -1,9 +1,14 @@
 (defgeneric serialize(x)
   x)
-(defgeneric unserialize(x)
-  x)
-(defmethod unserialize(x) cons
-  (map unserialize x))
+
+(init-vtable unserialize(x) x)
+(defun unserialize(x)
+  (aif (aand (gethash 'unserialize vtables*)
+             (call it type.x))
+    (call it x)
+    (if (isa x 'cons)
+      (map unserialize x)
+      x)))
 
 
 

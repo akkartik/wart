@@ -6,7 +6,6 @@
   :valueof (fromstring "\"abc\"" (read))
   :should be "abc")
 
-(wt-eval '(defmethod unserialize(x) footype x))
 (test-wart "read works on userdefined types"
   :valueof (type (fromstring "(tagged footype 34)" (read)))
   :should be 'footype)
