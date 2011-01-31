@@ -31,6 +31,9 @@
          macex1 macroexpand-1
          err error)
 
+(defun isnt(x y)
+  (no (is x y)))
+
 
 
 (defmacro macro-alias(a b)

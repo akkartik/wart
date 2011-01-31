@@ -76,7 +76,7 @@
 
 (defun required-params(params)
   (when (and (consp params)
-             (not (is '? (car params))))
+             (isnt '? (car params)))
     (cons (car params)
           (required-params (cdr params)))))
 
