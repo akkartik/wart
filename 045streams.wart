@@ -1,0 +1,18 @@
+(= stdin* *standard-input*)
+(= stdout* *standard-output*)
+
+(mac w/infile(var fname . body)
+  `(with-open-file(,var ,fname)
+     ,@body))
+
+(mac w/outfile(var fname . body)
+  `(with-open-file(,var ,fname :direction :output)
+     ,@body))
+
+(mac w/appendfile(var fname . body)
+  `(with-open-file(,var ,fname :direction :output :if-exists :append)
+     ,@body))
+
+(mac w/instring(var s . body)
+  `(with-input-from-string(,var ,s)
+     ,@body))
