@@ -112,6 +112,10 @@
   :valueof (map 'char-upcase "abc")
   :should be "ABC")
 
+(test-wart "map works on primitives"
+  :valueof (map 'char-upcase #\a)
+  :should be #\A)
+
 (wt-eval '(defmethod map(f . seqs) footype
             (apply 'map0 f (map0 'rep seqs))))
 (test-wart "map works on user-defined types"
