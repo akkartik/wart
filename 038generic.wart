@@ -45,7 +45,7 @@
            (if (isnt ,$lastarg
                      (as cons ,$lastarg))
              ,not-found
-             ,$lastarg)))))) ; only a good idea for single-arg generics
+             `(coerce-to-cons-error ,',name ,(type ,$lastarg))))))))
 
 (= vtables* (table))
 (mac init-vtable(name args . body)
