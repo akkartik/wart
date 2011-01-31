@@ -1,0 +1,5 @@
+(defmacro after(&body body)
+  (let (body finally) (split :do body)
+    `(unwind-protect
+       (do ,@body)
+       ,@finally)))
