@@ -49,6 +49,6 @@
         xs))))
 
 (defmacro fslot(f)
-  (if (and (atom f) (fboundp f))
+  (if (and (symbolp f) (fboundp f))
     `(function ,f)
     f))

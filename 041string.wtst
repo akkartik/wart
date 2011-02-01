@@ -1,3 +1,12 @@
+(test-wart "string indexing works"
+  :valueof (call "abc" 2)
+  :should be #\c)
+
+(test-wart "writing to string index works"
+  :valueof (ret s "abc"
+             (= s.1 #\d))
+  :should be "adc")
+
 (test-wart "symbols can be coerced to string"
   :valueof (as string 'a)
   :should be "a")

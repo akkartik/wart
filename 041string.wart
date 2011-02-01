@@ -1,3 +1,12 @@
+(synonym newstring make-string)
+
+(defcall string s
+  [elt s _])
+
+(defset string(s index val)
+  (setf (elt s index)
+        val))
+
 (defcoerce symbol string
   [map 'char-downcase (symbol-name _)])
 (defcoerce symbol cons
