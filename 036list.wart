@@ -12,7 +12,7 @@
 (defover last wart-last)
 
 (def mappend(f . args)
-  (apply 'join (apply 'map0 f args)))
+  (apply 'join (apply 'map0 (as function f) args)))
 
 (def consif (x y)
   (if x
