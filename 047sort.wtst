@@ -43,3 +43,7 @@
 (test-wart "insertnew-sorted works"
   :valueof (insertnew-sorted '> 5 '(10 5 1))
   :should be '(10 5 1))
+
+(test-wart "median works"
+  :valueof (median '(2 3 51 9 6))
+  :should be 6)

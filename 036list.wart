@@ -19,10 +19,7 @@
     (cons x y)
     y))
 
-(defun split(test s)
-  (if (consp s)
-    (let tmp (split test cdr.s)
-      (if (call testify.test car.s)
-        (cons nil tmp)
-        (cons (cons car.s car.tmp)
-              cdr.tmp)))))
+(def split(seq pos)
+  (list (cut seq 0 pos) (cut seq pos)))
+
+(alias copy copy-seq)

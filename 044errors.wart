@@ -1,5 +1,15 @@
 (defmacro after(&body body)
-  (let (body finally) (split :do body)
+  (let (body finally) (split-at :do body)
     `(unwind-protect
        (do ,@body)
        ,@finally)))
+
+
+
+(defun split-at(test s)
+  (if (consp s)
+    (let tmp (split-at test cdr.s)
+      (if (call testify.test car.s)
+        (cons nil tmp)
+        (cons (cons car.s car.tmp)
+              cdr.tmp)))))

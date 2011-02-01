@@ -26,6 +26,8 @@
 
 ; since comparison is generic, sort doesn't need to be
 (def wart-sort(seq ? using '> by 'idfn)
+  (sort copy.seq using :key (as function by)))
+(def sortf(seq ? using '> by 'idfn)
   (sort seq using :key (as function by)))
 (defover sort wart-sort)
 
@@ -44,3 +46,10 @@
       (call f elem car.seq)
        (cons elem (rem elem seq))
       (cons car.seq (insertnew-sorted f elem cdr.seq))))
+
+(def bestn (n f seq)
+  (firstn n (sort f seq)))
+
+(def median(ns)
+  (call sort.ns
+        (round (/ len.ns 2))))

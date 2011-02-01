@@ -31,3 +31,6 @@
                 (if ,$a
                   (++ ,$c)))
        ,@body)))
+
+(def avg(ns)
+  (/ (apply '+ ns) len.ns))
