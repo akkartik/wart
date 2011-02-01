@@ -16,12 +16,11 @@
                        pair.fields)))))))
 
 (def inst(tem . args)
-  (annotate 'template
-    (ret x (table)
-      (each (k v) (if consp.tem
-                    tem
-                    templates*.tem)
-        (when v
-          (= x.k (call v))))
-      (each (k v) pair.args
-        (= x.k v)))))
+  (ret x (table)
+    (each (k v) (if consp.tem
+                  tem
+                  templates*.tem)
+      (when v
+        (= x.k (call v))))
+    (each (k v) pair.args
+      (= x.k v))))
