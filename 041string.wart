@@ -22,3 +22,16 @@
   :coerce-to-cons)
 (defmethod downcase(s) standard-char
   (char-downcase s))
+
+
+
+(def mkstr args
+  (with-output-to-string(s)
+    (each a args
+      (princ upcase.a s))))
+
+(def sym args
+  (intern (apply 'mkstr args)))
+
+(defcoerce string symbol
+  'sym)
