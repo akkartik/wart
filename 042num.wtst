@@ -1,3 +1,19 @@
+(test-wart "coercing integers to strings works"
+  :valueof (as string 10)
+  :should be "10")
+
+(test-wart "coercing strings to integers works"
+  :valueof (as integer "34")
+  :should be 34)
+
+(test-wart "int coerces"
+  :valueof (int "34")
+  :should be 34)
+
+(test-wart "int takes optional base"
+  :valueof (int "23" :base 16)
+  :should be 35)
+
 (test-wart "mapn works"
   :valueof (mapn [* _ _] 3 5)
   :should be '(9 16 25))
