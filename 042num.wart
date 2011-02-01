@@ -18,3 +18,16 @@
 
 (def mapn(f a b)
   (call rev^accumulate :over a :taking f :next '1+ :unless [> _ b]))
+
+(def sumn(f a b)
+  (accumulate :over a :starting 0 :taking f :folding-with '+ :next '1+ :unless [> _ b]))
+
+(def sumlist(f xs)
+  (accumulate :over xs :starting 0 :taking f^car :folding-with '+))
+
+(mac counting-calls(to . body)
+  `(ret ,$c 0
+     (let ,to (fn(,$a)
+                (if ,$a
+                  (++ ,$c)))
+       ,@body)))

@@ -1,14 +1,3 @@
-; http://arclanguage.org/item?id=12878
-(def accumulate(over ? starting nil taking 'car folding-with 'cons next 'cdr unless 'no)
-  (call (afn(xs total)
-          (if (call-fn unless xs)
-              total
-              (self (call next xs)
-                    (call folding-with
-                          (call taking xs)
-                          total))))
-        over starting))
-
 (mac until(test . body)
   `(while (not ,test)
       ,@body))
@@ -69,6 +58,17 @@
 (mac each(var xs . body)
   `(some (fn(,var) ,@body nil)
          ,xs))
+
+; http://arclanguage.org/item?id=12878
+(def accumulate(over ? starting nil taking 'car folding-with 'cons next 'cdr unless 'no)
+  (call (afn(xs total)
+          (if (call-fn unless xs)
+              total
+              (self (call next xs)
+                    (call folding-with
+                          (call taking xs)
+                          total))))
+        over starting))
 
 (mac xloop(binds . body)
   (let w pair.binds
