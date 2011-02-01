@@ -69,3 +69,9 @@
 (mac each(var xs . body)
   `(some (fn(,var) ,@body nil)
          ,xs))
+
+(mac xloop(binds . body)
+  (let w pair.binds
+    `(call (rfn next ,(map 'car w)
+             ,@body)
+           ,@(map 'cadr w))))

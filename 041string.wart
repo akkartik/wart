@@ -44,3 +44,15 @@
 
 (defcoerce string symbol
   'sym)
+
+
+
+(synonym letter alpha-char-p)
+(synonym digit digit-char-p)
+(def alphadig(c) (or (letter c) (digit c)))
+
+(def punc(c)
+  (in c #\. #\, #\; #\: #\! #\?))
+
+(def whitec(c)
+  (in c #\space #\newline #\tab #\return))
