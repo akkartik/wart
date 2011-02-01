@@ -22,3 +22,6 @@
      (labels ((,accfn(_) (push _ ,$acc)))
        ,@body)
      (rev ,$acc)))
+
+(mac or=(place expr)
+  `(= ,place (or ,place ,expr)))

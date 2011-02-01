@@ -50,6 +50,6 @@
 (def bestn (n f seq)
   (firstn n (sort f seq)))
 
-(def median(ns)
-  (call sort.ns
-        (round (/ len.ns 2))))
+(def compare(comparer scorer)
+  (fn(x y)
+    (comparer scorer.x scorer.y)))

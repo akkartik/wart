@@ -14,7 +14,7 @@
 (def mappend(f . args)
   (apply 'join (apply 'map0 (as function f) args)))
 
-(def consif (x y)
+(def consif(x y)
   (if x
     (cons x y)
     y))

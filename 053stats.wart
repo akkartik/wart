@@ -1,0 +1,20 @@
+(def avg(ns)
+  (/ (apply '+ ns) len.ns))
+
+(def median(ns)
+  (call sort.ns
+        (round (/ len.ns 2))))
+
+(defgeneric freq(seq)
+  (ret ans (table)
+    (each elem seq
+      (or= ans.elem 0)
+      (++ ans.elem))))
+
+(def commonest(seq)
+  (with (winner nil n 0)
+    (each (k v) freq.seq
+      (when (> v n)
+        (= winner k n v)))
+    (list winner n)))
+

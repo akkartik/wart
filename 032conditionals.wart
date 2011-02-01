@@ -90,3 +90,8 @@
   `(if (,test ,$x)
      ,$x
      ,alt))
+
+(def only(f)
+  (fn args
+    (if car.args
+      (apply f args))))
