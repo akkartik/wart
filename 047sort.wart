@@ -1,0 +1,46 @@
+(def best(f seq)
+  (if seq
+    (let wins car.seq
+      (each elt cdr.seq
+        (if (call f elt wins)
+          (= wins elt)))
+      wins)))
+
+(def wart-max args
+  (best '> args))
+(defover max wart-max)
+(def wart-min args
+  (best '< args))
+(defover min wart-min)
+
+(def most(f seq)
+  (if seq
+    (withs (wins car.seq
+            topscore f.wins)
+      (each elt cdr.seq
+        (let score f.elt
+          (if (> score topscore)
+            (= wins elt
+               topscore score))))
+      wins)))
+
+; since comparison is generic, sort doesn't need to be
+(def wart-sort(seq ? using '> by 'idfn)
+  (sort seq using :key (as function by)))
+(defover sort wart-sort)
+
+(def insert-sorted(f elem seq)
+  (if (no seq)
+       (list elem)
+      (call f elem car.seq)
+       (cons elem seq)
+      (cons car.seq (insert-sorted f elem cdr.seq))))
+
+(def insertnew-sorted(f elem seq)
+  (if (no seq)
+       (list elem)
+      (iso elem car.seq)
+       (insertnew-sorted f elem cdr.seq)
+      (call f elem car.seq)
+       (cons elem (rem elem seq))
+      (cons car.seq (insertnew-sorted f elem cdr.seq))))

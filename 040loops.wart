@@ -41,6 +41,17 @@
   `(for ,var ,init (> ,var ,min) (-- ,var)
      ,@body))
 
+(mac forlen(var s . body)
+  `(for ,var 0 (< ,var (len ,s)) (++ ,var)
+     ,@body))
+
+(mac on(var o$s . body)
+  (if (iso var 'index)
+    (err "Can't use index as first arg to on.")
+    `(forlen index ,$s
+       (let ,var (call ,$s index)
+         ,@body))))
+
 (mac repeat(n . body)
   `(for ,$var 0 (< ,$var ,n) (++ ,$var)
       ,@body))

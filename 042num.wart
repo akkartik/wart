@@ -3,6 +3,13 @@
 (defcoerce string integer
   'read-from-string)
 
+(defgeneric wart-> args
+  (apply '> args))
+(defover > wart->)
+(defgeneric wart-< args
+  (apply '< args))
+(defover < wart-<)
+
 (def wart-int(x ? base 10)
   (if (isa x 'string)
     (parse-integer x :radix base)

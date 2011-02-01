@@ -1,0 +1,45 @@
+(test-wart "best works"
+  :valueof (let h (obj 1 5
+                       12 19
+                       34 2)
+             (best (fn(a b)
+                     (> h.a h.b))
+                   '(1 12 34)))
+  :should be 12)
+
+(test-wart "best works - 2"
+  :valueof (let h (obj 1 5
+                       12 3
+                       34 2)
+             (best (fn(a b)
+                     (< h.a h.b))
+                   '(1 12 34)))
+  :should be 34)
+
+(test-wart "sort works"
+  :valueof (sort '(1 7 3 4 16 2 34))
+  :should be '(34 16 7 4 3 2 1))
+
+(test-wart "sort :by works"
+  :valueof (let h (obj 1 5 12 19 34 2) (sort :by h '(1 12 34)))
+  :should be '(12 1 34))
+
+(test-wart "sort is meant to be stable"
+  :valueof (let h (obj 1 5 12 19 34 2 16 19) (sort :by h '(16 1 12 34)))
+  :should be '(16 12 1 34))
+
+(test-wart "insert-sorted works on empty list"
+  :valueof (insert-sorted '> 13 '())
+  :should be '(13))
+
+(test-wart "insert-sorted works on head"
+  :valueof (insert-sorted '> 13 '(12 3))
+  :should be '(13 12 3))
+
+(test-wart "insert-sorted works in between"
+  :valueof (insert-sorted '> 13 '(19 12 3))
+  :should be '(19 13 12 3))
+
+(test-wart "insertnew-sorted works"
+  :valueof (insertnew-sorted '> 5 '(10 5 1))
+  :should be '(10 5 1))
