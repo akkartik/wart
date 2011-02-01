@@ -61,4 +61,5 @@
              string ,$basefn
              bit ,$basefn
              integer ,$basefn
+             single-float ,$basefn
              cons ,$basefn))))
