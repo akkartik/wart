@@ -1,0 +1,14 @@
+(def memo(f)
+  (with (cache (table)
+         nilcache (table))
+    (fn args
+      (or cache.args
+          (and (no nilcache.args)
+               (aif (apply f args)
+                    (= cache.args it)
+                    (do1 nil
+                         (set nilcache.args))))))))
+
+(mac defmemo(name parms . body)
+  `(= (symbol-function ',name)
+      (memo (fn ,parms ,@body))))
