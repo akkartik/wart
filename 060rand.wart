@@ -1,0 +1,25 @@
+(synonym rand random)
+
+(mac rand-choice exprs
+  `(case (rand ,len.exprs)
+     ,@(let key -1
+         (mappend [list ++.key _]
+                  exprs))))
+
+(mac n-of(n expr)
+  `(let ,$a nil
+     (repeat ,n
+       (push ,expr ,$a))
+     (rev ,$a)))
+
+; rejects bytes >= 248 lest digits be overrepresented
+(def rand-string(n)
+  (let c "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    (with (nc 62 s (newstring n) i 0)
+      (w/infile str "/dev/urandom" :element-type 'unsigned-byte
+        (while (< i n)
+          (let x (read-byte str)
+             (unless (> x 247)
+               (= s.i (call c (mod x nc)))
+               (++ i)))))
+      s)))

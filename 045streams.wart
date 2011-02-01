@@ -1,16 +1,16 @@
 (defover stdin* *standard-input*)
 (defover stdout* *standard-output*)
 
-(mac w/infile(var fname . body)
-  `(with-open-file(,var ,fname)
+(mac w/infile(var fname ? element-type :default . body)
+  `(with-open-file(,var ,fname :element-type ,element-type)
      ,@body))
 
-(mac w/outfile(var fname . body)
-  `(with-open-file(,var ,fname :direction :output :if-exists :supersede)
+(mac w/outfile(var fname ? element-type :default . body)
+  `(with-open-file(,var ,fname :element-type ,element-type :direction :output :if-exists :supersede)
      ,@body))
 
-(mac w/appendfile(var fname . body)
-  `(with-open-file(,var ,fname :direction :output :if-exists :append)
+(mac w/appendfile(var fname ? element-type :default . body)
+  `(with-open-file(,var ,fname :element-type ,element-type :direction :output :if-exists :append)
      ,@body))
 
 (mac w/instring(var s . body)
