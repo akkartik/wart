@@ -4,13 +4,6 @@
 ;;;; A very simple SBCL network client for use in testing the servers in
 ;;;; prefork-example-simple.lisp and prefork-example-realistic.lisp.
 
-(in-package :cl-user)
-
-(eval-when (:load-toplevel :compile-toplevel :execute)
-  (require :sb-posix)
-  (require :sb-bsd-sockets)
-  (use-package :sb-bsd-sockets))
-
 ;;; The client is broken across many functions in order to make it easier to
 ;;; poke at the server.
 ;;;
@@ -26,7 +19,7 @@
   (client-herald)
   (client-write (with-output-to-string (s) (print object s)))
   (multiple-value-prog1 (client-results)
-    (socket-close *socket*)))
+    (sb-bsd-sockets:socket-close *socket*)))
 
 ;;;
 ;;; Misc utils
@@ -84,9 +77,9 @@
 ;;; 
 
 (defun client-connect ()
-  (setf *socket* (make-instance 'inet-socket :type :stream :protocol :tcp))
-  (socket-connect *socket* (make-inet-address "127.0.0.1") 1978)
-  (setf *stream* (socket-make-stream *socket* :input t :output t)))
+  (setf *socket* (make-instance 'sb-bsd-sockets:inet-socket :type :stream :protocol :tcp))
+  (sb-bsd-sockets:socket-connect *socket* (sb-bsd-sockets:make-inet-address "127.0.0.1") 1978)
+  (setf *stream* (sb-bsd-sockets:socket-make-stream *socket* :input t :output t)))
   
 (defun client-herald ()
   (format *stream* "PID ~D~%" (sb-posix:getpid))

@@ -13,16 +13,7 @@
 ;;;; We also assumes a BSD-like system, due to its use of flock(2) for
 ;;;; serialization.
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (require :sb-posix)
-  (require :sb-bsd-sockets))
-
-(use-package :cl :sb-bsd-sockets)
-
-;? (defpackage :prefork-example-simple
-;?   (:use :cl :sb-bsd-sockets))
-;? 
-;? (in-package :prefork-example-simple)
+(require :sb-bsd-sockets)
 
 ;;; In this simple example, the parent sets up a server socket, forks
 ;;; +NCHILDREN+ child processes, then just sits there, and periodically reaps
