@@ -1,0 +1,12 @@
+(require :sb-posix)
+
+(synonym spawn sb-thread:make-thread)
+
+; clone a process that stops after executing child
+(def fork(child)
+  (let pid (sb-posix:fork)
+    (if (zerop pid)
+      (after
+        (call child)
+      :do
+        (quit)))))
