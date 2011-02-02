@@ -1,7 +1,21 @@
 (require :sb-bsd-sockets)
 
-(mac w/socket(var port . body)
-  `(let ,var (make-server-socket ,port)
+; may be confusing that these take args that look like keyword args
+(synonym socket-bind sb-bsd-sockets:socket-bind
+         socket-accept sb-bsd-sockets:socket-accept
+         socket-close sb-bsd-sockets:socket-close
+         socket-make-stream sb-bsd-sockets:socket-make-stream
+         make-inet-address sb-bsd-sockets:make-inet-address)
+
+(mac w/server-socket(var port . body)
+  `(let ,var (make-socket "127.0.0.1" ,port :server t)
+     (after
+       ,@body
+     :do
+       (socket-close ,var))))
+
+(mac w/socket(var port ? host "127.0.0.1" . body)
+  `(let ,var (make-socket ,host ,port)
      (after
        ,@body
      :do
@@ -13,20 +27,23 @@
              ,stream  (socket-make-stream ,$conn :input t :output t))
        (after ,@body :do (socket-close ,$conn)))))
 
-(def make-server-socket(port)
+(mac connecting(stream ? to "127.0.0.1" at 80 . body)
+  `(w/socket ,$sock :host ,to :port ,at
+      (socket-connect ,$sock :host (make-inet-address ,to)
+                             :port ,at)
+      (let ,stream (socket-make-stream ,$sock :input t :output t)
+        ,@body)))
+
+(def make-socket(host port ? server nil)
   (ret sock (make-instance 'sb-bsd-sockets:inet-socket
                            :type :stream :protocol :tcp)
-    (set (sb-bsd-sockets:sockopt-reuse-address sock))
-    (socket-bind sock (make-inet-address "127.0.0.1")
-                 port)
-    (socket-listen sock :backlog 20)))
+    (when server
+      (set (sb-bsd-sockets:sockopt-reuse-address sock))
+      (socket-bind sock make-inet-address.host port)
+      (socket-listen sock :backlog 20))))
 
 (def socket-listen(socket backlog)
   (sb-bsd-sockets:socket-listen socket backlog))
 
-; may be confusing that these take args that look like keyword args
-(synonym socket-bind sb-bsd-sockets:socket-bind
-         socket-accept sb-bsd-sockets:socket-accept
-         socket-close sb-bsd-sockets:socket-close
-         socket-make-stream sb-bsd-sockets:socket-make-stream
-         make-inet-address sb-bsd-sockets:make-inet-address)
+(def socket-connect(socket host port)
+  (sb-bsd-sockets:socket-connect socket host port))

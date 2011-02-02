@@ -1,7 +1,7 @@
 ;; http://common-lisp.net/pipermail/small-cl-src/2004-June/000064.html
 
 (def start-server()
-  (w/socket s 1978
+  (w/server-socket s 1978
     (repeat 2
       (fork (thunk
               (handle-request s))))
