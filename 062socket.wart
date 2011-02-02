@@ -7,10 +7,11 @@
      :do
        (socket-close ,var))))
 
-(mac w/connection(stream socket . body)
-  `(withs (conn   (socket-accept ,socket)
-           ,stream  (socket-make-stream conn :input t :output t))
-    (after ,@body :do socket-close.conn)))
+(mac accepting(stream from . body)
+  `(forever
+     (withs (,$conn   (socket-accept ,from)
+             ,stream  (socket-make-stream ,$conn :input t :output t))
+       (after ,@body :do (socket-close ,$conn)))))
 
 (def make-server-socket(port)
   (ret sock (make-instance 'sb-bsd-sockets:inet-socket
