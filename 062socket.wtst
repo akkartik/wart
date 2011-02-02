@@ -1,0 +1,12 @@
+; integration test: fork+sockets
+(test-wart "communicating over sockets works"
+  :valueof (with (port 7357 ; 'test' in 1337
+                  data 34)
+             (w/server-socket s port
+               (fork (thunk (accepting stream :from s
+                              (format stream read-line.stream))))
+               (connecting stream :at port
+                 (format stream "~a~%" data)
+                 (flush stream)
+                 (read-line stream))))
+  :should be "34")
