@@ -11,5 +11,4 @@
   (accepting stream :from s
     (format stream "Hello ~A, this is PID ~D~%"
             (read-line stream) (sb-posix:getpid))
-    (flush stream)
-    (socket-close socket)))
+    (flush stream)))
