@@ -5,7 +5,7 @@
     (repeat 2
       (fork (thunk
               (handle-request s))))
-    (sb-posix:wait)))
+    (wait-for-children)))
 
 (def handle-request(s)
   (accepting stream :from s
