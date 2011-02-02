@@ -4,18 +4,18 @@
   `(let ((got ,expr))
      (unless (,(car predicate) got ,@(cdr predicate))
        (incf *test-failures*)
-       (pr "F " ,msg #\newline "  got ")(writeln got))))
+       (pr #\newline "F " ,msg #\newline "  got ")(writeln got))))
 
 (defmacro test-wart(msg Valueof expr Should &rest predicate)
   `(let ((got (wt-eval ',expr)))
      (unless (,(car predicate) got ,@(cdr predicate))
        (incf *test-failures*)
-       (pr "F " ,msg #\newline "  got ")(writeln got))))
+       (pr #\newline "F " ,msg #\newline "  got ")(writeln got))))
 
 (defmacro pending-test(msg &rest args)
-  (prn "X " msg))
+  (prn #\newline "X " msg))
 (defmacro pending-test-wart(msg &rest args)
-  (prn "X " msg))
+  (prn #\newline "X " msg))
 
 (defmacro be(&rest args)
   `(iso ,@args))
@@ -37,6 +37,7 @@
     (when (and (string< "" file)
                (char<= #\0 (char file 0))
                (char>= #\9 (char file 0)))
+      (format t "~a" (char file 1))(finish-output)
       (let* ((len (length file))
              (ext (subseq file (- len 4))))
         (cond
