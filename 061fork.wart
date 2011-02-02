@@ -10,4 +10,5 @@
         (quit)))))
 
 (synonym spawn sb-thread:make-thread
-         wait-for-children sb-posix:wait)
+         wait-for-children sb-posix:wait
+         getpid sb-posix:getpid)

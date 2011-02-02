@@ -10,5 +10,5 @@
 (def handle-request(s)
   (accepting stream :from s
     (format stream "Hello ~A, this is PID ~D~%"
-            (read-line stream) (sb-posix:getpid))
+            read-line.stream (getpid))
     (flush stream)))
