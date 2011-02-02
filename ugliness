@@ -1,3 +1,6 @@
+can't use ':' for ssyntax since it's used early in the lisp reader
+can't compose *any* ssyntax with any package-interned symbol with a ':'.
+
 inserting say prn^ requires a call-fn or call. still a single edit, though.
 
 case-insensitive symbols. converting strings to syms loses information.

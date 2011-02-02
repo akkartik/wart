@@ -1,26 +1,42 @@
 ;; http://common-lisp.net/pipermail/small-cl-src/2004-June/000064.html
 
-(require :sb-bsd-sockets)
-
-(defconstant +nchildren+ 2)
-(defconstant +backlog+ 16)
-
-(defvar *server-socket* nil)
-
 (def start-server()
-  (setf *server-socket* (make-instance 'sb-bsd-sockets:inet-socket :type :stream :protocol :tcp))
-  (wart-set (sb-bsd-sockets:sockopt-reuse-address *server-socket*))
-  (sb-bsd-sockets:socket-bind *server-socket* (sb-bsd-sockets:make-inet-address "127.0.0.1") 1978)
-  (sb-bsd-sockets:socket-listen *server-socket* +backlog+)
-  (repeat +nchildren+
-    (fork 'child-main))
-  (sb-posix:wait))
+  (w/socket s 1978
+    (repeat 2
+      (fork (thunk
+              (handle-request s))))
+    (sb-posix:wait)))
 
-(def child-main()
-  (loop for socket = (sb-bsd-sockets:socket-accept *server-socket*)
-        for stream = (sb-bsd-sockets:socket-make-stream socket :input t :output t)
-        for client-id = (read-line stream)
-        do (prn "received " client-id)
-           (format stream "Hello ~A, this is PID ~D~%" client-id (sb-posix:getpid))
-           (flush stream)
-           (sb-bsd-sockets:socket-close socket)))
+;? (def handle-request(s)
+;?   (loop for socket = (socket-accept s)
+;?         for stream = (socket-make-stream socket :input t :output t)
+;?         for client-id = (read-line stream)
+;?         do (prn "received " client-id)
+;?            (format stream "Hello ~A, this is PID ~D~%" client-id (sb-posix:getpid))
+;?            (flush stream)
+;?            (socket-close socket)))
+
+;? (def handle-request(s)
+;?   (loop
+;?     (let* ((socket  (socket-accept s))
+;?            (stream  (socket-make-stream socket :input t :output t))
+;?            (client-id   (read-line stream)))
+;?       (prn "received " client-id)
+;?       (format stream "Hello ~A, this is PID ~D~%" client-id (sb-posix:getpid))
+;?       (flush stream)
+;?       (socket-close socket))))
+
+(def handle-request(s)
+  (loop
+    (w/connection stream s
+      (format stream "Hello ~A, this is PID ~D~%"
+              (read-line stream) (sb-posix:getpid))
+      (flush stream)
+      (socket-close socket))))
+
+;? (def handle-request(s)
+;?   (w/connection stream s
+;?      (format stream "hello ~a, this is pid ~d~%"
+;?              read-line.stream
+;?              (sb-posix:getpid))
+;?      (flush stream)))

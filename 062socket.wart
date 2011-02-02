@@ -1,0 +1,31 @@
+(require :sb-bsd-sockets)
+
+(mac w/socket(var port . body)
+  `(let ,var (make-server-socket ,port)
+     (after
+       ,@body
+     :do
+       (socket-close ,var))))
+
+(mac w/connection(stream socket . body)
+  `(withs (conn   (socket-accept ,socket)
+           ,stream  (socket-make-stream conn :input t :output t))
+    (after ,@body :do socket-close.conn)))
+
+(def make-server-socket(port)
+  (ret sock (make-instance 'sb-bsd-sockets:inet-socket
+                           :type :stream :protocol :tcp)
+    (set (sb-bsd-sockets:sockopt-reuse-address sock))
+    (socket-bind sock (make-inet-address "127.0.0.1")
+                 port)
+    (socket-listen sock :backlog 20)))
+
+(def socket-listen(socket backlog)
+  (sb-bsd-sockets:socket-listen socket backlog))
+
+; may be confusing that these take args that look like keyword args
+(synonym socket-bind sb-bsd-sockets:socket-bind
+         socket-accept sb-bsd-sockets:socket-accept
+         socket-close sb-bsd-sockets:socket-close
+         socket-make-stream sb-bsd-sockets:socket-make-stream
+         make-inet-address sb-bsd-sockets:make-inet-address)
