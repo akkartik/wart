@@ -14,12 +14,13 @@
 
 ; rejects bytes >= 248 lest digits be overrepresented
 (def rand-string(n)
-  (let c "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    (with (nc 62 s (newstring n) i 0)
+  (withs (c   "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+          nc  len.c
+          i   0)
+    (ret s newstring.n
       (w/infile str "/dev/urandom" :element-type 'unsigned-byte
         (while (< i n)
           (let x (read-byte str)
-             (unless (> x 247)
+             (unless (> x 247) ; multiple of nc
                (= s.i (call c (mod x nc)))
-               (++ i)))))
-      s)))
+               ++.i)))))))

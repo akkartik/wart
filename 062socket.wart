@@ -1,12 +1,3 @@
-(require :sb-bsd-sockets)
-
-; may be confusing that these take args that look like keyword args
-(synonym socket-bind sb-bsd-sockets:socket-bind
-         socket-accept sb-bsd-sockets:socket-accept
-         socket-close sb-bsd-sockets:socket-close
-         socket-make-stream sb-bsd-sockets:socket-make-stream
-         make-inet-address sb-bsd-sockets:make-inet-address)
-
 (mac w/server-socket(var port . body)
   `(let ,var (make-socket "127.0.0.1" ,port :server t)
      (after
@@ -33,6 +24,19 @@
                              :port ,at)
       (let ,stream (socket-make-stream ,$sock :input t :output t)
         ,@body)))
+
+
+
+;; Internals
+
+(require :sb-bsd-sockets)
+
+; may be confusing that these take args that look like keyword args
+(synonym socket-bind sb-bsd-sockets:socket-bind
+         socket-accept sb-bsd-sockets:socket-accept
+         socket-close sb-bsd-sockets:socket-close
+         socket-make-stream sb-bsd-sockets:socket-make-stream
+         make-inet-address sb-bsd-sockets:make-inet-address)
 
 (def make-socket(host port ? server nil)
   (ret sock (make-instance 'sb-bsd-sockets:inet-socket

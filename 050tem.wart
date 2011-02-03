@@ -1,10 +1,7 @@
 (= templates* (table))
 
-(def carif(x)
-  (check car.x consp x))
-
 (mac deftem(tem . fields)
-  (withs (name carif.tem
+  (withs (name car.tem
           includes cdr.tem)
     `(do1 nil
        (= (call templates* ',name)

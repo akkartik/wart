@@ -15,7 +15,9 @@
 (defover load wart-load)
 
 (def wart-car(x)
-  (errsafe (car x)))
+  (if (consp x)
+    (car x)
+    x))
 (defover car wart-car)
 (def wart-cdr(x)
   (errsafe (cdr x)))
