@@ -43,7 +43,7 @@
                     (call it^type^last ,allargs))
            (apply it ,allargs)
            (if (isnt ,$lastarg
-                     (as cons ,$lastarg))
+                     (as cons ,$lastarg)) ; guard against infinite loops
              ,not-found
              (apply (fn ,args
                       ,@body)
