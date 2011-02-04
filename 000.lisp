@@ -1,3 +1,5 @@
+(require :sb-grovel)
+
 (defmacro ignore-redef(&body body)
   `(handler-bind (#+sbcl(sb-kernel:redefinition-warning 'muffle-warning))
      ,@body))
