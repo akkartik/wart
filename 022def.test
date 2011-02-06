@@ -177,9 +177,13 @@
   :should be (cons 3 4))
 
 (wt-eval '(def foo7 args args))
-(test-wart "just a rest arg without parens"
-    :valueof (foo7 3 4 5)
-    :should be '(3 4 5))
+(test-wart "varargs without parens"
+  :valueof (foo7 3 4 5)
+  :should be '(3 4 5))
+
+(test-wart "varargs include keyword args"
+  :valueof (foo7 3 4 :a 5)
+  :should be '(3 4 :a 5))
 
 (wt-eval '(def foo8(a . b) b))
 (test-wart "dotted rest"

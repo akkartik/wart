@@ -21,14 +21,18 @@
 ; lazy optionals alternate var and default
 ; lazy optionals require keywords if rest is present
 (defun$ compile-params(params args body)
-  `(let* ((,$positionals  (positional-args ,args ',(rest-param params)))
-          (,$keywords   (keyword-args ,args ',(rest-param params))))
-    (let* ,(append
-             (get-required-arg-exprs params $positionals $keywords)
-             ; args go to rest before optional
-             (get-rest-arg-expr params $positionals $keywords)
-             (get-optional-arg-exprs params $positionals $keywords))
-      ,@body)))
+  (cond
+    ((not params)  `(progn ,@body))
+    ((not (consp params))   `(let* ((,params ,args)) ,@body))
+    (t
+      `(let* ((,$positionals  (positional-args ,args ',(rest-param params)))
+              (,$keywords   (keyword-args ,args ',(rest-param params))))
+        (let* ,(append
+                 (get-required-arg-exprs params $positionals $keywords)
+                 ; args go to rest before optional
+                 (get-rest-arg-expr params $positionals $keywords)
+                 (get-optional-arg-exprs params $positionals $keywords))
+          ,@body)))))
 
 (defun get-required-arg-exprs(params positionals keywords)
   (let ((required-params (required-params params)))
