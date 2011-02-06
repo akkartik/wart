@@ -46,3 +46,11 @@
 (test-wart "downcase doesn't mess with nil"
   :valueof (downcase nil)
   :should be nil)
+
+(test-wart "whitec works"
+  :valueof (whitec #\a)
+  :should be nil)
+
+(test-wart "tokens works"
+  :valueof (tokens "abc def")
+  :should be '("abc" "def"))
