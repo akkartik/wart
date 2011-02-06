@@ -2,6 +2,10 @@
   :valueof (if 34)
   :should be 34)
 
+(test-wart "if recognizes keyword else"
+  :valueof (if nil 35 :else 36)
+  :should be 36)
+
 (test-wart "iflet works"
   :valueof (iflet a 34 a 253)
   :should be 34)

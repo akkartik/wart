@@ -1,4 +1,4 @@
-(defmacro after(&body body)
+(mac after body
   (let (body finally) (split-at :do body)
     `(unwind-protect
        (do ,@body)
