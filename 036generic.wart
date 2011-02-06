@@ -58,6 +58,7 @@
              boolean ,$basefn
              symbol ,$basefn
              standard-char ,$basefn
+             base-char ,$basefn
              string ,$basefn
              bit ,$basefn
              integer ,$basefn

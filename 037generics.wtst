@@ -32,6 +32,18 @@
   :valueof (obj 1 2 3 4)
   :should be (obj 3 4 1 2))
 
+(test-wart "iso works on characters"
+  :valueof (iso #\a #\a)
+  :should be t)
+
+(test-wart "iso works on characters - 2"
+  :valueof (iso #\a #\b)
+  :should be nil)
+
+(test-wart "iso works on non-characters"
+  :valueof (iso #\tab #\tab)
+  :should be t)
+
 
 
 (test-wart "all works"
