@@ -15,6 +15,14 @@
   :valueof (as string 'A)
   :should be "a")
 
+(test-wart "coercing characters to string works"
+  :valueof (as string #\a)
+  :should be "a")
+
+(test-wart "len on strings works"
+  :valueof (len "Abc")
+  :should be 3)
+
 (test-wart "upcase works"
   :valueof (upcase "abc")
   :should be "ABC")
@@ -47,6 +55,10 @@
   :valueof (downcase nil)
   :should be nil)
 
+(test-wart "capitalize works"
+  :valueof (capitalize "abc")
+  :should be "Abc")
+
 (test-wart "whitec works"
   :valueof (whitec #\a)
   :should be nil)
@@ -54,3 +66,10 @@
 (test-wart "tokens works"
   :valueof (tokens "abc def")
   :should be '("abc" "def"))
+
+
+
+; integration test: map+strings
+(test-wart "map works on lists of strings"
+  :valueof (map 'capitalize '("abc" "def"))
+  :should be '("Abc" "Def"))

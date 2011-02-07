@@ -11,6 +11,11 @@
   (setf (elt s index)
         val))
 
+(defcoerce standard-char string
+  [as string list._])
+(defcoerce basic-char string
+  [as string list._])
+
 (defcoerce symbol string
   [map 'char-downcase (symbol-name _)])
 (defcoerce symbol cons
@@ -35,6 +40,11 @@
   :coerce-to-cons)
 (defmethod downcase(s) standard-char
   (char-downcase s))
+
+(def capitalize(word)
+  (let chars (coerce word 'cons)
+    (as string (cons (char-upcase car.chars)
+                     (cdr chars)))))
 
 
 
@@ -68,3 +78,7 @@
                  :else  (self cdr.cs toks (cons car.cs tok))))
     (rev (map [as string _]
               (map 'rev (call rec (as cons s) nil nil))))))
+
+(def intersperse (x ys)
+  (and ys (cons (car ys)
+                (mappend [list x _] (cdr ys)))))
