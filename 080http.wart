@@ -2,11 +2,13 @@
 ;; assumes it's behind a reverse proxy
 (def http-serve(? port 8080)
   (w/server-socket s port
-    (accepting stream :from s
-      (handle-req stream))))
+    (repeat 6
+      (fork (thunk
+              (accepting stream :from s
+                (handle-req stream)))))))
 
 (def http-handler(req)
-  (prn "Hello, world!"))
+  (prn "Hello from " (getpid)))
 
 
 
