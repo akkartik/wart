@@ -1,4 +1,4 @@
-(wt-eval '(deftem t1 a "abc" b "def"))
+(wt-eval '(deftem t1() a "abc" b "def"))
 (test-wart "inst uses templates for per-key defaults"
   :valueof (iso (inst 't1 'b 34 'd 42)
                 (obj a "abc" b 34 d 42))

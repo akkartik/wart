@@ -1,16 +1,14 @@
 (= templates* (table))
 
-(mac deftem(tem . fields)
-  (withs (name car.tem
-          includes cdr.tem)
-    `(do1 nil
-       (= (call templates* ',name)
-          (join
-              (mappend templates* ',rev.includes)
-              (list
-                ,@(map (fn((k v))
-                         `(list ',k (thunk ,v)))
-                       pair.fields)))))))
+(mac deftem(name includes . fields)
+  `(do1 nil
+     (= (call templates* ',name)
+        (join
+            (mappend templates* ',rev.includes)
+            (list
+              ,@(map (fn((k v))
+                       `(list ',k (thunk ,v)))
+                     pair.fields))))))
 
 (def inst(tem . args)
   (ret x (table)
