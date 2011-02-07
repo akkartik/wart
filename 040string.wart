@@ -86,7 +86,7 @@
              p1
              0)
            (if (in where 'back 'end 'both)
-             (call only.+ (rpos ~f s) 1)))
+             (1+ (rpos ~f s))))
       "")))
 
 (def tokens(s ? sep 'whitec)
