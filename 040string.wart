@@ -13,7 +13,7 @@
 
 (defcoerce standard-char string
   [as string list._])
-(defcoerce basic-char string
+(defcoerce base-char string
   [as string list._])
 
 (defcoerce symbol string
@@ -45,7 +45,7 @@
   (apply 'concatenate 'string (map [as string _] args)))
 (defmethod join args standard-char
   (apply 'concatenate 'string (map [as string _] args)))
-(defmethod join args basic-char
+(defmethod join args base-char
   (apply 'concatenate 'string (map [as string _] args)))
 
 (def capitalize(word)
