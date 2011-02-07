@@ -41,10 +41,16 @@
 (defmethod downcase(s) standard-char
   (char-downcase s))
 
+(defmethod join args string
+  (apply 'concatenate 'string (map [as string _] args)))
+(defmethod join args standard-char
+  (apply 'concatenate 'string (map [as string _] args)))
+(defmethod join args basic-char
+  (apply 'concatenate 'string (map [as string _] args)))
+
 (def capitalize(word)
-  (let chars (coerce word 'cons)
-    (as string (cons (char-upcase car.chars)
-                     (cdr chars)))))
+  (join (char-upcase word.0)
+        (cut word 1)))
 
 
 

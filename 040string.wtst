@@ -67,6 +67,14 @@
   :valueof (tokens "abc def")
   :should be '("abc" "def"))
 
+(test-wart "join works on chars and strings"
+  :valueof (join #\a "bcd")
+  :should be "abcd")
+
+(test-wart "join works on chars and strings"
+  :valueof (join #\a "bc" #\d)
+  :should be "abcd")
+
 
 
 ; integration test: map+strings
