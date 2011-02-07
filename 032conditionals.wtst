@@ -102,3 +102,19 @@
 (test-wart "check works with alternate"
   :valueof (check (+ 10 10) oddp "foo")
   :should be "foo")
+
+(test-wart "only works"
+  :valueof (with (f [+ _ 1]
+                  a 34)
+             (call only.f a))
+  :should be 35)
+
+(test-wart "only works - 2"
+  :valueof (with (f [+ _ 1]
+                  a nil)
+             (call only.f a))
+  :should be nil)
+
+(test-wart "only works with predefined functions"
+  :valueof (call only.oddp 3)
+  :should be t)

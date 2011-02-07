@@ -91,7 +91,7 @@
      ,$x
      ,alt))
 
-(def only(f)
-  (fn args
-    (if car.args
-      (apply f args))))
+(mac only(f)
+  `(fn ,$args
+     (if (car ,$args)
+       (apply (fslot ,f) ,$args))))
