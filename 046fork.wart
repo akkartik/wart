@@ -9,6 +9,14 @@
       :do
         (quit)))))
 
-(synonym spawn sb-thread:make-thread
-         wait-for-children sb-posix:wait
+(synonym wait-for-children sb-posix:wait
          getpid sb-posix:getpid)
+
+
+
+;; Threads
+(mac spawn args
+  (if (and (singlep args)
+           (isa car.args 'function))
+    `(sb-thread:make-thread ,car.args)
+    `(apply 'sb-thread:make-thread (fn() ,@args))))
