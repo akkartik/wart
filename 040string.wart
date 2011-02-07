@@ -77,6 +77,18 @@
 (def whitec(c)
   (in c #\space #\newline #\tab #\return))
 
+(def trim(s ? where 'both test 'whitec)
+  (withs (f   (testify test)
+          p1  (pos ~f s))
+    (if p1
+      (cut s
+           (if (in where 'front 'start 'both)
+             p1
+             0)
+           (if (in where 'back 'end 'both)
+             (call only.+ (rpos ~f s) 1)))
+      "")))
+
 (def tokens(s ? sep 'whitec)
   (let rec (afn(cs toks tok)
              (if no.cs   (cons tok toks)

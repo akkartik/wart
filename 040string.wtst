@@ -59,14 +59,6 @@
   :valueof (capitalize "abc")
   :should be "Abc")
 
-(test-wart "whitec works"
-  :valueof (whitec #\a)
-  :should be nil)
-
-(test-wart "tokens works"
-  :valueof (tokens "abc def")
-  :should be '("abc" "def"))
-
 (test-wart "join works on chars and strings"
   :valueof (join #\a "bcd")
   :should be "abcd")
@@ -74,6 +66,34 @@
 (test-wart "join works on chars and strings"
   :valueof (join #\a "bc" #\d)
   :should be "abcd")
+
+(test-wart "whitec works"
+  :valueof (whitec #\a)
+  :should be nil)
+
+(test-wart "trim works"
+  :valueof (trim "   abc d e f  ")
+  :should be "abc d e f")
+
+(test-wart "trim works on just whitespace"
+  :valueof (trim " 	")
+  :should be "")
+
+(test-wart "trim works on empty string"
+  :valueof (trim "")
+  :should be "")
+
+(test-wart "trim works in front"
+  :valueof (trim "   abc d e f  " 'start)
+  :should be "abc d e f  ")
+
+(test-wart "trim works in back"
+  :valueof (trim "   abc d e f  " 'back)
+  :should be "   abc d e f")
+
+(test-wart "tokens works"
+  :valueof (tokens "abc def")
+  :should be '("abc" "def"))
 
 
 
