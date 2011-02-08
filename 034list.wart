@@ -23,3 +23,9 @@
   (list (cut seq 0 pos) (cut seq pos)))
 
 (alias copy copy-seq)
+
+(def alist(list-of-pairs)
+  (map0 [let (x y) _ (cons x y)] list-of-pairs))
+
+(def dot((a b))
+  (cons a b))

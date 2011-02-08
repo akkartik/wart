@@ -9,25 +9,24 @@
          path   path
          query  query
          headers  headers
-         cookies  (parse-cookies headers)
-         args   (call only.parse-args query))))
+         cookies  (parse-http-cookies headers)
+         args   (parse-http-args query))))
 
 (def parse-http-headers(? from stdin*)
   (let line read-line.from
     (awhen (pos #\: line)
-      (cons (list (map 'downcase (cut line 0 it))
+      (cons (cons (map 'downcase (cut line 0 it))
                   (trim (cut line 1+.it)))
             (parse-http-headers from)))))
 
-(def parse-cookies(reqhds)
-  (reduce 'join
-    (map [map [tokens trim._ #\=]
-              (tokens _.1 #\;)]
-         (keep [iso "cookie" car._] reqhds))))
+(def parse-http-cookies(headers)
+  (map [dot (tokens trim._ #\=)]
+       (tokens (alref "cookie" headers) #\;)))
 
-(def parse-args(argstr)
-  (map [map 'urldecode (tokens _ #\=)]
-       (tokens argstr #\&)))
+(def parse-http-args(args)
+  (when args
+    (map [dot (map 'urldecode (tokens _ #\=))]
+         (tokens args #\&))))
 
 (= http-ok+         "200 OK"
    http-created+    "201 Created"

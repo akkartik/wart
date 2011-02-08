@@ -37,7 +37,7 @@
     (rec x nil)))
 
 (defun alref(key alist)
-  (cdr (assoc key alist)))
+  (cdr (assoc key alist :test 'equal)))
 
 ; helper for certain kinds of recursive functions
 (defun append-or-afresh(f x xss)
