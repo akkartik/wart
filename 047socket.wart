@@ -12,9 +12,10 @@
      :do
        (socket-close ,var))))
 
-(mac accepting(stream from . body)
+(mac accepting(stream from ? ip 'ip . body)
   `(forever
      (withs (,$conn   (socket-accept ,from)
+             ,ip      (multiple-value-list (socket-peername ,$conn))
              ,stream  (socket-make-stream ,$conn :input t :output t))
        (after ,@body :do (socket-close ,$conn)))))
 
@@ -36,7 +37,8 @@
          socket-accept sb-bsd-sockets:socket-accept
          socket-close sb-bsd-sockets:socket-close
          socket-make-stream sb-bsd-sockets:socket-make-stream
-         make-inet-address sb-bsd-sockets:make-inet-address)
+         make-inet-address sb-bsd-sockets:make-inet-address
+         socket-peername sb-bsd-sockets:socket-peername)
 
 (def make-socket(host port ? server nil)
   (ret sock (make-instance 'sb-bsd-sockets:inet-socket
