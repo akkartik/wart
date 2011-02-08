@@ -32,13 +32,11 @@
          (tokens args #\&))))
 
 (def parse-http-body(headers body)
-  (prn "content-type: " (alref "content-type" headers))
   (when (search "x-www-form-urlencoded"
                 (alref "content-type" headers))
     (parse-http-args body)))
 
 (def read-body(headers ? from stdin*)
-  (prn "content-length: " (alref "content-length" headers))
   (whenlet num (aand (alref "content-length" headers)
                      (errsafe int.it))
     (str (accum acc
