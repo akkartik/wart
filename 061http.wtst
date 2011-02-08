@@ -36,3 +36,7 @@ Cookie: abc=def;foo=bar")
 (test-wart "parse-http-args urldecodes"
   :valueof (parse-http-args "foo=a+b+c&bar=%2034")
   :should be '(("foo" . "a b c") ("bar" . " 34")))
+
+(test-wart "read-body works"
+  :valueof (fromstring http-get-request (read-body '(("content-length" . "20"))))
+  :should be "Host: localhost:8080")

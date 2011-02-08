@@ -3,14 +3,17 @@
 (def parse-http-request(? from stdin*)
   (withs ((method url protocol)   (tokens read-line.from)
           (path query)  (tokens url #\?)
-          headers   (parse-http-headers from))
+          headers   (parse-http-headers from)
+          body  (read-body headers from))
     (obj protocol   protocol
          method   (call sym^downcase method)
          path   path
          query  query
          headers  headers
          cookies  (parse-http-cookies headers)
-         args   (parse-http-args query))))
+         body   body
+         args   (join parse-http-args.query
+                      (parse-http-body headers body)))))
 
 (def parse-http-headers(? from stdin*)
   (let line read-line.from
@@ -27,6 +30,18 @@
   (when args
     (map [dot (map 'urldecode (tokens _ #\=))]
          (tokens args #\&))))
+
+(def parse-http-body(headers body)
+  (when (search "x-www-form-urlencoded"
+                (alref "content-type" headers))
+    (parse-http-args body)))
+
+(def read-body(headers ? from stdin*)
+  (whenlet num (aand (alref "content-length" headers)
+                     (errsafe int.it))
+    (str (accum acc
+           (repeat num
+             (acc (read-char from)))))))
 
 (= http-ok+         "200 OK"
    http-created+    "201 Created"
