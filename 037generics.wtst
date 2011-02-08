@@ -98,6 +98,18 @@
   :valueof (join "abc" "def")
   :should be "abcdef")
 
+(test-wart "join can handle nils, especially as last arg"
+  :valueof (join nil '(3 4) nil '(5) '(6) nil)
+  :should be '(3 4 5 6))
+
+(test-wart "join handles zero-args"
+  :valueof (join)
+  :should be nil)
+
+(test-wart "join handles all null args"
+  :valueof (join nil nil nil)
+  :should be nil)
+
 (test-wart "pos works"
   :valueof (pos 'c '(a b c d))
   :should be 2)

@@ -3,6 +3,8 @@ can't compose *any* ssyntax with any package-interned symbol with a ':'.
 
 inserting say prn^ requires a call-fn or call. still a single edit, though.
 
+can't use dot with functions before they're defined
+
 case-insensitive symbols. converting strings to syms loses information.
 
 can't defover string because it's also a type. so we're stuck with a useless
