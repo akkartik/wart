@@ -13,6 +13,10 @@
   (apply 'pr args)
   (format t "~%")
   (car args))
+(defun prrn(&rest args)
+  (map 'list 'pr args)
+  (prn #\return)
+  (car args))
 
 (defun writeln(&rest args)
   (map 'list 'write args)
