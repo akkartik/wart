@@ -31,3 +31,12 @@
   (ret ans (table)
     (each (k v) (coerce rep.x 'hash-table)
       (= (call ans unserialize.k) unserialize.v))))
+
+
+
+(def peek(stream)
+  (peek-char nil stream nil))
+
+(def wart-read-line(stream)
+  (read-line stream nil))
+(defover read-line wart-read-line)

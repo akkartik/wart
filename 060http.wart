@@ -1,0 +1,38 @@
+;; http://www.arclanguage.org/item?id=11337
+
+(def parse-http-request(? from stdin*)
+  (withs ((method url protocol)   (tokens read-line.from)
+          (path query)  (tokens url #\?)
+          headers   (parse-http-headers from))
+    (obj protocol   protocol
+         method   (call sym^downcase method)
+         path   path
+         query  query
+         headers  headers
+         cookies  (parse-cookies headers)
+         args   (call only.parse-args query))))
+
+(def parse-http-headers(? from stdin*)
+  (let line read-line.from
+    (awhen (pos #\: line)
+      (cons (list (map 'downcase (cut line 0 it))
+                  (trim (cut line 1+.it)))
+            (parse-http-headers from)))))
+
+(def parse-cookies(reqhds)
+  (reduce 'join
+    (map [map [tokens trim._ #\=]
+              (tokens _.1 #\;)]
+         (keep [iso "cookie" car._] reqhds))))
+
+(def parse-args(argstr)
+  (map [tokens _ #\=]
+       (tokens argstr #\&)))
+
+(= http-ok+         "200 OK"
+   http-created+    "201 Created"
+   http-found+      "302 Found"
+   http-notmod+     "304 Not Modified"
+   http-bad+        "400 Bad Request"
+   http-forbidden+  "403 Forbidden"
+   http-notfound+   "404 Not Found")
