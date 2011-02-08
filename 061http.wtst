@@ -67,3 +67,7 @@ Cookie: abc=def;foo=bar")
              (call (http-get (join "127.0.0.1:" port "/foo"))
                    'body))
   :should be "Hello world!")
+
+(test-wart "http-get performs dns lookup"
+  :valueof (call (http-get "www.google.com") 'body)
+  :should satisfy true_value)

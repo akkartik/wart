@@ -19,9 +19,14 @@
              ,stream  (socket-make-stream ,$conn :input t :output t))
        (after ,@body :do (socket-close ,$conn)))))
 
+(def inet-address(name)
+  (if (some 'letter name)
+    (nslookup name)
+    (make-inet-address name)))
+
 (mac connecting(stream ? to "127.0.0.1" at 80 . body)
   `(w/socket ,$sock :host ,to :port ,at
-      (socket-connect ,$sock :host (make-inet-address ,to)
+      (socket-connect ,$sock :host (inet-address ,to)
                              :port ,at)
       (let ,stream (socket-make-stream ,$sock :input t :output t)
         ,@body)))
@@ -45,7 +50,7 @@
                            :type :stream :protocol :tcp)
     (when server
       (set (sb-bsd-sockets:sockopt-reuse-address sock))
-      (socket-bind sock make-inet-address.host port)
+      (socket-bind sock inet-address.host port)
       (socket-listen sock :backlog 20))))
 
 (def socket-listen(socket backlog)
@@ -53,3 +58,6 @@
 
 (def socket-connect(socket host port)
   (sb-bsd-sockets:socket-connect socket host port))
+
+(def nslookup(name)
+  (car (sb-bsd-sockets:host-ent-addresses (sb-bsd-sockets:get-host-by-name name))))
