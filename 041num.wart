@@ -21,8 +21,10 @@
     (as integer x)))
 (defover int wart-int)
 
-(def int-string(x ? base 10)
-  (write-to-string x :base base))
+(def str(x ? base 10)
+  (if (isa x 'integer)
+    (write-to-string x :base base)
+    (as string x)))
 
 (def mapn(f a b)
   (call rev^accumulate :over a :taking f :next '1+ :unless [> _ b]))

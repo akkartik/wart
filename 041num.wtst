@@ -14,8 +14,8 @@
   :valueof (int "23" :base 16)
   :should be 35)
 
-(test-wart "int-string works with base"
-  :valueof (int-string 32 :base 5)
+(test-wart "str works with base"
+  :valueof (str 32 :base 5)
   :should be "112")
 
 (test-wart "int coerces to char"

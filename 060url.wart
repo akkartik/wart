@@ -15,4 +15,4 @@
       (write-char #\%)
       (let i int.c
         (if (< i 16) (write-char #\0))
-        (pr (int-string i :base 16))))))
+        (pr (str i :base 16))))))

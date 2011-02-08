@@ -1,9 +1,5 @@
 (synonym newstring make-string)
 
-; can't defover string
-(def stringify(x)
-  (as string x))
-
 (defcall string s
   [elt s _])
 
