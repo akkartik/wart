@@ -73,10 +73,10 @@
         (let (protocol status . reason)   (tokens read-line.stream)
           (obj protocol protocol
                status status
-               reason reason
+               reason (intersperse " " reason)
                headers parse-http-headers.stream
                nil read-line.stream ; chomp newline after headers
-               body read-line.stream))))))
+               body (intersperse #\newline (drain read-line.stream))))))))
 
 (def pr-headers(headers)
   (each (n v) headers
