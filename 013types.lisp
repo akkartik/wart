@@ -3,6 +3,10 @@
 (defun wart-type(x)
   (cond
     ((macp x)   'macro)
+    ((characterp x)  'character)
+    ((floatp x)   'float)
+    ((stringp x)  'string)
+    ((integerp x)   'integer)
     ((match x '(tagged _ _))  (cadr x))
     (t  (generalized-common-lisp-type-specifier (type-of x)))))
 (defover type wart-type) ; reserved keyword. bad dog in the manger CL!

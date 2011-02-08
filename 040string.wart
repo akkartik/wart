@@ -11,9 +11,7 @@
   (setf (elt s index)
         val))
 
-(defcoerce standard-char string
-  [as string list._])
-(defcoerce base-char string
+(defcoerce character string
   [as string list._])
 
 (defcoerce symbol string
@@ -29,7 +27,7 @@
   nil)
 (defmethod upcase(s) symbol
   :coerce-to-cons)
-(defmethod upcase(s) standard-char
+(defmethod upcase(s) character
   (char-upcase s))
 
 (defgeneric downcase(s)
@@ -38,14 +36,12 @@
   nil)
 (defmethod downcase(s) symbol
   :coerce-to-cons)
-(defmethod downcase(s) standard-char
+(defmethod downcase(s) character
   (char-downcase s))
 
 (defmethod join args string
   (apply 'concatenate 'string (map [as string _] args)))
-(defmethod join args standard-char
-  (apply 'concatenate 'string (map [as string _] args)))
-(defmethod join args base-char
+(defmethod join args character
   (apply 'concatenate 'string (map [as string _] args)))
 
 (def capitalize(word)

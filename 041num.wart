@@ -5,9 +5,7 @@
 
 (defcoerce integer character
   'code-char)
-(defcoerce standard-char integer
-  'char-code)
-(defcoerce base-char integer
+(defcoerce character integer
   'char-code)
 
 (defgeneric wart-> args

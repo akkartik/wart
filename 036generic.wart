@@ -57,10 +57,9 @@
         (obj null ,$basefn
              boolean ,$basefn
              symbol ,$basefn
-             standard-char ,$basefn
-             base-char ,$basefn
+             character ,$basefn
              string ,$basefn
              bit ,$basefn
              integer ,$basefn
-             single-float ,$basefn
+             float ,$basefn
              cons ,$basefn))))
