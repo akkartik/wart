@@ -3,6 +3,13 @@
 (defcoerce string integer
   'read-from-string)
 
+(defcoerce integer character
+  'code-char)
+(defcoerce standard-char integer
+  'char-code)
+(defcoerce base-char integer
+  'char-code)
+
 (defgeneric wart-> args
   (apply '> args))
 (defover > wart->)
@@ -15,6 +22,9 @@
     (parse-integer x :radix base)
     (as integer x)))
 (defover int wart-int)
+
+(def int-string(x ? base 10)
+  (write-to-string x :base base))
 
 (def mapn(f a b)
   (call rev^accumulate :over a :taking f :next '1+ :unless [> _ b]))

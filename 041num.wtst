@@ -14,6 +14,18 @@
   :valueof (int "23" :base 16)
   :should be 35)
 
+(test-wart "int-string works with base"
+  :valueof (int-string 32 :base 5)
+  :should be "112")
+
+(test-wart "int coerces to char"
+  :valueof (as character 97)
+  :should be #\a)
+
+(test-wart "char coerces to int"
+  :valueof (as integer #\a)
+  :should be 97)
+
 (test-wart "mapn works"
   :valueof (mapn [* _ _] 3 5)
   :should be '(9 16 25))

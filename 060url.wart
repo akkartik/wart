@@ -1,0 +1,18 @@
+(def urldecode(s)
+  (tostring
+    (forlen i s
+      (caselet c s.i
+        #\+ (write-char #\space stdout*)
+        #\% (do (when (< i (- len.s 2))
+                  (write-char (code-char (int (cut s 1+.i (+ i 3)) :base 16))
+                              stdout*))
+                (++ i 2))
+            (write-char c stdout*)))))
+
+(def urlencode(s)
+  (tostring
+    (each c s
+      (write-char #\% stdout*)
+      (let i (char-code c)
+        (if (< i 16) (write-char #\0 stdout*))
+        (pr (int-string i :base 16))))))

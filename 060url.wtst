@@ -1,0 +1,16 @@
+(test-wart "urldecode works"
+  :valueof (urldecode "a+b+c")
+  :should be "a b c")
+
+(test-wart "urldecode works - 2"
+  :valueof (urldecode "a%20b")
+  :should be "a b")
+
+(test-wart "urlencode works"
+  :valueof (urldecode (urlencode "a b c"))
+  :should be "a b c")
+
+(test-wart "urlencode works - 2"
+  :valueof (urldecode (urlencode "a b://c"))
+  :should be "a b://c")
+

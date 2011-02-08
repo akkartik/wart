@@ -31,3 +31,7 @@ Cookie: abc=def;foo=bar")
 (test-wart "parse-args works"
   :valueof (parse-args "foo=bar&baz=42")
   :should be '(("foo" "bar") ("baz" "42")))
+
+(test-wart "parse-args urldecodes"
+  :valueof (parse-args "foo=a+b+c&bar=%2034")
+  :should be '(("foo" "a b c") ("bar" " 34")))
