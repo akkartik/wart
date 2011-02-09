@@ -26,6 +26,7 @@
   `(or ,@(map0 (fn(c) `(iso ,$x ,c))
                choices)))
 
+; bootstrapping version
 (def testify(x)
   (or (function-value x)
       [iso _ x]))

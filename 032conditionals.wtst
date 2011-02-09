@@ -62,6 +62,10 @@
   :valueof (call testify!oddp 3)
   :should be t)
 
+(test-wart "testify works with an atom"
+  :valueof (call testify.3 3)
+  :should be t)
+
 (test-wart "testify always returns a function"
   :valueof (call ~testify!oddp 3)
   :should be nil)

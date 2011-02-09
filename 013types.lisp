@@ -7,6 +7,7 @@
     ((floatp x)   'float)
     ((stringp x)  'string)
     ((integerp x)   'integer)
+    ((keywordp x)   'symbol)
     ((match x '(tagged _ _))  (cadr x))
     (t  (generalized-common-lisp-type-specifier (type-of x)))))
 (defover type wart-type) ; reserved keyword. bad dog in the manger CL!

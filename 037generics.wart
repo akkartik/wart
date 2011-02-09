@@ -1,3 +1,11 @@
+(defgeneric testify(x)
+  (or (function-value x)
+      [iso _ x]))
+(defmethod testify(x) function
+  (function-value x))
+(defmethod testify(x) cons
+  [find _ x])
+
 (ignore-redef
   (defgeneric len(x)
     (length x)))

@@ -1,3 +1,17 @@
+(test-wart "testify works with an atom"
+  :valueof (call testify.3 3)
+  :should be t)
+
+(test-wart "testify works with a list"
+  :valueof (call (testify '(1 2 3)) 3)
+  :should satisfy true_value)
+
+(test-wart "testify always returns a function"
+  :valueof (call ~testify!oddp 3)
+  :should be nil)
+
+
+
 (test "len works by default"
   :valueof (len nil)
   :should be 0)
