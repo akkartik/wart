@@ -89,9 +89,8 @@
     (rev (map [as string _]
               (map 'rev (call rec (as cons s) nil nil))))))
 
-(def intersperse(x ys)
+(def intersperse(x ys ? as 'cons)
   (if ys
-    (ret ans (cons car.ys (mappend [list x _]
-                                   cdr.ys))
-      (if (isa car.ys 'string)
-        (zap [apply 'join _] ans)))))
+    (coerce (cons car.ys (mappend [list x _]
+                                  cdr.ys))
+            as)))

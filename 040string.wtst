@@ -108,7 +108,7 @@
   :should be '(1 3 2 3 4))
 
 (test-wart "intersperse implicitly joins lists of strings"
-  :valueof (intersperse " " '("a" "b" "c"))
+  :valueof (intersperse :as 'string " " '("a" "b" "c"))
   :should be "a b c")
 
 

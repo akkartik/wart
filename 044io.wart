@@ -42,5 +42,5 @@
 (defover read-line wart-read-line)
 
 (def slurp(stream)
-  (intersperse #\newline
+  (intersperse :as 'string #\newline
                (drain read-line.stream)))
