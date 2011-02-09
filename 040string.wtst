@@ -55,10 +55,6 @@
   :valueof (downcase nil)
   :should be nil)
 
-(test-wart "capitalize works"
-  :valueof (capitalize "abc")
-  :should be "Abc")
-
 (test-wart "join works on chars and strings"
   :valueof (join #\a "bcd")
   :should be "abcd")
@@ -99,5 +95,5 @@
 
 ; integration test: map+strings
 (test-wart "map works on lists of strings"
-  :valueof (map 'capitalize '("abc" "def"))
+  :valueof (map 'string-capitalize '("abc" "def"))
   :should be '("Abc" "Def"))
