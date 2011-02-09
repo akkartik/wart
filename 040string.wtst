@@ -88,11 +88,11 @@
   :should be "")
 
 (test-wart "trim works in front"
-  :valueof (trim "   abc d e f  " 'start)
+  :valueof (trim "   abc d e f  " :from 'start)
   :should be "abc d e f  ")
 
 (test-wart "trim works in back"
-  :valueof (trim "   abc d e f  " 'back)
+  :valueof (trim "   abc d e f  " :from 'back)
   :should be "   abc d e f")
 
 (test-wart "tokens works"

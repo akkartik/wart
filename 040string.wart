@@ -73,15 +73,15 @@
 (def whitec(c)
   (in c #\space #\newline #\tab #\return))
 
-(def trim(s ? where 'both test 'whitec)
+(def trim(s ? from 'both test 'whitec)
   (withs (f   (testify test)
           p1  (pos ~f s))
     (if p1
       (cut s
-           (if (in where 'front 'start 'both)
+           (if (in from 'front 'start 'both)
              p1
              0)
-           (if (in where 'back 'end 'both)
+           (if (in from 'back 'end 'both)
              (1+ (rpos ~f s))))
       "")))
 
