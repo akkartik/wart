@@ -1,6 +1,6 @@
 (wt-eval '(do
             (= counter 0)
-            (defcache foocache 3 ++.counter)))
+            (defcache foocache 1 ++.counter)))
 (test-wart "defcache is like def the first call"
   :valueof (do (foocache) counter)
   :should be 1)
@@ -10,5 +10,5 @@
   :should be 1)
 
 (test-wart "defcache recomputes after timeout"
-  :valueof (do (sleep 3) (foocache) counter)
+  :valueof (do (sleep 1) (foocache) counter)
   :should be 2)

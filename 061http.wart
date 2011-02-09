@@ -71,12 +71,12 @@
         (flush))
       (w/stdin stream
         (let (protocol status . reason)   (tokens read-line.stream)
-          (obj protocol protocol
-               status status
-               reason (intersperse " " reason)
-               headers parse-http-headers.stream
-               nil read-line.stream ; chomp newline after headers
-               body (intersperse #\newline (drain read-line.stream))))))))
+          (obj protocol   protocol
+               status   status
+               reason   (intersperse " " reason)
+               headers  parse-http-headers.stream
+               nil  read-line.stream ; chomp newline after headers
+               body   slurp.stream))))))
 
 (def pr-headers(headers)
   (each (n v) headers
