@@ -73,7 +73,7 @@
         (let (protocol status . reason)   (tokens read-line.stream)
           (obj protocol   protocol
                status   status
-               reason   (str (intersperse " " reason))
+               reason   (intersperse " " reason)
                headers  parse-http-headers.stream
                nil  read-line.stream ; chomp newline after headers
                body   slurp.stream))))))
