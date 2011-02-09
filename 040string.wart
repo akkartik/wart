@@ -17,9 +17,9 @@
 (defcoerce character string
   [as string list._])
 (defcoerce cons string
-  [if (isa car._ 'character)
-    (cl-coerce _ 'string)
-    (apply 'join _)])
+  [if (all [isa _ 'character] _)
+    (cl-coerce _ 'string) ; base case
+    (apply 'join _)]) ; recurse
 
 
 

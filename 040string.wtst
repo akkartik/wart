@@ -27,6 +27,10 @@
   :valueof (as string '("a" "b" "c"))
   :should be "abc")
 
+(test-wart "coercing lists of chars or strings to string works"
+  :valueof (as string '(#\a #\b #\d "ef" #\g))
+  :should be "abdefg")
+
 (test-wart "len on strings works"
   :valueof (len "Abc")
   :should be 3)
