@@ -73,17 +73,54 @@
 (def whitec(c)
   (in c #\space #\newline #\tab #\return))
 
-(def trim(s ? from 'both test 'whitec)
-  (withs (f   (testify test)
-          p1  (pos ~f s))
-    (if p1
-      (cut s
-           (if (in from 'front 'start 'both)
-             p1
-             0)
-           (if (in from 'back 'end 'both)
-             (1+ (rpos ~f s))))
-      "")))
+;? (def trim(s ? from 'both test 'whitec)
+;?   (withs (f   (testify test)
+;?           p1  (pos ~f s))
+;?     (if p1
+;?       (cut s
+;?            (if (in from 'front 'start 'both)
+;?              p1
+;?              0)
+;?            (if (in from 'back 'end 'both)
+;?              (1+ (rpos ~f s))))
+;?       "")))
+
+;? (def trim(s ? from 'both test 'whitec)
+;?   (trim-start :from from :test test
+;?               (trim-end s from test)))
+;? 
+;? (def trim-start(s from test)
+;?   (if (in from 'front 'start 'both)
+;?     (aif (pos ~testify.test s)
+;?       (cut s it)
+;?       "")
+;?     s))
+;? 
+;? (def trim-end(s from test)
+;?   (if (in from 'back 'end 'both)
+;?     (aif (rpos ~testify.test s)
+;?       (cut s 0 1+.it)
+;?       "")
+;?     s))
+
+;? (def trim(s ? from 'both test 'whitec)
+;?   (ret s s
+;?     (if (in from 'front 'start 'both)
+;?       (= s (aif (pos ~testify.test s)
+;?              (cut s it)
+;?              "")))
+;?     (if (in from 'back 'end 'both)
+;?       (= s (aif (rpos ~testify.test s)
+;?              (cut s 0 1+.it)
+;?              "")))))
+
+(def trim(s ? from 'both all-of '(#\space #\newline #\tab #\return))
+  (case from
+    'both   (string-trim all-of s)
+    'front  (string-left-trim all-of s)
+    'start  (string-left-trim all-of s)
+    'back   (string-right-trim all-of s)
+    'end    (string-right-trim all-of s)))
 
 (def tokens(s ? sep 'whitec)
   (let rec (afn(cs toks tok)

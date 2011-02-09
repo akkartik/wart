@@ -95,6 +95,10 @@
   :valueof (trim "   abc d e f  " :from 'back)
   :should be "   abc d e f")
 
+(test-wart "trim can take a list of chars"
+  :valueof (trim "abcda" :all-of '(#\a))
+  :should be "bcd")
+
 (test-wart "tokens works"
   :valueof (tokens "abc def")
   :should be '("abc" "def"))
