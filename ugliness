@@ -13,4 +13,4 @@ function that can't handle symbols.
 
 zap and or= multiply-eval their place.
 
-intersperse checks types of args, something I want to avoid with facilities like defgeneric.
+intersperse checks types of args, something I want to avoid (by use of facilities like defgeneric).
