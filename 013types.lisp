@@ -33,6 +33,7 @@
 
 (setf *wart-coercions* (table))
 
+(defover cl-coerce coerce)
 (defun wart-coerce(val dest)
   (fa (indexing *wart-coercions* (dest (wart-type val))
         (funcall it val))

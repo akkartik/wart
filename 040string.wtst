@@ -19,6 +19,14 @@
   :valueof (as string #\a)
   :should be "a")
 
+(test-wart "coercing lists of chars to string works"
+  :valueof (as string '(#\a #\b #\d))
+  :should be "abd")
+
+(test-wart "coercing lists of strings to string works"
+  :valueof (as string '("a" "b" "c"))
+  :should be "abc")
+
 (test-wart "len on strings works"
   :valueof (len "Abc")
   :should be 3)
@@ -59,7 +67,7 @@
   :valueof (join #\a "bcd")
   :should be "abcd")
 
-(test-wart "join works on chars and strings"
+(test-wart "join works on chars and strings - 2"
   :valueof (join #\a "bc" #\d)
   :should be "abcd")
 
