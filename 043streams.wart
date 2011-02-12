@@ -1,5 +1,6 @@
 (defover stdin* *standard-input*)
 (defover stdout* *standard-output*)
+(defover stderr* *error-output*)
 (synonym flush force-output)
 
 (mac w/infile(var fname ? element-type :default . body)
