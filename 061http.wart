@@ -47,6 +47,8 @@
            (repeat num
              (acc (read-char from)))))))
 
+
+
 (def parse-url(url)
   (ret ans (obj protocol "http"
                 host nil
@@ -63,6 +65,16 @@
       (= ans!port (int (cut ans!host 1+.it))
          ans!host (cut ans!host 0 it)))))
 
+(def raw-get(url)
+  (let purl parse-url.url
+    (connecting stream :to purl!host :at purl!port
+      (w/stdout stream
+        (prrn (join "GET " purl!path " HTTP/1.0"))
+        (pr-headers (obj Host purl!host Connection "close"))
+        (flush))
+      (w/stdin stream
+        slurp.stream))))
+
 (def http-get(url)
   (let purl parse-url.url
     (connecting stream :to purl!host :at purl!port
@@ -76,8 +88,9 @@
                status   status
                reason   (intersperse " " reason)
                headers  parse-http-headers.stream
-               nil  read-line.stream ; chomp newline after headers
                body   slurp.stream))))))
+
+
 
 (def pr-headers(headers)
   (each (n v) headers
@@ -93,5 +106,11 @@
    http-notfound+   "404 Not Found")
 
 (= http-headers* (obj Server "wart"
-                      Content-Type "text/html"
-                      Connection "closed"))
+                      Content-Type "text/html; charset=utf-8"
+                      Connection "close"))
+
+(def error-page(status)
+  (prn "HTTP/1.1 " status)
+  (prrn "Content-Type: text/plain")
+  (prrn)
+  (prn (cut status 4)))
