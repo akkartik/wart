@@ -83,9 +83,9 @@
 
 (def tokens(s ? sep 'whitec)
   (let rec (afn(cs toks tok)
-             (if no.cs   (cons tok toks)
-                 (call testify.sep car.cs)   (self cdr.cs (cons tok toks) nil)
-                 :else  (self cdr.cs toks (cons car.cs tok))))
+             (if no.cs   (consif tok toks)
+               (call testify.sep car.cs)   (self cdr.cs (consif tok toks) nil)
+               :else  (self cdr.cs toks (cons car.cs tok))))
     (rev (map [as string _]
               (map 'rev (call rec (as cons s) nil nil))))))
 

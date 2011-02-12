@@ -107,6 +107,10 @@
   :valueof (tokens "abc def")
   :should be '("abc" "def"))
 
+(test-wart "tokens skips leading delimiters like in arc"
+  :valueof (tokens "  abc def")
+  :should be '("abc" "def"))
+
 (test-wart "intersperse works"
   :valueof (intersperse 3 '(1 2 4))
   :should be '(1 3 2 3 4))
