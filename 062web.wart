@@ -58,10 +58,10 @@
 (def register-url(str f)
   (if (some [in _ #\: #\*] str)
     (register-complex-url str f)
-    (= liturls*.str f)))
+    (newdef liturls*.str f)))
 
 (def register-complex-url(str f)
   (let ustruct (list (tokens str #\/) f)
     (aif (assoc str complex-urls*)
-      (= it.1 ustruct) ; already exists, replace
+      (newdef it.1 ustruct) ; already exists, replace
       (push (list str ustruct) complex-urls*))))

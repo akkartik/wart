@@ -7,7 +7,6 @@
       cached)))
 
 (mac defcache(name lasts . body)
-  `(do1 nil
-     (= (symbol-function ',name)
-        (cache (thunk ,lasts)
-               (thunk ,@body)))))
+  `(newdef (symbol-function ',name)
+           (cache (thunk ,lasts)
+                  (thunk ,@body))))

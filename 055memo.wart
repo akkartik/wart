@@ -6,9 +6,8 @@
           (and (no nilcache.args)
                (aif (apply f args)
                     (= cache.args it)
-                    (do1 nil
-                         (set nilcache.args))))))))
+                    (newdef nilcache.args t)))))))
 
 (mac defmemo(name parms . body)
-  `(= (symbol-function ',name)
-      (memo (fn ,parms ,@body))))
+  `(newdef (symbol-function ',name)
+           (memo (fn ,parms ,@body))))

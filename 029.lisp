@@ -9,6 +9,10 @@
 (defover do progn)
 (macro-alias do1 prog1)
 
+; don't try to print complex things at the repl
+(mac perform body
+  `(do1 nil ,@body))
+
 (defover ++ incf)
 (macro-alias -- decf)
 
