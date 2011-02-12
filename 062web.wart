@@ -1,5 +1,4 @@
-;; http://www.arclanguage.org/item?id=11337
-
+#-win32
 (def http-serve(? num-workers 6 port 8080)
   (w/server-socket s port
     (repeat num-workers
@@ -8,6 +7,16 @@
                 (w/stdout stream
                   (dispatch (parse-http-request ip stream)))))))
     (wait-for-children)))
+
+#-darwin
+(def http-serve(? port 8080)
+  (spawn
+    (w/server-socket s port
+      (accepting stream :from s
+        (w/stdout stream
+          (dispatch (parse-http-request ip stream)))))))
+
+;; http://www.arclanguage.org/item?id=11337
 
 (mac defurl-raw (url vars . body)
   `(register-url ,(str url) (fn ,vars ,@body)))
