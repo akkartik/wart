@@ -24,6 +24,12 @@
   (write serialize.x :stream port))
 (defover write wart-write)
 
+(ignore-redef
+  (def writeln args
+    (map 'write args)
+    (prn)
+    (car args)))
+
 
 
 (defmethod serialize(x) hash-table
