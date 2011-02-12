@@ -1,0 +1,18 @@
+Wart, the thin arc-like membrane atop Common Lisp -- http://github.com/akkartik/wart
+Feedback: wart@akkartik.com
+
+Rationale: http://arclanguage.org/item?id=12814
+In short, wart tries to be as arc-like as possible while making Common Lisp do
+as much of the work as possible.
+
+Reasons to try out wart:
+* You know arc and want to play with Common Lisp
+* You know Common Lisp and want to play with something arc-like
+* You want to read a simple arc-like implementation
+* You want an arc-like lisp that can use multiple cores of your processor
+
+Reasons to stick with arc:
+* You'll often have to say (call f arg) rather than (f arg)
+* You'll have to compose functions using (call f1^f2 arg) rather than (f1:f2 arg)
+* You need call/cc and first-class continuations
+* You'll need to wrap expressions in (perform ..) at the REPL because Common Lisp can't print certain kinds of objects.
