@@ -1,0 +1,36 @@
+(wt-eval '(defurl "/foo"(req)
+            (prn 42)))
+(test-wart "defurl works on simple urls"
+  :valueof (call liturls* "/foo")
+  :should satisfy true_value)
+
+(test-wart "url-handler finds simple urls"
+  :valueof (url-handler "/foo")
+  :should satisfy true_value)
+
+(wt-eval '(defurl "/user/:"(req user)
+            (prn user)))
+(test-wart "defurl works with complex urls"
+  :valueof complex-urls*
+  :should match '(("/user/:" (("user" ":") _))))
+
+(test-wart "url-handler finds complex urls"
+  :valueof (url-handler "/user/foo")
+  :should satisfy consp)
+
+
+
+; integration test: defurl+dispatch
+(wt-eval '(defurl "/path/*"(req path)
+            (prn path)))
+(test-wart "dispatch handles complex urls with *"
+  :valueof (let port (+ 1024 rand.80)
+             ; server
+             (w/server-socket s port
+               (fork (thunk (accepting stream :from s
+                              (w/stdout stream
+                                (dispatch (parse-http-request ip stream)))))))
+             ; client
+             (call (http-get (join "127.0.0.1:" port "/path/foo/bar/baz"))
+                   'body))
+  :should be "foo/bar/baz")
