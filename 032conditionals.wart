@@ -45,7 +45,7 @@
 (defover case wart-case)
 
 (mac check(o$expr test ? alt nil)
-  `(if (call ',test ,$expr)
+  `(if (call (fslot ,test) ,$expr)
      ,$expr
      ,alt))
 
@@ -86,11 +86,6 @@
     (no cdr.args)   car.args
                     `(let it ,(car args)
                        (and it (aand ,@(cdr args))))))
-
-(mac check(o$x test ? alt nil)
-  `(if (,test ,$x)
-     ,$x
-     ,alt))
 
 (mac only(f)
   `(fn ,$args

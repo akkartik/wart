@@ -107,6 +107,14 @@
   :valueof (check (+ 10 10) oddp "foo")
   :should be "foo")
 
+(test-wart "check works with fns"
+  :valueof (check (+ 10 10) [oddp _] "foo")
+  :should be "foo")
+
+(test-wart "check works with ssyntax"
+  :valueof (check (+ 10 10) ~evenp "foo")
+  :should be "foo")
+
 (test-wart "only works"
   :valueof (with (f [+ _ 1]
                   a 34)
