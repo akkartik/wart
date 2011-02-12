@@ -10,4 +10,7 @@
 (defpath /foo(req)
   (prn "bar"))
 
+(defpath "/user/:"(req user)
+  (prn "user is " user))
+
 (http-serve)

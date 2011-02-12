@@ -41,7 +41,7 @@
       (case cc.0.0  ; first char
         #\: (complexpath-match (cdr pc) (cdr cc) (cons (car pc) acc))
         #\* (cons (intersperse #\/ pc) acc)
-            (when (is cc.0 (car pc))  ; literal token
+            (when (iso cc.0 pc.0)  ; literal token
               (complexpath-match (cdr pc) (cdr cc) acc))))))
 
 (mac defpath-raw (path vars . body)
