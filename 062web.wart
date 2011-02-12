@@ -1,3 +1,12 @@
+#-darwin
+(def http-serve(? port 8080)
+  (spawn
+    (w/server-socket s port
+      (accepting stream :from s
+        (spawn
+          (let req (parse-http-request ip stream)
+            (w/stdout stream dispatch.req)))))))
+
 #-win32
 (def http-serve(? num-workers 6 port 8080)
   (w/server-socket s port
@@ -7,14 +16,6 @@
                 (w/stdout stream
                   (dispatch (parse-http-request ip stream)))))))
     (wait-for-children)))
-
-#-darwin
-(def http-serve(? port 8080)
-  (spawn
-    (w/server-socket s port
-      (accepting stream :from s
-        (w/stdout stream
-          (dispatch (parse-http-request ip stream)))))))
 
 ;; http://www.arclanguage.org/item?id=11337
 
