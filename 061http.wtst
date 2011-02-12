@@ -71,3 +71,20 @@ Cookie: abc=def;foo=bar")
 (test-wart "http-get performs dns lookup"
   :valueof (call (http-get "www.google.com") 'body)
   :should satisfy true_value)
+
+(test-wart "http-get works with servers that send just \\n, not \\r\\n"
+  :valueof (let port (+ 1024 rand.80)
+             ; server
+             (w/server-socket s port
+               (fork (thunk (accepting stream :from s
+                              (w/stdout stream
+                                (prn "HTTP/1.1 " http-ok+)
+                                (each (n v) http-headers*
+                                  (prn n ": " v))
+                                (prn)
+                                (prn "")
+                                (prn "Hello world!"))))))
+             ; client
+             (call (http-get (join "127.0.0.1:" port "/foo"))
+                   'body))
+  :should be "Hello world!")
