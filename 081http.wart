@@ -4,10 +4,10 @@
       (fork (thunk
               (accepting stream :from s
                 (w/stdout stream
-                  (http-handler (parse-http-request ip stream)))))))
+                  (dispatch (parse-http-request ip stream)))))))
     (wait-for-children)))
 
-(def http-handler(req)
-  (prn req!ip)
-  (prn "<hr>")
-  (prn req!args))
+(defpath /foo(req)
+  (prn "bar"))
+
+(http-serve)

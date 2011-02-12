@@ -26,8 +26,9 @@
             (parse-http-headers from)))))
 
 (def parse-http-cookies(headers)
-  (map [dot (tokens trim._ #\=)]
-       (tokens (alref "cookie" headers) #\;)))
+  (aif (alref "cookie" headers)
+    (map [dot (tokens trim._ #\=)]
+         (tokens it #\;))))
 
 (def parse-http-args(args)
   (when args
