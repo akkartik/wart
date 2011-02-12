@@ -4,6 +4,10 @@
 (defmethod serialize(x) cons
   (map 'serialize x))
 
+; just to avoid errors while debugging
+(defmethod serialize(x) function
+  'function)
+
 (init-vtable unserialize(x) x)
 (defgeneric unserialize(x)
   x)
