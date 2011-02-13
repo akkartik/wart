@@ -14,9 +14,6 @@
 
 
 
-;; Threads
 (mac spawn args
-  (if (and (singlep args)
-           (isa car.args 'function))
-    `(perform (sb-thread:make-thread ,car.args))
-    `(perform (call 'sb-thread:make-thread (fn() ,@args)))))
+  `(perform
+     (sb-thread:make-thread (thunk ,@args))))
