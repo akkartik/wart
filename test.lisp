@@ -30,6 +30,12 @@
 (defmacro _let(var val &body body)
   `(funcall (lambda(,var) ,@body) ,val))
 
+(defmacro skipping(error &body body)
+  `(catch ',error
+      (handler-bind ((,error  (lambda(x)
+                                (throw ',error ',error))))
+        ,@body)))
+
 
 
 (loop for path in (directory "./*.*") do

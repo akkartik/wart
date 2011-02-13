@@ -7,8 +7,9 @@
                (fork (thunk (accepting stream :from s
                               (format stream read-line.stream)))))
              ; client
-             (connecting stream :at port
-               (format stream "~a~%" data)
-               (flush stream)
-               (read-line stream)))
+             (skipping sb-bsd-sockets:socket-error
+               (connecting stream :at port
+                 (format stream "~a~%" data)
+                 (flush stream)
+                 (read-line stream))))
   :should be "34")

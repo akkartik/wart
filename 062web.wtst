@@ -31,6 +31,7 @@
                               (w/stdout stream
                                 (dispatch (parse-http-request ip stream)))))))
              ; client
-             (call (http-get (join "127.0.0.1:" port "/path/foo/bar/baz"))
-                   'body))
+             (skipping sb-bsd-sockets:socket-error
+               (call (http-get (join "127.0.0.1:" port "/path/foo/bar/baz"))
+                     'body)))
   :should be "foo/bar/baz")

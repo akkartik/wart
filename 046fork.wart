@@ -2,6 +2,7 @@
 
 ; clone a process that stops after executing child
 (def fork(child)
+  #-win32
   (let pid (sb-posix:fork)
     (if (zerop pid)
       (after

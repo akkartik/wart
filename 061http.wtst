@@ -63,8 +63,9 @@ Cookie: abc=def;foo=bar")
                                 (pr-headers http-headers*)
                                 (prn "Hello world!"))))))
              ; client
-             (call (http-get (join "127.0.0.1:" port "/foo"))
-                   'body))
+             (skipping sb-bsd-sockets:socket-error
+               (call (http-get (join "127.0.0.1:" port "/foo"))
+                     'body)))
   :should be "Hello world!")
 
 (test-wart "http-get performs dns lookup"
@@ -83,6 +84,7 @@ Cookie: abc=def;foo=bar")
                                 (prn)
                                 (prn "Hello world!"))))))
              ; client
-             (call (http-get (join "127.0.0.1:" port "/foo"))
-                   'body))
+             (skipping sb-bsd-sockets:socket-error
+               (call (http-get (join "127.0.0.1:" port "/foo"))
+                     'body)))
   :should be "Hello world!")
