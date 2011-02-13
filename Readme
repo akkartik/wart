@@ -1,6 +1,15 @@
 Wart, the thin arc-like membrane atop Common Lisp -- http://github.com/akkartik/wart
 Feedback: wart@akkartik.com
 
+You'll need SBCL.
+  $ wart
+  wart> (quit)
+  $
+
+To run tests:
+  $ wart test
+  $ # success
+
 Rationale: http://arclanguage.org/item?id=12814
 In short, wart tries to be as arc-like as possible while making Common Lisp do
 as much of the work as possible.
