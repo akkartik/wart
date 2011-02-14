@@ -1,11 +1,10 @@
 #-darwin
 (def http-serve(? port 8080)
-  (spawn
-    (w/server-socket s port
-      (accepting stream :from s
-        (spawn
-          (let req (parse-http-request ip stream)
-            (w/stdout stream (dispatch req))))))))
+  (w/server-socket s port
+    (accepting stream :from s
+      (spawn
+        (let req (parse-http-request ip stream)
+          (w/stdout stream (dispatch req)))))))
 
 #-win32
 (def http-serve(? num-workers 6 port 8080)
