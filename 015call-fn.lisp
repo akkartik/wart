@@ -14,13 +14,25 @@
      (lambda(,arg)
        ,@body)))
 
-(defcoerce macro function
-  'idfn)
+
+
+(defmacro fslot(f)
+  (or (function-value f)
+      f))
 
 (defun function-value(f)
   (cond
     ((isa f 'function)  f)
     ((function-name-p f)  (eval `(function ,f)))))
+
+(defun function-name-p(f)
+  (and (symbolp f)
+       (eval `(fboundp ',f))))
+
+
+
+(defcoerce macro function
+  'idfn)
 
 (defun idfn(x) x)
 
@@ -30,10 +42,6 @@
 
 
 ;; Internals
-
-(defun function-name-p(f)
-  (and (symbolp f)
-       (eval `(fboundp ',f))))
 
 (defun apply-fn(f)
   (lambda(&rest args)
@@ -47,8 +55,3 @@
       (if (consp (car xs))
         (car xs)
         xs))))
-
-(defmacro fslot(f)
-  (if (and (symbolp f) (fboundp f))
-    `(function ,f)
-    f))
