@@ -17,7 +17,8 @@
 ;; http://www.arclanguage.org/item?id=11337
 
 (mac defurl-raw(url vars . body)
-  `(register-url ,(str url) (fn ,vars ,@body)))
+  `(perform
+    (register-url ,(str url) (fn ,vars ,@body))))
 
 (mac defurl(url vars . body)
   `(defurl-raw ,url ,vars

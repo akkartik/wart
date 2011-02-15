@@ -1,0 +1,50 @@
+(test-wart "http-get performs dns lookup"
+  :valueof (call (http-get "www.google.com") 'body)
+  :should satisfy true_value)
+
+(test-wart "parse-url works"
+  :valueof (parse-url "www.google.com")
+  :should be (wt-eval '(obj protocol "http" host "www.google.com" port 80 path "/")))
+
+(test-wart "parse-url works - 2"
+  :valueof (parse-url "www.google.com:8080")
+  :should be (wt-eval '(obj protocol "http" host "www.google.com" port 8080 path "/")))
+
+(test-wart "parse-url works - 3"
+  :valueof (parse-url "ftp://www.google.com/blah")
+  :should be (wt-eval '(obj protocol "ftp" host "www.google.com" port 80 path "/blah")))
+
+
+
+; integration test: http client+server
+(test-wart "http-get works"
+  :valueof (let port (+ 1024 rand.80)
+             ; server
+             (w/server-socket s port
+               (fork (accepting stream :from s
+                       (w/stdout stream
+                         (prrn "HTTP/1.1 " http-ok+)
+                         (pr-headers http-headers*)
+                         (prn "Hello world!")))))
+             ; client
+             (skipping sb-bsd-sockets:socket-error
+               (call (http-get (join "127.0.0.1:" port "/foo"))
+                     'body)))
+  :should be "Hello world!")
+
+(test-wart "http-get works with servers that send just \\n, not \\r\\n"
+  :valueof (let port (+ 1024 rand.80)
+             ; server
+             (w/server-socket s port
+               (fork (accepting stream :from s
+                       (w/stdout stream
+                         (prn "HTTP/1.1 " http-ok+)
+                         (each (n v) http-headers*
+                           (prn n ": " v))
+                         (prn)
+                         (prn "Hello world!")))))
+             ; client
+             (skipping sb-bsd-sockets:socket-error
+               (call (http-get (join "127.0.0.1:" port "/foo"))
+                     'body)))
+  :should be "Hello world!")

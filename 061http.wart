@@ -47,56 +47,6 @@
            (repeat num
              (acc (read-char from)))))))
 
-
-
-(def parse-url(url)
-  (ret ans (obj protocol "http"
-                host nil
-                port 80
-                path "/")
-    (awhen (search "://" url)
-      (= ans!protocol (downcase (cut url 0 it))
-         url (cut url (+ it 3))))
-    (aif (pos #\/ url)
-       (= ans!host (cut url 0 it)
-          ans!path (cut url it))
-       (= ans!host url))
-    (awhen (pos #\: ans!host)
-      (= ans!port (int (cut ans!host 1+.it))
-         ans!host (cut ans!host 0 it)))))
-
-(def raw-get(url)
-  (let purl parse-url.url
-    (connecting stream :to purl!host :at purl!port
-      (w/stdout stream
-        (prrn (join "GET " purl!path " HTTP/1.0"))
-        (pr-headers (obj Host purl!host Connection "close"))
-        (flush))
-      (w/stdin stream
-        slurp.stream))))
-
-(def http-get(url)
-  (let purl parse-url.url
-    (connecting stream :to purl!host :at purl!port
-      (w/stdout stream
-        (prrn (join "GET " purl!path " HTTP/1.0"))
-        (pr-headers (obj Host purl!host Connection "close"))
-        (flush))
-      (w/stdin stream
-        (let (protocol status . reason)   (tokens read-line.stream)
-          (obj protocol   protocol
-               status   status
-               reason   (intersperse " " reason)
-               headers  parse-http-headers.stream
-               body   slurp.stream))))))
-
-
-
-(def pr-headers(headers)
-  (each (n v) headers
-    (prrn n ": " v))
-  (prrn))
-
 (= http-ok+         "200 OK"
    http-created+    "201 Created"
    http-found+      "302 Found"
