@@ -4,6 +4,12 @@
        (do ,@body)
        ,@finally)))
 
+(defmacro skipping(error &body body)
+  `(catch ',error
+      (handler-bind ((,error  (lambda(x)
+                                (throw ',error ',error))))
+        ,@body)))
+
 
 
 ;; Internals
