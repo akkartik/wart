@@ -3,12 +3,12 @@
 
 ; 'first available' - like or, but uses multiple values to indicate unavailable
 (defmacro$ fa(&rest args)
-  (cond
-    ((no (cdr args))  (car args))
-    (t  `(multiple-value-bind (,$val ,$unavailable) ,(car args)
-           (if ,$unavailable
-             (fa ,@(cdr args))
-             ,$val)))))
+  (if (no (cdr args))
+    (car args)
+    `(multiple-value-bind (,$val ,$unavailable) ,(car args)
+       (if ,$unavailable
+         (fa ,@(cdr args))
+         ,$val))))
 
 ; 'last available' - like and, but uses multiple values to indicate available
 ; Returns multiple values to indicate all args not eval'd.
