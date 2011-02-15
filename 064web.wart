@@ -1,0 +1,24 @@
+(mac defurl-raw(url vars . body)
+  `(perform
+    (register-url ,(str url) (fn ,vars ,@body))))
+
+(mac defurl(url vars . body)
+  `(defurl-raw ,url ,vars
+     (prrn "HTTP/1.1 " http-ok+)
+     (pr-headers http-headers*)
+     ,@body))
+
+
+
+;; Internals
+
+(def register-url(str f)
+  (if (some [in _ #\: #\*] str)
+    (register-complex-url str f)
+    (= liturls*.str f)))
+
+(def register-complex-url(str f)
+  (let ustruct (list (tokens str #\/) f)
+    (aif (assoc str complex-urls*)
+      (= it.1 ustruct)
+      (push (list str ustruct) complex-urls*))))

@@ -14,21 +14,12 @@
         (let req (parse-http-request ip stream)
           (w/stdout stream (dispatch req)))))))
 
-;; http://www.arclanguage.org/item?id=11337
-
-(mac defurl-raw(url vars . body)
-  `(perform
-    (register-url ,(str url) (fn ,vars ,@body))))
-
-(mac defurl(url vars . body)
-  `(defurl-raw ,url ,vars
-     (prrn "HTTP/1.1 " http-ok+)
-     (pr-headers http-headers*)
-     ,@body))
-
 
 
 ;; Internals
+
+(= liturls* (table)
+   complex-urls* ())
 
 (def dispatch(req)
   (iflet handler (url-handler req!path)
@@ -36,6 +27,8 @@
       (apply handler.0 (cons req handler.1))
       (call handler req))
     (error-page http-notfound+)))
+
+;; http://www.arclanguage.org/item?id=11337
 
 (def url-handler(url)
   (aif liturls*.url
@@ -57,19 +50,3 @@
         #\* (cons (intersperse #\/ pc) acc)
             (when (iso cc.0 pc.0)
               (match-complex-url cdr.pc cdr.cc acc))))))
-
-
-
-(= liturls* (table)
-   complex-urls* ())
-
-(def register-url(str f)
-  (if (some [in _ #\: #\*] str)
-    (register-complex-url str f)
-    (newdef liturls*.str f)))
-
-(def register-complex-url(str f)
-  (let ustruct (list (tokens str #\/) f)
-    (aif (assoc str complex-urls*)
-      (newdef it.1 ustruct) ; already exists, replace
-      (push (list str ustruct) complex-urls*))))

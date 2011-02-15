@@ -38,8 +38,3 @@
     (awhen (pos #\: ans!host)
       (= ans!port (int (cut ans!host 1+.it))
          ans!host (cut ans!host 0 it)))))
-
-(def pr-headers(headers)
-  (each (n v) headers
-    (prrn n ": " v))
-  (prrn))

@@ -20,7 +20,7 @@
 
 
 
-; integration test: defurl+dispatch
+; integration test: defurl+complexpath+dispatch
 (wt-eval '(defurl "/path/*"(req path)
             (prn path)))
 (test-wart "dispatch handles complex urls with *"
