@@ -20,33 +20,6 @@
 
 
 
-(= http-ok+         "200 OK"
-   http-created+    "201 Created"
-   http-found+      "302 Found"
-   http-notmod+     "304 Not Modified"
-   http-bad+        "400 Bad Request"
-   http-forbidden+  "403 Forbidden"
-   http-notfound+   "404 Not Found")
-
-(def error-page(status)
-  (prn "HTTP/1.1 " status)
-  (prrn "Content-Type: text/plain")
-  (prrn)
-  (prn (cut status 4)))
-
-
-
-(= http-headers* (obj Server "wart"
-                      Content-Type "text/html; charset=utf-8"
-                      Connection "close"))
-
-(def pr-headers(headers)
-  (each (n v) headers
-    (prrn n ": " v))
-  (prrn))
-
-
-
 ;; Internals
 
 (def parse-http-headers(? from stdin*)
