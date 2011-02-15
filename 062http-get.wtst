@@ -2,18 +2,6 @@
   :valueof (call (http-get "www.google.com") 'body)
   :should satisfy true_value)
 
-(test-wart "parse-url works"
-  :valueof (parse-url "www.google.com")
-  :should be (wt-eval '(obj protocol "http" host "www.google.com" port 80 path "/")))
-
-(test-wart "parse-url works - 2"
-  :valueof (parse-url "www.google.com:8080")
-  :should be (wt-eval '(obj protocol "http" host "www.google.com" port 8080 path "/")))
-
-(test-wart "parse-url works - 3"
-  :valueof (parse-url "ftp://www.google.com/blah")
-  :should be (wt-eval '(obj protocol "ftp" host "www.google.com" port 80 path "/blah")))
-
 
 
 ; integration test: http client+server

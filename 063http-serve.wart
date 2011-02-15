@@ -18,9 +18,6 @@
 
 ;; Internals
 
-(= liturls* (table)
-   complex-urls* ())
-
 (def dispatch(req)
   (iflet handler (url-handler req!path)
     (if consp.handler
@@ -29,6 +26,9 @@
     (error-page http-notfound+)))
 
 ;; http://www.arclanguage.org/item?id=11337
+
+(= liturls* (table)
+   complex-urls* ())
 
 (def url-handler(url)
   (aif liturls*.url
