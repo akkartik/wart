@@ -9,11 +9,10 @@
 #-win32
 (def http-serve(? num-workers 6 port 8080)
   (w/server-socket s port
-    (repeat num-workers (fork ; prefork a pool of child processes
+    (preforking num-workers
       (accepting stream :from s
         (let req (parse-http-request ip stream)
-          (w/stdout stream (dispatch req))))))
-    (wait-for-children)))
+          (w/stdout stream (dispatch req)))))))
 
 ;; http://www.arclanguage.org/item?id=11337
 

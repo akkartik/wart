@@ -16,6 +16,20 @@
 (synonym wait-for-children sb-posix:wait
          getpid sb-posix:getpid)
 
+(def preforking-fn(n f)
+  (repeat n
+    (fork-fn f))
+  (forever
+    (wait-for-child)
+    (prn "restart")
+    (fork-fn f)))
+
+(mac preforking(n . body)
+  `(preforking-fn ,n (thunk ,@body)))
+
+(def wait-for-child(? options 0)
+  (sb-posix:waitpid 0 options))
+
 
 
 (def spawn-fn(f)
