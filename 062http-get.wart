@@ -13,6 +13,9 @@
                headers  parse-http-headers.stream
                body   slurp.stream))))))
 
+
+
+; debug
 (def raw-get(url)
   (let purl (parse-url url)
     (connecting stream :to purl!host :at purl!port

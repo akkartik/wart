@@ -19,7 +19,7 @@
 ;; Internals
 
 (def dispatch(req)
-  (iflet handler (url-handler req!path)
+  (iflet handler (url-handler (cut req!path 1))
     (if consp.handler
       (apply handler.0 (cons req handler.1))
       (call handler req))
