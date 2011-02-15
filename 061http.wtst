@@ -57,11 +57,11 @@ Cookie: abc=def;foo=bar")
   :valueof (let port (+ 1024 rand.80)
              ; server
              (w/server-socket s port
-               (fork (thunk (accepting stream :from s
-                              (w/stdout stream
-                                (prrn "HTTP/1.1 " http-ok+)
-                                (pr-headers http-headers*)
-                                (prn "Hello world!"))))))
+               (fork (accepting stream :from s
+                       (w/stdout stream
+                         (prrn "HTTP/1.1 " http-ok+)
+                         (pr-headers http-headers*)
+                         (prn "Hello world!")))))
              ; client
              (skipping sb-bsd-sockets:socket-error
                (call (http-get (join "127.0.0.1:" port "/foo"))
@@ -76,13 +76,13 @@ Cookie: abc=def;foo=bar")
   :valueof (let port (+ 1024 rand.80)
              ; server
              (w/server-socket s port
-               (fork (thunk (accepting stream :from s
-                              (w/stdout stream
-                                (prn "HTTP/1.1 " http-ok+)
-                                (each (n v) http-headers*
-                                  (prn n ": " v))
-                                (prn)
-                                (prn "Hello world!"))))))
+               (fork (accepting stream :from s
+                       (w/stdout stream
+                         (prn "HTTP/1.1 " http-ok+)
+                         (each (n v) http-headers*
+                           (prn n ": " v))
+                         (prn)
+                         (prn "Hello world!")))))
              ; client
              (skipping sb-bsd-sockets:socket-error
                (call (http-get (join "127.0.0.1:" port "/foo"))

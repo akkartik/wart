@@ -1,7 +1,7 @@
 (require :sb-posix)
 
 ; clone a process that stops after executing child
-(def fork(child)
+(def fork-fn(child)
   #-win32
   (let pid (sb-posix:fork)
     (if (zerop pid)
@@ -10,11 +10,16 @@
       :do
         (quit)))))
 
+(mac fork body
+  `(fork-fn (thunk ,@body)))
+
 (synonym wait-for-children sb-posix:wait
          getpid sb-posix:getpid)
 
 
 
-(mac spawn args
-  `(perform
-     (sb-thread:make-thread (thunk ,@args))))
+(def spawn-fn(f)
+  (perform (sb-thread:make-thread f)))
+
+(mac spawn body
+  `(spawn-fn (thunk ,@body)))

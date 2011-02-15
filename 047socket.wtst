@@ -4,8 +4,8 @@
                   data 34)
              ; server
              (w/server-socket s port
-               (fork (thunk (accepting stream :from s
-                              (format stream read-line.stream)))))
+               (fork (accepting stream :from s
+                       (format stream read-line.stream))))
              ; client
              (skipping sb-bsd-sockets:socket-error
                (connecting stream :at port

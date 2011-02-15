@@ -27,9 +27,9 @@
   :valueof (let port (+ 1024 rand.80)
              ; server
              (w/server-socket s port
-               (fork (thunk (accepting stream :from s
-                              (w/stdout stream
-                                (dispatch (parse-http-request ip stream)))))))
+               (fork (accepting stream :from s
+                       (w/stdout stream
+                         (dispatch (parse-http-request ip stream))))))
              ; client
              (skipping sb-bsd-sockets:socket-error
                (call (http-get (join "127.0.0.1:" port "/path/foo/bar/baz"))
