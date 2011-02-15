@@ -18,10 +18,10 @@
 
 ;; http://www.arclanguage.org/item?id=11337
 
-(mac defurl-raw (url vars . body)
+(mac defurl-raw(url vars . body)
   `(register-url ,(str url) (fn ,vars ,@body)))
 
-(mac defurl (url vars . body)
+(mac defurl(url vars . body)
   `(defurl-raw ,url ,vars
      (prrn "HTTP/1.1 " http-ok+)
      (pr-headers http-headers*)
