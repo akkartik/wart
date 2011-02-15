@@ -37,3 +37,6 @@
 
 (mac spawn body
   `(spawn-fn (thunk ,@body)))
+
+(mac spawning(n . body)
+  `(repeat ,n (spawn ,@body)))

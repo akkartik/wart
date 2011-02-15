@@ -1,8 +1,8 @@
 #-darwin
-(def http-serve(? port 8080)
+(def http-serve(? num-workers 6 port 8080)
   (w/server-socket s port
-    (accepting stream :from s
-      (spawn ; one thread per request as it arrives
+    (spawning num-workers
+      (accepting stream :from s
         (let req (parse-http-request ip stream)
           (w/stdout stream (dispatch req)))))))
 
