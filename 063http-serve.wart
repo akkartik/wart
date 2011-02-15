@@ -31,9 +31,8 @@
    complex-urls* ())
 
 (def url-handler(url)
-  (aif liturls*.url
-    it
-    (find-complex-url (tokens url #\/))))
+  (or liturls*.url
+      (find-complex-url (tokens url #\/))))
 
 (def find-complex-url(ptoks ? cands complex-urls*)
   (whenlet (str (toks f)) car.cands

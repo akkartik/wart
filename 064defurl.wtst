@@ -1,3 +1,5 @@
+; integration tests: url-handler and defurl
+
 (wt-eval '(defurl "/foo"(req)
             (prn 42)))
 (test-wart "defurl works on simple urls"
