@@ -13,7 +13,7 @@
 ;; Internals
 
 (def register-url(str f)
-  (if (some [in _ #\: #\*] str)
+  (if (some [in _ #\? #\*] str)
     (register-complex-url str f)
     (= liturls*.str f)))
 

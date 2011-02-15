@@ -45,7 +45,7 @@
     rev.acc
     (when (aand cc.0 (not empty.it))
       (case cc.0.0
-        #\: (match-complex-url cdr.pc cdr.cc (cons car.pc acc))
+        #\? (match-complex-url cdr.pc cdr.cc (cons car.pc acc))
         #\* (cons (intersperse #\/ pc) acc)
             (when (iso cc.0 pc.0)
               (match-complex-url cdr.pc cdr.cc acc))))))

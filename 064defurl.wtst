@@ -1,6 +1,6 @@
 ; integration tests: url-handler and defurl
 
-(wt-eval '(defurl "/foo"(req)
+(wt-eval '(defurl /foo(req)
             (prn 42)))
 (test-wart "defurl works on simple urls"
   :valueof (call liturls* "/foo")
@@ -10,11 +10,11 @@
   :valueof (url-handler "/foo")
   :should satisfy true_value)
 
-(wt-eval '(defurl "/user/:"(req user)
+(wt-eval '(defurl /user/?(req user)
             (prn user)))
 (test-wart "defurl works with complex urls"
   :valueof complex-urls*
-  :should match '(("/user/:" (("user" ":") _))))
+  :should match '(("/user/?" (("user" "?") _))))
 
 (test-wart "url-handler finds complex urls"
   :valueof (url-handler "/user/foo")
@@ -23,7 +23,7 @@
 
 
 ; integration test: defurl+complexpath+dispatch
-(wt-eval '(defurl "/path/*"(req path)
+(wt-eval '(defurl /path/*(req path)
             (prn path)))
 (test-wart "dispatch handles complex urls with *"
   :valueof (let port (+ 1024 rand.80)
