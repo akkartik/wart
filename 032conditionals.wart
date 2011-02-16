@@ -44,6 +44,9 @@
   `(caselet ,(uniq) ,expr ,@args))
 (defover case wart-case)
 
+(mac acase(expr . args)
+  `(caselet it ,expr ,@args))
+
 (mac check(o$expr test ? alt nil)
   `(if (call (fslot ,test) ,$expr)
      ,$expr
