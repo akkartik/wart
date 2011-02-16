@@ -41,3 +41,8 @@
                 (if ,$a
                   (++ ,$c)))
        ,@body)))
+
+(= *epsilon* 1e-4)
+(defmethod iso(a b) float
+  (> *epsilon*
+     (abs (- a b))))

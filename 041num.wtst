@@ -42,3 +42,7 @@
   :valueof (counting-calls :to acc
               (map acc '(1 nil nil t)))
   :should be 2)
+
+(test-wart "comparing floats works"
+  :valueof (iso 4.2 4.200001)
+  :should be t)

@@ -4,9 +4,9 @@
   (cond
     ((macp x)   'macro)
     ((characterp x)  'character)
-    ((floatp x)   'float)
     ((stringp x)  'string)
     ((integerp x)   'integer)
+    ((floatp x)   'float)
     ((keywordp x)   'symbol)
     ((match x '(tagged _ _))  (cadr x))
     (t  (generalized-common-lisp-type-specifier (type-of x)))))
