@@ -95,6 +95,13 @@
                'evenp 36))
   :should be 34)
 
+(test-wart "case works with else"
+  :valueof (let x 4
+             (case x
+               'oddp 34
+               'else 36))
+  :should be 36)
+
 (test-wart "andf works"
   :valueof (call (andf 'consp 'car) '(3 4))
   :should be 3)
