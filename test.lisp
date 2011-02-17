@@ -1,12 +1,12 @@
 (defmacro test(msg Valueof expr Should &rest predicate)
   `(let ((got ,expr))
-     (unless (,(car predicate) got ,@(cdr predicate))
-       (fail "F " ,msg #\newline "  got ")(writeln got))))
+     (or (,(car predicate) got ,@(cdr predicate))
+         (fail ,msg got))))
 
 (defmacro test-wart(msg Valueof expr Should &rest predicate)
   `(let ((got (wt-eval ',expr)))
-     (unless (,(car predicate) got ,@(cdr predicate))
-       (fail "F " ,msg #\newline "  got ")(writeln got))))
+     (or (,(car predicate) got ,@(cdr predicate))
+         (fail ,msg got))))
 
 (defmacro pending-test(msg &rest args)
   (prn #\newline "X " msg))
@@ -35,18 +35,20 @@
 ;; harness
 
 (let ((test-failures 0))
-  (defun print-failures()
+  (defun print-test-failures()
     (cond
       ((> test-failures 1)
         (format t "~%~a failures~%" test-failures))
       ((> test-failures 0)
         (format t "~%~a failure~%" test-failures))))
-  (defun fail(&rest args)
+
+  (defun fail(msg got)
     (incf test-failures)
-    (apply 'pr #\newline args)))
+    (prn #\newline "F " msg)
+    (pr "  got ") (writeln got)))
 
 (let ((zxwf #\0))
-  (defun test-heartbeat(x)
+  (defun print-test-heartbeat(x)
     (if (and (eq #\0 x)
              (not (eq #\0 zxwf)))
       (format t "~%"))
@@ -61,7 +63,7 @@
     (when (and (string< "" file)
                (char<= #\0 (char file 0))
                (char>= #\9 (char file 0)))
-      (test-heartbeat (char file 1))
+      (print-test-heartbeat (char file 1))
       (let* ((len (length file))
              (ext (subseq file (- len 4))))
         (cond
@@ -70,4 +72,4 @@
           ((equalp ext "test") (load file))
           ((equalp ext "wtst") (load file))))))) ; only so it can load after .wart
 
-(print-failures)
+(print-test-failures)
