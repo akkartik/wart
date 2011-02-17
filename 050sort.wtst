@@ -16,6 +16,14 @@
                    '(1 12 34)))
   :should be 34)
 
+(test-wart "max works with list"
+  :valueof (max '(1 2 5 3))
+  :should be 5)
+
+(test-wart "min works with varargs"
+  :valueof (min 4 1 2 5 3)
+  :should be 1)
+
 (test-wart "sort works"
   :valueof (sort '(1 7 3 4 16 2 34))
   :should be '(34 16 7 4 3 2 1))

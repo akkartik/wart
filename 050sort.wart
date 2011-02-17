@@ -7,10 +7,10 @@
       wins)))
 
 (def wart-max args
-  (best '> args))
+  (best '> (if singlep.args car.args args)))
 (defover max wart-max)
 (def wart-min args
-  (best '< args))
+  (best '< (if singlep.args car.args args)))
 (defover min wart-min)
 
 (def most(f seq)

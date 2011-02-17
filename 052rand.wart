@@ -24,6 +24,3 @@
              (unless (> x 247) ; multiple of nc
                (= s.i (call c (mod x nc)))
                ++.i)))))))
-
-(mac distribution-of(n expr)
-  `(sort (vals (freq (n-of ,n ,expr)))))
