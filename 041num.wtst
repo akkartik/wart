@@ -46,3 +46,15 @@
 (test-wart "comparing floats works"
   :valueof (iso 4.2 4.200001)
   :should be t)
+
+(test-wart "fprec to 0 acts like round"
+  :valueof (fprec 4.3 0)
+  :should be (float (round 4.3)))
+
+(test-wart "fprec works"
+  :valueof (fprec 4.123456 3)
+  :should be 4.123)
+
+(test-wart "fprec even works with negative precisions to the left of the decimal"
+  :valueof (fprec 3243.43 -1)
+  :should be 3240.0)
