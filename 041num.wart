@@ -26,6 +26,8 @@
     (write-to-string x :base base)
     (as string x)))
 
+
+
 (def mapn(f a b)
   (call rev^accumulate :over a :taking f :next '1+ :unless [> _ b]))
 
@@ -42,6 +44,8 @@
                   (++ ,$c)))
        ,@body)))
 
+
+
 (= *epsilon* 1e-4)
 (defmethod iso(a b) float
   (> *epsilon*
@@ -51,3 +55,6 @@
 (def fprec(places f)
   (/ (fround (* f (expt 10 places)))
      (expt 10 places)))
+
+(def sq(x)
+  (* x x))
