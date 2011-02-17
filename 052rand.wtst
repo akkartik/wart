@@ -1,0 +1,7 @@
+(test-wart "rand generates uniform numbers"
+  :valueof (let l  (vals (freq (n-of 16000 (rand 16))))
+             (list (apply 'min l)
+                   (apply 'max l)))
+  ; 16 states, 16000 values, 1000 values/state on average
+  :should satisfy [destructuring-bind (min max) _
+                    (< 900 min 1000 max 1100)])
