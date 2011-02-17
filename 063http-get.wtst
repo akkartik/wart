@@ -1,5 +1,6 @@
 (test-wart "http-get performs dns lookup"
-  :valueof (call (http-get "www.google.com") 'body)
+  :valueof (skipping sb-bsd-sockets:host-not-found-error
+             (call (http-get "www.google.com") 'body))
   :should satisfy true_value)
 
 
