@@ -35,10 +35,10 @@
   (let ex (afn(args)
             (if (no cdr.args)
                 (car args)
-                `(if (call (testify ,(car args)) ,var)
-                     ,(cadr args)
+                `(if (call (testify ,car.args) ,var)
+                     ,cadr.args
                      ,(self cddr.args))))
-    `(let ,var ,expr ,(call ex args))))
+    `(let ,var ,expr ,ex.args)))
 
 (mac wart-case(expr . args)
   `(caselet ,(uniq) ,expr ,@args))
