@@ -1,21 +1,21 @@
-(setf *test-failures* 0)
-
 (defmacro test(msg Valueof expr Should &rest predicate)
   `(let ((got ,expr))
      (unless (,(car predicate) got ,@(cdr predicate))
-       (incf *test-failures*)
-       (pr #\newline "F " ,msg #\newline "  got ")(writeln got))))
+       (fail "F " ,msg #\newline "  got ")(writeln got))))
 
 (defmacro test-wart(msg Valueof expr Should &rest predicate)
   `(let ((got (wt-eval ',expr)))
      (unless (,(car predicate) got ,@(cdr predicate))
-       (incf *test-failures*)
-       (pr #\newline "F " ,msg #\newline "  got ")(writeln got))))
+       (fail "F " ,msg #\newline "  got ")(writeln got))))
 
 (defmacro pending-test(msg &rest args)
   (prn #\newline "X " msg))
 (defmacro pending-test-wart(msg &rest args)
   (prn #\newline "X " msg))
+
+
+
+;; Useful inside tests
 
 (defmacro be(&rest args)
   `(iso ,@args))
@@ -32,12 +32,36 @@
 
 
 
+;; harness
+
+(let ((test-failures 0))
+  (defun print-failures()
+    (cond
+      ((> test-failures 1)
+        (format t "~%~a failures~%" test-failures))
+      ((> test-failures 0)
+        (format t "~%~a failure~%" test-failures))))
+  (defun fail(&rest args)
+    (incf test-failures)
+    (apply 'pr #\newline args)))
+
+(let ((zxwf #\0))
+  (defun test-heartbeat(x)
+    (if (and (eq #\0 x)
+             (not (eq #\0 zxwf)))
+      (format t "~%"))
+    (setf zxwf x)
+    (format t "~a" x)
+    (finish-output)))
+
+
+
 (loop for path in (directory "./*.*") do
   (let ((file (file-namestring path)))
     (when (and (string< "" file)
                (char<= #\0 (char file 0))
                (char>= #\9 (char file 0)))
-      (format t "~a" (char file 1))(finish-output)
+      (test-heartbeat (char file 1))
       (let* ((len (length file))
              (ext (subseq file (- len 4))))
         (cond
@@ -46,8 +70,4 @@
           ((equalp ext "test") (load file))
           ((equalp ext "wtst") (load file))))))) ; only so it can load after .wart
 
-(cond
-  ((> *test-failures* 1)
-    (format t "~%~a failures~%" *test-failures*))
-  ((> *test-failures* 0)
-    (format t "~%~a failure~%" *test-failures*)))
+(print-failures)
