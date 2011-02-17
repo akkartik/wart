@@ -6,6 +6,9 @@
          (mappend [list ++.key _]
                   exprs))))
 
+(def randpos(l)
+  (call l^rand len.l))
+
 (mac n-of(n expr)
   `(let ,$a nil
      (repeat ,n
