@@ -34,12 +34,6 @@
                (push k ans))
              table)))
 
-(def keys(table)
-  (accum a
-    (maphash (fn(k v)
-               (a k))
-             table)))
-
 (def vals(table)
   (accum a
     (maphash (fn(k v)

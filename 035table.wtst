@@ -53,7 +53,7 @@
   :should be 3)
 
 (test-wart "keys works"
-  :valueof (keys (obj 1 2 3 4))
+  :valueof (sort (keys (obj 1 2 3 4)) '<)
   :should be '(1 3))
 
 (test-wart "fill-table has the right length"
