@@ -48,6 +48,6 @@
      (abs (- a b))))
 
 ; generalization of round; specify number of decimal places to keep
-(def fprec(f places)
+(def fprec(places f)
   (/ (fround (* f (expt 10 places)))
      (expt 10 places)))
