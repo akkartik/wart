@@ -1,4 +1,4 @@
-(defcall cons l
+(defcall cons(l)
   [elt l _])
 
 (defset cons(l index val)

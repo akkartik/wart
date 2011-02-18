@@ -1,4 +1,4 @@
-(defcall hash-table table
+(defcall hash-table(table)
   [gethash _ table])
 
 (defset hash-table(table key value)

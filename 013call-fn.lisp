@@ -9,9 +9,9 @@
             ,@args))
 (defover apply wart-apply)
 
-(defmacro defcall(type arg &rest body)
+(defmacro defcall(type args &rest body)
   `(defcoerce ,type function
-     (lambda(,arg)
+     (lambda ,args
        ,@body)))
 
 
