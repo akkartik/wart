@@ -63,7 +63,7 @@
   :should be 100)
 
 (test-wart "random constants use 'k' as a placeholder"
-  :valueof (all [< -20.0 _ 20.0]
+  :valueof (all [<= -20.0 _ 20.0]
                 (generate-pile-program 20 '(k)))
   :should be t)
 
