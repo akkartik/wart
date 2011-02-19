@@ -166,137 +166,117 @@
 
 
 
-(wt-eval '(def foo4() 34))
 (test-wart "simple def"
-  :valueof (foo4)
+  :valueof (call (fn() 34))
   :should be 34)
 
-(wt-eval '(def foo6() (cons 3 4)))
 (test-wart "def 2"
-  :valueof (foo6)
+  :valueof (call (fn() (cons 3 4)))
   :should be (cons 3 4))
 
-(wt-eval '(def foo7 args args))
 (test-wart "varargs without parens"
-  :valueof (foo7 3 4 5)
+  :valueof (call (fn args args) 3 4 5)
   :should be '(3 4 5))
 
 (test-wart "varargs include keyword args"
-  :valueof (foo7 3 4 :a 5)
+  :valueof (call (fn args args) 3 4 :a 5)
   :should be '(3 4 :a 5))
 
-(wt-eval '(def foo8(a . b) b))
 (test-wart "dotted rest"
-  :valueof (foo8 3 4)
+  :valueof (call (fn(a . b) b) 3 4)
   :should be '(4))
 
 (test-wart "rest args are optional"
-  :valueof (foo8 3)
+  :valueof (call (fn(a . b) b) 3)
   :should be nil)
 
 (test-wart "'required' params are really just optional"
-  :valueof (foo8)
+  :valueof (call (fn(a . b) a))
   :should be nil)
 
-(wt-eval '(def foo9((a b)) b))
 (test-wart "destructured args"
-  :valueof (foo9 '(3 4))
+  :valueof (call (fn((a b)) b) '(3 4))
   :should be 4)
 
 (wt-eval '(def foo10((a b) . c) b))
 (test-wart "destructured args + dotted rest"
-  :valueof (foo10 '(3 4) 5)
+  :valueof (call (fn((a b) . c) b) '(3 4) 5)
   :should be 4)
 
-(test-wart "destructured args + dotted rest for fn"
-  :valueof (call (fn ((a b) . c) b) '(3 4) 5)
-  :should be 4)
-
-(wt-eval '(def foo12(a b) (- a b)))
 (test-wart "allow param names"
-  :valueof (foo12 :a 3 :b 4)
+  :valueof (call (fn(a b) (- a b)) :a 3 :b 4)
   :should be -1)
 
 (test-wart "allow just some param names"
-  :valueof (foo12 :a 3 4)
+  :valueof (call (fn(a b) (- a b)) :a 3 4)
   :should be -1)
 
 (test-wart "allow args in any order when giving param names"
-  :valueof (foo12 :b 3 :a 4)
+  :valueof (call (fn(a b) (- a b)) :b 3 :a 4)
   :should be 1)
 
 (test-wart "take positional args in order after keyword args have been matched"
-  :valueof (foo12 3 :a 4)
+  :valueof (call (fn(a b) (- a b)) 3 :a 4)
   :should be 1)
 
-(wt-eval '(def foo13(a ? b nil) (cons a b)))
 (test-wart "optional param"
-  :valueof (foo13 3)
+  :valueof (call (fn(a ? b nil) (cons a b)) 3)
   :should be '(3))
 
-(wt-eval '(def foo14(a ? b 4) (cons a b)))
 (test-wart "named arg around optional params"
-  :valueof (foo14 :a 3)
+  :valueof (call (fn(a ? b 4) (cons a b)) :a 3)
   :should be '(3 . 4))
 
 (test-wart "optional args should override defaults"
-  :valueof (foo14 3 2)
+  :valueof (call (fn(a ? b 4) (cons a b)) 3 2)
   :should be '(3 . 2))
 
 (test-wart "named optional args should override defaults"
-  :valueof (foo14 3 :b 2)
+  :valueof (call (fn(a ? b 4) (cons a b)) 3 :b 2)
   :should be '(3 . 2))
 
 (test-wart "nil optional arg overrides default"
-  :valueof (foo14 3 :b nil)
+  :valueof (call (fn(a ? b 4) (cons a b)) 3 :b nil)
   :should be '(3))
 
 (test-wart "nil optional arg overrides default without naming"
-  :valueof (foo14 3 nil)
+  :valueof (call (fn(a ? b 4) (cons a b)) 3 nil)
   :should be '(3))
 
 (test-wart "defaults can be variables"
   :valueof (_let a 3 (call (fn(? x a) x)))
   :should be 3)
 
-(wt-eval '(def foo15(a ? b 4 c nil) (cons b c)))
 (test-wart "multiple optional params"
-  :valueof (foo15 3)
+  :valueof (call (fn(a ? b 4 c nil) (cons b c)) 3)
   :should be '(4))
 
 (test-wart "optional params without rest can be positionally filled"
-  :valueof (foo15 3 7 3)
+  :valueof (call (fn(a ? b 4 c nil) (cons b c)) 3 7 3)
   :should be '(7 . 3))
 
-(wt-eval '(def foo16(a . b) b))
 (test-wart "rest args can be named"
-  :valueof (foo16 3 :b 4 5)
+  :valueof (call (fn(a . b) b) 3 :b 4 5)
   :should be '(4 5))
 
-(wt-eval '(def foo17(a ? b 3 . c) (cons b c)))
 (test-wart "optional + named rest args"
-  :valueof (foo17 2 :c 3)
+  :valueof (call (fn(a ? b 3 . c) (cons b c)) 2 :c 3)
   :should be '(3 3))
 
 (test-wart "rest args take precedence over optionals"
-  :valueof (foo17 1 4 5)
+  :valueof (call (fn(a ? b 3 . c) (cons b c)) 1 4 5)
   :should be '(3 4 5))
 
 (test-wart "optional + named rest args - 2"
-  :valueof (foo17 2 4 :c 5)
+  :valueof (call (fn(a ? b 3 . c) (cons b c)) 1 4 :c 5)
   :should be '(4 5))
 
 (test-wart "optional + named rest args - 3"
-  :valueof (foo17 2 4 1)
-  :should be '(3 4 1))
-
-(test-wart "optional + named rest args - 4"
-  :valueof (foo17 2 :b 4 3)
+  :valueof (call (fn(a ? b 3 . c) (cons b c)) 2 :b 4 3)
   :should be '(4 3))
 
-(wt-eval '(def foo18(a ? b nil c 3 . body) (list b c body)))
 (test-wart "convention: :do => :body"
-  :valueof (foo18 3 4 :do 4 5)
+  :valueof (call (fn(a ? b nil c 3 . body) (list b c body)) 3 4 :do 4 5)
   :should be '(4 3 (4 5)))
 
 ; integration test: bracket + fn + call
