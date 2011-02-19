@@ -12,5 +12,5 @@
                (char>= #\9 (char file 0)))
       (wart-load file))))
 
-(unless *batch-mode*
+(unless batch-mode*
   (wrepl))

@@ -17,6 +17,6 @@ else
     done
     echo "(quit)"
   ) > .wartbatch
-  rlwrap sbcl `echo $COMMON_ARGS` --eval '(setf *batch-mode* t)' --load boot --load .wartbatch
+  rlwrap sbcl `echo $COMMON_ARGS` --eval '(setf batch-mode* t)' --load boot --load .wartbatch
   rm .wartbatch
 fi

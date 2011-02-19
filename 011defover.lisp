@@ -7,9 +7,9 @@
 ; intentionally ugly name; minimize its use
 (defmacro defover(name new-name)
   `(progn
-     (setf (gethash ',name *wart-special-form-handlers*)
+     (setf (gethash ',name wart-special-form-handlers*)
            [cons ',new-name (cdr _)])
-     (setf (gethash ',name *wart-special-form-quoted-handlers*)
+     (setf (gethash ',name wart-special-form-quoted-handlers*)
            ',new-name)))
 
 
@@ -18,16 +18,16 @@
 
 (defun lookup-unquoted-handler(sexp)
   (and (consp sexp)
-       (gethash (car sexp) *wart-special-form-handlers*)))
+       (gethash (car sexp) wart-special-form-handlers*)))
 
 (defun lookup-quoted-handler(name)
-  (or (gethash name *wart-special-form-quoted-handlers*)
+  (or (gethash name wart-special-form-quoted-handlers*)
       name))
 
 ; handlers are functions of the input s-expr
-(defvar *wart-special-form-handlers* (table))
+(setf wart-special-form-handlers* (table))
 ; quoted handlers are names of the handlers; all handlers must be named
-(defvar *wart-special-form-quoted-handlers* (table))
+(setf wart-special-form-quoted-handlers* (table))
 
 (add-wart-transformer
   [match _ '(quote _)]

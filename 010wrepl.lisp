@@ -19,8 +19,8 @@
 ; Insert a case into the wart cond.
 (defmacro add-wart-transformer(check trans)
   `(ignore-redef
-      (setf *wart-cases* (append *wart-cases* (list (list (function ,check)
-                                                          (function ,trans)))))
+      (setf wart-cases* (append wart-cases* (list (list (function ,check)
+                                                        (function ,trans)))))
       (build-wart-transform)))
 
 
@@ -28,11 +28,11 @@
 ;; Internals
 
 (defun wt-prompt()
-  (unless *batch-mode*
+  (unless batch-mode*
     (format t "wart> ")(finish-output)))
 
-(unless (boundp '*batch-mode*)
-  (setf *batch-mode* nil))
+(unless (boundp 'batch-mode*)
+  (setf batch-mode* nil))
 
 (defun wt-eval(sexp)
   (eval (wt-transform sexp)))
@@ -42,9 +42,9 @@
 
 ; code-generate wt-transform-1
 (defun build-wart-transform()
-  (eval (generate-wart-transform *wart-cases*)))
+  (eval (generate-wart-transform wart-cases*)))
 
-(defvar *wart-cases* ())
+(setf wart-cases* ())
 
 (defun generate-wart-transform(cases)
   `(defun wt-transform-1(sexp)

@@ -1,17 +1,17 @@
 ;; Simple syntax shortcuts that expand to s-expressions.
 
 (defun def-ssyntax(char handler-name &optional (precedence 0))
-  (setf (gethash char *wart-ssyntax-precedence*)
+  (setf (gethash char wart-ssyntax-precedence*)
         precedence)
-  (setf (gethash char *wart-ssyntax-handler*)
+  (setf (gethash char wart-ssyntax-handler*)
         handler-name))
 
 
 
 ;; Internals
 
-(defvar *wart-ssyntax-handler* (table))
-(defvar *wart-ssyntax-precedence* (table))
+(setf wart-ssyntax-handler* (table))
+(setf wart-ssyntax-precedence* (table))
 
 (defun ssyntaxp(x)
   (and (symbolp x)
@@ -29,9 +29,9 @@
   (let ((ssyntax-idx  (ssyntax-idx s)))
     (case ssyntax-idx
       ((nil)  (ssyntax-parse-token s))
-      (0  `(,(gethash (char s 0) *wart-ssyntax-handler*)
+      (0  `(,(gethash (char s 0) wart-ssyntax-handler*)
             ,(expand-ssyntax-string (cut s 1)))) ; unary
-      (t  `(,(gethash (char s ssyntax-idx) *wart-ssyntax-handler*)
+      (t  `(,(gethash (char s ssyntax-idx) wart-ssyntax-handler*)
             ,(expand-ssyntax-string (cut s 0 ssyntax-idx))
             ,(expand-ssyntax-string (cut s (1+ ssyntax-idx))))))))
 
@@ -43,14 +43,14 @@
 
 ; decompose lowest precedence first
 (defun ssyntax-chars-in-precedence()
-  (group-by [gethash _ *wart-ssyntax-precedence*]
+  (group-by [gethash _ wart-ssyntax-precedence*]
             (sort (ssyntax-chars) '<
-                  :key [gethash _ *wart-ssyntax-precedence*])))
+                  :key [gethash _ wart-ssyntax-precedence*])))
 
 (defun ssyntax-chars()
   (let ((ans ()))
     (maphash (lambda(k v) (push k ans))
-             *wart-ssyntax-precedence*)
+             wart-ssyntax-precedence*)
     ans))
 
 (defun ssyntax-parse-token(s)

@@ -32,11 +32,11 @@
 
 
 
-(setf *wart-coercions* (table))
+(setf wart-coercions* (table))
 
 (defover cl-coerce coerce)
 (defun wart-coerce(val dest)
-  (fa (indexing *wart-coercions* (dest (wart-type val))
+  (fa (indexing wart-coercions* (dest (wart-type val))
         (funcall it val))
       (funcall 'coerce val dest)))
 (defover coerce wart-coerce)
@@ -46,9 +46,9 @@
 
 (defmacro defcoerce(src dest converter)
   `(progn
-     (unless (gethash ',dest *wart-coercions*)
-       (setf (gethash ',dest *wart-coercions*) (table)))
-     (setf (gethash ',src (gethash ',dest *wart-coercions*))
+     (unless (gethash ',dest wart-coercions*)
+       (setf (gethash ',dest wart-coercions*) (table)))
+     (setf (gethash ',src (gethash ',dest wart-coercions*))
            ,converter)))
 
 (defun isa(elem typ)
