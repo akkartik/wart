@@ -90,6 +90,8 @@
 
 
 
+(setf *random-state* (make-random-state t))
+
 ;; http://vagueinnovation.com/pragmatic_gp/?p=528
 
 (test-wart "uniform mutation conserves token count in offspring"
@@ -98,14 +100,14 @@
 
 (test-wart "uniform mutation replaces tokens with uniform random sample of available tokens"
   :valueof (let l (call vals^freq
-                        (mutate (n-of 1000 '+) :from '(a b c d e) :prob 1.0))
-             (> 220 max.l 200 min.l 180))
+                        (mutate (n-of 10000 '+) :from '(a b c d e) :prob 1.0))
+             (> 2200 max.l 2000 min.l 1800))
   :should be t)
 
 (test-wart "uniform mutation replaces randomly chosen tokens in the parent"
   :valueof (let l (call vals^freq
-                        (mutate (n-of 1000 '+) :from '(a) :prob 0.5))
-             (> 520 max.l 500 min.l 480))
+                        (mutate (n-of 10000 '+) :from '(a) :prob 0.5))
+             (> 5200 max.l 5000 min.l 4800))
   :should be t)
 
 (test-wart "uneven one-point crossover yields two children"
@@ -118,7 +120,7 @@
 
 (test-wart "crossover breakpoints are chosen with uniform probability"
   :valueof (let l (map 'len (apply 'join
-                              (n-of 100
+                              (n-of 1000
                                 (crossover (n-of 10 '+) (n-of 10 '-)))))
              (and (iso min.l 0)
                   (iso max.l 20)))
