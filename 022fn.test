@@ -1,22 +1,3 @@
-(defun foo() 34)
-(test-wart "simple defun works as before"
-  :valueof (foo)
-  :should be 34)
-
-(progn
-  (defun foo0() 3)
-  (defun foo1() (+ 1 (foo0))))
-(test-wart "nested defuns work as before"
-  :valueof (foo1)
-  :should be 4)
-
-(progn
-  (defmacro foo2(n) `(+ 1 ,n))
-  (defmacro foo3(n) `(+ 1 (foo2 ,n))))
-(test-wart "nested macros work as before"
-  :valueof (foo3 2)
-  :should be 4)
-
 (test "keyword-args works"
   :valueof (keyword-args '(1 2 :a 3) ())
   :should be '((a . 3)))
@@ -166,11 +147,11 @@
 
 
 
-(test-wart "simple def"
+(test-wart "simple fn"
   :valueof (call (fn() 34))
   :should be 34)
 
-(test-wart "def 2"
+(test-wart "simple fn - 2"
   :valueof (call (fn() (cons 3 4)))
   :should be (cons 3 4))
 
@@ -198,7 +179,6 @@
   :valueof (call (fn((a b)) b) '(3 4))
   :should be 4)
 
-(wt-eval '(def foo10((a b) . c) b))
 (test-wart "destructured args + dotted rest"
   :valueof (call (fn((a b) . c) b) '(3 4) 5)
   :should be 4)

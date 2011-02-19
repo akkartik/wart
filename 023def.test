@@ -1,0 +1,18 @@
+(defun foo() 34)
+(test-wart "simple defun works as before"
+  :valueof (foo)
+  :should be 34)
+
+(progn
+  (defun foo0() 3)
+  (defun foo1() (+ 1 (foo0))))
+(test-wart "nested defuns work as before"
+  :valueof (foo1)
+  :should be 4)
+
+(progn
+  (defmacro foo2(n) `(+ 1 ,n))
+  (defmacro foo3(n) `(+ 1 (foo2 ,n))))
+(test-wart "nested macros work as before"
+  :valueof (foo3 2)
+  :should be 4)

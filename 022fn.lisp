@@ -1,15 +1,8 @@
 ;; Functions with complex arg lists
 
-(defmacro$ def(name params &body body)
-  `(defun$ ,name(&rest ,$args)
-     ,(compile-params params $args body)))
-
 (defmacro$ fn(params &body body)
   `(lambda(&rest ,$args)
      ,(compile-params params $args body)))
-
-(defmacro proc(name args . body)
-  `(def ,name ,args ,@body nil))
 
 
 
