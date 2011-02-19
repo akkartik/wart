@@ -12,6 +12,10 @@
   :valueof (call h 0)
   :should be 34)
 
+(test-wart "call on hash tables can take a default"
+  :valueof (call h 'no-such-key :default 42)
+  :should be 42)
+
 (test-wart "apply on hash tables works"
   :valueof (apply h '(0))
   :should be 34)
