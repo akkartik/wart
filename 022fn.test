@@ -1,17 +1,17 @@
 (test "keyword-args works"
-  :valueof (keyword-args '(1 2 :a 3) ())
+  :valueof (keyword-args '(a b c) '(1 2 :a 3) ())
   :should be '((a . 3)))
 
 (test "keyword-args works with rest args"
-  :valueof (keyword-args '(1 2 :a 3) 'a)
+  :valueof (keyword-args 'a '(1 2 :a 3) 'a)
   :should be '((a 3)))
 
 (test "positional-args works"
-  :valueof (positional-args '(1 2 :a 3 4) ())
+  :valueof (positional-args '(a b c) '(1 2 :a 3 4) ())
   :should be '(1 2 4))
 
 (test "positional-args works on rest args"
-  :valueof (positional-args '(1 2 :a 3 4) 'a)
+  :valueof (positional-args 'a '(1 2 :a 3 4) 'a)
   :should be '(1 2))
 
 (test "optional-alist works - 1"
@@ -254,6 +254,10 @@
 (test-wart "optional + named rest args - 3"
   :valueof (call (fn(a ? b 3 . c) (cons b c)) 2 :b 4 3)
   :should be '(4 3))
+
+(test-wart "unused keywords remain in rest args"
+  :valueof (call (fn(a . b) b) 3 :c 4 5)
+  :should be '(:c 4 5))
 
 (test-wart "convention: :do => :body"
   :valueof (call (fn(a ? b nil c 3 . body) (list b c body)) 3 4 :do 4 5)

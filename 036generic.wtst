@@ -18,7 +18,7 @@
   :should be 4)
 
 (wt-eval '(defmethod genericfoo(x) string
-            :coerce-to-cons)) ; syms never show up in body
+            ))
 (test-wart "defmethod can reset vtable"
   :valueof (genericfoo "abc")
   :should be '(#\a #\b #\c))

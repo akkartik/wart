@@ -18,8 +18,8 @@
     ((not params)  `(progn ,@body))
     ((not (consp params))   `(let* ((,params ,args)) ,@body))
     (t
-      `(let* ((,$positionals  (positional-args ,args ',(rest-param params)))
-              (,$keywords   (keyword-args ,args ',(rest-param params))))
+      `(let* ((,$positionals  (positional-args ',params ,args ',(rest-param params)))
+              (,$keywords   (keyword-args ',params ,args ',(rest-param params))))
         (let* ,(append
                  (get-required-arg-exprs params $positionals $keywords)
                  ; args go to rest before optional
@@ -83,26 +83,32 @@
     ((rest-param-p params)  params)
     (t   (rest-param (cdr params)))))
 
-(defun keyword-args(args rest-param)
+(defun keyword-args(params args rest-param)
   (cond
     ((no args)  ())
     ((not (consp args))  ())
-    ((keywordp (car args))  (let* ((param (keyword->symbol (car args))))
-                              (cons (cons param
-                                          (if (eq param rest-param)
-                                            (cdr args)
-                                            (cadr args)))
-                                    (keyword-args (cddr args) rest-param))))
-    (t   (keyword-args (cdr args) rest-param))))
+    ((kwargp params (car args))  (let* ((param (keyword->symbol (car args))))
+                                   (cons (cons param
+                                               (if (eq param rest-param)
+                                                 (cdr args)
+                                                 (cadr args)))
+                                         (keyword-args params (cddr args) rest-param))))
+    (t   (keyword-args params (cdr args) rest-param))))
 
-(defun positional-args(args rest-param)
+(defun positional-args(params args rest-param)
   (cond
     ((no args)  ())
-    ((keywordp (car args))  (if (eq rest-param (keyword->symbol (car args)))
-                              ()
-                              (positional-args (cddr args) rest-param)))
+    ((kwargp params (car args))  (if (eq rest-param (keyword->symbol (car args)))
+                                   ()
+                                   (positional-args params (cddr args) rest-param)))
     (t   (cons (car args)
-               (positional-args (cdr args) rest-param)))))
+               (positional-args params (cdr args) rest-param)))))
+
+(defun kwargp(params arg)
+  (and (keywordp arg)
+       (let* ((k (keyword->symbol arg)))
+         (or (iso k params)
+             (member k (flat params))))))
 
 (defun strip-defaults(params &optional past-?)
   (cond

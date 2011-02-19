@@ -28,7 +28,7 @@
 (defmethod upcase(s) null
   nil)
 (defmethod upcase(s) symbol
-  :coerce-to-cons)
+  )
 (defmethod upcase(s) character
   (char-upcase s))
 
@@ -37,7 +37,7 @@
 (defmethod downcase(s) null
   nil)
 (defmethod downcase(s) symbol
-  :coerce-to-cons)
+  )
 (defmethod downcase(s) character
   (char-downcase s))
 

@@ -40,7 +40,7 @@
        (or (call f xs)
            (reclist f cdr.xs))))
 (defmethod reclist(f s) string
-  :coerce-to-cons)
+  )
 
 (def wart-some(f seq)
   (reclist f^car seq))
@@ -58,7 +58,7 @@
       (call f car.seq)  (cons car.seq (keep f cdr.seq))
                         (keep f cdr.seq)))
 (defmethod wart-keep(f s) string
-  :coerce-to-cons)
+  )
 (defover keep wart-keep)
 
 (def wart-rem(test seq)
