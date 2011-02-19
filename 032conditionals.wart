@@ -28,7 +28,7 @@
 
 ; bootstrapping version
 (def testify(x)
-  (if (in x 'else 'otherwise)
+  (if (in x :else :otherwise)
     (fn(_) t)
     (or (function-value x)
         [iso _ x])))

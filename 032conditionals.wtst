@@ -70,6 +70,10 @@
   :valueof (call ~testify!oddp 3)
   :should be nil)
 
+(test-wart "testify on :else always returns t"
+  :valueof (call (testify :else) 'x)
+  :should be t)
+
 (test-wart "caselet works"
   :valueof (caselet x 'b
              'a 1
@@ -95,12 +99,12 @@
                'evenp 36))
   :should be 34)
 
-(test-wart "case works with else"
-  :valueof (let x 4
+(test-wart "case recognizes keyword :else"
+  :valueof (let x 3
              (case x
-               'oddp 34
-               'else 36))
-  :should be 36)
+               'evenp 34
+               :else 35))
+  :should be 35)
 
 (test-wart "andf works"
   :valueof (call (andf 'consp 'car) '(3 4))
