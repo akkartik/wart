@@ -1,6 +1,6 @@
 (synonym newstring make-string)
 
-(defcall string(s)
+(defcall string s
   [elt s _])
 
 (defset string(s index val)

@@ -1,4 +1,4 @@
-(defcall hash-table(table)
+(defcall hash-table table
   (fn(_ ? default nil)
     (gethash _ table default)))
 
