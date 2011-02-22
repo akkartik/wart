@@ -16,3 +16,17 @@
 (test "nested macros work as before"
   :valueof (foo3 2)
   :should be 4)
+
+(wt-eval '(def foo() 34))
+(test "def sets wart-signatures*"
+  :valueof (gethash 'foo wart-signatures*)
+  :should match '((_ _) nil))
+
+(wt-eval '(def foo(a) a))
+(test "subsequent defs overload"
+  :valueof (len (gethash 'foo wart-signatures*))
+  :should be 3)
+
+(test "both versions of def coexist"
+  :valueof (list (foo) (foo 3))
+  :should be (list 34 3))

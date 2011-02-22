@@ -1,3 +1,10 @@
+(progn
+  (defmacro foo2(n) `(+ 1 ,n))
+  (defmacro foo3(n) `(+ 1 (foo2 ,n))))
+(test "nested macros work as before"
+  :valueof (foo3 2)
+  :should be 4)
+
 (wt-eval '(mac foo5(n) `(+ ,n 1)))
 (test "simple mac"
   :valueof (foo5 32)
