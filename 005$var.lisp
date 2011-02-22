@@ -7,24 +7,20 @@
        (string= (symbol-name s) "$"
                 :start1 0 :end1 1)))
 
-(defmacro defmacro$(name args &rest body)
+(defmacro handling-$vars(&body body)
   (let ((syms (remove-duplicates
                 (remove-if-not #'dollar-symbol-p
                                (flat body)))))
-    `(defmacro ,name ,args
-       (let ,(mapcar (lambda(_)
-                       `(,_   (uniq ,(cut (symbol-name _) 1))))
-                     syms)
-         ,@body))))
+    `(let ,(mapcar (lambda(_)
+                     `(,_   (uniq ,(cut (symbol-name _) 1))))
+                   syms)
+       ,@body)))
+
+(defmacro defmacro$(name args &rest body)
+  `(defmacro ,name ,args
+     (handling-$vars ,@body)))
 
 ; Use defun$ to generate expressions for defmacro$ to return
-; Identical to defmacro/$ except we replace defmacro in the body with defun
 (defmacro defun$(name args &rest body)
-  (let ((syms (remove-duplicates
-                (remove-if-not #'dollar-symbol-p
-                               (flat body)))))
-    `(defun ,name ,args
-       (let ,(mapcar (lambda(_)
-                       `(,_   (uniq ,(cut (symbol-name _) 1))))
-                     syms)
-         ,@body))))
+  `(defun ,name ,args
+     (handling-$vars ,@body)))
