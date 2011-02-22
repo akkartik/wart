@@ -20,12 +20,12 @@
 (wt-eval '(def foo(a) 34))
 (test "def sets wart-signatures*"
   :valueof (gethash 'foo wart-signatures*)
-  :should match '((_ _) nil))
+  :should match '((_ _)))
 
 (wt-eval '(def foo(a b) a))
 (test "subsequent defs overload"
   :valueof (len (gethash 'foo wart-signatures*))
-  :should be 3)
+  :should be 2)
 
 (test "both versions of def coexist"
   :valueof (list (foo 2) (foo 3 2))

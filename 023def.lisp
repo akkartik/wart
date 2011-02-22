@@ -2,9 +2,6 @@
 
 (defmacro$ def(name params &body body)
   `(progn
-    (unless (gethash ',name wart-signatures*)
-      (setf (gethash ',name wart-signatures*)
-            (list nil)))
     (push (list (args-matcher ',params) (fn ,params
                                           (handling-$vars ,@body)))
           (gethash ',name wart-signatures*))
@@ -20,9 +17,9 @@
 ;; Internals
 
 (defun call-correct-variant(variants args)
-  (if (car variants)
+  (if variants
     (destructuring-bind (test func) (car variants)
-      (if (or (pairp variants) (apply test args))
+      (if (or (singlep variants) (apply test args))
         (apply func args)
         (call-correct-variant (cdr variants) args)))))
 
