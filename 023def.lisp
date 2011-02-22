@@ -22,7 +22,7 @@
 (defun call-correct-variant(variants args)
   (if (car variants)
     (destructuring-bind (test func) (car variants)
-      (if (apply test args)
+      (if (or (pairp variants) (apply test args))
         (apply func args)
         (call-correct-variant (cdr variants) args)))))
 
