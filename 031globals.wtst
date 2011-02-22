@@ -1,10 +1,10 @@
 (wt-eval '(alias fooplus +))
-(test-wart "alias works"
+(test "alias works"
   :valueof (fooplus 3 4)
   :should be 7)
 
 (wt-eval '(alias fooincf incf))
-(test-wart "alias works on macros"
+(test "alias works on macros"
   :valueof (let a 3
              (fooincf a)
              a)

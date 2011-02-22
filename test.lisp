@@ -1,10 +1,12 @@
-(defmacro test(msg Valueof expr Should &rest predicate)
+(defmacro test-lisp(msg Valueof expr Should &rest predicate)
   `(let ((got ,expr))
      (or (,(car predicate) got ,@(cdr predicate))
          (fail ,msg got))))
 
-(defmacro test-wart(msg Valueof expr Should &rest predicate)
-  `(let ((got (wt-eval ',expr)))
+(defmacro test(msg Valueof expr Should &rest predicate)
+  `(let ((got ,(if (fboundp 'wt-eval)
+                 `(wt-eval ',expr)
+                 expr)))
      (or (,(car predicate) got ,@(cdr predicate))
          (fail ,msg got))))
 

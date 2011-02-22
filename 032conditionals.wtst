@@ -1,87 +1,87 @@
-(test-wart "if works with no then"
+(test "if works with no then"
   :valueof (if 34)
   :should be 34)
 
-(test-wart "if recognizes keyword :else"
+(test "if recognizes keyword :else"
   :valueof (if nil 35 :else 36)
   :should be 36)
 
-(test-wart "iflet works"
+(test "iflet works"
   :valueof (iflet a 34 a 253)
   :should be 34)
 
-(test-wart "iflet works - 2"
+(test "iflet works - 2"
   :valueof (iflet a nil a 253)
   :should be 253)
 
-(test-wart "iflet works with no then"
+(test "iflet works with no then"
   :valueof (iflet a 34)
   :should be 34)
 
-(test-wart "iflet works with nil then"
+(test "iflet works with nil then"
   :valueof (iflet a nil nil 34 35)
   :should be 35)
 
-(test-wart "iflet binds multiple conditions"
+(test "iflet binds multiple conditions"
   :valueof (iflet a nil 34
                     35  (+ 1 a))
   :should be 36)
 
-(test-wart "iflet destructures"
+(test "iflet destructures"
   :valueof (iflet (a b)
               '(3 4)  42)
   :should be 42)
 
-(test-wart "iflet destructures - 2"
+(test "iflet destructures - 2"
   :valueof (iflet (a b)
               nil   34
               '(4 5) (cons a b))
   :should be '(4 . 5))
 
-(test-wart "aif works with no then"
+(test "aif works with no then"
   :valueof (aif 34)
   :should be 34)
 
-(test-wart "aif works with nil then"
+(test "aif works with nil then"
   :valueof (aif nil nil 34 35)
   :should be 35)
 
-(test-wart "aif works with nil then - 2"
+(test "aif works with nil then - 2"
   :valueof (aif t nil)
   :should be nil)
 
-(test-wart "in works - 1"
+(test "in works - 1"
   :valueof (let a 3 (in a 1 2 3))
   :should satisfy true_value)
 
-(test-wart "in works - 2"
+(test "in works - 2"
   :valueof (let a 1 (in a 2 3))
   :should be nil)
 
-(test-wart "testify works"
+(test "testify works"
   :valueof (call testify!oddp 3)
   :should be t)
 
-(test-wart "testify works with an atom"
+(test "testify works with an atom"
   :valueof (call testify.3 3)
   :should be t)
 
-(test-wart "testify always returns a function"
+(test "testify always returns a function"
   :valueof (call ~testify!oddp 3)
   :should be nil)
 
-(test-wart "testify on :else always returns t"
+(test "testify on :else always returns t"
   :valueof (call (testify :else) 'x)
   :should be t)
 
-(test-wart "caselet works"
+(test "caselet works"
   :valueof (caselet x 'b
              'a 1
              'b 2
                 3)
   :should be 2)
 
-(test-wart "case works"
+(test "case works"
   :valueof (with (x 1
                   y 2
                   z 3
@@ -92,52 +92,52 @@
                z 36))
   :should be 35)
 
-(test-wart "case uses testify"
+(test "case uses testify"
   :valueof (let x 3
              (case x
                'oddp 34
                'evenp 36))
   :should be 34)
 
-(test-wart "case recognizes keyword :else"
+(test "case recognizes keyword :else"
   :valueof (let x 3
              (case x
                'evenp 34
                :else 35))
   :should be 35)
 
-(test-wart "andf works"
+(test "andf works"
   :valueof (call (andf 'consp 'car) '(3 4))
   :should be 3)
 
-(test-wart "check works"
+(test "check works"
   :valueof (check (+ 10 10) evenp)
   :should be 20)
 
-(test-wart "check works with alternate"
+(test "check works with alternate"
   :valueof (check (+ 10 10) oddp "foo")
   :should be "foo")
 
-(test-wart "check works with fns"
+(test "check works with fns"
   :valueof (check (+ 10 10) [oddp _] "foo")
   :should be "foo")
 
-(test-wart "check works with ssyntax"
+(test "check works with ssyntax"
   :valueof (check (+ 10 10) ~evenp "foo")
   :should be "foo")
 
-(test-wart "only works"
+(test "only works"
   :valueof (with (f [+ _ 1]
                   a 34)
              (call only.f a))
   :should be 35)
 
-(test-wart "only works - 2"
+(test "only works - 2"
   :valueof (with (f [+ _ 1]
                   a nil)
              (call only.f a))
   :should be nil)
 
-(test-wart "only works with predefined functions"
+(test "only works with predefined functions"
   :valueof (call only.oddp 3)
   :should be t)

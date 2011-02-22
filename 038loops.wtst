@@ -1,33 +1,33 @@
-(test-wart "whiler works"
+(test "whiler works"
   :valueof (accum acc
              (with-input-from-string(f "abcdef")
                (whiler x (read-char f) #\d
                   (acc x))))
   :should be '(#\a #\b #\c))
 
-(test-wart "drain works"
+(test "drain works"
   :valueof (let s '(1 2 3)
              (drain (pop s)))
   :should be '(1 2 3))
 
-(test-wart "each works"
+(test "each works"
   :valueof (let counter 0
              (each x '(1 2 3) ++.counter)
              counter)
   :should be 3)
 
-(test-wart "each binds var"
+(test "each binds var"
   :valueof (let counter 0
              (each x '(1 2 3) (++ counter x))
              counter)
   :should be 6)
 
-(test-wart "each works on strings"
+(test "each works on strings"
   :valueof (accum acc
              (each x "abc" (acc x)))
   :should be '(#\a #\b #\c))
 
-(test-wart "each works on tables"
+(test "each works on tables"
   :valueof (sort
              (accum acc
                (let h (table)
@@ -36,7 +36,7 @@
              '<)
   :should be '(1 3))
 
-(test-wart "xloop works"
+(test "xloop works"
   :valueof (ret counter 0
              (xloop (x 0)
                (++ counter x)

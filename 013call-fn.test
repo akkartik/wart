@@ -1,24 +1,24 @@
-(test-wart "existing functions continue to work with call-fn"
+(test "existing functions continue to work with call-fn"
   :valueof (call-fn (coerce 'car 'function) '(3))
   :should be 3)
 
-(test-wart "wart-apply works"
+(test "wart-apply works"
   :valueof (wart-apply '+ '(1 2 3))
   :should be 6)
 
-(test-wart "wart-apply works without quoting function symbol"
+(test "wart-apply works without quoting function symbol"
   :valueof (wart-apply + '(1 2 3))
   :should be 6)
 
-(test-wart "call-fn works on simple functions"
+(test "call-fn works on simple functions"
   :valueof (call-fn 'car '(1))
   :should be 1)
 
-(test-wart "call-fn works on simple functions"
+(test "call-fn works on simple functions"
   :valueof (call-fn 'car '(1))
   :should be 1)
 
-(test-wart "call-fn coerces to function when necessary"
+(test "call-fn coerces to function when necessary"
   :valueof (call-fn 'car '(1))
   :should be 1)
 

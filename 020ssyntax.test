@@ -1,34 +1,34 @@
 (def-ssyntax #\. 'foo*)
 (def-ssyntax #\! 'bar* 1)
 
-(test "ssyntax-idx returns index of rightmost ssyntax"
+(test-lisp "ssyntax-idx returns index of rightmost ssyntax"
   :valueof (ssyntax-idx "a.b.cd")
   :should be 3)
 
-(test "ssyntax-idx returns rightmost index of lowest-precedence ssyntax"
+(test-lisp "ssyntax-idx returns rightmost index of lowest-precedence ssyntax"
   :valueof (ssyntax-idx "a!b.c!e")
   :should be 3)
 
-(test "ssyntaxp works"
+(test-lisp "ssyntaxp works"
   :valueof (ssyntaxp 'a.b)
   :should satisfy true_value)
 
-(test "ssyntaxp ignores ordinary lisp tokens"
+(test-lisp "ssyntaxp ignores ordinary lisp tokens"
   :valueof (ssyntaxp 'a+b-c)
   :should be nil)
 
-(test "expand-ssyntax works"
+(test-lisp "expand-ssyntax works"
   :valueof (expand-ssyntax 'a.b)
   :should be '(foo* a b))
 
-(test "expand-ssyntax works with ints in rhs"
+(test-lisp "expand-ssyntax works with ints in rhs"
   :valueof (expand-ssyntax 'a.3)
   :should be '(foo* a 3))
 
-(test "expand-ssyntax works with ints in lhs"
+(test-lisp "expand-ssyntax works with ints in lhs"
   :valueof (expand-ssyntax '3.a)
   :should be '(foo* 3 a))
 
-(test "expand-ssyntax tracks precedence"
+(test-lisp "expand-ssyntax tracks precedence"
   :valueof (expand-ssyntax 'a.b!c)
   :should be '(foo* a (bar* b c)))

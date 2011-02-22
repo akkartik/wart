@@ -1,30 +1,30 @@
-(test-wart "parse-url works"
+(test "parse-url works"
   :valueof (parse-url "www.google.com")
   :should be (wt-eval '(obj protocol "http" host "www.google.com" port 80 path "/")))
 
-(test-wart "parse-url works - 2"
+(test "parse-url works - 2"
   :valueof (parse-url "www.google.com:8080")
   :should be (wt-eval '(obj protocol "http" host "www.google.com" port 8080 path "/")))
 
-(test-wart "parse-url works - 3"
+(test "parse-url works - 3"
   :valueof (parse-url "ftp://www.google.com/blah")
   :should be (wt-eval '(obj protocol "ftp" host "www.google.com" port 80 path "/blah")))
 
 
 
-(test-wart "urldecode works"
+(test "urldecode works"
   :valueof (urldecode "a+b+c")
   :should be "a b c")
 
-(test-wart "urldecode works - 2"
+(test "urldecode works - 2"
   :valueof (urldecode "a%20b")
   :should be "a b")
 
-(test-wart "urlencode works"
+(test "urlencode works"
   :valueof (urldecode (urlencode "a b c"))
   :should be "a b c")
 
-(test-wart "urlencode works - 2"
+(test "urlencode works - 2"
   :valueof (urldecode (urlencode "a b://c"))
   :should be "a b://c")
 

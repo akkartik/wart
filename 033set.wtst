@@ -1,33 +1,33 @@
-(test-wart "set works"
+(test "set works"
   :valueof (let x nil
              (set x)
              x)
   :should be t)
 
-(test-wart "wipe works"
+(test "wipe works"
   :valueof (let x 34
              (wipe x)
              x)
   :should be nil)
 
-(test-wart "wipe works for multiple args"
+(test "wipe works for multiple args"
   :valueof (do (wipe x y z) (list x y z))
   :should be '(nil nil nil))
 
-(test-wart "swap works"
+(test "swap works"
   :valueof (with (a 3 b 4) (swap a b) (cons a b))
   :should be '(4 . 3))
 
-(test-wart "rotate works"
+(test "rotate works"
   :valueof (with (a 3 b 4 c 5) (rotate a b c) (list a b c))
   :should be '(4 5 3))
 
 (wt-eval '(mac pull(f seq)
             `(zap [remove-if ,f _] ,seq)))
-(test-wart "zap works"
+(test "zap works"
   :valueof (let x '(1 100 2 50 3) (pull [< _ 10] x) x)
   :should be '(100 50))
 
-(test-wart "accum works"
+(test "accum works"
   :valueof (accum acc (map0 [acc (* _ 10)] '(1 2 3)))
   :should be '(10 20 30))

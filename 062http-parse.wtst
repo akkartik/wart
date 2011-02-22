@@ -9,7 +9,7 @@ Accept-Language: en-US,en;q=0.8
 Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.3
 Cookie: abc=def;foo=bar")
 
-(test-wart "parse-http-headers works"
+(test "parse-http-headers works"
   :valueof (fromstring http-get-request (parse-http-headers))
   :should be 
      '(("host" . "localhost:8080")
@@ -24,19 +24,19 @@ Cookie: abc=def;foo=bar")
        ("accept-charset" . "ISO-8859-1,utf-8;q=0.7,*;q=0.3")
        ("cookie" . "abc=def;foo=bar")))
 
-(test-wart "parse-http-cookies works"
+(test "parse-http-cookies works"
   :valueof (parse-http-cookies (fromstring http-get-request
                                  (parse-http-headers)))
   :should be '(("abc" . "def") ("foo" . "bar")))
 
-(test-wart "parse-http-args works"
+(test "parse-http-args works"
   :valueof (parse-http-args "foo=bar&baz=42")
   :should be '(("foo" . "bar") ("baz" . "42")))
 
-(test-wart "parse-http-args urldecodes"
+(test "parse-http-args urldecodes"
   :valueof (parse-http-args "foo=a+b+c&bar=%2034")
   :should be '(("foo" . "a b c") ("bar" . " 34")))
 
-(test-wart "read-body works"
+(test "read-body works"
   :valueof (fromstring http-get-request (read-body '(("content-length" . "20"))))
   :should be "Host: localhost:8080")

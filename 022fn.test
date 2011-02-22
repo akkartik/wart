@@ -147,123 +147,123 @@
 
 
 
-(test-wart "simple fn"
+(test "simple fn"
   :valueof (call (fn() 34))
   :should be 34)
 
-(test-wart "simple fn - 2"
+(test "simple fn - 2"
   :valueof (call (fn() (cons 3 4)))
   :should be (cons 3 4))
 
-(test-wart "varargs without parens"
+(test "varargs without parens"
   :valueof (call (fn args args) 3 4 5)
   :should be '(3 4 5))
 
-(test-wart "varargs include keyword args"
+(test "varargs include keyword args"
   :valueof (call (fn args args) 3 4 :a 5)
   :should be '(3 4 :a 5))
 
-(test-wart "dotted rest"
+(test "dotted rest"
   :valueof (call (fn(a . b) b) 3 4)
   :should be '(4))
 
-(test-wart "rest args are optional"
+(test "rest args are optional"
   :valueof (call (fn(a . b) b) 3)
   :should be nil)
 
-(test-wart "'required' params are really just optional"
+(test "'required' params are really just optional"
   :valueof (call (fn(a . b) a))
   :should be nil)
 
-(test-wart "destructured args"
+(test "destructured args"
   :valueof (call (fn((a b)) b) '(3 4))
   :should be 4)
 
-(test-wart "destructured args + dotted rest"
+(test "destructured args + dotted rest"
   :valueof (call (fn((a b) . c) b) '(3 4) 5)
   :should be 4)
 
-(test-wart "allow param names"
+(test "allow param names"
   :valueof (call (fn(a b) (- a b)) :a 3 :b 4)
   :should be -1)
 
-(test-wart "allow just some param names"
+(test "allow just some param names"
   :valueof (call (fn(a b) (- a b)) :a 3 4)
   :should be -1)
 
-(test-wart "allow args in any order when giving param names"
+(test "allow args in any order when giving param names"
   :valueof (call (fn(a b) (- a b)) :b 3 :a 4)
   :should be 1)
 
-(test-wart "take positional args in order after keyword args have been matched"
+(test "take positional args in order after keyword args have been matched"
   :valueof (call (fn(a b) (- a b)) 3 :a 4)
   :should be 1)
 
-(test-wart "optional param"
+(test "optional param"
   :valueof (call (fn(a ? b nil) (cons a b)) 3)
   :should be '(3))
 
-(test-wart "named arg around optional params"
+(test "named arg around optional params"
   :valueof (call (fn(a ? b 4) (cons a b)) :a 3)
   :should be '(3 . 4))
 
-(test-wart "optional args should override defaults"
+(test "optional args should override defaults"
   :valueof (call (fn(a ? b 4) (cons a b)) 3 2)
   :should be '(3 . 2))
 
-(test-wart "named optional args should override defaults"
+(test "named optional args should override defaults"
   :valueof (call (fn(a ? b 4) (cons a b)) 3 :b 2)
   :should be '(3 . 2))
 
-(test-wart "nil optional arg overrides default"
+(test "nil optional arg overrides default"
   :valueof (call (fn(a ? b 4) (cons a b)) 3 :b nil)
   :should be '(3))
 
-(test-wart "nil optional arg overrides default without naming"
+(test "nil optional arg overrides default without naming"
   :valueof (call (fn(a ? b 4) (cons a b)) 3 nil)
   :should be '(3))
 
-(test-wart "defaults can be variables"
+(test "defaults can be variables"
   :valueof (_let a 3 (call (fn(? x a) x)))
   :should be 3)
 
-(test-wart "multiple optional params"
+(test "multiple optional params"
   :valueof (call (fn(a ? b 4 c nil) (cons b c)) 3)
   :should be '(4))
 
-(test-wart "optional params without rest can be positionally filled"
+(test "optional params without rest can be positionally filled"
   :valueof (call (fn(a ? b 4 c nil) (cons b c)) 3 7 3)
   :should be '(7 . 3))
 
-(test-wart "rest args can be named"
+(test "rest args can be named"
   :valueof (call (fn(a . b) b) 3 :b 4 5)
   :should be '(4 5))
 
-(test-wart "optional + named rest args"
+(test "optional + named rest args"
   :valueof (call (fn(a ? b 3 . c) (cons b c)) 2 :c 3)
   :should be '(3 3))
 
-(test-wart "rest args take precedence over optionals"
+(test "rest args take precedence over optionals"
   :valueof (call (fn(a ? b 3 . c) (cons b c)) 1 4 5)
   :should be '(3 4 5))
 
-(test-wart "optional + named rest args - 2"
+(test "optional + named rest args - 2"
   :valueof (call (fn(a ? b 3 . c) (cons b c)) 1 4 :c 5)
   :should be '(4 5))
 
-(test-wart "optional + named rest args - 3"
+(test "optional + named rest args - 3"
   :valueof (call (fn(a ? b 3 . c) (cons b c)) 2 :b 4 3)
   :should be '(4 3))
 
-(test-wart "unused keywords remain in rest args"
+(test "unused keywords remain in rest args"
   :valueof (call (fn(a . b) b) 3 :c 4 5)
   :should be '(:c 4 5))
 
-(test-wart "convention: :do => :body"
+(test "convention: :do => :body"
   :valueof (call (fn(a ? b nil c 3 . body) (list b c body)) 3 4 :do 4 5)
   :should be '(4 3 (4 5)))
 
 ; integration test: bracket + fn + call
-(test-wart "call works on lambdas"
+(test "call works on lambdas"
   :valueof (call [+ _ 1] 3)
   :should be 4)

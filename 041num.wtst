@@ -1,60 +1,60 @@
-(test-wart "coercing integers to strings works"
+(test "coercing integers to strings works"
   :valueof (as string 10)
   :should be "10")
 
-(test-wart "coercing strings to integers works"
+(test "coercing strings to integers works"
   :valueof (as integer "34")
   :should be 34)
 
-(test-wart "int coerces"
+(test "int coerces"
   :valueof (int "34")
   :should be 34)
 
-(test-wart "int takes optional base"
+(test "int takes optional base"
   :valueof (int "23" :base 16)
   :should be 35)
 
-(test-wart "str works with base"
+(test "str works with base"
   :valueof (str 32 :base 5)
   :should be "112")
 
-(test-wart "int coerces to char"
+(test "int coerces to char"
   :valueof (as character 97)
   :should be #\a)
 
-(test-wart "char coerces to int"
+(test "char coerces to int"
   :valueof (as integer #\a)
   :should be 97)
 
-(test-wart "mapn works"
+(test "mapn works"
   :valueof (mapn [* _ _] 3 5)
   :should be '(9 16 25))
 
-(test-wart "sumn works"
+(test "sumn works"
   :valueof (sumn [* _ _] 1 3)
   :should be 14)
 
-(test-wart "sumlist works"
+(test "sumlist works"
   :valueof (sumlist 'idfn '(1 2 3))
   :should be 6)
 
-(test-wart "counting-calls works"
+(test "counting-calls works"
   :valueof (counting-calls :to acc
               (map acc '(1 nil nil t)))
   :should be 2)
 
-(test-wart "comparing floats works"
+(test "comparing floats works"
   :valueof (iso 4.2 4.200001)
   :should be t)
 
-(test-wart "fprec to 0 acts like round"
+(test "fprec to 0 acts like round"
   :valueof (fprec 4.3 :places 0)
   :should be (float (round 4.3)))
 
-(test-wart "fprec works"
+(test "fprec works"
   :valueof (fprec 4.123456 :places 3)
   :should be 4.123)
 
-(test-wart "fprec even works with negative precisions to the left of the decimal"
+(test "fprec even works with negative precisions to the left of the decimal"
   :valueof (fprec 3243.43 :places -1)
   :should be 3240.0)

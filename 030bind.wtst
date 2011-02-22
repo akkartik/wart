@@ -1,20 +1,20 @@
-(test-wart "map0 works"
+(test "map0 works"
   :valueof (map0 '1+ '(2 3 4))
   :should be '(3 4 5))
 
-(test-wart "map0 works on strings"
+(test "map0 works on strings"
   :valueof (map0 'char-upcase "abc")
   :should be "ABC")
 
-(test-wart "new redefined let"
+(test "new redefined let"
   :valueof (let a 3 a)
   :should be 3)
 
-(test-wart "let destructures"
+(test "let destructures"
   :valueof (let (a b) '(3 4) a)
   :should be 3)
 
-(test-wart "new keyword - with"
+(test "new keyword - with"
   :valueof (with (a 3) a)
   :should be 3)
 
@@ -22,6 +22,6 @@
 
 ; integration test: wrepl + mac + let
 (wt-eval '(mac aand(a b) `(let it ,a (and it ,b))))
-(test-wart "macro bodies should pass through the compiler"
+(test "macro bodies should pass through the compiler"
   :valueof (let x 3 (aand (- x 1) (> it 1)))
   :should satisfy true_value)

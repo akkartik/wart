@@ -1,50 +1,50 @@
-(test-wart "compose works"
+(test "compose works"
   :valueof (call 1+^1+ 3)
   :should be 5)
 
-(test-wart "complement works"
+(test "complement works"
   :valueof (call ~oddp 3)
   :should be nil)
 
-(test "expand-ssyntax translates ^ to compose"
+(test-lisp "expand-ssyntax translates ^ to compose"
   :valueof (expand-ssyntax 'a^b)
   :should be '(compose a b))
 
-(test "expand-ssyntax translates ~ to complement"
+(test-lisp "expand-ssyntax translates ~ to complement"
   :valueof (expand-ssyntax '~b)
   :should be '(complement* b))
 
-(test "expand-ssyntax translates . to just a call"
+(test-lisp "expand-ssyntax translates . to just a call"
   :valueof (expand-ssyntax 'a.b)
   :should be '(call a b))
 
-(test "expand-ssyntax translates ! to just a call"
+(test-lisp "expand-ssyntax translates ! to just a call"
   :valueof (expand-ssyntax 'a!b)
   :should be '(call-quoted a b))
 
-(test ". and ! are left-associative"
+(test-lisp ". and ! are left-associative"
   :valueof (expand-ssyntax 'a.b!c.d)
   :should be '(call (call-quoted (call a b) c) d))
 
-(test "~ has higher precedence"
+(test-lisp "~ has higher precedence"
   :valueof (expand-ssyntax '~testify.test)
   :should be '(complement* (call testify test)))
 
-(test "expand numbers correctly"
+(test-lisp "expand numbers correctly"
   :valueof (expand-ssyntax 'a.3)
   :should be '(call a 3))
 
-(test-wart ". works"
+(test ". works"
   :valueof oddp.3
   :should be t)
 
 ; integration test: macros + call-fn + ssyntax
 (setf a 3)
-(test-wart ". works with macros"
+(test ". works with macros"
   :valueof incf.a
   :should be 4)
 
 ; integration test: defover + ssyntax
-(test "expand-ssyntax goes through wt-transform"
+(test-lisp "expand-ssyntax goes through wt-transform"
   :valueof (expand-ssyntax 'defover-foo.3)
   :should be '(call defover-bar 3))

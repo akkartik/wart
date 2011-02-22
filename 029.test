@@ -2,11 +2,11 @@
   :valueof (wt-transform '(if a b c))
   :should be '(wart-if a b c))
 
-(test-wart "wt-transform works through defuns"
+(test "wt-transform works through defuns"
   :valueof (wt-transform '(defun foo(n) (if a b c)))
   :should be '(defun foo(n) (wart-if a b c)))
 
-(test-wart "lookup-quoted-handler handles function-names"
+(test "lookup-quoted-handler handles function-names"
   :valueof (lookup-quoted-handler 'if)
   :should be 'wart-if)
 
@@ -18,7 +18,7 @@
   :valueof (wt-transform '(backq-list* 'if))
   :should be '(backq-list* 'wart-if))
 
-(test-wart "wt-transform works through backquote"
+(test "wt-transform works through backquote"
   :valueof (_let a 3 `(if ,a b c))
   :should be '(wart-if 3 b c))
 
@@ -28,40 +28,40 @@
 
 
 
-(test-wart "new redefined if with one branch"
+(test "new redefined if with one branch"
   :valueof (if nil 3)
   :should be nil)
 
-(test-wart "new redefined if with one branch - 2"
+(test "new redefined if with one branch - 2"
   :valueof (if t 3)
   :should be 3)
 
-(test-wart "new redefined if with two branches"
+(test "new redefined if with two branches"
   :valueof (if t 3 4)
   :should be 3)
 
-(test-wart "new redefined if with two branches - 2"
+(test "new redefined if with two branches - 2"
   :valueof (if nil 3 4)
   :should be 4)
 
-(test-wart "new redefined if with three branches"
+(test "new redefined if with three branches"
   :valueof (if (> 3 2) 3 (> 3 4) 5 6)
   :should be 3)
 
-(test-wart "new redefined if with three branches - 2"
+(test "new redefined if with three branches - 2"
   :valueof (if (< 3 2) 3 (< 3 4) 5 6)
   :should be 5)
 
-(test-wart "new redefined if with three branches - 3"
+(test "new redefined if with three branches - 3"
   :valueof (if (< 3 2) 3 (< 3 3) 5 6)
   :should be 6)
 
 (wt-eval '(= a 3))
-(test-wart "= works"
+(test "= works"
   :valueof a
   :should be 3)
 
 (wt-eval '(++ a))
-(test-wart "++ works"
+(test "++ works"
   :valueof a
   :should be 4)

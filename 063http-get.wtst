@@ -1,4 +1,4 @@
-(test-wart "http-get performs dns lookup"
+(test "http-get performs dns lookup"
   :valueof (skipping sb-bsd-sockets:host-not-found-error
              (call (http-get "www.google.com") 'body))
   :should satisfy true_value)
@@ -6,7 +6,7 @@
 
 
 ; integration test: http client+server
-(test-wart "http-get works"
+(test "http-get works"
   :valueof (let port (+ 1024 rand.80)
              ; server
              (w/server-socket s port
@@ -21,7 +21,7 @@
                      'body)))
   :should be "Hello world!")
 
-(test-wart "http-get works with servers that send just \\n, not \\r\\n"
+(test "http-get works with servers that send just \\n, not \\r\\n"
   :valueof (let port (+ 1024 rand.80)
              ; server
              (w/server-socket s port

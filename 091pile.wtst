@@ -1,46 +1,46 @@
 ;; http://vagueinnovation.com/pragmatic_gp/?p=497
 
-(test-wart "numerical constants are pushed onto the interpreter stack"
+(test "numerical constants are pushed onto the interpreter stack"
   :valueof (pile-exec '(-91.21))
   :should be '(-91.21))
 
-(test-wart "addition pushes the sum of 2 stack items"
+(test "addition pushes the sum of 2 stack items"
   :valueof (pile-exec '(1.2 3.4 +))
   :should be '(4.6))
 
-(test-wart "subtraction pushes the difference of 2 stack items"
+(test "subtraction pushes the difference of 2 stack items"
   :valueof (pile-exec '(1.2 3.4 -))
   :should be '(-2.2))
 
-(test-wart "multiplication pushes the product of 2 stack items"
+(test "multiplication pushes the product of 2 stack items"
   :valueof (pile-exec '(1.2 3.4 *))
   :should be '(4.08))
 
-(test-wart "division pushes the quotient of 2 stack items"
+(test "division pushes the quotient of 2 stack items"
   :valueof (pile-exec '(8.2 -2.0 /))
   :should be '(-4.1))
 
-(test-wart "x pushes the bound value"
+(test "x pushes the bound value"
   :valueof (pile-exec '(x) :x 2.1)
   :should be '(2.1))
 
-(test-wart "instructions with no args fail silently"
+(test "instructions with no args fail silently"
   :valueof (pile-exec '(+ / + *))
   :should be ())
 
-(test-wart "division by zero yields zero (protected division)"
+(test "division by zero yields zero (protected division)"
   :valueof (pile-exec '(8.2 -0.0 /))
   :should be '(0.0))
 
-(test-wart "gibberish tokens fail silently"
+(test "gibberish tokens fail silently"
   :valueof (pile-exec '(foo bar))
   :should be ())
 
-(test-wart "empty scripts do nothing"
+(test "empty scripts do nothing"
   :valueof (pile-exec ())
   :should be ())
 
-(test-wart "script execution leaves all resulting items on the stack"
+(test "script execution leaves all resulting items on the stack"
   :valueof (pile-exec '(1.1 2.2 3.3 4.4 x) :x 5.5)
   :should be '(5.5 4.4 3.3 2.2 1.1))
 
@@ -48,26 +48,26 @@
 
 ;; http://vagueinnovation.com/pragmatic_gp/?p=501
 
-(test-wart "sample available tokens uniformly"
+(test "sample available tokens uniformly"
   :valueof (let l (call vals^freq^flat^n-of 10000
                         (generate-list :of 20 :from '(a b c)))
              (> 68667 max.l 66667 min.l 64667))
   :should be t)
 
-(test-wart "generate-pile-program replaces k with a random float"
+(test "generate-pile-program replaces k with a random float"
   :valueof (call type^car^generate-pile-program 1 '(k))
   :should be 'float)
 
-(test-wart "should be able to generate scripts of a given size"
+(test "should be able to generate scripts of a given size"
   :valueof (len (generate-pile-program 100 '(foo bar baz qux)))
   :should be 100)
 
-(test-wart "random constants use 'k' as a placeholder"
+(test "random constants use 'k' as a placeholder"
   :valueof (all [<= -20.0 _ 20.0]
                 (generate-pile-program 20 '(k)))
   :should be t)
 
-(test-wart "random constants use 'k' as a placeholder"
+(test "random constants use 'k' as a placeholder"
   :valueof (all [<= -20.0 _ 20.0]
                 (flat (n-of 10000 (generate-pile-program 20 '(k)))))
   :should be t)
@@ -76,15 +76,15 @@
 
 ;; http://vagueinnovation.com/pragmatic_gp/?p=511
 
-(test-wart "return value is the top stack item after execution"
+(test "return value is the top stack item after execution"
   :valueof (pile-eval '(1.2 3.4 +) :x 1)
   :should be 4.6)
 
-(test-wart "return 1000000000.0 if the stack is empty"
+(test "return 1000000000.0 if the stack is empty"
   :valueof (pile-eval '(* / + -) :x 9.1)
   :should be 1000000000.0)
 
-(test-wart "score is summed squared errors"
+(test "score is summed squared errors"
   :valueof (pile-score '(x 8.0 +) x-plus-6)
   :should be 36.0)
 
@@ -94,31 +94,31 @@
 
 ;; http://vagueinnovation.com/pragmatic_gp/?p=528
 
-(test-wart "uniform mutation conserves token count in offspring"
+(test "uniform mutation conserves token count in offspring"
   :valueof (len (mutate (n-of 10 '+) :prob 1.0))
   :should be 10)
 
-(test-wart "uniform mutation replaces tokens with uniform random sample of available tokens"
+(test "uniform mutation replaces tokens with uniform random sample of available tokens"
   :valueof (let l (call vals^freq
                         (mutate (n-of 10000 '+) :from '(a b c d e) :prob 1.0))
              (> 2200 max.l 2000 min.l 1800))
   :should be t)
 
-(test-wart "uniform mutation replaces randomly chosen tokens in the parent"
+(test "uniform mutation replaces randomly chosen tokens in the parent"
   :valueof (let l (call vals^freq
                         (mutate (n-of 10000 '+) :from '(a) :prob 0.5))
              (> 5200 max.l 5000 min.l 4800))
   :should be t)
 
-(test-wart "uneven one-point crossover yields two children"
+(test "uneven one-point crossover yields two children"
   :valueof (len (crossover (n-of 10 '+) (n-of 10 '-)))
   :should be 2)
 
-(test-wart "uneven one-point crossover conserves the number of tokens"
+(test "uneven one-point crossover conserves the number of tokens"
   :valueof (len (flat (crossover (n-of 10 '+) (n-of 10 '-))))
   :should be 20)
 
-(test-wart "crossover breakpoints are chosen with uniform probability"
+(test "crossover breakpoints are chosen with uniform probability"
   :valueof (let l (map 'len (apply 'join
                               (n-of 1000
                                 (crossover (n-of 10 '+) (n-of 10 '-)))))

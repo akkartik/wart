@@ -1,4 +1,4 @@
-(test-wart "after is like do by default"
+(test "after is like do by default"
   :valueof (let counter 0
              (after
                (++ counter 1)
@@ -6,7 +6,7 @@
              counter)
   :should be 3)
 
-(test-wart ":do forms execute after normal forms"
+(test ":do forms execute after normal forms"
   :valueof (let counter 0
              (after
                (++ counter 1)
@@ -15,7 +15,7 @@
              counter)
   :should be 3)
 
-(test-wart ":do forms execute even after block returns"
+(test ":do forms execute even after block returns"
   :valueof (let counter 0
              (block nil
                (after
@@ -28,7 +28,7 @@
              counter)
   :should be 1101)
 
-(test-wart "after suppresses some errors like divide by zero"
+(test "after suppresses some errors like divide by zero"
   :valueof (let counter 0
              (after
                (++ counter 1)

@@ -1,103 +1,103 @@
 (setf h (table))
 (setf (gethash 0 h) 34)
-(test-wart "coercing hash tables to functions works"
+(test "coercing hash tables to functions works"
   :valueof (type (coerce h 'function))
   :should be 'function)
 
-(test-wart "call-fn on hash table works"
+(test "call-fn on hash table works"
   :valueof (call-fn h 0)
   :should be 34)
 
-(test-wart "call on hash tables works"
+(test "call on hash tables works"
   :valueof (call h 0)
   :should be 34)
 
-(test-wart "call on hash tables can take a default"
+(test "call on hash tables can take a default"
   :valueof (call h 'no-such-key :default 42)
   :should be 42)
 
-(test-wart "apply on hash tables works"
+(test "apply on hash tables works"
   :valueof (apply h '(0))
   :should be 34)
 
-(test-wart "coercing hash tables to functions in read position"
+(test "coercing hash tables to functions in read position"
   :valueof h.0
   :should be 34)
 
-(test-wart "coercing hash to list works"
+(test "coercing hash to list works"
   :valueof (coerce (ret x (table)
                      (setf (gethash 1 x) 2)
                      (setf (gethash 2 x) 3))
                    'cons)
   :should be '((2 3) (1 2)))
 
-(test-wart "coercing list to hash works"
+(test "coercing list to hash works"
   :valueof (let x (wart-coerce '((1 2) (2 3)) 'hash-table)
              (gethash 1 x))
   :should be 2)
 
-(test-wart "coercing list to hash works - 2"
+(test "coercing list to hash works - 2"
   :valueof (let x (wart-coerce '((1 2) (2 3)) 'hash-table)
              (gethash 2 x))
   :should be 3)
 
-(test-wart "coerce nil to hash works"
+(test "coerce nil to hash works"
   :valueof (hash-table-count (coerce nil 'hash-table))
   :should be 0)
 
-(test-wart "obj works"
+(test "obj works"
   :valueof (let x (obj a 1 b 2)
              x!a)
   :should be 1)
 
-(test-wart "assigning to hash works"
+(test "assigning to hash works"
   :valueof (let ans (table)
              (= ans.0 3)
              ans.0)
   :should be 3)
 
-(test-wart "keys works"
+(test "keys works"
   :valueof (sort (keys (obj 1 2 3 4)) '<)
   :should be '(1 3))
 
-(test-wart "fill-table has the right length"
+(test "fill-table has the right length"
   :valueof (let tb (obj a 1 b 2)
              (fill-table tb '(c 3 d 4))
              (hash-table-count tb))
   :should be 4)
 
-(test-wart "fill-table contains old keys"
+(test "fill-table contains old keys"
   :valueof (let tb (obj a 1 b 2)
              (fill-table tb '(c 3 d 4))
              tb!a)
   :should be 1)
 
-(test-wart "fill-table contains new keys"
+(test "fill-table contains new keys"
   :valueof (let tb (obj a 1 b 2)
              (fill-table tb '(c 3 d 4))
              tb!c)
   :should be 3)
 
-(test-wart "fill-table overrides old keys with new ones"
+(test "fill-table overrides old keys with new ones"
   :valueof (let tb (obj a 1 b 2)
              (fill-table tb '(b 45 c 3 d 4))
              tb!b)
   :should be 45)
 
 ; integration test: ssyntax + hash
-(test-wart "compose works with hash tables"
+(test "compose works with hash tables"
   :valueof (let h (obj 1 3)
              1+^h.1)
   :should be 4)
 
 ; integration test: ssyntax + hash + assignment
-(test-wart "compose works with assignment"
+(test "compose works with assignment"
   :valueof (let h (obj 1 3)
              ++^h.1
              h.1)
   :should be 4)
 
-(test-wart "nested compose works with assignment"
+(test "nested compose works with assignment"
   :valueof (let h (obj 1 3)
              (list 1+^++^h.1 h.1))
   :should be '(5 4))

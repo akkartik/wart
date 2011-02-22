@@ -1,4 +1,4 @@
-(test-wart "memo works"
+(test "memo works"
   :valueof (withs (counter 0
                    f (memo (fn(x)
                        ++.counter

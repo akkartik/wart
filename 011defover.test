@@ -1,6 +1,6 @@
 (defmacro defover-bar(&rest x) x)
 (defover defover-foo defover-bar)
 
-(test "defover works"
+(test-lisp "defover works"
   :valueof (wt-transform '(defover-foo a))
   :should be '(defover-bar a))

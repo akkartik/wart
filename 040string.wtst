@@ -1,127 +1,127 @@
-(test-wart "string indexing works"
+(test "string indexing works"
   :valueof (call "abc" 2)
   :should be #\c)
 
-(test-wart "writing to string index works"
+(test "writing to string index works"
   :valueof (ret s "abc"
              (= s.1 #\d))
   :should be "adc")
 
-(test-wart "symbols can be coerced to string"
+(test "symbols can be coerced to string"
   :valueof (as string 'a)
   :should be "a")
 
-(test-wart "coercing symbols to string downcases"
+(test "coercing symbols to string downcases"
   :valueof (as string 'A)
   :should be "a")
 
-(test-wart "coercing characters to string works"
+(test "coercing characters to string works"
   :valueof (as string #\a)
   :should be "a")
 
-(test-wart "coercing lists of chars to string works"
+(test "coercing lists of chars to string works"
   :valueof (as string '(#\a #\b #\d))
   :should be "abd")
 
-(test-wart "coercing lists of strings to string works"
+(test "coercing lists of strings to string works"
   :valueof (as string '("a" "b" "c"))
   :should be "abc")
 
-(test-wart "coercing lists of chars or strings to string works"
+(test "coercing lists of chars or strings to string works"
   :valueof (as string '(#\a #\b #\d "ef" #\g))
   :should be "abdefg")
 
-(test-wart "len on strings works"
+(test "len on strings works"
   :valueof (len "Abc")
   :should be 3)
 
-(test-wart "upcase works"
+(test "upcase works"
   :valueof (upcase "abc")
   :should be "ABC")
 
-(test-wart "downcase works"
+(test "downcase works"
   :valueof (downcase "ABC")
   :should be "abc")
 
-(test-wart "upcase works on char"
+(test "upcase works on char"
   :valueof (upcase #\a)
   :should be #\A)
 
-(test-wart "downcase works on char"
+(test "downcase works on char"
   :valueof (downcase #\A)
   :should be #\a)
 
-(test-wart "upcase returns string for symbol"
+(test "upcase returns string for symbol"
   :valueof (upcase 'a)
   :should be "A")
 
-(test-wart "downcase returns string for symbol"
+(test "downcase returns string for symbol"
   :valueof (downcase 'a)
   :should be "a")
 
-(test-wart "upcase doesn't mess with nil"
+(test "upcase doesn't mess with nil"
   :valueof (upcase nil)
   :should be nil)
 
-(test-wart "downcase doesn't mess with nil"
+(test "downcase doesn't mess with nil"
   :valueof (downcase nil)
   :should be nil)
 
-(test-wart "join works on chars and strings"
+(test "join works on chars and strings"
   :valueof (join #\a "bcd")
   :should be "abcd")
 
-(test-wart "join works on chars and strings - 2"
+(test "join works on chars and strings - 2"
   :valueof (join #\a "bc" #\d)
   :should be "abcd")
 
-(test-wart "whitec works"
+(test "whitec works"
   :valueof (whitec #\a)
   :should be nil)
 
-(test-wart "trim works"
+(test "trim works"
   :valueof (trim "   abc d e f  ")
   :should be "abc d e f")
 
-(test-wart "trim works on just whitespace"
+(test "trim works on just whitespace"
   :valueof (trim " 	")
   :should be "")
 
-(test-wart "trim works on empty string"
+(test "trim works on empty string"
   :valueof (trim "")
   :should be "")
 
-(test-wart "trim works in front"
+(test "trim works in front"
   :valueof (trim "   abc d e f  " :from 'start)
   :should be "abc d e f  ")
 
-(test-wart "trim works in back"
+(test "trim works in back"
   :valueof (trim "   abc d e f  " :from 'back)
   :should be "   abc d e f")
 
-(test-wart "trim can take a list of chars"
+(test "trim can take a list of chars"
   :valueof (trim "abcda" :all-of '(#\a))
   :should be "bcd")
 
-(test-wart "tokens works"
+(test "tokens works"
   :valueof (tokens "abc def")
   :should be '("abc" "def"))
 
-(test-wart "tokens skips leading delimiters like in arc"
+(test "tokens skips leading delimiters like in arc"
   :valueof (tokens "  abc def")
   :should be '("abc" "def"))
 
-(test-wart "intersperse works"
+(test "intersperse works"
   :valueof (intersperse 3 '(1 2 4))
   :should be '(1 3 2 3 4))
 
-(test-wart "intersperse implicitly joins lists of strings"
+(test "intersperse implicitly joins lists of strings"
   :valueof (intersperse " " '("a" "b" "c"))
   :should be "a b c")
 
 
 
 ; integration test: map+strings
-(test-wart "map works on lists of strings"
+(test "map works on lists of strings"
   :valueof (map 'string-capitalize '("abc" "def"))
   :should be '("Abc" "Def"))

@@ -1,40 +1,40 @@
 (wt-eval '(defgeneric genericfoo(x) x))
-(test-wart "defgeneric works"
+(test "defgeneric works"
   :valueof (genericfoo 3)
   :should be 3)
 
-(test-wart "defgeneric handles #$%# bit type"
+(test "defgeneric handles #$%# bit type"
   :valueof (genericfoo 1)
   :should be 1)
 
-(test-wart "defgeneric works on strings"
+(test "defgeneric works on strings"
   :valueof (genericfoo "abc")
   :should be "abc")
 
 (wt-eval '(defmethod genericfoo(x) integer
             (1+ x)))
-(test-wart "defmethod works"
+(test "defmethod works"
   :valueof (genericfoo 3)
   :should be 4)
 
 (wt-eval '(defmethod genericfoo(x) string
             ))
-(test-wart "defmethod can reset vtable"
+(test "defmethod can reset vtable"
   :valueof (genericfoo "abc")
   :should be '(#\a #\b #\c))
 
 (wt-eval '(deftransform genericfoo2(x) (cons #\0 x)))
-(test-wart "deftransform works"
+(test "deftransform works"
   :valueof (genericfoo2 '(1 2))
   :should be '(#\0 1 2))
-(test-wart "deftransform works on strings"
+(test "deftransform works on strings"
   :valueof (genericfoo2 "abc")
   :should be '(#\0 . "abc"))
 (wt-eval '(defmethod genericfoo2(x) string (concatenate 'string "0" x)))
-(test-wart "strings may need a specialcase"
+(test "strings may need a specialcase"
   :valueof (genericfoo2 "abc")
   :should be "0abc")
 
-(test-wart "defgeneric calls flag unknown types"
+(test "defgeneric calls flag unknown types"
   :valueof (genericfoo2 (annotate 'unknowntype1 34))
   :should be '(#\0 tagged unknowntype1 34))
