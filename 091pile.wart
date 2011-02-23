@@ -27,6 +27,21 @@
           (call op b a))
         rest))))
 
+(def pile-render(pgm ? stack nil)
+  (if (no pgm)
+    car.stack
+    (acase car.pgm
+      'x (pile-render cdr.pgm (cons it stack))
+      'floatp (pile-render cdr.pgm (cons it stack))
+      '(+ - * /) (pile-render cdr.pgm (pygapply it stack))
+      (pile-render cdr.pgm stack))))
+
+(def pygapply(op stack)
+  (let (a b . rest) stack
+    (if (or no.a no.b)
+      stack
+      (cons (list op b a) rest))))
+
 
 
 (= pile-tokens* '(+ - * / x k))
