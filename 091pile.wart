@@ -1,21 +1,20 @@
 ;; http://vagueinnovation.com/pragmatic_gp/?p=375
 
+(mac pile-case(name stack ? top (fn(_) t))
+  `(def ,name(pgm ? x nil stack) :case (call (testify ,top) car.pgm)
+     (let it car.pgm
+       (,name cdr.pgm x ,stack))))
+
 (def pile-exec(pgm ? x nil stack)
   (if pgm
     (pile-exec cdr.pgm x stack)
     stack))
-
-(mac pile-case(stack ? top (fn(_) t))
-  `(def pile-exec(pgm ? x nil stack) :case (call (testify ,top) car.pgm)
-     (let it car.pgm
-       (pile-exec cdr.pgm x ,stack))))
-
-(pile-case :top 'x
-           :stack (cons x stack))
-(pile-case :top '(+ - * /)
-           :stack (pile-apply it stack))
-(pile-case :top 'floatp
-           :stack (cons it stack))
+(pile-case pile-exec :top 'x
+                     :stack (cons x stack))
+(pile-case pile-exec :top '(+ - * /)
+                     :stack (pile-apply it stack))
+(pile-case pile-exec :top 'floatp
+                     :stack (cons it stack))
 
 (def pile-apply(op stack)
   (let (a b . rest) stack
