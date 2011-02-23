@@ -1,13 +1,19 @@
 ;; http://vagueinnovation.com/pragmatic_gp/?p=375
 
 (def pile-exec(pgm ? x nil stack nil)
-  (if (no pgm)
-    stack
-    (acase car.pgm
-      'floatp   (pile-exec cdr.pgm x (cons it stack))
-      '(+ - / *)  (pile-exec cdr.pgm x (pile-apply it stack))
-      'x  (pile-exec cdr.pgm x (cons x stack))
-      (pile-exec cdr.pgm x stack))))
+  (pile-exec cdr.pgm x stack))
+
+(def pile-exec(pgm ? x nil stack nil) :case (no pgm)
+  stack)
+
+(def pile-exec(pgm ? x nil stack nil) :case (iso 'x car.pgm)
+  (pile-exec cdr.pgm x (cons x stack)))
+
+(def pile-exec(pgm ? x nil stack nil) :case (find car.pgm '(+ - / *))
+  (pile-exec cdr.pgm x (pile-apply car.pgm stack)))
+
+(def pile-exec(pgm ? x nil stack nil) :case (floatp car.pgm)
+  (pile-exec cdr.pgm x (cons car.pgm stack)))
 
 (def pile-apply(op stack)
   (let (a b . rest) stack
