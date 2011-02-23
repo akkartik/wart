@@ -34,3 +34,7 @@
 (test "final version always works"
   :valueof (foo)
   :should be 34)
+
+(test "pick the right version when using keyword args"
+  :valueof (foo :a 3)
+  :should be 34)

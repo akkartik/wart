@@ -27,5 +27,5 @@
 
 (defun args-matcher(params)
   (fn args
-    (>= (length args) ; len will be overridden
+    (>= (length (remove-if [kwargp params _] args)) ; len will be overridden
         (length (required-params params)))))
