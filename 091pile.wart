@@ -1,11 +1,11 @@
 ;; http://vagueinnovation.com/pragmatic_gp/?p=375
 
 (mac pile-case(name stack ? top (fn(_) t))
-  `(def ,name(pgm ? x nil stack) :case (call (testify ,top) car.pgm)
+  `(def ,name(pgm ? x nil stack nil) :case (call (testify ,top) car.pgm)
      (let it car.pgm
        (,name cdr.pgm x ,stack))))
 
-(def pile-exec(pgm ? x nil stack)
+(def pile-exec(pgm ? x nil stack nil)
   (if pgm
     (pile-exec cdr.pgm x stack)
     stack))
