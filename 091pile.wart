@@ -34,18 +34,19 @@
                                      (zerop stack.0))
   0)
 
-(prn (pile-exec '(1.0 1.0 +)))
+
+
+;; visualize generated individuals
 
 (= wart-signatures*!pile-render
    (copy wart-signatures*!pile-exec))
 
-(def render-apply(op stack)
-  (list op stack.1 stack.0))
-
 (pile-case pile-render :top '(+ - * /)
                        :stack (checking-binary stack
                                 :do (render-apply it stack)))
-(prn (pile-render '(1.0 1.0 +)))
+
+(def render-apply(op stack)
+  (list op stack.1 stack.0))
 
 
 
