@@ -9,10 +9,10 @@
 ;; Internals
 ;; Use let* everywhere here because wart will soon override let
 
-; convert body to parse keyword args and params format (optionals* ? lazy-optionals . rest)
-; optionals can be destructured
-; lazy optionals alternate var and default
-; lazy optionals require keywords if rest is present
+; convert body to parse keyword args and params format (required* ? optional* . rest)
+; required args can be destructured
+; optionals alternate var and default
+; optionals require keywords if rest is present
 (defun$ compile-params(params args body)
   (cond
     ((not params)  `(progn ,@body))

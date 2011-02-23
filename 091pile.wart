@@ -1,6 +1,6 @@
 ;; http://vagueinnovation.com/pragmatic_gp/?p=375
 
-(def pile-exec(pgm x ? stack nil)
+(def pile-exec(pgm ? x nil stack nil)
   (if (no pgm)
     stack
     (acase car.pgm
