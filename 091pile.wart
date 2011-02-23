@@ -1,14 +1,17 @@
 ;; http://vagueinnovation.com/pragmatic_gp/?p=375
 
+(mac pile-base(name)
+  `(def ,name(pgm ? x nil stack nil)
+     (if pgm
+       (,name cdr.pgm x stack)
+       stack)))
+
 (mac pile-case(name stack ? top (fn(_) t))
   `(def ,name(pgm ? x nil stack nil) :case (call (testify ,top) car.pgm)
      (let it car.pgm
        (,name cdr.pgm x ,stack))))
 
-(def pile-exec(pgm ? x nil stack nil)
-  (if pgm
-    (pile-exec cdr.pgm x stack)
-    stack))
+(pile-base pile-exec)
 (pile-case pile-exec :top 'x
                      :stack (cons x stack))
 (pile-case pile-exec :top '(+ - * /)
@@ -27,14 +30,13 @@
           (call op b a))
         rest))))
 
-(def pile-render(pgm ? stack nil)
-  (if (no pgm)
-    car.stack
-    (acase car.pgm
-      'x (pile-render cdr.pgm (cons it stack))
-      'floatp (pile-render cdr.pgm (cons it stack))
-      '(+ - * /) (pile-render cdr.pgm (pygapply it stack))
-      (pile-render cdr.pgm stack))))
+(pile-base pile-render)
+(pile-case pile-render :top 'x
+                       :stack (cons (or x it) stack))
+(pile-case pile-render :top '(+ - * /)
+                       :stack (pygapply it stack))
+(pile-case pile-render :top 'floatp
+                       :stack (cons it stack))
 
 (def pygapply(op stack)
   (let (a b . rest) stack
