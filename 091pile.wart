@@ -30,19 +30,17 @@
           (call op b a))
         rest))))
 
-(pile-base pile-render)
-(pile-case pile-render :top 'x
-                       :stack (cons (or x it) stack))
-(pile-case pile-render :top '(+ - * /)
-                       :stack (pygapply it stack))
-(pile-case pile-render :top 'floatp
-                       :stack (cons it stack))
+(prn (pile-exec '(1.0 1.0 +)))
 
 (def pygapply(op stack)
   (let (a b . rest) stack
     (if (or no.a no.b)
       stack
       (cons (list op b a) rest))))
+
+(pile-case pile-exec :top '(+ - * /)
+                     :stack (pygapply it stack))
+(prn (pile-exec '(1.0 1.0 +)))
 
 
 
