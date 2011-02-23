@@ -6,6 +6,12 @@
        (,name cdr.pgm x stack)
        stack)))
 
+(mac checking-binary(stack body)
+  `(if (or (no ,stack)
+           (no (cdr ,stack)))
+     ,stack
+     (cons ,body (cddr ,stack))))
+
 (mac pile-case(name stack ? top (fn(_) t))
   `(def ,name(pgm ? x nil stack nil) :case (call (testify ,top) car.pgm)
      (let it car.pgm
@@ -15,31 +21,25 @@
 (pile-case pile-exec :top 'x
                      :stack (cons x stack))
 (pile-case pile-exec :top '(+ - * /)
-                     :stack (pile-apply it stack))
+                     :stack (checking-binary stack
+                              :do (pile-apply it stack)))
 (pile-case pile-exec :top 'floatp
                      :stack (cons it stack))
 
 (def pile-apply(op stack)
-  (let (a b . rest) stack
-    (if (or no.a no.b)
-      stack
-      (cons
-        (if (and (zerop a)
-                 (iso op '/))
-          0
-          (call op b a))
-        rest))))
+  (if (and (zerop (car stack))
+           (iso op '/))
+    0
+    (call op stack.1 stack.0)))
 
 (prn (pile-exec '(1.0 1.0 +)))
 
-(def pygapply(op stack)
-  (let (a b . rest) stack
-    (if (or no.a no.b)
-      stack
-      (cons (list op b a) rest))))
+(def pile-render(op stack)
+  (list op stack.1 stack.0))
 
 (pile-case pile-exec :top '(+ - * /)
-                     :stack (pygapply it stack))
+                     :stack (checking-binary stack
+                              :do (pile-render it stack)))
 (prn (pile-exec '(1.0 1.0 +)))
 
 
