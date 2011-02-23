@@ -27,10 +27,12 @@
                      :stack (cons it stack))
 
 (def pile-apply(op stack)
-  (if (and (zerop (car stack))
-           (iso op '/))
-    0
-    (call op stack.1 stack.0)))
+  (call op stack.1 stack.0))
+
+; protected division
+(def pile-apply(op stack) :case (and (iso '/ op)
+                                     (zerop stack.0))
+  0)
 
 (prn (pile-exec '(1.0 1.0 +)))
 
