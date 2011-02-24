@@ -30,3 +30,8 @@
                            3))
              counter)
   :should be 1)
+
+(wt-eval '(mac foomac0(n m) `(+ ,n 2)))
+(test "subsequent macs override where repeated defs overload"
+  :valueof (list (foomac0 2) (foomac0 2 3))
+  :should be (list 4 4))
