@@ -2,9 +2,8 @@
 
 (defmacro$ def-case(name params test &body body)
   `(progn
-    (push (list (fn args
-                  (and (apply (length-matcher ',params) args)
-                       (apply (fn ,params ,test) args)))
+    (push (list (allf (length-matcher ',params)
+                      (fn ,params ,test))
                 (fn ,params
                   (handling-$vars ,@body)))
           (gethash ',name wart-signatures*))
