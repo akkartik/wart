@@ -30,13 +30,3 @@
                            3))
              counter)
   :should be 1)
-
-(wt-eval '(mac foomac2(x) :case (floatp x)
-            `(+ 3.0 ,x)))
-(test "mac :case works"
-  :valueof (foomac2 3.67)
-  :should be 6.67)
-
-(test "mac :case doesn't override"
-  :valueof (foomac2 3)
-  :should be 4)

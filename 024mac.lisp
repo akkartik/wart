@@ -9,9 +9,6 @@
          `(let* ,(mapcar #'list (list ,@$s) (list ,@$os))
             ,(progn ,@body))))))
 
-(extend-macro mac(name params &body body) :if (iso :case (car body))
-  `(extend-macro ,name ,params :if ,(cadr body) ,@(cddr body)))
-
 
 
 ;; Internals
