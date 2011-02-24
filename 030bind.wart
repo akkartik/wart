@@ -12,6 +12,10 @@
   `(with (,var ,val) ,@body))
 (defover let wart-let)
 
+(mac let(f . body) :case (match f '(def _..))
+  `(labels (,(cdr f))
+     ,@body))
+
 (mac ret(var val . body)
   `(let ,var ,val ,@body ,var))
 
