@@ -11,10 +11,9 @@
   :should be 'footype)
 
 (test "read and write work on tables"
-  :valueof (withs (h  (obj a 1 b 2)
-                   hs (tostring write.h))
-             (iso h (fromstring hs (read))))
-  :should be t)
+  :valueof (fromstring (tostring (write (obj a 1 b 2)))
+                       (read))
+  :should be (obj a 1 b 2))
 
 (test "unserialize nests through lists"
   :valueof (unserialize `(1 2 ,(annotate 'hash-table nil)))
@@ -29,19 +28,11 @@
   :should be '((tagged footype 34)))
 
 (test "unserialize nests through tables"
-  :valueof (type (call (unserialize '(tagged hash-table ((1 2)
-                                                   (3 (tagged footype 34)))))
-                   3))
-  :should be 'footype)
-
-(test "unserialize nests through tables"
   :valueof (type (call (unserialize
                          '(tagged hash-table ((1 2) (3 (tagged footype 34)))))
                    3))
   :should be 'footype)
 
 (test "unserialize handles nested tables"
-  :valueof (rep (call (unserialize
-                        '(tagged hash-table ((1 2) (3 (tagged hash-table nil)))))
-                   3))
-  :should be (make-hash-table))
+  :valueof (unserialize '(tagged hash-table ((1 2) (3 (tagged hash-table nil)))))
+  :should be (obj 1 2 3 (table)))
