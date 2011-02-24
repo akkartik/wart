@@ -38,9 +38,9 @@
   (defun print-test-failures()
     (cond
       ((> test-failures 1)
-        (format t "~%[1;31m~a failures[1;37m~%" test-failures))
+        (format t "~%~a failures~%" test-failures))
       ((> test-failures 0)
-        (format t "~%[1;31m~a failure[1;37m~%" test-failures))))
+        (format t "~%~a failure~%" test-failures))))
 
   (defun fail(msg got)
     (incf test-failures)
