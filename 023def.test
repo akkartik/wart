@@ -40,6 +40,6 @@
   :should be 34)
 
 (wt-eval '(def foo(a b) :case (oddp a) b))
-(test "add conditions using :case"
+(test "guarded def clauses using :case"
   :valueof (list (foo 33 2) (foo 4 2))
   :should be (list 2 4))
