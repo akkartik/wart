@@ -8,11 +8,13 @@
                  (apply orig ,args)))))))
 
 (defmacro extend-macro(name params If test body)
-  (let ((orig (uniq)))
+  (let ((args (uniq))
+        (orig (uniq)))
     `(progn
        (setf (macro-function ',orig)
              (macro-function ',name))
-       (defmacro ,name ,params
-         (if ,test
-           ,body
-           (,orig ,@params))))))
+       (defmacro ,name(&rest ,args)
+         (destructuring-bind ,params ,args
+           (if ,test
+             ,body
+             (cons ',orig ,args)))))))

@@ -11,3 +11,18 @@
 (test "extend-macro works"
   :valueof (list (fooextmac 3) (fooextmac 2))
   :should be (list 8 3))
+
+(defmacro foomac1(x) `(+ ,x 5))
+(defmacro foomac2(x) `(foomac1 ,x))
+(extend-macro foomac2(x) :if (evenp x)
+   `(+ ,x 1))
+(test "extend-macro works inside nested macros"
+  :valueof (list (foomac2 3) (foomac2 2))
+  :should be (list 8 3))
+
+(defmacro foomac3(&rest args) 6453)
+(extend-macro foomac3(&rest args) :if (no args)
+  5739)
+(test "extend-macro can handle lambda keywords"
+  :value-of (foomac3 3 4 5)
+  :should be 6453)

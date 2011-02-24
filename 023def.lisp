@@ -1,17 +1,6 @@
 (setf wart-signatures* (table))
 
-(defmacro$ def-case(name params test &body body)
-  `(progn
-    (push (list (allf (length-matcher ',params)
-                      (fn ,params ,test))
-                (fn ,params
-                  (handling-$vars ,@body)))
-          (gethash ',name wart-signatures*))
-    (defun$ ,name(&rest ,$args)
-      (call-correct-variant (gethash ',name wart-signatures*)
-                            ,$args))))
-
-(defmacro$ def-normal(name params &body body)
+(defmacro$ def(name params &body body)
   `(progn
     (push (list (length-matcher ',params)
                 (fn ,params
@@ -21,10 +10,12 @@
       (call-correct-variant (gethash ',name wart-signatures*)
                             ,$args))))
 
-(defmacro$ def(name params &body body)
-  (case (car body)
-    (:case  `(def-case ,name ,params ,(cadr body) ,@(cddr body)))
-    (otherwise `(def-normal ,name ,params ,@body))))
+(extend-macro def(name params &body body) :if (iso :case (car body))
+  `(push (list (allf (length-matcher ',params)
+                     (fn ,params ,(cadr body)))
+               (fn ,params
+                 (handling-$vars ,@(cddr body))))
+         (gethash ',name wart-signatures*)))
 
 (defmacro proc(name args . body)
   `(def ,name ,args ,@body nil))
