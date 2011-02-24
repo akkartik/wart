@@ -45,3 +45,12 @@
   (fn args
     (>= (length (remove-if [kwargp params _] args)) ; len will be overridden
         (length (required-params params)))))
+
+(defun allf(&rest tests)
+  (if (no tests)
+    (lambda(&rest args) t)
+    (lambda(&rest args)
+      (and (apply (car tests)
+                  args)
+           (apply (apply 'allf (cdr tests))
+                  args)))))
