@@ -1,32 +1,32 @@
 (progn
-  (defmacro foo2(n) `(+ 1 ,n))
-  (defmacro foo3(n) `(+ 1 (foo2 ,n))))
+  (defmacro foomac0(n) `(+ 1 ,n))
+  (defmacro foomac1(n) `(+ 1 (foomac0 ,n))))
 (test "nested macros work as before"
-  :valueof (foo3 2)
+  :valueof (foomac1 2)
   :should be 4)
 
-(wt-eval '(mac foo5(n) `(+ ,n 1)))
+(wt-eval '(mac foomac2(n) `(+ ,n 1)))
 (test "simple mac"
-  :valueof (foo5 32)
+  :valueof (foomac2 32)
   :should be 33)
 
-(wt-eval '(def foo19(x) `(_let ,$x ,x (+ 1 ,$x))))
-(wt-eval '(mac foo20(x) (foo19 x)))
+(wt-eval '(def foomac3(x) `(_let ,$x ,x (+ 1 ,$x))))
+(wt-eval '(mac foomac4(x) (foomac3 x)))
 (test "mac sees $vars inside defs"
-  :valueof (foo20 3)
+  :valueof (foomac4 3)
   :should be 4)
 
-(wt-eval '(mac foo21(o$x) `(* ,$x ,$x)))
+(wt-eval '(mac foomac5(o$x) `(* ,$x ,$x)))
 (test "mac handles o$vars"
-  :valueof (macex1 '(foo21 3))
+  :valueof (macex1 '(foomac5 3))
   :should match '(let* ((_ 3)) (* _ _)))
 (test "mac handles o$vars - 2"
-  :valueof (type-of (caar (cadr (macex1 '(foo21 3)))))
+  :valueof (type-of (caar (cadr (macex1 '(foomac5 3)))))
   :should be 'symbol)
 
 (test "o$vars eval exactly once"
   :valueof (_let counter 0
-             (foo21 (progn (incf counter)
+             (foomac5 (progn (incf counter)
                            3))
              counter)
   :should be 1)
