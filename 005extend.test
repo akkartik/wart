@@ -4,3 +4,10 @@
 (test "extend works"
   :valueof (list (fooextend 3) (fooextend 2))
   :should be (list 8 3))
+
+(defmacro fooextmac(x) `(+ ,x 5))
+(extend-macro fooextmac(x) :if (evenp x)
+  `(+ ,x 1))
+(test "extend-macro works"
+  :valueof (list (fooextmac 3) (fooextmac 2))
+  :should be (list 8 3))
