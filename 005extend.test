@@ -26,3 +26,12 @@
 (test "extend-macro can handle lambda keywords"
   :value-of (foomac3 3 4 5)
   :should be 6453)
+
+(defmacro foodef(n)
+  `(incf ,n))
+(extend-macro foodef(n) :if (no n)
+  42)
+(setf fooplace 34)
+(test "extend-macro works on bodies calling other macros"
+  :valueof (foodef fooplace)
+  :should be 35)
