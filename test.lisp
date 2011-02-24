@@ -2,13 +2,11 @@
   `(let ((got ,(if (fboundp 'wt-eval)
                  `(wt-eval ',expr)
                  expr)))
-     (format t ".") (finish-output)
      (or (,(car predicate) got ,@(cdr predicate))
          (fail ,msg got))))
 
 (defmacro test-lisp(msg Valueof expr Should &rest predicate)
   `(let ((got ,expr))
-     (format t ".") (finish-output)
      (or (,(car predicate) got ,@(cdr predicate))
          (fail ,msg got))))
 
@@ -54,6 +52,7 @@
     (when (and (string< "" file)
                (char<= #\0 (char file 0))
                (char>= #\9 (char file 0)))
+      (format t ".") (finish-output)
       (let* ((len (length file))
              (ext (subseq file (- len 4))))
         (cond
