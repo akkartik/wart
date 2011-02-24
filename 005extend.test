@@ -1,0 +1,6 @@
+(defun fooextend(x) (+ x 5))
+(extend fooextend(x) :if (evenp x)
+  (+ x 1))
+(test "extend works"
+  :valueof (list (fooextend 3) (fooextend 2))
+  :should be (list 8 3))
