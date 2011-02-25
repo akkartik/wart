@@ -1,13 +1,11 @@
-; like funcall, but can handle macros
-; knows about compose so that we can use ssyntax with macros
-;   ++^h.1 => (call incf (call h 1))
-; ssyntax doesn't seem a good fit for a lisp-2.
-(defmacro call(f &rest args)
-  `(call-fn (fslot ,f) ,@args))
+(defun compose-fn(f g)
+  (lambda(&rest args)
+    (call-fn f (wart-apply g args))))
 
-(extend-macro call(f &rest args) :if (macp f)
-  `(,f ,@args))
+(defmacro compose(f g)
+  `(compose-fn (fslot ,f) (fslot ,g)))
 
+; tell call about compose so that we can use ssyntax with macros
 (extend-macro call(f &rest args) :if (match f '(compose _ _))
   (apply-nested-calls (compositions f) args))
 

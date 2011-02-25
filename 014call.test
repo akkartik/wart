@@ -23,11 +23,3 @@
 (test "call nests"
   :valueof (macex '(call (call a 3) 4))
   :should be '(call-fn (fslot (call a 3)) 4))
-
-(test "call expands compositions"
-  :valueof (macex1 '(call (compose incf foo) x))
-  :should be '(call incf (call foo x)))
-
-(test "call expands compositions - 2"
-  :valueof (let ((a (lambda(x) 34))) (macex1 '(call (compose a incf) x)))
-  :should be '(call a (call incf x)))
