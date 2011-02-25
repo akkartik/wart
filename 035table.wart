@@ -23,6 +23,9 @@
 (defcoerce null hash-table
   [table])
 
+(def len(x) :case (isa x 'hash-table)
+  (hash-table-count x))
+
 (mac obj args
   `(as hash-table
        (list ,@(map0 (fn((k v))

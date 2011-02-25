@@ -48,6 +48,10 @@
   :valueof (hash-table-count (as hash-table nil))
   :should be 0)
 
+(test "len works on hash tables"
+  :valueof (len (obj 1 2 3 4))
+  :should be 2)
+
 (test "obj works"
   :valueof (let x (obj a 1 b 2)
              x!a)

@@ -1,18 +1,4 @@
 (ignore-redef
-  (def len(x)
-    (if x
-      (length (as cons x))
-      0)))
-
-(def len(x) :case (isa x 'hash-table)
-  (hash-table-count x))
-
-(def empty(x)
-  (iso 0 len.x))
-
-
-
-(ignore-redef
   (def iso(x y)
     (or (equal x y)
         (and (consp x)

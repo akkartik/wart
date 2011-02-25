@@ -5,6 +5,15 @@
   (setf (elt l index)
         val))
 
+(ignore-redef
+  (def len(x)
+    (if x
+      (length (as cons x))
+      0)))
+
+(def empty(x)
+  (iso 0 len.x))
+
 (def testify(x) :case (isa x 'cons)
   [find _ x])
 

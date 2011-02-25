@@ -1,17 +1,3 @@
-(test "len works by default"
-  :valueof (len nil)
-  :should be 0)
-
-(test "len works by default - 2"
-  :valueof (len '(1 2 3))
-  :should be 3)
-
-(test "len works on hash tables"
-  :valueof (len (obj 1 2 3 4))
-  :should be 2)
-
-
-
 (test "iso works like equal by default"
   :valueof (iso nil nil)
   :should be t)
