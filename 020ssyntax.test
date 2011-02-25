@@ -17,10 +17,6 @@
   :valueof (ssyntaxp 'a+b-c)
   :should be nil)
 
-(test-lisp "ssyntaxp ignores certain special vars"
-  :valueof (ssyntaxp '_..)
-  :should be nil)
-
 (test-lisp "expand-ssyntax works"
   :valueof (expand-ssyntax 'a.b)
   :should be '(foo* a b))

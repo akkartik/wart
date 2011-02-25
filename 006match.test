@@ -26,22 +26,10 @@
   :valueof (match '(2 (2 3 4)) '(1 (_ 3 4)))
   :should be nil)
 
-(test "match - _ doesn't match lists"
+(test "match - _ matches lists"
   :valueof (match '(3) '_)
   :should be t)
 
-(test "match - _ doesn't match lists - 2"
-  :valueof (match '(1 2 3) '(1 _))
-  :should be nil)
-
-(test "match - _.. positive"
-  :valueof (match '(1 (2 3 4)) '(1 (2 _..)))
+(test "match - _ matches lists when dotted"
+  :valueof (match '(1 2 3) '(1 . _))
   :should be t)
-
-(test "match - _.. negative"
-  :valueof (match '(2 (2 3 4)) '(1 (2 _..)))
-  :should be nil)
-
-(test "match - _.. doesn't match non-lists"
-  :valueof (match 3 '(_..))
-  :should be nil)

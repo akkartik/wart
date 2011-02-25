@@ -15,7 +15,6 @@
 
 (defun ssyntaxp(x)
   (and (symbolp x)
-       (not (member x '(_..)))
        (ssyntax-idx (symbol-name x))))
 
 (defun expand-ssyntax(sym)
