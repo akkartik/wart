@@ -1,7 +1,7 @@
 (setf h (table))
 (setf (gethash 0 h) 34)
 (test "coercing hash tables to functions works"
-  :valueof (type (coerce h 'function))
+  :valueof (type (as function h))
   :should be 'function)
 
 (test "call-fn on hash table works"
@@ -25,24 +25,27 @@
   :should be 34)
 
 (test "coercing hash to list works"
-  :valueof (coerce (ret x (table)
-                     (setf (gethash 1 x) 2)
-                     (setf (gethash 2 x) 3))
-                   'cons)
+  :valueof (as cons (ret x (table)
+                      (setf (gethash 1 x) 2)
+                      (setf (gethash 2 x) 3)))
   :should be '((2 3) (1 2)))
 
+(test "coercing empty hash to list works"
+  :valueof (as cons (table))
+  :should be nil)
+
 (test "coercing list to hash works"
-  :valueof (let x (wart-coerce '((1 2) (2 3)) 'hash-table)
+  :valueof (let x (as hash-table '((1 2) (2 3)))
              (gethash 1 x))
   :should be 2)
 
 (test "coercing list to hash works - 2"
-  :valueof (let x (wart-coerce '((1 2) (2 3)) 'hash-table)
+  :valueof (let x (as hash-table '((1 2) (2 3)))
              (gethash 2 x))
   :should be 3)
 
 (test "coerce nil to hash works"
-  :valueof (hash-table-count (coerce nil 'hash-table))
+  :valueof (hash-table-count (as hash-table nil))
   :should be 0)
 
 (test "obj works"
