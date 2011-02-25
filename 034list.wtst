@@ -7,6 +7,10 @@
              (= l.1 34))
   :should be '(1 34 3))
 
+(test "testify works with a list"
+  :valueof (call (testify '(1 2 3)) 3)
+  :should satisfy true_value)
+
 (test "last has arc semantics rather than common lisp semantics"
   :valueof (last '(1 2 3))
   :should be 3)

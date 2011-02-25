@@ -5,6 +5,9 @@
   (setf (elt l index)
         val))
 
+(def testify(x) :case (isa x 'cons)
+  [find _ x])
+
 (def wart-last(xs)
   (if (cdr xs)
     (wart-last cdr.xs)

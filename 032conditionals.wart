@@ -26,13 +26,14 @@
   `(or ,@(map0 (fn(c) `(iso ,$x ,c))
                choices)))
 
-; bootstrapping version
 (def testify(x)
-  (if (in x :else :otherwise)
-    (fn(_) t)
-    (or (function-value x)
-        [iso _ x])))
+  (or (function-value x)
+      [iso _ x]))
+(def testify(x) :case (isa x 'function)
+  (function-value x))
 
+(def testify(x) :case (in x :else :otherwise)
+  (fn(_) t))
 (mac caselet(var expr . args)
   (let ex (afn(args)
             (if (no cdr.args)

@@ -66,13 +66,13 @@
   :valueof (call testify.3 3)
   :should be t)
 
-(test "testify always returns a function"
-  :valueof (call ~testify!oddp 3)
-  :should be nil)
-
 (test "testify on :else always returns t"
   :valueof (call (testify :else) 'x)
   :should be t)
+
+(test "testify always returns a function, can be combined with ssyntax"
+  :valueof (call ~testify!oddp 3)
+  :should be nil)
 
 (test "caselet works"
   :valueof (caselet x 'b

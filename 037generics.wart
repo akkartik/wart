@@ -1,14 +1,3 @@
-(def testify(x)
-  (or (function-value x)
-      [iso _ x]))
-(def testify(x) :case (isa x 'function)
-  (function-value x))
-(def testify(x) :case (isa x 'cons)
-  [find _ x])
-
-(def testify(x) :case (in x :else :otherwise)
-  (fn(_) t))
-
 (ignore-redef
   (def len(x)
     (if x
