@@ -8,10 +8,10 @@
 (defcoerce character integer
   'char-code)
 
-(defgeneric wart-> args
+(def wart-> args
   (apply '> args))
 (defover > wart->)
-(defgeneric wart-< args
+(def wart-< args
   (apply '< args))
 (defover < wart-<)
 

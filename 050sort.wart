@@ -24,7 +24,6 @@
                topscore score))))
       wins)))
 
-; since comparison is generic, sort doesn't need to be
 (def wart-sort(seq ? using '> by 'idfn)
   (sort copy.seq using :key (as function by)))
 (def sortf(seq ? using '> by 'idfn)
