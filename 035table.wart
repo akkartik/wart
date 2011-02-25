@@ -36,9 +36,9 @@
              table)))
 
 (def vals(table)
-  (accum a
+  (ret ans ()
     (maphash (fn(k v)
-               (a v))
+               (push v ans))
              table)))
 
 (def fill-table(tb data)
