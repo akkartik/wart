@@ -5,7 +5,7 @@
   (call sort.ns
         (round (/ len.ns 2))))
 
-(defgeneric freq(seq)
+(def freq(seq)
   (ret ans (table)
     (each elem seq
       (or= ans.elem 0)
