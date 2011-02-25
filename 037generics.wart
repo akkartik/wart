@@ -37,12 +37,12 @@
 
 
 
-(defgeneric reclist(f xs)
+(def reclist(f xs)
   (and xs
        (or (call f xs)
            (reclist f cdr.xs))))
-(defmethod reclist(f s) string
-  )
+(def reclist(f s) :case (not (listp s))
+  (reclist f (as cons s)))
 
 (def wart-some(f seq)
   (reclist f^car seq))
