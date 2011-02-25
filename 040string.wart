@@ -21,22 +21,22 @@
 
 
 
-(defgeneric upcase(s)
+(def upcase(s)
   (as string (map 'char-upcase s)))
-(defmethod upcase(s) null
+(def upcase(s) :case (not stringp.s)
+  (upcase (as string s)))
+(def upcase(s) :case (no s)
   nil)
-(defmethod upcase(s) symbol
-  )
-(defmethod upcase(s) character
+(def upcase(s) :case characterp.s
   (char-upcase s))
 
-(defgeneric downcase(s)
+(def downcase(s)
   (as string (map 'char-downcase s)))
-(defmethod downcase(s) null
+(def downcase(s) :case (not stringp.s)
+  (downcase (as string s)))
+(def downcase(s) :case (no s)
   nil)
-(defmethod downcase(s) symbol
-  )
-(defmethod downcase(s) character
+(def downcase(s) :case characterp.s
   (char-downcase s))
 
 
