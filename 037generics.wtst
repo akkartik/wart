@@ -6,6 +6,10 @@
   :valueof (call (testify '(1 2 3)) 3)
   :should satisfy true_value)
 
+(test "testify works with :else"
+  :valueof (call (testify :else) 3)
+  :should satisfy true_value)
+
 (test "testify always returns a function"
   :valueof (call ~testify!oddp 3)
   :should be nil)

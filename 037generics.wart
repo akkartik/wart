@@ -6,6 +6,9 @@
 (def testify(x) :case (isa x 'cons)
   [find _ x])
 
+(def testify(x) :case (in x :else :otherwise)
+  (fn(_) t))
+
 (ignore-redef
   (def len(x)
     (if x
@@ -58,13 +61,17 @@
   (reclist [if (call testify.test car._) _]
            seq))
 
-(deftransform wart-keep(f seq)
-  (if (no seq)          nil
-      (call f car.seq)  (cons car.seq (keep f cdr.seq))
-                        (keep f cdr.seq)))
-(defmethod wart-keep(f s) string
-  )
 (defover keep wart-keep)
+(def keep(f seq)
+  (if seq
+    (coerce
+      (keep f (as cons seq))
+      type.seq)))
+
+(def keep(f seq) :case consp.seq
+  (acase car.seq
+    f     (cons it (keep f cdr.seq))
+    :else (keep f cdr.seq)))
 
 (def wart-rem(test seq)
   (keep ~testify.test seq))
