@@ -150,6 +150,7 @@
   (not (consp params)))
 
 (defun keyword->symbol(k)
-  (if (eq k ':do)
-    'body
-    (intern (symbol-name k)))) ; strip the colon
+  (intern (symbol-name k))) ; strip the colon
+
+(extend keyword->symbol(k) :case (eq k :do)
+  'body)
