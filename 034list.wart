@@ -23,16 +23,10 @@
     (car xs)))
 (defover last wart-last)
 
-(def mappend(f . args)
-  (apply 'join (apply 'map0 (as function f) args)))
-
 (def consif(x y)
   (if x
     (cons x y)
     y))
-
-(def split(seq pos)
-  (list (cut seq 0 pos) (cut seq pos)))
 
 (alias copy copy-seq)
 
@@ -41,3 +35,67 @@
 
 (def dot((a b))
   (cons a b))
+
+
+
+(def mappend(f . args)
+  (apply 'join (apply 'map0 (as function f) args)))
+
+(def split(seq pos)
+  (list (cut seq 0 pos) (cut seq pos)))
+
+(def reclist(f xs)
+  (and xs
+       (or (call f xs)
+           (reclist f cdr.xs))))
+(def reclist(f s) :case (not listp.s)
+  (reclist f (as cons s)))
+
+(def wart-some(f seq)
+  (reclist f^car seq))
+(defover some wart-some)
+
+(def all(test xs)
+  (call ~some ~testify.test xs))
+
+(def mem(test seq)
+  (reclist [if (call testify.test car._) _]
+           seq))
+
+(defover keep wart-keep)
+(def keep(f seq)
+  (if seq
+    (coerce
+      (keep f (as cons seq))
+      type.seq)))
+
+(def keep(f seq) :case consp.seq
+  (acase car.seq
+    f     (cons it (keep f cdr.seq))
+    :else (keep f cdr.seq)))
+
+(def wart-rem(test seq)
+  (keep ~testify.test seq))
+(defover rem wart-rem)
+
+(def trues (f xs)
+  (and xs
+       (iflet fx (call f car.xs)
+          (cons fx (trues f cdr.xs))
+          (trues f cdr.xs))))
+
+(ignore-redef
+  (def join args
+    (apply 'concatenate (type (car (rem nil args))) args)))
+
+(def pos(test s ? idx 0)
+  (position-if testify.test s :start idx))
+(def rpos(test s ? idx 0)
+  (position-if testify.test s :from-end t :start idx))
+
+(def wart-map(f . seqs)
+  (if (subtypep (type car.seqs)
+                'sequence)
+    (apply 'map0 f seqs)
+    (apply f seqs)))
+(defover map wart-map)
