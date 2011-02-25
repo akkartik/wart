@@ -40,7 +40,9 @@
       ((> test-failures 1)
         (format t "~%~a failures~%" test-failures))
       ((> test-failures 0)
-        (format t "~%~a failure~%" test-failures))))
+        (format t "~%~a failure~%" test-failures))
+      (:else
+        (format t "[1K"))))
 
   (defun fail(msg got)
     (incf test-failures)
