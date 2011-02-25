@@ -32,7 +32,7 @@
 ; protected division
 (def pile-apply(op stack) :case (and (iso '/ op)
                                      (zerop stack.0))
-  0)
+  0.0)
 
 
 

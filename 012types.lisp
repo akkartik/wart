@@ -52,7 +52,7 @@
            ,converter)))
 
 (defun isa(elem typ)
-  (iso typ (wart-type elem)))
+  (eq typ (wart-type elem))) ; can't use eq because isa gets used in def :case later
 
 
 

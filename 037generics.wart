@@ -21,15 +21,15 @@
 
 
 (ignore-redef
-  (defgeneric* iso(x y)
+  (def iso(x y)
     (or (equal x y)
         (and (consp x)
              (consp y)
              (iso car.x car.y)
              (iso cdr.x cdr.y)))))
 
-(defmethod iso(x y) hash-table
-  (and (iso (len keys.x) (len keys.y))
+(def iso(x y) :case (isa x 'hash-table)
+  (and (iso (length keys.x) (length keys.y))
        (all
          (fn((k v))
            (iso y.k v))

@@ -47,7 +47,7 @@
 
 
 (= epsilon* 1e-4)
-(defmethod iso(a b) float
+(def iso(a b) :case (isa a 'float)
   (> epsilon*
      (abs (- a b))))
 
