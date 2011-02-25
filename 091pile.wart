@@ -38,9 +38,11 @@
 
 ;; visualize generated individuals
 
-(= wart-signatures*!pile-render
-   (copy wart-signatures*!pile-exec))
-
+(pile-base pile-render)
+(pile-case pile-render :top 'x
+                       :stack (cons x stack))
+(pile-case pile-render :top 'floatp
+                       :stack (cons it stack))
 (pile-case pile-render :top '(+ - * /)
                        :stack (checking-binary stack
                                 :do (render-apply it stack)))
