@@ -1,16 +1,18 @@
-(defgeneric testify(x)
+(def testify(x)
   (or (function-value x)
       [iso _ x]))
-(defmethod testify(x) function
+(def testify(x) :case (isa x 'function)
   (function-value x))
-(defmethod testify(x) cons
+(def testify(x) :case (isa x 'cons)
   [find _ x])
 
 (ignore-redef
-  (defgeneric len(x)
-    (length x)))
+  (def len(x)
+    (if x
+      (length (as cons x))
+      0)))
 
-(defmethod len(x) hash-table
+(def len(x) :case (isa x 'hash-table)
   (hash-table-count x))
 
 (def empty(x)
