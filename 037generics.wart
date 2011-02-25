@@ -28,6 +28,9 @@
              (iso car.x car.y)
              (iso cdr.x cdr.y)))))
 
+(def iso(x y) :case (not (or atom.x listp.x))
+  (iso (as cons x) (as cons y)))
+
 (def iso(x y) :case (isa x 'hash-table)
   (and (iso (length keys.x) (length keys.y))
        (all
@@ -41,7 +44,7 @@
   (and xs
        (or (call f xs)
            (reclist f cdr.xs))))
-(def reclist(f s) :case (not (listp s))
+(def reclist(f s) :case (not listp.s)
   (reclist f (as cons s)))
 
 (def wart-some(f seq)
