@@ -1,17 +1,15 @@
-(init-vtable serialize(x) x)
-(defgeneric serialize(x)
+(def serialize(x)
   x)
-(defmethod serialize(x) cons
+(def serialize(x) :case (isa x 'cons)
   (map 'serialize x))
 
 ; just to avoid errors while debugging
-(defmethod serialize(x) function
+(def serialize(x) :case functionp.x
   'function)
 
-(init-vtable unserialize(x) x)
-(defgeneric unserialize(x)
+(def unserialize(x)
   x)
-(defmethod unserialize(x) cons
+(def unserialize(x) :case (isa x 'cons)
   (map 'unserialize x))
 
 
@@ -36,14 +34,14 @@
 
 
 
-(defmethod serialize(x) hash-table
+(def serialize(x) :case (isa x 'hash-table)
   ; beware: all generics will see this as a hash, but only unserialize can handle it
   (annotate 'hash-table
             (map 'serialize (coerce x 'cons))))
 
-(defmethod unserialize(x) hash-table
+(def unserialize(x) :case (isa x 'hash-table)
   (ret ans (table)
-    (each (k v) (coerce rep.x 'hash-table)
+    (each (k v) (as hash-table rep.x)
       (= (call ans unserialize.k) unserialize.v))))
 
 
