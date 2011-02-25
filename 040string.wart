@@ -9,9 +9,7 @@
 
 
 
-(defmethod join args string
-  (apply 'concatenate 'string (map [as string _] args)))
-(defmethod join args character
+(def join args :case (in (type car.args) 'character 'string)
   (apply 'concatenate 'string (map [as string _] args)))
 
 (defcoerce character string

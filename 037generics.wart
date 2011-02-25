@@ -84,8 +84,8 @@
           (trues f cdr.xs))))
 
 (ignore-redef
-  (defgeneric* join args
-    (apply 'concatenate (type (last (rem nil args))) args)))
+  (def join args
+    (apply 'concatenate (type (car (rem nil args))) args)))
 
 (defgeneric pos(test s ? idx 0)
   (position-if testify.test s :start idx))
