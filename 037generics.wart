@@ -87,12 +87,12 @@
   (def join args
     (apply 'concatenate (type (car (rem nil args))) args)))
 
-(defgeneric pos(test s ? idx 0)
+(def pos(test s ? idx 0)
   (position-if testify.test s :start idx))
-(defgeneric rpos(test s ? idx 0)
+(def rpos(test s ? idx 0)
   (position-if testify.test s :from-end t :start idx))
 
-(defgeneric wart-map(f . seqs)
+(def wart-map(f . seqs)
   (if (subtypep (type car.seqs)
                 'sequence)
     (apply 'map0 f seqs)

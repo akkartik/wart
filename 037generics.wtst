@@ -38,7 +38,7 @@
             (and (position 3 rep.x)
                  (position 3 rep.y))))
 
-(test "defmethod for iso takes"
+(test "new case for iso takes"
   :valueof (annotate 'footype '(1 2 3))
   :should be (annotate 'footype '(3 4 5)))
 
@@ -46,7 +46,7 @@
   :valueof (table)
   :should be (table))
 
-(test "iso works on tables using defmethod"
+(test "iso works on tables"
   :valueof (obj 1 2 3 4)
   :should be (obj 3 4 1 2))
 
@@ -158,7 +158,7 @@
   :valueof (map 'char-upcase #\a)
   :should be #\A)
 
-(wt-eval '(defmethod map(f . seqs) footype
+(wt-eval '(def map(f . seqs) :case (isa car.seqs 'footype)
             (apply 'map0 f (map0 'rep seqs))))
 (test "map works on user-defined types"
   :valueof (map 'len (annotate 'footype '((2 3) (3 4 4 6))))
