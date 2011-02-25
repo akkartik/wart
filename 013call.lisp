@@ -1,8 +1,10 @@
-;; call-fn and apply using extensible coerce
+;; call and apply using extensible coerce
 
-(defun call-fn(f &rest args)
-  (apply (wart-coerce f 'function)
-         args))
+(defmacro call(f &rest args)
+  `(call-fn (fslot ,f) ,@args))
+
+(extend-macro call(f &rest args) :if (macp f)
+  `(,f ,@args))
 
 (defmacro wart-apply(f &rest args)
   `(call-fn (apply-fn (wart-coerce (fslot ,f) 'function))
@@ -42,6 +44,10 @@
 
 
 ;; Internals
+
+(defun call-fn(f &rest args)
+  (apply (wart-coerce f 'function)
+         args))
 
 (defun apply-fn(f)
   (lambda(&rest args)

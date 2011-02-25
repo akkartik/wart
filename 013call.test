@@ -22,6 +22,36 @@
   :valueof (call-fn 'car '(1))
   :should be 1)
 
+
+
+(defmacro macfoo(a) `(+ 1 ,a))
+(test "call handles macros"
+  :valueof (call macfoo 3)
+  :should be 4)
+
+(test "call works"
+  :valueof (call oddp 3)
+  :should be t)
+
+(setf a 2)
+(test "call handles macros with global bindings"
+  :valueof (call macfoo a)
+  :should be 3)
+
+(test "call handles macros with bindings"
+  :valueof (_let a 3 (call macfoo a))
+  :should be 4)
+
+(test "call handles incf macro"
+  :valueof (_let a 32 (call incf a))
+  :should be 33)
+
+(test "call nests"
+  :valueof (macex '(call (call a 3) 4))
+  :should be '(call-fn (fslot (call a 3)) 4))
+
+
+
 (test "inline-last works"
   :valueof (inline-last '(1 2 (3 4 5)))
   :should be '(1 2 3 4 5))
