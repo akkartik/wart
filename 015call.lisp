@@ -3,23 +3,20 @@
 ;   ++^h.1 => (call incf (call h 1))
 ; ssyntax doesn't seem a good fit for a lisp-2.
 (defmacro call(f &rest args)
-  (cond
-    ((macp f)   `(,f ,@args))
-    ((compose-form-p f)   (expand-composition f args))
-    (t  `(call-fn (fslot ,f) ,@args))))
+  `(call-fn (fslot ,f) ,@args))
+
+(extend-macro call(f &rest args) :if (macp f)
+  `(,f ,@args))
+
+(extend-macro call(f &rest args) :if (match f '(compose _ _))
+  (apply-nested-calls (compositions f) args))
 
 
 
 ;; Internals
 
-(defun compose-form-p(expr)
-  (match expr '(compose _ _)))
-
-(defun expand-composition(f args)
-  (apply-nested-calls (compositions f) args))
-
 (defun compositions(f)
-  (if (compose-form-p f)
+  (if (match f '(compose _ _))
     (append (compositions (cadr f))
             (compositions (caddr f)))
     (list f))) ; Assumption: compose operates only on syms
