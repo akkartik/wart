@@ -1,3 +1,11 @@
+(def iso(x y) :case (isa x 'hash-table)
+  (and (iso (length (keys x))
+            (length (keys y)))
+       (all
+         (fn((k v))
+           (iso y.k v))
+         (coerce x 'cons))))
+
 (defcall hash-table table
   (fn(_ ? default nil)
     (gethash _ table default)))

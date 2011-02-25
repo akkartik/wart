@@ -1,3 +1,11 @@
+(test "iso works by coercing empty tables"
+  :valueof (table)
+  :should be (table))
+
+(test "iso works on tables"
+  :valueof (obj 1 2 3 4)
+  :should be (obj 3 4 1 2))
+
 (setf h (table))
 (setf (gethash 0 h) 34)
 (test "coercing hash tables to functions works"
@@ -91,6 +99,8 @@
              tb!b)
   :should be 45)
 
+
+
 ; integration test: ssyntax + hash
 (test "compose works with hash tables"
   :valueof (let h (obj 1 3)
@@ -108,3 +118,9 @@
   :valueof (let h (obj 1 3)
              (list 1+^++^h.1 h.1))
   :should be '(5 4))
+
+; integration test: obj + set + iso
+(test "setting inside compound structures works"
+  :valueof (ret aa (obj a '(1 2) b 3)
+             (= aa!a.1 34))
+  :should be (obj a '(1 34) b 3))
