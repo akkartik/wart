@@ -60,6 +60,15 @@
   :valueof (len (obj 1 2 3 4))
   :should be 2)
 
+(test "each works on tables"
+  :valueof (sort
+             (accum acc
+               (let h (table)
+                 (= h.1 2 h.3 4)
+                 (each (k v) h (acc k))))
+             '<)
+  :should be '(1 3))
+
 (test "obj works"
   :valueof (let x (obj a 1 b 2)
              x!a)

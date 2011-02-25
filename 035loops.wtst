@@ -27,15 +27,6 @@
              (each x "abc" (acc x)))
   :should be '(#\a #\b #\c))
 
-(test "each works on tables"
-  :valueof (sort
-             (accum acc
-               (let h (table)
-                 (= h.1 2 h.3 4)
-                 (each (k v) h (acc k))))
-             '<)
-  :should be '(1 3))
-
 (test "xloop works"
   :valueof (ret counter 0
              (xloop (x 0)
