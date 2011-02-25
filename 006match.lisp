@@ -4,8 +4,8 @@
            (match (car a) (car b))
            (match (cdr a) (cdr b)))))
 
-(extend match(a b) :if (equal b '_)
+(extend match(a b) :case (equal b '_)
   t)
-(extend match(a b) :if (and (consp a) (consp b)
-                         (equal (car b) '_..))
+(extend match(a b) :case (and (consp a) (consp b)
+                           (equal (car b) '_..))
   t)

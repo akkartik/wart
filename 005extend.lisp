@@ -1,4 +1,4 @@
-(defmacro extend(name params If test &body body)
+(defmacro extend(name params Case test &body body)
   (let ((args (uniq)))
     `(let ((orig (symbol-function ',name)))
        (setf (symbol-function ',name)
@@ -7,7 +7,7 @@
                  (apply (lambda ,params ,@body) ,args)
                  (apply orig ,args)))))))
 
-(defmacro extend-macro(name params If test body)
+(defmacro extend-macro(name params Case test body)
   (let ((args (uniq))
         (orig (uniq)))
     `(progn
