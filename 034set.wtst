@@ -28,6 +28,6 @@
   :valueof (let x '(1 100 2 50 3) (pull [< _ 10] x) x)
   :should be '(100 50))
 
-(test "accum works"
-  :valueof (accum acc (map0 [acc (* _ 10)] '(1 2 3)))
+(test "collect works"
+  :valueof (collect (map0 [yield (* _ 10)] '(1 2 3)))
   :should be '(10 20 30))

@@ -1,8 +1,8 @@
 (test "whiler works"
-  :valueof (accum acc
+  :valueof (collect
              (with-input-from-string(f "abcdef")
                (whiler x (read-char f) #\d
-                  (acc x))))
+                  (yield x))))
   :should be '(#\a #\b #\c))
 
 (test "drain works"
@@ -23,8 +23,8 @@
   :should be 6)
 
 (test "each works on strings"
-  :valueof (accum acc
-             (each x "abc" (acc x)))
+  :valueof (collect
+             (each x "abc" (yield x)))
   :should be '(#\a #\b #\c))
 
 (test "xloop works"

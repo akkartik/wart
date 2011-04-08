@@ -33,6 +33,11 @@
   :valueof (call oddp 3)
   :should be t)
 
+(pending-test "call works with labels"
+  :valueof (labels ((x(_) 34))
+             (call x 12))
+  :should be 34)
+
 (setf a 2)
 (test "call handles macros with global bindings"
   :valueof (call macfoo a)

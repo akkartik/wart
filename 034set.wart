@@ -15,11 +15,11 @@
 (mac zap(f place . args)
   `(= ,place (,f ,place ,@args)))
 
-(mac accum(accfn . body)
+(mac collect body
   `(let ,$acc nil
      ; labels => can't use ssyntax like acc.elem
      ; let => must use call with acc
-     (labels ((,accfn(_) (push _ ,$acc)))
+     (labels ((yield(_) (push _ ,$acc)))
        ,@body)
      (rev ,$acc)))
 

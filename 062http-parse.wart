@@ -47,6 +47,6 @@
 (def read-body(headers ? from stdin*)
   (whenlet num (aand (alref "content-length" headers)
                      (errsafe int.it))
-    (str (accum acc
+    (str (collect
            (repeat num
-             (acc (read-char from)))))))
+             (yield read-char.from))))))
