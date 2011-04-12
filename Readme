@@ -21,7 +21,7 @@ Reasons to try out wart:
 * You want an arc-like lisp that can use multiple cores of your processor
 
 Reasons to stick with arc:
+* You want an arc-compatible language. Wart differs from arc in lots of subtle
+  ways that you'll have to read the unit tests (*.test, *.wtst) to understand.
 * You'll often have to say (call f arg) rather than (f arg)
-* You'll have to compose functions using (call f1^f2 arg) rather than (f1:f2 arg)
 * You need call/cc and first-class continuations
-* You'll need to wrap expressions in (perform ..) at the REPL because Common Lisp can't print certain kinds of objects.
