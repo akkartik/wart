@@ -66,7 +66,7 @@
                (let h (table)
                  (= h.1 2 h.3 4)
                  (each (k v) h
-                   yield.k)))
+                   (yield k))))
              '<)
   :should be '(1 3))
 
