@@ -12,10 +12,6 @@
   `(with (,var ,val) ,@body))
 (defover let wart-let)
 
-(mac let(f . body) :case (match f '(def . _))
-  `(labels (,(cdr f))
-     ,@body))
-
 (mac ret(var val . body)
   `(let ,var ,val ,@body ,var))
 
@@ -24,3 +20,8 @@
       `(do ,@body)
       `(let ,(car parms) ,(cadr parms)
          (withs ,(cddr parms) ,@body))))
+
+(mac let(f . body) :case (match f '(def . _))
+  `(ret result (do ,f
+                   ,@body)
+     (def ,(cadr f)() 'undefined)))

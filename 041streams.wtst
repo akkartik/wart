@@ -1,4 +1,4 @@
 (wt-eval '(def fooread() (read)))
 (test "fromstring gives new port dynamic scope"
-  :valueof (fromstring "34" (foo))
+  :valueof (fromstring "34" (fooread))
   :should be 34)
