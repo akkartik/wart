@@ -20,8 +20,3 @@
       `(do ,@body)
       `(let ,(car parms) ,(cadr parms)
          (withs ,(cddr parms) ,@body))))
-
-(mac let(f . body) :case (match f '(def . _))
-  `(ret result (do ,f
-                   ,@body)
-     (def ,(cadr f)() 'undefined)))

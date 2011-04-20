@@ -14,11 +14,6 @@
   :valueof (let (a b) '(3 4) a)
   :should be 3)
 
-(test "let for recursive local fns"
-  :valueof (let (def foo(a b) (+ a b))
-             (foo 3 4))
-  :should be 7)
-
 (test "new keyword - with"
   :valueof (with (a 3) a)
   :should be 3)
