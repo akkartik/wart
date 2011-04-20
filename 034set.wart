@@ -17,10 +17,10 @@
 
 (mac collect body
   `(let ,$acc nil
-     ; labels => can't use ssyntax like acc.elem
-     ; let => must use call with acc
-     (labels ((yield(_) (push _ ,$acc)))
-       ,@body)
+     (ignore-redef
+       (def yield(_) (push _ ,$acc))
+       (do ,@body)
+       (def yield(_) 'yield-outside-collect))
      (rev ,$acc)))
 
 (mac or=(place expr)
