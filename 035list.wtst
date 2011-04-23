@@ -45,6 +45,10 @@
   :valueof (mappend [list (* _ 10)] '(1 2 3))
   :should be '(10 20 30))
 
+(test "intersperse works"
+  :valueof (intersperse 3 '(1 2 4))
+  :should be '(1 3 2 3 4))
+
 (test "split works"
   :valueof (split '(1 2 3) 1)
   :should be '((1) (2 3)))
