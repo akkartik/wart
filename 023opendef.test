@@ -1,6 +1,7 @@
-(wt-eval '(def foo(a b) :case (oddp a) b))
+(wt-eval '(def foodef(a b) a))
+(wt-eval '(def foodef(a b) :case (oddp a) b))
 (test "guarded def clauses using :case"
-  :valueof (list (foo 33 2) (foo 4 2))
+  :valueof (list (foodef 33 2) (foodef 4 2))
   :should be (list 2 4))
 
 (wt-eval '(mac foomac2(x) :case (floatp x)

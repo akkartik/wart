@@ -27,5 +27,12 @@
 
 (defun length-matcher(params)
   (fn args
-    (>= (length (remove-if [kwargp params _] args)) ; len will be overridden
-        (length (required-params params)))))
+    (let* ((args (remove-if [kwargp params _] args))
+           (req  (required-params params))
+           (rest (rest-param params))
+           (opt  (map 'list 'car (optional-alist params))))
+      (if rest
+        (>= (length args) (length req))
+        (>= (+ (length req) (length opt))
+            (length args)
+            (length req))))))
