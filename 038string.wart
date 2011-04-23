@@ -9,31 +9,35 @@
 
 
 
-(def join args :case (in (type car.args) 'character 'string)
-  (apply 'concatenate 'string (map [as string _] args)))
+(def str(x)
+  (as string x))
 
 (defcoerce character string
-  [as string list._])
+  str^list)
+
+(def join args :case (in (type car.args) 'character 'string)
+  (apply 'concatenate 'string (map 'str args)))
+
 (defcoerce cons string
-  [if (all [isa _ 'character] _)
+  [if (all 'characterp _)
     (cl-coerce _ 'string) ; base case
     (apply 'join _)]) ; recurse
 
 
 
 (def upcase(s)
-  (as string (map 'char-upcase s)))
+  (map 'char-upcase s))
 (def upcase(s) :case (not stringp.s)
-  (upcase (as string s)))
+  (upcase str.s))
 (def upcase(s) :case (no s)
   nil)
 (def upcase(s) :case characterp.s
   (char-upcase s))
 
 (def downcase(s)
-  (as string (map 'char-downcase s)))
+  (map 'char-downcase s))
 (def downcase(s) :case (not stringp.s)
-  (downcase (as string s)))
+  (downcase str.s))
 (def downcase(s) :case (no s)
   nil)
 (def downcase(s) :case characterp.s
@@ -55,9 +59,9 @@
   [map 'char-downcase (symbol-name _)])
 
 (defcoerce symbol cons
-  [as cons (as string _)])
+  [as cons str._])
 (defcoerce cons symbol
-  [intern (as string _)])
+  intern^str)
 
 
 
@@ -84,8 +88,7 @@
              (if no.cs   (consif tok toks)
                (call testify.sep car.cs)   (self cdr.cs (consif tok toks) nil)
                :else  (self cdr.cs toks (cons car.cs tok))))
-    (rev (map [as string _]
-              (map 'rev (call rec (as cons s) nil nil))))))
+    (rev (map str^rev (call rec (as cons s) nil nil)))))
 
 (def intersperse(x ys) :case (all [isa _ 'string] ys)
   (intersperse x ys :as 'string))

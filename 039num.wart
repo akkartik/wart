@@ -15,16 +15,14 @@
   (apply '< args))
 (defover < wart-<)
 
-(def wart-int(x ? base 10)
-  (if (isa x 'string)
-    (parse-integer x :radix base)
-    (as integer x)))
 (defover int wart-int)
+(def int(x)
+  (as integer x))
+(def int(x ? base 10) :case (isa x 'string)
+  (parse-integer x :radix base))
 
-(def str(x ? base 10)
-  (if (isa x 'integer)
-    (write-to-string x :base base)
-    (as string x)))
+(def str(x ? base 10) :case (isa x 'integer)
+  (write-to-string x :base base))
 
 
 
