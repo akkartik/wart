@@ -41,10 +41,11 @@
 (def mappend(f . args)
   (apply 'join (apply 'map0 (as function f) args)))
 
-(def intersperse(x ys)
+(def intersperse(x ys ? as 'cons)
   (if ys
-    (cons car.ys
-          (mappend [list x _] cdr.ys))))
+    (coerce (cons car.ys
+                  (mappend [list x _] cdr.ys))
+            as)))
 
 (def split(seq pos)
   (list (cut seq 0 pos) (cut seq pos)))

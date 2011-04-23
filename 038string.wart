@@ -88,7 +88,4 @@
               (map 'rev (call rec (as cons s) nil nil))))))
 
 (def intersperse(x ys) :case (all [isa _ 'string] ys)
-  (if ys
-    (as string
-        (cons car.ys
-              (mappend [list x _] cdr.ys)))))
+  (intersperse x ys :as 'string))
