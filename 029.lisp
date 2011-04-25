@@ -22,9 +22,11 @@
   (if (consp x)
     (car x)
     x))
+(defsetf wart-car rplaca)
 (defover car wart-car)
 (def wart-cdr(x)
   (errsafe (cdr x)))
+(defsetf wart-cdr rplacd)
 (defover cdr wart-cdr)
 
 

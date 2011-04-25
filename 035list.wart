@@ -12,7 +12,7 @@
       0)))
 
 (def empty(x)
-  (iso 0 len.x))
+  (no x))
 
 (def testify(x) :case (isa x 'cons)
   [find _ x])
