@@ -2,7 +2,7 @@
   :valueof (collect
              (with-input-from-string(f "abcdef")
                (whiler x (read-char f) #\d
-                  (yield x))))
+                  yield.x)))
   :should be '(#\a #\b #\c))
 
 (test "drain works"
@@ -24,7 +24,7 @@
 
 (test "each works on strings"
   :valueof (collect
-             (each x "abc" (yield x)))
+             (each x "abc" yield.x))
   :should be '(#\a #\b #\c))
 
 (test "xloop works"

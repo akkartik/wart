@@ -4,7 +4,7 @@
   `(call-fn ,f ,@args))
 
 (extend-macro call(f &rest args) :if (function-name-p f)
-  `(call-fn (function ,f) ,@args))
+  `(,f ,@args))
 
 (extend-macro call(f &rest args) :if (macp f)
   `(,f ,@args))

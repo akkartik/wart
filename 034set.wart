@@ -16,10 +16,13 @@
   `(= ,place (,f ,place ,@args)))
 
 (mac collect body
-  `(let ,$acc nil
-     (labels ((yield(_) (push _ ,$acc)))
-       ,@body)
+  `(with (,$acc nil
+          ,$old-yield (symbol-function 'yield))
+     (= (symbol-function 'yield) [push _ ,$acc])
+     (do ,@body)
+     (= (symbol-function 'yield) ,$old-yield)
      (rev ,$acc)))
+(def yield(_) 'yield-outside-collect)
 
 (mac or=(place expr)
   `(= ,place (or ,place ,expr)))
