@@ -27,10 +27,13 @@
                choices)))
 
 (def testify(x)
-  (or (function-value x)
-      [iso _ x]))
+  [iso _ x])
+
 (def testify(x) :case (isa x 'function)
-  (function-value x))
+  x)
+
+(def testify(x) :case (function-name-p x)
+  (eval `(function ,x)))
 
 (def testify(x) :case (in x :else :otherwise)
   (fn(_) t))

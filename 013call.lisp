@@ -1,7 +1,10 @@
 ;; call and apply using extensible coerce
 
 (defmacro call(f &rest args)
-  `(call-fn (fslot ,f) ,@args))
+  `(call-fn ,f ,@args))
+
+(extend-macro call(f &rest args) :if (function-name-p f)
+  `(call-fn (function ,f) ,@args))
 
 (extend-macro call(f &rest args) :if (macp f)
   `(,f ,@args))
@@ -19,8 +22,9 @@
 
 
 (defmacro fslot(f)
-  (or (function-value f)
-      f))
+  (if (function-name-p f)
+    (eval `(function ,f))
+    f))
 
 (defun function-value(f)
   (cond
