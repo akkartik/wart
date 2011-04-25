@@ -1,0 +1,8 @@
+(mac collect body
+  `(with (,$acc (queue)
+          ,$old-yield (symbol-function 'yield))
+     (= (symbol-function 'yield) [enq ,$acc _])
+     (do ,@body)
+     (= (symbol-function 'yield) ,$old-yield)
+     (as cons ,$acc)))
+(def yield(_) (prn 'yield-outside-collect))

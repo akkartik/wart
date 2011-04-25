@@ -1,0 +1,12 @@
+(test "collect works"
+  :valueof (collect (map0 [yield (* _ 10)] '(1 2 3)))
+  :should be '(10 20 30))
+
+(wt-eval '(def fooyield(_) (yield (* _ 10))))
+(test "collect can yield from deep inside the call hierarchy"
+  :valueof (collect (map0 #'fooyield '(1 2 3)))
+  :should be '(10 20 30))
+
+(test "collect/yield can nest"
+  :valueof (collect (yield (collect yield.1)))
+  :should be '((1)))
