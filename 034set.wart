@@ -22,7 +22,7 @@
      (do ,@body)
      (= (symbol-function 'yield) ,$old-yield)
      (rev ,$acc)))
-(def yield(_) 'yield-outside-collect)
+(def yield(_) (prn 'yield-outside-collect))
 
 (mac or=(place expr)
   `(= ,place (or ,place ,expr)))
