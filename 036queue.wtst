@@ -1,0 +1,20 @@
+(wt-eval '(= q (queue)))
+(test "queues start out empty"
+  :valueof (len q)
+  :should be 0)
+
+(wt-eval '(enq q 1))
+(test "enq adds to queue"
+  :valueof (len q)
+  :should be 1)
+
+(test "deq returns enq'd elem"
+  :valueof (deq q)
+  :should be 1)
+
+(wt-eval '(enq q 1))
+(wt-eval '(enq q 2))
+(wt-eval '(enq q 3))
+(test "coercing queues to cons works"
+  :valueof (as cons q)
+  :should be '(1 2 3))
