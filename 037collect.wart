@@ -1,4 +1,4 @@
-(defvar *yield* [])
+(defvar *yield* [prn (join "yield outside collect: " _)])
 (def yield(_) (call *yield* _))
 
 (mac collect body
