@@ -1,16 +1,10 @@
 ;; Extensible wart transformer
 ;; Inspired by http://awwx.posterous.com/how-to-future-proof-your-code
 
-(setf eof-marker* (gensym))
-(defmacro wt-read()
-  `(let ((form (read *standard-input* nil eof-marker*)))
-    (if (eq form eof-marker*)
-      (return-from wrepl)
-      form)))
-
 ; read transform macroexpand eval print
 (defun wrepl()
-  (loop
+  (setf wart-quit* nil)
+  (loop until wart-quit* do
     (wt-prompt)
     (format t "~s~%" (wt-eval (wt-read)))))
 
@@ -40,6 +34,13 @@
 
 (unless (boundp 'batch-mode*)
   (setf batch-mode* nil))
+
+(let ((eof-marker (gensym)))
+  (defun wt-read()
+    (let ((form (read *standard-input* nil eof-marker)))
+      (if (eq form eof-marker)
+        (setf wart-quit* t)
+        form))))
 
 (defun wt-eval(sexp)
   (eval (wt-transform sexp)))
