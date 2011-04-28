@@ -5,7 +5,7 @@
 (defun wrepl()
   (loop
     (wt-prompt)
-    (format t "~s~%" (wt-eval (read)))))
+    (format t "~s~%" (wt-eval (wt-read)))))
 
 (defun wt-load(file)
   (with-open-file (f (merge-pathnames file))
@@ -30,6 +30,13 @@
 (defun wt-prompt()
   (unless batch-mode*
     (format t "wart> ")(finish-output)))
+
+(let ((eof-marker (gensym)))
+  (defun wt-read()
+    (let ((form (read *standard-input* nil eof-marker)))
+      (if (eq form eof-marker)
+        (quit)
+        form))))
 
 (unless (boundp 'batch-mode*)
   (setf batch-mode* nil))
