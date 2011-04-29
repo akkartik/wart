@@ -3,10 +3,10 @@
 
 ; read transform macroexpand eval print
 (defun wrepl()
-  (setf wart-quit* nil)
-  (loop until wart-quit* do
-    (wt-prompt)
-    (format t "~s~%" (wt-eval (wt-read)))))
+  (catch 'wart-quit
+    (loop
+      (wt-prompt)
+      (format t "~s~%" (wt-eval (wt-read))))))
 
 (defun wt-load(file)
   (with-open-file (f (merge-pathnames file))
@@ -39,7 +39,7 @@
   (defun wt-read()
     (let ((form (read *standard-input* nil eof-marker)))
       (if (eq form eof-marker)
-        (setf wart-quit* t)
+        (throw 'wart-quit t)
         form))))
 
 (defun wt-eval(sexp)
