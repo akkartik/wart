@@ -39,14 +39,6 @@
 (defun alref(key alist)
   (cdr (assoc key alist :test 'equal)))
 
-; helper for certain kinds of recursive functions
-(defun append-or-afresh(f x xss)
-  (if (funcall f x)
-    (cons (cons x (car xss))
-          (cdr xss))
-    (cons (list x)
-          xss)))
-
 (defun group-by(f xs &optional acc)
   (if xs
     (group-by f (cdr xs)
@@ -55,3 +47,14 @@
                                 (car xs)
                                 acc))
     (nreverse acc)))
+
+
+
+;; Internals
+
+(defun append-or-afresh(f x xss)
+  (if (funcall f x)
+    (cons (cons x (car xss))
+          (cdr xss))
+    (cons (list x)
+          xss)))
