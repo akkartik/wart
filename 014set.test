@@ -3,6 +3,18 @@
   :valueof x
   :should be 3)
 
+(test "= assigns in parallel"
+  :valueof (progn
+             (= x 4 y x)
+             (list x y))
+  :should be '(4 3))
+
+(test "=* assigns in series"
+  :valueof (progn
+             (=* x 2 y x)
+             (list x y))
+  :should be '(2 2))
+
 (wt-eval '(progn
             (= y nil)
             (push 13 y)
