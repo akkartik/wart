@@ -15,8 +15,8 @@
     (++ rep.q.2)
     (if (empty q)
       (= r.1 (= r.0 list.elem))
-      (= (cdr r.1) list.elem
-         r.1  (cdr r.1)))))
+      (=* (cdr r.1)   list.elem
+          r.1   (cdr r.1)))))
 
 (def deq(q)
   (let r rep.q

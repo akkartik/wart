@@ -36,6 +36,9 @@
                         (rec (cdr x) acc))))))
     (rec x nil)))
 
+(defun interleave(&rest lists)
+  (apply 'append (apply 'map 'list 'list lists)))
+
 (defun alref(key alist)
   (cdr (assoc key alist :test 'equal)))
 
