@@ -3,6 +3,10 @@
   :valueof x
   :should be 3)
 
+(test "= returns final value assigned"
+  :valueof (= x 3 y 4)
+  :should be 4)
+
 (test "= assigns in parallel"
   :valueof (progn
              (= x 4 y x)
