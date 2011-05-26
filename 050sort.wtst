@@ -1,5 +1,5 @@
 (test "best works"
-  :valueof (let h (obj 1 5
+  :valueof (let h (table 1 5
                        12 19
                        34 2)
              (best (fn(a b)
@@ -8,7 +8,7 @@
   :should be 12)
 
 (test "best works - 2"
-  :valueof (let h (obj 1 5
+  :valueof (let h (table 1 5
                        12 3
                        34 2)
              (best (fn(a b)
@@ -29,11 +29,11 @@
   :should be '(34 16 7 4 3 2 1))
 
 (test "sort :by works"
-  :valueof (let h (obj 1 5 12 19 34 2) (sort :by h '(1 12 34)))
+  :valueof (let h (table 1 5 12 19 34 2) (sort :by h '(1 12 34)))
   :should be '(12 1 34))
 
 (test "sort is meant to be stable"
-  :valueof (let h (obj 1 5 12 19 34 2 16 19) (sort :by h '(16 1 12 34)))
+  :valueof (let h (table 1 5 12 19 34 2 16 19) (sort :by h '(16 1 12 34)))
   :should be '(16 12 1 34))
 
 (test "insert-sorted works on empty list"

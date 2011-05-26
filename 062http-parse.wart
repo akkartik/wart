@@ -5,7 +5,7 @@
           (path query)  (tokens url #\?)
           headers   (parse-http-headers from)
           body  (read-body headers from))
-    (obj protocol   protocol
+    (table protocol   protocol
          method   (call sym^downcase method)
          path   path
          query  query

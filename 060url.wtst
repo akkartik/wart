@@ -1,14 +1,14 @@
 (test "parse-url works"
   :valueof (parse-url "www.google.com")
-  :should be (wt-eval '(obj protocol "http" host "www.google.com" port 80 path "/")))
+  :should be (wt-eval '(table protocol "http" host "www.google.com" port 80 path "/")))
 
 (test "parse-url works - 2"
   :valueof (parse-url "www.google.com:8080")
-  :should be (wt-eval '(obj protocol "http" host "www.google.com" port 8080 path "/")))
+  :should be (wt-eval '(table protocol "http" host "www.google.com" port 8080 path "/")))
 
 (test "parse-url works - 3"
   :valueof (parse-url "ftp://www.google.com/blah")
-  :should be (wt-eval '(obj protocol "ftp" host "www.google.com" port 80 path "/blah")))
+  :should be (wt-eval '(table protocol "ftp" host "www.google.com" port 80 path "/blah")))
 
 
 

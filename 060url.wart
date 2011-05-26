@@ -1,5 +1,5 @@
 (def parse-url(url)
-  (ret ans (obj protocol "http"
+  (ret ans (table protocol "http"
                 host nil
                 port 80
                 path "/")

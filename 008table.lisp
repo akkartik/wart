@@ -1,5 +1,5 @@
-(defun table()
-  (make-hash-table :test 'equal))
+(defmacro table() ; bootstrapping version
+  `(make-hash-table :test 'equal))
 
 ; 'first available' - like or, but uses multiple values to indicate unavailable
 (defmacro$ fa(&rest args)

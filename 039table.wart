@@ -34,11 +34,12 @@
 (def len(x) :case (isa x 'hash-table)
   (hash-table-count x))
 
-(mac obj args
+(ignore-redef
+(mac table args
   `(as hash-table
        (list ,@(map0 (fn((k v))
                         `(list ',k ,v))
-                     pair.args))))
+                     pair.args)))))
 
 (def keys(table)
   (ret ans ()

@@ -3,8 +3,8 @@
   :should be (table))
 
 (test "iso works on tables"
-  :valueof (obj 1 2 3 4)
-  :should be (obj 3 4 1 2))
+  :valueof (table 1 2 3 4)
+  :should be (table 3 4 1 2))
 
 (setf h (table))
 (setf (gethash 0 h) 34)
@@ -57,7 +57,7 @@
   :should be 0)
 
 (test "len works on hash tables"
-  :valueof (len (obj 1 2 3 4))
+  :valueof (len (table 1 2 3 4))
   :should be 2)
 
 (test "each works on tables"
@@ -70,8 +70,8 @@
              '<)
   :should be '(1 3))
 
-(test "obj works"
-  :valueof (let x (obj a 1 b 2)
+(test "table works with args"
+  :valueof (let x (table a 1 b 2)
              x!a)
   :should be 1)
 
@@ -82,29 +82,29 @@
   :should be 3)
 
 (test "keys works"
-  :valueof (sort (keys (obj 1 2 3 4)) '<)
+  :valueof (sort (keys (table 1 2 3 4)) '<)
   :should be '(1 3))
 
 (test "fill-table has the right length"
-  :valueof (let tb (obj a 1 b 2)
+  :valueof (let tb (table a 1 b 2)
              (fill-table tb '(c 3 d 4))
              (hash-table-count tb))
   :should be 4)
 
 (test "fill-table contains old keys"
-  :valueof (let tb (obj a 1 b 2)
+  :valueof (let tb (table a 1 b 2)
              (fill-table tb '(c 3 d 4))
              tb!a)
   :should be 1)
 
 (test "fill-table contains new keys"
-  :valueof (let tb (obj a 1 b 2)
+  :valueof (let tb (table a 1 b 2)
              (fill-table tb '(c 3 d 4))
              tb!c)
   :should be 3)
 
 (test "fill-table overrides old keys with new ones"
-  :valueof (let tb (obj a 1 b 2)
+  :valueof (let tb (table a 1 b 2)
              (fill-table tb '(b 45 c 3 d 4))
              tb!b)
   :should be 45)
@@ -113,24 +113,24 @@
 
 ; integration test: ssyntax + hash
 (test "compose works with hash tables"
-  :valueof (let h (obj 1 3)
+  :valueof (let h (table 1 3)
              1+^h.1)
   :should be 4)
 
 ; integration test: ssyntax + hash + assignment
 (test "compose works with assignment"
-  :valueof (let h (obj 1 3)
+  :valueof (let h (table 1 3)
              ++^h.1
              h.1)
   :should be 4)
 
 (test "nested compose works with assignment"
-  :valueof (let h (obj 1 3)
+  :valueof (let h (table 1 3)
              (list 1+^++^h.1 h.1))
   :should be '(5 4))
 
-; integration test: obj + set + iso
+; integration test: table + set + iso
 (test "setting inside compound structures works"
-  :valueof (ret aa (obj a '(1 2) b 3)
+  :valueof (ret aa (table a '(1 2) b 3)
              (= aa!a.1 34))
-  :should be (obj a '(1 34) b 3))
+  :should be (table a '(1 34) b 3))
