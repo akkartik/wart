@@ -21,7 +21,7 @@
 
 
 ; integration test: wrepl + mac + let
-(wt-eval '(mac aand(a b) `(let it ,a (and it ,b))))
+(wt-eval '(mac fooaand(a b) `(let it ,a (and it ,b))))
 (test "macro bodies should pass through the compiler"
-  :valueof (let x 3 (aand (- x 1) (> it 1)))
+  :valueof (let x 3 (fooaand (- x 1) (> it 1)))
   :should satisfy true_value)

@@ -7,7 +7,7 @@
                (apply orig ,$args))))))
 
 (defmacro$ extend-macro(name params Case test body)
-  `(progn
+  `(ignore-redef
      (setf (macro-function ',$orig)
            (macro-function ',name))
      (defmacro ,name(&rest ,$args)
