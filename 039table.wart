@@ -7,7 +7,7 @@
          (coerce x 'cons))))
 
 (defcall hash-table table
-  (fn(_ ? default nil)
+  (fn(_ default)
     (gethash _ table default)))
 
 (defset hash-table(table key value)

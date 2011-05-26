@@ -45,7 +45,7 @@
   `(for ,$var 0 (< ,$var ,n) (++ ,$var)
       ,@body))
 
-(mac drain(expr ? eof nil)
+(mac drain(expr eof)
   `(with (,$acc nil
           ,$done nil)
     (while (no ,$done)

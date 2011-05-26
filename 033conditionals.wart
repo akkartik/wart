@@ -53,7 +53,7 @@
 (mac acase(expr . args)
   `(caselet it ,expr ,@args))
 
-(mac check(o$expr test ? alt nil)
+(mac check(o$expr test alt)
   `(if (call (fslot ,test) ,$expr)
      ,$expr
      ,alt))

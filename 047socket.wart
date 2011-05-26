@@ -45,7 +45,7 @@
          make-inet-address sb-bsd-sockets:make-inet-address
          socket-peername sb-bsd-sockets:socket-peername)
 
-(def make-socket(host port ? server nil)
+(def make-socket(host port server)
   (ret sock (make-instance 'sb-bsd-sockets:inet-socket
                            :type :stream :protocol :tcp)
     (when server

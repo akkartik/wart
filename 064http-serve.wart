@@ -40,7 +40,7 @@
       (list f it)
       (find-complex-url ptoks cdr.cands))))
 
-(def match-complex-url(pc cc ? acc nil)
+(def match-complex-url(pc cc acc)
   (if (and no.pc no.cc)
     rev.acc
     (when (aand cc.0 (not empty.it))
