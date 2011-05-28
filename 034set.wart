@@ -17,7 +17,3 @@
 
 (mac or=(place expr)
   `(= ,place (or ,place ,expr)))
-
-; assignments to complex things; don't try to print at the repl
-(mac newdef body
-  `(do1 nil (= ,@body)))

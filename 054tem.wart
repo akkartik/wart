@@ -1,12 +1,13 @@
 (= templates* (table))
 
 (mac deftem(name includes . fields)
-  `(newdef (call templates* ',name)
-           (join (mappend templates* ',rev.includes)
-                 (list
-                   ,@(map (fn((k v))
-                            `(list ',k (thunk ,v)))
-                          pair.fields)))))
+  `(perform
+     (= (call templates* ',name)
+        (join (mappend templates* ',rev.includes)
+              (list
+                ,@(map (fn((k v))
+                         `(list ',k (thunk ,v)))
+                       pair.fields))))))
 
 (def inst(tem . args)
   (ret x (table)
