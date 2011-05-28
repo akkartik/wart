@@ -31,7 +31,7 @@
 (alias copy copy-seq)
 
 (def alist(list-of-pairs)
-  (map0 [let (x y) _ (cons x y)] list-of-pairs))
+  (map0 (fn((x y)) (cons x y)) list-of-pairs))
 
 (def dot((a b))
   (cons a b))
