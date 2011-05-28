@@ -23,8 +23,11 @@
   (prn #\return)
   (car args))
 
+(defun wart-write(x &optional stream)
+  (print x stream))
+
 (defun writeln(&rest args)
-  (map 'list 'write args)
+  (map 'list 'wart-write args)
   (format t "~%")
   (car args))
 

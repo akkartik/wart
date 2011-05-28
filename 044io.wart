@@ -18,15 +18,10 @@
   (unserialize read.stream))
 (defover read wart-read)
 
-(def wart-write(x ? stream stdout*)
-  (write serialize.x :stream stream))
-(defover write wart-write)
-
 (ignore-redef
-  (def writeln args
-    (map 'write args)
-    (prn)
-    (car args)))
+  (def wart-write(x ? stream stdout*)
+    (write serialize.x :stream stream)))
+(defover write wart-write)
 
 (def ero args
   (w/stdout stderr*

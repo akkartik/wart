@@ -6,7 +6,7 @@
   (catch 'wart-quit
     (loop
       (wt-prompt)
-      (format t "~s~%" (wt-eval (wt-read))))))
+      (writeln (wt-eval (wt-read))))))
 
 (defun wt-load(file)
   (with-open-file (f (merge-pathnames file))
