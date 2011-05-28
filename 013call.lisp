@@ -14,10 +14,11 @@
             ,@args))
 (defover apply wart-apply)
 
-(defmacro defcall(type instance &rest body)
-  `(defcoerce ,type function
-     (lambda(,instance)
-       ,@body)))
+(defmacro defcall(type args &rest body)
+  `(defcoerce ,type function ; coercer: function returning a function
+     (lambda(,(car args)) ; instance of type
+       (fn ,(cdr args) ; fn not defined yet
+         ,@body))))
 
 
 

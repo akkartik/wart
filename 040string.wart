@@ -1,7 +1,7 @@
 (synonym newstring make-string)
 
-(defcall string s
-  [elt s _])
+(defcall string(s index)
+  (elt s index))
 
 (defset string(s index val)
   (setf (elt s index)
