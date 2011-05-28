@@ -14,12 +14,12 @@
 
 
 
-(def wart-read(? port stdin*)
-  (unserialize read.port))
+(def wart-read(? stream stdin*)
+  (unserialize read.stream))
 (defover read wart-read)
 
-(def wart-write(x ? port stdout*)
-  (write serialize.x :stream port))
+(def wart-write(x ? stream stdout*)
+  (write serialize.x :stream stream))
 (defover write wart-write)
 
 (ignore-redef
