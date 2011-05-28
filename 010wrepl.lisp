@@ -29,11 +29,8 @@
 ;; Internals
 
 (defun wt-prompt()
-  (unless batch-mode*
+  (unless (boundp 'batch-mode*)
     (format t "wart> ")(finish-output)))
-
-(unless (boundp 'batch-mode*)
-  (setf batch-mode* nil))
 
 (let ((eof-marker (gensym)))
   (defun wt-read()
