@@ -1,4 +1,4 @@
-;; def and mac that can be augmented rather than just overridden.
+;; Guards for def and mac
 
 (extend-macro def(name params &body body) :case (iso :case (car body))
   `(prog1 ',name
