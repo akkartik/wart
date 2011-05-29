@@ -5,11 +5,10 @@
   (setf (elt l index)
         val))
 
-(ignore-redef
-  (def len(x)
-    (if x
-      (length (as cons x))
-      0)))
+(redef len(x)
+  (if x
+    (length (as cons x))
+    0))
 
 (def empty(x)
   (no x))
@@ -90,9 +89,8 @@
           (cons fx (trues f cdr.xs))
           (trues f cdr.xs))))
 
-(ignore-redef
-  (def join args
-    (apply 'concatenate (type (car (rem nil args))) args)))
+(redef join args
+  (apply 'concatenate (type (car (rem nil args))) args))
 
 (def pos(test s ? idx 0)
   (position-if testify.test s :start idx))

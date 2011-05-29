@@ -13,6 +13,11 @@
 (defmacro proc(name args . body)
   `(def ,name ,args ,@body nil))
 
+(defmacro redef(name params &body body)
+  `(ignore-redef
+     (setf (gethash ',name wart-signatures*) nil)
+     (def ,name ,params ,@body)))
+
 
 
 ;; Internals
