@@ -10,7 +10,7 @@
       (call-correct-variant (gethash ',name wart-signatures*)
                             ,$args))))
 
-(defmacro proc(name params . body)
+(defmacro proc(name params &body body)
   `(def ,name ,params ,@body nil))
 
 (defmacro redef(name params &body body)
