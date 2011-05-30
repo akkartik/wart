@@ -1,11 +1,3 @@
-(def iso(x y) :case (isa x 'hash-table)
-  (and (iso (length (keys x))
-            (length (keys y)))
-       (all
-         (fn((k v))
-           (iso y.k v))
-         (coerce x 'cons))))
-
 (defcall hash-table(table index default)
   (gethash index table default))
 
@@ -29,6 +21,14 @@
 
 (defcoerce null hash-table
   [table])
+
+(def iso(x y) :case (isa x 'hash-table)
+  (and (iso (length (keys x))
+            (length (keys y)))
+       (all
+         (fn((k v))
+           (iso y.k v))
+         (coerce x 'cons))))
 
 (def len(x) :case (isa x 'hash-table)
   (hash-table-count x))

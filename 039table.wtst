@@ -1,11 +1,3 @@
-(test "iso works by coercing empty tables"
-  :valueof (table)
-  :should be (table))
-
-(test "iso works on tables"
-  :valueof (table 1 2 3 4)
-  :should be (table 3 4 1 2))
-
 (setf h (table))
 (setf (gethash 0 h) 34)
 (test "coercing table to function works"
@@ -51,6 +43,14 @@
 (test "coercing nil to table works"
   :valueof (hash-table-count (as hash-table nil))
   :should be 0)
+
+(test "iso works by coercing empty tables"
+  :valueof (table)
+  :should be (table))
+
+(test "iso works on tables"
+  :valueof (table 1 2 3 4)
+  :should be (table 3 4 1 2))
 
 (test "len works on tables"
   :valueof (len (table 1 2 3 4))
