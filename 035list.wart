@@ -90,7 +90,7 @@
   (keep ~testify.test seq))
 (defover rem wart-rem)
 
-(def trues (f xs)
+(def trues(f xs)
   (and xs
        (iflet fx (call f car.xs)
           (cons fx (trues f cdr.xs))
