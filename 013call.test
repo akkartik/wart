@@ -1,29 +1,3 @@
-(test "existing functions continue to work with call-fn"
-  :valueof (call-fn (coerce 'car 'function) '(3))
-  :should be 3)
-
-(test "wart-apply works"
-  :valueof (wart-apply '+ '(1 2 3))
-  :should be 6)
-
-(test "wart-apply works without quoting function symbol"
-  :valueof (wart-apply + '(1 2 3))
-  :should be 6)
-
-(test "call-fn works on simple functions"
-  :valueof (call-fn 'car '(1))
-  :should be 1)
-
-(test "call-fn works on simple functions"
-  :valueof (call-fn 'car '(1))
-  :should be 1)
-
-(test "call-fn coerces to function when necessary"
-  :valueof (call-fn 'car '(1))
-  :should be 1)
-
-
-
 (defmacro macfoo(a) `(+ 1 ,a))
 (test "call handles macros"
   :valueof (call macfoo 3)
@@ -48,33 +22,11 @@
 
 (test "call nests"
   :valueof (macex '(call (call a 3) 4))
-  :should be '(call-fn (call a 3) 4))
+  :should be '(funcall (wart-coerce (call a 3) 'function) 4))
 
-
-
-(test "inline-last works"
-  :valueof (inline-last '(1 2 (3 4 5)))
-  :should be '(1 2 3 4 5))
-
-(test "inline-last works on nil"
-  :valueof (inline-last nil)
-  :should be nil)
-
-(test "inline-last works on non-lists"
-  :valueof (inline-last 3)
-  :should be 3)
-
-(test "inline-last works on singleton"
-  :valueof (inline-last '(1))
-  :should be '(1))
-
-(test "inline-last works on flat list"
-  :valueof (inline-last '(1 2 3))
-  :should be '(1 2 3))
-
-(test "inline-last works on nested list"
-  :valueof (inline-last '(1 2 (3) 4 (5 6 (7))))
-  :should be '(1 2 (3) 4 5 6 (7)))
+(test "wart-apply works"
+  :valueof (wart-apply '+ '(1 2 3))
+  :should be 6)
 
 
 

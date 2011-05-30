@@ -38,7 +38,7 @@
   :valueof oddp.3
   :should be t)
 
-; integration test: macros + call-fn + ssyntax
+; integration test: macros + call + ssyntax
 (setf a 3)
 (test ". works with macros"
   :valueof incf.a

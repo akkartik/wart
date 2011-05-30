@@ -1,7 +1,8 @@
 ;; call and apply using extensible coerce
 
 (defmacro call(f &rest args)
-  `(call-fn ,f ,@args))
+  `(funcall (wart-coerce ,f 'function)
+            ,@args))
 
 (extend-macro call(f &rest args) :if (function-name-p f)
   `(,f ,@args))
@@ -45,20 +46,3 @@
 
 (defmacro thunk(&body body)
   `(lambda() ,@body))
-
-
-
-;; Internals
-
-(defun call-fn(f &rest args)
-  (apply (wart-coerce f 'function)
-         args))
-
-(defun inline-last(xs)
-  (if (not (consp xs))
-    xs
-    (if (cdr xs)
-      (cons (car xs) (inline-last (cdr xs)))
-      (if (consp (car xs))
-        (car xs)
-        xs))))

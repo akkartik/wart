@@ -12,10 +12,6 @@
   :valueof (type (as function h))
   :should be 'function)
 
-(test "call-fn on table works"
-  :valueof (call-fn h 0)
-  :should be 34)
-
 (test "call on table works"
   :valueof (call h 0)
   :should be 34)
