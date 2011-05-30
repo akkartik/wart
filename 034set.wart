@@ -16,4 +16,4 @@
   `(= ,place (,f ,place ,@args)))
 
 (mac or=(place expr)
-  `(= ,place (or ,place ,expr)))
+  `(zap or ,place ,expr))
