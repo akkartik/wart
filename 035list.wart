@@ -1,6 +1,9 @@
 (defcall cons(l index)
   (elt l index))
 
+(defcall cons(l start end)
+  (cut l start end))
+
 (defset cons(l index val)
   (setf (elt l index)
         val))

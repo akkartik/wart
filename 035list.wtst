@@ -2,6 +2,10 @@
   :valueof (call '(1 2 3) 2)
   :should be 3)
 
+(test "list slicing works"
+  :valueof (call '(1 2 3) 0 1)
+  :should be '(1))
+
 (test "writing to list index works"
   :valueof (ret l '(1 2 3)
              (= l.1 34))

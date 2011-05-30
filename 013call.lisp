@@ -15,11 +15,23 @@
           ,@args))
 (defover apply wart-apply)
 
-(defmacro defcall(type args &rest body)
+; defcall syntax is restricted defun:
+;   name must be a type
+;   no destructured, optional or rest args
+(defmacro$ defcall(type args &rest body)
+  (if (not (gethash type (gethash 'function wart-coercions*)))
   `(defcoerce ,type function ; coercer: function returning a function
      (lambda(,(car args)) ; instance of type
        (fn ,(cdr args) ; fn not defined yet
-         ,@body))))
+         ,@body)))
+  `(defcoerce ,type function
+     (let ((,$oldfn (gethash ',type (gethash 'function wart-coercions*))))
+       (lambda(,(car args))
+         (fn ,$args
+           (if (iso (len ',(cdr args)) (len ,$args))
+             (destructuring-bind ,(cdr args) ,$args
+               ,@body)
+             (apply (call ,$oldfn ,(car args)) ,$args))))))))
 
 
 
