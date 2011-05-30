@@ -8,6 +8,10 @@
   (setf (elt l index)
         val))
 
+(defset cons(l start end newlist)
+  (setf (subseq l start end)
+        newlist))
+
 (redef len(x)
   (if x
     (length (as cons x))

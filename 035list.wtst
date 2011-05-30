@@ -11,6 +11,11 @@
              (= l.1 34))
   :should be '(1 34 3))
 
+(test "writing list slice works"
+  :valueof (ret l '(1 2 3 4)
+             (= (call l 0 2) '(34)))
+  :should be '(34 2 3 4)) ; crap result from setf-subseq
+
 (test "len works"
   :valueof (len '(1 2 3))
   :should be 3)

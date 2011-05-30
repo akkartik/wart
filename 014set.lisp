@@ -14,10 +14,19 @@
 (defmacro =*(&rest args)
   `(setf ,@args))
 
-(defmacro defset(type args &rest body)
+(defmacro$ defset(type args &rest body)
+  (if (not (and (gethash 'function= wart-coercions*)
+                (gethash type (gethash 'function= wart-coercions*))))
   `(defcoerce ,type function=
     (lambda ,args
-      ,@body)))
+      ,@body))
+  `(defcoerce ,type function=
+     (let ((,$oldfn (gethash ',type (gethash 'function= wart-coercions*))))
+       (lambda(&rest ,$args)
+         (if (iso (len ',args) (len ,$args))
+           (destructuring-bind ,args ,$args
+             ,@body)
+           (apply ,$oldfn ,$args)))))))
 
 
 
