@@ -8,7 +8,7 @@
 
 (test-lisp "expand-ssyntax translates ^ to compose"
   :valueof (expand-ssyntax 'a^b)
-  :should be '(compose a b))
+  :should be '(wart-compose a b))
 
 (test-lisp "expand-ssyntax translates ~ to complement"
   :valueof (expand-ssyntax '~b)

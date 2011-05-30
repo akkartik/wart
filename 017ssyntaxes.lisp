@@ -1,5 +1,5 @@
 ;; Standard ssyntax
-(def-ssyntax #\^ 'compose)
+(def-ssyntax #\^ 'wart-compose)
 (def-ssyntax #\. 'call)
 (def-ssyntax #\! 'call-quoted)
 (def-ssyntax #\~ 'complement* -1) ; precedence like arc for now
