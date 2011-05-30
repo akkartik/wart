@@ -1,5 +1,33 @@
+(test "cut works"
+  :valueof (cut '(1 2 3 4) 2)
+  :should be '(3 4))
+
+(test "cut works with nil indices"
+  :valueof (cut '(1 2 3 4) 2 nil)
+  :should be '(3 4))
+
+(test "cut works with negative indices"
+  :valueof (cut '(1 2 3 4) 1 -1)
+  :should be '(2 3))
+
+(test "cut works with negative indices - 2"
+  :valueof (cut '(1 2 3 4) nil -1)
+  :should be '(1 2 3))
+
+(test "cut works with negative indices - 3"
+  :valueof (cut '(1 2 3 4) -3 -1)
+  :should be '(2 3))
+
+(test "cut works with negative indices - 4"
+  :valueof (cut '(1 2 3 4) -3 0)
+  :should be '(2 3 4))
+
 (test "list indexing works"
   :valueof (call '(1 2 3) 2)
+  :should be 3)
+
+(test "negative list index works"
+  :valueof (call '(1 2 3) -1)
   :should be 3)
 
 (test "list slicing works"
@@ -97,10 +125,6 @@
 (test "trues works"
   :valueof (trues 'cdr '((1 2) (3) (4 5)))
   :should be '((2) (5)))
-
-(test "cut works"
-  :valueof (cut '(1 2 3 4) 2)
-  :should be '(3 4))
 
 (test "cut works on strings"
   :valueof (cut "abc" 1)

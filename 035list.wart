@@ -1,5 +1,15 @@
+(redef cut(l start end)
+  (let n len.l
+    (or= start 0)
+    (or= end n)
+    (if (< start 0)
+      (= start (+ n start)))
+    (if (<= end 0)
+      (= end (+ n end)))
+    (subseq l start end)))
+
 (defcall cons(l index)
-  (elt l index))
+  (car (cut l index 1+.index)))
 
 (defcall cons(l start end)
   (cut l start end))
