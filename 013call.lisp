@@ -10,8 +10,8 @@
   `(,f ,@args))
 
 (defmacro wart-apply(f &rest args)
-  `(call-fn (apply-fn (wart-coerce (fslot ,f) 'function))
-            ,@args))
+  `(apply (wart-coerce (fslot ,f) 'function)
+          ,@args))
 (defover apply wart-apply)
 
 (defmacro defcall(type args &rest body)
@@ -53,10 +53,6 @@
 (defun call-fn(f &rest args)
   (apply (wart-coerce f 'function)
          args))
-
-(defun apply-fn(f)
-  (lambda(&rest args)
-    (apply f (inline-last args))))
 
 (defun inline-last(xs)
   (if (not (consp xs))
