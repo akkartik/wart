@@ -15,12 +15,12 @@
   (cut l start end))
 
 (defset cons(l index val)
-  (setf (elt l index)
-        val))
+  (= (elt l index)
+     val))
 
 (defset cons(l start end newlist)
-  (setf (subseq l start end)
-        newlist))
+  (= (subseq l start end)
+     newlist))
 
 (redef len(x)
   (if x
