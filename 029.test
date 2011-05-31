@@ -65,3 +65,9 @@
 (test "++ works"
   :valueof a
   :should be 4)
+
+(pending-test "can write to car with ssyntax (ssyntax+set)"
+  :valueof (ret l '(1 2 3)
+             (= (call car l) 34) ; as opposed to (car l)
+             l)
+  :should be '(34 2 3))
