@@ -117,7 +117,6 @@
 
 
 
-; integration test: map+strings
 (test "map works on lists of strings"
   :valueof (map 'string-capitalize '("abc" "def"))
   :should be '("Abc" "Def"))

@@ -5,7 +5,6 @@
 
 
 
-; integration test: http client+server
 (test "http-get works"
   :valueof (let port (+ 1024 rand.80)
              ; server

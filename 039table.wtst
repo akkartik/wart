@@ -107,26 +107,23 @@
 
 
 
-; integration test: ssyntax + hash
-(test "compose works with tables"
+(test "compose works with tables (table+ssyntax)"
   :valueof (let h (table 1 3)
              1+^h.1)
   :should be 4)
 
-; integration test: ssyntax + hash + assignment
-(test "compose works with assignment"
+(test "compose works with assignment (table+ssyntax+set)"
   :valueof (let h (table 1 3)
              ++^h.1
              h.1)
   :should be 4)
 
-(test "nested compose works with assignment"
+(test "nested compose works with assignment (table+ssyntax+set)"
   :valueof (let h (table 1 3)
              (list 1+^++^h.1 h.1))
   :should be '(5 4))
 
-; integration test: table + set + iso
-(test "setting inside compound structures works"
+(test "setting inside compound structures works (table+set+iso)"
   :valueof (ret aa (table a '(1 2) b 3)
              (= aa!a.1 34))
   :should be (table a '(1 34) b 3))

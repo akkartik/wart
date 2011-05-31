@@ -20,8 +20,7 @@
 
 
 
-; integration test: wrepl + mac + let
 (wt-eval '(mac fooaand(a b) `(let it ,a (and it ,b))))
-(test "macro bodies should pass through the compiler"
+(test "macro bodies should pass through the compiler (wrepl+mac+let)"
   :valueof (let x 3 (fooaand (- x 1) (> it 1)))
   :should satisfy true_value)

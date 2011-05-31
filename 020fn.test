@@ -263,7 +263,10 @@
   :valueof (call (fn(a ? b nil c 3 . body) (list b c body)) 3 4 :do 4 5)
   :should be '(4 3 (4 5)))
 
-; integration test: bracket + fn + call
-(test "call works on lambdas"
+(test "call works on fns"
+  :valueof (call (fn(_) (+ _ 1)) 3)
+  :should be 4)
+
+(test "call works on fn with bracket syntax (fn+brackets+call)"
   :valueof (call [+ _ 1] 3)
   :should be 4)
