@@ -39,6 +39,11 @@
              (= l.1 34))
   :should be '(1 34 3))
 
+(test "writing to negative list index works"
+  :valueof (ret l '(1 2 3)
+             (= l.-1 34))
+  :should be '(1 2 34))
+
 (test "writing list slice works"
   :valueof (ret l '(1 2 3 4)
              (= (call l 0 2) '(34)))
