@@ -29,6 +29,10 @@
   :valueof (expand-ssyntax '3.a)
   :should be '(foo* 3 a))
 
+(test-lisp "expand-ssyntax works with negative ints"
+  :valueof (expand-ssyntax 'a.-1)
+  :should be '(foo* a -1))
+
 (test-lisp "expand-ssyntax tracks precedence"
   :valueof (expand-ssyntax 'a.b!c)
   :should be '(foo* a (bar* b c)))

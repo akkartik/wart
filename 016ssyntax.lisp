@@ -54,11 +54,16 @@
     ans))
 
 (defun ssyntax-parse-token(s)
-  (if (all-digits s)
+  (if (all-integer-chars s)
     (parse-integer s)
     (intern s)))
 
+(defun all-integer-chars(s)
+  (all-digits (if (member (elt s 0) '(#\+ #\-))
+                (cut s 1)
+                s)))
+
 (defun all-digits(s)
-  (no (position-if
-        (lambda(x) (no (digit-char-p x)))
-        s)))
+  (not (position-if
+         [not (digit-char-p _)]
+         s)))
