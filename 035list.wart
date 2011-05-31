@@ -19,8 +19,35 @@
      val))
 
 (defset cons(l start end newlist)
-  (= (subseq l start end)
-     newlist))
+  (let n len.l
+    (if (< start 0)
+      (= start (+ n start)))
+    (if (<= end 0)
+      (= end (+ n end)))
+    (or= start 0)
+    (or= end 0)
+    (if
+      (and newlist (iso start 0))
+        (do (= (car l) car.newlist)
+            (= (cdr l) (set-slice cdr.l 0 1-.end cdr.newlist)))
+      (and no.newlist (iso start 0))
+        (do (= (car l) (nth end l)) ; BUG: we can't delete entire l
+            (= (cdr l) (set-slice cdr.l 0 end nil)))
+      :else
+        (= (cdr l) (set-slice cdr.l 1-.start 1-.end newlist)))))
+
+(def set-slice(l start end newlist ? curr 0)
+  (if
+    (no l)
+      nil
+    (< curr start)
+      (cons car.l (set-slice cdr.l start end newlist 1+.curr))
+    (and (<= start curr) (< curr end))
+      (if newlist
+        (cons car.newlist (set-slice cdr.l start end cdr.newlist 1+.curr))
+        (set-slice cdr.l start end nil 1+.curr))
+    (<= end curr)
+      (cons car.l (set-slice cdr.l start end newlist 1+.curr))))
 
 (redef len(x)
   (if x
