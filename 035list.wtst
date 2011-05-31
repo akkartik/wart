@@ -49,6 +49,11 @@
              (= (call l 1 3) '(34)))
   :should be '(1 34 4))
 
+(test "writing to list slice including nil works"
+  :valueof (ret l '(1 2 3 4)
+             (= (call l 1 nil) '(34)))
+  :should be '(1 34))
+
 (test "writing list slice to nil deletes"
   :valueof (ret l '(1 2 3 4)
              (wipe (call l 1 3)))
