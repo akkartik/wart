@@ -29,12 +29,14 @@
     (if (<= end 0)
       (= end (+ n end)))
     (if
+      (and no.newlist (iso start 0) (>= end n))
+        (err "BUG: cannot delete entire list by writing to list slice")
+      (and no.newlist (iso start 0))
+        (do (= (car l) (nth end l))
+            (= (cdr l) (set-slice cdr.l 0 end nil)))
       (and newlist (iso start 0))
         (do (= (car l) car.newlist)
             (= (cdr l) (set-slice cdr.l 0 1-.end cdr.newlist)))
-      (and no.newlist (iso start 0))
-        (do (= (car l) (nth end l)) ; BUG: we can't delete entire l
-            (= (cdr l) (set-slice cdr.l 0 end nil)))
       :else
         (= (cdr l) (set-slice cdr.l 1-.start 1-.end newlist)))))
 
