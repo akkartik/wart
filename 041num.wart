@@ -21,7 +21,7 @@
 (def int(x ? base 10) :case (isa x 'string)
   (parse-integer x :radix base))
 
-(def str(x ? base 10) :case (isa x 'integer)
+(def str(x ? base 10) :type 'integer
   (write-to-string x :base base))
 
 
@@ -45,7 +45,7 @@
 
 
 (= epsilon* 1e-4)
-(def iso(a b) :case (isa a 'float)
+(def iso(a b) :case (or (isa a 'float) (isa b 'float))
   (> epsilon*
      (abs (- a b))))
 

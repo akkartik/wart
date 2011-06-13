@@ -22,7 +22,7 @@
 (defcoerce null hash-table
   [table])
 
-(def iso(x y) :case (isa x 'hash-table)
+(def iso(x y) :type 'hash-table
   (and (iso (length (keys x))
             (length (keys y)))
        (all
@@ -30,7 +30,7 @@
            (iso y.k v))
          (coerce x 'cons))))
 
-(def len(x) :case (isa x 'hash-table)
+(def len(x) :type 'hash-table
   (hash-table-count x))
 
 (ignore-redef

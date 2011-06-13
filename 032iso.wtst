@@ -2,7 +2,7 @@
   :valueof (iso nil nil)
   :should be t)
 
-(wt-eval '(def iso(x y) :case (isa x 'footype)
+(wt-eval '(def iso(x y) :type 'footype
             (and (position 3 rep.x)
                  (position 3 rep.y))))
 

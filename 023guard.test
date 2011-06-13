@@ -1,5 +1,6 @@
 (wt-eval '(def foodef(a b) a))
-(wt-eval '(def foodef(a b) :case (oddp a) b))
+(wt-eval '(def foodef(a b) :case (oddp a)
+            b))
 (test "guarded def clauses using :case"
   :valueof (list (foodef 33 2) (foodef 4 2))
   :should be (list 2 4))
@@ -9,3 +10,9 @@
 (test "guarded mac clauses using :case"
   :valueof (list (foomac2 3.67) (foomac2 3))
   :should be (list 6.67 4))
+
+(wt-eval '(def foodef(a b) :type 'string
+            b))
+(test "guarded def clauses using :type"
+  :valueof (list (foodef "abc" 2) (foodef 4 2))
+  :should be (list 2 4))

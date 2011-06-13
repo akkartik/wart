@@ -29,7 +29,7 @@
 (def testify(x)
   [iso _ x])
 
-(def testify(x) :case (isa x 'function)
+(def testify(x) :type 'function
   x)
 
 (def testify(x) :case (function-name-p x)

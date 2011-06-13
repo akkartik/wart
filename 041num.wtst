@@ -47,6 +47,10 @@
   :valueof (iso 4.2 4.200001)
   :should be t)
 
+(test "comparing floats works - 2"
+  :valueof (iso 4 4.000001)
+  :should be t)
+
 (test "fprec to 0 acts like round"
   :valueof (fprec 4.3 :places 0)
   :should be (float (round 4.3)))

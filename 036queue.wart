@@ -1,13 +1,13 @@
 (def queue()
   (annotate 'queue (list nil nil 0)))
 
-(def len(x) :case (isa x 'queue)
+(def len(x) :type 'queue
   rep.q.2)
 
 (defcoerce queue cons
   [car (rep _)])
 
-(def empty(x) :case (isa x 'queue)
+(def empty(x) :type 'queue
   (empty (as cons x)))
 
 (def enq(q elem)
