@@ -15,7 +15,7 @@
 (defcoerce character string
   str^list)
 
-(def join args :case (in (type car.args) 'character 'string)
+(def join args :type '(character string)
   (apply 'concatenate 'string (map 'str args)))
 
 (defcoerce cons string

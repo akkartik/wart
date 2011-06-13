@@ -29,3 +29,21 @@
 (test "wart-coerce works on user-defined types"
   :valueof (wart-coerce (annotate 'foo 34) 'bar)
   :should be '(tagged bar 35))
+
+
+
+(test "isa works"
+  :valueof (isa 4 'integer)
+  :should be t)
+
+(test "isa works with user-defined types - 1"
+  :valueof (isa (annotate 'foo 34) 'foo)
+  :should be t)
+
+(test "isa works with user-defined types - 2"
+  :valueof (isa (annotate 'foo 34) 'foo2)
+  :should be nil)
+
+(test "isa works with multiple type args"
+  :valueof (isa (annotate 'foo 34) '(integer foo))
+  :should be t)

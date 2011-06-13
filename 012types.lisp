@@ -52,7 +52,13 @@
            ,converter)))
 
 (defun isa(elem typ)
-  (eq typ (wart-type elem))) ; can't use eq because isa gets used in def :case later
+  (eq typ (wart-type elem)))
+
+(extend isa(elem types) :if (consp types)
+  (if (singlep types)
+    (isa elem (car types))
+    (or (isa elem (car types))
+        (isa elem (cdr types)))))
 
 
 
