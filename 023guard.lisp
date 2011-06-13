@@ -9,8 +9,11 @@
            (gethash ',name wart-signatures*))))
 
 (extend-macro def(name params &body body) :case (iso :type (car body))
-  `(def ,name ,params :case (isa ,(car params) ,(cadr body))
-     ,@(cddr body)))
+  (if (consp params)
+    `(def ,name ,params :case (isa ,(car params) ,(cadr body))
+       ,@(cddr body))
+    `(def ,name ,params :case (isa (car ,params) ,(cadr body))
+       ,@(cddr body))))
 
 (extend-macro mac(name params &body body) :case (iso :case (car body))
   `(extend-macro ,name ,params :case ,(cadr body)
