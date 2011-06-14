@@ -42,7 +42,7 @@
 
 (defun function-value(f)
   (cond
-    ((isa f 'function)  f)
+    ((isa f function)  f)
     ((function-name-p f)  (eval `(function ,f)))))
 
 (defun function-name-p(f)

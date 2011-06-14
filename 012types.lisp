@@ -51,14 +51,11 @@
      (setf (gethash ',src (gethash ',dest wart-coercions*))
            ,converter)))
 
-(defun isa(elem typ)
-  (eq typ (wart-type elem)))
+(defmacro isa(elem typ)
+  `(eq ',typ (wart-type ,elem)))
 
-(extend isa(elem types) :if (consp types)
-  (if (singlep types)
-    (isa elem (car types))
-    (or (isa elem (car types))
-        (isa elem (cdr types)))))
+(extend-macro isa(elem typ) :if (consp typ)
+  `(member (wart-type ,elem) ',typ))
 
 
 

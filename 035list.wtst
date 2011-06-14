@@ -210,7 +210,7 @@
   :valueof (map 'char-upcase #\a)
   :should be #\A)
 
-(wt-eval '(def map(f . seqs) :case (isa car.seqs 'footype)
+(wt-eval '(def map(f . seqs) :case (isa car.seqs footype)
             (apply 'map0 f (map0 'rep seqs))))
 (test "map works on user-defined types"
   :valueof (map 'len (annotate footype '((2 3) (3 4 4 6))))

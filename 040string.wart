@@ -90,5 +90,5 @@
                :else  (self cdr.cs toks (cons car.cs tok))))
     (rev (map str^rev (call rec (as cons s) nil nil)))))
 
-(def intersperse(x ys) :case (all [isa _ 'string] ys)
+(def intersperse(x ys) :case (all [isa _ string] ys)
   (intersperse x ys :as 'string))
