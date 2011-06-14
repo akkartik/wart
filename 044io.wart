@@ -31,7 +31,7 @@
 (def serialize(x) :type hash-table
   ; beware: all generics will see this as a hash, but only unserialize can handle it
   (annotate hash-table
-            (map 'serialize (coerce x 'cons))))
+            (map 'serialize (as cons x))))
 
 (def unserialize(x) :type hash-table
   (ret ans (table)

@@ -28,7 +28,7 @@
        (all
          (fn((k v))
            (iso y.k v))
-         (coerce x 'cons))))
+         (as cons x))))
 
 (def len(x) :type hash-table
   (hash-table-count x))
