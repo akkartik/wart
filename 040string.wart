@@ -15,7 +15,7 @@
 (defcoerce character string
   str^list)
 
-(def join args :type '(character string)
+(def join args :type (character string)
   (apply 'concatenate 'string (map 'str args)))
 
 (defcoerce cons string
@@ -29,18 +29,18 @@
   (map 'char-upcase s))
 (def upcase(s) :case (not stringp.s)
   (upcase str.s))
-(def upcase(s) :type 'null
+(def upcase(s) :type null
   nil)
-(def upcase(s) :type 'character
+(def upcase(s) :type character
   (char-upcase s))
 
 (def downcase(s)
   (map 'char-downcase s))
 (def downcase(s) :case (not stringp.s)
   (downcase str.s))
-(def downcase(s) :type 'null
+(def downcase(s) :type null
   nil)
-(def downcase(s) :type 'character
+(def downcase(s) :type character
   (char-downcase s))
 
 

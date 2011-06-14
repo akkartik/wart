@@ -10,9 +10,9 @@
 
 (extend-macro def(name params &body body) :case (iso :type (car body))
   (if (consp params)
-    `(def ,name ,params :case (isa ,(car params) ,(cadr body))
+    `(def ,name ,params :case (isa ,(car params) ',(cadr body))
        ,@(cddr body))
-    `(def ,name ,params :case (isa (car ,params) ,(cadr body))
+    `(def ,name ,params :case (isa (car ,params) ',(cadr body))
        ,@(cddr body))))
 
 (extend-macro mac(name params &body body) :case (iso :case (car body))

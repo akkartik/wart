@@ -61,7 +61,7 @@
 (def empty(x)
   (no x))
 
-(def testify(x) :type 'cons
+(def testify(x) :type cons
   [find _ x])
 
 (def wart-last(xs)

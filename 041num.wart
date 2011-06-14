@@ -18,10 +18,10 @@
 (defover int wart-int)
 (def int(x)
   (as integer x))
-(def int(x ? base 10) :type 'string
+(def int(x ? base 10) :type string
   (parse-integer x :radix base))
 
-(def str(x ? base 10) :type 'integer
+(def str(x ? base 10) :type integer
   (write-to-string x :base base))
 
 
