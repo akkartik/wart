@@ -16,7 +16,7 @@
   :should be (table a 1 b 2))
 
 (test "unserialize nests through lists"
-  :valueof (unserialize `(1 2 ,(annotate 'hash-table nil)))
+  :valueof (unserialize `(1 2 ,(annotate hash-table nil)))
   :should be `(1 2 ,(table)))
 
 (test "serialize nests though lists"
@@ -24,7 +24,7 @@
   :should be '((tagged hash-table nil)))
 
 (test "serialize nests through tables"
-  :valueof (alref 3 (rep (serialize (table 1 2 3 (annotate 'footype 34)))))
+  :valueof (alref 3 (rep (serialize (table 1 2 3 (annotate footype 34)))))
   :should be '((tagged footype 34)))
 
 (test "unserialize nests through tables"

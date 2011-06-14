@@ -7,8 +7,8 @@
                  (position 3 rep.y))))
 
 (test "new case for iso takes"
-  :valueof (annotate 'footype '(1 2 3))
-  :should be (annotate 'footype '(3 4 5)))
+  :valueof (annotate footype '(1 2 3))
+  :should be (annotate footype '(3 4 5)))
 
 (test "iso works on characters"
   :valueof (iso #\a #\a)

@@ -12,8 +12,8 @@
     (t  (generalized-common-lisp-type-specifier (type-of x)))))
 (defover type wart-type) ; reserved keyword. bad dog in the manger CL!
 
-(defun annotate(type val)
-  (list 'tagged type val))
+(defmacro annotate(type val)
+  `(list 'tagged ',type ,val))
 
 (defun rep(x)
   (if (match x '(tagged _ _))

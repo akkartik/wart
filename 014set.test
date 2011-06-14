@@ -31,12 +31,12 @@
   (push (+ index value) (rep f)))
 
 (test "defset augments setf behavior for new types"
-  :valueof (let ((f (annotate 'footype nil)))
+  :valueof (let ((f (annotate footype nil)))
              (setf (call f 3) 4)
              f)
   :should be '(tagged footype (7)))
 
 (test "set after defset returns rhs"
-  :valueof (let ((f (annotate 'footype nil)))
+  :valueof (let ((f (annotate footype nil)))
              (setf (call f 3) 4))
   :should be '(7))
