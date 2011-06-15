@@ -4,7 +4,7 @@
     using std::list;
     #include<iostream>
     typedef std::wistream istream;
-    using std::cerr;
+    #define cerr std::wcerr
     using std::endl;
     #include<sstream>
     typedef std::wstringstream stringstream;
