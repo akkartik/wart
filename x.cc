@@ -4,9 +4,9 @@ typedef std::wstring string;
 #include<list>
 using std::list;
 #include<iostream>
-using std::istream;
+typedef std::wistream istream;
 #include<sstream>
-using std::stringstream;
+typedef std::wstringstream stringstream;
 
 int numFailures = 0;
 
@@ -39,7 +39,7 @@ list<ParenToken> parseParens(istream& in) {
 }
 
 void test_emptyInput() {
-  stringstream ss("");
+  stringstream ss(L"");
   check(parseParens(ss).empty());
 }
 
