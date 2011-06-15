@@ -31,7 +31,7 @@
 
 
 
-//// insert explicit parens
+//// insert explicit parens (and tokenize in the process)
 
 enum ParenTokenType {
   TOKEN,
@@ -64,27 +64,33 @@ ostream& operator<<(ostream& os, ParenToken p) {
 }
 
     void skipWhitespace(istream& in) {
-      char curr;
+      char curr, dummy;
+      in >> std::noskipws;
       while ((curr = in.peek()) == L' '
               || curr == L'\t')
-        in >> curr;
+        in >> dummy;
+      in >> std::skipws;
     }
 
-    ParenToken nextParenToken(istream& in) {
-      ParenToken result;
-      string s;
-      in >> s;
-      result.token = s;
-      return result;
+    bool eof(istream& in) {
+      in.peek();
+      return in.eof();
     }
 
-list<ParenToken> parseParens(istream& in) {
-  static ParenToken prev(START_OF_LINE);
-  list<ParenToken> result;
+ParenToken parseToken(istream& in) {
+  ParenToken result;
 
   skipWhitespace(in);
-  while (!in.eof())
-    result.push_back(nextParenToken(in));
+  string s;
+  in >> s;
+  result.token = s;
+  return result;
+}
+
+list<ParenToken> parseParens(istream& in) {
+  list<ParenToken> result;
+  while (!eof(in))
+    result.push_back(parseToken(in));
   return result;
 }
 
