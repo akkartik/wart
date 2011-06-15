@@ -1,5 +1,12 @@
 #include<stdio.h>
 #include<string>
+using std::string;
+#include<list>
+using std::list;
+#include<iostream>
+using std::istream;
+#include<sstream>
+using std::stringstream;
 
 int numFailures = 0;
 
@@ -8,12 +15,32 @@ int numFailures = 0;
 
 
 
-void test1() {
-  check(2+1 == 2);
+//// insert explicit parens
+
+enum ParenTokenType {
+  TOKEN,
+  START_OF_LINE,
+  INDENT,
+  OUTDENT,
+  STRING,
+};
+
+struct ParenToken {
+  ParenTokenType code;
+  string token;
+  ParenToken(string x) :token(x) {}
+  ParenToken(ParenTokenType x) :code(x) {}
+};
+
+list<ParenToken> parseParens(istream& in) {
+  static ParenToken prev(START_OF_LINE);
+  list<ParenToken> result;
+  return result;
 }
 
-void test2() {
-  check(1+1 == 2);
+void test_emptyInput() {
+  stringstream ss("");
+  check(parseParens(ss).empty());
 }
 
 
