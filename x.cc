@@ -8,6 +8,10 @@ typedef std::wistream istream;
 #include<sstream>
 typedef std::wstringstream stringstream;
 
+// This must come after system includes.
+typedef char ascii;
+#define char wchar_t
+
 int numFailures = 0;
 
 #define check(X) if (!(X)) { ++numFailures; fprintf(stderr, "F %s: %s\n", __FUNCTION__, #X); } \
@@ -64,7 +68,7 @@ void runTests() {
   }
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, ascii* argv[]) {
   if (argc == 1) return 0;
   std::string arg1(argv[1]);
   if (arg1 == "test") {
