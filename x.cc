@@ -32,19 +32,49 @@ enum ParenTokenType {
 struct ParenToken {
   ParenTokenType code;
   string token;
+
+  ParenToken(){}
   ParenToken(string x) :token(x) {}
   ParenToken(ParenTokenType x) :code(x) {}
+
+  bool operator==(string x) {
+    return token == x;
+  }
 };
+
+    void skipWhitespace(istream& in) {
+      char curr;
+      while ((curr = in.peek()) == L' '
+              || curr == L'\t')
+        in >> curr;
+    }
+
+    ParenToken nextParenToken(istream& in) {
+      ParenToken result;
+      string s;
+      in >> s;
+      result.token = s;
+      return result;
+    }
 
 list<ParenToken> parseParens(istream& in) {
   static ParenToken prev(START_OF_LINE);
   list<ParenToken> result;
+
+  skipWhitespace(in);
+  if (!in.eof())
+    result.push_back(nextParenToken(in));
   return result;
 }
 
 void test_emptyInput() {
   stringstream ss(L"");
   check(parseParens(ss).empty());
+}
+
+void test_atom() {
+  stringstream ss(L"34");
+  check(parseParens(ss).front() == L"34");
 }
 
 
