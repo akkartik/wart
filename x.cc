@@ -1,6 +1,6 @@
 #include<stdio.h>
 #include<string>
-using std::string;
+typedef std::wstring string;
 #include<list>
 using std::list;
 #include<iostream>
