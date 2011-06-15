@@ -62,7 +62,7 @@ list<ParenToken> parseParens(istream& in) {
   list<ParenToken> result;
 
   skipWhitespace(in);
-  if (!in.eof())
+  while (!in.eof())
     result.push_back(nextParenToken(in));
   return result;
 }
@@ -75,6 +75,13 @@ void test_emptyInput() {
 void test_atom() {
   stringstream ss(L"34");
   check(parseParens(ss).front() == L"34");
+}
+
+void test_multiple_atoms() {
+  list<ParenToken> ast = parseParens(*new stringstream(L"34 abc"));
+  check(ast.size() == 2);
+  check(ast.front() == L"34");
+  check(ast.back() == L"abc");
 }
 
 
