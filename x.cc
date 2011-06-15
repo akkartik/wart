@@ -1,10 +1,11 @@
-#include<stdio.h>
 #include<string>
 typedef std::wstring string;
 #include<list>
 using std::list;
 #include<iostream>
 typedef std::wistream istream;
+using std::cerr;
+using std::endl;
 #include<sstream>
 typedef std::wstringstream stringstream;
 
@@ -14,8 +15,12 @@ typedef char ascii;
 
 int numFailures = 0;
 
-#define check(X) if (!(X)) { ++numFailures; fprintf(stderr, "F %s: %s\n", __FUNCTION__, #X); } \
-  else { fprintf(stderr, "."); fflush(stderr); }
+#define check(X) if (!(X)) { \
+    ++numFailures; \
+    cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
+    cerr << "  got " << (X) << endl; \
+  } \
+  else { cerr << "."; fflush(stderr); }
 
 
 
@@ -96,13 +101,12 @@ void runTests() {
   for (int i = 0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
     (*tests[i])();
   }
-  fprintf(stderr, "\n");
-  if (numFailures > 1) {
-    fprintf(stderr, "%d failures\n", numFailures);
-  }
-  else if (numFailures == 1) {
-    fprintf(stderr, "1 failure\n");
-  }
+  cerr << endl;
+  if (numFailures == 0) return;
+
+  cerr << numFailures << " failure";
+      if (numFailures > 1) { cerr << "s"; }
+      cerr << endl;
 }
 
 int main(int argc, ascii* argv[]) {
