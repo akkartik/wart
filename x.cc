@@ -1,26 +1,26 @@
-#include<string>
-typedef std::wstring string;
-#include<list>
-using std::list;
-#include<iostream>
-typedef std::wistream istream;
-using std::cerr;
-using std::endl;
-#include<sstream>
-typedef std::wstringstream stringstream;
+    #include<string>
+    typedef std::wstring string;
+    #include<list>
+    using std::list;
+    #include<iostream>
+    typedef std::wistream istream;
+    using std::cerr;
+    using std::endl;
+    #include<sstream>
+    typedef std::wstringstream stringstream;
 
-// This must come after system includes.
-typedef char ascii;
-#define char wchar_t
+    // This must come after system includes.
+    typedef char ascii;
+    #define char wchar_t
 
-int numFailures = 0;
+    int numFailures = 0;
 
-#define check(X) if (!(X)) { \
-    ++numFailures; \
-    cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
-    cerr << "  got " << (X) << endl; \
-  } \
-  else { cerr << "."; fflush(stderr); }
+    #define check(X) if (!(X)) { \
+        ++numFailures; \
+        cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
+        cerr << "  got " << (X) << endl; \
+      } \
+      else { cerr << "."; fflush(stderr); }
 
 
 
