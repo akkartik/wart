@@ -20,7 +20,9 @@ void test2() {
 
 typedef void (*testfunc)(void);
 
-const testfunc tests[] = {test1, test2,};
+const testfunc tests[] = {
+  #include"test_list"
+};
 
 void runTests() {
   for (int i = 0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
