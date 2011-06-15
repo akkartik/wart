@@ -4,6 +4,7 @@
     using std::list;
     #include<iostream>
     typedef std::wistream istream;
+    typedef std::wostream ostream;
     #define cerr std::wcerr
     using std::endl;
     #include<sstream>
@@ -18,6 +19,12 @@
     #define check(X) if (!(X)) { \
         ++numFailures; \
         cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
+      } \
+      else { cerr << "."; fflush(stderr); }
+
+    #define check_eq(X, Y) if ((X) != (Y)) { \
+        ++numFailures; \
+        cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
         cerr << "  got " << (X) << endl; \
       } \
       else { cerr << "."; fflush(stderr); }
@@ -45,7 +52,16 @@ struct ParenToken {
   bool operator==(string x) {
     return token == x;
   }
+  bool operator!=(string x) {
+    return !(*this == x);
+  }
 };
+
+ostream& operator<<(ostream& os, ParenToken p) {
+  if (p.code == TOKEN) os << p.code;
+  else os << p.token;
+  return os;
+}
 
     void skipWhitespace(istream& in) {
       char curr;
@@ -79,14 +95,14 @@ void test_emptyInput() {
 
 void test_atom() {
   stringstream ss(L"34");
-  check(parseParens(ss).front() == L"34");
+  check_eq(parseParens(ss).front(), L"34");
 }
 
 void test_multiple_atoms() {
   list<ParenToken> ast = parseParens(*new stringstream(L"34 abc"));
-  check(ast.size() == 2);
-  check(ast.front() == L"34");
-  check(ast.back() == L"abc");
+  check_eq(ast.size(), 2);
+  check_eq(ast.front(), L"34");
+  check_eq(ast.back(), L"abc");
 }
 
 
