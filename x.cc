@@ -83,7 +83,6 @@ ostream& operator<<(ostream& os, Token p) {
 
     // slurp functions are for reading a kind of token when you know
     Token slurpWord(istream& in) {
-      Token result;
       ostringstream out;
       while (!eof(in)) {
         char c;
@@ -96,7 +95,7 @@ ostream& operator<<(ostream& os, Token p) {
         out << c;
       }
 
-      result.token = out.rdbuf()->str();
+      Token result(out.rdbuf()->str());
       return result;
     }
 
