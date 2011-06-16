@@ -123,10 +123,9 @@ Token parseToken(istream& in) {
   ostringstream out;
 
   switch (in.peek()) {
-    case L'\n': {
+    case L'\n':
       skip(in);
       return Token::of(START_OF_LINE);
-    }
 
     case L'"':
       slurpString(in, out); break;
