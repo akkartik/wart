@@ -77,7 +77,7 @@ ostream& operator<<(ostream& os, Token p) {
       return in.eof();
     }
 
-    // slurp functions are for reading a kind of token when you know
+    // slurp functions read a token when you're sure to be at it
     Token slurpWord(istream& in) {
       ostringstream out;
       while (!eof(in)) {
