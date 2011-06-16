@@ -119,12 +119,17 @@ ostream& operator<<(ostream& os, Token p) {
     }
 
 Token parseToken(istream& in) {
+  static TokenType prev = START_OF_LINE;
+start_parse:
   skipWhitespace(in);
   ostringstream out;
 
   switch (in.peek()) {
     case L'\n':
       skip(in);
+      if (prev == START_OF_LINE)
+        goto start_parse;
+      prev = START_OF_LINE;
       return Token::of(START_OF_LINE);
 
     case L'"':
@@ -136,6 +141,7 @@ Token parseToken(istream& in) {
     default:
       slurpWord(in, out); break;
   }
+  prev = TOKEN;
   return Token::of(out.rdbuf()->str());
 }
 
@@ -187,6 +193,13 @@ void test_strings_with_spaces() {
 
 void test_strings_with_escapes() {
   list<Token> ast = tokenize(*new stringstream(L"34\n\"abc \\\"quote def\""));
+  check_eq(ast.size(), 3);
+  check_eq(ast.front(), L"34");
+  check_eq(ast.back(), L"\"abc \\\"quote def\"");
+}
+
+void test_repeated_newlines() {
+  list<Token> ast = tokenize(*new stringstream(L"34\n\n\"abc \\\"quote def\""));
   check_eq(ast.size(), 3);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"\"abc \\\"quote def\"");
