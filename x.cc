@@ -70,9 +70,7 @@ ostream& operator<<(ostream& os, Token p) {
     }
 
     void skipWhitespace(istream& in) {
-      char curr;
-      while ((curr = in.peek()) != L'\n'
-              && isspace(curr))
+      while (isspace(in.peek()) && in.peek() != L'\n')
         skip(in);
     }
 
