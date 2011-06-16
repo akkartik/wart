@@ -98,16 +98,14 @@ ostream& operator<<(ostream& os, Token p) {
     }
 
 Token parseToken(istream& in) {
-  Token result;
-
   skipWhitespace(in);
-  if (eof(in)) return result;
 
   switch (in.peek()) {
-    case L'\n':
+    case L'\n': {
       skip(in);
-      result.code == START_OF_LINE;
+      Token result(START_OF_LINE);
       return result;
+    }
     case L'(':
     case L')':
     case L'"':
