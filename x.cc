@@ -143,8 +143,13 @@ start_parse:
     case L'(':
     case L')':
     case L'\'':
-    case L',':
       slurpChar(in, out); break;
+
+    case L',':
+      slurpChar(in, out);
+      if (in.peek() == L'@')
+        slurpChar(in, out);
+      break;
 
     default:
       slurpWord(in, out); break;
@@ -218,6 +223,13 @@ void test_quotes_commas_parens_are_separate_tokens() {
   check_eq(ast.size(), 4);
   check_eq(ast.front(), L"(");
   check_eq(ast.back(), L")");
+}
+
+void test_splice_operator_is_one_token() {
+  list<Token> ast = tokenize(*new stringstream(L"()',@"));
+  check_eq(ast.size(), 4);
+  check_eq(ast.front(), L"(");
+  check_eq(ast.back(), L",@");
 }
 
 
