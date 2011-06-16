@@ -95,6 +95,21 @@ ostream& operator<<(ostream& os, Token p) {
       return result;
     }
 
+    Token slurpString(istream& in) {
+      ostringstream out;
+      char c;
+      in >> c; out << c; // initial quote
+      while (!eof(in)) {
+        in >> c; out << c;
+        if (c == L'"') {
+          break;
+        }
+      }
+
+      Token result(out.rdbuf()->str());
+      return result;
+    }
+
 Token parseToken(istream& in) {
   skipWhitespace(in);
 
@@ -104,9 +119,12 @@ Token parseToken(istream& in) {
       Token result(START_OF_LINE);
       return result;
     }
+
+    case L'"':
+      return slurpString(in);
+
     case L'(':
     case L')':
-    case L'"':
     case L'\'':
     default:
       return slurpWord(in);
