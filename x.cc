@@ -123,6 +123,18 @@ ostream& operator<<(ostream& os, Token p) {
       }
     }
 
+    void slurpComment(istream& in, ostream& out) {
+      char c;
+      while (!eof(in)) {
+        in >> c;
+        if (c == L'\n') {
+          in.putback(c);
+          break;
+        }
+        out << c;
+      }
+    }
+
 Token parseToken(istream& in) {
   static TokenType prev = START_OF_LINE;
 start_parse:
@@ -150,6 +162,9 @@ start_parse:
       if (in.peek() == L'@')
         slurpChar(in, out);
       break;
+
+    case L';':
+      slurpComment(in, out); break;
 
     default:
       slurpWord(in, out); break;
@@ -230,6 +245,19 @@ void test_splice_operator_is_one_token() {
   check_eq(ast.size(), 4);
   check_eq(ast.front(), L"(");
   check_eq(ast.back(), L",@");
+}
+
+void test_comments_are_single_token() {
+  list<Token> ast = tokenize(*new stringstream(L"()',@ ;abc def ghi"));
+  check_eq(ast.size(), 5);
+  check_eq(ast.front(), L"(");
+  check_eq(ast.back(), L";abc def ghi");
+}
+
+void test_comments_end_at_newline() {
+  list<Token> ast = tokenize(*new stringstream(L";abc def ghi\nabc"));
+  check_eq(ast.size(), 3);
+  check_eq(ast.front(), L";abc def ghi");
 }
 
 
