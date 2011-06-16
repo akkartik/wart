@@ -32,9 +32,9 @@
 
 
 
-//// insert explicit parens (and tokenize in the process)
+//// tokenize. newlines and indent matter.
 
-enum ParenTokenType {
+enum TokenType {
   TOKEN,
   START_OF_LINE,
   INDENT,
@@ -42,13 +42,13 @@ enum ParenTokenType {
   STRING,
 };
 
-struct ParenToken {
-  ParenTokenType code;
+struct Token {
+  TokenType code;
   string token;
 
-  ParenToken() :code(TOKEN) {}
-  ParenToken(string x) :token(x), code(TOKEN) {}
-  ParenToken(ParenTokenType x) :code(x) {}
+  Token() :code(TOKEN) {}
+  Token(string x) :token(x), code(TOKEN) {}
+  Token(TokenType x) :code(x) {}
 
   bool operator==(string x) {
     return token == x;
@@ -58,7 +58,7 @@ struct ParenToken {
   }
 };
 
-ostream& operator<<(ostream& os, ParenToken p) {
+ostream& operator<<(ostream& os, Token p) {
   if (p.code == TOKEN) os << p.code;
   else os << p.token;
   return os;
@@ -82,8 +82,8 @@ ostream& operator<<(ostream& os, ParenToken p) {
     }
 
     // slurp functions are for reading a kind of token when you know
-    ParenToken slurpWord(istream& in) {
-      ParenToken result;
+    Token slurpWord(istream& in) {
+      Token result;
       ostringstream out;
       while (!eof(in)) {
         char c;
@@ -100,8 +100,8 @@ ostream& operator<<(ostream& os, ParenToken p) {
       return result;
     }
 
-ParenToken parseToken(istream& in) {
-  ParenToken result;
+Token parseToken(istream& in) {
+  Token result;
 
   skipWhitespace(in);
   if (eof(in)) return result;
@@ -120,9 +120,9 @@ ParenToken parseToken(istream& in) {
   }
 }
 
-list<ParenToken> parseParens(istream& in) {
+list<Token> parseParens(istream& in) {
   in >> std::noskipws;
-  list<ParenToken> result;
+  list<Token> result;
   while (!eof(in))
     result.push_back(parseToken(in));
   return result;
@@ -139,21 +139,21 @@ void test_atom() {
 }
 
 void test_multiple_atoms() {
-  list<ParenToken> ast = parseParens(*new stringstream(L"34 abc"));
+  list<Token> ast = parseParens(*new stringstream(L"34 abc"));
   check_eq(ast.size(), 2);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"abc");
 }
 
 void test_string_literals() {
-  list<ParenToken> ast = parseParens(*new stringstream(L"34 \"abc\""));
+  list<Token> ast = parseParens(*new stringstream(L"34 \"abc\""));
   check_eq(ast.size(), 2);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"\"abc\"");
 }
 
 void test_multiple_lines() {
-  list<ParenToken> ast = parseParens(*new stringstream(L"34\n\"abc\""));
+  list<Token> ast = parseParens(*new stringstream(L"34\n\"abc\""));
   check_eq(ast.size(), 3);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"\"abc\"");
