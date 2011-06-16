@@ -42,11 +42,11 @@ enum TokenType {
 };
 
 struct Token {
-  const TokenType code;
+  const TokenType type;
   const string token;
 
-  Token(const string x) :token(x), code(TOKEN) {}
-  Token(TokenType x) :code(x) {}
+  Token(const string x) :token(x), type(TOKEN) {}
+  Token(TokenType x) :type(x) {}
 
   // static convenience methods are more concisely used without new than constructors
   static Token of(TokenType t) {
@@ -60,10 +60,10 @@ struct Token {
   }
 
   bool operator==(string x) {
-    return code == TOKEN && token == x;
+    return type == TOKEN && token == x;
   }
   bool operator==(TokenType x) {
-    return code == x;
+    return type == x;
   }
   bool operator!=(string x) {
     return !(*this == x);
@@ -74,7 +74,7 @@ struct Token {
 };
 
 ostream& operator<<(ostream& os, Token p) {
-  if (p.code != TOKEN) os << p.code;
+  if (p.type != TOKEN) os << p.type;
   else os << p.token;
   return os;
 }
