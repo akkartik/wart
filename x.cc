@@ -91,8 +91,7 @@ ostream& operator<<(ostream& os, Token p) {
     }
 
     // slurp functions read a token when you're sure to be at it
-    Token slurpWord(istream& in) {
-      ostringstream out;
+    void slurpWord(istream& in, ostream& out) {
       while (!eof(in)) {
         char c;
         in >> c;
@@ -103,12 +102,9 @@ ostream& operator<<(ostream& os, Token p) {
 
         out << c;
       }
-
-      return Token::of(out.rdbuf()->str());
     }
 
-    Token slurpString(istream& in) {
-      ostringstream out;
+    void slurpString(istream& in, ostream& out) {
       char c;
       in >> c; out << c; // initial quote
       while (!eof(in)) {
@@ -120,12 +116,11 @@ ostream& operator<<(ostream& os, Token p) {
           break;
         }
       }
-
-      return Token::of(out.rdbuf()->str());
     }
 
 Token parseToken(istream& in) {
   skipWhitespace(in);
+  ostringstream out;
 
   switch (in.peek()) {
     case L'\n': {
@@ -134,14 +129,15 @@ Token parseToken(istream& in) {
     }
 
     case L'"':
-      return slurpString(in);
+      slurpString(in, out); break;
 
     case L'(':
     case L')':
     case L'\'':
     default:
-      return slurpWord(in);
+      slurpWord(in, out); break;
   }
+  return Token::of(out.rdbuf()->str());
 }
 
 list<Token> tokenize(istream& in) {
