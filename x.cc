@@ -71,8 +71,8 @@ ostream& operator<<(ostream& os, ParenToken p) {
 
     void skipWhitespace(istream& in) {
       char curr;
-      while ((curr = in.peek()) == L' '
-              || curr == L'\t')
+      while ((curr = in.peek()) != L'\n'
+              && isspace(curr))
         skip(in);
     }
 
@@ -87,19 +87,25 @@ ParenToken parseToken(istream& in) {
   ostringstream s;
 
   skipWhitespace(in);
+  if (eof(in)) return result;
+
+  if (in.peek() == L'\n') {
+    skip(in);
+    result.code == START_OF_LINE;
+    return result;
+  }
+
   while (!eof(in)) {
     char c;
     in >> c;
-    switch(c) {
-      case L'\r':
-      case L'\n':
-      case L' ': case L'\t':
-        goto token_done;
-      default:
-        s << c;
+    if (isspace(c)) {
+      in.putback(c);
+      break;
     }
+
+    s << c;
   }
-token_done:
+
   result.token = s.rdbuf()->str();
   return result;
 }
@@ -132,6 +138,13 @@ void test_multiple_atoms() {
 void test_string_literals() {
   list<ParenToken> ast = parseParens(*new stringstream(L"34 \"abc\""));
   check_eq(ast.size(), 2);
+  check_eq(ast.front(), L"34");
+  check_eq(ast.back(), L"\"abc\"");
+}
+
+void test_multiple_lines() {
+  list<ParenToken> ast = parseParens(*new stringstream(L"34\n\"abc\""));
+  check_eq(ast.size(), 3);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"\"abc\"");
 }
