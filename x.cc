@@ -46,8 +46,8 @@ struct ParenToken {
   ParenTokenType code;
   string token;
 
-  ParenToken(){}
-  ParenToken(string x) :token(x) {}
+  ParenToken() :code(TOKEN) {}
+  ParenToken(string x) :token(x), code(TOKEN) {}
   ParenToken(ParenTokenType x) :code(x) {}
 
   bool operator==(string x) {
