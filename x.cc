@@ -46,7 +46,6 @@ struct Token {
   TokenType code;
   string token;
 
-  Token() :code(TOKEN) {}
   Token(string x) :token(x), code(TOKEN) {}
   Token(TokenType x) :code(x) {}
 
