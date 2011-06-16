@@ -64,11 +64,16 @@ ostream& operator<<(ostream& os, ParenToken p) {
   return os;
 }
 
+    void skip(istream& in) {
+      char dummy;
+      in >> dummy;
+    }
+
     void skipWhitespace(istream& in) {
-      char curr, dummy;
+      char curr;
       while ((curr = in.peek()) == L' '
               || curr == L'\t')
-        in >> dummy;
+        skip(in);
     }
 
     bool eof(istream& in) {
