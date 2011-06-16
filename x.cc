@@ -39,7 +39,6 @@ enum TokenType {
   START_OF_LINE,
   INDENT,
   OUTDENT,
-  STRING,
 };
 
 struct Token {
@@ -50,7 +49,7 @@ struct Token {
   Token(TokenType x) :code(x) {}
 
   bool operator==(string x) {
-    return token == x;
+    return code == TOKEN && token == x;
   }
   bool operator!=(string x) {
     return !(*this == x);
