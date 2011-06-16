@@ -91,6 +91,11 @@ ostream& operator<<(ostream& os, Token p) {
     }
 
     // slurp functions read a token when you're sure to be at it
+    void slurpChar(istream& in, ostream& out) {
+      char c;
+      in >> c; out << c;
+    }
+
     void slurpWord(istream& in, ostream& out) {
       while (!eof(in)) {
         char c;
@@ -105,12 +110,12 @@ ostream& operator<<(ostream& os, Token p) {
     }
 
     void slurpString(istream& in, ostream& out) {
+      slurpChar(in, out); // initial quote
       char c;
-      in >> c; out << c; // initial quote
       while (!eof(in)) {
         in >> c; out << c;
         if (c == L'\\') {
-          in >> c; out << c; // blindly read next
+          slurpChar(in, out); // blindly read next
         }
         else if (c == L'"') {
           break;
@@ -138,6 +143,9 @@ start_parse:
     case L'(':
     case L')':
     case L'\'':
+    case L',':
+      slurpChar(in, out); break;
+
     default:
       slurpWord(in, out); break;
   }
@@ -203,6 +211,13 @@ void test_repeated_newlines() {
   check_eq(ast.size(), 3);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"\"abc \\\"quote def\"");
+}
+
+void test_quotes_commas_parens_are_separate_tokens() {
+  list<Token> ast = tokenize(*new stringstream(L"(',)"));
+  check_eq(ast.size(), 4);
+  check_eq(ast.front(), L"(");
+  check_eq(ast.back(), L")");
 }
 
 
