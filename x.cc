@@ -9,6 +9,7 @@
     using std::endl;
     #include<sstream>
     typedef std::wstringstream stringstream;
+    typedef std::wostringstream ostringstream;
 
     // This must come after system includes.
     typedef char ascii;
@@ -65,11 +66,9 @@ ostream& operator<<(ostream& os, ParenToken p) {
 
     void skipWhitespace(istream& in) {
       char curr, dummy;
-      in >> std::noskipws;
       while ((curr = in.peek()) == L' '
               || curr == L'\t')
         in >> dummy;
-      in >> std::skipws;
     }
 
     bool eof(istream& in) {
@@ -78,16 +77,30 @@ ostream& operator<<(ostream& os, ParenToken p) {
     }
 
 ParenToken parseToken(istream& in) {
+  static ParenToken prev(START_OF_LINE);
   ParenToken result;
+  ostringstream s;
 
   skipWhitespace(in);
-  string s;
-  in >> s;
-  result.token = s;
+  while (!eof(in)) {
+    char c;
+    in >> c;
+    switch(c) {
+      case L'\r':
+      case L'\n':
+      case L' ': case L'\t':
+        goto token_done;
+      default:
+        s << c;
+    }
+  }
+token_done:
+  result.token = s.rdbuf()->str();
   return result;
 }
 
 list<ParenToken> parseParens(istream& in) {
+  in >> std::noskipws;
   list<ParenToken> result;
   while (!eof(in))
     result.push_back(parseToken(in));
@@ -109,6 +122,13 @@ void test_multiple_atoms() {
   check_eq(ast.size(), 2);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"abc");
+}
+
+void test_string_literals() {
+  list<ParenToken> ast = parseParens(*new stringstream(L"34 \"abc\""));
+  check_eq(ast.size(), 2);
+  check_eq(ast.front(), L"34");
+  check_eq(ast.back(), L"\"abc\"");
 }
 
 

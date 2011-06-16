@@ -1,3 +1,4 @@
 test_emptyInput,
 test_atom,
 test_multiple_atoms,
+test_string_literals,
