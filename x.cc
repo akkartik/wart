@@ -110,7 +110,7 @@ ostream& operator<<(ostream& os, Token p) {
       while (!eof(in)) {
         in >> c; out << c;
         if (c == L'\\') {
-          in >> c; out << c;
+          in >> c; out << c; // blindly read next
         }
         else if (c == L'"') {
           break;
