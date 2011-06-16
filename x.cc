@@ -57,7 +57,7 @@ struct Token {
 };
 
 ostream& operator<<(ostream& os, Token p) {
-  if (p.code == TOKEN) os << p.code;
+  if (p.code != TOKEN) os << p.code;
   else os << p.token;
   return os;
 }
@@ -150,6 +150,13 @@ void test_multiple_lines() {
   check_eq(ast.size(), 3);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"\"abc\"");
+}
+
+void test_strings_with_spaces() {
+  list<Token> ast = tokenize(*new stringstream(L"34\n\"abc def\""));
+  check_eq(ast.size(), 3);
+  check_eq(ast.front(), L"34");
+  check_eq(ast.back(), L"\"abc def\"");
 }
 
 
