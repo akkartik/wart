@@ -115,7 +115,7 @@ Token parseToken(istream& in) {
   }
 }
 
-list<Token> parseParens(istream& in) {
+list<Token> tokenize(istream& in) {
   in >> std::noskipws;
   list<Token> result;
   while (!eof(in))
@@ -125,30 +125,30 @@ list<Token> parseParens(istream& in) {
 
 void test_emptyInput() {
   stringstream ss(L"");
-  check(parseParens(ss).empty());
+  check(tokenize(ss).empty());
 }
 
 void test_atom() {
   stringstream ss(L"34");
-  check_eq(parseParens(ss).front(), L"34");
+  check_eq(tokenize(ss).front(), L"34");
 }
 
 void test_multiple_atoms() {
-  list<Token> ast = parseParens(*new stringstream(L"34 abc"));
+  list<Token> ast = tokenize(*new stringstream(L"34 abc"));
   check_eq(ast.size(), 2);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"abc");
 }
 
 void test_string_literals() {
-  list<Token> ast = parseParens(*new stringstream(L"34 \"abc\""));
+  list<Token> ast = tokenize(*new stringstream(L"34 \"abc\""));
   check_eq(ast.size(), 2);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"\"abc\"");
 }
 
 void test_multiple_lines() {
-  list<Token> ast = parseParens(*new stringstream(L"34\n\"abc\""));
+  list<Token> ast = tokenize(*new stringstream(L"34\n\"abc\""));
   check_eq(ast.size(), 3);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"\"abc\"");
