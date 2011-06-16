@@ -41,12 +41,13 @@ enum TokenType {
   OUTDENT,
 };
 
+const string dummy_token = L"";
 struct Token {
   TokenType code;
-  string token;
+  const string& token;
 
-  Token(string x) :token(x), code(TOKEN) {}
-  Token(TokenType x) :code(x) {}
+  Token(const string x) :token(x), code(TOKEN) { cerr << "0\n"; cerr << x << endl; cerr.flush(); }
+  Token(TokenType x) :code(x), token(dummy_token) { cerr << "1\n"; cerr.flush(); }
 
   bool operator==(string x) {
     return code == TOKEN && token == x;
