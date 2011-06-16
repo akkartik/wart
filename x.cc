@@ -180,3 +180,11 @@ int main(int argc, ascii* argv[]) {
   }
   return 0;
 }
+
+// style:
+//  wide unicode strings everywhere
+//  no function prototypes
+//  indented functions are deemphasized, would be pushed farther down if C permitted
+//  no new except in tests
+//  minimal STL
+//  immutable objects; copy everywhere; no references or pointers
