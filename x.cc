@@ -81,33 +81,43 @@ ostream& operator<<(ostream& os, ParenToken p) {
       return in.eof();
     }
 
+    // slurp functions are for reading a kind of token when you know
+    ParenToken slurpWord(istream& in) {
+      ParenToken result;
+      ostringstream out;
+      while (!eof(in)) {
+        char c;
+        in >> c;
+        if (isspace(c)) {
+          in.putback(c);
+          break;
+        }
+
+        out << c;
+      }
+
+      result.token = out.rdbuf()->str();
+      return result;
+    }
+
 ParenToken parseToken(istream& in) {
-  static ParenToken prev(START_OF_LINE);
   ParenToken result;
-  ostringstream s;
 
   skipWhitespace(in);
   if (eof(in)) return result;
 
-  if (in.peek() == L'\n') {
-    skip(in);
-    result.code == START_OF_LINE;
-    return result;
+  switch (in.peek()) {
+    case L'\n':
+      skip(in);
+      result.code == START_OF_LINE;
+      return result;
+    case L'(':
+    case L')':
+    case L'"':
+    case L'\'':
+    default:
+      return slurpWord(in);
   }
-
-  while (!eof(in)) {
-    char c;
-    in >> c;
-    if (isspace(c)) {
-      in.putback(c);
-      break;
-    }
-
-    s << c;
-  }
-
-  result.token = s.rdbuf()->str();
-  return result;
 }
 
 list<ParenToken> parseParens(istream& in) {
