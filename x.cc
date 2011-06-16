@@ -42,11 +42,22 @@ enum TokenType {
 };
 
 struct Token {
-  TokenType code;
+  const TokenType code;
   const string token;
 
   Token(const string x) :token(x), code(TOKEN) {}
   Token(TokenType x) :code(x) {}
+
+  // static convenience methods are more concisely used without new than constructors
+  static Token of(TokenType t) {
+    Token result(t);
+    return result;
+  }
+
+  static Token of(string s) {
+    Token result(s);
+    return result;
+  }
 
   bool operator==(string x) {
     return code == TOKEN && token == x;
@@ -61,6 +72,8 @@ ostream& operator<<(ostream& os, Token p) {
   else os << p.token;
   return os;
 }
+
+
 
     void skip(istream& in) {
       char dummy;
@@ -91,8 +104,7 @@ ostream& operator<<(ostream& os, Token p) {
         out << c;
       }
 
-      Token result(out.rdbuf()->str());
-      return result;
+      return Token::of(out.rdbuf()->str());
     }
 
     Token slurpString(istream& in) {
@@ -109,8 +121,7 @@ ostream& operator<<(ostream& os, Token p) {
         }
       }
 
-      Token result(out.rdbuf()->str());
-      return result;
+      return Token::of(out.rdbuf()->str());
     }
 
 Token parseToken(istream& in) {
@@ -119,8 +130,7 @@ Token parseToken(istream& in) {
   switch (in.peek()) {
     case L'\n': {
       skip(in);
-      Token result(START_OF_LINE);
-      return result;
+      return Token::of(START_OF_LINE);
     }
 
     case L'"':
