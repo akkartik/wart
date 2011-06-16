@@ -62,7 +62,13 @@ struct Token {
   bool operator==(string x) {
     return code == TOKEN && token == x;
   }
+  bool operator==(TokenType x) {
+    return code == x;
+  }
   bool operator!=(string x) {
+    return !(*this == x);
+  }
+  bool operator!=(TokenType x) {
     return !(*this == x);
   }
 };
@@ -137,7 +143,7 @@ ostream& operator<<(ostream& os, Token p) {
 
 Token parseToken(istream& in) {
   static TokenType prev = START_OF_LINE;
-start_parse:
+next_token:
   skipWhitespace(in);
   ostringstream out;
 
@@ -145,7 +151,7 @@ start_parse:
     case L'\n':
       skip(in);
       if (prev == START_OF_LINE)
-        goto start_parse;
+        goto next_token;
       prev = START_OF_LINE;
       return Token::of(START_OF_LINE);
 
@@ -258,6 +264,18 @@ void test_comments_end_at_newline() {
   list<Token> ast = tokenize(*new stringstream(L";abc def ghi\nabc"));
   check_eq(ast.size(), 3);
   check_eq(ast.front(), L";abc def ghi");
+}
+
+void test_indent_outdent_tokens() {
+  list<Token> ast = tokenize(*new stringstream(L"abc def ghi\n    abc"));
+  check_eq(ast.size(), 6);
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p++, L"abc");
+  check_eq(*p++, L"def");
+  check_eq(*p++, L"ghi");
+  check_eq(*p++, START_OF_LINE);
+  check_eq(*p++, INDENT);
+  check_eq(*p++, L"abc");
 }
 
 
