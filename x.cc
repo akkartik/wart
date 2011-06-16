@@ -101,7 +101,10 @@ ostream& operator<<(ostream& os, Token p) {
       in >> c; out << c; // initial quote
       while (!eof(in)) {
         in >> c; out << c;
-        if (c == L'"') {
+        if (c == L'\\') {
+          in >> c; out << c;
+        }
+        else if (c == L'"') {
           break;
         }
       }
@@ -175,6 +178,13 @@ void test_strings_with_spaces() {
   check_eq(ast.size(), 3);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"\"abc def\"");
+}
+
+void test_strings_with_escapes() {
+  list<Token> ast = tokenize(*new stringstream(L"34\n\"abc \\\"quote def\""));
+  check_eq(ast.size(), 3);
+  check_eq(ast.front(), L"34");
+  check_eq(ast.back(), L"\"abc \\\"quote def\"");
 }
 
 
