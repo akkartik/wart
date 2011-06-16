@@ -87,7 +87,7 @@ ostream& operator<<(ostream& os, Token p) {
     }
 
     void skipWhitespace(istream& in) {
-      while (isspace(in.peek()) && in.peek() != L'\n')
+      while (isspace(in.peek()))
         skip(in);
     }
 
@@ -144,17 +144,16 @@ ostream& operator<<(ostream& os, Token p) {
 Token parseToken(istream& in) {
   static TokenType prev = START_OF_LINE;
 next_token:
-  skipWhitespace(in);
   ostringstream out;
 
-  switch (in.peek()) {
-    case L'\n':
-      skip(in);
-      if (prev == START_OF_LINE)
-        goto next_token;
-      prev = START_OF_LINE;
-      return Token::of(START_OF_LINE);
+  if (in.peek() == L'\n' && prev != START_OF_LINE) {
+    skip(in);
+    prev = START_OF_LINE;
+    return Token::of(START_OF_LINE);
+  }
 
+  skipWhitespace(in);
+  switch (in.peek()) {
     case L'"':
       slurpString(in, out); break;
 
