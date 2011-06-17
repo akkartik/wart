@@ -123,6 +123,10 @@ ostream& operator<<(ostream& os, Token p) {
 
 // emit whitespace token if found, or a null token
 Token processWhitespace(istream& in, TokenType prev) {
+  if (prev != START_OF_LINE) {
+    skipWhitespace(in);
+  }
+
 next_token:
   if (prev == START_OF_LINE) {
     if (isspace(in.peek())) {
@@ -136,14 +140,9 @@ next_token:
       }
     }
   }
-  else {
-    if (in.peek() == L'\n') {
-      skip(in);
-      return Token::of(START_OF_LINE);
-    }
-    else {
-      //skipWhitespace(in);
-    }
+  else if (in.peek() == L'\n') {
+    skip(in);
+    return Token::of(START_OF_LINE);
   }
 
   return Token::of((TokenType)0);
@@ -159,7 +158,7 @@ void test_processWhitespace_generates_newline() {
   check_eq(processWhitespace(teststream(L"\nabc"), TOKEN),
            START_OF_LINE);
   check_eq(processWhitespace(teststream(L"  \nabc"), TOKEN),
-           (TokenType)0); // next call will pick up the newline
+           START_OF_LINE);
 }
 
 void test_processWhitespace_collapses_continguous_newlines() {
@@ -223,9 +222,6 @@ void test_processWhitespace_generates_indent() {
 
 TokenType tokenize_prev = START_OF_LINE;
 Token parseToken(istream& in) {
-  if (tokenize_prev != START_OF_LINE) {
-    skipWhitespace(in);
-  }
   Token ws = processWhitespace(in, tokenize_prev);
   if (ws != (TokenType)0) {
     tokenize_prev = ws.type;
