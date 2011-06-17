@@ -94,50 +94,6 @@ ostream& operator<<(ostream& os, Token p) {
                                     return in.eof();
                                   }
 
-                                  // slurp functions read a token when you're sure to be at it
-                                  void slurpChar(istream& in, ostream& out) {
-                                    char c;
-                                    in >> c; out << c;
-                                  }
-
-                                  void slurpWord(istream& in, ostream& out) {
-                                    char c;
-                                    while (!eof(in)) {
-                                      in >> c;
-                                      if (isspace(c)) {
-                                        in.putback(c);
-                                        break;
-                                      }
-                                      out << c;
-                                    }
-                                  }
-
-                                  void slurpString(istream& in, ostream& out) {
-                                    slurpChar(in, out); // initial quote
-                                    char c;
-                                    while (!eof(in)) {
-                                      in >> c; out << c;
-                                      if (c == L'\\') {
-                                        slurpChar(in, out); // blindly read next
-                                      }
-                                      else if (c == L'"') {
-                                        break;
-                                      }
-                                    }
-                                  }
-
-                                  void slurpComment(istream& in, ostream& out) {
-                                    char c;
-                                    while (!eof(in)) {
-                                      in >> c;
-                                      if (c == L'\n') {
-                                        in.putback(c);
-                                        break;
-                                      }
-                                      out << c;
-                                    }
-                                  }
-
                                   int slurpIndentChars(istream& in) {
                                     int count = 0;
                                     char c;
@@ -226,6 +182,50 @@ void test_processWhitespace_generates_indent() {
 }
 
 
+
+                                  // slurp functions read a token when you're sure to be at it
+                                  void slurpChar(istream& in, ostream& out) {
+                                    char c;
+                                    in >> c; out << c;
+                                  }
+
+                                  void slurpWord(istream& in, ostream& out) {
+                                    char c;
+                                    while (!eof(in)) {
+                                      in >> c;
+                                      if (isspace(c)) {
+                                        in.putback(c);
+                                        break;
+                                      }
+                                      out << c;
+                                    }
+                                  }
+
+                                  void slurpString(istream& in, ostream& out) {
+                                    slurpChar(in, out); // initial quote
+                                    char c;
+                                    while (!eof(in)) {
+                                      in >> c; out << c;
+                                      if (c == L'\\') {
+                                        slurpChar(in, out); // blindly read next
+                                      }
+                                      else if (c == L'"') {
+                                        break;
+                                      }
+                                    }
+                                  }
+
+                                  void slurpComment(istream& in, ostream& out) {
+                                    char c;
+                                    while (!eof(in)) {
+                                      in >> c;
+                                      if (c == L'\n') {
+                                        in.putback(c);
+                                        break;
+                                      }
+                                      out << c;
+                                    }
+                                  }
 
 Token parseToken(istream& in) {
   static TokenType prev = START_OF_LINE;
