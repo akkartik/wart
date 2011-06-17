@@ -311,7 +311,6 @@ void test_tokenize_comments_end_at_newline() {
 
 void test_tokenize_sexpr() {
   list<Token> ast = tokenize(teststream(L"('a '(boo) \"foo\nbar\" `c `,d ,@e)\nabc ;def ghi\nabc"));
-  check_eq(ast.size(), 21);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"'"); ++p;
@@ -360,7 +359,6 @@ void test_tokenize_repeated_newline() {
 
 void test_tokenize_indent_outdent() {
   list<Token> ast = tokenize(teststream(L"abc def ghi\n\n    abc\n  def"));
-  check_eq(ast.size(), 9);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"abc"); ++p;
   check_eq(*p, L"def"); ++p;
@@ -376,7 +374,6 @@ void test_tokenize_indent_outdent() {
 
 void test_tokenize_whitespace_lines() {
   list<Token> ast = tokenize(teststream(L"abc def ghi\n\n    \n  def"));
-  check_eq(ast.size(), 6);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"abc"); ++p;
   check_eq(*p, L"def"); ++p;
@@ -389,7 +386,6 @@ void test_tokenize_whitespace_lines() {
 
 void test_tokenize_whitespace_at_eol() {
   list<Token> ast = tokenize(teststream(L"a \nb\r\nc"));
-  check_eq(ast.size(), 5);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"a"); ++p;
   check_eq(*p, START_OF_LINE); ++p;
@@ -401,7 +397,6 @@ void test_tokenize_whitespace_at_eol() {
 
 void test_tokenize_initial_whitespace_lines() {
   list<Token> ast = tokenize(teststream(L"  \nabc def ghi\n\n    \n  def"));
-  check_eq(ast.size(), 6);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"abc"); ++p;
   check_eq(*p, L"def"); ++p;
@@ -441,7 +436,6 @@ list<Token> parenthesize(list<Token> in) {
 
 void test_parenthesize_lines_with_initial_parens() {
   list<Token> ast = parenthesize(tokenize(teststream(L"(a b c)")));
-  check_eq(ast.size(), 5);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"a"); ++p;
@@ -453,7 +447,6 @@ void test_parenthesize_lines_with_initial_parens() {
 
 void test_parenthesize_skips_indent_tokens() {
   list<Token> ast = parenthesize(tokenize(teststream(L"  (a\tb c)")));
-  check_eq(ast.size(), 5);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"a"); ++p;
@@ -465,7 +458,6 @@ void test_parenthesize_skips_indent_tokens() {
 
 void test_parenthesize_skips_outdent_tokens() {
   list<Token> ast = parenthesize(tokenize(teststream(L"(a b c\n  b c\n    def\n  gh)")));
-  check_eq(ast.size(), 9);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"a"); ++p;
@@ -481,7 +473,6 @@ void test_parenthesize_skips_outdent_tokens() {
 
 void test_parenthesize_passes_through_single_word_lines() {
   list<Token> ast = parenthesize(tokenize(teststream(L"a  ")));
-  check_eq(ast.size(), 1);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"a"); ++p;
   check(p == ast.end());
@@ -489,7 +480,6 @@ void test_parenthesize_passes_through_single_word_lines() {
 
 void test_parenthesize_groups_words_on_single_line() {
   list<Token> ast = parenthesize(tokenize(teststream(L"a b c  ")));
-  check_eq(ast.size(), 5);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"a"); ++p;
@@ -501,7 +491,6 @@ void test_parenthesize_groups_words_on_single_line() {
 
 void test_parenthesize_groups_words_on_each_line_without_indent() {
   list<Token> ast = parenthesize(tokenize(teststream(L"a b c  \nd ef")));
-  check_eq(ast.size(), 9);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"a"); ++p;
