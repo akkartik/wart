@@ -354,6 +354,18 @@ void test_indent_outdent_tokens() {
   check_eq(*p, L"def");
 }
 
+void test_empty_lines_dont_generate_indent_tokens() {
+  list<Token> ast = tokenize(teststream(L"abc def ghi\n\n    \n  def"));
+  check_eq(ast.size(), 6);
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"abc"); ++p;
+  check_eq(*p, L"def"); ++p;
+  check_eq(*p, L"ghi"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, INDENT); ++p;
+  check_eq(*p, L"def");
+}
+
 
 
 typedef void (*testfunc)(void);
