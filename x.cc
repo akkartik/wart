@@ -193,7 +193,9 @@ void test_processWhitespace_generates_indent() {
                                     char c;
                                     while (!eof(in)) {
                                       in >> c;
-                                      if (isspace(c)) {
+                                      if (isspace(c) || c == L',' || c == ';'
+                                          // keep this list sync'd with the parseToken switch below
+                                          || c == L'(' || c == L')' || c == L'\'' || c == L'"') {
                                         in.putback(c);
                                         break;
                                       }
@@ -385,6 +387,25 @@ void test_tokenize_initial_whitespace_lines() {
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, INDENT); ++p;
   check_eq(*p, L"def");
+}
+
+
+
+//// insert explicit parens based on indentation.
+
+list<Token> parenthesize(list<Token> in) {
+  return in;
+}
+
+void test_parenthesize_lines_with_initial_parens() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"(a b c)")));
+  check_eq(ast.size(), 5);
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L")");
 }
 
 
