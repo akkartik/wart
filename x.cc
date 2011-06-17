@@ -207,6 +207,13 @@ next_token:
                                       return result;
                                     }
 
+void test_processWhitespace_generates_newline() {
+  check_eq(processWhitespace(teststream(L"\nabc"), TOKEN),
+           START_OF_LINE);
+  check_eq(processWhitespace(teststream(L"  \nabc"), TOKEN),
+           (TokenType)0); // next call will pick up the newline
+}
+
 void test_processWhitespace_collapses_continguous_newlines() {
   check_eq(processWhitespace(teststream(L"\nabc"), START_OF_LINE),
            (TokenType)0);
@@ -217,6 +224,8 @@ void test_processWhitespace_collapses_continguous_newlines() {
 void test_processWhitespace_generates_indent() {
   check_eq(processWhitespace(teststream(L"   abc"), START_OF_LINE), INDENT);
 }
+
+
 
 Token parseToken(istream& in) {
   static TokenType prev = START_OF_LINE;
@@ -356,6 +365,18 @@ void test_indent_outdent_tokens() {
 
 void test_empty_lines_dont_generate_indent_tokens() {
   list<Token> ast = tokenize(teststream(L"abc def ghi\n\n    \n  def"));
+  check_eq(ast.size(), 6);
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"abc"); ++p;
+  check_eq(*p, L"def"); ++p;
+  check_eq(*p, L"ghi"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, INDENT); ++p;
+  check_eq(*p, L"def");
+}
+
+void test_initial_empty_lines_are_irrelevant() {
+  list<Token> ast = tokenize(teststream(L"  \nabc def ghi\n\n    \n  def"));
   check_eq(ast.size(), 6);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"abc"); ++p;
