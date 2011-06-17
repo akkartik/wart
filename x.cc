@@ -121,7 +121,7 @@ ostream& operator<<(ostream& os, Token p) {
                                     }
                                   }
 
-// emit whitespace token if found, or a null token
+// emit whitespace token if found, or a null token to fall through
 Token processWhitespace(istream& in, TokenType prev) {
   if (prev != START_OF_LINE) {
     skipWhitespace(in);
@@ -133,10 +133,10 @@ next_token:
       TokenType type;
       if (in.peek() == L'\n') {
         skip(in);
-        goto next_token;
+        goto next_token; // repeating newlines
       }
       else {
-        return Token::of(slurpIndent(in));
+        return Token::of(slurpIndent(in)); // indent or fall through
       }
     }
   }
