@@ -427,8 +427,12 @@ list<Token> parenthesize(list<Token> in) {
         ++parenStack;
       }
       result.push_back(*p);
-      prevTokenType = p->type;
     }
+    else if (*p == START_OF_LINE && parenStack > 0) {
+      result.push_back(Token::of(L")"));
+      --parenStack;
+    }
+    prevTokenType = p->type;
   }
   for (int i = 0; i < parenStack; ++i)
     result.push_back(Token::of(L")"));
@@ -448,7 +452,7 @@ void test_parenthesize_lines_with_initial_parens() {
 }
 
 void test_parenthesize_skips_whitespace_tokens() {
-  list<Token> ast = parenthesize(tokenize(teststream(L"(a\nb c)")));
+  list<Token> ast = parenthesize(tokenize(teststream(L"(a\tb c)")));
   check_eq(ast.size(), 5);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"("); ++p;
@@ -467,6 +471,22 @@ void test_parenthesize_groups_words_on_single_line() {
   check_eq(*p, L"a"); ++p;
   check_eq(*p, L"b"); ++p;
   check_eq(*p, L"c"); ++p;
+  check_eq(*p, L")"); ++p;
+  check(p == ast.end());
+}
+
+void test_parenthesize_groups_words_on_each_line_without_indent() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"a b c  \nd ef")));
+  check_eq(ast.size(), 9);
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"d"); ++p;
+  check_eq(*p, L"ef"); ++p;
   check_eq(*p, L")"); ++p;
   check(p == ast.end());
 }
