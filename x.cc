@@ -26,7 +26,7 @@
                                   #define check_eq(X, Y) if ((X) != (Y)) { \
                                       ++numFailures; \
                                       cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
-                                      cerr << "  got " << (X) << endl; \
+                                      cerr << "  got " << (X) << endl; /* BEWARE: multiple eval */ \
                                     } \
                                     else { cerr << "."; fflush(stderr); }
 
@@ -346,11 +346,11 @@ void test_indent_outdent_tokens() {
   list<Token> ast = tokenize(teststream(L"abc def ghi\n\n    abc"));
   check_eq(ast.size(), 6);
   list<Token>::iterator p = ast.begin();
-  check_eq(*p++, L"abc");
-  check_eq(*p++, L"def");
-  check_eq(*p++, L"ghi");
-  check_eq(*p++, START_OF_LINE);
-  check_eq(*p++, INDENT);
+  check_eq(*p, L"abc"); ++p;
+  check_eq(*p, L"def"); ++p;
+  check_eq(*p, L"ghi"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, INDENT); ++p;
   check_eq(*p, L"abc");
 }
 
