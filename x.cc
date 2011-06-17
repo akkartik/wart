@@ -422,7 +422,7 @@ list<Token> parenthesize(list<Token> in) {
   list<Token> result;
   for (list<Token>::iterator p = in.begin(); p != in.end(); ++p) {
     if (!whitespace(p->type)) {
-      if (prevTokenType == START_OF_LINE && p->token != L"(") {
+      if (prevTokenType == START_OF_LINE && *p != L"(") {
         result.push_back(Token::of(L"("));
         ++parenStack;
       }
@@ -451,7 +451,7 @@ void test_parenthesize_lines_with_initial_parens() {
   check(p == ast.end());
 }
 
-void test_parenthesize_skips_whitespace_tokens() {
+void test_parenthesize_skips_indent_tokens() {
   list<Token> ast = parenthesize(tokenize(teststream(L"  (a\tb c)")));
   check_eq(ast.size(), 5);
   list<Token>::iterator p = ast.begin();
@@ -459,6 +459,22 @@ void test_parenthesize_skips_whitespace_tokens() {
   check_eq(*p, L"a"); ++p;
   check_eq(*p, L"b"); ++p;
   check_eq(*p, L"c"); ++p;
+  check_eq(*p, L")"); ++p;
+  check(p == ast.end());
+}
+
+void test_parenthesize_skips_outdent_tokens() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"(a b c\n  b c\n    def\n  gh)")));
+  check_eq(ast.size(), 9);
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L"def"); ++p;
+  check_eq(*p, L"gh"); ++p;
   check_eq(*p, L")"); ++p;
   check(p == ast.end());
 }
