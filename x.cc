@@ -101,14 +101,12 @@ int countIndent(istream& in) {
   int count = 0;
   char c;
   while (!eof(in)) {
+    if (!isspace(in.peek()))
+      break;
     in >> c;
     ++count; // BEWARE: tab = 1 space; don't mix the two
-    if (c == L'\n') count = 0;
-    else if (!isspace(c)) {
-      in.putback(c);
-      --count;
-      break;
-    }
+    if (c == L'\n')
+      count = 0;
   }
   return count;
 }
@@ -120,6 +118,7 @@ int countIndent(istream& in) {
                                   }
 
 void test_countIndent() {
+  // countIndent requires a non-empty stream
   check_eq(countIndent(teststream(L" ")), 1);
   check_eq(countIndent(teststream(L"   ")), 3);
   check_eq(countIndent(teststream(L" \t ")), 3);
@@ -187,7 +186,7 @@ Token parseToken(istream& in) {
     }
   }
 
-  if (prevTokenType == START_OF_LINE && isspace(in.peek())) {
+  if (prevTokenType == START_OF_LINE) {
     int prevIndentLevel = indentLevel;
     indentLevel = countIndent(in);
     if (indentLevel > prevIndentLevel)
@@ -197,7 +196,7 @@ Token parseToken(istream& in) {
   }
 
   ostringstream out;
-  switch (in.peek()) {
+  switch (in.peek()) { // now can't be whitespace
     case L'"':
       slurpString(in, out); break;
 
