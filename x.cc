@@ -362,7 +362,8 @@ void test_tokenize_indent_outdent() {
   check_eq(*p, L"abc"); ++p;
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, OUTDENT); ++p;
-  check_eq(*p, L"def");
+  check_eq(*p, L"def"); ++p;
+  check(p == ast.end());
 }
 
 void test_tokenize_whitespace_lines() {
@@ -374,7 +375,8 @@ void test_tokenize_whitespace_lines() {
   check_eq(*p, L"ghi"); ++p;
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, INDENT); ++p;
-  check_eq(*p, L"def");
+  check_eq(*p, L"def"); ++p;
+  check(p == ast.end());
 }
 
 void test_tokenize_initial_whitespace_lines() {
@@ -386,7 +388,8 @@ void test_tokenize_initial_whitespace_lines() {
   check_eq(*p, L"ghi"); ++p;
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, INDENT); ++p;
-  check_eq(*p, L"def");
+  check_eq(*p, L"def"); ++p;
+  check(p == ast.end());
 }
 
 
