@@ -84,7 +84,7 @@ ostream& operator<<(ostream& os, Token p) {
                                   }
 
                                   void skipWhitespace(istream& in) {
-                                    while (isspace(in.peek()))
+                                    while (isspace(in.peek()) && in.peek() != L'\n')
                                       skip(in);
                                   }
 
@@ -142,7 +142,7 @@ next_token:
       return Token::of(START_OF_LINE);
     }
     else {
-      skipWhitespace(in);
+      //skipWhitespace(in);
     }
   }
 
@@ -223,6 +223,9 @@ void test_processWhitespace_generates_indent() {
 
 TokenType tokenize_prev = START_OF_LINE;
 Token parseToken(istream& in) {
+  if (tokenize_prev != START_OF_LINE) {
+    skipWhitespace(in);
+  }
   Token ws = processWhitespace(in, tokenize_prev);
   if (ws != (TokenType)0) {
     tokenize_prev = ws.type;
@@ -399,6 +402,18 @@ void test_tokenize_whitespace_lines() {
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, INDENT); ++p;
   check_eq(*p, L"def"); ++p;
+  check(p == ast.end());
+}
+
+void test_tokenize_whitespace_at_eol() {
+  list<Token> ast = tokenize(teststream(L"a \nb\r\nc"));
+  check_eq(ast.size(), 5);
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, L"c"); ++p;
   check(p == ast.end());
 }
 
