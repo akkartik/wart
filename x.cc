@@ -230,6 +230,10 @@ list<Token> tokenize(istream& in) {
     result.push_back(parseToken(in));
     prevTokenType = result.back().type;
   }
+
+  while(!result.empty()
+        && (whitespace(result.back().type) || result.back().token == L""))
+    result.pop_back();
   return result;
 }
 
@@ -273,13 +277,6 @@ void test_tokenize_string_with_space() {
 
 void test_tokenize_string_with_escape() {
   list<Token> ast = tokenize(teststream(L"34\n\"abc \\\"quote def\""));
-  check_eq(ast.size(), 3);
-  check_eq(ast.front(), L"34");
-  check_eq(ast.back(), L"\"abc \\\"quote def\"");
-}
-
-void test_tokenize_repeated_newline() {
-  list<Token> ast = tokenize(teststream(L"34\n\n\"abc \\\"quote def\""));
   check_eq(ast.size(), 3);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"\"abc \\\"quote def\"");
@@ -338,6 +335,27 @@ void test_tokenize_sexpr() {
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, L"abc"); ++p;
   check(p == ast.end());
+}
+
+void test_tokenize_suppress_trailing_whitespace() {
+  list<Token> ast = tokenize(teststream(L"34 \nabc"));
+  check_eq(ast.size(), 3);
+  check_eq(ast.front(), L"34");
+  check_eq(ast.back(), L"abc");
+}
+
+void test_tokenize_suppress_terminal_whitespace() {
+  list<Token> ast = tokenize(teststream(L"34 abc\n  "));
+  check_eq(ast.size(), 2);
+  check_eq(ast.front(), L"34");
+  check_eq(ast.back(), L"abc");
+}
+
+void test_tokenize_repeated_newline() {
+  list<Token> ast = tokenize(teststream(L"34\n\n\"abc \\\"quote def\""));
+  check_eq(ast.size(), 3);
+  check_eq(ast.front(), L"34");
+  check_eq(ast.back(), L"\"abc \\\"quote def\"");
 }
 
 void test_tokenize_indent_outdent() {
@@ -440,7 +458,7 @@ void test_parenthesize_skips_whitespace_tokens() {
 }
 
 void test_parenthesize_groups_words_on_single_line() {
-  list<Token> ast = parenthesize(tokenize(teststream(L"a b c")));
+  list<Token> ast = parenthesize(tokenize(teststream(L"a b c  ")));
   check_eq(ast.size(), 5);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"("); ++p;
