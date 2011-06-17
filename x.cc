@@ -100,13 +100,16 @@ ostream& operator<<(ostream& os, Token p) {
 int countIndent(istream& in) {
   int count = 0;
   char c;
-  in >> c;
-  while (isspace(c)) { // BEWARE: tab = 1 space; don't mix
-    ++count;
-    if (c == L'\n') count = 0;
+  while (!eof(in)) {
     in >> c;
+    ++count; // BEWARE: tab = 1 space; don't mix the two
+    if (c == L'\n') count = 0;
+    else if (!isspace(c)) {
+      in.putback(c);
+      --count;
+      break;
+    }
   }
-  in.putback(c);
   return count;
 }
 
@@ -116,58 +119,13 @@ int countIndent(istream& in) {
                                     return result;
                                   }
 
-                                  int indentLevel = 0;
-                                  TokenType slurpIndent(istream& in) {
-                                    int prevIndent = indentLevel;
-                                    indentLevel = countIndent(in);
-                                    if (indentLevel > prevIndent) {
-                                      return INDENT;
-                                    }
-                                    else if (indentLevel < prevIndent) {
-                                      return OUTDENT;
-                                    }
-                                    else { // indentLevel == prevIndent
-                                      return NON_WHITESPACE; // emit nothing
-                                    }
-                                  }
-
-// emit whitespace token if found
-Token processWhitespace(istream& in, TokenType prev) {
-  if (prev != START_OF_LINE) {
-    skipWhitespace(in);
-  }
-
-  if (prev == START_OF_LINE) {
-    while (in.peek() == L'\n')
-      skip(in);
-    if (isspace(in.peek())) {
-      return Token::of(slurpIndent(in));
-    }
-  }
-  else if (in.peek() == L'\n') {
-    skip(in);
-    return Token::of(START_OF_LINE);
-  }
-
-  return Token::of(NON_WHITESPACE); // emit nothing
-}
-
-void test_processWhitespace_generates_newline() {
-  check_eq(processWhitespace(teststream(L"\nabc"), NON_WHITESPACE),
-           START_OF_LINE);
-  check_eq(processWhitespace(teststream(L"  \nabc"), NON_WHITESPACE),
-           START_OF_LINE);
-}
-
-void test_processWhitespace_collapses_continguous_newlines() {
-  check_eq(processWhitespace(teststream(L"\nabc"), START_OF_LINE),
-           (TokenType)0);
-  check_eq(processWhitespace(teststream(L"   \nabc"), START_OF_LINE),
-           (TokenType)0);
-}
-
-void test_processWhitespace_generates_indent() {
-  check_eq(processWhitespace(teststream(L"   abc"), START_OF_LINE), INDENT);
+void test_countIndent() {
+  check_eq(countIndent(teststream(L" ")), 1);
+  check_eq(countIndent(teststream(L"   ")), 3);
+  check_eq(countIndent(teststream(L" \t ")), 3);
+  check_eq(countIndent(teststream(L" \n ")), 1);
+  check_eq(countIndent(teststream(L" \r\n  ")), 2);
+  check_eq(countIndent(teststream(L"\n\na")), 0);
 }
 
 
@@ -218,11 +176,24 @@ void test_processWhitespace_generates_indent() {
                                     }
                                   }
 
+int indentLevel = 0;
 TokenType prevTokenType = START_OF_LINE;
 Token parseToken(istream& in) {
-  Token ws = processWhitespace(in, prevTokenType);
-  if (whitespace(ws.type)) {
-    return ws;
+  if (prevTokenType != START_OF_LINE) {
+    skipWhitespace(in);
+    if (in.peek() == L'\n') {
+      skip(in);
+      return Token::of(START_OF_LINE);
+    }
+  }
+
+  if (prevTokenType == START_OF_LINE && isspace(in.peek())) {
+    int prevIndentLevel = indentLevel;
+    indentLevel = countIndent(in);
+    if (indentLevel > prevIndentLevel)
+      return Token::of(INDENT);
+    else if (prevTokenType < prevIndentLevel)
+      return Token::of(OUTDENT);
   }
 
   ostringstream out;

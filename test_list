@@ -1,6 +1,4 @@
-test_processWhitespace_generates_newline,
-test_processWhitespace_collapses_continguous_newlines,
-test_processWhitespace_generates_indent,
+test_countIndent,
 test_tokenize_empty_input,
 test_tokenize_atom,
 test_tokenize_multiple_atoms,
