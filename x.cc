@@ -245,6 +245,7 @@ Token parseToken(istream& in) {
     case L'(':
     case L')':
     case L'\'':
+    case L'`':
       slurpChar(in, out); break;
 
     case L',':
@@ -348,6 +349,34 @@ void test_tokenize_comments_end_at_newline() {
   list<Token> ast = tokenize(teststream(L";abc def ghi\nabc"));
   check_eq(ast.size(), 3);
   check_eq(ast.front(), L";abc def ghi");
+}
+
+void test_tokenize_sexpr() {
+  list<Token> ast = tokenize(teststream(L"('a '(boo) \"foo\nbar\" `c `,d ,@e)\nabc ;def ghi\nabc"));
+  check_eq(ast.size(), 21);
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"'"); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"'"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"boo"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L"\"foo\nbar\""); ++p;
+  check_eq(*p, L"`"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L"`"); ++p;
+  check_eq(*p, L","); ++p;
+  check_eq(*p, L"d"); ++p;
+  check_eq(*p, L",@"); ++p;
+  check_eq(*p, L"e"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, L"abc"); ++p;
+  check_eq(*p, L";def ghi"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, L"abc"); ++p;
+  check(p == ast.end());
 }
 
 void test_tokenize_indent_outdent() {
