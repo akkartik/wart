@@ -35,7 +35,7 @@
 //// tokenize. newlines and indent matter.
 
 enum TokenType {
-  TOKEN,
+  TOKEN, // First enum value must not be whitespace.
   START_OF_LINE,
   INDENT,
   OUTDENT,
@@ -141,18 +141,95 @@ ostream& operator<<(ostream& os, Token p) {
                                     }
                                   }
 
-Token parseToken(istream& in) {
-  static TokenType prev = START_OF_LINE;
-next_token:
-  ostringstream out;
+                                  int slurpIndentChars(istream& in) {
+                                    int count = 0;
+                                    char c;
+                                    in >> c;
+                                    while (isspace(c)) { // BEWARE: tab = 1 space; don't mix
+                                      ++count;
+                                      if (c == L'\n') count = 0;
+                                      in >> c;
+                                    }
+                                    in.putback(c);
+                                    return count;
+                                  }
 
-  if (in.peek() == L'\n' && prev != START_OF_LINE) {
-    skip(in);
-    prev = START_OF_LINE;
-    return Token::of(START_OF_LINE);
+                                  TokenType slurpIndent(istream& in) {
+                                    static int indentLevel = 0;
+                                    // reset indentLevel if new istream
+                                    static istream* prevStream = &in;
+                                    if (prevStream != &in) {
+                                      prevStream = &in;
+                                      indentLevel = 0;
+                                    }
+
+                                    int prevIndent = indentLevel;
+                                    indentLevel = slurpIndentChars(in);
+                                    if (indentLevel > prevIndent) {
+                                      return INDENT;
+                                    }
+                                    else if (indentLevel < prevIndent) {
+                                      return OUTDENT;
+                                    }
+                                    else { // indentLevel == prevIndent
+                                      return (TokenType)0;
+                                    }
+                                  }
+
+// emit whitespace token if found, or a null token
+Token processWhitespace(istream& in, TokenType prev) {
+next_token:
+  if (prev == START_OF_LINE) {
+    if (isspace(in.peek())) {
+      TokenType type;
+      if (in.peek() == L'\n') {
+        skip(in);
+        goto next_token;
+      }
+      else {
+        return Token::of(slurpIndent(in));
+      }
+    }
+  }
+  else {
+    if (in.peek() == L'\n') {
+      skip(in);
+      return Token::of(START_OF_LINE);
+    }
+    else {
+      skipWhitespace(in);
+    }
   }
 
-  skipWhitespace(in);
+  return Token::of((TokenType)0);
+}
+
+                                    stringstream& teststream(string s) {
+                                      stringstream& result = *new stringstream(s);
+                                      result << std::noskipws;
+                                      return result;
+                                    }
+
+void test_processWhitespace_collapses_continguous_newlines() {
+  check_eq(processWhitespace(teststream(L"\nabc"), START_OF_LINE),
+           (TokenType)0);
+  check_eq(processWhitespace(teststream(L"   \nabc"), START_OF_LINE),
+           (TokenType)0);
+}
+
+void test_processWhitespace_generates_indent() {
+  check_eq(processWhitespace(teststream(L"   abc"), START_OF_LINE), INDENT);
+}
+
+Token parseToken(istream& in) {
+  static TokenType prev = START_OF_LINE;
+  Token ws = processWhitespace(in, prev);
+  if (ws != (TokenType)0) {
+    prev = ws.type;
+    return ws;
+  }
+
+  ostringstream out;
   switch (in.peek()) {
     case L'"':
       slurpString(in, out); break;
@@ -185,12 +262,6 @@ list<Token> tokenize(istream& in) {
     result.push_back(parseToken(in));
   return result;
 }
-
-                                    stringstream& teststream(string s) {
-                                      stringstream& result = *new stringstream(s);
-                                      result << std::noskipws;
-                                      return result;
-                                    }
 
 void test_emptyInput() {
   stringstream ss(L"");
@@ -272,7 +343,7 @@ void test_comments_end_at_newline() {
 }
 
 void test_indent_outdent_tokens() {
-  list<Token> ast = tokenize(teststream(L"abc def ghi\n    abc"));
+  list<Token> ast = tokenize(teststream(L"abc def ghi\n\n    abc"));
   check_eq(ast.size(), 6);
   list<Token>::iterator p = ast.begin();
   check_eq(*p++, L"abc");
@@ -280,7 +351,7 @@ void test_indent_outdent_tokens() {
   check_eq(*p++, L"ghi");
   check_eq(*p++, START_OF_LINE);
   check_eq(*p++, INDENT);
-  check_eq(*p++, L"abc");
+  check_eq(*p, L"abc");
 }
 
 

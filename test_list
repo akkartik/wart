@@ -1,3 +1,5 @@
+test_processWhitespace_collapses_continguous_newlines,
+test_processWhitespace_generates_indent,
 test_emptyInput,
 test_atom,
 test_multiple_atoms,
