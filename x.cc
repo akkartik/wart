@@ -443,7 +443,8 @@ void test_parenthesize_lines_with_initial_parens() {
   check_eq(*p, L"a"); ++p;
   check_eq(*p, L"b"); ++p;
   check_eq(*p, L"c"); ++p;
-  check_eq(*p, L")");
+  check_eq(*p, L")"); ++p;
+  check(p == ast.end());
 }
 
 void test_parenthesize_skips_whitespace_tokens() {
@@ -454,7 +455,8 @@ void test_parenthesize_skips_whitespace_tokens() {
   check_eq(*p, L"a"); ++p;
   check_eq(*p, L"b"); ++p;
   check_eq(*p, L"c"); ++p;
-  check_eq(*p, L")");
+  check_eq(*p, L")"); ++p;
+  check(p == ast.end());
 }
 
 void test_parenthesize_groups_words_on_single_line() {
@@ -465,7 +467,8 @@ void test_parenthesize_groups_words_on_single_line() {
   check_eq(*p, L"a"); ++p;
   check_eq(*p, L"b"); ++p;
   check_eq(*p, L"c"); ++p;
-  check_eq(*p, L")");
+  check_eq(*p, L")"); ++p;
+  check(p == ast.end());
 }
 
 
