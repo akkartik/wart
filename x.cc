@@ -479,6 +479,14 @@ void test_parenthesize_skips_outdent_tokens() {
   check(p == ast.end());
 }
 
+void test_parenthesize_passes_through_single_word_lines() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"a  ")));
+  check_eq(ast.size(), 1);
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"a"); ++p;
+  check(p == ast.end());
+}
+
 void test_parenthesize_groups_words_on_single_line() {
   list<Token> ast = parenthesize(tokenize(teststream(L"a b c  ")));
   check_eq(ast.size(), 5);
