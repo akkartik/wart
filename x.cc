@@ -255,92 +255,94 @@ Token parseToken(istream& in) {
 list<Token> tokenize(istream& in) {
   in >> std::noskipws;
   list<Token> result;
+  result.push_back(START_OF_LINE);
   while (!eof(in))
     result.push_back(parseToken(in));
   return result;
 }
 
 void test_emptyInput() {
-  stringstream ss(L"");
-  check(tokenize(ss).empty());
+  list<Token> ast = tokenize(teststream(L""));
+  check_eq(ast.size(), 1);
+  check_eq(ast.front(), START_OF_LINE);
 }
 
 void test_atom() {
-  stringstream ss(L"34");
-  check_eq(tokenize(ss).front(), L"34");
+  list<Token> ast = tokenize(teststream(L"34")); ast.pop_front(); // skip implicit START_OF_LINE
+  check_eq(ast.front(), L"34");
 }
 
 void test_multiple_atoms() {
-  list<Token> ast = tokenize(teststream(L"34 abc"));
+  list<Token> ast = tokenize(teststream(L"34 abc")); ast.pop_front();
   check_eq(ast.size(), 2);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"abc");
 }
 
 void test_string_literals() {
-  list<Token> ast = tokenize(teststream(L"34 \"abc\""));
+  list<Token> ast = tokenize(teststream(L"34 \"abc\"")); ast.pop_front();
   check_eq(ast.size(), 2);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"\"abc\"");
 }
 
 void test_multiple_lines() {
-  list<Token> ast = tokenize(teststream(L"34\n\"abc\""));
+  list<Token> ast = tokenize(teststream(L"34\n\"abc\"")); ast.pop_front();
   check_eq(ast.size(), 3);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"\"abc\"");
 }
 
 void test_strings_with_spaces() {
-  list<Token> ast = tokenize(teststream(L"34\n\"abc def\""));
+  list<Token> ast = tokenize(teststream(L"34\n\"abc def\"")); ast.pop_front();
   check_eq(ast.size(), 3);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"\"abc def\"");
 }
 
 void test_strings_with_escapes() {
-  list<Token> ast = tokenize(teststream(L"34\n\"abc \\\"quote def\""));
+  list<Token> ast = tokenize(teststream(L"34\n\"abc \\\"quote def\"")); ast.pop_front();
   check_eq(ast.size(), 3);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"\"abc \\\"quote def\"");
 }
 
 void test_repeated_newlines() {
-  list<Token> ast = tokenize(teststream(L"34\n\n\"abc \\\"quote def\""));
+  list<Token> ast = tokenize(teststream(L"34\n\n\"abc \\\"quote def\"")); ast.pop_front();
   check_eq(ast.size(), 3);
   check_eq(ast.front(), L"34");
   check_eq(ast.back(), L"\"abc \\\"quote def\"");
 }
 
 void test_quotes_commas_parens_are_separate_tokens() {
-  list<Token> ast = tokenize(teststream(L"(',)"));
+  list<Token> ast = tokenize(teststream(L"(',)")); ast.pop_front();
   check_eq(ast.size(), 4);
   check_eq(ast.front(), L"(");
   check_eq(ast.back(), L")");
 }
 
 void test_splice_operator_is_one_token() {
-  list<Token> ast = tokenize(teststream(L"()',@"));
+  list<Token> ast = tokenize(teststream(L"()',@")); ast.pop_front();
   check_eq(ast.size(), 4);
   check_eq(ast.front(), L"(");
   check_eq(ast.back(), L",@");
 }
 
 void test_comments_are_single_token() {
-  list<Token> ast = tokenize(teststream(L"()',@ ;abc def ghi"));
+  list<Token> ast = tokenize(teststream(L"()',@ ;abc def ghi")); ast.pop_front();
   check_eq(ast.size(), 5);
   check_eq(ast.front(), L"(");
   check_eq(ast.back(), L";abc def ghi");
 }
 
 void test_comments_end_at_newline() {
-  list<Token> ast = tokenize(teststream(L";abc def ghi\nabc"));
+  list<Token> ast = tokenize(teststream(L";abc def ghi\nabc")); ast.pop_front();
   check_eq(ast.size(), 3);
   check_eq(ast.front(), L";abc def ghi");
 }
 
 void test_indent_outdent_tokens() {
-  list<Token> ast = tokenize(teststream(L"abc def ghi\n\n    abc\n  def"));
+  list<Token> ast = tokenize(teststream(L"abc def ghi\n\n    abc\n  def")); ast.pop_front();
   check_eq(ast.size(), 9);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"abc"); ++p;
@@ -355,7 +357,7 @@ void test_indent_outdent_tokens() {
 }
 
 void test_empty_lines_dont_generate_indent_tokens() {
-  list<Token> ast = tokenize(teststream(L"abc def ghi\n\n    \n  def"));
+  list<Token> ast = tokenize(teststream(L"abc def ghi\n\n    \n  def")); ast.pop_front();
   check_eq(ast.size(), 6);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"abc"); ++p;
