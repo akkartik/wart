@@ -1,34 +1,34 @@
-    #include<string>
-    typedef std::wstring string;
-    #include<list>
-    using std::list;
-    #include<iostream>
-    typedef std::wistream istream;
-    typedef std::wostream ostream;
-    #define cerr std::wcerr
-    using std::endl;
-    #include<sstream>
-    typedef std::wstringstream stringstream;
-    typedef std::wostringstream ostringstream;
+                                  #include<string>
+                                  typedef std::wstring string;
+                                  #include<list>
+                                  using std::list;
+                                  #include<iostream>
+                                  typedef std::wistream istream;
+                                  typedef std::wostream ostream;
+                                  #define cerr std::wcerr
+                                  using std::endl;
+                                  #include<sstream>
+                                  typedef std::wstringstream stringstream;
+                                  typedef std::wostringstream ostringstream;
 
-    // This must come after system includes.
-    typedef char ascii;
-    #define char wchar_t
+                                  // This must come after system includes.
+                                  typedef char ascii;
+                                  #define char wchar_t
 
-    int numFailures = 0;
+                                  int numFailures = 0;
 
-    #define check(X) if (!(X)) { \
-        ++numFailures; \
-        cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
-      } \
-      else { cerr << "."; fflush(stderr); }
+                                  #define check(X) if (!(X)) { \
+                                      ++numFailures; \
+                                      cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
+                                    } \
+                                    else { cerr << "."; fflush(stderr); }
 
-    #define check_eq(X, Y) if ((X) != (Y)) { \
-        ++numFailures; \
-        cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
-        cerr << "  got " << (X) << endl; \
-      } \
-      else { cerr << "."; fflush(stderr); }
+                                  #define check_eq(X, Y) if ((X) != (Y)) { \
+                                      ++numFailures; \
+                                      cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
+                                      cerr << "  got " << (X) << endl; \
+                                    } \
+                                    else { cerr << "."; fflush(stderr); }
 
 
 
@@ -81,65 +81,65 @@ ostream& operator<<(ostream& os, Token p) {
 
 
 
-    void skip(istream& in) {
-      char dummy;
-      in >> dummy;
-    }
+                                  void skip(istream& in) {
+                                    char dummy;
+                                    in >> dummy;
+                                  }
 
-    void skipWhitespace(istream& in) {
-      while (isspace(in.peek()))
-        skip(in);
-    }
+                                  void skipWhitespace(istream& in) {
+                                    while (isspace(in.peek()))
+                                      skip(in);
+                                  }
 
-    bool eof(istream& in) {
-      in.peek();
-      return in.eof();
-    }
+                                  bool eof(istream& in) {
+                                    in.peek();
+                                    return in.eof();
+                                  }
 
-    // slurp functions read a token when you're sure to be at it
-    void slurpChar(istream& in, ostream& out) {
-      char c;
-      in >> c; out << c;
-    }
+                                  // slurp functions read a token when you're sure to be at it
+                                  void slurpChar(istream& in, ostream& out) {
+                                    char c;
+                                    in >> c; out << c;
+                                  }
 
-    void slurpWord(istream& in, ostream& out) {
-      while (!eof(in)) {
-        char c;
-        in >> c;
-        if (isspace(c)) {
-          in.putback(c);
-          break;
-        }
+                                  void slurpWord(istream& in, ostream& out) {
+                                    while (!eof(in)) {
+                                      char c;
+                                      in >> c;
+                                      if (isspace(c)) {
+                                        in.putback(c);
+                                        break;
+                                      }
 
-        out << c;
-      }
-    }
+                                      out << c;
+                                    }
+                                  }
 
-    void slurpString(istream& in, ostream& out) {
-      slurpChar(in, out); // initial quote
-      char c;
-      while (!eof(in)) {
-        in >> c; out << c;
-        if (c == L'\\') {
-          slurpChar(in, out); // blindly read next
-        }
-        else if (c == L'"') {
-          break;
-        }
-      }
-    }
+                                  void slurpString(istream& in, ostream& out) {
+                                    slurpChar(in, out); // initial quote
+                                    char c;
+                                    while (!eof(in)) {
+                                      in >> c; out << c;
+                                      if (c == L'\\') {
+                                        slurpChar(in, out); // blindly read next
+                                      }
+                                      else if (c == L'"') {
+                                        break;
+                                      }
+                                    }
+                                  }
 
-    void slurpComment(istream& in, ostream& out) {
-      char c;
-      while (!eof(in)) {
-        in >> c;
-        if (c == L'\n') {
-          in.putback(c);
-          break;
-        }
-        out << c;
-      }
-    }
+                                  void slurpComment(istream& in, ostream& out) {
+                                    char c;
+                                    while (!eof(in)) {
+                                      in >> c;
+                                      if (c == L'\n') {
+                                        in.putback(c);
+                                        break;
+                                      }
+                                      out << c;
+                                    }
+                                  }
 
 Token parseToken(istream& in) {
   static TokenType prev = START_OF_LINE;
