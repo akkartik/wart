@@ -127,17 +127,11 @@ Token processWhitespace(istream& in, TokenType prev) {
     skipWhitespace(in);
   }
 
-next_token:
   if (prev == START_OF_LINE) {
+    while (in.peek() == L'\n')
+      skip(in);
     if (isspace(in.peek())) {
-      TokenType type;
-      if (in.peek() == L'\n') {
-        skip(in);
-        goto next_token; // repeating newlines
-      }
-      else {
-        return Token::of(slurpIndent(in)); // indent or fall through
-      }
+      return Token::of(slurpIndent(in)); // indent or fall through
     }
   }
   else if (in.peek() == L'\n') {
