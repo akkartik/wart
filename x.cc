@@ -107,24 +107,17 @@ ostream& operator<<(ostream& os, Token p) {
                                     return count;
                                   }
 
+                                  int tokenize_indentLevel = 0;
                                   TokenType slurpIndent(istream& in) {
-                                    static int indentLevel = 0;
-                                    // reset indentLevel if new istream
-                                    static istream* prevStream = &in;
-                                    if (prevStream != &in) {
-                                      prevStream = &in;
-                                      indentLevel = 0;
-                                    }
-
-                                    int prevIndent = indentLevel;
-                                    indentLevel = slurpIndentChars(in);
-                                    if (indentLevel > prevIndent) {
+                                    int prevIndent = tokenize_indentLevel;
+                                    tokenize_indentLevel = slurpIndentChars(in);
+                                    if (tokenize_indentLevel > prevIndent) {
                                       return INDENT;
                                     }
-                                    else if (indentLevel < prevIndent) {
+                                    else if (tokenize_indentLevel < prevIndent) {
                                       return OUTDENT;
                                     }
-                                    else { // indentLevel == prevIndent
+                                    else { // tokenize_indentLevel == prevIndent
                                       return (TokenType)0;
                                     }
                                   }
@@ -229,11 +222,11 @@ void test_processWhitespace_generates_indent() {
                                     }
                                   }
 
+TokenType tokenize_prev = START_OF_LINE;
 Token parseToken(istream& in) {
-  static TokenType prev = START_OF_LINE;
-  Token ws = processWhitespace(in, prev);
+  Token ws = processWhitespace(in, tokenize_prev);
   if (ws != (TokenType)0) {
-    prev = ws.type;
+    tokenize_prev = ws.type;
     return ws;
   }
 
@@ -260,11 +253,13 @@ Token parseToken(istream& in) {
     default:
       slurpWord(in, out); break;
   }
-  prev = TOKEN;
+  tokenize_prev = TOKEN;
   return Token::of(out.rdbuf()->str());
 }
 
 list<Token> tokenize(istream& in) {
+  tokenize_indentLevel = 0;
+  tokenize_prev = START_OF_LINE;
   in >> std::noskipws;
   list<Token> result;
   while (!eof(in))
