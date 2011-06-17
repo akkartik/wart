@@ -399,11 +399,21 @@ void test_tokenize_initial_whitespace_lines() {
 //// insert explicit parens based on indentation.
 
 list<Token> parenthesize(list<Token> in) {
+  TokenType prevTokenType = START_OF_LINE;
+  int parenStack = 0;
   list<Token> result;
   for (list<Token>::iterator p = in.begin(); p != in.end(); ++p) {
-    if (!whitespace(p->type))
+    if (!whitespace(p->type)) {
+      if (prevTokenType == START_OF_LINE && p->token != L"(") {
+        result.push_back(Token::of(L"("));
+        ++parenStack;
+      }
       result.push_back(*p);
+      prevTokenType = p->type;
+    }
   }
+  for (int i = 0; i < parenStack; ++i)
+    result.push_back(Token::of(L")"));
   return result;
 }
 
@@ -420,6 +430,17 @@ void test_parenthesize_lines_with_initial_parens() {
 
 void test_parenthesize_skips_whitespace_tokens() {
   list<Token> ast = parenthesize(tokenize(teststream(L"(a\nb c)")));
+  check_eq(ast.size(), 5);
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L")");
+}
+
+void test_parenthesize_groups_words_on_single_line() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"a b c")));
   check_eq(ast.size(), 5);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"("); ++p;
