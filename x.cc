@@ -40,6 +40,10 @@ enum TokenType {
   OUTDENT,
 };
 
+bool whitespace(TokenType t) {
+  return t != NON_WHITESPACE;
+}
+
 struct Token {
   const TokenType type;
   const string token;
@@ -217,7 +221,7 @@ void test_processWhitespace_generates_indent() {
 TokenType prevTokenType = START_OF_LINE;
 Token parseToken(istream& in) {
   Token ws = processWhitespace(in, prevTokenType);
-  if (ws != NON_WHITESPACE) {
+  if (whitespace(ws.type)) {
     return ws;
   }
 
