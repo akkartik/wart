@@ -452,7 +452,7 @@ void test_parenthesize_lines_with_initial_parens() {
 }
 
 void test_parenthesize_skips_whitespace_tokens() {
-  list<Token> ast = parenthesize(tokenize(teststream(L"(a\tb c)")));
+  list<Token> ast = parenthesize(tokenize(teststream(L"  (a\tb c)")));
   check_eq(ast.size(), 5);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"("); ++p;
