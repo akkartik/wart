@@ -34,7 +34,7 @@
 //// tokenize. newlines and indent matter.
 
 enum TokenType {
-  TOKEN, // first value must not be whitespace
+  NON_WHITESPACE,
   START_OF_LINE,
   INDENT,
   OUTDENT,
@@ -44,7 +44,7 @@ struct Token {
   const TokenType type;
   const string token;
 
-  Token(const string x) :token(x), type(TOKEN) {}
+  Token(const string x) :token(x), type(NON_WHITESPACE) {}
   Token(TokenType x) :type(x) {}
   // static methods for single-line stack allocation
   static Token of(TokenType t) {
@@ -57,7 +57,7 @@ struct Token {
   }
 
   bool operator==(string x) {
-    return type == TOKEN && token == x;
+    return type == NON_WHITESPACE && token == x;
   }
   bool operator==(TokenType x) {
     return type == x;
@@ -71,7 +71,7 @@ struct Token {
 };
 
 ostream& operator<<(ostream& os, Token p) {
-  if (p.type != TOKEN) os << p.type;
+  if (p.type != NON_WHITESPACE) os << p.type;
   else os << p.token;
   return os;
 }
@@ -117,11 +117,11 @@ ostream& operator<<(ostream& os, Token p) {
                                       return OUTDENT;
                                     }
                                     else { // tokenize_indentLevel == prevIndent
-                                      return (TokenType)0;
+                                      return NON_WHITESPACE; // emit nothing
                                     }
                                   }
 
-// emit whitespace token if found, or a null token to fall through
+// emit whitespace token if found
 Token processWhitespace(istream& in, TokenType prev) {
   if (prev != START_OF_LINE) {
     skipWhitespace(in);
@@ -131,7 +131,7 @@ Token processWhitespace(istream& in, TokenType prev) {
     while (in.peek() == L'\n')
       skip(in);
     if (isspace(in.peek())) {
-      return Token::of(slurpIndent(in)); // indent or fall through
+      return Token::of(slurpIndent(in));
     }
   }
   else if (in.peek() == L'\n') {
@@ -139,7 +139,7 @@ Token processWhitespace(istream& in, TokenType prev) {
     return Token::of(START_OF_LINE);
   }
 
-  return Token::of((TokenType)0);
+  return Token::of(NON_WHITESPACE); // emit nothing
 }
 
                                     stringstream& teststream(string s) {
@@ -149,9 +149,9 @@ Token processWhitespace(istream& in, TokenType prev) {
                                     }
 
 void test_processWhitespace_generates_newline() {
-  check_eq(processWhitespace(teststream(L"\nabc"), TOKEN),
+  check_eq(processWhitespace(teststream(L"\nabc"), NON_WHITESPACE),
            START_OF_LINE);
-  check_eq(processWhitespace(teststream(L"  \nabc"), TOKEN),
+  check_eq(processWhitespace(teststream(L"  \nabc"), NON_WHITESPACE),
            START_OF_LINE);
 }
 
@@ -217,7 +217,7 @@ void test_processWhitespace_generates_indent() {
 TokenType tokenize_prev = START_OF_LINE;
 Token parseToken(istream& in) {
   Token ws = processWhitespace(in, tokenize_prev);
-  if (ws != (TokenType)0) {
+  if (ws != NON_WHITESPACE) {
     tokenize_prev = ws.type;
     return ws;
   }
@@ -245,7 +245,7 @@ Token parseToken(istream& in) {
     default:
       slurpWord(in, out); break;
   }
-  tokenize_prev = TOKEN;
+  tokenize_prev = NON_WHITESPACE;
   return Token::of(out.rdbuf()->str());
 }
 
