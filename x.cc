@@ -47,13 +47,11 @@ struct Token {
 
   Token(const string x) :token(x), type(TOKEN) {}
   Token(TokenType x) :type(x) {}
-
   // static convenience methods are more concisely used without new than constructors
   static Token of(TokenType t) {
     Token result(t);
     return result;
   }
-
   static Token of(string s) {
     Token result(s);
     return result;
@@ -110,7 +108,6 @@ ostream& operator<<(ostream& os, Token p) {
                                         in.putback(c);
                                         break;
                                       }
-
                                       out << c;
                                     }
                                   }
@@ -343,15 +340,18 @@ void test_comments_end_at_newline() {
 }
 
 void test_indent_outdent_tokens() {
-  list<Token> ast = tokenize(teststream(L"abc def ghi\n\n    abc"));
-  check_eq(ast.size(), 6);
+  list<Token> ast = tokenize(teststream(L"abc def ghi\n\n    abc\n  def"));
+  check_eq(ast.size(), 9);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"abc"); ++p;
   check_eq(*p, L"def"); ++p;
   check_eq(*p, L"ghi"); ++p;
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, INDENT); ++p;
-  check_eq(*p, L"abc");
+  check_eq(*p, L"abc"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, OUTDENT); ++p;
+  check_eq(*p, L"def");
 }
 
 
