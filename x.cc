@@ -97,23 +97,29 @@ ostream& operator<<(ostream& os, Token p) {
                                     return in.eof();
                                   }
 
-                                  int slurpIndentChars(istream& in) {
-                                    int count = 0;
-                                    char c;
-                                    in >> c;
-                                    while (isspace(c)) { // BEWARE: tab = 1 space; don't mix
-                                      ++count;
-                                      if (c == L'\n') count = 0;
-                                      in >> c;
-                                    }
-                                    in.putback(c);
-                                    return count;
+int countIndent(istream& in) {
+  int count = 0;
+  char c;
+  in >> c;
+  while (isspace(c)) { // BEWARE: tab = 1 space; don't mix
+    ++count;
+    if (c == L'\n') count = 0;
+    in >> c;
+  }
+  in.putback(c);
+  return count;
+}
+
+                                  stringstream& teststream(string s) {
+                                    stringstream& result = *new stringstream(s);
+                                    result << std::noskipws;
+                                    return result;
                                   }
 
                                   int indentLevel = 0;
                                   TokenType slurpIndent(istream& in) {
                                     int prevIndent = indentLevel;
-                                    indentLevel = slurpIndentChars(in);
+                                    indentLevel = countIndent(in);
                                     if (indentLevel > prevIndent) {
                                       return INDENT;
                                     }
@@ -145,12 +151,6 @@ Token processWhitespace(istream& in, TokenType prev) {
 
   return Token::of(NON_WHITESPACE); // emit nothing
 }
-
-                                    stringstream& teststream(string s) {
-                                      stringstream& result = *new stringstream(s);
-                                      result << std::noskipws;
-                                      return result;
-                                    }
 
 void test_processWhitespace_generates_newline() {
   check_eq(processWhitespace(teststream(L"\nabc"), NON_WHITESPACE),
