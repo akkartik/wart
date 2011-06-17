@@ -11,8 +11,7 @@
                                   typedef std::wstringstream stringstream;
                                   typedef std::wostringstream ostringstream;
 
-                                  // This must come after system includes.
-                                  typedef char ascii;
+                                  typedef char ascii; // must come after system includes
                                   #define char wchar_t
 
                                   int numFailures = 0;
@@ -35,7 +34,7 @@
 //// tokenize. newlines and indent matter.
 
 enum TokenType {
-  TOKEN, // First enum value must not be whitespace.
+  TOKEN, // first value must not be whitespace
   START_OF_LINE,
   INDENT,
   OUTDENT,
@@ -47,7 +46,7 @@ struct Token {
 
   Token(const string x) :token(x), type(TOKEN) {}
   Token(TokenType x) :type(x) {}
-  // static convenience methods are more concisely used without new than constructors
+  // static methods for single-line stack allocation
   static Token of(TokenType t) {
     Token result(t);
     return result;
