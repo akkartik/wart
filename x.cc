@@ -103,8 +103,8 @@ ostream& operator<<(ostream& os, Token p) {
                                   }
 
                                   void slurpWord(istream& in, ostream& out) {
+                                    char c;
                                     while (!eof(in)) {
-                                      char c;
                                       in >> c;
                                       if (isspace(c)) {
                                         in.putback(c);
