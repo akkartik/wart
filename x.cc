@@ -399,11 +399,27 @@ void test_tokenize_initial_whitespace_lines() {
 //// insert explicit parens based on indentation.
 
 list<Token> parenthesize(list<Token> in) {
-  return in;
+  list<Token> result;
+  for (list<Token>::iterator p = in.begin(); p != in.end(); ++p) {
+    if (!whitespace(p->type))
+      result.push_back(*p);
+  }
+  return result;
 }
 
 void test_parenthesize_lines_with_initial_parens() {
   list<Token> ast = parenthesize(tokenize(teststream(L"(a b c)")));
+  check_eq(ast.size(), 5);
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L")");
+}
+
+void test_parenthesize_skips_whitespace_tokens() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"(a\nb c)")));
   check_eq(ast.size(), 5);
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"("); ++p;
