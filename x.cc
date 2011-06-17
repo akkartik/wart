@@ -106,17 +106,17 @@ ostream& operator<<(ostream& os, Token p) {
                                     return count;
                                   }
 
-                                  int tokenize_indentLevel = 0;
+                                  int indentLevel = 0;
                                   TokenType slurpIndent(istream& in) {
-                                    int prevIndent = tokenize_indentLevel;
-                                    tokenize_indentLevel = slurpIndentChars(in);
-                                    if (tokenize_indentLevel > prevIndent) {
+                                    int prevIndent = indentLevel;
+                                    indentLevel = slurpIndentChars(in);
+                                    if (indentLevel > prevIndent) {
                                       return INDENT;
                                     }
-                                    else if (tokenize_indentLevel < prevIndent) {
+                                    else if (indentLevel < prevIndent) {
                                       return OUTDENT;
                                     }
-                                    else { // tokenize_indentLevel == prevIndent
+                                    else { // indentLevel == prevIndent
                                       return NON_WHITESPACE; // emit nothing
                                     }
                                   }
@@ -214,9 +214,9 @@ void test_processWhitespace_generates_indent() {
                                     }
                                   }
 
-TokenType tokenize_prev = START_OF_LINE;
+TokenType prevTokenType = START_OF_LINE;
 Token parseToken(istream& in) {
-  Token ws = processWhitespace(in, tokenize_prev);
+  Token ws = processWhitespace(in, prevTokenType);
   if (ws != NON_WHITESPACE) {
     return ws;
   }
@@ -248,13 +248,13 @@ Token parseToken(istream& in) {
 }
 
 list<Token> tokenize(istream& in) {
-  tokenize_indentLevel = 0;
-  tokenize_prev = START_OF_LINE;
+  indentLevel = 0;
+  prevTokenType = START_OF_LINE;
   in >> std::noskipws;
   list<Token> result;
   while (!eof(in)) {
     result.push_back(parseToken(in));
-    tokenize_prev = result.back().type;
+    prevTokenType = result.back().type;
   }
   return result;
 }
