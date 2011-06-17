@@ -218,7 +218,6 @@ TokenType tokenize_prev = START_OF_LINE;
 Token parseToken(istream& in) {
   Token ws = processWhitespace(in, tokenize_prev);
   if (ws != NON_WHITESPACE) {
-    tokenize_prev = ws.type;
     return ws;
   }
 
@@ -245,7 +244,6 @@ Token parseToken(istream& in) {
     default:
       slurpWord(in, out); break;
   }
-  tokenize_prev = NON_WHITESPACE;
   return Token::of(out.rdbuf()->str());
 }
 
@@ -254,8 +252,10 @@ list<Token> tokenize(istream& in) {
   tokenize_prev = START_OF_LINE;
   in >> std::noskipws;
   list<Token> result;
-  while (!eof(in))
+  while (!eof(in)) {
     result.push_back(parseToken(in));
+    tokenize_prev = result.back().type;
+  }
   return result;
 }
 
