@@ -48,7 +48,7 @@ struct Token {
   const TokenType type;
   const string token;
 
-  Token(const string x) :token(x), type(NON_WHITESPACE) {}
+  Token(const string x) :type(NON_WHITESPACE), token(x) {}
   Token(TokenType x) :type(x) {}
   // static methods for single-line stack allocation
   static Token of(TokenType t) {
@@ -438,7 +438,7 @@ const testfunc tests[] = {
 };
 
 void runTests() {
-  for (int i = 0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
+  for (unsigned int i = 0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
     (*tests[i])();
   }
   cerr << endl;
