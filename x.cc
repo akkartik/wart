@@ -5,6 +5,8 @@
                                   #include<iostream>
                                   typedef std::wistream istream;
                                   typedef std::wostream ostream;
+                                  #define cin std::wcin
+                                  #define cout std::wcout
                                   #define cerr std::wcerr
                                   using std::endl;
                                   #include<sstream>
@@ -444,46 +446,52 @@ void test_tokenize_initial_whitespace_lines() {
 
 //// insert explicit parens based on indentation.
 
-list<Token> slurpLine(list<Token>::iterator p) {
+#define inc(p) { ++p; if (p == end) return result; }
+list<Token> slurpLine(list<Token>::iterator p, list<Token>::iterator end) {
   list<Token> result;
-  if (*p == START_OF_LINE) ++p;
-  if (*p == INDENT) ++p;
+  if (*p == START_OF_LINE) inc(p);
+  if (*p == INDENT) inc(p);
 
   while (!whitespace(p->type)) {
     result.push_back(*p);
-    ++p;
+    inc(p);
   }
 
-  if (*p == START_OF_LINE) ++p;
+  if (*p == START_OF_LINE) inc(p);
   if (*p == INDENT || *p == MAYBE_WRAP || *p == OUTDENT) {
     result.push_back(*p);
-    ++p;
+    inc(p);
   }
 
   return result;
 }
+#undef inc
 
 void test_slurpLine() {
-  list<Token> line = slurpLine(tokenize(teststream(L"abc")).begin());
+  list<Token> ast = tokenize(teststream(L"abc"));
+  list<Token> line = slurpLine(ast.begin(), ast.end());
   list<Token>::iterator p = line.begin();
   check_eq(*p, L"abc"); ++p;
   check(p == line.end());
 }
 
 void test_slurpLine_empty() {
-  list<Token> line = slurpLine(tokenize(teststream(L"")).begin());
+  list<Token> ast = tokenize(teststream(L""));
+  list<Token> line = slurpLine(ast.begin(), ast.end());
   check(line.empty());
 }
 
 void test_slurpLine_skips_indent() {
-  list<Token> line = slurpLine(tokenize(teststream(L"abc")).begin());
+  list<Token> ast = tokenize(teststream(L"abc"));
+  list<Token> line = slurpLine(ast.begin(), ast.end());
   list<Token>::iterator p = line.begin();
   check_eq(*p, L"abc"); ++p;
   check(p == line.end());
 }
 
 void test_slurpLine_includes_indent_from_next_line() {
-  list<Token> line = slurpLine(tokenize(teststream(L"  \nabc def ghi\n\n    \n  def")).begin());
+  list<Token> ast = tokenize(teststream(L"  \nabc def ghi\n\n    \n  def"));
+  list<Token> line = slurpLine(ast.begin(), ast.end());
   list<Token>::iterator p = line.begin();
   check_eq(*p, L"abc"); ++p;
   check_eq(*p, L"def"); ++p;
@@ -519,7 +527,7 @@ list<Token> parenthesize(list<Token> in) {
   list<Token> result;
   int parenCount = 0;
   for (list<Token>::iterator p = in.begin(); p != in.end(); p = skipLine(p, in.end())) {
-    list<Token> line = slurpLine(p);
+    list<Token> line = slurpLine(p, in.end());
     int numWords = numWordsInLine(line);
     if (numWords == 0)
       cerr << "tokenize shouldn't have passed through empty lines\n" << DIE;
@@ -612,9 +620,18 @@ void test_parenthesize_handles_fully_parenthesized_expressions_regardless_of_ind
 }
 
 void test_parenthesize_passes_through_single_word_lines() {
-  list<Token> ast = parenthesize(tokenize(teststream(L"a  ")));
+  list<Token> ast = parenthesize(tokenize(teststream(L"a")));
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"a"); ++p;
+  check(p == ast.end());
+}
+
+void test_parenthesize_passes_through_single_word_lines2() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"a  \nb\nc")));
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
   check(p == ast.end());
 }
 
@@ -692,6 +709,17 @@ void test_parenthesize_groups_across_indent3() {
 
 
 
+ostream& operator<<(ostream& os, list<Token> l) {
+  for (list<Token>::iterator p = l.begin(); p != l.end(); ++p) {
+    if (*p != L")") os << " ";
+    os << *p;
+  }
+  os << endl;
+  return os;
+}
+
+
+
 typedef void (*testfunc)(void);
 
 const testfunc tests[] = {
@@ -711,11 +739,15 @@ void runTests() {
 }
 
 int main(int argc, ascii* argv[]) {
-  if (argc == 1) return 0;
-  std::string arg1(argv[1]);
-  if (arg1 == "test") {
-    runTests();
+  if (argc > 1) {
+    std::string arg1(argv[1]);
+    if (arg1 == "test") {
+      runTests();
+      return 0;
+    }
   }
+
+  cout << parenthesize(tokenize(cin));
   return 0;
 }
 
