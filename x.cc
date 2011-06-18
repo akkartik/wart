@@ -552,10 +552,12 @@ list<Token> parenthesize(list<Token> in) {
 
     if (numWords > 1
         && line.front() != L"(" && line.front() != L"'" && line.front() != L"`") {
+      // open paren
       result.push_back(Token::of(L"("));
       parenStack.push_back(indentLevel);
     }
 
+    // copy line tokens
     for (list<Token>::iterator q = line.begin(); q != line.end(); ++q) {
       if (!whitespace(q->type))
         result.push_back(*q);
@@ -563,12 +565,14 @@ list<Token> parenthesize(list<Token> in) {
 
     if (line.back() != INDENT && numWords > 1
         && line.front() != L"(" && line.front() != L"'" && line.front() != L"`") {
+      // close paren for this line
       result.push_back(Token::of(L")"));
       parenStack.pop_back();
     }
 
     if (line.back() == OUTDENT
         && !parenStack.empty() && parenStack.back() == line.back().indentLevel) {
+      // close paren for a previous line
       result.push_back(Token::of(L")"));
       parenStack.pop_back();
     }
