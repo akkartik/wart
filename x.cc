@@ -47,16 +47,26 @@ bool whitespace(TokenType t) {
 struct Token {
   const TokenType type;
   const string token;
+  const int indentLevel;
 
-  Token(const string x) :type(NON_WHITESPACE), token(x) {}
-  Token(TokenType x) :type(x) {}
+  // private
+  Token(const TokenType t, const string x, const int l) :type(t), token(x), indentLevel(l) {}
+
   // static methods for single-line stack allocation
-  static Token of(TokenType t) {
-    Token result(t);
+  static Token of(string s) {
+    Token result(NON_WHITESPACE, s, 0);
     return result;
   }
-  static Token of(string s) {
-    Token result(s);
+  static Token sol() {
+    Token result(START_OF_LINE, L"", 0);
+    return result;
+  }
+  static Token indent(int l) {
+    Token result(INDENT, L"", l);
+    return result;
+  }
+  static Token outdent(int l) {
+    Token result(OUTDENT, L"", l);
     return result;
   }
 
@@ -182,7 +192,7 @@ Token parseToken(istream& in) {
     skipWhitespace(in);
     if (in.peek() == L'\n') {
       skip(in);
-      return Token::of(START_OF_LINE);
+      return Token::sol();
     }
   }
 
@@ -190,9 +200,9 @@ Token parseToken(istream& in) {
     int prevIndentLevel = indentLevel;
     indentLevel = countIndent(in);
     if (indentLevel > prevIndentLevel)
-      return Token::of(INDENT);
+      return Token::indent(indentLevel);
     else if (prevTokenType < prevIndentLevel)
-      return Token::of(OUTDENT);
+      return Token::outdent(indentLevel);
   }
 
   ostringstream out;
