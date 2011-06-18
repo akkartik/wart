@@ -514,6 +514,7 @@ void test_slurpLine_includes_indent_from_next_line() {
                                     for (list<Token>::reverse_iterator p = line.rbegin(); p != line.rend(); ++p) {
                                       if (whitespace(p->type)) --numWords; // indent
                                       else if (*p == L")") --numWords;
+                                      else if (p->token[0] == L';') --numWords; // comment
                                       else break;
                                     }
                                     return numWords;
@@ -532,7 +533,8 @@ list<Token> parenthesize(list<Token> in) {
     if (numWords == 0)
       cerr << "tokenize shouldn't have passed through empty lines\n" << DIE;
 
-    if (numWords > 1 && line.front() != L"(") {
+    if (numWords > 1
+        && line.front() != L"(" && line.front() != L"'" && line.front() != L"`") {
       result.push_back(Token::of(L"("));
       ++parenCount;
     }
@@ -542,7 +544,8 @@ list<Token> parenthesize(list<Token> in) {
         result.push_back(*q);
     }
 
-    if (!isIndent(line.back()) && numWords > 1 && line.front() != L"(") {
+    if (!isIndent(line.back()) && numWords > 1
+        && line.front() != L"(" && line.front() != L"'" && line.front() != L"`") {
       result.push_back(Token::of(L")"));
       --parenCount;
     }
@@ -703,6 +706,24 @@ void test_parenthesize_groups_across_indent3() {
   check_eq(*p, L"ef"); ++p;
   check_eq(*p, L")"); ++p;
   check_eq(*p, L"g"); ++p;
+  check_eq(*p, L")"); ++p;
+  check(p == ast.end());
+}
+
+void test_parenthesize_handles_quotes_and_comments() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"a b c  \n  '(d ef)\n\n  g ;abc")));
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L"'"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"d"); ++p;
+  check_eq(*p, L"ef"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L"g"); ++p;
+  check_eq(*p, L";abc"); ++p;
   check_eq(*p, L")"); ++p;
   check(p == ast.end());
 }
