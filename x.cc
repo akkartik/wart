@@ -570,7 +570,7 @@ list<Token> parenthesize(list<Token> in) {
     for (list<Token>::iterator q = line.begin(); q != line.end(); ++q) {
       add(result, *q);
 
-      if (*q == L"(")
+      if (q != line.begin() && *q == L"(")
         suppressInsert = parenCount;
 
       if (*q == L")" && parenCount <= suppressInsert)
@@ -815,6 +815,22 @@ void test_parenthesize_wraps_around_outdents2() {
 
 void test_parenthesize_wraps_across_comments() {
   list<Token> ast = parenthesize(tokenize(teststream(L"def foo\n    ;a b c\n  d e\nnewdef")));
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"def"); ++p;
+  check_eq(*p, L"foo"); ++p;
+  check_eq(*p, L";a b c"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"d"); ++p;
+  check_eq(*p, L"e"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L"newdef"); ++p;
+  check(p == ast.end());
+}
+
+void test_parenthesize_wraps_inside_parens() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"(def foo\n    ;a b c\n  d e)\nnewdef")));
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"def"); ++p;
