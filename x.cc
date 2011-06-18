@@ -827,7 +827,8 @@ ostream& operator<<(ostream& os, list<Token> l) {
     else if (isIndent(*p))
       for (int i=0; i < p->indentLevel; ++i)
         os << " ";
-    else os << *p;
+    else
+      os << *p;
   }
   os << endl;
   return os;
