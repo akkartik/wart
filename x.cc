@@ -466,6 +466,11 @@ void test_slurpLine() {
   check(p == line.end());
 }
 
+void test_slurpLine_empty() {
+  list<Token> line = slurpLine(tokenize(teststream(L"")).begin());
+  check(line.empty());
+}
+
 void test_slurpLine_skips_indent() {
   list<Token> line = slurpLine(tokenize(teststream(L"abc")).begin());
   list<Token>::iterator p = line.begin();
@@ -485,26 +490,23 @@ void test_slurpLine_includes_indent_from_next_line() {
 
 
 
+                                  list<Token>::iterator skipLine(list<Token>::iterator p, list<Token>::iterator end) {
+                                    while(whitespace(p->type) && p != end) ++p;
+                                    while(!whitespace(p->type) && p != end) ++p;
+                                    while(whitespace(p->type) && p != end) ++p;
+                                    return p;
+                                  }
+
 list<Token> parenthesize(list<Token> in) {
-  TokenType prevTokenType = START_OF_LINE;
-  int parenStack = 0;
   list<Token> result;
-  for (list<Token>::iterator p = in.begin(); p != in.end(); ++p) {
-    if (!whitespace(p->type)) {
-      if (prevTokenType == START_OF_LINE && *p != L"(") {
-        result.push_back(Token::of(L"("));
-        ++parenStack;
+  for (list<Token>::iterator p = in.begin(); p != in.end(); p = skipLine(p, in.end())) {
+    list<Token> line = slurpLine(p);
+    for (list<Token>::iterator q = line.begin(); q != line.end(); ++q) {
+      if (!whitespace(q->type)) {
+        result.push_back(*q);
       }
-      result.push_back(*p);
     }
-    else if (*p == START_OF_LINE && parenStack > 0) {
-      result.push_back(Token::of(L")"));
-      --parenStack;
-    }
-    prevTokenType = p->type;
   }
-  for (int i = 0; i < parenStack; ++i)
-    result.push_back(Token::of(L")"));
   return result;
 }
 
