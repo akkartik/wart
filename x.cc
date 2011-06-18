@@ -547,8 +547,6 @@ list<Token> parenthesize(list<Token> in) {
     list<Token> line = slurpLine(p, in.end());
     int numWords = numWordsInLine(line);
     int indentLevel = indentLevelOfLine(p, in.end());
-    if (numWords == 0)
-      cerr << "tokenize shouldn't have passed through empty lines\n" << DIE;
 
     if (numWords > 1
         && line.front() != L"(" && line.front() != L"'" && line.front() != L"`") {
@@ -791,6 +789,22 @@ void test_parenthesize_wraps_around_outdents2() {
   check_eq(*p, L"b"); ++p;
   check_eq(*p, L"c"); ++p;
   check_eq(*p, L")"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"d"); ++p;
+  check_eq(*p, L"e"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L"newdef"); ++p;
+  check(p == ast.end());
+}
+
+void test_parenthesize_wraps_across_comments() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"def foo\n    ;a b c\n  d e\nnewdef")));
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"def"); ++p;
+  check_eq(*p, L"foo"); ++p;
+  check_eq(*p, L";a b c"); ++p;
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"d"); ++p;
   check_eq(*p, L"e"); ++p;
