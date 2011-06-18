@@ -501,16 +501,44 @@ void test_slurpLine_includes_indent_from_next_line() {
                                     return p;
                                   }
 
+                                  int numWordsInLine(list<Token> line) {
+                                    int numWords = line.size();
+                                    for (list<Token>::reverse_iterator p = line.rbegin(); p != line.rend(); ++p) {
+                                      if (whitespace(p->type)) --numWords; // indent
+                                      else if (*p == L")") --numWords;
+                                      else break;
+                                    }
+                                    return numWords;
+                                  }
+
 list<Token> parenthesize(list<Token> in) {
   list<Token> result;
+  int parenCount = 0;
   for (list<Token>::iterator p = in.begin(); p != in.end(); p = skipLine(p, in.end())) {
     list<Token> line = slurpLine(p);
+    int numWords = numWordsInLine(line);
+    if (numWords == 0)
+      cerr << "tokenize shouldn't have passed through empty lines\n" << DIE;
+
+    if (numWords > 1 && line.front() != L"(") {
+      result.push_back(Token::of(L"("));
+      ++parenCount;
+    }
+
     for (list<Token>::iterator q = line.begin(); q != line.end(); ++q) {
       if (!whitespace(q->type)) {
         result.push_back(*q);
       }
     }
+
+    if (line.back() == OUTDENT && parenCount > 0) {
+      result.push_back(Token::of(L")"));
+      --parenCount;
+    }
   }
+
+  for (int i=0; i < parenCount; ++i)
+    result.push_back(Token::of(L")"));
   return result;
 }
 
