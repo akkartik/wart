@@ -561,7 +561,7 @@ list<Token> parenthesize(list<Token> in) {
         result.push_back(*q);
     }
 
-    if (!isIndent(line.back()) && numWords > 1
+    if (line.back() != INDENT && numWords > 1
         && line.front() != L"(" && line.front() != L"'" && line.front() != L"`") {
       result.push_back(Token::of(L")"));
       parenStack.pop_back();
@@ -667,6 +667,18 @@ void test_parenthesize_groups_words_on_single_line() {
   check(p == ast.end());
 }
 
+void test_parenthesize_groups_words_on_single_indented_line() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"    a b c\n  34")));
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L"34"); ++p;
+  check(p == ast.end());
+}
+
 void test_parenthesize_groups_words_on_each_line_without_indent() {
   list<Token> ast = parenthesize(tokenize(teststream(L"a b c  \nd ef")));
   list<Token>::iterator p = ast.begin();
@@ -761,6 +773,26 @@ void test_parenthesize_wraps_around_outdents() {
   check_eq(*p, L"g"); ++p;
   check_eq(*p, L";abc"); ++p;
   check_eq(*p, L")"); ++p;
+  check(p == ast.end());
+}
+
+void test_parenthesize_wraps_around_outdents2() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"def foo\n    a b c\n  d e\nnewdef")));
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"def"); ++p;
+  check_eq(*p, L"foo"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"d"); ++p;
+  check_eq(*p, L"e"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L"newdef"); ++p;
   check(p == ast.end());
 }
 
