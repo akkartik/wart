@@ -577,9 +577,9 @@ list<Token> parenthesize(list<Token> in) {
       add(result, *q);
 
       if (parenNotAtStartOfLine(q, line.begin()))
-        suppressInsert = parenCount;
+        suppressInsert = parenCount; // no more paren-insertion until it closes
 
-      if (*q == L")" && parenCount <= suppressInsert)
+      if (*q == L")" && parenCount <= suppressInsert) // it closed
         suppressInsert = 0;
     }
 
