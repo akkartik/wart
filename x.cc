@@ -107,17 +107,26 @@ ostream& operator<<(ostream& os, Token p) {
                                     return in.eof();
                                   }
 
+// counts number of whitespace chars between next non-whitespace char and previous newline
+// BEWARE: tab = 1 space; don't mix the two
+// NOTE: for wiggle-room a single extra space over the previous indentLevel is treated as the same
+// indentLevel.
+int indentLevel = 0;
 int countIndent(istream& in) {
   int count = 0;
   char c;
+  bool lastCharWasSpace = false;
   while (!eof(in)) {
     if (!isspace(in.peek()))
       break;
     in >> c;
-    ++count; // BEWARE: tab = 1 space; don't mix the two
+    lastCharWasSpace = (c == L' ');
+    ++count;
     if (c == L'\n')
       count = 0;
   }
+  if (lastCharWasSpace && count == indentLevel+1)
+    return indentLevel;
   return count;
 }
 
@@ -129,11 +138,21 @@ int countIndent(istream& in) {
 
 void test_countIndent() {
   // countIndent requires a non-empty stream
-  check_eq(countIndent(teststream(L" ")), 1);
+
+  indentLevel = 0; // don't forget to reset
+  check_eq(countIndent(teststream(L" ")), 0); // single extra space is not indent
+
+  indentLevel = 0;
+  check_eq(countIndent(teststream(L"  ")), 2);
+  indentLevel = 0;
   check_eq(countIndent(teststream(L"   ")), 3);
+  indentLevel = 0;
   check_eq(countIndent(teststream(L" \t ")), 3);
-  check_eq(countIndent(teststream(L" \n ")), 1);
-  check_eq(countIndent(teststream(L" \r\n  ")), 2);
+  indentLevel = 0;
+  check_eq(countIndent(teststream(L"  \n  ")), 2);
+  indentLevel = 0;
+  check_eq(countIndent(teststream(L"    \r\n  ")), 2);
+  indentLevel = 0;
   check_eq(countIndent(teststream(L"\n\na")), 0);
 }
 
@@ -185,7 +204,6 @@ void test_countIndent() {
                                     }
                                   }
 
-int indentLevel = 0;
 TokenType prevTokenType = START_OF_LINE;
 Token parseToken(istream& in) {
   if (prevTokenType != START_OF_LINE) {
