@@ -803,9 +803,17 @@ void test_parenthesize_wraps_around_outdents2() {
 
 
 ostream& operator<<(ostream& os, list<Token> l) {
+  bool prevWasOpen = true;
   for (list<Token>::iterator p = l.begin(); p != l.end(); ++p) {
-    if (*p != L")") os << " ";
-    os << *p;
+    if (!(*p == L")") || !prevWasOpen) os << " ";
+    if (*p == L"(") prevWasOpen = true;
+
+    if (*p == START_OF_LINE)
+      os << "$" << endl;
+    else if (isIndent(*p))
+      for (int i=0; i < p->indentLevel; ++i)
+        os << " ";
+    else os << *p;
   }
   os << endl;
   return os;
@@ -840,7 +848,7 @@ int main(int argc, ascii* argv[]) {
     }
   }
 
-  cout << parenthesize(tokenize(cin));
+  cout << tokenize(cin);
   return 0;
 }
 
