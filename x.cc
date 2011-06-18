@@ -203,7 +203,7 @@ Token parseToken(istream& in) {
     indentLevel = countIndent(in);
     if (indentLevel > prevIndentLevel)
       return Token::indent(indentLevel);
-    else if (prevTokenType < prevIndentLevel)
+    else if (indentLevel < prevIndentLevel)
       return Token::outdent(indentLevel);
   }
 
