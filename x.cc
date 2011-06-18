@@ -457,16 +457,40 @@ void test_parenthesize_skips_indent_tokens() {
 }
 
 void test_parenthesize_skips_outdent_tokens() {
-  list<Token> ast = parenthesize(tokenize(teststream(L"(a b c\n  b c\n    def\n  gh)")));
+  list<Token> ast = parenthesize(tokenize(teststream(L"(a b c\n  bc\n    def\n  gh)")));
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"a"); ++p;
   check_eq(*p, L"b"); ++p;
   check_eq(*p, L"c"); ++p;
-  check_eq(*p, L"b"); ++p;
-  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L"bc"); ++p;
   check_eq(*p, L"def"); ++p;
   check_eq(*p, L"gh"); ++p;
+  check_eq(*p, L")"); ++p;
+  check(p == ast.end());
+}
+
+void test_parenthesize_handles_fully_parenthesized_expressions_regardless_of_indent() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"(a b c\n  (def gh)\n    (i j k)\n  lm\n\n\n    (no p))")));
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"def"); ++p;
+  check_eq(*p, L"gh"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"i"); ++p;
+  check_eq(*p, L"j"); ++p;
+  check_eq(*p, L"k"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L"lm"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"no"); ++p;
+  check_eq(*p, L"p"); ++p;
+  check_eq(*p, L")"); ++p;
   check_eq(*p, L")"); ++p;
   check(p == ast.end());
 }
