@@ -524,19 +524,36 @@ void test_slurpLine_includes_indent_from_next_line() {
                                     return whitespace(t.type); // No more START_OF_LINE at this point
                                   }
 
+                                  int indentLevelOfLine(list<Token>::iterator p, list<Token>::iterator end) {
+                                    if (p == end) return 0;
+                                    list<Token>::iterator prev = p;
+                                    if (!whitespace(prev->type)) return 0;
+
+                                    for (++p; p != end; prev=p, ++p) {
+                                      if (*p == START_OF_LINE) continue;
+                                      if (!isIndent(*p)) break;
+                                    }
+
+                                    if (*prev == START_OF_LINE) return 0;
+                                    if (!isIndent(*prev))
+                                      cerr << "error in indentLevel" << DIE;
+                                    return prev->indentLevel;
+                                  }
+
 list<Token> parenthesize(list<Token> in) {
   list<Token> result;
-  int parenCount = 0;
+  list<int> parenStack;
   for (list<Token>::iterator p = in.begin(); p != in.end(); p = skipLine(p, in.end())) {
     list<Token> line = slurpLine(p, in.end());
     int numWords = numWordsInLine(line);
+    int indentLevel = indentLevelOfLine(p, in.end());
     if (numWords == 0)
       cerr << "tokenize shouldn't have passed through empty lines\n" << DIE;
 
     if (numWords > 1
         && line.front() != L"(" && line.front() != L"'" && line.front() != L"`") {
       result.push_back(Token::of(L"("));
-      ++parenCount;
+      parenStack.push_back(indentLevel);
     }
 
     for (list<Token>::iterator q = line.begin(); q != line.end(); ++q) {
@@ -547,16 +564,17 @@ list<Token> parenthesize(list<Token> in) {
     if (!isIndent(line.back()) && numWords > 1
         && line.front() != L"(" && line.front() != L"'" && line.front() != L"`") {
       result.push_back(Token::of(L")"));
-      --parenCount;
+      parenStack.pop_back();
     }
 
-    if (line.back() == OUTDENT && parenCount > 0) {
+    if (line.back() == OUTDENT
+        && !parenStack.empty() && parenStack.back() == line.back().indentLevel) {
       result.push_back(Token::of(L")"));
-      --parenCount;
+      parenStack.pop_back();
     }
   }
 
-  for (int i=0; i < parenCount; ++i)
+  for (unsigned int i=0; i < parenStack.size(); ++i)
     result.push_back(Token::of(L")"));
   return result;
 }
@@ -712,6 +730,24 @@ void test_parenthesize_groups_across_indent3() {
 
 void test_parenthesize_handles_quotes_and_comments() {
   list<Token> ast = parenthesize(tokenize(teststream(L"a b c  \n  '(d ef)\n\n  g ;abc")));
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L"'"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"d"); ++p;
+  check_eq(*p, L"ef"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L"g"); ++p;
+  check_eq(*p, L";abc"); ++p;
+  check_eq(*p, L")"); ++p;
+  check(p == ast.end());
+}
+
+void test_parenthesize_wraps_around_outdents() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"a b c  \n    '(d ef)\n\n  g ;abc")));
   list<Token>::iterator p = ast.begin();
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"a"); ++p;
