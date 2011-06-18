@@ -548,6 +548,11 @@ void test_slurpLine_includes_indent_from_next_line() {
                                     if (x == L")") --parenCount;
                                   }
 
+                                  bool parenNotAtStartOfLine(list<Token>::iterator q, list<Token>& line) {
+                                    if (q == line.begin()) return false;
+                                    return (*q == L"(");
+                                  }
+
 list<Token> parenthesize(list<Token> in) {
   list<Token> result;
   list<int> parenStack;
@@ -570,7 +575,7 @@ list<Token> parenthesize(list<Token> in) {
     for (list<Token>::iterator q = line.begin(); q != line.end(); ++q) {
       add(result, *q);
 
-      if (q != line.begin() && *q == L"(")
+      if (parenNotAtStartOfLine(q, line))
         suppressInsert = parenCount;
 
       if (*q == L")" && parenCount <= suppressInsert)
