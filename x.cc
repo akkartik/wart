@@ -526,9 +526,8 @@ list<Token> parenthesize(list<Token> in) {
     }
 
     for (list<Token>::iterator q = line.begin(); q != line.end(); ++q) {
-      if (!whitespace(q->type)) {
+      if (!whitespace(q->type))
         result.push_back(*q);
-      }
     }
 
     if (line.back() == OUTDENT && parenCount > 0) {
@@ -645,7 +644,7 @@ const testfunc tests[] = {
 };
 
 void runTests() {
-  for (unsigned int i = 0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
+  for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
     (*tests[i])();
   }
   cerr << endl;
