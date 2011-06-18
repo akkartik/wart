@@ -819,11 +819,11 @@ void test_parenthesize_wraps_across_comments() {
 ostream& operator<<(ostream& os, list<Token> l) {
   bool prevWasOpen = true;
   for (list<Token>::iterator p = l.begin(); p != l.end(); ++p) {
-    if (!(*p == L")") || !prevWasOpen) os << " ";
-    if (*p == L"(") prevWasOpen = true;
+    if (!(*p == L")" || prevWasOpen)) os << " ";
+    prevWasOpen = (*p == L"(" || *p == L"'" || *p == L"," || *p == L",@");
 
-    if (*p == START_OF_LINE)
-      os << "$" << endl;
+    if (*p == START_OF_LINE || p->token[0] == L';')
+      os << endl;
     else if (isIndent(*p))
       for (int i=0; i < p->indentLevel; ++i)
         os << " ";
