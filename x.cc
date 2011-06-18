@@ -511,6 +511,10 @@ void test_slurpLine_includes_indent_from_next_line() {
                                     return numWords;
                                   }
 
+                                  bool isIndent(Token t) {
+                                    return whitespace(t.type); // No more START_OF_LINE at this point
+                                  }
+
 list<Token> parenthesize(list<Token> in) {
   list<Token> result;
   int parenCount = 0;
@@ -530,7 +534,7 @@ list<Token> parenthesize(list<Token> in) {
         result.push_back(*q);
     }
 
-    if (line.back() != OUTDENT && numWords > 1 && line.front() != L"(") {
+    if (!isIndent(line.back()) && numWords > 1 && line.front() != L"(") {
       result.push_back(Token::of(L")"));
       --parenCount;
     }
@@ -636,6 +640,21 @@ void test_parenthesize_groups_words_on_each_line_without_indent() {
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"d"); ++p;
   check_eq(*p, L"ef"); ++p;
+  check_eq(*p, L")"); ++p;
+  check(p == ast.end());
+}
+
+void test_parenthesize_groups_across_indent() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"a b c  \n  d ef")));
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"d"); ++p;
+  check_eq(*p, L"ef"); ++p;
+  check_eq(*p, L")"); ++p;
   check_eq(*p, L")"); ++p;
   check(p == ast.end());
 }
