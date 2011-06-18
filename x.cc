@@ -659,6 +659,37 @@ void test_parenthesize_groups_across_indent() {
   check(p == ast.end());
 }
 
+void test_parenthesize_groups_across_indent2() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"a b c  \n  (d ef)")));
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"d"); ++p;
+  check_eq(*p, L"ef"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L")"); ++p;
+  check(p == ast.end());
+}
+
+void test_parenthesize_groups_across_indent3() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"a b c  \n  (d ef)\n\n  g")));
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"d"); ++p;
+  check_eq(*p, L"ef"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L"g"); ++p;
+  check_eq(*p, L")"); ++p;
+  check(p == ast.end());
+}
+
 
 
 typedef void (*testfunc)(void);
