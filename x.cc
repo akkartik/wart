@@ -107,6 +107,12 @@ ostream& operator<<(ostream& os, Token p) {
                                     return in.eof();
                                   }
 
+                                  class Die {};
+                                  ostream& operator<<(ostream& os, Die die) {
+                                    exit(1);
+                                  }
+                                  Die DIE;
+
 // counts number of whitespace chars between next non-whitespace char and previous newline
 // BEWARE: tab = 1 space; don't mix the two
 //
@@ -125,10 +131,8 @@ int countIndent(istream& in) {
     if (c == L'\n')
       count = 0;
   }
-  if (count >= LAST_CHAR_IS_SPACE) {
-    cerr << L"eek, too much indent\n";
-    exit(1);
-  }
+  if (count >= LAST_CHAR_IS_SPACE)
+    cerr << L"eek, too much indent\n" << DIE;
   if (lastCharIsSpace)
     count += LAST_CHAR_IS_SPACE;
   return count;
