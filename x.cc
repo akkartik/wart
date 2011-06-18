@@ -840,15 +840,24 @@ ostream& operator<<(ostream& os, list<Token> l) {
                                   }
 
 int main(int argc, ascii* argv[]) {
+  int pass = 0;
   if (argc > 1) {
     std::string arg1(argv[1]);
     if (arg1 == "test") {
       runTests();
       return 0;
     }
+    else if (arg1[0] >= L'0' || arg1[0] <= L'9')
+      pass = atoi(arg1.c_str());
   }
 
-  cout << tokenize(cin);
+  switch (pass) {
+  case 1:
+    cout << tokenize(cin); break;
+  case 2:
+  default:
+    cout << parenthesize(tokenize(cin)); break;
+  }
   return 0;
 }
 
