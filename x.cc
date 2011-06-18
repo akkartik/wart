@@ -530,6 +530,11 @@ list<Token> parenthesize(list<Token> in) {
         result.push_back(*q);
     }
 
+    if (line.back() != OUTDENT && numWords > 1 && line.front() != L"(") {
+      result.push_back(Token::of(L")"));
+      --parenCount;
+    }
+
     if (line.back() == OUTDENT && parenCount > 0) {
       result.push_back(Token::of(L")"));
       --parenCount;
