@@ -549,6 +549,7 @@ void test_slurpLine_includes_indent_from_next_line() {
                                   }
 
                                   bool parenNotAtStartOfLine(list<Token>::iterator q, list<Token>::iterator begin) {
+                                    if (*begin == L"`") begin++;
                                     if (q == begin) return false;
                                     return (*q == L"(");
                                   }
@@ -837,6 +838,23 @@ void test_parenthesize_wraps_across_comments() {
 void test_parenthesize_wraps_inside_parens() {
   list<Token> ast = parenthesize(tokenize(teststream(L"(def foo\n    ;a b c\n  d e)\nnewdef")));
   list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"def"); ++p;
+  check_eq(*p, L"foo"); ++p;
+  check_eq(*p, L";a b c"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"d"); ++p;
+  check_eq(*p, L"e"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L"newdef"); ++p;
+  check(p == ast.end());
+}
+
+void test_parenthesize_wraps_inside_parens2() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"`(def foo\n    ;a b c\n  d e)\nnewdef")));
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"`"); ++p;
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"def"); ++p;
   check_eq(*p, L"foo"); ++p;
