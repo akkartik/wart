@@ -133,9 +133,9 @@ void test_countIndent() {
   // countIndent requires a non-empty stream
   check_eq(countIndent(teststream(L" ")), 1);
   check_eq(countIndent(teststream(L"   ")), 3);
-  check_eq(countIndent(teststream(L" \t ")), 3);
-  check_eq(countIndent(teststream(L" \n ")), 1);
-  check_eq(countIndent(teststream(L" \r\n  ")), 2);
+  check_eq(countIndent(teststream(L" \t ")), 3); // tab == 1 space
+  check_eq(countIndent(teststream(L" \n ")), 1); // skip empty lines
+  check_eq(countIndent(teststream(L" \r\n  ")), 2); // dos
   check_eq(countIndent(teststream(L"\n\na")), 0);
 }
 
