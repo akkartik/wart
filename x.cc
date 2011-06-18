@@ -813,23 +813,23 @@ ostream& operator<<(ostream& os, list<Token> l) {
 
 
 
-typedef void (*testfunc)(void);
+                                  typedef void (*testfunc)(void);
 
-const testfunc tests[] = {
-  #include"test_list"
-};
+                                  const testfunc tests[] = {
+                                    #include"test_list"
+                                  };
 
-void runTests() {
-  for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
-    (*tests[i])();
-  }
-  cerr << endl;
-  if (numFailures == 0) return;
+                                  void runTests() {
+                                    for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
+                                      (*tests[i])();
+                                    }
+                                    cerr << endl;
+                                    if (numFailures == 0) return;
 
-  cerr << numFailures << " failure";
-      if (numFailures > 1) { cerr << "s"; }
-      cerr << endl;
-}
+                                    cerr << numFailures << " failure";
+                                        if (numFailures > 1) { cerr << "s"; }
+                                        cerr << endl;
+                                  }
 
 int main(int argc, ascii* argv[]) {
   if (argc > 1) {
