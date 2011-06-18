@@ -36,7 +36,7 @@
 enum TokenType {
   NON_WHITESPACE,
   START_OF_LINE,
-  INDENT,
+  INDENT, MAYBE_WRAP,
   OUTDENT,
 };
 
@@ -61,8 +61,8 @@ struct Token {
     Token result(START_OF_LINE, L"", 0);
     return result;
   }
-  static Token indent(int l) {
-    Token result(INDENT, L"", l);
+  static Token indent(int l, bool justOneExtraChar) {
+    Token result(justOneExtraChar ? MAYBE_WRAP : INDENT, L"", l);
     return result;
   }
   static Token outdent(int l) {
@@ -109,17 +109,28 @@ ostream& operator<<(ostream& os, Token p) {
 
 // counts number of whitespace chars between next non-whitespace char and previous newline
 // BEWARE: tab = 1 space; don't mix the two
+//
+// But do track whether the final indent char is a space. We'll need that farther down.
+const int LAST_CHAR_IS_SPACE = 100;
 int countIndent(istream& in) {
   int count = 0;
+  bool lastCharIsSpace = false;
   char c;
   while (!eof(in)) {
     if (!isspace(in.peek()))
       break;
     in >> c;
+    lastCharIsSpace = (c == L' ');
     ++count;
     if (c == L'\n')
       count = 0;
   }
+  if (count >= LAST_CHAR_IS_SPACE) {
+    cerr << L"eek, too much indent\n";
+    exit(1);
+  }
+  if (lastCharIsSpace)
+    count += LAST_CHAR_IS_SPACE;
   return count;
 }
 
@@ -131,11 +142,12 @@ int countIndent(istream& in) {
 
 void test_countIndent() {
   // countIndent requires a non-empty stream
-  check_eq(countIndent(teststream(L" ")), 1);
-  check_eq(countIndent(teststream(L"   ")), 3);
-  check_eq(countIndent(teststream(L" \t ")), 3); // tab == 1 space
-  check_eq(countIndent(teststream(L" \n ")), 1); // skip empty lines
-  check_eq(countIndent(teststream(L" \r\n  ")), 2); // dos
+  check_eq(countIndent(teststream(L"\t")), 1);
+  check_eq(countIndent(teststream(L" ")), 1+LAST_CHAR_IS_SPACE);
+  check_eq(countIndent(teststream(L"   ")), 3+LAST_CHAR_IS_SPACE);
+  check_eq(countIndent(teststream(L" \t ")), 3+LAST_CHAR_IS_SPACE); // tab == 1 space
+  check_eq(countIndent(teststream(L" \n ")), 1+LAST_CHAR_IS_SPACE); // skip empty lines
+  check_eq(countIndent(teststream(L" \r\n  ")), 2+LAST_CHAR_IS_SPACE); // dos
   check_eq(countIndent(teststream(L"\n\na")), 0);
 }
 
@@ -201,10 +213,15 @@ Token parseToken(istream& in) {
   if (prevTokenType == START_OF_LINE) {
     int prevIndentLevel = indentLevel;
     indentLevel = countIndent(in);
-    if (indentLevel > prevIndentLevel)
-      return Token::indent(indentLevel);
+    bool lastCharIsSpace = (indentLevel >= LAST_CHAR_IS_SPACE);
+    if (lastCharIsSpace) indentLevel -= LAST_CHAR_IS_SPACE;
+    if (indentLevel > prevIndentLevel+1)
+      return Token::indent(indentLevel, false);
+    else if (indentLevel == prevIndentLevel+1)
+      return Token::indent(indentLevel, lastCharIsSpace);
     else if (indentLevel < prevIndentLevel)
       return Token::outdent(indentLevel);
+    // otherwise prevIndentLevel == indentLevel; fall through
   }
 
   ostringstream out;
