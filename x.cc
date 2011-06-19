@@ -545,6 +545,73 @@ void test_slurpLine_includes_indent_from_next_line() {
   check(p == line.end());
 }
 
+#define inc(p) { ++p; if (p == end) return p; }
+#define pop(l) { l.pop_front(); if (l.empty()) break; }
+list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, list<Token>::iterator end) {
+  while (!line.empty() && whitespace(line.front().type)) pop(line);
+  while (!line.empty() && !whitespace(line.front().type)) pop(line);
+
+  if (line.empty()) {
+    while (whitespace(p->type)) {
+      line.push_back(*p);
+      inc(p);
+    }
+  }
+
+  while (!whitespace(p->type)) {
+    line.push_back(*p);
+    inc(p);
+  }
+  while (whitespace(p->type)) {
+    line.push_back(*p);
+    inc(p);
+  }
+  return p;
+}
+#undef pop
+#undef inc
+
+void test_slurpNextLine_adds_all_words_in_next_line() {
+  list<Token> ast = tokenize(teststream(L"abc def\nghi jkl"));
+  list<Token> line;
+  slurpNextLine(line, ast.begin(), ast.end());
+  list<Token>::iterator p = line.begin();
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, L"abc"); ++p;
+  check_eq(*p, L"def"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check(p == line.end());
+}
+
+void test_slurpNextLine_includes_indent_for_current_and_next_line() {
+  list<Token> ast = tokenize(teststream(L"  abc def\nghi jkl"));
+  list<Token> line;
+  slurpNextLine(line, ast.begin(), ast.end());
+  list<Token>::iterator p = line.begin();
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, INDENT); ++p;
+  check_eq(*p, L"abc"); ++p;
+  check_eq(*p, L"def"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, OUTDENT); ++p;
+  check(p == line.end());
+}
+
+void test_slurpNextLine_deletes_previous_line_on_recall() {
+  list<Token> ast = tokenize(teststream(L"  abc def\nghi jkl\n  mnop"));
+  list<Token> line;
+  list<Token>::iterator q = slurpNextLine(line, ast.begin(), ast.end());
+  slurpNextLine(line, q, ast.end());
+  list<Token>::iterator p = line.begin();
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, OUTDENT); ++p;
+  check_eq(*p, L"ghi"); ++p;
+  check_eq(*p, L"jkl"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, INDENT); ++p;
+  check(p == line.end());
+}
+
 
 
                                   list<Token>::iterator skipLine(list<Token>::iterator p, list<Token>::iterator end) {
