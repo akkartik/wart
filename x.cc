@@ -553,18 +553,20 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
   while (!line.empty() && whitespace(line.front().type)) pop(line);
   while (!line.empty() && !whitespace(line.front().type)) pop(line);
 
-  if (line.empty()) {
-    while (whitespace(p->type)) {
+  if (line.empty()) // initial condition
+    while (p != end) {
+      if (!whitespace(p->type)) break;
       line.push_back(*p);
       inc(p);
     }
-  }
 
-  while (!whitespace(p->type)) {
+  while (p != end) {
+    if (whitespace(p->type)) break;
     line.push_back(*p);
     inc(p);
   }
-  while (whitespace(p->type)) {
+  while (p != end) {
+    if (!whitespace(p->type)) break;
     line.push_back(*p);
     inc(p);
   }
