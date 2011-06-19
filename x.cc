@@ -14,6 +14,9 @@
                                   #include<sstream>
                                   typedef std::wstringstream stringstream;
                                   typedef std::wostringstream ostringstream;
+                                  #include <ext/hash_map>
+                                  using __gnu_cxx::hash_map;
+                                  using __gnu_cxx::hash;
 
                                   typedef char ascii; // must come after system includes
                                   #define char wchar_t
@@ -1045,6 +1048,29 @@ ostream& operator<<(ostream& os, list<Token> l) {
   os << endl;
   return os;
 }
+
+
+
+//// bindings
+
+                                  struct strEq {
+                                    bool operator() (const string& s1, const string& s2) const {
+                                      return s1 == s2;
+                                    }
+                                  };
+
+                                  struct strHash {
+                                    static hash<char*> h;
+                                    size_t operator() (const string& in) const {
+                                      unsigned long h = 0;
+                                      for (const char* s=in.c_str(); *s; ++s)
+                                        h = 5 * h + *s;
+                                      return size_t(h);
+                                    }
+                                  };
+
+                                  template<class Data>
+                                  class StringMap :public hash_map<string, Data, strHash, strEq>{};
 
 
 
