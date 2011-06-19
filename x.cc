@@ -554,21 +554,47 @@ void test_slurpLine_includes_indent_from_next_line() {
                                     return (*q == L"(");
                                   }
 
+                                  bool wrappingLine(list<Token>::iterator p) {
+                                    if (*p == START_OF_LINE) ++p;
+                                    cerr << "here: " << p->type << endl;
+                                    return (*p == MAYBE_WRAP);
+                                  }
+
 list<Token> parenthesize(list<Token> in) {
   list<Token> result;
   list<int> parenStack;
   int suppressInsert = 0;
+  int nextLineIndent=-1, thisLineIndent=0, prevLineIndent=0;
+  TokenType thisLineIndentType=INDENT, nextLineIndentType=INDENT;
+  for (list<Token>::iterator p = in.begin(); p != in.end(); ++p) {
+    cerr << *p;
+    if (isIndent(*p)) cerr << "(" << p->indentLevel << ") ";
+    cerr << " ";
+  }
+  cerr << endl;
+
   for (list<Token>::iterator p = in.begin(); p != in.end(); p = skipLine(p, in.end())) {
     list<Token> line = slurpLine(p, in.end());
     int numWords = numWordsInLine(line);
-    int indentLevel = indentLevelOfLine(p, in.end());
+    prevLineIndent = thisLineIndent;
+    thisLineIndent = nextLineIndent == -1 ? indentLevelOfLine(p, in.end()) : nextLineIndent;
+    thisLineIndentType = nextLineIndentType;
+    nextLineIndent = whitespace(line.back().type) ? line.back().indentLevel : 0;
+    nextLineIndentType = line.back().type;
     bool insertedParenThisLine = false;
 
+    cerr << "===\n";
+    cerr << "AA: " << prevLineIndent << " " << thisLineIndent << " " << nextLineIndent << endl;
+    for (list<Token>::iterator q = line.begin(); q != line.end(); ++q)
+      cerr << *q << " ";
+    cerr << endl;
+
     if (!suppressInsert && numWords > 1
-        && line.front() != L"(" && line.front() != L"'" && line.front() != L"`") {
+        && line.front() != L"(" && line.front() != L"'" && line.front() != L"`"
+        && !(thisLineIndent == prevLineIndent+1 && thisLineIndentType == MAYBE_WRAP)) {
       // open paren
       add(result, Token::of(L"("));
-      parenStack.push_back(indentLevel);
+      parenStack.push_back(thisLineIndent);
       insertedParenThisLine = true;
     }
 
@@ -886,6 +912,20 @@ void test_parenthesize_lets_arglists_wrap() {
   check_eq(*p, L")"); ++p;
   check_eq(*p, L")"); ++p;
   check_eq(*p, L"newdef"); ++p;
+  check(p == ast.end());
+}
+
+void test_parenthesize_wraps_when_indented_by_one_space() {
+  list<Token> ast = parenthesize(tokenize(teststream(L"    (a b c\n     d e f)")));
+  list<Token>::iterator p = ast.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L"d"); ++p;
+  check_eq(*p, L"e"); ++p;
+  check_eq(*p, L"f"); ++p;
+  check_eq(*p, L")"); ++p;
   check(p == ast.end());
 }
 
