@@ -31,6 +31,8 @@
                                     } \
                                     else { cerr << "."; fflush(stderr); }
 
+                                  #define __unused__ __attribute__((unused))
+
 
 
 //// tokenize. newlines and indent matter.
@@ -110,7 +112,7 @@ ostream& operator<<(ostream& os, Token p) {
                                   }
 
                                   class Die {};
-                                  ostream& operator<<(ostream& os, Die die) {
+                                  ostream& operator<<(ostream& os __unused__, Die die __unused__) {
                                     exit(1);
                                   }
                                   Die DIE;
