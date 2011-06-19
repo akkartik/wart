@@ -47,9 +47,9 @@ bool whitespace(TokenType t) {
 }
 
 struct Token {
-  const TokenType type;
-  const string token;
-  const int indentLevel;
+  TokenType type;
+  string token;
+  int indentLevel;
 
   // private
   Token(const TokenType t, const string x, const int l) :type(t), token(x), indentLevel(l) {}
@@ -614,42 +614,39 @@ void test_slurpNextLine_deletes_previous_line_on_recall() {
 
 
 
-                                  list<Token>::iterator skipLine(list<Token>::iterator p, list<Token>::iterator end) {
-                                    while(whitespace(p->type) && p != end) ++p;
-                                    while(!whitespace(p->type) && p != end) ++p;
-                                    while(whitespace(p->type) && p != end) ++p;
-                                    return p;
-                                  }
-
                                   int numWordsInLine(list<Token> line) {
-                                    int numWords = line.size();
-                                    for (list<Token>::reverse_iterator p = line.rbegin(); p != line.rend(); ++p) {
-                                      if (whitespace(p->type)) --numWords; // indent
-                                      else if (*p == L")") --numWords;
-                                      else if (p->token[0] == L';') --numWords; // comment
-                                      else break;
+                                    int numWords = 0;
+                                    for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
+                                      if (!whitespace(p->type)
+                                          && *p != L"(" && *p != L")"
+                                          && p->token[0] != L';')
+                                        ++numWords;
                                     }
                                     return numWords;
                                   }
 
                                   bool isIndent(Token t) {
-                                    return whitespace(t.type); // No more START_OF_LINE at this point
+                                    return whitespace(t.type) && t != START_OF_LINE;
                                   }
 
-                                  int indentLevelOfLine(list<Token>::iterator p, list<Token>::iterator end) {
-                                    if (p == end) return 0;
-                                    list<Token>::iterator prev = p;
-                                    if (!whitespace(prev->type)) return 0;
+                                  Token indentBefore(list<Token> line) {
+                                    line.pop_front(); // there's always a START_OF_LINE
+                                    if (isIndent(line.front())) return line.front();
+                                    return Token::sol();
+                                  }
 
-                                    for (++p; p != end; prev=p, ++p) {
-                                      if (*p == START_OF_LINE) continue;
-                                      if (!isIndent(*p)) break;
+                                  Token indentAfter(list<Token> line) {
+                                    if (isIndent(line.back())) return line.back();
+                                    if (line.back() == START_OF_LINE) return line.back();
+                                    return Token::sol();
+                                  }
+
+                                  Token firstTokenInLine(list<Token> line) {
+                                    for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
+                                      if (!whitespace(p->type))
+                                        return *p;
                                     }
-
-                                    if (*prev == START_OF_LINE) return 0;
-                                    if (!isIndent(*prev))
-                                      cerr << "error in indentLevel" << DIE;
-                                    return prev->indentLevel;
+                                    return Token::sol();
                                   }
 
                                   int parenCount = 0;
@@ -661,6 +658,7 @@ void test_slurpNextLine_deletes_previous_line_on_recall() {
                                   }
 
                                   bool parenNotAtStartOfLine(list<Token>::iterator q, list<Token>::iterator begin) {
+                                    if (*begin == START_OF_LINE) begin++;
                                     if (*begin == L"`") begin++;
                                     if (q == begin) return false;
                                     return (*q == L"(");
@@ -670,25 +668,22 @@ list<Token> parenthesize(list<Token> in) {
   list<Token> result;
   list<int> parenStack;
   int suppressInsert = 0;
-  int nextLineIndent=-1, thisLineIndent=0, prevLineIndent=0;
-  TokenType thisLineIndentType=INDENT, nextLineIndentType=INDENT;
 
-  for (list<Token>::iterator p = in.begin(); p != in.end(); p = skipLine(p, in.end())) {
-    list<Token> line = slurpLine(p, in.end());
-    int numWords = numWordsInLine(line);
-    prevLineIndent = thisLineIndent;
-    thisLineIndent = nextLineIndent == -1 ? indentLevelOfLine(p, in.end()) : nextLineIndent;
-    thisLineIndentType = nextLineIndentType;
-    nextLineIndent = whitespace(line.back().type) ? line.back().indentLevel : 0;
-    nextLineIndentType = line.back().type;
+  list<Token> line;
+  Token prevLineIndent=Token::sol(), thisLineIndent=Token::sol(), nextLineIndent=Token::sol();
+  for (list<Token>::iterator p = in.begin(), q = slurpNextLine(line, p, in.end());
+        p != in.end();
+        p = q, q = slurpNextLine(line, p, in.end())) {
+    prevLineIndent=thisLineIndent, thisLineIndent=indentBefore(line), nextLineIndent=indentAfter(line);
+
     bool insertedParenThisLine = false;
-
-    if (!suppressInsert && numWords > 1
-        && line.front() != L"(" && line.front() != L"'" && line.front() != L"`"
-        && !(thisLineIndent == prevLineIndent+1 && thisLineIndentType == MAYBE_WRAP)) {
+    Token firstToken = firstTokenInLine(line);
+    if (!suppressInsert && numWordsInLine(line) > 1
+        && firstToken != L"(" && firstToken != L"'" && firstToken != L"`"
+        && !(thisLineIndent.indentLevel == prevLineIndent.indentLevel+1 && thisLineIndent.type == MAYBE_WRAP)) {
       // open paren
       add(result, Token::of(L"("));
-      parenStack.push_back(thisLineIndent);
+      parenStack.push_back(thisLineIndent.indentLevel);
       insertedParenThisLine = true;
     }
 
@@ -703,14 +698,16 @@ list<Token> parenthesize(list<Token> in) {
         suppressInsert = 0;
     }
 
-    if (!suppressInsert && line.back() != INDENT /*TODO: MAYBE_WRAP?*/ && insertedParenThisLine) {
+    if (suppressInsert) continue;
+
+    if (nextLineIndent != INDENT /*TODO: MAYBE_WRAP?*/ && insertedParenThisLine) {
       // close paren for this line
       add(result, Token::of(L")"));
       parenStack.pop_back();
     }
 
-    if (!suppressInsert && line.back() == OUTDENT
-        && !parenStack.empty() && parenStack.back() == line.back().indentLevel) {
+    if (nextLineIndent == OUTDENT
+        && !parenStack.empty() && parenStack.back() == nextLineIndent.indentLevel) {
       // close paren for a previous line
       add(result, Token::of(L")"));
       parenStack.pop_back();
