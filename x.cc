@@ -2,6 +2,8 @@
                                   typedef std::wstring string;
                                   #include<list>
                                   using std::list;
+                                  #include<stack>
+                                  using std::stack;
                                   #include<iostream>
                                   typedef std::wistream istream;
                                   typedef std::wostream ostream;
@@ -670,7 +672,7 @@ void test_slurpNextLine_deletes_previous_line_on_recall() {
 
 list<Token> parenthesize(list<Token> in) {
   list<Token> result;
-  list<int> parenStack;
+  stack<int> parenStack;
   int suppressInsert = 0;
 
   list<Token> line;
@@ -687,7 +689,7 @@ list<Token> parenthesize(list<Token> in) {
         && !(thisLineIndent.indentLevel == prevLineIndent.indentLevel+1 && thisLineIndent.type == MAYBE_WRAP)) {
       // open paren
       add(result, Token::of(L"("));
-      parenStack.push_back(thisLineIndent.indentLevel);
+      parenStack.push(thisLineIndent.indentLevel);
       insertedParenThisLine = true;
     }
 
@@ -707,14 +709,14 @@ list<Token> parenthesize(list<Token> in) {
     if (nextLineIndent != INDENT /*TODO: MAYBE_WRAP?*/ && insertedParenThisLine) {
       // close paren for this line
       add(result, Token::of(L")"));
-      parenStack.pop_back();
+      parenStack.pop();
     }
 
     if (nextLineIndent == OUTDENT
-        && !parenStack.empty() && parenStack.back() == nextLineIndent.indentLevel) {
+        && !parenStack.empty() && parenStack.top() == nextLineIndent.indentLevel) {
       // close paren for a previous line
       add(result, Token::of(L")"));
-      parenStack.pop_back();
+      parenStack.pop();
     }
   }
 
