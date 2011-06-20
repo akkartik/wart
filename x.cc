@@ -1013,6 +1013,9 @@ struct AstNode {
     AstNode result(l);
     return result;
   }
+  bool isForm() {
+    return !form.empty();
+  }
   bool operator==(Token x) {
     return form.empty() && atom == x.token; // whitespace should be gone by now.
   }
@@ -1043,20 +1046,34 @@ list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterato
   while (curr->token[0] == L';')
     ++curr;
 
-  if (*curr != L"(" || *curr != L"'" || *curr != L"`" || *curr != L"," || *curr != L",@") {
+  if (*curr == L")")
+    cerr << "Unbalanced (" << endl << DIE;
+
+  if (*curr != L"(" && *curr != L"'" && *curr != L"`" && *curr != L"," && *curr != L",@") {
     out.push_back(AstNode::of(*curr));
     return ++curr;
   }
 
-  if (*curr == L")")
-    cerr << "Unbalanced paren" << endl << DIE;
-
   list<AstNode> subform;
-  if (*curr == L"(") {
-    while (*curr != L")")
-      curr = parseNext(curr, end, subform);
+  if (*curr != L"(") { // quote/comma
+    subform.push_back(*curr);
+    ++curr;
   }
-  else ++curr; //TODO
+
+  if (*curr == L"(") {
+    subform.push_back(*curr);
+    ++curr;
+    while (curr != end && *curr != L")")
+      curr = parseNext(curr, end, subform);
+    if (curr == end)
+      cerr << "Unbalanced (" << endl << DIE;
+    subform.push_back(*curr);
+    ++curr;
+  }
+  else {
+    subform.push_back(*curr);
+    ++curr;
+  }
 
   out.push_back(subform);
   return curr;
@@ -1088,6 +1105,39 @@ void test_parse_handles_atoms() {
   check_eq(*p, Token::of(L"34")); ++p;
   check_eq(*p, Token::of(L"\"a b c\"")); ++p;
   check(p == ast.end());
+}
+
+void test_parse_handles_forms() {
+  list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"34 \"a b c\""))));
+  check_eq(ast.size(), 1);
+  check(ast.front().isForm());
+  list<AstNode>::iterator p = ast.front().form.begin();
+  check_eq(*p, Token::of(L"(")); ++p;
+  check_eq(*p, Token::of(L"34")); ++p;
+  check_eq(*p, Token::of(L"\"a b c\"")); ++p;
+  check_eq(*p, Token::of(L")")); ++p;
+  check(p == ast.front().form.end());
+}
+
+void test_parse_handles_nested_forms() {
+  list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"34 (2 3) \"a b c\""))));
+  check_eq(ast.size(), 1);
+  check(ast.front().isForm());
+  list<AstNode>::iterator p = ast.front().form.begin();
+  check_eq(*p, Token::of(L"(")); ++p;
+  check_eq(*p, Token::of(L"34")); ++p;
+  check(p->isForm());
+    list<AstNode> ast2 = p->form; ++p;
+    list<AstNode>::iterator q = ast2.begin();
+    check_eq(*q, Token::of(L"(")); ++q;
+    check_eq(*q, Token::of(L"2")); ++q;
+    check_eq(*q, Token::of(L"3")); ++q;
+    check_eq(*q, Token::of(L")")); ++q;
+    check(q == ast2.end());
+
+  check_eq(*p, Token::of(L"\"a b c\"")); ++p;
+  check_eq(*p, Token::of(L")")); ++p;
+  check(p == ast.front().form.end());
 }
 
 
