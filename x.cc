@@ -1136,7 +1136,6 @@ ostream& operator<<(ostream& os, cell* c) {
 cell* build(list<Token> l) {
   cell* result = NULL;
   cell* curr = NULL;
-  cerr << "\n";
   for (list<Token>::iterator p = l.begin(); p != l.end(); ++p) {
     if (whitespace(p->type) || *p == L"(" || *p == L")") continue;
     if (!result) {
@@ -1148,9 +1147,6 @@ cell* build(list<Token> l) {
     curr = curr->cdr;
   }
 
-  for (curr=result; curr; curr=curr->cdr)
-    cerr << curr << " ";
-  cerr << endl;
   mkref(result); // it's leaving the function
   return result;
 }
@@ -1234,5 +1230,4 @@ int main(int argc, ascii* argv[]) {
 //  no function prototypes
 //  indented functions are deemphasized, would be pushed farther down if C permitted
 //  no new except in tests
-//  minimal STL
-//  immutable objects; copy everywhere; no references or pointers
+//  immutable objects; copy everywhere; no references or pointers except cell*
