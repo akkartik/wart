@@ -1052,6 +1052,8 @@ ostream& operator<<(ostream& os, list<Token> l) {
 
 
 //// data
+////
+//// stolen from picolisp: http://software-lab.de/doc/ref.html#data
 
 struct cell {
   cell* car;
@@ -1114,6 +1116,16 @@ void dec(cell* c) {
 
 #define addr(x) ((unsigned long)x)
 #define num(x) ((long)x)
+
+cell* newNum(int x) {
+  cell* result = newCell();
+  result->car = (cell*)(x << 3 | 0x2);
+  return (cell*)(addr(result)+2);
+}
+
+bool isNum(cell* x) {
+  return (addr(x)&0x7) == 0x2;
+}
 
 
 
