@@ -1036,6 +1036,7 @@ ostream& operator<<(ostream& os, AstNode x) {
       prevWasOpen = (*p == L"(" || *p == L"'" || *p == L"," || *p == L",@");
       os << *p;
     }
+    os << endl;
   }
   return os;
 }
@@ -1364,6 +1365,8 @@ int main(int argc, ascii* argv[]) {
     cout << tokenize(cin); break;
   case 2:
     cout << parenthesize(tokenize(cin)); break;
+  case 3:
+    cout << parse(parenthesize(tokenize(cin))); break;
   default:
     build(parenthesize(tokenize(cin))); break;
   }
