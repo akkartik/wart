@@ -1051,6 +1051,72 @@ ostream& operator<<(ostream& os, list<Token> l) {
 
 
 
+//// data
+
+struct cell {
+  cell* car;
+  cell* cdr;
+  int nrefs;
+  cell() :car(NULL), cdr(NULL), nrefs(0) {}
+  void init() { car=cdr=NULL, nrefs=0; }
+  void clear() { car=cdr=NULL, nrefs=0; }
+};
+
+#define HEAPCELLS (1024*1024/sizeof(cell)) // 1MB
+struct Heap {
+  cell cells[HEAPCELLS];
+  Heap *next;
+  Heap() :next(NULL) {}
+};
+
+Heap* currHeap = new Heap();
+cell* currCell = &currHeap->cells[0];
+cell* heapEnd = &currHeap->cells[HEAPCELLS];
+cell* freelist = NULL;
+cell* newCell() {
+  cell* result = NULL;
+  if (freelist) {
+    result = freelist;
+    freelist = freelist->cdr;
+    result->init();
+    return result;
+  }
+
+  result = currCell;
+  ++currCell;
+  if (currCell != heapEnd)
+    return result;
+
+  currHeap->next = new Heap();
+  currHeap = currHeap->next;
+  if (!currHeap)
+    cerr << "Out of memory" << endl << DIE;
+  currCell = &currHeap->cells[0];
+  heapEnd = &currHeap->cells[HEAPCELLS];
+
+  result = currCell;
+  ++currCell;
+  return result;
+}
+
+void inc(cell* c) {
+  ++c->nrefs;
+}
+
+void dec(cell* c) {
+  --c->nrefs;
+  if (c->nrefs) return;
+
+  c->clear();
+  c->cdr = freelist;
+  freelist = c;
+}
+
+#define addr(x) ((unsigned long)x)
+#define num(x) ((long)x)
+
+
+
 //// bindings
 
                                   struct strEq {
