@@ -1299,6 +1299,17 @@ cell* buildCell(AstNode n) {
   return newNum(wcstol(n.atom.token.c_str(), NULL, 0));
 }
 
+void test_build_handles_empty_input() {
+  cell* c = build(parse(parenthesize(tokenize(teststream(L"")))));
+  check_eq(c, nil);
+}
+
+void test_build_handles_number() {
+  cell* c = build(parse(parenthesize(tokenize(teststream(L"34")))));
+  check(isNum(c));
+  check_eq(toNum(c), 34);
+}
+
 
 
 //// bindings
