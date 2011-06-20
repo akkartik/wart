@@ -498,60 +498,6 @@ void test_tokenize_initial_whitespace_lines() {
 
 //// insert explicit parens based on indentation.
 
-#define inc(p) { ++p; if (p == end) return result; }
-list<Token> slurpLine(list<Token>::iterator p, list<Token>::iterator end) {
-  list<Token> result;
-  if (*p == START_OF_LINE) inc(p);
-  if (*p == INDENT) inc(p);
-
-  while (!whitespace(p->type)) {
-    result.push_back(*p);
-    inc(p);
-  }
-
-  if (*p == START_OF_LINE) inc(p);
-  if (*p == INDENT || *p == MAYBE_WRAP || *p == OUTDENT) {
-    result.push_back(*p);
-    inc(p);
-  }
-
-  return result;
-}
-#undef inc
-
-void test_slurpLine() {
-  list<Token> ast = tokenize(teststream(L"abc"));
-  list<Token> line = slurpLine(ast.begin(), ast.end());
-  list<Token>::iterator p = line.begin();
-  check_eq(*p, L"abc"); ++p;
-  check(p == line.end());
-}
-
-void test_slurpLine_empty() {
-  list<Token> ast = tokenize(teststream(L""));
-  list<Token> line = slurpLine(ast.begin(), ast.end());
-  check(line.empty());
-}
-
-void test_slurpLine_skips_indent() {
-  list<Token> ast = tokenize(teststream(L"abc"));
-  list<Token> line = slurpLine(ast.begin(), ast.end());
-  list<Token>::iterator p = line.begin();
-  check_eq(*p, L"abc"); ++p;
-  check(p == line.end());
-}
-
-void test_slurpLine_includes_indent_from_next_line() {
-  list<Token> ast = tokenize(teststream(L"  \nabc def ghi\n\n    \n  def"));
-  list<Token> line = slurpLine(ast.begin(), ast.end());
-  list<Token>::iterator p = line.begin();
-  check_eq(*p, L"abc"); ++p;
-  check_eq(*p, L"def"); ++p;
-  check_eq(*p, L"ghi"); ++p;
-  check_eq(*p, INDENT); ++p;
-  check(p == line.end());
-}
-
 #define inc(p) { ++p; if (p == end) return p; }
 #define pop(l) { l.pop_front(); if (l.empty()) break; }
 list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, list<Token>::iterator end) {
