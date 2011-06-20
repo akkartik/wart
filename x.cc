@@ -1245,7 +1245,7 @@ bool isCons(cell* x) {
 }
 
 void setCar(cell* x, cell* y) {
-  if (x->car && isCons(x->car)) {
+  if (x->car && x->car != nil && isCons(x->car)) {
     rmref(x->car);
   }
   x->car = y;
@@ -1253,7 +1253,7 @@ void setCar(cell* x, cell* y) {
 }
 
 void setCdr(cell* x, cell* y) {
-  if (x->cdr && isCons(x->cdr)) {
+  if (x->cdr && x->cdr != nil && isCons(x->cdr)) {
     rmref(x->cdr);
   }
   x->cdr = y;
