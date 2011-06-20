@@ -998,6 +998,54 @@ ostream& operator<<(ostream& os, list<Token> l) {
 
 
 
+//// parse
+
+struct AstNode {
+  Token atom;
+  list<AstNode> form;
+  AstNode(Token t) :atom(t) {}
+  AstNode(list<AstNode> l) :atom(Token::sol()), form(l) {}
+  static AstNode of(Token t) {
+    AstNode result(t);
+    return result;
+  }
+  static AstNode of(list<AstNode> l) {
+    AstNode result(l);
+    return result;
+  }
+};
+
+list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterator end, list<AstNode>& out) {
+  if (curr == end) return curr;
+
+  while (curr->token[0] == L';')
+    ++curr;
+
+  if (*curr != L"(" || *curr != L"'" || *curr != L"`" || *curr != L"," || *curr != L",@") {
+    out.push_back(AstNode::of(*curr));
+    return curr;
+  }
+
+  if (*curr == L")")
+    cerr << "Unbalanced paren" << endl << DIE;
+
+  list<AstNode> subform;
+  //TODO
+
+  out.push_back(subform);
+  return curr;
+}
+
+list<AstNode> parse(list<Token> tokens) {
+  list<AstNode> result;
+  list<Token>::iterator p=tokens.begin();
+  while (p != tokens.end())
+    p=parseNext(p, tokens.end(), result);
+  return result;
+}
+
+
+
 //// data
 ////
 //// stolen from picolisp: http://software-lab.de/doc/ref.html#data
