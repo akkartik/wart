@@ -1013,7 +1013,29 @@ struct AstNode {
     AstNode result(l);
     return result;
   }
+  bool operator==(Token x) {
+    return form.empty() && atom == x.token; // whitespace should be gone by now.
+  }
+  bool operator==(string x) {
+    return form.empty() && atom == x;
+  }
+  bool operator!=(Token x) {
+    return !(*this == x);
+  }
 };
+
+ostream& operator<<(ostream& os, AstNode x) {
+  if (x.form.empty()) os << x.atom;
+  else {
+    bool prevWasOpen = true;
+    for (list<AstNode>::iterator p = x.form.begin(); p != x.form.end(); ++p) {
+      if (!(*p == L")" || prevWasOpen)) os << " ";
+      prevWasOpen = (*p == L"(" || *p == L"'" || *p == L"," || *p == L",@");
+      os << *p;
+    }
+  }
+  return os;
+}
 
 list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterator end, list<AstNode>& out) {
   if (curr == end) return curr;
@@ -1023,14 +1045,18 @@ list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterato
 
   if (*curr != L"(" || *curr != L"'" || *curr != L"`" || *curr != L"," || *curr != L",@") {
     out.push_back(AstNode::of(*curr));
-    return curr;
+    return ++curr;
   }
 
   if (*curr == L")")
     cerr << "Unbalanced paren" << endl << DIE;
 
   list<AstNode> subform;
-  //TODO
+  if (*curr == L"(") {
+    while (*curr != L")")
+      curr = parseNext(curr, end, subform);
+  }
+  else ++curr; //TODO
 
   out.push_back(subform);
   return curr;
@@ -1042,6 +1068,26 @@ list<AstNode> parse(list<Token> tokens) {
   while (p != tokens.end())
     p=parseNext(p, tokens.end(), result);
   return result;
+}
+
+void test_parse_handles_empty_input() {
+  list<AstNode> ast = parse(parenthesize(tokenize(teststream(L""))));
+  check(ast.empty());
+}
+
+void test_parse_handles_atom() {
+  list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"34"))));
+  list<AstNode>::iterator p = ast.begin();
+  check_eq(*p, Token::of(L"34")); ++p;
+  check(p == ast.end());
+}
+
+void test_parse_handles_atoms() {
+  list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"34\n\"a b c\""))));
+  list<AstNode>::iterator p = ast.begin();
+  check_eq(*p, Token::of(L"34")); ++p;
+  check_eq(*p, Token::of(L"\"a b c\"")); ++p;
+  check(p == ast.end());
 }
 
 
