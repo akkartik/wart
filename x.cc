@@ -1295,7 +1295,12 @@ cell* build(list<AstNode> l) {
 }
 
 cell* buildCell(AstNode n) {
-  if (n.isForm()) return build(n.form);
+  if (n.isForm()) {
+    if (n.form.size() == 2 && n.form.front() == L"(" && n.form.back() == L")")
+      return nil;
+    cell* result = build(n.form);
+    return result;
+  }
   return newNum(wcstol(n.atom.token.c_str(), NULL, 0));
 }
 
@@ -1308,6 +1313,10 @@ void test_build_handles_number() {
   cell* c = build(parse(parenthesize(tokenize(teststream(L"34")))));
   check(isNum(c));
   check_eq(toNum(c), 34);
+}
+
+void test_build_handles_nil() {
+  check_eq(build(parse(parenthesize(tokenize(teststream(L"()"))))), nil);
 }
 
 
