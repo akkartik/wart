@@ -1,5 +1,5 @@
 C=10
-all: x.cc test_list
+a.out: x.cc test_list
 	g++ -g -Wall -Wextra x.cc
 	@echo
 	@echo `cat x.cc |strip_tests.pl |grep -v "^ *//\|^\?$$" |wc -l` LoC
