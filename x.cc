@@ -1279,22 +1279,24 @@ ostream& operator<<(ostream& os, cell* c) {
   return os;
 }
 
-cell* build(list<Token> l) {
-  cell* result = NULL;
-  cell* curr = NULL;
-  for (list<Token>::iterator p = l.begin(); p != l.end(); ++p) {
-    if (whitespace(p->type) || *p == L"(" || *p == L")") continue;
-    if (!result) {
-      result = curr = newNum(wcstol(p->token.c_str(), NULL, 0));
-      continue;
-    }
+extern cell* buildCell(AstNode n);
 
-    setCdr(curr, newNum(wcstol(p->token.c_str(), NULL, 0)));
-    curr = curr->cdr;
+cell* build(list<AstNode> l) {
+  if (l.empty()) return nil;
+  list<AstNode>::iterator p = l.begin();
+  cell* result = buildCell(*p);
+  cell* curr = result;
+  for (++p; p != l.end(); ++p, curr=curr->cdr) {
+    setCdr(curr, buildCell(*p));
   }
 
   mkref(result); // it's leaving the function
   return result;
+}
+
+cell* buildCell(AstNode n) {
+  if (n.isForm()) return build(n.form);
+  return newNum(wcstol(n.atom.token.c_str(), NULL, 0));
 }
 
 
@@ -1367,8 +1369,9 @@ int main(int argc, ascii* argv[]) {
     cout << parenthesize(tokenize(cin)); break;
   case 3:
     cout << parse(parenthesize(tokenize(cin))); break;
+  case 4:
   default:
-    build(parenthesize(tokenize(cin))); break;
+    cout << build(parse(parenthesize(tokenize(cin)))); break;
   }
   return 0;
 }
