@@ -1021,6 +1021,7 @@ Heap* currHeap = new Heap();
 cell* currCell = &currHeap->cells[0];
 cell* heapEnd = &currHeap->cells[HEAPCELLS];
 cell* freelist = NULL;
+// cell addresses must have lower 3 bits unset
 cell* newCell() {
   cell* result = NULL;
   if (freelist) {
@@ -1047,13 +1048,18 @@ cell* newCell() {
   return result;
 }
 
-void inc(cell* c) {
+void mkref(cell* c) {
   ++c->nrefs;
 }
 
-void dec(cell* c) {
+void rmref(cell* c) {
+  if (!c) return;
+
   --c->nrefs;
-  if (c->nrefs) return;
+  if (c->nrefs > 0) return;
+
+  rmref(c->car);
+  rmref(c->cdr);
 
   c->clear();
   c->cdr = freelist;
@@ -1063,14 +1069,81 @@ void dec(cell* c) {
 #define addr(x) ((unsigned long)x)
 #define num(x) ((long)x)
 
-cell* newNum(int x) {
+#define MASK 0x7
+// tag bits
+#define CONS 0x0
+#define NUM 0x2
+#define SYM 0x4
+
+cell* newNum(long x) {
   cell* result = newCell();
-  result->car = (cell*)(x << 3 | 0x2);
-  return (cell*)(addr(result)+2);
+  result->car = (cell*)x;
+  return (cell*)(addr(result)+NUM);
 }
 
 bool isNum(cell* x) {
-  return (addr(x)&0x7) == 0x2;
+  return (addr(x)&MASK) == NUM;
+}
+
+long toNum(cell* c) {
+  if (!isNum(c)) return 0;
+  return addr(((cell*)(addr(c)-NUM))->car);
+}
+
+bool isCons(cell* x) {
+  return (addr(x)&MASK) == CONS;
+}
+
+void setCar(cell* x, cell* y) {
+  if (x->car && isCons(x->car)) {
+    rmref(x->car);
+  }
+  x->car = y;
+  mkref(y);
+}
+
+void setCdr(cell* x, cell* y) {
+  if (x->cdr && isCons(x->cdr)) {
+    rmref(x->cdr);
+  }
+  x->cdr = y;
+  mkref(y);
+}
+
+ostream& operator<<(ostream& os, cell* c) {
+  if (!c) return os;
+
+  switch(addr(c)&MASK) {
+  case NUM:
+    os << toNum(c); break;
+  case SYM:
+  case CONS:
+  default:
+    os << L"(" << c->car << " " << c->cdr << L")";
+  }
+  return os;
+}
+
+cell* build(list<Token> l) {
+  cell* result = NULL;
+  cell* curr = NULL;
+  cerr << "\n";
+  for (list<Token>::iterator p = l.begin(); p != l.end(); ++p) {
+    if (whitespace(p->type) || *p == L"(" || *p == L")") continue;
+    if (!result) {
+      result = curr = newNum(wcstol(p->token.c_str(), NULL, 0));
+      continue;
+    }
+
+    setCdr(curr, newNum(wcstol(p->token.c_str(), NULL, 0)));
+    curr = curr->cdr;
+  }
+
+  for (curr=result; curr; curr=curr->cdr)
+    cerr << curr << " ";
+  cerr << endl;
+  mkref(result); // it's leaving the function
+  return result;
 }
 
 
@@ -1132,8 +1205,9 @@ int main(int argc, ascii* argv[]) {
   case 1:
     cout << tokenize(cin); break;
   case 2:
-  default:
     cout << parenthesize(tokenize(cin)); break;
+  default:
+    build(parenthesize(tokenize(cin))); break;
   }
   return 0;
 }
