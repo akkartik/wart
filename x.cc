@@ -1001,13 +1001,16 @@ ostream& operator<<(ostream& os, list<Token> l) {
 ////
 //// stolen from picolisp: http://software-lab.de/doc/ref.html#data
 
+struct cell;
+cell* nil = NULL; // gets setup later
+
 struct cell {
   cell* car;
   cell* cdr;
   int nrefs;
-  cell() :car(NULL), cdr(NULL), nrefs(0) {}
-  void init() { car=cdr=NULL, nrefs=0; }
-  void clear() { car=cdr=NULL, nrefs=0; }
+  cell() :car(nil), cdr(nil), nrefs(0) {}
+  void init() { car=cdr=nil, nrefs=0; }
+  void clear() { car=cdr=nil, nrefs=0; }
 };
 
 #define HEAPCELLS (1024*1024/sizeof(cell)) // 1MB
@@ -1018,7 +1021,7 @@ struct Heap {
 };
 
 Heap* currHeap = new Heap();
-cell* currCell = &currHeap->cells[0];
+cell* currCell = &currHeap->cells[4]; // leave room for nil
 cell* heapEnd = &currHeap->cells[HEAPCELLS];
 cell* freelist = NULL;
 // cell addresses must have lower 3 bits unset
@@ -1053,7 +1056,8 @@ void mkref(cell* c) {
 }
 
 void rmref(cell* c) {
-  if (!c) return;
+  if (!c) cerr << "cell should never point to NULL\n" << DIE;
+  if (c == nil) return; // never gc nil
 
   --c->nrefs;
   if (c->nrefs > 0) return;
@@ -1112,6 +1116,11 @@ void setCdr(cell* x, cell* y) {
 
 ostream& operator<<(ostream& os, cell* c) {
   if (!c) return os;
+
+  if (c == nil) {
+    os << "nil";
+    return os;
+  }
 
   switch(addr(c)&MASK) {
   case NUM:
@@ -1189,7 +1198,15 @@ cell* build(list<Token> l) {
                                         cerr << endl;
                                   }
 
+void setupNil() {
+  nil = &currHeap->cells[1];
+}
+
+
+
 int main(int argc, ascii* argv[]) {
+  setupNil();
+
   int pass = 0;
   if (argc > 1) {
     std::string arg1(argv[1]);
