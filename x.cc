@@ -1607,6 +1607,18 @@ void test_nil_evals_to_itself() {
   check_eq(eval(cells.front()), nil);
 }
 
+void test_num_evals_to_itself() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34")))));
+  check_eq(cells.size(), 1);
+  check_eq(eval(cells.front()), cells.front());
+}
+
+void test_string_evals_to_itself() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"\"ac bd\"")))));
+  check_eq(cells.size(), 1);
+  check_eq(eval(cells.front()), cells.front());
+}
+
 
 
                                   typedef void (*testfunc)(void);
