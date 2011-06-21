@@ -1003,10 +1003,10 @@ ostream& operator<<(ostream& os, list<Token> l) {
 
 struct AstNode {
   Token atom;
-  list<AstNode> form;
+  list<AstNode> elems;
 
   AstNode(Token t) :atom(t) {}
-  AstNode(list<AstNode> l) :atom(Token::sol()), form(l) {}
+  AstNode(list<AstNode> l) :atom(Token::sol()), elems(l) {}
   static AstNode of(Token t) {
     AstNode result(t);
     return result;
@@ -1017,21 +1017,21 @@ struct AstNode {
   }
 
   bool isAtom() {
-    return form.empty();
+    return elems.empty();
   }
-  bool isForm() {
-    return !form.empty();
+  bool isList() {
+    return !elems.empty();
   }
   bool isNil() {
-    return form.size() == 2
-      && form.front() == L"(" && form.back() == L")";
+    return elems.size() == 2
+      && elems.front() == L"(" && elems.back() == L")";
   }
 
   bool operator==(Token x) {
-    return form.empty() && atom == x.token; // whitespace should be gone by now.
+    return elems.empty() && atom == x.token; // whitespace should be gone by now.
   }
   bool operator==(string x) {
-    return form.empty() && atom == x;
+    return elems.empty() && atom == x;
   }
   bool operator!=(Token x) {
     return !(*this == x);
@@ -1039,10 +1039,10 @@ struct AstNode {
 };
 
 ostream& operator<<(ostream& os, AstNode x) {
-  if (x.form.empty()) os << x.atom;
+  if (x.elems.empty()) os << x.atom;
   else {
     bool prevWasOpen = true;
-    for (list<AstNode>::iterator p = x.form.begin(); p != x.form.end(); ++p) {
+    for (list<AstNode>::iterator p = x.elems.begin(); p != x.elems.end(); ++p) {
       if (!(*p == L")" || prevWasOpen)) os << " ";
       prevWasOpen = (*p == L"(" || *p == L"'" || *p == L"," || *p == L",@");
       os << *p;
@@ -1122,24 +1122,24 @@ void test_parse_handles_atoms() {
 void test_parse_handles_forms() {
   list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"34 \"a b c\""))));
   check_eq(ast.size(), 1);
-  check(ast.front().isForm());
-  list<AstNode>::iterator p = ast.front().form.begin();
+  check(ast.front().isList());
+  list<AstNode>::iterator p = ast.front().elems.begin();
   check_eq(*p, Token::of(L"(")); ++p;
   check_eq(*p, Token::of(L"34")); ++p;
   check_eq(*p, Token::of(L"\"a b c\"")); ++p;
   check_eq(*p, Token::of(L")")); ++p;
-  check(p == ast.front().form.end());
+  check(p == ast.front().elems.end());
 }
 
 void test_parse_handles_nested_forms() {
   list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"34 (2 3) \"a b c\""))));
   check_eq(ast.size(), 1);
-  check(ast.front().isForm());
-  list<AstNode>::iterator p = ast.front().form.begin();
+  check(ast.front().isList());
+  list<AstNode>::iterator p = ast.front().elems.begin();
   check_eq(*p, Token::of(L"(")); ++p;
   check_eq(*p, Token::of(L"34")); ++p;
-  check(p->isForm());
-    list<AstNode> ast2 = p->form; ++p;
+  check(p->isList());
+    list<AstNode> ast2 = p->elems; ++p;
     list<AstNode>::iterator q = ast2.begin();
     check_eq(*q, Token::of(L"(")); ++q;
     check_eq(*q, Token::of(L"2")); ++q;
@@ -1149,7 +1149,7 @@ void test_parse_handles_nested_forms() {
 
   check_eq(*p, Token::of(L"\"a b c\"")); ++p;
   check_eq(*p, Token::of(L")")); ++p;
-  check(p == ast.front().form.end());
+  check(p == ast.front().elems.end());
 }
 
 
@@ -1378,7 +1378,7 @@ cell* buildCell(AstNode n) {
 
   cell* newForm = NULL;
   cell* curr = NULL;
-  for (list<AstNode>::iterator q = n.form.begin(); q != n.form.end(); ++q) {
+  for (list<AstNode>::iterator q = n.elems.begin(); q != n.elems.end(); ++q) {
     if (q->atom == L"(")
       continue;
     if (q->atom == L")")
