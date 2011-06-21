@@ -1164,7 +1164,7 @@ void test_parse_handles_nested_forms() {
                                   #define CONS 0x0
                                   #define NUM 0x2
                                   #define SYM WORD // nil's alignment
-                                  #define MASK WORD*2-1
+                                  #define MASK (WORD*2-1) // stretch as necessary
 
 struct cell {
   cell* car;
