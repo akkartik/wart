@@ -1296,7 +1296,7 @@ ostream& operator<<(ostream& os, cell* c) {
   case SYM:
   case CONS:
   default:
-    os << L"(" << c->car << " " << c->cdr << L")";
+    os << L"<" << c->car << " . " << c->cdr << L">";
   }
   return os;
 }
@@ -1311,32 +1311,51 @@ ostream& operator<<(ostream& os, list<cell*> l) {
 
 
 
-                                  extern list<AstNode>::iterator buildCell(list<AstNode>::iterator, list<cell*>&);
+                                  extern cell* buildCell(AstNode);
 
 list<cell*> buildCells(list<AstNode> in) {
   list<cell*> result;
   if (in.empty()) return result;
 
-  list<AstNode>::iterator p = in.begin();
-  while (p != in.end()) {
-    p = buildCell(p, result);
+  for (list<AstNode>::iterator p = in.begin(); p != in.end(); ++p) {
+    result.push_back(buildCell(*p));
   }
 
   return result;
 }
 
-list<AstNode>::iterator buildCell(list<AstNode>::iterator p, list<cell*>& out) {
-  if (p->isNil())
-    out.push_back(nil);
+cell* buildCell(AstNode n) {
+  if (n.isNil())
+    return nil;
 
-  else if (p->isAtom())
-    out.push_back(newNum(wcstol(p->atom.token.c_str(), NULL, 0)));
+  if (n.isAtom()) {
+    if (n.atom.token == L")")
+      cerr << "syntax error" << endl << DIE;
 
-  else if (p->isForm())
-    out.push_back(newCell());
-//?       buildCells(n.form);
+    char** end;
+    long v = wcstol(n.atom.token.c_str(), end, 0);
+    if (**end == L'\0')
+      return newNum(v);
+    // TODO: strings, syms
+    return nil;
+  }
 
-  return ++p;
+  cell* newForm = NULL;
+  list<AstNode>::iterator q = n.form.begin();
+  if (q->atom == L"(") {
+    cell* curr = NULL;
+    for (++q; q != n.form.end(); ++q) {
+      if (q->atom.token == L")")
+        break;
+      if (!curr)
+        newForm = curr = newCell();
+      else
+        curr = curr->cdr = newCell();
+      curr->car = buildCell(*q);
+    }
+  }
+
+  return newForm;
 }
 
 void test_build_handles_empty_input() {
@@ -1366,6 +1385,20 @@ void test_build_handles_multiple_atoms() {
   check(isNum(c));
   check_eq(c->cdr, nil);
   check_eq(toNum(c), 35);
+}
+
+void test_build_handles_form() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34 35")))));
+  check_eq(cells.size(), 1);
+  cell* c = cells.front();
+  check(isCons(c));
+  check(isNum(c->car));
+  check_eq(toNum(c->car), 34);
+  c = c->cdr;
+  check(isCons(c));
+  check(isNum(c->car));
+  check_eq(toNum(c->car), 35);
+  check_eq(c->cdr, nil);
 }
 
 
