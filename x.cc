@@ -1325,7 +1325,9 @@ ostream& operator<<(ostream& os, cell* c) {
   switch(c->tags) {
   case NUM:
     os << toNum(c); break;
+  case SYM:
   case STRING:
+    os << toString(c); break;
   case CONS:
   default:
     os << L"<" << c->car << " . " << c->cdr << L">";
@@ -1364,14 +1366,13 @@ cell* buildCell(AstNode n) {
     if (n.atom.token == L")")
       cerr << "syntax error" << endl << DIE;
 
-    if (n.atom.token.c_str()[0] == L'"')
-      return newString(new string(n.atom.token)); // caveat fragmentation
-
     char** end;
     long v = wcstol(n.atom.token.c_str(), end, 0);
     if (**end == L'\0')
       return newNum(v);
 
+    if (n.atom.token.c_str()[0] == L'"')
+      return newString(new string(n.atom.token)); // caveat fragmentation
     return newSym(new string(n.atom.token));
   }
 
