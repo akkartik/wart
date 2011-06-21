@@ -1165,7 +1165,8 @@ struct cell {
   long tags;
     #define CONS 0
     #define NUM 1
-    #define STRING 2
+    #define SYM 2
+    #define STRING 3
   long nrefs;
   cell() :car(nil), cdr(nil), nrefs(0) {}
   void init() { car=cdr=nil, nrefs=0; }
@@ -1238,7 +1239,7 @@ void rmref(cell* c) {
   --c->nrefs;
   if (c->nrefs > 0) return;
 
-  if (c->tags == STRING)
+  if (c->tags == STRING || c->tags == SYM)
     delete (string*)c->car;
   else
     rmref(c->car);
@@ -1272,9 +1273,19 @@ bool isCons(cell* x) {
   return x->tags == CONS;
 }
 
-cell* newString(string* x) {
+cell* newSym(string* x) {
   cell* result = newCell();
   result->car = (cell*)x;
+  result->tags = SYM;
+  return result;
+}
+
+bool isSym(cell* x) {
+  return x->tags == SYM;
+}
+
+cell* newString(string* x) {
+  cell* result = newSym(x);
   result->tags = STRING;
   return result;
 }
@@ -1284,6 +1295,8 @@ bool isString(cell* x) {
 }
 
 string toString(cell* x) {
+  if (!isString(x) && !isSym(x))
+    return L"";
   return *(string*)x->car;
 }
 
@@ -1359,8 +1372,7 @@ cell* buildCell(AstNode n) {
     if (**end == L'\0')
       return newNum(v);
 
-    // TODO: syms
-    return nil;
+    return newSym(new string(n.atom.token));
   }
 
   cell* newForm = NULL;
@@ -1469,6 +1481,38 @@ void test_build_handles_strings() {
     check(isCons(c2));
     check(isString(c2->car));
     check_eq(toString(c2->car), L"\"abc\"");
+    c2 = c2->cdr;
+    check(isCons(c2));
+    check(isNum(c2->car));
+    check_eq(toNum(c2->car), 23);
+  check_eq(c->cdr, nil);
+}
+
+void test_build_handles_syms() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 \"abc\" def 23))")))));
+  check_eq(cells.size(), 1);
+  cell* c = cells.front();
+  check(isCons(c));
+  check(isNum(c->car));
+  check_eq(toNum(c->car), 3);
+  c = c->cdr;
+  check(isCons(c));
+  check(isNum(c->car));
+  check_eq(toNum(c->car), 7);
+  c = c->cdr;
+  check(isCons(c));
+    cell* c2 = c->car;
+    check(isCons(c2));
+    check(isNum(c2->car));
+    check_eq(toNum(c2->car), 33);
+    c2 = c2->cdr;
+    check(isCons(c2));
+    check(isString(c2->car));
+    check_eq(toString(c2->car), L"\"abc\"");
+    c2 = c2->cdr;
+    check(isCons(c2));
+    check(isSym(c2->car));
+    check_eq(toString(c2->car), L"def");
     c2 = c2->cdr;
     check(isCons(c2));
     check(isNum(c2->car));
