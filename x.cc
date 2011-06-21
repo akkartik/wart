@@ -1016,6 +1016,10 @@ struct AstNode {
   bool isForm() {
     return !form.empty();
   }
+  bool isNil() {
+    return form.size() == 2
+      && form.front() == L"(" && form.back() == L")";
+  }
   bool operator==(Token x) {
     return form.empty() && atom == x.token; // whitespace should be gone by now.
   }
@@ -1148,7 +1152,7 @@ void test_parse_handles_nested_forms() {
 //// stolen from picolisp: http://software-lab.de/doc/ref.html#data
 
 struct cell;
-cell* nil = NULL; // gets setup later
+cell* nil = NULL; // gets setup lower down
 
 struct cell {
   cell* car;
@@ -1302,11 +1306,11 @@ list<cell*> buildCells(list<AstNode> in) {
 }
 
 list<AstNode>::iterator buildCell(list<AstNode>::iterator p, list<cell*>& out) {
-  if (p->isForm()) {
-    if (p->form.size() == 2 && p->form.front() == L"(" && p->form.back() == L")")
-      out.push_back(nil);
-    else
-      out.push_back(newCell());
+  if (p->isNil())
+    out.push_back(nil);
+
+  else if (p->isForm()) {
+    out.push_back(newCell());
 //?       buildCells(n.form);
   }
   else
