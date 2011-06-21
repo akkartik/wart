@@ -1401,6 +1401,30 @@ void test_build_handles_form() {
   check_eq(c->cdr, nil);
 }
 
+void test_build_handles_nested_form() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 23))")))));
+  check_eq(cells.size(), 1);
+  cell* c = cells.front();
+  check(isCons(c));
+  check(isNum(c->car));
+  check_eq(toNum(c->car), 3);
+  c = c->cdr;
+  check(isCons(c));
+  check(isNum(c->car));
+  check_eq(toNum(c->car), 7);
+  c = c->cdr;
+  check(isCons(c));
+    cell* c2 = c->car;
+    check(isCons(c2));
+    check(isNum(c2->car));
+    check_eq(toNum(c2->car), 33);
+    c2 = c2->cdr;
+    check(isCons(c2));
+    check(isNum(c2->car));
+    check_eq(toNum(c2->car), 23);
+  check_eq(c->cdr, nil);
+}
+
 
 
 //// bindings
