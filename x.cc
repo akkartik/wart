@@ -1165,7 +1165,7 @@ struct cell {
   long tags;
     #define CONS 0
     #define NUM 1
-    #define SYM 2
+    #define STRING 2
   long nrefs;
   cell() :car(nil), cdr(nil), nrefs(0) {}
   void init() { car=cdr=nil, nrefs=0; }
@@ -1259,13 +1259,28 @@ bool isNum(cell* x) {
   return x->tags == NUM;
 }
 
-long toNum(cell* c) {
-  if (!isNum(c)) return 0;
-  return (long)c->car;
+long toNum(cell* x) {
+  if (!isNum(x)) return 0;
+  return (long)x->car;
 }
 
 bool isCons(cell* x) {
   return x->tags == CONS;
+}
+
+cell* newString(string* x) {
+  cell* result = newCell();
+  result->car = (cell*)x;
+  result->tags = STRING;
+  return result;
+}
+
+bool isString(cell* x) {
+  return x->tags == STRING;
+}
+
+string toString(cell* x) {
+  return *(string*)x->car;
 }
 
 void setCar(cell* x, cell* y) {
@@ -1293,7 +1308,7 @@ ostream& operator<<(ostream& os, cell* c) {
   switch(c->tags) {
   case NUM:
     os << toNum(c); break;
-  case SYM:
+  case STRING:
   case CONS:
   default:
     os << L"<" << c->car << " . " << c->cdr << L">";
@@ -1332,11 +1347,15 @@ cell* buildCell(AstNode n) {
     if (n.atom.token == L")")
       cerr << "syntax error" << endl << DIE;
 
+    if (n.atom.token.c_str()[0] == L'"')
+      return newString(new string(n.atom.token)); // TODO: not garbage-collected
+
     char** end;
     long v = wcstol(n.atom.token.c_str(), end, 0);
     if (**end == L'\0')
       return newNum(v);
-    // TODO: strings, syms
+
+    // TODO: syms
     return nil;
   }
 
@@ -1418,6 +1437,34 @@ void test_build_handles_nested_form() {
     check(isCons(c2));
     check(isNum(c2->car));
     check_eq(toNum(c2->car), 33);
+    c2 = c2->cdr;
+    check(isCons(c2));
+    check(isNum(c2->car));
+    check_eq(toNum(c2->car), 23);
+  check_eq(c->cdr, nil);
+}
+
+void test_build_handles_strings() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 \"abc\" 23))")))));
+  check_eq(cells.size(), 1);
+  cell* c = cells.front();
+  check(isCons(c));
+  check(isNum(c->car));
+  check_eq(toNum(c->car), 3);
+  c = c->cdr;
+  check(isCons(c));
+  check(isNum(c->car));
+  check_eq(toNum(c->car), 7);
+  c = c->cdr;
+  check(isCons(c));
+    cell* c2 = c->car;
+    check(isCons(c2));
+    check(isNum(c2->car));
+    check_eq(toNum(c2->car), 33);
+    c2 = c2->cdr;
+    check(isCons(c2));
+    check(isString(c2->car));
+    check_eq(toString(c2->car), L"\"abc\"");
     c2 = c2->cdr;
     check(isCons(c2));
     check(isNum(c2->car));
