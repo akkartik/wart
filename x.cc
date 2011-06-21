@@ -1149,23 +1149,19 @@ void test_parse_handles_nested_forms() {
 
 
 //// data
-////
-//// stolen from picolisp: http://software-lab.de/doc/ref.html#data
 
                                   struct cell;
                                   extern cell* nil;
 
                                   #define num(x) ((long)x)
 
-                                  // tag bits
-                                  #define CONS 0x0
-                                  #define NUM 0x2
-                                  #define SYM 0x4
-
 struct cell {
   cell* car;
   cell* cdr;
   long tags;
+    #define CONS 0
+    #define NUM 1
+    #define SYM 2
   long nrefs;
   cell() :car(nil), cdr(nil), nrefs(0) {}
   void init() { car=cdr=nil, nrefs=0; }
