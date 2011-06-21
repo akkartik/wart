@@ -1200,6 +1200,15 @@ Heap* currHeap = new Heap();
 cell* currCell = &currHeap->cells[4]; // leave room for nil
 cell* heapEnd = &currHeap->cells[HEAPCELLS];
 cell* freelist = NULL;
+
+                                  void growHeap() {
+                                    currHeap = currHeap->next = new Heap();
+                                    if (!currHeap)
+                                      cerr << "Out of memory" << endl << DIE;
+                                    currCell = &currHeap->cells[0];
+                                    heapEnd = &currHeap->cells[HEAPCELLS];
+                                  }
+
 // cell addresses must have lower 3 bits unset
 cell* newCell() {
   cell* result = NULL;
@@ -1210,21 +1219,17 @@ cell* newCell() {
     return result;
   }
 
-  result = currCell;
-  ++currCell;
-  if (currCell != heapEnd)
-    return result;
-
-  currHeap->next = new Heap();
-  currHeap = currHeap->next;
-  if (!currHeap)
-    cerr << "Out of memory" << endl << DIE;
-  currCell = &currHeap->cells[0];
-  heapEnd = &currHeap->cells[HEAPCELLS];
+  if (currCell == heapEnd)
+    growHeap();
 
   result = currCell;
   ++currCell;
   return result;
+}
+
+void test_newCell_has_nil_car_and_cdr() {
+  check_eq(newCell()->car, nil);
+  check_eq(newCell()->cdr, nil);
 }
 
 void mkref(cell* c) {
