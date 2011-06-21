@@ -126,7 +126,7 @@ ostream& operator<<(ostream& os, Token p) {
 // counts number of whitespace chars between next non-whitespace char and previous newline
 // BEWARE: tab = 1 space; don't mix the two
 //
-// But do track whether the final indent char is a space. We'll need that farther down.
+// But do track whether the final indent char is a space. Sometimes you want to wrap a long form.
 const int LAST_CHAR_IS_SPACE = 100;
 int countIndent(istream& in) {
   int count = 0;
