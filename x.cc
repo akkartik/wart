@@ -1158,8 +1158,6 @@ void test_parse_handles_nested_forms() {
                                   #define addr(x) ((unsigned long)x)
                                   #define num(x) ((long)x)
 
-                                  #define PTR sizeof(cell*)
-                                  #define WORD sizeof(long)
                                   // tag bits
                                   #define CONS 0x0
                                   #define NUM 0x2
