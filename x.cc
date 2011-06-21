@@ -1300,6 +1300,10 @@ string toString(cell* x) {
   return *(string*)x->car;
 }
 
+bool isAtom(cell* x) {
+  return !isCons(x);
+}
+
 void setCar(cell* x, cell* y) {
   if (x->car != nil && isCons(x->car)) {
     rmref(x->car);
@@ -1583,6 +1587,25 @@ void test_build_handles_quotes() {
 
                                   template<class Data>
                                   class StringMap :public hash_map<string, Data, strHash, strEq>{};
+
+cell* eval(cell* expr) {
+  if (expr == NULL)
+    cerr << "eval: cell should never be NULL" << endl << DIE;
+
+  if (isAtom(expr) && !isSym(expr))
+    return expr;
+
+  if (isCons(expr)) {
+  }
+
+  return nil; // TODO: syms
+}
+
+void test_nil_evals_to_itself() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
+  check_eq(cells.size(), 1);
+  check_eq(eval(cells.front()), nil);
+}
 
 
 
