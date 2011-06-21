@@ -1152,7 +1152,7 @@ void test_parse_handles_nested_forms() {
 //// stolen from picolisp: http://software-lab.de/doc/ref.html#data
 
                                   struct cell;
-                                  cell* nil = NULL; // gets setup lower down
+                                  extern cell* nil;
 
                                   #define addr(x) ((unsigned long)x)
                                   #define num(x) ((long)x)
@@ -1171,6 +1171,18 @@ struct cell {
   void init() { car=cdr=nil, nrefs=0; }
   void clear() { car=cdr=nil, nrefs=0; }
 };
+
+cell nilCells[2];
+cell* nil = (cell*)(addr(nilCells)+4);
+void setupNil() {
+  nilCells[0].car = nilCells[0].cdr = nil;
+  nilCells[1].car = nilCells[1].cdr = nil;
+}
+
+void test_pointers_from_nil_are_nil() {
+  check_eq(nil->car, nil);
+  check_eq(nil->cdr, nil);
+}
 
 #define HEAPCELLS (1024*1024/sizeof(cell)) // 1MB
 struct Heap {
@@ -1376,10 +1388,6 @@ void test_build_handles_number() {
                                         if (numFailures > 1) { cerr << "s"; }
                                         cerr << endl;
                                   }
-
-void setupNil() {
-  nil = &currHeap->cells[1];
-}
 
 
 
