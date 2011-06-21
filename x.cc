@@ -1157,11 +1157,13 @@ void test_parse_handles_nested_forms() {
                                   #define addr(x) ((unsigned long)x)
                                   #define num(x) ((long)x)
 
-                                  #define MASK 0x7
+                                  #define PTR sizeof(cell*)
+                                  #define WORD sizeof(long)
                                   // tag bits
                                   #define CONS 0x0
                                   #define NUM 0x2
-                                  #define SYM 0x4
+                                  #define SYM WORD // nil's alignment
+                                  #define MASK WORD*2-1
 
 struct cell {
   cell* car;
@@ -1172,11 +1174,13 @@ struct cell {
   void clear() { car=cdr=nil, nrefs=0; }
 };
 
-cell nilCells[2];
-cell* nil = (cell*)(addr(nilCells)+4);
+cell nilCells[4];
+cell* nil = &nilCells[1];
 void setupNil() {
-  nilCells[0].car = nilCells[0].cdr = nil;
-  nilCells[1].car = nilCells[1].cdr = nil;
+  if ((addr(nil)&MASK) != SYM)
+    cerr << "nil is incorrectly aligned: " << std::hex << addr(nil) << endl << DIE;
+  for (int i=0; i < 4; ++i)
+    nilCells[i].car = nilCells[i].cdr = nil;
 }
 
 void test_pointers_from_nil_are_nil() {
