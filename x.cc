@@ -1588,17 +1588,36 @@ void test_build_handles_quotes() {
                                   template<class Data>
                                   class StringMap :public hash_map<string, Data, strHash, strEq>{};
 
+StringMap<cell*> globals;
+
+cell* lookup(cell* sym) {
+  cell* result = globals[toString(sym)];
+  if (result)
+    return result;
+
+  cerr << "No binding for " << toString(sym) << endl;
+  return nil;
+}
+
+void test_lookup_returns_global_binding() {
+  cell* expected = globals[L"a"] = newNum(34);
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"a")))));
+  check_eq(lookup(cells.front()), expected);
+}
+
+
+
 cell* eval(cell* expr) {
   if (expr == NULL)
     cerr << "eval: cell should never be NULL" << endl << DIE;
 
-  if (isAtom(expr) && !isSym(expr))
+  if (isSym(expr))
+    return lookup(expr);
+
+  if (isAtom(expr))
     return expr;
 
-  if (isCons(expr)) {
-  }
-
-  return nil; // TODO: syms
+  return nil; // TODO: cons
 }
 
 void test_nil_evals_to_itself() {
