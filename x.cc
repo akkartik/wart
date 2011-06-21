@@ -1154,6 +1154,15 @@ void test_parse_handles_nested_forms() {
                                   struct cell;
                                   cell* nil = NULL; // gets setup lower down
 
+                                  #define addr(x) ((unsigned long)x)
+                                  #define num(x) ((long)x)
+
+                                  #define MASK 0x7
+                                  // tag bits
+                                  #define CONS 0x0
+                                  #define NUM 0x2
+                                  #define SYM 0x4
+
 struct cell {
   cell* car;
   cell* cdr;
@@ -1219,15 +1228,6 @@ void rmref(cell* c) {
   c->cdr = freelist;
   freelist = c;
 }
-
-#define addr(x) ((unsigned long)x)
-#define num(x) ((long)x)
-
-#define MASK 0x7
-// tag bits
-#define CONS 0x0
-#define NUM 0x2
-#define SYM 0x4
 
 cell* newNum(long x) {
   cell* result = newCell();
