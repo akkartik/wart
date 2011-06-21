@@ -1370,9 +1370,9 @@ cell* buildCell(AstNode n) {
     if (n.atom.token == L")")
       cerr << "syntax error: unbalanced )" << endl << DIE;
 
-    char** end;
-    long v = wcstol(n.atom.token.c_str(), end, 0);
-    if (**end == L'\0')
+    char* end;
+    long v = wcstol(n.atom.token.c_str(), &end, 0);
+    if (*end == L'\0')
       return newNum(v);
 
     if (n.atom.token.c_str()[0] == L'"')
@@ -1532,7 +1532,7 @@ void test_build_handles_strings() {
 }
 
 void test_build_handles_syms() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 \"abc\" def 23))")))));
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 \"abc\" 3de 23))")))));
   check_eq(cells.size(), 1);
   cell* c = cells.front();
   check(isCons(c));
@@ -1555,7 +1555,7 @@ void test_build_handles_syms() {
     c2 = c2->cdr;
     check(isCons(c2));
     check(isSym(c2->car));
-    check_eq(toString(c2->car), L"def");
+    check_eq(toString(c2->car), L"3de");
     c2 = c2->cdr;
     check(isCons(c2));
     check(isNum(c2->car));
