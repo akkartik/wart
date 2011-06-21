@@ -1169,7 +1169,7 @@ void test_parse_handles_nested_forms() {
 struct cell {
   cell* car;
   cell* cdr;
-  long nrefs;
+  long long nrefs;
   cell() :car(nil), cdr(nil), nrefs(0) {}
   void init() { car=cdr=nil, nrefs=0; }
   void clear() { car=cdr=nil, nrefs=0; }
@@ -1406,6 +1406,9 @@ void test_build_handles_number() {
 
 int main(int argc, ascii* argv[]) {
   setupNil();
+
+  if (sizeof(cell)%8)
+    cerr << "Cells should be a multiple of 8 bytes long." << endl << DIE;
 
   int pass = 0;
   if (argc > 1) {
