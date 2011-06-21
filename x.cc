@@ -1163,25 +1163,21 @@ void test_parse_handles_nested_forms() {
                                   // tag bits
                                   #define CONS 0x0
                                   #define NUM 0x2
-                                  #define SYM WORD // nil's alignment
-                                  #define MASK (WORD*2-1) // stretch as necessary
+                                  #define SYM 0x4
+                                  #define MASK 0x7
 
 struct cell {
   cell* car;
   cell* cdr;
-  int nrefs;
+  long nrefs;
   cell() :car(nil), cdr(nil), nrefs(0) {}
   void init() { car=cdr=nil, nrefs=0; }
   void clear() { car=cdr=nil, nrefs=0; }
 };
 
-cell nilCells[4];
-cell* nil = &nilCells[1];
+cell* nil = new cell;
 void setupNil() {
-  if ((addr(nil)&MASK) != SYM)
-    cerr << "nil is incorrectly aligned: " << std::hex << addr(nil) << endl << DIE;
-  for (int i=0; i < 4; ++i)
-    nilCells[i].car = nilCells[i].cdr = nil;
+  nil->car = nil->cdr = nil;
 }
 
 void test_pointers_from_nil_are_nil() {
@@ -1284,6 +1280,13 @@ void setCdr(cell* x, cell* y) {
   }
   x->cdr = y;
   mkref(y);
+}
+
+cell* car(cell* c) {
+  return ((cell*)(addr(c)&~MASK))->car;
+}
+cell* cdr(cell* c) {
+  return ((cell*)(addr(c)&~MASK))->cdr;
 }
 
 ostream& operator<<(ostream& os, cell* c) {
