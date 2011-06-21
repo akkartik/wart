@@ -1,3 +1,4 @@
+                                  #include<cstdio>
                                   #include<string>
                                   typedef std::wstring string;
                                   #include<list>
