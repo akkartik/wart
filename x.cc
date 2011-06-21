@@ -1357,6 +1357,20 @@ void test_build_handles_number() {
   check_eq(toNum(cells.front()), 34);
 }
 
+void test_build_handles_multiple_atoms() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34\n35")))));
+  check_eq(cells.size(), 2);
+  cell* c = cells.front();
+  check(isNum(c));
+  check_eq(cdr(c), nil);
+  check_eq(toNum(c), 34);
+
+  c = cells.back();
+  check(isNum(c));
+  check_eq(cdr(c), nil);
+  check_eq(toNum(c), 35);
+}
+
 
 
 //// bindings
