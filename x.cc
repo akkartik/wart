@@ -1385,9 +1385,11 @@ cell* buildCell(AstNode n) {
         break;
       if (!curr)
         newForm = curr = newCell();
-      else
-        curr = curr->cdr = newCell();
-      curr->car = buildCell(*q);
+      else {
+        setCdr(curr, newCell());
+        curr = curr->cdr;
+      }
+      setCar(curr, buildCell(*q));
     }
   }
 
@@ -1407,6 +1409,7 @@ void test_build_handles_number() {
   check_eq(cells.size(), 1);
   check(isNum(cells.front()));
   check_eq(toNum(cells.front()), 34);
+  check_eq(cells.front()->nrefs, 0);
 }
 
 void test_build_handles_multiple_atoms() {
@@ -1416,11 +1419,13 @@ void test_build_handles_multiple_atoms() {
   check(isNum(c));
   check_eq(c->cdr, nil);
   check_eq(toNum(c), 34);
+  check_eq(c->nrefs, 0);
 
   c = cells.back();
   check(isNum(c));
   check_eq(c->cdr, nil);
   check_eq(toNum(c), 35);
+  check_eq(c->nrefs, 0);
 }
 
 void test_build_handles_form() {
@@ -1430,11 +1435,14 @@ void test_build_handles_form() {
   check(isCons(c));
   check(isNum(c->car));
   check_eq(toNum(c->car), 34);
+  check_eq(c->nrefs, 0);
+
   c = c->cdr;
   check(isCons(c));
   check(isNum(c->car));
   check_eq(toNum(c->car), 35);
   check_eq(c->cdr, nil);
+  check_eq(c->nrefs, 1);
 }
 
 void test_build_handles_nested_form() {
@@ -1444,20 +1452,27 @@ void test_build_handles_nested_form() {
   check(isCons(c));
   check(isNum(c->car));
   check_eq(toNum(c->car), 3);
+  check_eq(c->nrefs, 0);
+
   c = c->cdr;
   check(isCons(c));
   check(isNum(c->car));
   check_eq(toNum(c->car), 7);
+  check_eq(c->nrefs, 1);
+
   c = c->cdr;
   check(isCons(c));
+  check_eq(c->nrefs, 1);
     cell* c2 = c->car;
     check(isCons(c2));
     check(isNum(c2->car));
     check_eq(toNum(c2->car), 33);
+    check_eq(c2->nrefs, 1);
     c2 = c2->cdr;
     check(isCons(c2));
     check(isNum(c2->car));
     check_eq(toNum(c2->car), 23);
+    check_eq(c2->nrefs, 1);
   check_eq(c->cdr, nil);
 }
 
