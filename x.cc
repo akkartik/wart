@@ -1238,7 +1238,11 @@ void rmref(cell* c) {
   --c->nrefs;
   if (c->nrefs > 0) return;
 
-  rmref(c->car);
+  if (c->tags == STRING)
+    delete (string*)c->car;
+  else
+    rmref(c->car);
+
   rmref(c->cdr);
 
   c->clear();
@@ -1348,7 +1352,7 @@ cell* buildCell(AstNode n) {
       cerr << "syntax error" << endl << DIE;
 
     if (n.atom.token.c_str()[0] == L'"')
-      return newString(new string(n.atom.token)); // TODO: not garbage-collected
+      return newString(new string(n.atom.token)); // caveat fragmentation
 
     char** end;
     long v = wcstol(n.atom.token.c_str(), end, 0);
