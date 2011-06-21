@@ -1155,23 +1155,28 @@ void test_parse_handles_nested_forms() {
                                   struct cell;
                                   extern cell* nil;
 
-                                  #define addr(x) ((unsigned long)x)
                                   #define num(x) ((long)x)
 
                                   // tag bits
                                   #define CONS 0x0
                                   #define NUM 0x2
                                   #define SYM 0x4
-                                  #define MASK 0x7
 
 struct cell {
   cell* car;
   cell* cdr;
-  long long nrefs;
+  long tags;
+  long nrefs;
   cell() :car(nil), cdr(nil), nrefs(0) {}
   void init() { car=cdr=nil, nrefs=0; }
   void clear() { car=cdr=nil, nrefs=0; }
 };
+
+                                  void platformChecks() {
+                                    if (sizeof(long) != sizeof(cell*))
+                                      cerr << "Longs and pointers are of inequal size; the num macro will stop working."
+                                        << endl << DIE;
+                                  }
 
 cell* nil = new cell;
 void setupNil() {
@@ -1248,20 +1253,21 @@ void rmref(cell* c) {
 cell* newNum(long x) {
   cell* result = newCell();
   result->car = (cell*)x;
-  return (cell*)(addr(result)+NUM);
+  result->tags = NUM;
+  return result;
 }
 
 bool isNum(cell* x) {
-  return (addr(x)&MASK) == NUM;
+  return x->tags == NUM;
 }
 
 long toNum(cell* c) {
   if (!isNum(c)) return 0;
-  return addr(((cell*)(addr(c)-NUM))->car);
+  return num(c->car);
 }
 
 bool isCons(cell* x) {
-  return (addr(x)&MASK) == CONS;
+  return x->tags == CONS;
 }
 
 void setCar(cell* x, cell* y) {
@@ -1280,13 +1286,6 @@ void setCdr(cell* x, cell* y) {
   mkref(y);
 }
 
-cell* car(cell* c) {
-  return ((cell*)(addr(c)&~MASK))->car;
-}
-cell* cdr(cell* c) {
-  return ((cell*)(addr(c)&~MASK))->cdr;
-}
-
 ostream& operator<<(ostream& os, cell* c) {
   if (!c) return os;
 
@@ -1295,7 +1294,7 @@ ostream& operator<<(ostream& os, cell* c) {
     return os;
   }
 
-  switch(addr(c)&MASK) {
+  switch(c->tags) {
   case NUM:
     os << toNum(c); break;
   case SYM:
@@ -1362,12 +1361,12 @@ void test_build_handles_multiple_atoms() {
   check_eq(cells.size(), 2);
   cell* c = cells.front();
   check(isNum(c));
-  check_eq(cdr(c), nil);
+  check_eq(c->cdr, nil);
   check_eq(toNum(c), 34);
 
   c = cells.back();
   check(isNum(c));
-  check_eq(cdr(c), nil);
+  check_eq(c->cdr, nil);
   check_eq(toNum(c), 35);
 }
 
@@ -1417,10 +1416,8 @@ void test_build_handles_multiple_atoms() {
 
 
 int main(int argc, ascii* argv[]) {
+  platformChecks();
   setupNil();
-
-  if (sizeof(cell)%8)
-    cerr << "Cells should be a multiple of 8 bytes long." << endl << DIE;
 
   int pass = 0;
   if (argc > 1) {
