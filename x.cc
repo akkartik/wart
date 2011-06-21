@@ -1014,6 +1014,9 @@ struct AstNode {
     AstNode result(l);
     return result;
   }
+  bool isAtom() {
+    return form.empty();
+  }
   bool isForm() {
     return !form.empty();
   }
@@ -1323,12 +1326,12 @@ list<AstNode>::iterator buildCell(list<AstNode>::iterator p, list<cell*>& out) {
   if (p->isNil())
     out.push_back(nil);
 
-  else if (p->isForm()) {
+  else if (p->isAtom())
+    out.push_back(newNum(wcstol(p->atom.token.c_str(), NULL, 0)));
+
+  else if (p->isForm())
     out.push_back(newCell());
 //?       buildCells(n.form);
-  }
-  else
-    out.push_back(newNum(wcstol(p->atom.token.c_str(), NULL, 0)));
 
   return ++p;
 }
