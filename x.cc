@@ -1368,7 +1368,7 @@ cell* buildCell(AstNode n) {
 
   if (n.isAtom()) {
     if (n.atom.token == L")")
-      cerr << "syntax error" << endl << DIE;
+      cerr << "syntax error: unbalanced )" << endl << DIE;
 
     char** end;
     long v = wcstol(n.atom.token.c_str(), end, 0);
