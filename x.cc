@@ -1153,14 +1153,6 @@ void test_parse_handles_nested_forms() {
                                   struct cell;
                                   extern cell* nil;
 
-                                  #define num(x) ((long)x)
-
-                                  void platformChecks() {
-                                    if (sizeof(long) != sizeof(cell*))
-                                      cerr << "Longs and pointers are of inequal size; the num macro will stop working."
-                                        << endl << DIE;
-                                  }
-
 struct cell {
   cell* car;
   cell* cdr;
@@ -1183,6 +1175,8 @@ void test_pointers_from_nil_are_nil() {
   check_eq(nil->car, nil);
   check_eq(nil->cdr, nil);
 }
+
+
 
 #define HEAPCELLS (1024*1024/sizeof(cell)) // 1MB
 struct Heap {
@@ -1246,6 +1240,8 @@ void rmref(cell* c) {
   freelist = c;
 }
 
+
+
 cell* newNum(long x) {
   cell* result = newCell();
   result->car = (cell*)x;
@@ -1259,7 +1255,7 @@ bool isNum(cell* x) {
 
 long toNum(cell* c) {
   if (!isNum(c)) return 0;
-  return num(c->car);
+  return (long)c->car;
 }
 
 bool isCons(cell* x) {
@@ -1306,6 +1302,8 @@ ostream& operator<<(ostream& os, list<cell*> l) {
   os << endl;
   return os;
 }
+
+
 
                                   extern list<AstNode>::iterator buildCell(list<AstNode>::iterator, list<cell*>&);
 
@@ -1407,10 +1405,7 @@ void test_build_handles_multiple_atoms() {
                                         cerr << endl;
                                   }
 
-
-
 int main(int argc, ascii* argv[]) {
-  platformChecks();
   setupNil();
 
   int pass = 0;
