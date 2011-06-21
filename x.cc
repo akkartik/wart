@@ -1610,7 +1610,7 @@ void test_build_handles_quotes() {
                                   template<class Data>
                                   class StringMap :public hash_map<string, Data, strHash, strEq>{};
 
-StringMap<cell*> globals;
+StringMap<stack<cell*> > dynamics;
 stack<StringMap<cell*> > lexicals;
 
                                   cell* lexicalLookup(string sym) {
@@ -1621,18 +1621,19 @@ stack<StringMap<cell*> > lexicals;
 cell* lookup(cell* sym) {
   string s = toString(sym);
   cell* result = lexicalLookup(s);
-  if (!result) result = globals[s];
+  if (!result) result = dynamics[s].top();
   if (result) return result;
 
   cerr << "No binding for " << toString(sym) << endl;
   return nil;
 }
 
-void test_lookup_returns_global_binding() {
-  cell* expected = globals[L"a"] = newNum(34);
+void test_lookup_returns_dynamic_binding() {
+  cell* expected = newNum(34);
+  dynamics[L"a"].push(expected);
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"a")))));
   check_eq(lookup(cells.front()), expected);
-  globals.clear();
+  dynamics.clear();
 }
 
 void test_lookup_returns_lexical_binding() {
