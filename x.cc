@@ -1155,6 +1155,12 @@ void test_parse_handles_nested_forms() {
 
                                   #define num(x) ((long)x)
 
+                                  void platformChecks() {
+                                    if (sizeof(long) != sizeof(cell*))
+                                      cerr << "Longs and pointers are of inequal size; the num macro will stop working."
+                                        << endl << DIE;
+                                  }
+
 struct cell {
   cell* car;
   cell* cdr;
@@ -1167,12 +1173,6 @@ struct cell {
   void init() { car=cdr=nil, nrefs=0; }
   void clear() { car=cdr=nil, nrefs=0; }
 };
-
-                                  void platformChecks() {
-                                    if (sizeof(long) != sizeof(cell*))
-                                      cerr << "Longs and pointers are of inequal size; the num macro will stop working."
-                                        << endl << DIE;
-                                  }
 
 cell* nil = new cell;
 void setupNil() {
