@@ -1388,6 +1388,13 @@ cell* buildCell(AstNode n) {
     if (q->atom == L")")
       break;
 
+    if (q->atom == L".") {
+      ++q;
+      if (!curr) cerr << "syntax error: dot at start of expression" << endl << DIE;
+      setCdr(curr, buildCell(*q));
+      break;
+    }
+
     if (!curr)
       newForm = curr = newCell();
     else {
@@ -1447,6 +1454,21 @@ void test_build_handles_form() {
   check(isNum(c->car));
   check_eq(toNum(c->car), 35);
   check_eq(c->cdr, nil);
+  check_eq(c->nrefs, 1);
+}
+
+void test_build_handles_dot() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34 . 35")))));
+  check_eq(cells.size(), 1);
+  cell* c = cells.front();
+  check(isCons(c));
+  check(isNum(c->car));
+  check_eq(toNum(c->car), 34);
+  check_eq(c->nrefs, 0);
+
+  c = c->cdr;
+  check(isNum(c));
+  check_eq(toNum(c), 35);
   check_eq(c->nrefs, 1);
 }
 
