@@ -1004,6 +1004,7 @@ ostream& operator<<(ostream& os, list<Token> l) {
 struct AstNode {
   Token atom;
   list<AstNode> form;
+
   AstNode(Token t) :atom(t) {}
   AstNode(list<AstNode> l) :atom(Token::sol()), form(l) {}
   static AstNode of(Token t) {
@@ -1014,6 +1015,7 @@ struct AstNode {
     AstNode result(l);
     return result;
   }
+
   bool isAtom() {
     return form.empty();
   }
@@ -1024,6 +1026,7 @@ struct AstNode {
     return form.size() == 2
       && form.front() == L"(" && form.back() == L")";
   }
+
   bool operator==(Token x) {
     return form.empty() && atom == x.token; // whitespace should be gone by now.
   }
