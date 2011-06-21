@@ -1279,44 +1279,55 @@ ostream& operator<<(ostream& os, cell* c) {
   return os;
 }
 
-extern cell* buildCell(AstNode n);
+ostream& operator<<(ostream& os, list<cell*> l) {
+  for (list<cell*>::iterator p = l.begin(); p != l.end(); ++p) {
+    os << *p;
+  }
+  os << endl;
+  return os;
+}
 
-cell* build(list<AstNode> l) {
-  if (l.empty()) return nil;
-  list<AstNode>::iterator p = l.begin();
-  cell* result = buildCell(*p);
-  cell* curr = result;
-  for (++p; p != l.end(); ++p, curr=curr->cdr) {
-    setCdr(curr, buildCell(*p));
+extern list<AstNode>::iterator buildCell(list<AstNode>::iterator, list<cell*>&);
+
+list<cell*> buildCells(list<AstNode> in) {
+  list<cell*> result;
+  if (in.empty()) return result;
+
+  list<AstNode>::iterator p = in.begin();
+  while (p != in.end()) {
+    p = buildCell(p, result);
   }
 
-  mkref(result); // it's leaving the function
   return result;
 }
 
-cell* buildCell(AstNode n) {
-  if (n.isForm()) {
-    if (n.form.size() == 2 && n.form.front() == L"(" && n.form.back() == L")")
-      return nil;
-    cell* result = build(n.form);
-    return result;
+list<AstNode>::iterator buildCell(list<AstNode>::iterator p, list<cell*>& out) {
+  if (p->isForm()) {
+    if (p->form.size() == 2 && p->form.front() == L"(" && p->form.back() == L")")
+      out.push_back(nil);
+    else
+      out.push_back(newCell());
+//?       buildCells(n.form);
   }
-  return newNum(wcstol(n.atom.token.c_str(), NULL, 0));
+  else
+    out.push_back(newNum(wcstol(p->atom.token.c_str(), NULL, 0)));
+
+  return ++p;
 }
 
 void test_build_handles_empty_input() {
-  cell* c = build(parse(parenthesize(tokenize(teststream(L"")))));
-  check_eq(c, nil);
-}
-
-void test_build_handles_number() {
-  cell* c = build(parse(parenthesize(tokenize(teststream(L"34")))));
-  check(isNum(c));
-  check_eq(toNum(c), 34);
+  check(buildCells(parse(parenthesize(tokenize(teststream(L""))))).empty());
 }
 
 void test_build_handles_nil() {
-  check_eq(build(parse(parenthesize(tokenize(teststream(L"()"))))), nil);
+  check_eq(buildCells(parse(parenthesize(tokenize(teststream(L"()"))))).front(), nil);
+}
+
+void test_build_handles_number() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34")))));
+  check_eq(cells.size(), 1);
+  check(isNum(cells.front()));
+  check_eq(toNum(cells.front()), 34);
 }
 
 
@@ -1391,7 +1402,7 @@ int main(int argc, ascii* argv[]) {
     cout << parse(parenthesize(tokenize(cin))); break;
   case 4:
   default:
-    cout << build(parse(parenthesize(tokenize(cin)))); break;
+    cout << buildCells(parse(parenthesize(tokenize(cin)))); break;
   }
   return 0;
 }
