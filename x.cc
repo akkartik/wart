@@ -1151,8 +1151,8 @@ void test_parse_handles_nested_forms() {
 ////
 //// stolen from picolisp: http://software-lab.de/doc/ref.html#data
 
-struct cell;
-cell* nil = NULL; // gets setup lower down
+                                  struct cell;
+                                  cell* nil = NULL; // gets setup lower down
 
 struct cell {
   cell* car;
@@ -1291,7 +1291,7 @@ ostream& operator<<(ostream& os, list<cell*> l) {
   return os;
 }
 
-extern list<AstNode>::iterator buildCell(list<AstNode>::iterator, list<cell*>&);
+                                  extern list<AstNode>::iterator buildCell(list<AstNode>::iterator, list<cell*>&);
 
 list<cell*> buildCells(list<AstNode> in) {
   list<cell*> result;
