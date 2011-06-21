@@ -1196,13 +1196,13 @@ cell* currCell = &currHeap->cells[4]; // leave room for nil
 cell* heapEnd = &currHeap->cells[HEAPCELLS];
 cell* freelist = NULL;
 
-                                  void growHeap() {
-                                    currHeap = currHeap->next = new Heap();
-                                    if (!currHeap)
-                                      cerr << "Out of memory" << endl << DIE;
-                                    currCell = &currHeap->cells[0];
-                                    heapEnd = &currHeap->cells[HEAPCELLS];
-                                  }
+void growHeap() {
+  currHeap = currHeap->next = new Heap();
+  if (!currHeap)
+    cerr << "Out of memory" << endl << DIE;
+  currCell = &currHeap->cells[0];
+  heapEnd = &currHeap->cells[HEAPCELLS];
+}
 
 // cell addresses must have lower 3 bits unset
 cell* newCell() {
