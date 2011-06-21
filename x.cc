@@ -1377,20 +1377,21 @@ cell* buildCell(AstNode n) {
   }
 
   cell* newForm = NULL;
-  list<AstNode>::iterator q = n.form.begin();
-  if (q->atom == L"(") {
-    cell* curr = NULL;
-    for (++q; q != n.form.end(); ++q) {
-      if (q->atom.token == L")")
-        break;
-      if (!curr)
-        newForm = curr = newCell();
-      else {
-        setCdr(curr, newCell());
-        curr = curr->cdr;
-      }
-      setCar(curr, buildCell(*q));
+  cell* curr = NULL;
+  for (list<AstNode>::iterator q = n.form.begin(); q != n.form.end(); ++q) {
+    if (q->atom == L"(")
+      continue;
+    if (q->atom == L")")
+      break;
+
+    if (!curr)
+      newForm = curr = newCell();
+    else {
+      setCdr(curr, newCell());
+      curr = curr->cdr;
     }
+
+    setCar(curr, buildCell(*q));
   }
 
   return newForm;
@@ -1533,6 +1534,30 @@ void test_build_handles_syms() {
     check(isCons(c2));
     check(isNum(c2->car));
     check_eq(toNum(c2->car), 23);
+  check_eq(c->cdr, nil);
+}
+
+void test_build_handles_quotes() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"`(34 ,35)")))));
+  check_eq(cells.size(), 1);
+  cell* c = cells.front();
+  check(isCons(c));
+  check(isSym(c->car));
+  check_eq(toString(c->car), L"`");
+  c = c->cdr;
+  check(isNum(c->car));
+  check_eq(toNum(c->car), 34);
+  c = c->cdr;
+  check(isCons(c));
+    cell* c2 = c->car;
+    check(isCons(c2));
+    check(isSym(c2->car));
+    check_eq(toString(c2->car), L",");
+    c2 = c2->cdr;
+    check(isCons(c2));
+    check(isNum(c2->car));
+    check_eq(toNum(c2->car), 35);
+    check_eq(c2->cdr, nil);
   check_eq(c->cdr, nil);
 }
 
