@@ -1192,7 +1192,6 @@ void growHeap() {
   heapEnd = &currHeap->cells[HEAPCELLS];
 }
 
-// cell addresses must have lower 3 bits unset
 cell* newCell() {
   cell* result = NULL;
   if (freelist) {
