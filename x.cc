@@ -1389,15 +1389,20 @@ void set(cell* t, cell* k, cell* val) {
   mkref(val);
 }
 
+                                  cell* unsafeGet(cell* t, cell* k) {
+                                    if (!isTable(t)) {
+                                      cerr << "get on a non-table" << endl;
+                                      return nil;
+                                    }
+                                    hash_map<long, cell*> table = ((Table*)t->car)->table;
+                                    long key = (long)k;
+                                    return table[key];
+                                  }
+
 cell* get(cell* t, cell* k) {
-  if (!isTable(t)) {
-    cerr << "get on a non-table" << endl;
-    return nil;
-  }
-  hash_map<long, cell*> table = ((Table*)t->car)->table;
-  long key = (long)k;
-  if (!table[key]) return nil;
-  return table[key];
+  cell* result = unsafeGet(t, k);
+  if (!result) return nil;
+  return result;
 }
 
 
@@ -1697,32 +1702,83 @@ void test_build_handles_quotes() {
 
 //// bindings
 
-StringMap<stack<cell*> > dynamics;
+                                  cell* baseLexicalScope = newTable();
 
-cell* lookup(cell* sym) {
-  string s = toString(sym);
-  cell* result = dynamics[s].top();
+                                  cell* lookupLexicalBinding(cell* sym, cell* env) {
+                                    if (env == nil) return NULL;
+                                    cell* result = unsafeGet(env, sym);
+                                    if (result) return result;
+                                    return lookupLexicalBinding(sym, env->cdr);
+                                  }
+
+                                  cell* newLexicalScope(cell* env) {
+                                    cell* newScope = newTable();
+                                    setCdr(newScope, env);
+                                    return newScope;
+                                  }
+
+                                  void addLexicalBinding(cell* env, cell* sym, cell* val) {
+                                    if (unsafeGet(env, sym)) cerr << "Can't rebind within a lexical scope" << endl << DIE;
+                                    set(env, sym, val);
+                                  }
+
+                                  hash_map<long, stack<cell*> > dynamics;
+                                  cell* lookupDynamicBinding(cell* sym) {
+                                    stack<cell*> bindings = dynamics[(long)sym];
+                                    if (bindings.empty()) return NULL;
+                                    return bindings.top();
+                                  }
+
+                                  void newDynamicScope(cell* sym, cell* val) {
+                                    long key = (long)sym;
+                                    if (dynamics[key].empty()) mkref(sym);
+                                    dynamics[key].push(val);
+                                    mkref(val);
+                                  }
+
+                                  void endDynamicScope(cell* sym) {
+                                    long key = (long)sym;
+                                    if (dynamics[key].empty()) {
+                                      cerr << "No dynamic binding for " << sym << endl;
+                                      return;
+                                    }
+                                    rmref(dynamics[key].top());
+                                    dynamics[key].top();
+                                  }
+
+cell* lookup(cell* sym, cell* env) {
+  cell* result = lookupLexicalBinding(sym, env);
+  if (result) return result;
+  result = lookupDynamicBinding(sym);
   if (result) return result;
   cerr << "No binding for " << toString(sym) << endl;
   return nil;
 }
 
 void test_lookup_returns_dynamic_binding() {
-  cell* expected = newNum(34);
-  dynamics[L"a"].push(expected);
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"a")))));
-  check_eq(lookup(cells.front()), expected);
-  dynamics.clear();
+  cell* val = newNum(34);
+  cell* sym = newSym(L"a");
+  newDynamicScope(sym, val);
+  check_eq(lookup(sym, baseLexicalScope), val);
+  endDynamicScope(sym);
+}
+
+void test_lookup_returns_lexical_binding() {
+  cell* val = newNum(34);
+  cell* sym = newSym(L"a");
+  set(baseLexicalScope, sym, val);
+  check_eq(lookup(sym, baseLexicalScope), val);
+  set(baseLexicalScope, sym, nil);
 }
 
 
 
-cell* eval(cell* expr) {
+cell* eval(cell* expr, cell* env) {
   if (expr == NULL)
     cerr << "eval: cell should never be NULL" << endl << DIE;
 
   if (isSym(expr))
-    return lookup(expr);
+    return lookup(expr, env);
 
   if (isAtom(expr))
     return expr;
@@ -1733,19 +1789,19 @@ cell* eval(cell* expr) {
 void test_nil_evals_to_itself() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
   check_eq(cells.size(), 1);
-  check_eq(eval(cells.front()), nil);
+  check_eq(eval(cells.front(), baseLexicalScope), nil);
 }
 
 void test_num_evals_to_itself() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34")))));
   check_eq(cells.size(), 1);
-  check_eq(eval(cells.front()), cells.front());
+  check_eq(eval(cells.front(), baseLexicalScope), cells.front());
 }
 
 void test_string_evals_to_itself() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"\"ac bd\"")))));
   check_eq(cells.size(), 1);
-  check_eq(eval(cells.front()), cells.front());
+  check_eq(eval(cells.front(), baseLexicalScope), cells.front());
 }
 
 
