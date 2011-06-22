@@ -1239,6 +1239,10 @@ void rmref(cell* c) {
   --c->nrefs;
   if (c->nrefs > 0) return;
 
+  // do we ever delete atoms?
+  if (c->tags != CONS)
+    cerr << "tried to delete an atom" << endl << DIE;
+
   if (c->tags == STRING || c->tags == SYM)
     delete (string*)c->car;
   else
