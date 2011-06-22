@@ -1154,9 +1154,9 @@ struct cell {
     #define STRING 3
     #define TABLE 4
   long nrefs;
-  cell() :car(nil), cdr(nil), nrefs(0) {}
-  void init() { car=cdr=nil, nrefs=0; }
-  void clear() { car=cdr=NULL, nrefs=0; }
+  cell() :car(nil), cdr(nil), type(CONS), nrefs(0) {}
+  void init() { car=cdr=nil, type=CONS, nrefs=0; }
+  void clear() { car=cdr=NULL, type=CONS, nrefs=0; }
 };
 
 cell* nil = new cell;
