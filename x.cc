@@ -59,10 +59,8 @@ struct Token {
   string token;
   int indentLevel;
 
-  // private
   Token(const TokenType t, const string x, const int l) :type(t), token(x), indentLevel(l) {}
 
-  // static methods for single-line stack allocation
   static Token of(string s) {
     Token result(NON_WHITESPACE, s, 0);
     return result;
@@ -176,8 +174,8 @@ void test_countIndent() {
                                     char c;
                                     while (!eof(in)) {
                                       in >> c;
+                                      // keep this list sync'd with the parseToken switch below
                                       if (isspace(c) || c == L',' || c == ';'
-                                          // keep this list sync'd with the parseToken switch below
                                           || c == L'(' || c == L')' || c == L'\'' || c == L'"') {
                                         in.putback(c);
                                         break;
@@ -1181,7 +1179,7 @@ struct Heap {
 };
 
 Heap* currHeap = new Heap();
-cell* currCell = &currHeap->cells[4]; // leave room for nil
+cell* currCell = &currHeap->cells[0];
 cell* heapEnd = &currHeap->cells[HEAPCELLS];
 cell* freelist = NULL;
 
