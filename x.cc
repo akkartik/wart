@@ -1245,7 +1245,6 @@ void rmref(cell* c) {
     break; // numbers don't need freeing
   case STRING:
   case SYM:
-    cerr << "delete: " << *(string*)c->car << endl;
     delete (string*)c->car;
     break;
   case TABLE:
@@ -1347,14 +1346,14 @@ bool isAtom(cell* x) {
                                   void clearLiteralTables() { // just for testing
                                     for (hash_map<long, cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
                                       if (p->second->nrefs > 1)
-                                        cerr << "forcing unintern";
+                                        cerr << "forcing unintern: " << (long)p->second->car << endl;
                                       while (p->second->nrefs > 0)
                                         rmref(p->second);
                                     }
                                     numLiterals.clear();
                                     for (StringMap<cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
                                       if (p->second->nrefs > 1)
-                                        cerr << "forcing unintern";
+                                        cerr << "forcing unintern: " << *(string*)p->second->car << endl;
                                       while (p->second->nrefs > 0)
                                         rmref(p->second);
                                     }
@@ -1541,11 +1540,15 @@ cell* buildCell(AstNode n) {
 }
 
 void test_build_handles_empty_input() {
-  check(buildCells(parse(parenthesize(tokenize(teststream(L""))))).empty());
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"")))));
+  check(cells.empty());
+  clearLiteralTables();
 }
 
 void test_build_handles_nil() {
-  check_eq(buildCells(parse(parenthesize(tokenize(teststream(L"()"))))).front(), nil);
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
+  check_eq(cells.front(), nil);
+  clearLiteralTables();
 }
 
 void test_build_handles_number() {
@@ -1554,6 +1557,7 @@ void test_build_handles_number() {
   check(isNum(cells.front()));
   check_eq(toNum(cells.front()), 34);
   check_eq(cells.front()->nrefs, 1);
+  clearLiteralTables();
 }
 
 void test_build_handles_multiple_atoms() {
@@ -1570,10 +1574,11 @@ void test_build_handles_multiple_atoms() {
   check_eq(toNum(c), 35);
   check_eq(c->nrefs, 1);
   check_eq(c->cdr, nil);
+
+  clearLiteralTables();
 }
 
 void test_build_handles_form() {
-  clearLiteralTables();
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34 35")))));
   check_eq(cells.size(), 1);
   cell* c = cells.front();
@@ -1590,10 +1595,12 @@ void test_build_handles_form() {
   check_eq(toNum(c->car), 35);
   check_eq(c->car->nrefs, 2);
   check_eq(c->cdr, nil);
+
+  rmref(cells.front());
+  clearLiteralTables();
 }
 
 void test_build_handles_dot() {
-  numLiterals.clear();
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34 . 35")))));
   check_eq(cells.size(), 1);
   cell* c = cells.front();
@@ -1607,10 +1614,12 @@ void test_build_handles_dot() {
   check(isNum(c));
   check_eq(toNum(c), 35);
   check_eq(c->nrefs, 2);
+
+  rmref(cells.front());
+  clearLiteralTables();
 }
 
 void test_build_handles_nested_form() {
-  numLiterals.clear();
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 23))")))));
   check_eq(cells.size(), 1);
   cell* c = cells.front();
@@ -1644,10 +1653,12 @@ void test_build_handles_nested_form() {
     check_eq(c2->car->nrefs, 2);
     check_eq(c2->cdr, nil);
   check_eq(c->cdr, nil);
+
+  rmref(cells.front());
+  clearLiteralTables();
 }
 
 void test_build_handles_strings() {
-  numLiterals.clear();
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 \"abc\" 23))")))));
   check_eq(cells.size(), 1);
   cell* c = cells.front();
@@ -1685,10 +1696,12 @@ void test_build_handles_strings() {
     check_eq(c2->car->nrefs, 2);
     check_eq(c2->cdr, nil);
   check_eq(c->cdr, nil);
+
+  rmref(cells.front());
+  clearLiteralTables();
 }
 
 void test_build_handles_syms() {
-  numLiterals.clear();
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 \"abc\" 3de 23))")))));
   check_eq(cells.size(), 1);
   cell* c = cells.front();
@@ -1719,10 +1732,12 @@ void test_build_handles_syms() {
     check_eq(toNum(c2->car), 23);
     check_eq(c2->cdr, nil);
   check_eq(c->cdr, nil);
+
+  rmref(cells.front());
+  clearLiteralTables();
 }
 
 void test_build_handles_quotes() {
-  numLiterals.clear();
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"`(34 ,35)")))));
   check_eq(cells.size(), 1);
   cell* c = cells.front();
@@ -1744,6 +1759,9 @@ void test_build_handles_quotes() {
     check_eq(toNum(c2->car), 35);
     check_eq(c2->cdr, nil);
   check_eq(c->cdr, nil);
+
+  rmref(cells.front());
+  clearLiteralTables();
 }
 
 
@@ -1813,6 +1831,7 @@ void test_lookup_returns_dynamic_binding() {
   newDynamicScope(sym, val);
   check_eq(lookup(sym, baseLexicalScope), val);
   endDynamicScope(sym);
+  //clearLiteralTables();
 }
 
 void test_lookup_returns_lexical_binding() {
@@ -1821,6 +1840,7 @@ void test_lookup_returns_lexical_binding() {
   set(baseLexicalScope, sym, val);
   check_eq(lookup(sym, baseLexicalScope), val);
   set(baseLexicalScope, sym, nil);
+  //clearLiteralTables();
 }
 
 
