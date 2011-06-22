@@ -95,9 +95,8 @@ struct Token {
 };
 
 ostream& operator<<(ostream& os, Token p) {
-  if (p.type != NON_WHITESPACE) os << p.type;
-  else os << p.token;
-  return os;
+  if (p.type != NON_WHITESPACE) return os << p.type;
+  else return os << p.token;
 }
 
 
@@ -587,8 +586,7 @@ void test_slurpNextLine_deletes_previous_line_on_recall() {
                                       else
                                         os << *p;
                                     }
-                                    os << endl;
-                                    return os;
+                                    return os << endl;
                                   }
 
                                   int numWordsInLine(list<Token> line) {
@@ -1033,19 +1031,14 @@ struct AstNode {
 };
 
 ostream& operator<<(ostream& os, AstNode x) {
-  if (x.elems.empty()) {
-    os << x.atom;
-    return os;
-  }
-
+  if (x.elems.empty()) return os << x.atom;
   bool prevWasOpen = true;
   for (list<AstNode>::iterator p = x.elems.begin(); p != x.elems.end(); ++p) {
     if (!(*p == L")" || prevWasOpen)) os << " ";
     prevWasOpen = (*p == L"(" || *p == L"'" || *p == L"," || *p == L",@");
     os << *p;
   }
-  os << endl;
-  return os;
+  return os << endl;
 }
 
 list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterator end, list<AstNode>& out) {
@@ -1351,30 +1344,25 @@ void setCdr(cell* x, cell* y) {
   mkref(y);
 }
 
-ostream& operator<<(ostream& os, cell* c) {
-  if (c == nil) {
-    os << "nil";
-    return os;
-  }
-
-  switch(c->type) {
-  case NUM:
-    os << toNum(c); break;
-  case SYM:
-  case STRING:
-    os << toString(c); break;
-  case CONS:
-  default:
-    os << L"<" << c->car << " . " << c->cdr << L">";
-  }
-  return os;
-}
+                                  ostream& operator<<(ostream& os, cell* c) {
+                                    if (c == nil) return os << "nil";
+                                    switch(c->type) {
+                                    case NUM:
+                                      os << toNum(c); break;
+                                    case SYM:
+                                    case STRING:
+                                      os << toString(c); break;
+                                    case CONS:
+                                    default:
+                                      os << L"<" << c->car << " . " << c->cdr << L">";
+                                    }
+                                    return os;
+                                  }
 
 ostream& operator<<(ostream& os, list<cell*> l) {
   for (list<cell*>::iterator p = l.begin(); p != l.end(); ++p)
     os << *p;
-  os << endl;
-  return os;
+  return os << endl;
 }
 
 
@@ -1726,7 +1714,7 @@ void test_string_evals_to_itself() {
                                     if (numFailures == 0) return;
 
                                     cerr << numFailures << " failure";
-                                        if (numFailures > 1) { cerr << "s"; }
+                                        if (numFailures > 1) cerr << "s";
                                         cerr << endl;
                                   }
 
