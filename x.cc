@@ -1685,19 +1685,11 @@ void test_build_handles_quotes() {
 //// bindings
 
 StringMap<stack<cell*> > dynamics;
-stack<StringMap<cell*> > lexicals;
-
-                                  cell* lexicalLookup(string sym) {
-                                    if (lexicals.empty()) return NULL;
-                                    return lexicals.top()[sym];
-                                  }
 
 cell* lookup(cell* sym) {
   string s = toString(sym);
-  cell* result = lexicalLookup(s);
-  if (!result) result = dynamics[s].top();
+  cell* result = dynamics[s].top();
   if (result) return result;
-
   cerr << "No binding for " << toString(sym) << endl;
   return nil;
 }
@@ -1708,14 +1700,6 @@ void test_lookup_returns_dynamic_binding() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"a")))));
   check_eq(lookup(cells.front()), expected);
   dynamics.clear();
-}
-
-void test_lookup_returns_lexical_binding() {
-  StringMap<cell*> l; lexicals.push(l);
-  cell* expected = lexicals.top()[L"a"] = newNum(34);
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"a")))));
-  check_eq(lookup(cells.front()), expected);
-  lexicals.pop();
 }
 
 
