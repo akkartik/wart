@@ -1156,7 +1156,7 @@ struct cell {
   long nrefs;
   cell() :car(nil), cdr(nil), nrefs(0) {}
   void init() { car=cdr=nil, nrefs=0; }
-  void clear() { car=cdr=nil, nrefs=0; }
+  void clear() { car=cdr=NULL, nrefs=0; }
 };
 
 cell* nil = new cell;
@@ -1251,6 +1251,15 @@ void rmref(cell* c) {
   c->clear();
   c->cdr = freelist;
   freelist = c;
+}
+
+void test_rmref_frees_space() {
+  cell* c = newCell();
+  check_eq(c->car, nil);
+  check_eq(freelist, NULL);
+  rmref(c);
+  check(!c->car);
+  check_eq(freelist, c);
 }
 
 
