@@ -1237,14 +1237,23 @@ void rmref(cell* c) {
   --c->nrefs;
   if (c->nrefs > 0) return;
 
-  if (c->type != CONS) cerr << "tried to delete an atom" << endl << DIE;
+  if (c->type != CONS) cerr << "deleted atom" << endl;
 
-  if (c->type == STRING || c->type == SYM)
+  switch (c->type) {
+  case NUM:
+    break; // numbers don't need freeing
+  case STRING:
+  case SYM:
+    cerr << "delete: " << *(string*)c->car << endl;
     delete (string*)c->car;
-  else if (c->type == TABLE)
+    break;
+  case TABLE:
     delete (hash_map<long, cell*>*)c->car;
-  else
+    break;
+  case CONS:
+  default:
     rmref(c->car);
+  }
 
   rmref(c->cdr);
 
@@ -1257,6 +1266,15 @@ void test_rmref_frees_space() {
   cell* c = newCell();
   check_eq(c->car, nil);
   check_eq(freelist, NULL);
+  rmref(c);
+  check(!c->car);
+  check_eq(freelist, c);
+}
+
+void test_rmref_handles_nums() {
+  cell* c = newCell();
+  c->type = NUM;
+  c->car = (cell*)34;
   rmref(c);
   check(!c->car);
   check_eq(freelist, c);
