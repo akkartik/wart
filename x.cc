@@ -1543,15 +1543,15 @@ void test_build_handles_multiple_atoms() {
   check_eq(cells.size(), 2);
   cell* c = cells.front();
   check(isNum(c));
-  check_eq(c->cdr, nil);
   check_eq(toNum(c), 34);
   check_eq(c->nrefs, 1);
+  check_eq(c->cdr, nil);
 
   c = cells.back();
   check(isNum(c));
-  check_eq(c->cdr, nil);
   check_eq(toNum(c), 35);
   check_eq(c->nrefs, 1);
+  check_eq(c->cdr, nil);
 }
 
 void test_build_handles_form() {
@@ -1624,6 +1624,7 @@ void test_build_handles_nested_form() {
     check(isNum(c2->car));
     check_eq(toNum(c2->car), 23);
     check_eq(c2->car->nrefs, 2);
+    check_eq(c2->cdr, nil);
   check_eq(c->cdr, nil);
 }
 
@@ -1664,6 +1665,7 @@ void test_build_handles_strings() {
     check(isNum(c2->car));
     check_eq(toNum(c2->car), 23);
     check_eq(c2->car->nrefs, 2);
+    check_eq(c2->cdr, nil);
   check_eq(c->cdr, nil);
 }
 
@@ -1697,6 +1699,7 @@ void test_build_handles_syms() {
     check(isCons(c2));
     check(isNum(c2->car));
     check_eq(toNum(c2->car), 23);
+    check_eq(c2->cdr, nil);
   check_eq(c->cdr, nil);
 }
 
