@@ -1241,6 +1241,8 @@ void rmref(cell* c) {
 
   if (c->type == STRING || c->type == SYM)
     delete (string*)c->car;
+  else if (c->type == TABLE)
+    delete (hash_map<long, cell*>*)c->car;
   else
     rmref(c->car);
 
@@ -1279,6 +1281,10 @@ long toNum(cell* x) {
 
 bool isCons(cell* x) {
   return x->type == CONS;
+}
+
+bool isAtom(cell* x) {
+  return !isCons(x);
 }
                                   struct strEq {
                                     bool operator() (const string& s1, const string& s2) const {
@@ -1336,8 +1342,15 @@ string toString(cell* x) {
   return *(string*)x->car;
 }
 
-bool isAtom(cell* x) {
-  return !isCons(x);
+cell* newTable() {
+  cell* result = newCell();
+  result->type = TABLE;
+  result->car = (cell*)new hash_map<long, cell*>();
+  return result;
+}
+
+bool isTable(cell* x) {
+  return x->type == TABLE;
 }
 
 
@@ -1359,7 +1372,7 @@ void setCdr(cell* x, cell* y) {
 }
 
 void set(cell* t, cell* k, cell* val) {
-  if (t->type != TABLE) {
+  if (!isTable(t)) {
     cerr << "set on a non-table" << endl;
     return;
   }
@@ -1377,7 +1390,7 @@ void set(cell* t, cell* k, cell* val) {
 }
 
 cell* get(cell* t, cell* k) {
-  if (t->type != TABLE) {
+  if (!isTable(t)) {
     cerr << "get on a non-table" << endl;
     return nil;
   }
