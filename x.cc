@@ -22,6 +22,7 @@
                                   typedef char ascii; // must come after system includes
                                   #define char wchar_t
 
+                                  bool runningTests = false;
                                   int numFailures = 0;
 
                                   #define check(X) if (!(X)) { \
@@ -1237,7 +1238,7 @@ void rmref(cell* c) {
   --c->nrefs;
   if (c->nrefs > 0) return;
 
-  if (c->type != CONS) cerr << "deleted atom" << endl;
+  if (c->type != CONS && !runningTests) cerr << "deleted atom" << endl;
 
   switch (c->type) {
   case NUM:
@@ -1864,6 +1865,7 @@ void test_string_evals_to_itself() {
                                   };
 
                                   void runTests() {
+                                    runningTests = true; // never reset
                                     for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
                                       (*tests[i])();
                                     }
