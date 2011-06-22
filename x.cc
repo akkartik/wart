@@ -1154,6 +1154,7 @@ struct cell {
     #define NUM 1
     #define SYM 2
     #define STRING 3
+    #define TABLE 4
   long nrefs;
   cell() :car(nil), cdr(nil), nrefs(0) {}
   void init() { car=cdr=nil, nrefs=0; }
@@ -1213,6 +1214,20 @@ void test_newCell_has_nil_car_and_cdr() {
   check_eq(newCell()->car, nil);
   check_eq(newCell()->cdr, nil);
 }
+
+
+
+                                  extern void rmref(cell*);
+
+struct Table {
+  hash_map<long, cell*> table;
+  ~Table() {
+    for (hash_map<long, cell*>::iterator p = table.begin(); p != table.end(); ++p) {
+      rmref((cell*)p->first);
+      rmref(p->second);
+    }
+  }
+};
 
 void mkref(cell* c) {
   ++c->nrefs;
@@ -1328,6 +1343,8 @@ bool isAtom(cell* x) {
   return !isCons(x);
 }
 
+
+
 void setCar(cell* x, cell* y) {
   if (x->car != nil && isCons(x->car)) {
     rmref(x->car);
@@ -1343,6 +1360,45 @@ void setCdr(cell* x, cell* y) {
   x->cdr = y;
   mkref(y);
 }
+
+void set(cell* t, cell* k, cell* val) {
+  if (t->type != TABLE) {
+    cerr << "set on a non-table" << endl;
+    return;
+  }
+  hash_map<long, cell*> table = ((Table*)t->car)->table;
+  long key = (long)k;
+  if (table[key])
+    rmref(table[key]);
+  if (val == nil) {
+    rmref(k);
+    table[key] = NULL;
+    return;
+  }
+  table[key] = val;
+  ++val->nrefs;
+}
+
+cell* get(cell* t, cell* k) {
+  if (t->type != TABLE) {
+    cerr << "get on a non-table" << endl;
+    return nil;
+  }
+  hash_map<long, cell*> table = ((Table*)t->car)->table;
+  long key = (long)k;
+  if (!table[key]) return nil;
+  return table[key];
+}
+
+
+
+                                  ostream& operator<<(ostream& os, Table* t) {
+                                    os << "{" << endl;
+                                    for (hash_map<long, cell*>::iterator p = t->table.begin(); p != t->table.end(); ++p) {
+                                      os << (cell*)p->first << ": " << p->second << endl;
+                                    }
+                                    return os << "}" << endl;
+                                  }
 
                                   ostream& operator<<(ostream& os, cell* c) {
                                     if (c == nil) return os << "nil";
