@@ -1195,9 +1195,7 @@ cell* newCell() {
   if (freelist) {
     result = freelist;
     freelist = freelist->cdr;
-    cerr << endl << "recycling: " << result << endl;
     result->init();
-    cerr << result->type << endl;
     return result;
   }
 
@@ -1233,7 +1231,6 @@ void mkref(cell* c) {
 }
 
 void rmref(cell* c) {
-  cerr << endl << "rmref: " << c << ": " << c->nrefs << endl;
   if (!c) cerr << "rmref: cell should never point to NULL\n" << DIE;
   if (c == nil) return; // base case in the absence of NULL
 
@@ -1247,7 +1244,7 @@ void rmref(cell* c) {
     break; // numbers don't need freeing
   case STRING:
   case SYM:
-    cerr << "  delete: " << *(string*)c->car << endl;
+    cerr << "delete: " << *(string*)c->car << endl;
     delete (string*)c->car;
     break;
   case TABLE:
@@ -1258,7 +1255,6 @@ void rmref(cell* c) {
     rmref(c->car);
   }
 
-  cerr << "  freeing " << c << endl;
   rmref(c->cdr);
 
   c->clear();
@@ -1288,15 +1284,12 @@ void test_rmref_handles_nums() {
 
                                   hash_map<long, cell*> numLiterals;
                                   cell* intern(long x) {
-                                    if (numLiterals[x]) {
-                                      cerr << endl << "reuse: " << x << " " << numLiterals[x] << endl;
+                                    if (numLiterals[x])
                                       return numLiterals[x];
-                                    }
                                     numLiterals[x] = newCell();
                                     numLiterals[x]->car = (cell*)x;
                                     numLiterals[x]->type = NUM;
                                     mkref(numLiterals[x]);
-                                    cerr << endl << "new: " << x << " " << numLiterals[x] << endl;
                                     return numLiterals[x];
                                   }
 
@@ -1342,11 +1335,8 @@ bool isAtom(cell* x) {
 
                                   StringMap<cell*> stringLiterals;
                                   cell* intern(string x) {
-                                    if (stringLiterals[x]) {
-                                      cerr << endl << "reuse: " << x << endl;
+                                    if (stringLiterals[x])
                                       return stringLiterals[x];
-                                    }
-                                    cerr << endl << "new: " << x << endl;
                                     stringLiterals[x] = newCell();
                                     stringLiterals[x]->car = (cell*)new string(x); // not aligned like cells; can fragment memory
                                     mkref(stringLiterals[x]);
@@ -1354,7 +1344,6 @@ bool isAtom(cell* x) {
                                   }
 
                                   void clearLiteralTables() { // just for testing
-                                    cerr << endl << "clearing literal tables";
                                     for (hash_map<long, cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
                                       if (p->second->nrefs > 1)
                                         cerr << "forcing unintern";
