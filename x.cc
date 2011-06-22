@@ -1174,7 +1174,6 @@ struct cell {
 cell* nil = new cell;
 void setupNil() {
   nil->car = nil->cdr = nil;
-  ++nil->nrefs; // never delete nil
 }
 
 void test_pointers_from_nil_are_nil() {
@@ -1232,15 +1231,11 @@ void mkref(cell* c) {
 }
 
 void rmref(cell* c) {
-  if (!c)
-    cerr << "rmref: cell should never point to NULL\n" << DIE;
+  if (!c) cerr << "rmref: cell should never point to NULL\n" << DIE;
+  if (c == nil) return; // base case in the absence of NULL
 
   --c->nrefs;
-  if (c->nrefs > 0)
-    return;
-
-  if (c == nil)
-    cerr << "tried to delete nil!" << endl << DIE;
+  if (c->nrefs > 0) return;
 
   // do we ever delete atoms?
   if (c->tags != CONS)
