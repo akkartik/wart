@@ -1253,11 +1253,38 @@ void rmref(cell* c) {
 
 
 
+                                  struct strEq {
+                                    bool operator() (const string& s1, const string& s2) const {
+                                      return s1 == s2;
+                                    }
+                                  };
+
+                                  struct strHash {
+                                    static hash<char*> h;
+                                    size_t operator() (const string& in) const {
+                                      unsigned long h = 0;
+                                      for (const char* s=in.c_str(); *s; ++s)
+                                        h = 5 * h + *s;
+                                      return size_t(h);
+                                    }
+                                  };
+
+                                  template<class Data>
+                                  class StringMap :public hash_map<string, Data, strHash, strEq>{};
+
+                                  hash_map<long, cell*> numLiterals;
+                                  cell* intern(long x) {
+                                    if (!numLiterals[x]) {
+                                      numLiterals[x] = newCell();
+                                      numLiterals[x]->car = (cell*)x;
+                                      numLiterals[x]->tags = NUM;
+                                      ++numLiterals[x]->nrefs;
+                                    }
+                                    return numLiterals[x];
+                                  }
+
 cell* newNum(long x) {
-  cell* result = newCell();
-  result->car = (cell*)x;
-  result->tags = NUM;
-  return result;
+  return intern(x);
 }
 
 bool isNum(cell* x) {
@@ -1273,9 +1300,18 @@ bool isCons(cell* x) {
   return x->tags == CONS;
 }
 
-cell* newSym(string* x) {
-  cell* result = newCell();
-  result->car = (cell*)x;
+                                  StringMap<cell*> stringLiterals;
+                                  cell* intern(string x) {
+                                    if (!stringLiterals[x]) {
+                                      stringLiterals[x] = newCell();
+                                      stringLiterals[x]->car = (cell*)new string(x); // not aligned like cells; can fragment memory
+                                      ++stringLiterals[x]->nrefs;
+                                    }
+                                    return stringLiterals[x];
+                                  }
+
+cell* newSym(string x) {
+  cell* result = intern(x);
   result->tags = SYM;
   return result;
 }
@@ -1284,8 +1320,8 @@ bool isSym(cell* x) {
   return x->tags == SYM;
 }
 
-cell* newString(string* x) {
-  cell* result = newSym(x);
+cell* newString(string x) {
+  cell* result = intern(x);
   result->tags = STRING;
   return result;
 }
@@ -1376,8 +1412,8 @@ cell* buildCell(AstNode n) {
       return newNum(v);
 
     if (n.atom.token.c_str()[0] == L'"')
-      return newString(new string(n.atom.token)); // caveat fragmentation
-    return newSym(new string(n.atom.token));
+      return newString(n.atom.token);
+    return newSym(n.atom.token);
   }
 
   cell* newForm = NULL;
@@ -1421,7 +1457,7 @@ void test_build_handles_number() {
   check_eq(cells.size(), 1);
   check(isNum(cells.front()));
   check_eq(toNum(cells.front()), 34);
-  check_eq(cells.front()->nrefs, 0);
+  check_eq(cells.front()->nrefs, 1);
 }
 
 void test_build_handles_multiple_atoms() {
@@ -1431,107 +1467,130 @@ void test_build_handles_multiple_atoms() {
   check(isNum(c));
   check_eq(c->cdr, nil);
   check_eq(toNum(c), 34);
-  check_eq(c->nrefs, 0);
+  check_eq(c->nrefs, 1);
 
   c = cells.back();
   check(isNum(c));
   check_eq(c->cdr, nil);
   check_eq(toNum(c), 35);
-  check_eq(c->nrefs, 0);
+  check_eq(c->nrefs, 1);
 }
 
 void test_build_handles_form() {
+  numLiterals.clear();
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34 35")))));
   check_eq(cells.size(), 1);
   cell* c = cells.front();
   check(isCons(c));
+  check_eq(c->nrefs, 0);
   check(isNum(c->car));
   check_eq(toNum(c->car), 34);
-  check_eq(c->nrefs, 0);
+  check_eq(c->car->nrefs, 2);
 
   c = c->cdr;
   check(isCons(c));
+  check_eq(c->nrefs, 1);
   check(isNum(c->car));
   check_eq(toNum(c->car), 35);
+  check_eq(c->car->nrefs, 2);
   check_eq(c->cdr, nil);
-  check_eq(c->nrefs, 1);
 }
 
 void test_build_handles_dot() {
+  numLiterals.clear();
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34 . 35")))));
   check_eq(cells.size(), 1);
   cell* c = cells.front();
   check(isCons(c));
+  check_eq(c->nrefs, 0);
   check(isNum(c->car));
   check_eq(toNum(c->car), 34);
-  check_eq(c->nrefs, 0);
+  check_eq(c->car->nrefs, 2);
 
   c = c->cdr;
   check(isNum(c));
   check_eq(toNum(c), 35);
-  check_eq(c->nrefs, 1);
+  check_eq(c->nrefs, 2);
 }
 
 void test_build_handles_nested_form() {
+  numLiterals.clear();
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 23))")))));
   check_eq(cells.size(), 1);
   cell* c = cells.front();
   check(isCons(c));
+  check_eq(c->nrefs, 0);
   check(isNum(c->car));
   check_eq(toNum(c->car), 3);
-  check_eq(c->nrefs, 0);
+  check_eq(c->car->nrefs, 2);
 
   c = c->cdr;
   check(isCons(c));
+  check_eq(c->nrefs, 1);
   check(isNum(c->car));
   check_eq(toNum(c->car), 7);
-  check_eq(c->nrefs, 1);
+  check_eq(c->car->nrefs, 2);
 
   c = c->cdr;
   check(isCons(c));
   check_eq(c->nrefs, 1);
     cell* c2 = c->car;
     check(isCons(c2));
+    check_eq(c2->nrefs, 1);
     check(isNum(c2->car));
     check_eq(toNum(c2->car), 33);
-    check_eq(c2->nrefs, 1);
+    check_eq(c2->car->nrefs, 2);
     c2 = c2->cdr;
     check(isCons(c2));
+    check_eq(c2->nrefs, 1);
     check(isNum(c2->car));
     check_eq(toNum(c2->car), 23);
-    check_eq(c2->nrefs, 1);
+    check_eq(c2->car->nrefs, 2);
   check_eq(c->cdr, nil);
 }
 
 void test_build_handles_strings() {
+  numLiterals.clear();
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 \"abc\" 23))")))));
   check_eq(cells.size(), 1);
   cell* c = cells.front();
   check(isCons(c));
+  check_eq(c->nrefs, 0);
   check(isNum(c->car));
   check_eq(toNum(c->car), 3);
+  check_eq(c->car->nrefs, 2);
   c = c->cdr;
   check(isCons(c));
+  check_eq(c->nrefs, 1);
   check(isNum(c->car));
   check_eq(toNum(c->car), 7);
+  check_eq(c->car->nrefs, 2);
   c = c->cdr;
   check(isCons(c));
+  check_eq(c->nrefs, 1);
     cell* c2 = c->car;
     check(isCons(c2));
+    check_eq(c2->nrefs, 1);
     check(isNum(c2->car));
     check_eq(toNum(c2->car), 33);
+    check_eq(c2->car->nrefs, 2);
     c2 = c2->cdr;
     check(isCons(c2));
+    check_eq(c2->nrefs, 1);
     check(isString(c2->car));
     check_eq(toString(c2->car), L"\"abc\"");
+    check_eq(c2->car->nrefs, 2);
     c2 = c2->cdr;
     check(isCons(c2));
+    check_eq(c2->nrefs, 1);
     check(isNum(c2->car));
     check_eq(toNum(c2->car), 23);
+    check_eq(c2->car->nrefs, 2);
   check_eq(c->cdr, nil);
 }
 
 void test_build_handles_syms() {
+  numLiterals.clear();
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 \"abc\" 3de 23))")))));
   check_eq(cells.size(), 1);
   cell* c = cells.front();
@@ -1564,6 +1623,7 @@ void test_build_handles_syms() {
 }
 
 void test_build_handles_quotes() {
+  numLiterals.clear();
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"`(34 ,35)")))));
   check_eq(cells.size(), 1);
   cell* c = cells.front();
@@ -1590,25 +1650,6 @@ void test_build_handles_quotes() {
 
 
 //// bindings
-
-                                  struct strEq {
-                                    bool operator() (const string& s1, const string& s2) const {
-                                      return s1 == s2;
-                                    }
-                                  };
-
-                                  struct strHash {
-                                    static hash<char*> h;
-                                    size_t operator() (const string& in) const {
-                                      unsigned long h = 0;
-                                      for (const char* s=in.c_str(); *s; ++s)
-                                        h = 5 * h + *s;
-                                      return size_t(h);
-                                    }
-                                  };
-
-                                  template<class Data>
-                                  class StringMap :public hash_map<string, Data, strHash, strEq>{};
 
 StringMap<stack<cell*> > dynamics;
 stack<StringMap<cell*> > lexicals;
