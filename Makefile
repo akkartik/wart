@@ -7,7 +7,7 @@ a.out: x.cc test_list
 	@echo assignments: `grep "\->car = " x.cc |wc -l` car, `grep "\->cdr = " x.cc |wc -l` cdr
 
 test_list: x.cc
-	@grep -h "^\s*void test" *.cc |perl -pwe 's/^\s*void (.*)\(\) {$$/$$1,/' > test_list
+	@grep -h "^[[:space:]]*void test" *.cc |perl -pwe 's/^\s*void (.*)\(\) {$$/$$1,/' > test_list
 
 clean:
 	rm -rf a.out* test_list

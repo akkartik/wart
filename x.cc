@@ -1751,6 +1751,10 @@ void test_build_handles_quotes() {
 
                                   cell* baseLexicalScope = newTable();
 
+                                  void test_lexical_scopes_have_nil_cdrs_by_default() {
+                                    check_eq(baseLexicalScope->cdr, nil);
+                                  }
+
                                   cell* lookupLexicalBinding(cell* sym, cell* env) {
                                     if (env == nil) return NULL;
                                     cell* result = unsafeGet(env, sym);
