@@ -571,6 +571,28 @@ void test_slurpNextLine_deletes_previous_line_on_recall() {
 
 
 
+                                  bool isIndent(Token t) {
+                                    return whitespace(t.type) && t != START_OF_LINE;
+                                  }
+
+                                  ostream& operator<<(ostream& os, list<Token> l) {
+                                    bool prevWasOpen = true;
+                                    for (list<Token>::iterator p = l.begin(); p != l.end(); ++p) {
+                                      if (!(*p == L")" || prevWasOpen)) os << " ";
+                                      prevWasOpen = (*p == L"(" || *p == L"'" || *p == L"," || *p == L",@");
+
+                                      if (*p == START_OF_LINE || p->token[0] == L';')
+                                        os << endl;
+                                      else if (isIndent(*p))
+                                        for (int i=0; i < p->indentLevel; ++i)
+                                          os << " ";
+                                      else
+                                        os << *p;
+                                    }
+                                    os << endl;
+                                    return os;
+                                  }
+
                                   int numWordsInLine(list<Token> line) {
                                     int numWords = 0;
                                     for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
@@ -580,10 +602,6 @@ void test_slurpNextLine_deletes_previous_line_on_recall() {
                                         ++numWords;
                                     }
                                     return numWords;
-                                  }
-
-                                  bool isIndent(Token t) {
-                                    return whitespace(t.type) && t != START_OF_LINE;
                                   }
 
                                   Token indentBefore(list<Token> line) {
@@ -979,26 +997,6 @@ void test_parenthesize_wraps_when_indented_by_one_space() {
 
 
 
-ostream& operator<<(ostream& os, list<Token> l) {
-  bool prevWasOpen = true;
-  for (list<Token>::iterator p = l.begin(); p != l.end(); ++p) {
-    if (!(*p == L")" || prevWasOpen)) os << " ";
-    prevWasOpen = (*p == L"(" || *p == L"'" || *p == L"," || *p == L",@");
-
-    if (*p == START_OF_LINE || p->token[0] == L';')
-      os << endl;
-    else if (isIndent(*p))
-      for (int i=0; i < p->indentLevel; ++i)
-        os << " ";
-    else
-      os << *p;
-  }
-  os << endl;
-  return os;
-}
-
-
-
 //// parse
 
 struct AstNode {
@@ -1262,25 +1260,6 @@ void rmref(cell* c) {
 
 
 
-                                  struct strEq {
-                                    bool operator() (const string& s1, const string& s2) const {
-                                      return s1 == s2;
-                                    }
-                                  };
-
-                                  struct strHash {
-                                    static hash<char*> h;
-                                    size_t operator() (const string& in) const {
-                                      unsigned long h = 0;
-                                      for (const char* s=in.c_str(); *s; ++s)
-                                        h = 5 * h + *s;
-                                      return size_t(h);
-                                    }
-                                  };
-
-                                  template<class Data>
-                                  class StringMap :public hash_map<string, Data, strHash, strEq>{};
-
                                   hash_map<long, cell*> numLiterals;
                                   cell* intern(long x) {
                                     if (!numLiterals[x]) {
@@ -1308,6 +1287,25 @@ long toNum(cell* x) {
 bool isCons(cell* x) {
   return x->tags == CONS;
 }
+                                  struct strEq {
+                                    bool operator() (const string& s1, const string& s2) const {
+                                      return s1 == s2;
+                                    }
+                                  };
+
+                                  struct strHash {
+                                    static hash<char*> h;
+                                    size_t operator() (const string& in) const {
+                                      unsigned long h = 0;
+                                      for (const char* s=in.c_str(); *s; ++s)
+                                        h = 5 * h + *s;
+                                      return size_t(h);
+                                    }
+                                  };
+
+                                  template<class Data>
+                                  class StringMap :public hash_map<string, Data, strHash, strEq>{};
+
 
                                   StringMap<cell*> stringLiterals;
                                   cell* intern(string x) {
