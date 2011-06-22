@@ -1343,6 +1343,23 @@ bool isAtom(cell* x) {
                                     return stringLiterals[x];
                                   }
 
+                                  void clearLiteralTables() { // just for testing
+                                    for (hash_map<long, cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
+                                      if (p->second->nrefs > 1)
+                                        cerr << "forcing unintern";
+                                      while (p->second->nrefs > 0)
+                                        rmref(p->second);
+                                    }
+                                    numLiterals.clear();
+                                    for (StringMap<cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
+                                      if (p->second->nrefs > 1)
+                                        cerr << "forcing unintern";
+                                      while (p->second->nrefs > 0)
+                                        rmref(p->second);
+                                    }
+                                    stringLiterals.clear();
+                                  }
+
 cell* newSym(string x) {
   cell* result = intern(x);
   result->type = SYM;
@@ -1555,7 +1572,7 @@ void test_build_handles_multiple_atoms() {
 }
 
 void test_build_handles_form() {
-  numLiterals.clear();
+  clearLiteralTables();
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34 35")))));
   check_eq(cells.size(), 1);
   cell* c = cells.front();
