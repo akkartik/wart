@@ -8,3 +8,6 @@ a.out: x.cc test_list
 
 test_list: x.cc
 	@grep -h "^\s*void test" *.cc |perl -pwe 's/^\s*void (.*)\(\) {$$/$$1,/' > test_list
+
+clean:
+	rm -rf a.out* test_list
