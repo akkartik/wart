@@ -192,12 +192,10 @@ void test_countIndent() {
                                     char c;
                                     while (!eof(in)) {
                                       in >> c; out << c;
-                                      if (c == L'\\') {
+                                      if (c == L'\\')
                                         slurpChar(in, out); // blindly read next
-                                      }
-                                      else if (c == L'"') {
+                                      else if (c == L'"')
                                         break;
-                                      }
                                     }
                                   }
 
@@ -595,12 +593,11 @@ void test_slurpNextLine_deletes_previous_line_on_recall() {
 
                                   int numWordsInLine(list<Token> line) {
                                     int numWords = 0;
-                                    for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
+                                    for (list<Token>::iterator p = line.begin(); p != line.end(); ++p)
                                       if (!whitespace(p->type)
                                           && *p != L"(" && *p != L")"
                                           && p->token[0] != L';')
                                         ++numWords;
-                                    }
                                     return numWords;
                                   }
 
@@ -617,10 +614,9 @@ void test_slurpNextLine_deletes_previous_line_on_recall() {
                                   }
 
                                   Token firstTokenInLine(list<Token> line) {
-                                    for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
+                                    for (list<Token>::iterator p = line.begin(); p != line.end(); ++p)
                                       if (!whitespace(p->type))
                                         return *p;
-                                    }
                                     return Token::sol();
                                   }
 
@@ -1037,16 +1033,18 @@ struct AstNode {
 };
 
 ostream& operator<<(ostream& os, AstNode x) {
-  if (x.elems.empty()) os << x.atom;
-  else {
-    bool prevWasOpen = true;
-    for (list<AstNode>::iterator p = x.elems.begin(); p != x.elems.end(); ++p) {
-      if (!(*p == L")" || prevWasOpen)) os << " ";
-      prevWasOpen = (*p == L"(" || *p == L"'" || *p == L"," || *p == L",@");
-      os << *p;
-    }
-    os << endl;
+  if (x.elems.empty()) {
+    os << x.atom;
+    return os;
   }
+
+  bool prevWasOpen = true;
+  for (list<AstNode>::iterator p = x.elems.begin(); p != x.elems.end(); ++p) {
+    if (!(*p == L")" || prevWasOpen)) os << " ";
+    prevWasOpen = (*p == L"(" || *p == L"'" || *p == L"," || *p == L",@");
+    os << *p;
+  }
+  os << endl;
   return os;
 }
 
@@ -1056,8 +1054,7 @@ list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterato
   while (curr->token[0] == L';')
     ++curr;
 
-  if (*curr == L")")
-    cerr << "Unbalanced (" << endl << DIE;
+  if (*curr == L")") cerr << "Unbalanced (" << endl << DIE;
 
   if (*curr != L"(" && *curr != L"'" && *curr != L"`" && *curr != L"," && *curr != L",@") {
     out.push_back(AstNode::of(*curr));
@@ -1075,8 +1072,7 @@ list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterato
     ++curr;
     while (curr != end && *curr != L")")
       curr = parseNext(curr, end, subform);
-    if (curr == end)
-      cerr << "Unbalanced (" << endl << DIE;
+    if (curr == end) cerr << "Unbalanced (" << endl << DIE;
     subform.push_back(*curr);
     ++curr;
   }
@@ -1197,8 +1193,7 @@ cell* freelist = NULL;
 
 void growHeap() {
   currHeap = currHeap->next = new Heap();
-  if (!currHeap)
-    cerr << "Out of memory" << endl << DIE;
+  if (!currHeap) cerr << "Out of memory" << endl << DIE;
   currCell = &currHeap->cells[0];
   heapEnd = &currHeap->cells[HEAPCELLS];
 }
@@ -1237,9 +1232,7 @@ void rmref(cell* c) {
   --c->nrefs;
   if (c->nrefs > 0) return;
 
-  // do we ever delete atoms?
-  if (c->tags != CONS)
-    cerr << "tried to delete an atom" << endl << DIE;
+  if (c->tags != CONS) cerr << "tried to delete an atom" << endl << DIE;
 
   if (c->tags == STRING || c->tags == SYM)
     delete (string*)c->car;
@@ -1257,12 +1250,12 @@ void rmref(cell* c) {
 
                                   hash_map<long, cell*> numLiterals;
                                   cell* intern(long x) {
-                                    if (!numLiterals[x]) {
-                                      numLiterals[x] = newCell();
-                                      numLiterals[x]->car = (cell*)x;
-                                      numLiterals[x]->tags = NUM;
-                                      ++numLiterals[x]->nrefs;
-                                    }
+                                    if (numLiterals[x])
+                                      return numLiterals[x];
+                                    numLiterals[x] = newCell();
+                                    numLiterals[x]->car = (cell*)x;
+                                    numLiterals[x]->tags = NUM;
+                                    ++numLiterals[x]->nrefs;
                                     return numLiterals[x];
                                   }
 
@@ -1304,11 +1297,11 @@ bool isCons(cell* x) {
 
                                   StringMap<cell*> stringLiterals;
                                   cell* intern(string x) {
-                                    if (!stringLiterals[x]) {
-                                      stringLiterals[x] = newCell();
-                                      stringLiterals[x]->car = (cell*)new string(x); // not aligned like cells; can fragment memory
-                                      ++stringLiterals[x]->nrefs;
-                                    }
+                                    if (stringLiterals[x])
+                                      return stringLiterals[x];
+                                    stringLiterals[x] = newCell();
+                                    stringLiterals[x]->car = (cell*)new string(x); // not aligned like cells; can fragment memory
+                                    ++stringLiterals[x]->nrefs;
                                     return stringLiterals[x];
                                   }
 
@@ -1378,9 +1371,8 @@ ostream& operator<<(ostream& os, cell* c) {
 }
 
 ostream& operator<<(ostream& os, list<cell*> l) {
-  for (list<cell*>::iterator p = l.begin(); p != l.end(); ++p) {
+  for (list<cell*>::iterator p = l.begin(); p != l.end(); ++p)
     os << *p;
-  }
   os << endl;
   return os;
 }
@@ -1392,11 +1384,8 @@ ostream& operator<<(ostream& os, list<cell*> l) {
 list<cell*> buildCells(list<AstNode> in) {
   list<cell*> result;
   if (in.empty()) return result;
-
-  for (list<AstNode>::iterator p = in.begin(); p != in.end(); ++p) {
+  for (list<AstNode>::iterator p = in.begin(); p != in.end(); ++p)
     result.push_back(buildCell(*p));
-  }
-
   return result;
 }
 
@@ -1433,8 +1422,9 @@ cell* buildCell(AstNode n) {
       break;
     }
 
-    if (!curr)
+    if (!curr) {
       newForm = curr = newCell();
+    }
     else {
       setCdr(curr, newCell());
       curr = curr->cdr;
@@ -1750,8 +1740,9 @@ int main(int argc, ascii* argv[]) {
       runTests();
       return 0;
     }
-    else if (arg1[0] >= L'0' || arg1[0] <= L'9')
+    else if (arg1[0] >= L'0' || arg1[0] <= L'9') {
       pass = atoi(arg1.c_str());
+    }
   }
 
   switch (pass) {
