@@ -1262,7 +1262,7 @@ void rmref(cell* c) {
                                     numLiterals[x] = newCell();
                                     numLiterals[x]->car = (cell*)x;
                                     numLiterals[x]->type = NUM;
-                                    ++numLiterals[x]->nrefs;
+                                    mkref(numLiterals[x]);
                                     return numLiterals[x];
                                   }
 
@@ -1308,7 +1308,7 @@ bool isCons(cell* x) {
                                       return stringLiterals[x];
                                     stringLiterals[x] = newCell();
                                     stringLiterals[x]->car = (cell*)new string(x); // not aligned like cells; can fragment memory
-                                    ++stringLiterals[x]->nrefs;
+                                    mkref(stringLiterals[x]);
                                     return stringLiterals[x];
                                   }
 
@@ -1375,7 +1375,7 @@ void set(cell* t, cell* k, cell* val) {
     return;
   }
   table[key] = val;
-  ++val->nrefs;
+  mkref(val);
 }
 
 cell* get(cell* t, cell* k) {
