@@ -1156,7 +1156,7 @@ void test_parse_handles_nested_forms() {
 struct cell {
   cell* car;
   cell* cdr;
-  long tags;
+  long type;
     #define CONS 0
     #define NUM 1
     #define SYM 2
@@ -1232,9 +1232,9 @@ void rmref(cell* c) {
   --c->nrefs;
   if (c->nrefs > 0) return;
 
-  if (c->tags != CONS) cerr << "tried to delete an atom" << endl << DIE;
+  if (c->type != CONS) cerr << "tried to delete an atom" << endl << DIE;
 
-  if (c->tags == STRING || c->tags == SYM)
+  if (c->type == STRING || c->type == SYM)
     delete (string*)c->car;
   else
     rmref(c->car);
@@ -1254,7 +1254,7 @@ void rmref(cell* c) {
                                       return numLiterals[x];
                                     numLiterals[x] = newCell();
                                     numLiterals[x]->car = (cell*)x;
-                                    numLiterals[x]->tags = NUM;
+                                    numLiterals[x]->type = NUM;
                                     ++numLiterals[x]->nrefs;
                                     return numLiterals[x];
                                   }
@@ -1264,7 +1264,7 @@ cell* newNum(long x) {
 }
 
 bool isNum(cell* x) {
-  return x->tags == NUM;
+  return x->type == NUM;
 }
 
 long toNum(cell* x) {
@@ -1273,7 +1273,7 @@ long toNum(cell* x) {
 }
 
 bool isCons(cell* x) {
-  return x->tags == CONS;
+  return x->type == CONS;
 }
                                   struct strEq {
                                     bool operator() (const string& s1, const string& s2) const {
@@ -1307,22 +1307,22 @@ bool isCons(cell* x) {
 
 cell* newSym(string x) {
   cell* result = intern(x);
-  result->tags = SYM;
+  result->type = SYM;
   return result;
 }
 
 bool isSym(cell* x) {
-  return x->tags == SYM;
+  return x->type == SYM;
 }
 
 cell* newString(string x) {
   cell* result = intern(x);
-  result->tags = STRING;
+  result->type = STRING;
   return result;
 }
 
 bool isString(cell* x) {
-  return x->tags == STRING;
+  return x->type == STRING;
 }
 
 string toString(cell* x) {
@@ -1357,7 +1357,7 @@ ostream& operator<<(ostream& os, cell* c) {
     return os;
   }
 
-  switch(c->tags) {
+  switch(c->type) {
   case NUM:
     os << toNum(c); break;
   case SYM:
