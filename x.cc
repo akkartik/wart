@@ -1820,6 +1820,15 @@ void test_build_handles_quotes() {
                                     baseLexicalScope = newScope;
                                   }
 
+                                  void endLexicalScope() {
+                                    if (baseLexicalScope == nil)
+                                      cerr << "No lexical scope to end" << endl << DIE;
+                                    cell* nextLexicalScope = baseLexicalScope->cdr;
+                                    setCdr(baseLexicalScope, nil);
+                                    rmref(baseLexicalScope);
+                                    baseLexicalScope = nextLexicalScope;
+                                  }
+
                                   void addLexicalBinding(cell* env, cell* sym, cell* val) {
                                     if (unsafeGet(env, sym)) cerr << "Can't rebind within a lexical scope" << endl << DIE;
                                     set(env, sym, val);
@@ -1852,8 +1861,9 @@ void test_lookup_returns_lexical_binding() {
   check_eq(val->nrefs, 1);
   newLexicalScope();
   set(baseLexicalScope, sym, val);
-  check_eq(lookup(sym, baseLexicalScope), val);
+    check_eq(lookup(sym, baseLexicalScope), val);
   set(baseLexicalScope, sym, nil);
+  endLexicalScope();
   clearLiteralTables();
 }
 
@@ -1868,6 +1878,7 @@ void test_lexical_binding_overrides_dynamic() {
       check_eq(sym->nrefs, 3);
       check_eq(lookup(sym, baseLexicalScope), val);
     set(baseLexicalScope, sym, nil);
+    endLexicalScope();
     check_eq(lookup(sym, baseLexicalScope), newNum(35));
   endDynamicScope(sym);
   clearLiteralTables();
