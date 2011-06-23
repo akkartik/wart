@@ -1429,8 +1429,9 @@ void set(cell* t, cell* k, cell* val) {
     table[key] = NULL;
     return;
   }
-  table[key] = val;
+  if (!table[key]) mkref(k);
   mkref(val);
+  table[key] = val;
 }
 
                                   cell* unsafeGet(cell* t, cell* k) {
@@ -1813,7 +1814,8 @@ void test_build_handles_quotes() {
                                       return;
                                     }
                                     rmref(dynamics[key].top());
-                                    rmref(sym);
+                                    dynamics[key].pop();
+                                    if (dynamics[key].empty()) rmref(sym);
                                   }
 
 cell* lookup(cell* sym, cell* env) {
@@ -1844,6 +1846,21 @@ void test_lookup_returns_lexical_binding() {
   set(baseLexicalScope, sym, val);
   check_eq(lookup(sym, baseLexicalScope), val);
   set(baseLexicalScope, sym, nil);
+  clearLiteralTables();
+}
+
+void test_lexical_binding_overrides_dynamic() {
+  cell* val = newNum(34);
+  cell* sym = newSym(L"a");
+  check_eq(sym->nrefs, 1);
+  newDynamicScope(sym, newNum(35));
+    check_eq(sym->nrefs, 2);
+    set(baseLexicalScope, sym, val);
+      check_eq(sym->nrefs, 3);
+      check_eq(lookup(sym, baseLexicalScope), val);
+    set(baseLexicalScope, sym, nil);
+    check_eq(lookup(sym, baseLexicalScope), newNum(35));
+  endDynamicScope(sym);
   clearLiteralTables();
 }
 
