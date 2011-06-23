@@ -1830,9 +1830,9 @@ void test_build_handles_quotes() {
                                     currLexicalScope = nextLexicalScope;
                                   }
 
-                                  void addLexicalBinding(cell* env, cell* sym, cell* val) {
-                                    if (unsafeGet(env, sym)) cerr << "Can't rebind within a lexical scope" << endl << DIE;
-                                    set(env, sym, val);
+                                  void addLexicalBinding(cell* sym, cell* val) {
+                                    if (unsafeGet(currLexicalScope, sym)) cerr << "Can't rebind within a lexical scope" << endl << DIE;
+                                    set(currLexicalScope, sym, val);
                                   }
 
 cell* lookup(cell* sym) {
@@ -1865,7 +1865,7 @@ void test_lookup_returns_lexical_binding() {
   cell* val = newNum(34);
   check_eq(val->nrefs, 1);
   newLexicalScope();
-    set(currLexicalScope, sym, val);
+    addLexicalBinding(sym, val);
       check_eq(lookup(sym), val);
       check_eq(sym->nrefs, 2);
       check_eq(val->nrefs, 2);
@@ -1888,7 +1888,7 @@ void test_lexical_binding_overrides_dynamic() {
     check_eq(val->nrefs, 1);
     check_eq(dynVal->nrefs, 2);
     newLexicalScope();
-      set(currLexicalScope, sym, val);
+      addLexicalBinding(sym, val);
         check_eq(lookup(sym), val);
         check_eq(sym->nrefs, 3);
         check_eq(val->nrefs, 2);
