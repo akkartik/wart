@@ -1499,7 +1499,7 @@ cell* buildCell(AstNode n) {
 
   if (n.isAtom()) {
     if (n.atom.token == L")")
-      cerr << "syntax error: unbalanced )" << endl << DIE;
+      cerr << "Syntax error: unbalanced )" << endl << DIE;
 
     char* end;
     long v = wcstol(n.atom.token.c_str(), &end, 0);
@@ -1521,7 +1521,7 @@ cell* buildCell(AstNode n) {
 
     if (q->atom == L".") {
       ++q;
-      if (!curr) cerr << "syntax error: dot at start of expression" << endl << DIE;
+      if (!curr) cerr << "Syntax error: dot at start of expression" << endl << DIE;
       setCdr(curr, buildCell(*q));
       break;
     }
@@ -1873,7 +1873,7 @@ void test_lexical_binding_overrides_dynamic() {
 
 
 cell* eval(cell* expr, cell* env) {
-  if (expr == NULL)
+  if (!expr)
     cerr << "eval: cell should never be NULL" << endl << DIE;
 
   if (isSym(expr))
