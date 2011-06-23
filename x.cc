@@ -1854,7 +1854,9 @@ void test_build_handles_quotes() {
                                     if (currLexicalScope == nil)
                                       cerr << "No lexical scope to end" << endl << DIE;
                                     cell* nextLexicalScope = currLexicalScope->cdr;
+                                    cerr << "AAA\n";
                                     setCdr(currLexicalScope, nil);
+                                    cerr << "ZZZ\n";
                                     rmref(currLexicalScope);
                                     currLexicalScope = nextLexicalScope;
                                   }
@@ -1944,6 +1946,59 @@ void test_nil_lexical_binding_overrides_dynamic() {
         check_eq(lookup(sym), nil);
     endLexicalScope();
   endDynamicScope(sym);
+  clearLiteralTables();
+}
+
+void test_lexical_scopes_nest_correctly() {
+  cell* sym = newSym(L"a");
+  check_eq(sym->nrefs, 1);
+  cell* val = newNum(34);
+  check_eq(val->nrefs, 1);
+  cell* val2 = newNum(35);
+  check_eq(val->nrefs, 1);
+  cell* dynVal = newNum(36);
+  check_eq(dynVal->nrefs, 1);
+  newDynamicScope(sym, dynVal);
+    check_eq(sym->nrefs, 2);
+    check_eq(val->nrefs, 1);
+    check_eq(val2->nrefs, 1);
+    check_eq(dynVal->nrefs, 2);
+    newLexicalScope();
+      check(currLexicalScope != nil);
+      check_eq(currLexicalScope->nrefs, 1);
+      addLexicalBinding(sym, val);
+        check_eq(lookup(sym), val);
+        check_eq(sym->nrefs, 3);
+        check_eq(val->nrefs, 2);
+        check_eq(val2->nrefs, 1);
+        check_eq(dynVal->nrefs, 2);
+      newLexicalScope();
+        check_eq(currLexicalScope->cdr->nrefs, 2);
+        check_eq(currLexicalScope->nrefs, 1);
+        addLexicalBinding(sym, val2);
+          check_eq(lookup(sym), val2);
+          check_eq(sym->nrefs, 4);
+          check_eq(val->nrefs, 2);
+          check_eq(val2->nrefs, 2);
+          check_eq(dynVal->nrefs, 2);
+      endLexicalScope();
+      check_eq(currLexicalScope->nrefs, 1);
+      check_eq(sym->nrefs, 3);
+      check_eq(val->nrefs, 2);
+      check_eq(val2->nrefs, 1);
+      check_eq(dynVal->nrefs, 2);
+    endLexicalScope();
+
+    check_eq(lookup(sym), dynVal);
+    check_eq(sym->nrefs, 2);
+    check_eq(val->nrefs, 1);
+    check_eq(val2->nrefs, 1);
+    check_eq(dynVal->nrefs, 2);
+  endDynamicScope(sym);
+  check_eq(sym->nrefs, 1);
+  check_eq(val->nrefs, 1);
+  check_eq(val2->nrefs, 1);
+  check_eq(dynVal->nrefs, 1);
   clearLiteralTables();
 }
 
