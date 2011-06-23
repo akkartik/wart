@@ -1419,23 +1419,27 @@ void setCdr(cell* x, cell* y) {
   mkref(y);
 }
 
+                                  void unsafeSet(cell* t, cell* k, cell* val, bool deleteNils) {
+                                    if (!isTable(t)) {
+                                      cerr << "set on a non-table" << endl;
+                                      return;
+                                    }
+                                    hash_map<long, cell*>& table = ((Table*)t->car)->table;
+                                    long key = (long)k;
+                                    if (table[key])
+                                      rmref(table[key]);
+                                    if (deleteNils && val == nil) {
+                                      rmref(k);
+                                      table[key] = NULL;
+                                      return;
+                                    }
+                                    if (!table[key]) mkref(k);
+                                    mkref(val);
+                                    table[key] = val;
+                                  }
+
 void set(cell* t, cell* k, cell* val) {
-  if (!isTable(t)) {
-    cerr << "set on a non-table" << endl;
-    return;
-  }
-  hash_map<long, cell*>& table = ((Table*)t->car)->table;
-  long key = (long)k;
-  if (table[key])
-    rmref(table[key]);
-  if (val == nil) {
-    rmref(k);
-    table[key] = NULL;
-    return;
-  }
-  if (!table[key]) mkref(k);
-  mkref(val);
-  table[key] = val;
+  unsafeSet(t, k, val, true);
 }
 
                                   cell* unsafeGet(cell* t, cell* k) {
@@ -1857,7 +1861,7 @@ void test_build_handles_quotes() {
 
                                   void addLexicalBinding(cell* sym, cell* val) {
                                     if (unsafeGet(currLexicalScope, sym)) cerr << "Can't rebind within a lexical scope" << endl << DIE;
-                                    set(currLexicalScope, sym, val);
+                                    unsafeSet(currLexicalScope, sym, val, false);
                                   }
 
 cell* lookup(cell* sym) {
@@ -1927,6 +1931,19 @@ void test_lexical_binding_overrides_dynamic() {
   check_eq(sym->nrefs, 1);
   check_eq(val->nrefs, 1);
   check_eq(dynVal->nrefs, 1);
+  clearLiteralTables();
+}
+
+void test_nil_lexical_binding_overrides_dynamic() {
+  cell* sym = newSym(L"a");
+  check_eq(sym->nrefs, 1);
+  cell* dynVal = newNum(35);
+  newDynamicScope(sym, dynVal);
+    newLexicalScope();
+      addLexicalBinding(sym, nil);
+        check_eq(lookup(sym), nil);
+    endLexicalScope();
+  endDynamicScope(sym);
   clearLiteralTables();
 }
 
