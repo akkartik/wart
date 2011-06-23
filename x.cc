@@ -1439,7 +1439,7 @@ void set(cell* t, cell* k, cell* val) {
                                       cerr << "get on a non-table" << endl;
                                       return nil;
                                     }
-                                    hash_map<long, cell*> table = ((Table*)t->car)->table;
+                                    hash_map<long, cell*>& table = ((Table*)t->car)->table;
                                     long key = (long)k;
                                     return table[key];
                                   }
