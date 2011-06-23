@@ -1233,7 +1233,7 @@ void mkref(cell* c) {
 
 void rmref(cell* c) {
   if (!c) cerr << "rmref: cell should never point to NULL\n" << DIE;
-  if (c == nil) return; // base case in the absence of NULL
+  if (c == nil) return; // base case; nil->nrefs has no effect
 
   --c->nrefs;
   if (c->nrefs > 0) return;
