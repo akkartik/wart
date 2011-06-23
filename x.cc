@@ -1420,7 +1420,7 @@ void set(cell* t, cell* k, cell* val) {
     cerr << "set on a non-table" << endl;
     return;
   }
-  hash_map<long, cell*> table = ((Table*)t->car)->table;
+  hash_map<long, cell*>& table = ((Table*)t->car)->table;
   long key = (long)k;
   if (table[key])
     rmref(table[key]);
@@ -1840,7 +1840,7 @@ void test_lookup_returns_lexical_binding() {
   set(baseLexicalScope, sym, val);
   check_eq(lookup(sym, baseLexicalScope), val);
   set(baseLexicalScope, sym, nil);
-  //clearLiteralTables();
+  clearLiteralTables();
 }
 
 
