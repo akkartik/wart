@@ -1784,9 +1784,9 @@ void test_build_handles_quotes() {
 
                                   void newDynamicScope(cell* sym, cell* val) {
                                     long key = (long)sym;
-                                    if (dynamics[key].empty()) mkref(sym);
-                                    dynamics[key].push(val);
+                                    mkref(sym);
                                     mkref(val);
+                                    dynamics[key].push(val);
                                   }
 
                                   void endDynamicScope(cell* sym) {
@@ -1795,9 +1795,9 @@ void test_build_handles_quotes() {
                                       cerr << "No dynamic binding for " << sym << endl;
                                       return;
                                     }
+                                    rmref(sym);
                                     rmref(dynamics[key].top());
                                     dynamics[key].pop();
-                                    if (dynamics[key].empty()) rmref(sym);
                                   }
 
                                   cell* baseLexicalScope = newTable();
