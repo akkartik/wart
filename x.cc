@@ -1850,8 +1850,12 @@ void test_lookup_returns_dynamic_binding() {
   cell* val = newNum(34);
   check_eq(val->nrefs, 1);
   newDynamicScope(sym, val);
-  check_eq(lookup(sym), val);
+    check_eq(lookup(sym), val);
+    check_eq(sym->nrefs, 2);
+    check_eq(val->nrefs, 2);
   endDynamicScope(sym);
+  check_eq(sym->nrefs, 1);
+  check_eq(val->nrefs, 1);
   clearLiteralTables();
 }
 
@@ -1861,27 +1865,48 @@ void test_lookup_returns_lexical_binding() {
   cell* val = newNum(34);
   check_eq(val->nrefs, 1);
   newLexicalScope();
-  set(currLexicalScope, sym, val);
-    check_eq(lookup(sym), val);
-  set(currLexicalScope, sym, nil);
+    set(currLexicalScope, sym, val);
+      check_eq(lookup(sym), val);
+      check_eq(sym->nrefs, 2);
+      check_eq(val->nrefs, 2);
+    set(currLexicalScope, sym, nil);
+    check_eq(sym->nrefs, 1);
+    check_eq(val->nrefs, 1);
   endLexicalScope();
   clearLiteralTables();
 }
 
 void test_lexical_binding_overrides_dynamic() {
-  cell* val = newNum(34);
   cell* sym = newSym(L"a");
   check_eq(sym->nrefs, 1);
-  newDynamicScope(sym, newNum(35));
+  cell* val = newNum(34);
+  check_eq(val->nrefs, 1);
+  cell* dynVal = newNum(35);
+  check_eq(dynVal->nrefs, 1);
+  newDynamicScope(sym, dynVal);
     check_eq(sym->nrefs, 2);
+    check_eq(val->nrefs, 1);
+    check_eq(dynVal->nrefs, 2);
     newLexicalScope();
-    set(currLexicalScope, sym, val);
-      check_eq(sym->nrefs, 3);
-      check_eq(lookup(sym), val);
-    set(currLexicalScope, sym, nil);
+      set(currLexicalScope, sym, val);
+        check_eq(lookup(sym), val);
+        check_eq(sym->nrefs, 3);
+        check_eq(val->nrefs, 2);
+        check_eq(dynVal->nrefs, 2);
+      set(currLexicalScope, sym, nil);
+      check_eq(sym->nrefs, 2);
+      check_eq(val->nrefs, 1);
+      check_eq(dynVal->nrefs, 2);
     endLexicalScope();
+
     check_eq(lookup(sym), newNum(35));
+    check_eq(sym->nrefs, 2);
+    check_eq(val->nrefs, 1);
+    check_eq(dynVal->nrefs, 2);
   endDynamicScope(sym);
+  check_eq(sym->nrefs, 1);
+  check_eq(val->nrefs, 1);
+  check_eq(dynVal->nrefs, 1);
   clearLiteralTables();
 }
 
