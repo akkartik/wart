@@ -1813,7 +1813,7 @@ void test_build_handles_quotes() {
                                       return;
                                     }
                                     rmref(dynamics[key].top());
-                                    dynamics[key].top();
+                                    rmref(sym);
                                   }
 
 cell* lookup(cell* sym, cell* env) {
@@ -1831,7 +1831,7 @@ void test_lookup_returns_dynamic_binding() {
   newDynamicScope(sym, val);
   check_eq(lookup(sym, baseLexicalScope), val);
   endDynamicScope(sym);
-  //clearLiteralTables();
+  clearLiteralTables();
 }
 
 void test_lookup_returns_lexical_binding() {
