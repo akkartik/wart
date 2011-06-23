@@ -1806,11 +1806,12 @@ void test_build_handles_quotes() {
                                     check_eq(currLexicalScope->cdr, nil);
                                   }
 
-                                  cell* lookupLexicalBinding(cell* sym, cell* env) {
-                                    if (env == nil) return NULL;
-                                    cell* result = unsafeGet(env, sym);
-                                    if (result) return result;
-                                    return lookupLexicalBinding(sym, env->cdr);
+                                  cell* lookupLexicalBinding(cell* sym) {
+                                    for (cell* scope = currLexicalScope; scope != nil; scope = scope->cdr) {
+                                      cell* result = unsafeGet(currLexicalScope, sym);
+                                      if (result) return result;
+                                    }
+                                    return NULL;
                                   }
 
                                   void newLexicalScope() {
@@ -1834,8 +1835,8 @@ void test_build_handles_quotes() {
                                     set(env, sym, val);
                                   }
 
-cell* lookup(cell* sym, cell* env) {
-  cell* result = lookupLexicalBinding(sym, env);
+cell* lookup(cell* sym) {
+  cell* result = lookupLexicalBinding(sym);
   if (result) return result;
   result = lookupDynamicBinding(sym);
   if (result) return result;
@@ -1849,7 +1850,7 @@ void test_lookup_returns_dynamic_binding() {
   cell* val = newNum(34);
   check_eq(val->nrefs, 1);
   newDynamicScope(sym, val);
-  check_eq(lookup(sym, currLexicalScope), val);
+  check_eq(lookup(sym), val);
   endDynamicScope(sym);
   clearLiteralTables();
 }
@@ -1861,7 +1862,7 @@ void test_lookup_returns_lexical_binding() {
   check_eq(val->nrefs, 1);
   newLexicalScope();
   set(currLexicalScope, sym, val);
-    check_eq(lookup(sym, currLexicalScope), val);
+    check_eq(lookup(sym), val);
   set(currLexicalScope, sym, nil);
   endLexicalScope();
   clearLiteralTables();
@@ -1876,22 +1877,22 @@ void test_lexical_binding_overrides_dynamic() {
     newLexicalScope();
     set(currLexicalScope, sym, val);
       check_eq(sym->nrefs, 3);
-      check_eq(lookup(sym, currLexicalScope), val);
+      check_eq(lookup(sym), val);
     set(currLexicalScope, sym, nil);
     endLexicalScope();
-    check_eq(lookup(sym, currLexicalScope), newNum(35));
+    check_eq(lookup(sym), newNum(35));
   endDynamicScope(sym);
   clearLiteralTables();
 }
 
 
 
-cell* eval(cell* expr, cell* env) {
+cell* eval(cell* expr) {
   if (!expr)
     cerr << "eval: cell should never be NULL" << endl << DIE;
 
   if (isSym(expr))
-    return lookup(expr, env);
+    return lookup(expr);
 
   if (isAtom(expr))
     return expr;
@@ -1902,19 +1903,19 @@ cell* eval(cell* expr, cell* env) {
 void test_nil_evals_to_itself() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
   check_eq(cells.size(), 1);
-  check_eq(eval(cells.front(), currLexicalScope), nil);
+  check_eq(eval(cells.front()), nil);
 }
 
 void test_num_evals_to_itself() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34")))));
   check_eq(cells.size(), 1);
-  check_eq(eval(cells.front(), currLexicalScope), cells.front());
+  check_eq(eval(cells.front()), cells.front());
 }
 
 void test_string_evals_to_itself() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"\"ac bd\"")))));
   check_eq(cells.size(), 1);
-  check_eq(eval(cells.front(), currLexicalScope), cells.front());
+  check_eq(eval(cells.front()), cells.front());
 }
 
 
