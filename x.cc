@@ -1014,8 +1014,8 @@ struct AstNode {
     return !elems.empty();
   }
   bool isNil() {
-    return elems.size() == 2
-      && elems.front() == L"(" && elems.back() == L")";
+    return atom == L"nil"
+        || (elems.size() == 2 && elems.front() == L"(" && elems.back() == L")");
   }
 
   bool operator==(Token x) {
@@ -1548,6 +1548,12 @@ void test_build_handles_empty_input() {
 
 void test_build_handles_nil() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
+  check_eq(cells.front(), nil);
+  clearLiteralTables();
+}
+
+void test_build_handles_nil2() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"nil")))));
   check_eq(cells.front(), nil);
   clearLiteralTables();
 }
