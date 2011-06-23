@@ -1854,9 +1854,7 @@ void test_build_handles_quotes() {
                                     if (currLexicalScope == nil)
                                       cerr << "No lexical scope to end" << endl << DIE;
                                     cell* nextLexicalScope = currLexicalScope->cdr;
-                                    cerr << "AAA\n";
                                     setCdr(currLexicalScope, nil);
-                                    cerr << "ZZZ\n";
                                     rmref(currLexicalScope);
                                     currLexicalScope = nextLexicalScope;
                                   }
