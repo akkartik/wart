@@ -1800,10 +1800,10 @@ void test_build_handles_quotes() {
                                     dynamics[key].pop();
                                   }
 
-                                  cell* baseLexicalScope = nil;
+                                  cell* currLexicalScope = nil;
 
                                   void test_lexical_scopes_have_nil_cdrs_by_default() {
-                                    check_eq(baseLexicalScope->cdr, nil);
+                                    check_eq(currLexicalScope->cdr, nil);
                                   }
 
                                   cell* lookupLexicalBinding(cell* sym, cell* env) {
@@ -1815,18 +1815,18 @@ void test_build_handles_quotes() {
 
                                   void newLexicalScope() {
                                     cell* newScope = newTable();
-                                    setCdr(newScope, baseLexicalScope);
+                                    setCdr(newScope, currLexicalScope);
                                     mkref(newScope);
-                                    baseLexicalScope = newScope;
+                                    currLexicalScope = newScope;
                                   }
 
                                   void endLexicalScope() {
-                                    if (baseLexicalScope == nil)
+                                    if (currLexicalScope == nil)
                                       cerr << "No lexical scope to end" << endl << DIE;
-                                    cell* nextLexicalScope = baseLexicalScope->cdr;
-                                    setCdr(baseLexicalScope, nil);
-                                    rmref(baseLexicalScope);
-                                    baseLexicalScope = nextLexicalScope;
+                                    cell* nextLexicalScope = currLexicalScope->cdr;
+                                    setCdr(currLexicalScope, nil);
+                                    rmref(currLexicalScope);
+                                    currLexicalScope = nextLexicalScope;
                                   }
 
                                   void addLexicalBinding(cell* env, cell* sym, cell* val) {
@@ -1849,7 +1849,7 @@ void test_lookup_returns_dynamic_binding() {
   cell* val = newNum(34);
   check_eq(val->nrefs, 1);
   newDynamicScope(sym, val);
-  check_eq(lookup(sym, baseLexicalScope), val);
+  check_eq(lookup(sym, currLexicalScope), val);
   endDynamicScope(sym);
   clearLiteralTables();
 }
@@ -1860,9 +1860,9 @@ void test_lookup_returns_lexical_binding() {
   cell* val = newNum(34);
   check_eq(val->nrefs, 1);
   newLexicalScope();
-  set(baseLexicalScope, sym, val);
-    check_eq(lookup(sym, baseLexicalScope), val);
-  set(baseLexicalScope, sym, nil);
+  set(currLexicalScope, sym, val);
+    check_eq(lookup(sym, currLexicalScope), val);
+  set(currLexicalScope, sym, nil);
   endLexicalScope();
   clearLiteralTables();
 }
@@ -1874,12 +1874,12 @@ void test_lexical_binding_overrides_dynamic() {
   newDynamicScope(sym, newNum(35));
     check_eq(sym->nrefs, 2);
     newLexicalScope();
-    set(baseLexicalScope, sym, val);
+    set(currLexicalScope, sym, val);
       check_eq(sym->nrefs, 3);
-      check_eq(lookup(sym, baseLexicalScope), val);
-    set(baseLexicalScope, sym, nil);
+      check_eq(lookup(sym, currLexicalScope), val);
+    set(currLexicalScope, sym, nil);
     endLexicalScope();
-    check_eq(lookup(sym, baseLexicalScope), newNum(35));
+    check_eq(lookup(sym, currLexicalScope), newNum(35));
   endDynamicScope(sym);
   clearLiteralTables();
 }
@@ -1902,19 +1902,19 @@ cell* eval(cell* expr, cell* env) {
 void test_nil_evals_to_itself() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
   check_eq(cells.size(), 1);
-  check_eq(eval(cells.front(), baseLexicalScope), nil);
+  check_eq(eval(cells.front(), currLexicalScope), nil);
 }
 
 void test_num_evals_to_itself() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34")))));
   check_eq(cells.size(), 1);
-  check_eq(eval(cells.front(), baseLexicalScope), cells.front());
+  check_eq(eval(cells.front(), currLexicalScope), cells.front());
 }
 
 void test_string_evals_to_itself() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"\"ac bd\"")))));
   check_eq(cells.size(), 1);
-  check_eq(eval(cells.front(), baseLexicalScope), cells.front());
+  check_eq(eval(cells.front(), currLexicalScope), cells.front());
 }
 
 
