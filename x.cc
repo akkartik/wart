@@ -1800,7 +1800,7 @@ void test_build_handles_quotes() {
                                     dynamics[key].pop();
                                   }
 
-                                  cell* baseLexicalScope = newTable();
+                                  cell* baseLexicalScope = nil;
 
                                   void test_lexical_scopes_have_nil_cdrs_by_default() {
                                     check_eq(baseLexicalScope->cdr, nil);
@@ -1813,10 +1813,11 @@ void test_build_handles_quotes() {
                                     return lookupLexicalBinding(sym, env->cdr);
                                   }
 
-                                  cell* newLexicalScope(cell* env) {
+                                  void newLexicalScope() {
                                     cell* newScope = newTable();
-                                    setCdr(newScope, env);
-                                    return newScope;
+                                    setCdr(newScope, baseLexicalScope);
+                                    mkref(newScope);
+                                    baseLexicalScope = newScope;
                                   }
 
                                   void addLexicalBinding(cell* env, cell* sym, cell* val) {
@@ -1849,6 +1850,7 @@ void test_lookup_returns_lexical_binding() {
   check_eq(sym->nrefs, 1);
   cell* val = newNum(34);
   check_eq(val->nrefs, 1);
+  newLexicalScope();
   set(baseLexicalScope, sym, val);
   check_eq(lookup(sym, baseLexicalScope), val);
   set(baseLexicalScope, sym, nil);
@@ -1861,6 +1863,7 @@ void test_lexical_binding_overrides_dynamic() {
   check_eq(sym->nrefs, 1);
   newDynamicScope(sym, newNum(35));
     check_eq(sym->nrefs, 2);
+    newLexicalScope();
     set(baseLexicalScope, sym, val);
       check_eq(sym->nrefs, 3);
       check_eq(lookup(sym, baseLexicalScope), val);
