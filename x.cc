@@ -1904,7 +1904,7 @@ void test_lookup_returns_lexical_binding() {
   clearLiteralTables();
 }
 
-void test_lexical_binding_overrides_dynamic() {
+void test_lexical_binding_always_overrides_dynamic() {
   cell* sym = newSym(L"a");
   check_eq(sym->nrefs, 1);
   cell* val = newNum(34);
@@ -1934,7 +1934,7 @@ void test_lexical_binding_overrides_dynamic() {
   clearLiteralTables();
 }
 
-void test_nil_lexical_binding_overrides_dynamic() {
+void test_nil_lexical_binding_works() {
   cell* sym = newSym(L"a");
   check_eq(sym->nrefs, 1);
   cell* dynVal = newNum(35);
