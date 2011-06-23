@@ -1775,30 +1775,6 @@ void test_build_handles_quotes() {
 
 //// bindings
 
-                                  cell* baseLexicalScope = newTable();
-
-                                  void test_lexical_scopes_have_nil_cdrs_by_default() {
-                                    check_eq(baseLexicalScope->cdr, nil);
-                                  }
-
-                                  cell* lookupLexicalBinding(cell* sym, cell* env) {
-                                    if (env == nil) return NULL;
-                                    cell* result = unsafeGet(env, sym);
-                                    if (result) return result;
-                                    return lookupLexicalBinding(sym, env->cdr);
-                                  }
-
-                                  cell* newLexicalScope(cell* env) {
-                                    cell* newScope = newTable();
-                                    setCdr(newScope, env);
-                                    return newScope;
-                                  }
-
-                                  void addLexicalBinding(cell* env, cell* sym, cell* val) {
-                                    if (unsafeGet(env, sym)) cerr << "Can't rebind within a lexical scope" << endl << DIE;
-                                    set(env, sym, val);
-                                  }
-
                                   hash_map<long, stack<cell*> > dynamics;
                                   cell* lookupDynamicBinding(cell* sym) {
                                     stack<cell*> bindings = dynamics[(long)sym];
@@ -1822,6 +1798,30 @@ void test_build_handles_quotes() {
                                     rmref(dynamics[key].top());
                                     dynamics[key].pop();
                                     if (dynamics[key].empty()) rmref(sym);
+                                  }
+
+                                  cell* baseLexicalScope = newTable();
+
+                                  void test_lexical_scopes_have_nil_cdrs_by_default() {
+                                    check_eq(baseLexicalScope->cdr, nil);
+                                  }
+
+                                  cell* lookupLexicalBinding(cell* sym, cell* env) {
+                                    if (env == nil) return NULL;
+                                    cell* result = unsafeGet(env, sym);
+                                    if (result) return result;
+                                    return lookupLexicalBinding(sym, env->cdr);
+                                  }
+
+                                  cell* newLexicalScope(cell* env) {
+                                    cell* newScope = newTable();
+                                    setCdr(newScope, env);
+                                    return newScope;
+                                  }
+
+                                  void addLexicalBinding(cell* env, cell* sym, cell* val) {
+                                    if (unsafeGet(env, sym)) cerr << "Can't rebind within a lexical scope" << endl << DIE;
+                                    set(env, sym, val);
                                   }
 
 cell* lookup(cell* sym, cell* env) {
