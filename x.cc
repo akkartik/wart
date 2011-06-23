@@ -1346,14 +1346,14 @@ bool isAtom(cell* x) {
                                   void clearLiteralTables() { // just for testing
                                     for (hash_map<long, cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
                                       if (p->second->nrefs > 1)
-                                        cerr << "forcing unintern: " << (long)p->second->car << endl;
+                                        cerr << "forcing unintern: " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
                                       while (p->second->nrefs > 0)
                                         rmref(p->second);
                                     }
                                     numLiterals.clear();
                                     for (StringMap<cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
                                       if (p->second->nrefs > 1)
-                                        cerr << "forcing unintern: " << *(string*)p->second->car << endl;
+                                        cerr << "forcing unintern: " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
                                       while (p->second->nrefs > 0)
                                         rmref(p->second);
                                     }
@@ -1826,8 +1826,10 @@ cell* lookup(cell* sym, cell* env) {
 }
 
 void test_lookup_returns_dynamic_binding() {
-  cell* val = newNum(34);
   cell* sym = newSym(L"a");
+  check_eq(sym->nrefs, 1);
+  cell* val = newNum(34);
+  check_eq(val->nrefs, 1);
   newDynamicScope(sym, val);
   check_eq(lookup(sym, baseLexicalScope), val);
   endDynamicScope(sym);
@@ -1835,8 +1837,10 @@ void test_lookup_returns_dynamic_binding() {
 }
 
 void test_lookup_returns_lexical_binding() {
-  cell* val = newNum(34);
   cell* sym = newSym(L"a");
+  check_eq(sym->nrefs, 1);
+  cell* val = newNum(34);
+  check_eq(val->nrefs, 1);
   set(baseLexicalScope, sym, val);
   check_eq(lookup(sym, baseLexicalScope), val);
   set(baseLexicalScope, sym, nil);
