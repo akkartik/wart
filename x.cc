@@ -1247,9 +1247,15 @@ void rmref(cell* c) {
   case SYM:
     delete (string*)c->car;
     break;
-  case TABLE:
-    delete (hash_map<long, cell*>*)c->car;
+  case TABLE: {
+    hash_map<long, cell*>& table = *(hash_map<long, cell*>*)c->car;
+    for (hash_map<long, cell*>::iterator p = table.begin(); p != table.end(); ++p) {
+      rmref((cell*)p->first);
+      rmref(p->second);
+    }
+    delete &table;
     break;
+  }
   case CONS:
   default:
     rmref(c->car);
@@ -1888,10 +1894,9 @@ void test_lookup_returns_lexical_binding() {
       check_eq(lookup(sym), val);
       check_eq(sym->nrefs, 2);
       check_eq(val->nrefs, 2);
-    set(currLexicalScope, sym, nil);
-    check_eq(sym->nrefs, 1);
-    check_eq(val->nrefs, 1);
   endLexicalScope();
+  check_eq(sym->nrefs, 1);
+  check_eq(val->nrefs, 1);
   clearLiteralTables();
 }
 
@@ -1912,10 +1917,6 @@ void test_lexical_binding_overrides_dynamic() {
         check_eq(sym->nrefs, 3);
         check_eq(val->nrefs, 2);
         check_eq(dynVal->nrefs, 2);
-      set(currLexicalScope, sym, nil);
-      check_eq(sym->nrefs, 2);
-      check_eq(val->nrefs, 1);
-      check_eq(dynVal->nrefs, 2);
     endLexicalScope();
 
     check_eq(lookup(sym), newNum(35));
