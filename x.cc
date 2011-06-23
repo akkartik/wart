@@ -1400,17 +1400,15 @@ bool isTable(cell* x) {
 
 
 void setCar(cell* x, cell* y) {
-  if (x->car != nil && isCons(x->car)) {
+  if (x->car != nil)
     rmref(x->car);
-  }
   x->car = y;
   mkref(y);
 }
 
 void setCdr(cell* x, cell* y) {
-  if (x->cdr != nil && isCons(x->cdr)) {
+  if (x->cdr != nil)
     rmref(x->cdr);
-  }
   x->cdr = y;
   mkref(y);
 }
