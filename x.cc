@@ -1228,12 +1228,13 @@ struct Table {
 };
 
 void mkref(cell* c) {
+  if (c == nil) return;
   ++c->nrefs;
 }
 
 void rmref(cell* c) {
   if (!c) cerr << "rmref: cell should never point to NULL\n" << DIE;
-  if (c == nil) return; // base case; nil->nrefs has no effect
+  if (c == nil) return;
 
   --c->nrefs;
   if (c->nrefs > 0) return;
