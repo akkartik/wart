@@ -1812,21 +1812,20 @@ void test_build_handles_quotes() {
                                   }
 
                                   void newDynamicScope(cell* sym, cell* val) {
-                                    long key = (long)sym;
                                     mkref(sym);
                                     mkref(val);
-                                    dynamics[key].push(val);
+                                    dynamics[(long)sym].push(val);
                                   }
 
                                   void endDynamicScope(cell* sym) {
-                                    long key = (long)sym;
-                                    if (dynamics[key].empty()) {
+                                    stack<cell*>& bindings = dynamics[(long)sym];
+                                    if (bindings.empty()) {
                                       cerr << "No dynamic binding for " << sym << endl;
                                       return;
                                     }
                                     rmref(sym);
-                                    rmref(dynamics[key].top());
-                                    dynamics[key].pop();
+                                    rmref(bindings.top());
+                                    bindings.pop();
                                   }
 
                                   cell* currLexicalScope = nil;
