@@ -2040,6 +2040,12 @@ cell* eval(cell* expr) {
   if (isAtom(expr))
     return expr;
 
+  if (expr->car == newSym(L"'"))
+    if (expr->cdr->cdr == nil)
+      return expr->cdr->car;
+    else
+      return expr->cdr;
+
   return nil; // TODO: cons
 }
 
@@ -2059,6 +2065,21 @@ void test_string_evals_to_itself() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"\"ac bd\"")))));
   check_eq(cells.size(), 1);
   check_eq(eval(cells.front()), cells.front());
+}
+
+void test_eval_handles_quoted_atoms() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'a '34")))));
+  check_eq(cells.size(), 2);
+  check_eq(eval(cells.front()), newSym(L"a"));
+  check_eq(eval(cells.back()), newNum(34));
+}
+
+void test_eval_handles_quoted_lists() {
+  cell* c = eval(buildCells(parse(parenthesize(tokenize(teststream(L"'(a b)"))))).front());
+  check_eq(c->car, newSym(L"a"));
+  c = c->cdr;
+  check_eq(c->car, newSym(L"b"));
+  check_eq(c->cdr, nil);
 }
 
 
