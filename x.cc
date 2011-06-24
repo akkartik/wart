@@ -1358,12 +1358,15 @@ bool isAtom(cell* x) {
                                     }
                                     numLiterals.clear();
                                     for (StringMap<cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
+                                      if (p->first == L"currLexicalScope") continue; // memory leak
                                       if (p->second->nrefs > 1)
                                         cerr << "forcing unintern: " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
                                       while (p->second->nrefs > 0)
                                         rmref(p->second);
                                     }
                                     stringLiterals.clear();
+                                    extern void setupLexicalScope();
+                                    setupLexicalScope();
                                   }
 
 cell* newSym(string x) {
@@ -1828,13 +1831,32 @@ void test_build_handles_quotes() {
                                     bindings.pop();
                                   }
 
-                                  cell* currLexicalScope = nil;
+                                  void assignDynamicVar(cell* sym, cell* val) {
+                                    stack<cell*>& bindings = dynamics[(long)sym];
+                                    if (bindings.empty()) {
+                                      cerr << "No dynamic binding to assign for " << sym << endl;
+                                      return;
+                                    }
+                                    rmref(bindings.top());
+                                    bindings.pop();
+                                    mkref(val);
+                                    bindings.push(val);
+                                  }
 
-                                  void test_lexical_scopes_have_nil_cdrs_by_default() {
+                                  // the current lexical scope is a first-class dynamic variable
+                                  #define currLexicalScopes dynamics[(long)newSym(L"currLexicalScope")]
+                                  void setupLexicalScope() {
+                                    newDynamicScope(newSym(L"currLexicalScope"), nil);
+                                  }
+
+                                  void test_lexical_scope_has_nil_cdr_on_startup() {
+                                    check_eq(currLexicalScopes.size(), 1);
+                                    cell* currLexicalScope = currLexicalScopes.top();
                                     check_eq(currLexicalScope->cdr, nil);
                                   }
 
                                   cell* lookupLexicalBinding(cell* sym) {
+                                    cell* currLexicalScope = currLexicalScopes.top();
                                     for (cell* scope = currLexicalScope; scope != nil; scope = scope->cdr) {
                                       cell* result = unsafeGet(currLexicalScope, sym);
                                       if (result) return result;
@@ -1842,23 +1864,27 @@ void test_build_handles_quotes() {
                                     return NULL;
                                   }
 
+                                  // entering and leaving lexical scopes *assigns the current dynamic*
+                                  // binding of the currLexicalScope sym.
+                                  // Calling functions will create new dynamic bindings.
                                   void newLexicalScope() {
+                                    cell* currLexicalScope = currLexicalScopes.top();
                                     cell* newScope = newTable();
                                     setCdr(newScope, currLexicalScope);
-                                    mkref(newScope);
-                                    currLexicalScope = newScope;
+                                    assignDynamicVar(newSym(L"currLexicalScope"), newScope); //TODO dec currLexicalScopes?
                                   }
 
                                   void endLexicalScope() {
+                                    cell* currLexicalScope = currLexicalScopes.top();
                                     if (currLexicalScope == nil)
                                       cerr << "No lexical scope to end" << endl << DIE;
-                                    cell* nextLexicalScope = currLexicalScope->cdr;
+                                    cell* lowerLexicalScope = currLexicalScope->cdr;
                                     setCdr(currLexicalScope, nil);
-                                    rmref(currLexicalScope);
-                                    currLexicalScope = nextLexicalScope;
+                                    assignDynamicVar(newSym(L"currLexicalScope"), lowerLexicalScope);
                                   }
 
                                   void addLexicalBinding(cell* sym, cell* val) {
+                                    cell* currLexicalScope = currLexicalScopes.top();
                                     if (unsafeGet(currLexicalScope, sym)) cerr << "Can't rebind within a lexical scope" << endl << DIE;
                                     unsafeSet(currLexicalScope, sym, val, false);
                                   }
@@ -1961,8 +1987,8 @@ void test_lexical_scopes_nest_correctly() {
     check_eq(val2->nrefs, 1);
     check_eq(dynVal->nrefs, 2);
     newLexicalScope();
-      check(currLexicalScope != nil);
-      check_eq(currLexicalScope->nrefs, 1);
+      check(currLexicalScopes.top() != nil);
+      check_eq(currLexicalScopes.top()->nrefs, 1);
       addLexicalBinding(sym, val);
         check_eq(lookup(sym), val);
         check_eq(sym->nrefs, 3);
@@ -1970,8 +1996,8 @@ void test_lexical_scopes_nest_correctly() {
         check_eq(val2->nrefs, 1);
         check_eq(dynVal->nrefs, 2);
       newLexicalScope();
-        check_eq(currLexicalScope->cdr->nrefs, 2);
-        check_eq(currLexicalScope->nrefs, 1);
+        check_eq(currLexicalScopes.top()->cdr->nrefs, 2);
+        check_eq(currLexicalScopes.top()->nrefs, 1);
         addLexicalBinding(sym, val2);
           check_eq(lookup(sym), val2);
           check_eq(sym->nrefs, 4);
@@ -1979,7 +2005,7 @@ void test_lexical_scopes_nest_correctly() {
           check_eq(val2->nrefs, 2);
           check_eq(dynVal->nrefs, 2);
       endLexicalScope();
-      check_eq(currLexicalScope->nrefs, 1);
+      check_eq(currLexicalScopes.top()->nrefs, 1);
       check_eq(sym->nrefs, 3);
       check_eq(val->nrefs, 2);
       check_eq(val2->nrefs, 1);
@@ -2055,6 +2081,7 @@ void test_string_evals_to_itself() {
 
 int main(int argc, ascii* argv[]) {
   setupNil();
+  setupLexicalScope();
 
   int pass = 0;
   if (argc > 1) {
