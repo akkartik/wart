@@ -1996,7 +1996,7 @@ void test_lexical_scopes_nest_correctly() {
         check_eq(val2->nrefs, 1);
         check_eq(dynVal->nrefs, 2);
       newLexicalScope();
-        check_eq(currLexicalScopes.top()->cdr->nrefs, 2);
+        check_eq(currLexicalScopes.top()->cdr->nrefs, 1);
         check_eq(currLexicalScopes.top()->nrefs, 1);
         addLexicalBinding(sym, val2);
           check_eq(lookup(sym), val2);
