@@ -1872,7 +1872,8 @@ void test_build_handles_quotes() {
                                     cell* oldScope = currLexicalScopes.top();
                                     cell* newScope = newTable();
                                     setCdr(newScope, oldScope);
-                                    assignDynamicVar(newSym(L"currLexicalScope"), newScope); //TODO dec currLexicalScopes?
+                                    mkref(newScope);
+                                    assignDynamicVar(newSym(L"currLexicalScope"), newScope);
                                   }
 
                                   void endLexicalScope() {
@@ -1881,6 +1882,7 @@ void test_build_handles_quotes() {
                                       cerr << "No lexical scope to end" << endl << DIE;
                                     cell* oldScope = currScope->cdr;
                                     setCdr(currScope, nil);
+                                    rmref(currScope);
                                     assignDynamicVar(newSym(L"currLexicalScope"), oldScope);
                                   }
 
@@ -1989,7 +1991,7 @@ void test_lexical_scopes_nest_correctly() {
     check_eq(dynVal->nrefs, 2);
     newLexicalScope();
       check(currLexicalScopes.top() != nil);
-      check_eq(currLexicalScopes.top()->nrefs, 1);
+      check_eq(currLexicalScopes.top()->nrefs, 2);
       addLexicalBinding(sym, val);
         check_eq(lookup(sym), val);
         check_eq(sym->nrefs, 3);
@@ -1997,8 +1999,8 @@ void test_lexical_scopes_nest_correctly() {
         check_eq(val2->nrefs, 1);
         check_eq(dynVal->nrefs, 2);
       newLexicalScope();
-        check_eq(currLexicalScopes.top()->cdr->nrefs, 1);
-        check_eq(currLexicalScopes.top()->nrefs, 1);
+        check_eq(currLexicalScopes.top()->cdr->nrefs, 2);
+        check_eq(currLexicalScopes.top()->nrefs, 2);
         addLexicalBinding(sym, val2);
           check_eq(lookup(sym), val2);
           check_eq(sym->nrefs, 4);
@@ -2006,7 +2008,7 @@ void test_lexical_scopes_nest_correctly() {
           check_eq(val2->nrefs, 2);
           check_eq(dynVal->nrefs, 2);
       endLexicalScope();
-      check_eq(currLexicalScopes.top()->nrefs, 1);
+      check_eq(currLexicalScopes.top()->nrefs, 2);
       check_eq(sym->nrefs, 3);
       check_eq(val->nrefs, 2);
       check_eq(val2->nrefs, 1);
