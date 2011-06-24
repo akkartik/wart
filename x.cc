@@ -1868,19 +1868,19 @@ void test_build_handles_quotes() {
                                   // binding of the currLexicalScope sym.
                                   // Calling functions will create new dynamic bindings.
                                   void newLexicalScope() {
-                                    cell* currLexicalScope = currLexicalScopes.top();
+                                    cell* oldScope = currLexicalScopes.top();
                                     cell* newScope = newTable();
-                                    setCdr(newScope, currLexicalScope);
+                                    setCdr(newScope, oldScope);
                                     assignDynamicVar(newSym(L"currLexicalScope"), newScope); //TODO dec currLexicalScopes?
                                   }
 
                                   void endLexicalScope() {
-                                    cell* currLexicalScope = currLexicalScopes.top();
-                                    if (currLexicalScope == nil)
+                                    cell* currScope = currLexicalScopes.top();
+                                    if (currScope == nil)
                                       cerr << "No lexical scope to end" << endl << DIE;
-                                    cell* lowerLexicalScope = currLexicalScope->cdr;
-                                    setCdr(currLexicalScope, nil);
-                                    assignDynamicVar(newSym(L"currLexicalScope"), lowerLexicalScope);
+                                    cell* oldScope = currScope->cdr;
+                                    setCdr(currScope, nil);
+                                    assignDynamicVar(newSym(L"currLexicalScope"), oldScope);
                                   }
 
                                   void addLexicalBinding(cell* sym, cell* val) {
