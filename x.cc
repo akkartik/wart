@@ -2046,6 +2046,9 @@ cell* eval(cell* expr) {
     else
       return expr->cdr;
 
+  if (expr->car == newSym(L"lambda"))
+    return expr;
+
   return nil; // TODO: cons
 }
 
@@ -2090,6 +2093,15 @@ void test_eval_handles_quoted_lists() {
   c = c->cdr;
   check_eq(c->car, newSym(L"b"));
   check_eq(c->cdr, nil);
+  rmref(cells.front());
+  clearLiteralTables();
+}
+
+void test_eval_handles_simple_lambda() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
+  check_eq(cells.size(), 1);
+  cell* lambda = eval(cells.front());
+  check_eq(lambda, cells.front());
   rmref(cells.front());
   clearLiteralTables();
 }
