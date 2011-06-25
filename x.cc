@@ -2053,18 +2053,24 @@ void test_nil_evals_to_itself() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
   check_eq(cells.size(), 1);
   check_eq(eval(cells.front()), nil);
+  rmref(cells.front());
+  clearLiteralTables();
 }
 
 void test_num_evals_to_itself() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34")))));
   check_eq(cells.size(), 1);
   check_eq(eval(cells.front()), cells.front());
+  rmref(cells.front());
+  clearLiteralTables();
 }
 
 void test_string_evals_to_itself() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"\"ac bd\"")))));
   check_eq(cells.size(), 1);
   check_eq(eval(cells.front()), cells.front());
+  rmref(cells.front());
+  clearLiteralTables();
 }
 
 void test_eval_handles_quoted_atoms() {
@@ -2072,14 +2078,20 @@ void test_eval_handles_quoted_atoms() {
   check_eq(cells.size(), 2);
   check_eq(eval(cells.front()), newSym(L"a"));
   check_eq(eval(cells.back()), newNum(34));
+  rmref(cells.front());
+  rmref(cells.back());
+  clearLiteralTables();
 }
 
 void test_eval_handles_quoted_lists() {
-  cell* c = eval(buildCells(parse(parenthesize(tokenize(teststream(L"'(a b)"))))).front());
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'(a b)")))));
+  cell* c = eval(cells.front());
   check_eq(c->car, newSym(L"a"));
   c = c->cdr;
   check_eq(c->car, newSym(L"b"));
   check_eq(c->cdr, nil);
+  rmref(cells.front());
+  clearLiteralTables();
 }
 
 
