@@ -2066,8 +2066,11 @@ cell* eval(cell* expr) {
   // add lexical scope, throw param bindings on it
   cell* body = lambda->cdr->cdr->car;
   cell* result = nil;
-  for (cell* form = body->car; form != nil; form = form->cdr)
+  for (cell* form = body->car; form != nil; form = form->cdr) {
+    rmref(result);
     result = eval(form);
+  }
+  rmref(lambda);
   // end lexical scope
   // end dynamic binding
   return result;
