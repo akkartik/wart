@@ -2053,14 +2053,21 @@ cell* eval(cell* expr) {
     cell* ans = newCell();
     setCar(ans, expr->car);
     setCdr(ans, newCell());
-    setCar(ans->cdr, expr->cdr->car); // args
+    setCar(ans->cdr, expr->cdr->car); // sig
     setCdr(ans->cdr, newCell());
     setCar(ans->cdr->cdr, expr->cdr->cdr); // body
     setCdr(ans->cdr->cdr, currLexicalScopes.top());
     return ans;
   }
 
-  return nil; // TODO: cons
+  // TODO: calls
+  // eval args based on current scope; skip eval based on sig
+  // new dynamic binding for currLexicalScope from lambda
+  // add lexical scope, throw param bindings on it
+  // eval all forms in body; save result of final form
+  // end lexical scope
+  // end dynamic binding
+  return nil;
 }
 
 void test_nil_evals_to_itself() {
