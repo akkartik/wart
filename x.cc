@@ -1229,7 +1229,6 @@ struct Table {
 
 void mkref(cell* c) {
   if (c == nil) return;
-  cerr << "mkref: " << c << " " << c->nrefs << endl;
   ++c->nrefs;
 }
 
@@ -2154,18 +2153,12 @@ void test_eval_handles_closure() {
 }
 
 void test_eval_handles_lambda_calls() {
-  cerr << "AAA: " << newSym(L"lambda")->nrefs << endl;
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () 34))")))));
-  cerr << "BBB: " << newSym(L"lambda")->nrefs << endl;
   check_eq(cells.size(), 1);
-  cerr << "CCC: " << newSym(L"lambda")->nrefs << endl;
   cell* result = eval(cells.front());
-  cerr << "DDD: " << newSym(L"lambda")->nrefs << endl;
   check_eq(result, newNum(34));
-  cerr << "EEE: " << newSym(L"lambda")->nrefs << endl;
   rmref(cells.front());
   rmref(result);
-  cerr << "FFF: " << newSym(L"lambda")->nrefs << endl;
   clearLiteralTables();
 }
 
