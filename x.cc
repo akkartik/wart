@@ -1229,6 +1229,7 @@ struct Table {
 
 void mkref(cell* c) {
   if (c == nil) return;
+  cerr << "mkref: " << c << " " << c->nrefs << endl;
   ++c->nrefs;
 }
 
@@ -2064,10 +2065,13 @@ cell* eval(cell* expr) {
   // eval args based on current scope; skip eval based on sig
   // new dynamic binding for currLexicalScope from lambda
   // add lexical scope, throw param bindings on it
-  // eval all forms in body; save result of final form
+  cell* body = lambda->cdr->cdr->car;
+  cell* result = nil;
+  for (cell* form = body->car; form != nil; form = form->cdr)
+    result = eval(form);
   // end lexical scope
   // end dynamic binding
-  return nil;
+  return result;
 }
 
 void test_nil_evals_to_itself() {
@@ -2150,10 +2154,18 @@ void test_eval_handles_closure() {
 }
 
 void test_eval_handles_lambda_calls() {
+  cerr << "AAA: " << newSym(L"lambda")->nrefs << endl;
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () 34))")))));
+  cerr << "BBB: " << newSym(L"lambda")->nrefs << endl;
   check_eq(cells.size(), 1);
-  check_eq(eval(cells.front()), newNum(34));
+  cerr << "CCC: " << newSym(L"lambda")->nrefs << endl;
+  cell* result = eval(cells.front());
+  cerr << "DDD: " << newSym(L"lambda")->nrefs << endl;
+  check_eq(result, newNum(34));
+  cerr << "EEE: " << newSym(L"lambda")->nrefs << endl;
   rmref(cells.front());
+  rmref(result);
+  cerr << "FFF: " << newSym(L"lambda")->nrefs << endl;
   clearLiteralTables();
 }
 
