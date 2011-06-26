@@ -1314,7 +1314,7 @@ long toNum(cell* x) {
 }
 
 bool isCons(cell* x) {
-  return x->type == CONS;
+  return x != nil && x->type != NUM && x->type != STRING && x->type != SYM;
 }
 
 bool isAtom(cell* x) {
@@ -2060,7 +2060,7 @@ cell* eval(cell* expr) {
     return ans;
   }
 
-  // TODO: calls
+  cell* lambda = eval(expr->car);
   // eval args based on current scope; skip eval based on sig
   // new dynamic binding for currLexicalScope from lambda
   // add lexical scope, throw param bindings on it
@@ -2145,6 +2145,14 @@ void test_eval_handles_closure() {
   check_eq(c->cdr->cdr->cdr, newLexicalScope);
   rmref(c);
   check_eq(newLexicalScope->nrefs, 0);
+  rmref(cells.front());
+  clearLiteralTables();
+}
+
+void test_eval_handles_lambda_calls() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () 34))")))));
+  check_eq(cells.size(), 1);
+  check_eq(eval(cells.front()), newNum(34));
   rmref(cells.front());
   clearLiteralTables();
 }
