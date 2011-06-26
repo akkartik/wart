@@ -2179,6 +2179,19 @@ void test_eval_expands_syms_in_lambda_bodies() {
   clearLiteralTables();
 }
 
+void test_eval_expands_lexically_scoped_syms_in_lambda_bodies() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () a))")))));
+  check_eq(cells.size(), 1);
+  newLexicalScope();
+    addLexicalBinding(newSym(L"a"), newNum(34));
+    cell* result = eval(cells.front());
+    check_eq(result, newNum(34));
+  endLexicalScope();
+  rmref(cells.front());
+  rmref(result);
+  clearLiteralTables();
+}
+
 
 
                                   typedef void (*testfunc)(void);
