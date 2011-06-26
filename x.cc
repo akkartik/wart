@@ -1480,6 +1480,8 @@ cell* get(cell* t, cell* k) {
                                     case SYM:
                                     case STRING:
                                       os << toString(c); break;
+                                    case TABLE:
+                                      os << (Table*)c->car; break;
                                     case CONS:
                                     default:
                                       os << L"<" << c->car << " . " << c->cdr << L">";
@@ -2046,8 +2048,17 @@ cell* eval(cell* expr) {
     else
       return expr->cdr;
 
-  if (expr->car == newSym(L"lambda"))
-    return expr;
+  // lambda expressions get the current lexical scope attached to them
+  if (expr->car == newSym(L"lambda")) {
+    cell* ans = newCell();
+    setCar(ans, expr->car);
+    setCdr(ans, newCell());
+    setCar(ans->cdr, expr->cdr->car); // args
+    setCdr(ans->cdr, newCell());
+    setCar(ans->cdr->cdr, expr->cdr->cdr); // body
+    setCdr(ans->cdr->cdr, currLexicalScopes.top());
+    return ans;
+  }
 
   return nil; // TODO: cons
 }
@@ -2101,7 +2112,32 @@ void test_eval_handles_simple_lambda() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
   check_eq(cells.size(), 1);
   cell* lambda = eval(cells.front());
-  check_eq(lambda, cells.front());
+  check_eq(lambda->car, newSym(L"lambda"));
+  check_eq(lambda->cdr->car, nil);
+  check(isCons(lambda->cdr->cdr->car));
+  check_eq(lambda->cdr->cdr->car->car, newNum(34));
+  check_eq(lambda->cdr->cdr->cdr, nil);
+  rmref(cells.front());
+  rmref(lambda);
+  clearLiteralTables();
+}
+
+void test_eval_handles_closure() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
+  check_eq(cells.size(), 1);
+  newLexicalScope();
+    cell* newLexicalScope = currLexicalScopes.top();
+    check_eq(newLexicalScope->nrefs, 2);
+    cell* c = eval(cells.front());
+    check_eq(newLexicalScope->nrefs, 3);
+  endLexicalScope();
+  check_eq(newLexicalScope->nrefs, 1);
+  check_eq(c->car, newSym(L"lambda"));
+  check_eq(c->cdr->car, nil);
+  check_eq(c->cdr->cdr->car->car, newNum(34));
+  check_eq(c->cdr->cdr->cdr, newLexicalScope);
+  rmref(c);
+  check_eq(newLexicalScope->nrefs, 0);
   rmref(cells.front());
   clearLiteralTables();
 }
