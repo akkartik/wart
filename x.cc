@@ -2168,6 +2168,18 @@ void test_eval_handles_lambda_calls() {
   clearLiteralTables();
 }
 
+void test_eval_expands_syms_in_lambda_bodies() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () a))")))));
+  check_eq(cells.size(), 1);
+  newDynamicScope(newSym(L"a"), newNum(34));
+  cell* result = eval(cells.front());
+  check_eq(result, newNum(34));
+  endDynamicScope(newSym(L"a"));
+  rmref(cells.front());
+  rmref(result);
+  clearLiteralTables();
+}
+
 
 
                                   typedef void (*testfunc)(void);
