@@ -2064,6 +2064,8 @@ cell* eval(cell* expr) {
   // eval args based on current scope; skip eval based on sig
   // new dynamic binding for currLexicalScope from lambda
   // add lexical scope, throw param bindings on it
+
+  // eval all forms in body; save result of final form
   cell* body = lambda->cdr->cdr->car;
   cell* result = nil;
   for (cell* form = body->car; form != nil; form = form->cdr) {
@@ -2071,6 +2073,7 @@ cell* eval(cell* expr) {
     result = eval(form);
   }
   rmref(lambda);
+
   // end lexical scope
   // end dynamic binding
   return result;
