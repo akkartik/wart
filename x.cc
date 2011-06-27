@@ -1474,6 +1474,8 @@ cell* get(cell* t, cell* k) {
 
 
 
+                                  ostream& operator<<(ostream& os, cell* c);
+
                                   ostream& operator<<(ostream& os, Table* t) {
                                     os << "{" << endl;
                                     for (hash_map<long, cell*>::iterator p = t->table.begin(); p != t->table.end(); ++p) {
