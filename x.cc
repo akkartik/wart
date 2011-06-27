@@ -1493,7 +1493,9 @@ cell* get(cell* t, cell* k) {
                                     case STRING:
                                       os << toString(c); break;
                                     case TABLE:
-                                      os << (Table*)c->car; break;
+                                      os << (Table*)c->car;
+                                      os << c->cdr;
+                                      break;
                                     case CONS:
                                     default:
                                       os << L"<" << c->car << " . " << c->cdr << L">";
