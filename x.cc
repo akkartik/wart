@@ -2093,10 +2093,18 @@ cell* eval(cell* expr) {
   mkref(lambda);
 
   // eval args based on current scope; skip eval based on sig
+  cell* sig = lambda->cdr->car;
+  list<cell*> args;
+  for (cell* arg = sig; arg != nil; arg = arg->cdr)
+    args.push_back(eval(arg->car));
 
   newDynamicScope(L"currLexicalScope", lambda->cdr->cdr->cdr);
 
     // add lexical scope, throw param bindings on it
+    newLexicalScope();
+    for (list<cell*>::iterator p = args.begin(); p != args.end(); ++p, sig = sig->cdr) {
+      addLexicalBinding(sig->car, *p);
+    }
 
       // eval all forms in body; save result of final form
       cell* body = lambda->cdr->cdr->car;
@@ -2107,7 +2115,7 @@ cell* eval(cell* expr) {
       }
       rmref(lambda);
 
-    // end lexical scope
+    endLexicalScope();
   endDynamicScope(newSym(L"currLexicalScope"));
   return result;
 }
@@ -2251,6 +2259,24 @@ void test_eval_expands_syms_in_original_lexical_scope() {
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
   endDynamicScope(newSym(L"a"));
+  clearLiteralTables();
+}
+
+void test_eval_expands_args_in_caller_scope() {
+  newDynamicScope(L"arg1", newNum(23));
+  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda (arg1) arg1)"))))).front();
+  newLexicalScope();
+  addLexicalBinding(newSym(L"arg1"), newNum(34));
+    newDynamicScope(L"f", eval(lambda));
+  endLexicalScope();
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
+  cell* result = eval(call);
+  check_eq(result, newNum(23));
+  rmref(result);
+  rmref(call);
+  rmref(lambda);
+  endDynamicScope(newSym(L"f"));
+  endDynamicScope(newSym(L"arg1"));
   clearLiteralTables();
 }
 
