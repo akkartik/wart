@@ -2122,9 +2122,8 @@ cell* eval(cell* expr) {
   mkref(lambda);
 
   // eval args based on current scope; skip eval based on sig
-  cell* sig = lambda->cdr->car;
   list<cell*> args;
-  for (cell *param=sig, *arg=expr->cdr; param != nil; param = param->cdr, arg = arg->cdr) {
+  for (cell *param=sig(lambda), *arg=expr->cdr; param != nil; param = param->cdr, arg = arg->cdr) {
     if (isQuoted(param->car))
       args.push_back(arg->car);
     else
@@ -2135,7 +2134,7 @@ cell* eval(cell* expr) {
 
   // add lexical scope, throw param bindings on it
   newLexicalScope();
-  cell* param = sig;
+  cell* param = sig(lambda);
   for (list<cell*>::iterator p = args.begin(); p != args.end(); ++p, param = param->cdr) {
     cell* tt = isQuoted(param->car) ? param->car->cdr : param;
     addLexicalBinding(tt->car, *p);
