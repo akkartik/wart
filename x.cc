@@ -1887,13 +1887,15 @@ void test_build_handles_quotes() {
                                   // entering and leaving lexical scopes *assigns the current dynamic*
                                   // binding of the currLexicalScope sym.
                                   // Calling functions will create new dynamic bindings.
-                                  void newLexicalScope() {
+                                  void newLexicalScope(cell* newScope) {
                                     cell* oldScope = currLexicalScopes.top();
-                                    cell* newScope = newTable();
                                     dbg << "new lexical scope: " << newScope << endl;
                                     setCdr(newScope, oldScope);
                                     mkref(newScope);
                                     assignDynamicVar(newSym(L"currLexicalScope"), newScope);
+                                  }
+                                  void newLexicalScope() {
+                                    newLexicalScope(newTable());
                                   }
 
                                   void endLexicalScope() {
@@ -1907,10 +1909,12 @@ void test_build_handles_quotes() {
                                     assignDynamicVar(newSym(L"currLexicalScope"), oldScope);
                                   }
 
+                                  void addLexicalBinding(cell* scope, cell* sym, cell* val) {
+                                    if (unsafeGet(scope, sym)) cerr << "Can't rebind within a lexical scope" << endl << DIE;
+                                    unsafeSet(scope, sym, val, false);
+                                  }
                                   void addLexicalBinding(cell* sym, cell* val) {
-                                    cell* currLexicalScope = currLexicalScopes.top();
-                                    if (unsafeGet(currLexicalScope, sym)) cerr << "Can't rebind within a lexical scope" << endl << DIE;
-                                    unsafeSet(currLexicalScope, sym, val, false);
+                                    addLexicalBinding(currLexicalScopes.top(), sym, val);
                                   }
 
 cell* lookup(cell* sym) {
@@ -2121,25 +2125,20 @@ cell* eval(cell* expr) {
   cell* lambda = eval(expr->car);
   mkref(lambda);
 
-  // eval args based on current scope; skip eval based on sig
-  list<cell*> args;
+  // construct a new scope with args based on current scope and sig
+  cell* newScope = newTable();
   cell* param = sig(lambda);
   for (cell* arg=expr->cdr; arg != nil; arg=arg->cdr, param=param->cdr) {
     if (isQuoted(param->car))
-      args.push_back(arg->car);
+      addLexicalBinding(newScope, param->car->cdr->car, arg->car);
     else
-      args.push_back(eval(arg->car));
+      addLexicalBinding(newScope, param->car, eval(arg->car));
   }
 
+  // swap in the function's lexical environment
   newDynamicScope(L"currLexicalScope", env(lambda));
-
-  // add lexical scope, throw param bindings on it
-  newLexicalScope();
-  param = sig(lambda);
-  for (list<cell*>::iterator p = args.begin(); p != args.end(); ++p, param = param->cdr) {
-    cell* tt = isQuoted(param->car) ? param->car->cdr : param;
-    addLexicalBinding(tt->car, *p);
-  }
+  // throw the new scope on it
+  newLexicalScope(newScope);
 
   // eval all forms in body; save result of final form
   cell* result = nil;
