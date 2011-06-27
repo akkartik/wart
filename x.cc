@@ -2065,6 +2065,34 @@ void test_lower_lexical_scopes_are_available() {
 
 
 
+                                  cell* sig(cell* lambda) {
+                                    return lambda->cdr->car;
+                                  }
+
+                                  cell* body(cell* lambda) {
+                                    return lambda->cdr->cdr;
+                                  }
+
+                                  cell* call_body(cell* call) {
+                                    return call->cdr->cdr->car;
+                                  }
+
+                                  cell* env(cell* call) {
+                                    return call->cdr->cdr->cdr;
+                                  }
+
+                                  cell* args(cell* call) {
+                                    return call->cdr->car;
+                                  }
+
+                                  bool isQuoted(cell* cell) {
+                                    return isCons(cell) && cell->car == newSym(L"'");
+                                  }
+
+                                  bool single(cell* cell) {
+                                    return cell->cdr == nil;
+                                  }
+
 cell* eval(cell* expr) {
   if (!expr)
     cerr << "eval: cell should never be NULL" << endl << DIE;
@@ -2075,20 +2103,17 @@ cell* eval(cell* expr) {
   if (isAtom(expr))
     return expr;
 
-  if (expr->car == newSym(L"'"))
-    if (expr->cdr->cdr == nil)
-      return expr->cdr->car;
-    else
-      return expr->cdr;
+  if (isQuoted(expr))
+    return single(expr->cdr) ? expr->cdr->car : expr->cdr;
 
   // lambda expressions get the current lexical scope attached to them
   if (expr->car == newSym(L"lambda")) {
     cell* ans = newCell();
     setCar(ans, expr->car);
     setCdr(ans, newCell());
-    setCar(ans->cdr, expr->cdr->car); // sig
+    setCar(ans->cdr, sig(expr));
     setCdr(ans->cdr, newCell());
-    setCar(ans->cdr->cdr, expr->cdr->cdr); // body
+    setCar(ans->cdr->cdr, body(expr));
     setCdr(ans->cdr->cdr, currLexicalScopes.top());
     return ans;
   }
@@ -2100,28 +2125,25 @@ cell* eval(cell* expr) {
   cell* sig = lambda->cdr->car;
   list<cell*> args;
   for (cell *param=sig, *arg=expr->cdr; param != nil; param = param->cdr, arg = arg->cdr) {
-    if (isCons(param->car) && toString(param->car->car) == L"'")
+    if (isQuoted(param->car))
       args.push_back(arg->car);
     else
       args.push_back(eval(arg->car));
   }
 
-  newDynamicScope(L"currLexicalScope", lambda->cdr->cdr->cdr);
+  newDynamicScope(L"currLexicalScope", env(lambda));
 
   // add lexical scope, throw param bindings on it
   newLexicalScope();
   cell* param = sig;
   for (list<cell*>::iterator p = args.begin(); p != args.end(); ++p, param = param->cdr) {
-    cell* tt = param;
-    if (isCons(param->car) && toString(param->car->car) == L"'")
-      tt = param->car->cdr;
+    cell* tt = isQuoted(param->car) ? param->car->cdr : param;
     addLexicalBinding(tt->car, *p);
   }
 
   // eval all forms in body; save result of final form
-  cell* body = lambda->cdr->cdr->car;
   cell* result = nil;
-  for (cell* form = body->car; form != nil; form = form->cdr) {
+  for (cell* form = call_body(lambda)->car; form != nil; form = form->cdr) {
     rmref(result);
     result = eval(form);
   }
