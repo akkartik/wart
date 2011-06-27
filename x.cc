@@ -2095,8 +2095,12 @@ cell* eval(cell* expr) {
   // eval args based on current scope; skip eval based on sig
   cell* sig = lambda->cdr->car;
   list<cell*> args;
-  for (cell* arg = expr->cdr; arg != nil; arg = arg->cdr)
-    args.push_back(eval(arg->car));
+  for (cell *param=sig, *arg=expr->cdr; param != nil; param = param->cdr, arg = arg->cdr) {
+    if (isCons(param->car) && toString(param->car->car) == L"'")
+      args.push_back(arg->car);
+    else
+      args.push_back(eval(arg->car));
+  }
 
   newDynamicScope(L"currLexicalScope", lambda->cdr->cdr->cdr);
 
@@ -2271,6 +2275,24 @@ void test_eval_expands_args_in_caller_scope() {
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f a)"))))).front();
   cell* result = eval(call);
   check_eq(result, newNum(23));
+  rmref(result);
+  rmref(call);
+  rmref(lambda);
+  endDynamicScope(newSym(L"f"));
+  endDynamicScope(newSym(L"a"));
+  clearLiteralTables();
+}
+
+void test_eval_doesnt_eval_quoted_args() {
+  newDynamicScope(L"a", newNum(23));
+  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda ('arg1) arg1)"))))).front();
+  newLexicalScope();
+  addLexicalBinding(newSym(L"arg1"), newNum(34));
+    newDynamicScope(L"f", eval(lambda));
+  endLexicalScope();
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f a)"))))).front();
+  cell* result = eval(call);
+  check_eq(result, newSym(L"a"));
   rmref(result);
   rmref(call);
   rmref(lambda);
