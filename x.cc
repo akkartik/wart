@@ -2174,11 +2174,12 @@ void test_eval_handles_closure() {
 }
 
 void test_eval_handles_lambda_calls() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () 34))")))));
-  check_eq(cells.size(), 1);
-  cell* result = eval(cells.front());
+  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)"))))).front();
+  cell* call = newCell();
+  setCar(call, lambda);
+  cell* result = eval(call);
   check_eq(result, newNum(34));
-  rmref(cells.front());
+  rmref(call);
   rmref(result);
   clearLiteralTables();
 }
