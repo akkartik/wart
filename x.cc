@@ -2175,9 +2175,7 @@ void test_eval_handles_closure() {
 }
 
 void test_eval_handles_lambda_calls() {
-  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)"))))).front();
-  cell* call = newCell();
-  setCar(call, lambda);
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () 34))"))))).front();
   cell* result = eval(call);
   check_eq(result, newNum(34));
   rmref(call);
@@ -2186,13 +2184,12 @@ void test_eval_handles_lambda_calls() {
 }
 
 void test_eval_expands_syms_in_lambda_bodies() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () a))")))));
-  check_eq(cells.size(), 1);
+  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () a))"))))).front();
   newDynamicScope(newSym(L"a"), newNum(34));
-  cell* result = eval(cells.front());
+  cell* result = eval(lambda);
   check_eq(result, newNum(34));
   endDynamicScope(newSym(L"a"));
-  rmref(cells.front());
+  rmref(lambda);
   rmref(result);
   clearLiteralTables();
 }
@@ -2200,26 +2197,25 @@ void test_eval_expands_syms_in_lambda_bodies() {
 void test_eval_handles_assigned_lambda_calls() {
   cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)"))))).front();
   newDynamicScope(newSym(L"f"), eval(lambda));
-    list<cell*> cells2 = buildCells(parse(parenthesize(tokenize(teststream(L"(f)")))));
-    cell* result = eval(cells2.front());
+    cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
+    cell* result = eval(call);
     check_eq(result, newNum(34));
   endDynamicScope(newSym(L"f"));
-  rmref(lambda);
-  rmref(cells2.front());
   rmref(result);
+  rmref(call);
+  rmref(lambda);
   clearLiteralTables();
 }
 
 void test_eval_expands_lexically_scoped_syms_in_lambda_bodies() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () a))")))));
-  check_eq(cells.size(), 1);
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () a))"))))).front();
   newLexicalScope();
     addLexicalBinding(newSym(L"a"), newNum(34));
-    cell* result = eval(cells.front());
+    cell* result = eval(call);
     check_eq(result, newNum(34));
   endLexicalScope();
-  rmref(cells.front());
   rmref(result);
+  rmref(call);
   clearLiteralTables();
 }
 
