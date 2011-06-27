@@ -1225,6 +1225,7 @@ struct Table {
   hash_map<long, cell*> table;
   ~Table() {
     for (hash_map<long, cell*>::iterator p = table.begin(); p != table.end(); ++p) {
+      if (!p->second) continue;
       rmref((cell*)p->first);
       rmref(p->second);
     }
@@ -1872,9 +1873,8 @@ void test_build_handles_quotes() {
                                   }
 
                                   cell* lookupLexicalBinding(cell* sym) {
-                                    cell* currLexicalScope = currLexicalScopes.top();
-                                    for (cell* scope = currLexicalScope; scope != nil; scope = scope->cdr) {
-                                      cell* result = unsafeGet(currLexicalScope, sym);
+                                    for (cell* scope = currLexicalScopes.top(); scope != nil; scope = scope->cdr) {
+                                      cell* result = unsafeGet(scope, sym);
                                       if (result) return result;
                                     }
                                     return NULL;
@@ -2041,6 +2041,21 @@ void test_lexical_scopes_nest_correctly() {
   check_eq(val->nrefs, 1);
   check_eq(val2->nrefs, 1);
   check_eq(dynVal->nrefs, 1);
+  clearLiteralTables();
+}
+
+void test_lower_lexical_scopes_are_available() {
+  cell* sym = newSym(L"a");
+  check_eq(sym->nrefs, 1);
+  cell* val = newNum(34);
+  check_eq(val->nrefs, 1);
+  newLexicalScope();
+    addLexicalBinding(sym, val);
+      check_eq(lookup(sym), val);
+      newLexicalScope();
+        check_eq(lookup(sym), val);
+      endLexicalScope();
+  endLexicalScope();
   clearLiteralTables();
 }
 
