@@ -2127,12 +2127,12 @@ cell* eval(cell* expr) {
 
   // construct a new scope with args based on current scope and sig
   cell* newScope = newTable();
-  cell* param = sig(lambda);
+  bool quoted = isQuoted(sig(lambda));
+  cell* param = quoted ? sig(lambda)->cdr : sig(lambda);
   for (cell* arg=expr->cdr; arg != nil; arg=arg->cdr, param=param->cdr) {
-    if (isQuoted(param->car))
-      addLexicalBinding(newScope, param->car->cdr->car, arg->car);
-    else
-      addLexicalBinding(newScope, param->car, eval(arg->car));
+    cell* lhs = isQuoted(param->car) ? param->car->cdr->car : param->car;
+    cell* rhs = (quoted || isQuoted(param->car)) ? arg->car : eval(arg->car);
+    addLexicalBinding(newScope, lhs, rhs);
   }
 
   // swap in the function's lexical environment
@@ -2316,6 +2316,24 @@ void test_eval_expands_args_in_caller_scope() {
 void test_eval_doesnt_eval_quoted_params() {
   newDynamicScope(L"a", newNum(23));
   cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda ('arg1) arg1)"))))).front();
+  newLexicalScope();
+  addLexicalBinding(newSym(L"arg1"), newNum(34));
+    newDynamicScope(L"f", eval(lambda));
+  endLexicalScope();
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f a)"))))).front();
+  cell* result = eval(call);
+  check_eq(result, newSym(L"a"));
+  rmref(result);
+  rmref(call);
+  rmref(lambda);
+  endDynamicScope(newSym(L"f"));
+  endDynamicScope(newSym(L"a"));
+  clearLiteralTables();
+}
+
+void test_eval_handles_quoted_param_list() {
+  newDynamicScope(L"a", newNum(23));
+  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda '(arg1) arg1)"))))).front();
   newLexicalScope();
   addLexicalBinding(newSym(L"arg1"), newNum(34));
     newDynamicScope(L"f", eval(lambda));
