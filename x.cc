@@ -2314,7 +2314,7 @@ void test_eval_expands_args_in_caller_scope() {
   clearLiteralTables();
 }
 
-void test_eval_doesnt_eval_quoted_args() {
+void test_eval_doesnt_eval_quoted_params() {
   newDynamicScope(L"a", newNum(23));
   cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda ('arg1) arg1)"))))).front();
   newLexicalScope();
