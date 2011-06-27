@@ -2076,23 +2076,23 @@ cell* eval(cell* expr) {
 
   cell* lambda = eval(expr->car);
   mkref(lambda);
+
   // eval args based on current scope; skip eval based on sig
 
-  // new dynamic binding for currLexicalScope from lambda
   newDynamicScope(L"currLexicalScope", lambda->cdr->cdr->cdr);
 
-  // add lexical scope, throw param bindings on it
+    // add lexical scope, throw param bindings on it
 
-  // eval all forms in body; save result of final form
-  cell* body = lambda->cdr->cdr->car;
-  cell* result = nil;
-  for (cell* form = body->car; form != nil; form = form->cdr) {
-    rmref(result);
-    result = eval(form);
-  }
-  rmref(lambda);
+      // eval all forms in body; save result of final form
+      cell* body = lambda->cdr->cdr->car;
+      cell* result = nil;
+      for (cell* form = body->car; form != nil; form = form->cdr) {
+        rmref(result);
+        result = eval(form);
+      }
+      rmref(lambda);
 
-  // end lexical scope
+    // end lexical scope
   endDynamicScope(newSym(L"currLexicalScope"));
   return result;
 }
