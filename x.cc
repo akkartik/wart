@@ -1409,7 +1409,7 @@ string toString(cell* x) {
 cell* newTable() {
   cell* result = newCell();
   result->type = TABLE;
-  result->car = (cell*)new hash_map<long, cell*>();
+  result->car = (cell*)new Table();
   return result;
 }
 
