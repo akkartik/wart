@@ -1255,15 +1255,10 @@ void rmref(cell* c) {
     dbg << "  delete: " << *(string*)c->car << endl;
     delete (string*)c->car;
     break;
-  case TABLE: {
-    hash_map<long, cell*>& table = *(hash_map<long, cell*>*)c->car;
-    for (hash_map<long, cell*>::iterator p = table.begin(); p != table.end(); ++p) {
-      rmref((cell*)p->first);
-      rmref(p->second);
-    }
-    delete &table;
+  case TABLE:
+    dbg << "  delete table" << endl;
+    delete (Table*)c->car;
     break;
-  }
   case CONS:
   default:
     rmref(c->car);
