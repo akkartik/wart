@@ -1837,6 +1837,10 @@ void test_build_handles_quotes() {
                                     dynamics[(long)sym].push(val);
                                   }
 
+                                  void newDynamicScope(string s, cell* val) {
+                                    newDynamicScope(newSym(s), val);
+                                  }
+
                                   void endDynamicScope(cell* sym) {
                                     stack<cell*>& bindings = dynamics[(long)sym];
                                     if (bindings.empty()) {
@@ -1863,7 +1867,7 @@ void test_build_handles_quotes() {
                                   // the current lexical scope is a first-class dynamic variable
                                   #define currLexicalScopes dynamics[(long)newSym(L"currLexicalScope")]
                                   void setupLexicalScope() {
-                                    newDynamicScope(newSym(L"currLexicalScope"), nil);
+                                    newDynamicScope(L"currLexicalScope", nil);
                                   }
 
                                   void test_lexical_scope_has_nil_cdr_on_startup() {
@@ -2080,7 +2084,7 @@ cell* eval(cell* expr) {
   // eval args based on current scope; skip eval based on sig
 
   // new dynamic binding for currLexicalScope from lambda
-  newDynamicScope(newSym(L"currLexicalScope"), lambda->cdr->cdr->cdr);
+  newDynamicScope(L"currLexicalScope", lambda->cdr->cdr->cdr);
 
   // add lexical scope, throw param bindings on it
 
@@ -2188,7 +2192,7 @@ void test_eval_handles_lambda_calls() {
 
 void test_eval_expands_syms_in_lambda_bodies() {
   cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () a))"))))).front();
-  newDynamicScope(newSym(L"a"), newNum(34));
+  newDynamicScope(L"a", newNum(34));
   cell* result = eval(lambda);
   check_eq(result, newNum(34));
   endDynamicScope(newSym(L"a"));
@@ -2199,7 +2203,7 @@ void test_eval_expands_syms_in_lambda_bodies() {
 
 void test_eval_handles_assigned_lambda_calls() {
   cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)"))))).front();
-  newDynamicScope(newSym(L"f"), eval(lambda));
+  newDynamicScope(L"f", eval(lambda));
     cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
     cell* result = eval(call);
     check_eq(result, newNum(34));
@@ -2223,11 +2227,11 @@ void test_eval_expands_lexically_scoped_syms_in_lambda_bodies() {
 }
 
 void test_eval_expands_syms_in_original_lexical_scope() {
-  newDynamicScope(newSym(L"a"), newNum(23));
+  newDynamicScope(L"a", newNum(23));
   cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () a)"))))).front();
   newLexicalScope();
   addLexicalBinding(newSym(L"a"), newNum(34));
-    newDynamicScope(newSym(L"f"), eval(lambda));
+    newDynamicScope(L"f", eval(lambda));
   endLexicalScope();
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
   cell* result = eval(call);
