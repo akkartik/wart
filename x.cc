@@ -22,6 +22,11 @@
                                   typedef char ascii; // must come after system includes
                                   #define char wchar_t
 
+                                  #define __unused__ __attribute__((unused))
+
+                                  bool debug = false;
+                                  #define dbg if(debug) cerr
+
                                   bool runningTests = false;
                                   int numFailures = 0;
 
@@ -37,8 +42,6 @@
                                       cerr << "  got " << (X) << endl; /* BEWARE: multiple eval */ \
                                     } \
                                     else { cerr << "."; fflush(stderr); }
-
-                                  #define __unused__ __attribute__((unused))
 
 
 
@@ -1197,6 +1200,7 @@ cell* newCell() {
     result = freelist;
     freelist = freelist->cdr;
     result->init();
+    dbg << endl << "recycling: " << result << " " << result->type << endl;
     return result;
   }
 
@@ -1229,12 +1233,14 @@ struct Table {
 
 void mkref(cell* c) {
   if (c == nil) return;
+  dbg << "mkref: " << c << " " << c->nrefs << endl;
   ++c->nrefs;
 }
 
 void rmref(cell* c) {
   if (!c) cerr << "rmref: cell should never point to NULL\n" << DIE;
   if (c == nil) return;
+  dbg << endl << "rmref: " << c << ": " << c->nrefs << " " << c->type << endl;
 
   --c->nrefs;
   if (c->nrefs > 0) return;
@@ -1246,6 +1252,7 @@ void rmref(cell* c) {
     break; // numbers don't need freeing
   case STRING:
   case SYM:
+    dbg << "  delete: " << *(string*)c->car << endl;
     delete (string*)c->car;
     break;
   case TABLE: {
@@ -1262,6 +1269,7 @@ void rmref(cell* c) {
     rmref(c->car);
   }
 
+  dbg << "  freeing " << c << endl;
   rmref(c->cdr);
 
   c->clear();
@@ -1291,12 +1299,15 @@ void test_rmref_handles_nums() {
 
                                   hash_map<long, cell*> numLiterals;
                                   cell* intern(long x) {
-                                    if (numLiterals[x])
+                                    if (numLiterals[x]) {
+                                      dbg << endl << "reuse: " << x << " " << numLiterals[x] << endl;
                                       return numLiterals[x];
+                                    }
                                     numLiterals[x] = newCell();
                                     numLiterals[x]->car = (cell*)x;
                                     numLiterals[x]->type = NUM;
                                     mkref(numLiterals[x]);
+                                    dbg << endl << "new: " << x << " " << numLiterals[x] << endl;
                                     return numLiterals[x];
                                   }
 
@@ -1342,9 +1353,12 @@ bool isAtom(cell* x) {
 
                                   StringMap<cell*> stringLiterals;
                                   cell* intern(string x) {
-                                    if (stringLiterals[x])
+                                    if (stringLiterals[x]) {
+                                      dbg << endl << "reuse: " << x << endl;
                                       return stringLiterals[x];
+                                    }
                                     stringLiterals[x] = newCell();
+                                    dbg << endl << "new: " << x << " " << stringLiterals[x] << endl;
                                     stringLiterals[x]->car = (cell*)new string(x); // not aligned like cells; can fragment memory
                                     mkref(stringLiterals[x]);
                                     return stringLiterals[x];
@@ -1873,6 +1887,7 @@ void test_build_handles_quotes() {
                                   void newLexicalScope() {
                                     cell* oldScope = currLexicalScopes.top();
                                     cell* newScope = newTable();
+                                    dbg << "new lexical scope: " << newScope << endl;
                                     setCdr(newScope, oldScope);
                                     mkref(newScope);
                                     assignDynamicVar(newSym(L"currLexicalScope"), newScope);
@@ -1882,6 +1897,7 @@ void test_build_handles_quotes() {
                                     cell* currScope = currLexicalScopes.top();
                                     if (currScope == nil)
                                       cerr << "No lexical scope to end" << endl << DIE;
+                                    dbg << "end lexical scope: " << currScope << endl;
                                     cell* oldScope = currScope->cdr;
                                     setCdr(currScope, nil);
                                     rmref(currScope);
