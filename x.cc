@@ -2100,22 +2100,21 @@ cell* eval(cell* expr) {
 
   newDynamicScope(L"currLexicalScope", lambda->cdr->cdr->cdr);
 
-    // add lexical scope, throw param bindings on it
-    newLexicalScope();
-    for (list<cell*>::iterator p = args.begin(); p != args.end(); ++p, sig = sig->cdr) {
-      addLexicalBinding(sig->car, *p);
-    }
+  // add lexical scope, throw param bindings on it
+  newLexicalScope();
+  for (list<cell*>::iterator p = args.begin(); p != args.end(); ++p, sig = sig->cdr)
+    addLexicalBinding(sig->car, *p);
 
-      // eval all forms in body; save result of final form
-      cell* body = lambda->cdr->cdr->car;
-      cell* result = nil;
-      for (cell* form = body->car; form != nil; form = form->cdr) {
-        rmref(result);
-        result = eval(form);
-      }
-      rmref(lambda);
+  // eval all forms in body; save result of final form
+  cell* body = lambda->cdr->cdr->car;
+  cell* result = nil;
+  for (cell* form = body->car; form != nil; form = form->cdr) {
+    rmref(result);
+    result = eval(form);
+  }
+  rmref(lambda);
 
-    endLexicalScope();
+  endLexicalScope();
   endDynamicScope(newSym(L"currLexicalScope"));
   return result;
 }
