@@ -2076,6 +2076,7 @@ cell* eval(cell* expr) {
   }
 
   cell* lambda = eval(expr->car);
+  mkref(lambda);
   // eval args based on current scope; skip eval based on sig
   // new dynamic binding for currLexicalScope from lambda
   // add lexical scope, throw param bindings on it
@@ -2192,6 +2193,19 @@ void test_eval_expands_syms_in_lambda_bodies() {
   check_eq(result, newNum(34));
   endDynamicScope(newSym(L"a"));
   rmref(cells.front());
+  rmref(result);
+  clearLiteralTables();
+}
+
+void test_eval_handles_assigned_lambda_calls() {
+  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)"))))).front();
+  newDynamicScope(newSym(L"f"), eval(lambda));
+    list<cell*> cells2 = buildCells(parse(parenthesize(tokenize(teststream(L"(f)")))));
+    cell* result = eval(cells2.front());
+    check_eq(result, newNum(34));
+  endDynamicScope(newSym(L"f"));
+  rmref(lambda);
+  rmref(cells2.front());
   rmref(result);
   clearLiteralTables();
 }
