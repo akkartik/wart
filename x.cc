@@ -2110,8 +2110,13 @@ cell* eval(cell* expr) {
 
   // add lexical scope, throw param bindings on it
   newLexicalScope();
-  for (list<cell*>::iterator p = args.begin(); p != args.end(); ++p, sig = sig->cdr)
-    addLexicalBinding(sig->car, *p);
+  cell* param = sig;
+  for (list<cell*>::iterator p = args.begin(); p != args.end(); ++p, param = param->cdr) {
+    cell* tt = param;
+    if (isCons(param->car) && toString(param->car->car) == L"'")
+      tt = param->car->cdr;
+    addLexicalBinding(tt->car, *p);
+  }
 
   // eval all forms in body; save result of final form
   cell* body = lambda->cdr->cdr->car;
