@@ -1539,6 +1539,14 @@ cell* buildCell(AstNode n) {
     return newSym(n.atom.token);
   }
 
+  if (n.elems.size() == 2 && (n.elems.front() == L"'" || n.elems.front() == L"`")
+      && n.elems.back().isAtom()) {
+    cell* newForm = newCell();
+    setCar(newForm, buildCell(n.elems.front()));
+    setCdr(newForm, buildCell(n.elems.back()));
+    return newForm;
+  }
+
   cell* newForm = NULL;
   cell* curr = NULL;
   for (list<AstNode>::iterator q = n.elems.begin(); q != n.elems.end(); ++q) {
@@ -1592,6 +1600,29 @@ void test_build_handles_number() {
   check(isNum(cells.front()));
   check_eq(toNum(cells.front()), 34);
   check_eq(cells.front()->nrefs, 1);
+  clearLiteralTables();
+}
+
+void test_build_handles_symbol() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"a")))));
+  check_eq(cells.size(), 1);
+  check(isSym(cells.front()));
+  check_eq(toString(cells.front()), L"a");
+  check_eq(cells.front()->nrefs, 1);
+  clearLiteralTables();
+}
+
+void test_build_handles_quoted_symbol() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'a")))));
+  check_eq(cells.size(), 1);
+  check(isCons(cells.front()));
+  check(isSym(cells.front()->car));
+  check_eq(toString(cells.front()->car), L"'");
+  check_eq(cells.front()->car->nrefs, 2);
+  check(isSym(cells.front()->cdr));
+  check_eq(toString(cells.front()->cdr), L"a");
+  check_eq(cells.front()->cdr->nrefs, 2);
+  rmref(cells.front());
   clearLiteralTables();
 }
 
