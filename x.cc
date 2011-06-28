@@ -1321,12 +1321,13 @@ long toNum(cell* x) {
 }
 
 bool isCons(cell* x) {
-  return x != nil && x->type != NUM && x->type != STRING && x->type != SYM;
+  return x != nil && x->type == CONS;
 }
 
 bool isAtom(cell* x) {
-  return !isCons(x);
+  return x->type != CONS && x->type != TABLE;
 }
+
                                   struct strEq {
                                     bool operator() (const string& s1, const string& s2) const {
                                       return s1 == s2;
