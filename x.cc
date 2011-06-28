@@ -2121,12 +2121,12 @@ void test_lower_lexical_scopes_are_available() {
                                     return cdr(cdr(lambda));
                                   }
 
-                                  cell* callee_body(cell* call) {
-                                    return car(cdr(cdr(call)));
+                                  cell* callee_body(cell* callee) {
+                                    return car(cdr(cdr(callee)));
                                   }
 
-                                  cell* callee_env(cell* call) {
-                                    return cdr(cdr(cdr(call)));
+                                  cell* callee_env(cell* callee) {
+                                    return cdr(cdr(cdr(callee)));
                                   }
 
                                   cell* call_args(cell* call) {
