@@ -1421,7 +1421,7 @@ bool isTable(cell* x) {
 
 
 void setCar(cell* x, cell* y) {
-  if (x->car != nil)
+  if (isCons(car(x)))
     rmref(x->car);
   x->car = y;
   mkref(y);
