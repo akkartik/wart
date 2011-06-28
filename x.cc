@@ -2125,6 +2125,12 @@ void test_lower_lexical_scopes_are_available() {
                                     return isCons(cell) && cell->car == newSym(L"'");
                                   }
 
+                                  cell* unQuote(cell* cell) {
+                                    if (isQuoted(cell))
+                                      return cell->cdr;
+                                    return cell;
+                                  }
+
 cell* eval(cell* expr) {
   if (!expr)
     cerr << "eval: cell should never be NULL" << endl << DIE;
@@ -2161,9 +2167,8 @@ cell* eval(cell* expr) {
   bool quoted = isQuoted(sig(lambda));
   cell* param = quoted ? sig(lambda)->cdr : sig(lambda);
   for (cell* arg=expr->cdr; arg != nil; arg=arg->cdr, param=param->cdr) {
-    cell* lhs = isQuoted(param->car) ? param->car->cdr->car : param->car;
     cell* rhs = (quoted || isQuoted(param->car)) ? arg->car : eval(arg->car);
-    addLexicalBinding(newScope, lhs, rhs);
+    addLexicalBinding(newScope, unQuote(param->car), rhs);
   }
 
   // swap in the function's lexical environment
