@@ -2125,10 +2125,6 @@ void test_lower_lexical_scopes_are_available() {
                                     return isCons(cell) && cell->car == newSym(L"'");
                                   }
 
-                                  bool single(cell* cell) {
-                                    return cell->cdr == nil;
-                                  }
-
 cell* eval(cell* expr) {
   if (!expr)
     cerr << "eval: cell should never be NULL" << endl << DIE;
@@ -2140,7 +2136,7 @@ cell* eval(cell* expr) {
     return expr;
 
   if (isQuoted(expr))
-    return single(expr->cdr) ? expr->cdr->car : expr->cdr;
+    return expr->cdr;
 
   // lambda expressions get the current lexical scope attached to them
   if (expr->car == newSym(L"lambda")) {
