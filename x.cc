@@ -2129,6 +2129,9 @@ cell* eval(cell* expr) {
   if (!expr)
     cerr << "eval: cell should never be NULL" << endl << DIE;
 
+  if (expr == nil)
+    return nil;
+
   if (isSym(expr))
     return lookup(expr);
 
