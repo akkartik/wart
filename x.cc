@@ -2109,11 +2109,11 @@ void test_lower_lexical_scopes_are_available() {
                                     return lambda->cdr->cdr;
                                   }
 
-                                  cell* call_body(cell* call) {
+                                  cell* callee_body(cell* call) {
                                     return call->cdr->cdr->car;
                                   }
 
-                                  cell* env(cell* call) {
+                                  cell* callee_env(cell* call) {
                                     return call->cdr->cdr->cdr;
                                   }
 
@@ -2172,13 +2172,13 @@ cell* eval(cell* expr) {
   }
 
   // swap in the function's lexical environment
-  newDynamicScope(L"currLexicalScope", env(lambda));
+  newDynamicScope(L"currLexicalScope", callee_env(lambda));
   // throw the new scope on it
   newLexicalScope(newScope);
 
   // eval all forms in body; save result of final form
   cell* result = nil;
-  for (cell* form = call_body(lambda)->car; form != nil; form = form->cdr) {
+  for (cell* form = callee_body(lambda)->car; form != nil; form = form->cdr) {
     rmref(result);
     result = eval(form);
   }
