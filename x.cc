@@ -2129,10 +2129,6 @@ void test_lower_lexical_scopes_are_available() {
                                     return cdr(cdr(cdr(call)));
                                   }
 
-                                  cell* args(cell* call) {
-                                    return car(cdr(call));
-                                  }
-
                                   bool isQuoted(cell* cell) {
                                     return isCons(cell) && car(cell) == newSym(L"'");
                                   }
