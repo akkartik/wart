@@ -1420,16 +1420,28 @@ bool isTable(cell* x) {
 
 
 
+cell* car(cell* x) {
+  if (x->type != CONS) {
+    cerr << "car of non-cons" << endl;
+    return nil;
+  }
+  return x->car;
+}
+
+cell* cdr(cell* x) {
+  return x->cdr;
+}
+
 void setCar(cell* x, cell* y) {
   if (isCons(car(x)))
-    rmref(x->car);
+    rmref(car(x));
   x->car = y;
   mkref(y);
 }
 
 void setCdr(cell* x, cell* y) {
-  if (x->cdr != nil)
-    rmref(x->cdr);
+  if (cdr(x) != nil)
+    rmref(cdr(x));
   x->cdr = y;
   mkref(y);
 }
@@ -1495,11 +1507,11 @@ cell* get(cell* t, cell* k) {
                                       os << toString(c); break;
                                     case TABLE:
                                       os << (Table*)c->car;
-                                      os << c->cdr;
+                                      os << cdr(c);
                                       break;
                                     case CONS:
                                     default:
-                                      os << L"<" << c->car << " . " << c->cdr << L">";
+                                      os << L"<" << car(c) << " . " << cdr(c) << L">";
                                     }
                                     return os;
                                   }
@@ -1568,7 +1580,7 @@ cell* buildCell(AstNode n) {
     }
     else {
       setCdr(curr, newCell());
-      curr = curr->cdr;
+      curr = cdr(curr);
     }
 
     setCar(curr, buildCell(*q));
@@ -1617,12 +1629,12 @@ void test_build_handles_quoted_symbol() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'a")))));
   check_eq(cells.size(), 1);
   check(isCons(cells.front()));
-  check(isSym(cells.front()->car));
-  check_eq(toString(cells.front()->car), L"'");
-  check_eq(cells.front()->car->nrefs, 2);
-  check(isSym(cells.front()->cdr));
-  check_eq(toString(cells.front()->cdr), L"a");
-  check_eq(cells.front()->cdr->nrefs, 2);
+  check(isSym(car(cells.front())));
+  check_eq(toString(car(cells.front())), L"'");
+  check_eq(car(cells.front())->nrefs, 2);
+  check(isSym(car(cells.front())));
+  check_eq(toString(cdr(cells.front())), L"a");
+  check_eq(cdr(cells.front())->nrefs, 2);
   rmref(cells.front());
   clearLiteralTables();
 }
@@ -1634,13 +1646,13 @@ void test_build_handles_multiple_atoms() {
   check(isNum(c));
   check_eq(toNum(c), 34);
   check_eq(c->nrefs, 1);
-  check_eq(c->cdr, nil);
+  check_eq(cdr(c), nil);
 
   c = cells.back();
   check(isNum(c));
   check_eq(toNum(c), 35);
   check_eq(c->nrefs, 1);
-  check_eq(c->cdr, nil);
+  check_eq(cdr(c), nil);
 
   clearLiteralTables();
 }
@@ -1651,17 +1663,17 @@ void test_build_handles_form() {
   cell* c = cells.front();
   check(isCons(c));
   check_eq(c->nrefs, 0);
-  check(isNum(c->car));
-  check_eq(toNum(c->car), 34);
-  check_eq(c->car->nrefs, 2);
+  check(isNum(car(c)));
+  check_eq(toNum(car(c)), 34);
+  check_eq(car(c)->nrefs, 2);
 
-  c = c->cdr;
+  c = cdr(c);
   check(isCons(c));
   check_eq(c->nrefs, 1);
-  check(isNum(c->car));
-  check_eq(toNum(c->car), 35);
-  check_eq(c->car->nrefs, 2);
-  check_eq(c->cdr, nil);
+  check(isNum(car(c)));
+  check_eq(toNum(car(c)), 35);
+  check_eq(car(c)->nrefs, 2);
+  check_eq(cdr(c), nil);
 
   rmref(cells.front());
   clearLiteralTables();
@@ -1673,11 +1685,11 @@ void test_build_handles_dot() {
   cell* c = cells.front();
   check(isCons(c));
   check_eq(c->nrefs, 0);
-  check(isNum(c->car));
-  check_eq(toNum(c->car), 34);
-  check_eq(c->car->nrefs, 2);
+  check(isNum(car(c)));
+  check_eq(toNum(car(c)), 34);
+  check_eq(car(c)->nrefs, 2);
 
-  c = c->cdr;
+  c = cdr(c);
   check(isNum(c));
   check_eq(toNum(c), 35);
   check_eq(c->nrefs, 2);
@@ -1692,21 +1704,21 @@ void test_build_handles_nested_form() {
   cell* c = cells.front();
   check(isCons(c));
   check_eq(c->nrefs, 0);
-  check(isNum(c->car));
-  check_eq(toNum(c->car), 3);
-  check_eq(c->car->nrefs, 2);
+  check(isNum(car(c)));
+  check_eq(toNum(car(c)), 3);
+  check_eq(car(c)->nrefs, 2);
 
-  c = c->cdr;
+  c = cdr(c);
   check(isCons(c));
   check_eq(c->nrefs, 1);
-  check(isNum(c->car));
-  check_eq(toNum(c->car), 7);
-  check_eq(c->car->nrefs, 2);
+  check(isNum(car(c)));
+  check_eq(toNum(car(c)), 7);
+  check_eq(car(c)->nrefs, 2);
 
-  c = c->cdr;
+  c = cdr(c);
   check(isCons(c));
   check_eq(c->nrefs, 1);
-    cell* c2 = c->car;
+    cell* c2 = car(c);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
     check(isNum(c2->car));
@@ -1719,7 +1731,7 @@ void test_build_handles_nested_form() {
     check_eq(toNum(c2->car), 23);
     check_eq(c2->car->nrefs, 2);
     check_eq(c2->cdr, nil);
-  check_eq(c->cdr, nil);
+  check_eq(cdr(c), nil);
 
   rmref(cells.front());
   clearLiteralTables();
@@ -1731,19 +1743,19 @@ void test_build_handles_strings() {
   cell* c = cells.front();
   check(isCons(c));
   check_eq(c->nrefs, 0);
-  check(isNum(c->car));
-  check_eq(toNum(c->car), 3);
-  check_eq(c->car->nrefs, 2);
-  c = c->cdr;
+  check(isNum(car(c)));
+  check_eq(toNum(car(c)), 3);
+  check_eq(car(c)->nrefs, 2);
+  c = cdr(c);
   check(isCons(c));
   check_eq(c->nrefs, 1);
-  check(isNum(c->car));
-  check_eq(toNum(c->car), 7);
-  check_eq(c->car->nrefs, 2);
-  c = c->cdr;
+  check(isNum(car(c)));
+  check_eq(toNum(car(c)), 7);
+  check_eq(car(c)->nrefs, 2);
+  c = cdr(c);
   check(isCons(c));
   check_eq(c->nrefs, 1);
-    cell* c2 = c->car;
+    cell* c2 = car(c);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
     check(isNum(c2->car));
@@ -1762,7 +1774,7 @@ void test_build_handles_strings() {
     check_eq(toNum(c2->car), 23);
     check_eq(c2->car->nrefs, 2);
     check_eq(c2->cdr, nil);
-  check_eq(c->cdr, nil);
+  check_eq(cdr(c), nil);
 
   rmref(cells.front());
   clearLiteralTables();
@@ -1774,18 +1786,18 @@ void test_build_handles_syms() {
   cell* c = cells.front();
   check(isCons(c));
   check_eq(c->nrefs, 0);
-  check(isNum(c->car));
-  check_eq(toNum(c->car), 3);
-  check_eq(c->car->nrefs, 2);
-  c = c->cdr;
+  check(isNum(car(c)));
+  check_eq(toNum(car(c)), 3);
+  check_eq(car(c)->nrefs, 2);
+  c = cdr(c);
   check(isCons(c));
   check_eq(c->nrefs, 1);
-  check(isNum(c->car));
-  check_eq(toNum(c->car), 7);
-  check_eq(c->car->nrefs, 2);
-  c = c->cdr;
+  check(isNum(car(c)));
+  check_eq(toNum(car(c)), 7);
+  check_eq(car(c)->nrefs, 2);
+  c = cdr(c);
   check(isCons(c));
-    cell* c2 = c->car;
+    cell* c2 = car(c);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
     check(isNum(c2->car));
@@ -1810,7 +1822,7 @@ void test_build_handles_syms() {
     check_eq(toNum(c2->car), 23);
     check_eq(c2->car->nrefs, 2);
     check_eq(c2->cdr, nil);
-  check_eq(c->cdr, nil);
+  check_eq(cdr(c), nil);
 
   rmref(cells.front());
   clearLiteralTables();
@@ -1822,18 +1834,18 @@ void test_build_handles_quotes() {
   cell* c = cells.front();
   check(isCons(c));
   check_eq(c->nrefs, 0);
-  check(isSym(c->car));
-  check_eq(toString(c->car), L"`");
-  check_eq(c->car->nrefs, 2);
-  c = c->cdr;
+  check(isSym(car(c)));
+  check_eq(toString(car(c)), L"`");
+  check_eq(car(c)->nrefs, 2);
+  c = cdr(c);
   check(isCons(c));
   check_eq(c->nrefs, 1);
-  check(isNum(c->car));
-  check_eq(toNum(c->car), 34);
-  check_eq(c->car->nrefs, 2);
-  c = c->cdr;
+  check(isNum(car(c)));
+  check_eq(toNum(car(c)), 34);
+  check_eq(car(c)->nrefs, 2);
+  c = cdr(c);
   check(isCons(c));
-    cell* c2 = c->car;
+    cell* c2 = car(c);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
     check(isSym(c2->car));
@@ -1846,7 +1858,7 @@ void test_build_handles_quotes() {
     check_eq(toNum(c2->car), 35);
     check_eq(c2->car->nrefs, 2);
     check_eq(c2->cdr, nil);
-  check_eq(c->cdr, nil);
+  check_eq(cdr(c), nil);
 
   rmref(cells.front());
   clearLiteralTables();
@@ -2102,32 +2114,32 @@ void test_lower_lexical_scopes_are_available() {
 
 
                                   cell* sig(cell* lambda) {
-                                    return lambda->cdr->car;
+                                    return car(cdr(lambda));
                                   }
 
                                   cell* body(cell* lambda) {
-                                    return lambda->cdr->cdr;
+                                    return cdr(cdr(lambda));
                                   }
 
                                   cell* callee_body(cell* call) {
-                                    return call->cdr->cdr->car;
+                                    return car(cdr(cdr(call)));
                                   }
 
                                   cell* callee_env(cell* call) {
-                                    return call->cdr->cdr->cdr;
+                                    return cdr(cdr(cdr(call)));
                                   }
 
                                   cell* args(cell* call) {
-                                    return call->cdr->car;
+                                    return car(cdr(call));
                                   }
 
                                   bool isQuoted(cell* cell) {
-                                    return isCons(cell) && cell->car == newSym(L"'");
+                                    return isCons(cell) && car(cell) == newSym(L"'");
                                   }
 
                                   cell* unQuote(cell* cell) {
                                     if (isQuoted(cell))
-                                      return cell->cdr;
+                                      return cdr(cell);
                                     return cell;
                                   }
 
@@ -2148,27 +2160,27 @@ cell* eval(cell* expr) {
     return expr->cdr;
 
   // lambda expressions get the current lexical scope attached to them
-  if (expr->car == newSym(L"lambda")) {
+  if (car(expr) == newSym(L"lambda")) {
     cell* ans = newCell();
-    setCar(ans, expr->car);
+    setCar(ans, car(expr));
     setCdr(ans, newCell());
-    setCar(ans->cdr, sig(expr));
-    setCdr(ans->cdr, newCell());
-    setCar(ans->cdr->cdr, body(expr));
-    setCdr(ans->cdr->cdr, currLexicalScopes.top());
+    setCar(cdr(ans), sig(expr));
+    setCdr(cdr(ans), newCell());
+    setCar(cdr(cdr(ans)), body(expr));
+    setCdr(cdr(cdr(ans)), currLexicalScopes.top());
     return ans;
   }
 
-  cell* lambda = eval(expr->car);
+  cell* lambda = eval(car(expr));
   mkref(lambda);
 
   // construct a new scope with args based on current scope and sig
   cell* newScope = newTable();
   bool quoted = isQuoted(sig(lambda));
-  cell* param = quoted ? sig(lambda)->cdr : sig(lambda);
-  for (cell* arg=expr->cdr; arg != nil; arg=arg->cdr, param=param->cdr) {
-    cell* rhs = (quoted || isQuoted(param->car)) ? arg->car : eval(arg->car);
-    addLexicalBinding(newScope, unQuote(param->car), rhs);
+  cell* param = quoted ? cdr(sig(lambda)) : sig(lambda);
+  for (cell* arg=cdr(expr); arg != nil; arg=cdr(arg), param=cdr(param)) {
+    cell* rhs = (quoted || isQuoted(car(param))) ? car(arg) : eval(car(arg));
+    addLexicalBinding(newScope, unQuote(car(param)), rhs);
   }
 
   // swap in the function's lexical environment
@@ -2178,7 +2190,7 @@ cell* eval(cell* expr) {
 
   // eval all forms in body; save result of final form
   cell* result = nil;
-  for (cell* form = callee_body(lambda)->car; form != nil; form = form->cdr) {
+  for (cell* form = car(callee_body(lambda)); form != nil; form = cdr(form)) {
     rmref(result);
     result = eval(form);
   }
@@ -2226,10 +2238,10 @@ void test_eval_handles_quoted_atoms() {
 void test_eval_handles_quoted_lists() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'(a b)")))));
   cell* c = eval(cells.front());
-  check_eq(c->car, newSym(L"a"));
-  c = c->cdr;
-  check_eq(c->car, newSym(L"b"));
-  check_eq(c->cdr, nil);
+  check_eq(car(c), newSym(L"a"));
+  c = cdr(c);
+  check_eq(car(c), newSym(L"b"));
+  check_eq(cdr(c), nil);
   rmref(cells.front());
   clearLiteralTables();
 }
@@ -2258,10 +2270,10 @@ void test_eval_handles_closure() {
     check_eq(newLexicalScope->nrefs, 3);
   endLexicalScope();
   check_eq(newLexicalScope->nrefs, 1);
-  check_eq(c->car, newSym(L"lambda"));
-  check_eq(c->cdr->car, nil);
-  check_eq(c->cdr->cdr->car->car, newNum(34));
-  check_eq(c->cdr->cdr->cdr, newLexicalScope);
+  check_eq(car(c), newSym(L"lambda"));
+  check_eq(car(cdr(c)), nil);
+  check_eq(car(car(cdr(cdr(c)))), newNum(34));
+  check_eq(cdr(cdr(cdr(c))), newLexicalScope);
   rmref(c);
   check_eq(newLexicalScope->nrefs, 0);
   rmref(cells.front());
