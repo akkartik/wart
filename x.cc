@@ -2129,6 +2129,10 @@ void test_lower_lexical_scopes_are_available() {
                                     return cdr(cdr(cdr(call)));
                                   }
 
+                                  cell* call_args(cell* call) {
+                                    return cdr(call);
+                                  }
+
                                   bool isQuoted(cell* cell) {
                                     return isCons(cell) && car(cell) == newSym(L"'");
                                   }
@@ -2174,7 +2178,7 @@ cell* eval(cell* expr) {
   cell* newScope = newTable();
   bool quoted = isQuoted(sig(lambda));
   cell* param = quoted ? cdr(sig(lambda)) : sig(lambda);
-  for (cell* arg=cdr(expr); arg != nil; arg=cdr(arg), param=cdr(param)) {
+  for (cell* arg=call_args(expr); arg != nil; arg=cdr(arg), param=cdr(param)) {
     cell* rhs = (quoted || isQuoted(car(param))) ? car(arg) : eval(car(arg));
     addLexicalBinding(newScope, unQuote(car(param)), rhs);
   }
