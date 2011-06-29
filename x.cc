@@ -1186,6 +1186,7 @@ Heap* currHeap = new Heap();
 cell* currCell = &currHeap->cells[0];
 cell* heapEnd = &currHeap->cells[HEAPCELLS];
 cell* freelist = NULL;
+cell* postinitCell = NULL;
 
 void growHeap() {
   currHeap = currHeap->next = new Heap();
@@ -1211,6 +1212,15 @@ cell* newCell() {
   ++currCell;
   return result;
 }
+
+void checkUnfreed() {
+  int n = currCell-postinitCell;
+  for (; freelist; freelist = freelist->cdr)
+    --n;
+  if (n > 0) cerr << n << " cells unfreed" << endl;
+}
+
+                                  extern void resetState();
 
 void test_newCell_has_nil_car_and_cdr() {
   check_eq(newCell()->car, nil);
@@ -1280,6 +1290,7 @@ void test_rmref_frees_space() {
   rmref(c);
   check(!c->car);
   check_eq(freelist, c);
+  resetState();
 }
 
 void test_rmref_handles_nums() {
@@ -1289,6 +1300,7 @@ void test_rmref_handles_nums() {
   rmref(c);
   check(!c->car);
   check_eq(freelist, c);
+  resetState();
 }
 
 
@@ -1377,8 +1389,6 @@ bool isAtom(cell* x) {
                                         rmref(p->second);
                                     }
                                     stringLiterals.clear();
-                                    extern void setupLexicalScope();
-                                    setupLexicalScope();
                                   }
 
 cell* newSym(string x) {
@@ -1593,19 +1603,19 @@ cell* buildCell(AstNode n) {
 void test_build_handles_empty_input() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"")))));
   check(cells.empty());
-  clearLiteralTables();
+  resetState();
 }
 
 void test_build_handles_nil() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
   check_eq(cells.front(), nil);
-  clearLiteralTables();
+  resetState();
 }
 
 void test_build_handles_nil2() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"nil")))));
   check_eq(cells.front(), nil);
-  clearLiteralTables();
+  resetState();
 }
 
 void test_build_handles_number() {
@@ -1614,7 +1624,7 @@ void test_build_handles_number() {
   check(isNum(cells.front()));
   check_eq(toNum(cells.front()), 34);
   check_eq(cells.front()->nrefs, 1);
-  clearLiteralTables();
+  resetState();
 }
 
 void test_build_handles_symbol() {
@@ -1623,7 +1633,7 @@ void test_build_handles_symbol() {
   check(isSym(cells.front()));
   check_eq(toString(cells.front()), L"a");
   check_eq(cells.front()->nrefs, 1);
-  clearLiteralTables();
+  resetState();
 }
 
 void test_build_handles_quoted_symbol() {
@@ -1637,7 +1647,7 @@ void test_build_handles_quoted_symbol() {
   check_eq(toString(cdr(cells.front())), L"a");
   check_eq(cdr(cells.front())->nrefs, 2);
   rmref(cells.front());
-  clearLiteralTables();
+  resetState();
 }
 
 void test_build_handles_multiple_atoms() {
@@ -1655,7 +1665,7 @@ void test_build_handles_multiple_atoms() {
   check_eq(c->nrefs, 1);
   check_eq(cdr(c), nil);
 
-  clearLiteralTables();
+  resetState();
 }
 
 void test_build_handles_form() {
@@ -1677,7 +1687,7 @@ void test_build_handles_form() {
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
-  clearLiteralTables();
+  resetState();
 }
 
 void test_build_handles_dot() {
@@ -1696,7 +1706,7 @@ void test_build_handles_dot() {
   check_eq(c->nrefs, 2);
 
   rmref(cells.front());
-  clearLiteralTables();
+  resetState();
 }
 
 void test_build_handles_nested_form() {
@@ -1735,7 +1745,7 @@ void test_build_handles_nested_form() {
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
-  clearLiteralTables();
+  resetState();
 }
 
 void test_build_handles_strings() {
@@ -1778,7 +1788,7 @@ void test_build_handles_strings() {
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
-  clearLiteralTables();
+  resetState();
 }
 
 void test_build_handles_syms() {
@@ -1826,7 +1836,7 @@ void test_build_handles_syms() {
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
-  clearLiteralTables();
+  resetState();
 }
 
 void test_build_handles_quotes() {
@@ -1862,7 +1872,7 @@ void test_build_handles_quotes() {
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
-  clearLiteralTables();
+  resetState();
 }
 
 
@@ -1983,7 +1993,7 @@ void test_lookup_returns_dynamic_binding() {
   endDynamicScope(sym);
   check_eq(sym->nrefs, 1);
   check_eq(val->nrefs, 1);
-  clearLiteralTables();
+  resetState();
 }
 
 void test_lookup_returns_lexical_binding() {
@@ -1999,7 +2009,7 @@ void test_lookup_returns_lexical_binding() {
   endLexicalScope();
   check_eq(sym->nrefs, 1);
   check_eq(val->nrefs, 1);
-  clearLiteralTables();
+  resetState();
 }
 
 void test_lexical_binding_always_overrides_dynamic() {
@@ -2029,7 +2039,7 @@ void test_lexical_binding_always_overrides_dynamic() {
   check_eq(sym->nrefs, 1);
   check_eq(val->nrefs, 1);
   check_eq(dynVal->nrefs, 1);
-  clearLiteralTables();
+  resetState();
 }
 
 void test_nil_lexical_binding_works() {
@@ -2042,7 +2052,7 @@ void test_nil_lexical_binding_works() {
         check_eq(lookup(sym), nil);
     endLexicalScope();
   endDynamicScope(sym);
-  clearLiteralTables();
+  resetState();
 }
 
 void test_lexical_scopes_nest_correctly() {
@@ -2094,7 +2104,7 @@ void test_lexical_scopes_nest_correctly() {
   check_eq(val->nrefs, 1);
   check_eq(val2->nrefs, 1);
   check_eq(dynVal->nrefs, 1);
-  clearLiteralTables();
+  resetState();
 }
 
 void test_lower_lexical_scopes_are_available() {
@@ -2109,7 +2119,7 @@ void test_lower_lexical_scopes_are_available() {
         check_eq(lookup(sym), val);
       endLexicalScope();
   endLexicalScope();
-  clearLiteralTables();
+  resetState();
 }
 
 
@@ -2191,7 +2201,7 @@ void test_bindArgs_handles_vararg() {
   rmref(result);
   rmref(args);
   rmref(params);
-  clearLiteralTables();
+  resetState();
 }
 
 cell* eval(cell* expr) {
@@ -2249,7 +2259,7 @@ void test_nil_evals_to_itself() {
   check_eq(cells.size(), 1);
   check_eq(eval(cells.front()), nil);
   rmref(cells.front());
-  clearLiteralTables();
+  resetState();
 }
 
 void test_num_evals_to_itself() {
@@ -2257,7 +2267,7 @@ void test_num_evals_to_itself() {
   check_eq(cells.size(), 1);
   check_eq(eval(cells.front()), cells.front());
   rmref(cells.front());
-  clearLiteralTables();
+  resetState();
 }
 
 void test_string_evals_to_itself() {
@@ -2265,7 +2275,7 @@ void test_string_evals_to_itself() {
   check_eq(cells.size(), 1);
   check_eq(eval(cells.front()), cells.front());
   rmref(cells.front());
-  clearLiteralTables();
+  resetState();
 }
 
 void test_eval_handles_quoted_atoms() {
@@ -2275,7 +2285,7 @@ void test_eval_handles_quoted_atoms() {
   check_eq(eval(cells.back()), newNum(34));
   rmref(cells.front());
   rmref(cells.back());
-  clearLiteralTables();
+  resetState();
 }
 
 void test_eval_handles_quoted_lists() {
@@ -2286,7 +2296,7 @@ void test_eval_handles_quoted_lists() {
   check_eq(car(c), newSym(L"b"));
   check_eq(cdr(c), nil);
   rmref(cells.front());
-  clearLiteralTables();
+  resetState();
 }
 
 void test_eval_handles_simple_lambda() {
@@ -2300,7 +2310,7 @@ void test_eval_handles_simple_lambda() {
   check_eq(lambda->cdr->cdr->cdr, nil);
   rmref(cells.front());
   rmref(lambda);
-  clearLiteralTables();
+  resetState();
 }
 
 void test_eval_handles_closure() {
@@ -2320,7 +2330,7 @@ void test_eval_handles_closure() {
   rmref(c);
   check_eq(newLexicalScope->nrefs, 0);
   rmref(cells.front());
-  clearLiteralTables();
+  resetState();
 }
 
 void test_eval_handles_lambda_calls() {
@@ -2329,7 +2339,7 @@ void test_eval_handles_lambda_calls() {
   check_eq(result, newNum(34));
   rmref(call);
   rmref(result);
-  clearLiteralTables();
+  resetState();
 }
 
 void test_eval_expands_syms_in_lambda_bodies() {
@@ -2340,7 +2350,7 @@ void test_eval_expands_syms_in_lambda_bodies() {
   endDynamicScope(newSym(L"a"));
   rmref(lambda);
   rmref(result);
-  clearLiteralTables();
+  resetState();
 }
 
 void test_eval_handles_assigned_lambda_calls() {
@@ -2353,7 +2363,7 @@ void test_eval_handles_assigned_lambda_calls() {
   rmref(result);
   rmref(call);
   rmref(lambda);
-  clearLiteralTables();
+  resetState();
 }
 
 void test_eval_expands_lexically_scoped_syms_in_lambda_bodies() {
@@ -2365,7 +2375,7 @@ void test_eval_expands_lexically_scoped_syms_in_lambda_bodies() {
   endLexicalScope();
   rmref(result);
   rmref(call);
-  clearLiteralTables();
+  resetState();
 }
 
 void test_eval_expands_syms_in_original_lexical_scope() {
@@ -2383,7 +2393,7 @@ void test_eval_expands_syms_in_original_lexical_scope() {
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
   endDynamicScope(newSym(L"a"));
-  clearLiteralTables();
+  resetState();
 }
 
 void test_eval_expands_args_in_caller_scope() {
@@ -2401,7 +2411,7 @@ void test_eval_expands_args_in_caller_scope() {
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
   endDynamicScope(newSym(L"a"));
-  clearLiteralTables();
+  resetState();
 }
 
 void test_eval_doesnt_eval_quoted_params() {
@@ -2419,7 +2429,7 @@ void test_eval_doesnt_eval_quoted_params() {
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
   endDynamicScope(newSym(L"a"));
-  clearLiteralTables();
+  resetState();
 }
 
 void test_eval_handles_quoted_param_list() {
@@ -2437,7 +2447,7 @@ void test_eval_handles_quoted_param_list() {
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
   endDynamicScope(newSym(L"a"));
-  clearLiteralTables();
+  resetState();
 }
 
 void test_eval_handles_multiple_args() {
@@ -2450,7 +2460,7 @@ void test_eval_handles_multiple_args() {
   rmref(call);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
-  clearLiteralTables();
+  resetState();
 }
 
 void test_eval_handles_multiple_body_exprs() {
@@ -2463,7 +2473,7 @@ void test_eval_handles_multiple_body_exprs() {
   rmref(call);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
-  clearLiteralTables();
+  resetState();
 }
 
 void test_eval_handles_vararg_param() {
@@ -2473,7 +2483,7 @@ void test_eval_handles_vararg_param() {
   check_eq(car(result), newNum(1));
   rmref(result);
   rmref(call);
-  clearLiteralTables();
+  resetState();
 }
 
 
@@ -2497,9 +2507,16 @@ void test_eval_handles_vararg_param() {
                                         cerr << endl;
                                   }
 
+                                  void resetState() {
+                                    clearLiteralTables();
+                                    checkUnfreed();
+                                    setupLexicalScope();
+                                  }
+
 int main(int argc, ascii* argv[]) {
   setupNil();
   setupLexicalScope();
+  postinitCell = currCell;
 
   int pass = 0;
   if (argc > 1) {
