@@ -1222,14 +1222,17 @@ void checkUnfreed() {
 
                                   extern void resetState();
 
+                                  extern void rmref(cell*);
+
 void test_newCell_has_nil_car_and_cdr() {
-  check_eq(newCell()->car, nil);
-  check_eq(newCell()->cdr, nil);
+  cell* x = newCell();
+  check_eq(x->car, nil);
+  check_eq(x->cdr, nil);
+  rmref(x);
+  resetState();
 }
 
 
-
-                                  extern void rmref(cell*);
 
 struct Table {
   hash_map<long, cell*> table;
