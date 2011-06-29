@@ -2507,6 +2507,12 @@ void test_eval_handles_vararg_param() {
                                         cerr << endl;
                                   }
 
+                                  void setupState() {
+                                    setupNil();
+                                    setupLexicalScope();
+                                    postinitCell = currCell;
+                                  }
+
                                   void resetState() {
                                     clearLiteralTables();
                                     checkUnfreed();
@@ -2514,9 +2520,7 @@ void test_eval_handles_vararg_param() {
                                   }
 
 int main(int argc, ascii* argv[]) {
-  setupNil();
-  setupLexicalScope();
-  postinitCell = currCell;
+  setupState();
 
   int pass = 0;
   if (argc > 1) {
