@@ -2146,6 +2146,15 @@ void test_lower_lexical_scopes_are_available() {
 
                                   extern cell* eval(cell*);
 
+                                  cell* eval_all(cell* arg) {
+                                    if (arg == nil) return arg;
+                                    if (!isCons(arg)) return eval(arg);
+                                    cell* result = newCell();
+                                    setCar(result, eval(car(arg)));
+                                    setCdr(result, eval_all(cdr(arg)));
+                                    return result;
+                                  }
+
 void bindArg(cell* scope, cell* param, cell* arg, bool quoted) {
   if (param == nil) return;
 
@@ -2155,7 +2164,7 @@ void bindArg(cell* scope, cell* param, cell* arg, bool quoted) {
   }
 
   if (isSym(param) || isQuoted(param)) {
-    cell* result = (quoted || isQuoted(param)) ? arg : eval(arg);
+    cell* result = (quoted || isQuoted(param)) ? arg : eval_all(arg);
     addLexicalBinding(scope, unQuote(param), result);
   }
   else {
@@ -2169,6 +2178,20 @@ cell* bindArgs(cell* params, cell* args) {
   cell* scope = newTable();
   bindArg(scope, params, args, false);
   return scope;
+}
+
+// eval each arg or not, depending on quotes in params
+// eval each arg in rest, then return a list
+void test_bindArgs_handles_vararg() {
+  cell* params = buildCells(parse(parenthesize(tokenize(teststream(L"a"))))).front();
+  cell* args = buildCells(parse(parenthesize(tokenize(teststream(L"(1)"))))).front();
+  cell* result = unsafeGet(bindArgs(params, args), newSym(L"a"));
+  check_eq(car(result), newNum(1));
+  check_eq(cdr(result), nil);
+  rmref(result);
+  rmref(args);
+  rmref(params);
+  clearLiteralTables();
 }
 
 cell* eval(cell* expr) {
@@ -2211,12 +2234,11 @@ cell* eval(cell* expr) {
 
   // eval all forms in body; save result of final form
   cell* result = nil;
-  for (cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
-    rmref(result);
+  for (cell* form = callee_body(lambda); form != nil; form = cdr(form))
     result = eval(form->car);
-  }
   rmref(lambda);
 
+  mkref(result);
   endLexicalScope();
   endDynamicScope(newSym(L"currLexicalScope"));
   return result;
@@ -2441,6 +2463,16 @@ void test_eval_handles_multiple_body_exprs() {
   rmref(call);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
+  clearLiteralTables();
+}
+
+void test_eval_handles_vararg_param() {
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda args args) 1)"))))).front();
+  cell* result = eval(call);
+  check(isCons(result));
+  check_eq(car(result), newNum(1));
+  rmref(result);
+  rmref(call);
   clearLiteralTables();
 }
 
