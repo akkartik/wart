@@ -1948,8 +1948,7 @@ void test_build_handles_quotes() {
                                     if (currScope == nil)
                                       cerr << "No lexical scope to end" << endl << DIE;
                                     dbg << "end lexical scope: " << currScope << endl;
-                                    cell* oldScope = currScope->cdr;
-                                    setCdr(currScope, nil);
+                                    cell* oldScope = cdr(currScope);
                                     rmref(currScope);
                                     assignDynamicVar(newSym(L"currLexicalScope"), oldScope);
                                   }
