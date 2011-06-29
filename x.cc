@@ -1498,6 +1498,7 @@ cell* get(cell* t, cell* k) {
                                   }
 
                                   ostream& operator<<(ostream& os, cell* c) {
+                                    if (c == NULL) return os << "NULLNULLNULL";
                                     if (c == nil) return os << "nil";
                                     switch(c->type) {
                                     case NUM:
