@@ -2144,6 +2144,33 @@ void test_lower_lexical_scopes_are_available() {
                                     return cell;
                                   }
 
+                                  extern cell* eval(cell*);
+
+void bindArg(cell* scope, cell* param, cell* arg, bool quoted) {
+  if (param == nil) return;
+
+  if (isQuoted(param)) {
+    bindArg(scope, cdr(param), arg, true);
+    return;
+  }
+
+  if (isSym(param) || isQuoted(param)) {
+    cell* result = (quoted || isQuoted(param)) ? arg : eval(arg);
+    addLexicalBinding(scope, unQuote(param), result);
+  }
+  else {
+    bindArg(scope, car(param), car(arg), quoted);
+  }
+
+  bindArg(scope, cdr(param), cdr(arg), quoted);
+}
+
+cell* bindArgs(cell* params, cell* args) {
+  cell* scope = newTable();
+  bindArg(scope, params, args, false);
+  return scope;
+}
+
 cell* eval(cell* expr) {
   if (!expr)
     cerr << "eval: cell should never be NULL" << endl << DIE;
@@ -2176,14 +2203,7 @@ cell* eval(cell* expr) {
   mkref(lambda);
 
   // construct a new scope with args based on current scope and sig
-  cell* newScope = newTable();
-  bool quoted = isQuoted(sig(lambda));
-  cell* param = quoted ? cdr(sig(lambda)) : sig(lambda);
-  for (cell* arg=call_args(expr); arg != nil; arg=cdr(arg), param=cdr(param)) {
-    cell* rhs = (quoted || isQuoted(car(param))) ? car(arg) : eval(car(arg));
-    addLexicalBinding(newScope, unQuote(car(param)), rhs);
-  }
-
+  cell* newScope = bindArgs(sig(lambda), call_args(expr));
   // swap in the function's lexical environment
   newDynamicScope(L"currLexicalScope", callee_env(lambda));
   // throw the new scope on it
