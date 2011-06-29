@@ -1954,6 +1954,7 @@ void test_build_handles_quotes() {
                                   }
 
                                   void addLexicalBinding(cell* scope, cell* sym, cell* val) {
+                                    dbg << "creating binding: " << (void*)scope << " " << sym << endl;
                                     if (unsafeGet(scope, sym)) cerr << "Can't rebind within a lexical scope" << endl << DIE;
                                     unsafeSet(scope, sym, val, false);
                                   }
