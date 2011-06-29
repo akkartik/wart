@@ -2191,9 +2191,9 @@ cell* eval(cell* expr) {
 
   // eval all forms in body; save result of final form
   cell* result = nil;
-  for (cell* form = car(callee_body(lambda)); form != nil; form = cdr(form)) {
+  for (cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
     rmref(result);
-    result = eval(form);
+    result = eval(form->car);
   }
   rmref(lambda);
 
@@ -2395,6 +2395,32 @@ void test_eval_handles_quoted_param_list() {
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
   endDynamicScope(newSym(L"a"));
+  clearLiteralTables();
+}
+
+void test_eval_handles_multiple_args() {
+  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda (a b) b)"))))).front();
+  newDynamicScope(L"f", eval(lambda));
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f 1 2)"))))).front();
+  cell* result = eval(call);
+  check_eq(result, newNum(2));
+  rmref(result);
+  rmref(call);
+  rmref(lambda);
+  endDynamicScope(newSym(L"f"));
+  clearLiteralTables();
+}
+
+void test_eval_handles_multiple_body_exprs() {
+  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 1 2)"))))).front();
+  newDynamicScope(L"f", eval(lambda));
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
+  cell* result = eval(call);
+  check_eq(result, newNum(2));
+  rmref(result);
+  rmref(call);
+  rmref(lambda);
+  endDynamicScope(newSym(L"f"));
   clearLiteralTables();
 }
 
