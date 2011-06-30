@@ -1218,7 +1218,7 @@ void checkUnfreed() {
   int n = currCell-heapStart-1; // ignore empty currLexicalScopes
   for (; freelist; freelist = freelist->cdr)
     --n;
-  if (n > 0) cerr << n << " cells unfreed" << endl;
+  check(n == 0);
 }
 
                                   extern void checkState();
