@@ -2521,6 +2521,10 @@ void test_eval_handles_vararg_param() {
                                     clearLiteralTables();
                                     checkUnfreed();
                                     setupLexicalScope();
+                                    freelist = NULL;
+                                    for(cell* curr=currCell; curr >= postinitCell; --curr)
+                                      curr->init();
+                                    currCell = postinitCell;
                                   }
 
 int main(int argc, ascii* argv[]) {
