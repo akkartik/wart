@@ -1183,10 +1183,10 @@ struct Heap {
 };
 
 Heap* currHeap = new Heap();
-cell* currCell = &currHeap->cells[0];
+cell* heapStart = &currHeap->cells[0];
 cell* heapEnd = &currHeap->cells[HEAPCELLS];
+cell* currCell = heapStart;
 cell* freelist = NULL;
-cell* postinitCell = NULL;
 
 void growHeap() {
   currHeap = currHeap->next = new Heap();
@@ -1215,7 +1215,7 @@ cell* newCell() {
 }
 
 void checkUnfreed() {
-  int n = currCell-postinitCell;
+  int n = currCell-heapStart;
   for (; freelist; freelist = freelist->cdr)
     --n;
   if (n > 0) cerr << n << " cells unfreed" << endl;
@@ -2514,7 +2514,7 @@ void test_eval_handles_vararg_param() {
                                   void setupState() {
                                     setupNil();
                                     setupLexicalScope();
-                                    postinitCell = currCell;
+                                    heapStart = currCell;
                                   }
 
                                   void resetState() { // just for tests
@@ -2524,9 +2524,9 @@ void test_eval_handles_vararg_param() {
                                     dynamics.clear(); // leaks memory for strings and tables
                                     setupLexicalScope();
                                     freelist = NULL;
-                                    for(cell* curr=currCell; curr >= postinitCell; --curr)
+                                    for(cell* curr=currCell; curr >= heapStart; --curr)
                                       curr->init();
-                                    currCell = postinitCell;
+                                    currCell = heapStart;
                                   }
 
 int main(int argc, ascii* argv[]) {
