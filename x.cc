@@ -2517,9 +2517,11 @@ void test_eval_handles_vararg_param() {
                                     postinitCell = currCell;
                                   }
 
-                                  void resetState() {
+                                  void resetState() { // just for tests
                                     clearLiteralTables();
                                     checkUnfreed();
+
+                                    dynamics.clear(); // leaks memory for strings and tables
                                     setupLexicalScope();
                                     freelist = NULL;
                                     for(cell* curr=currCell; curr >= postinitCell; --curr)
