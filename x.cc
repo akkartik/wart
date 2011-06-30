@@ -1201,7 +1201,7 @@ cell* newCell() {
     result = freelist;
     freelist = freelist->cdr;
     result->init();
-    dbg << endl << "recycling: " << result << " " << result->type << endl;
+    dbg << endl << "newCell r: " << result << " " << result->type << endl;
     return result;
   }
 
@@ -1210,6 +1210,7 @@ cell* newCell() {
 
   result = currCell;
   ++currCell;
+  dbg << endl << "newCell a: " << result << " " << result->type << endl;
   return result;
 }
 
