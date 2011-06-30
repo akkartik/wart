@@ -1221,7 +1221,7 @@ void checkUnfreed() {
   if (n > 0) cerr << n << " cells unfreed" << endl;
 }
 
-                                  extern void resetState();
+                                  extern void checkState();
 
                                   extern void rmref(cell*);
 
@@ -1230,7 +1230,7 @@ void test_newCell_has_nil_car_and_cdr() {
   check_eq(x->car, nil);
   check_eq(x->cdr, nil);
   rmref(x);
-  resetState();
+  checkState();
 }
 
 
@@ -1294,7 +1294,7 @@ void test_rmref_frees_space() {
   rmref(c);
   check(!c->car);
   check_eq(freelist, c);
-  resetState();
+  checkState();
 }
 
 void test_rmref_handles_nums() {
@@ -1304,7 +1304,7 @@ void test_rmref_handles_nums() {
   rmref(c);
   check(!c->car);
   check_eq(freelist, c);
-  resetState();
+  checkState();
 }
 
 
@@ -1607,19 +1607,19 @@ cell* buildCell(AstNode n) {
 void test_build_handles_empty_input() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"")))));
   check(cells.empty());
-  resetState();
+  checkState();
 }
 
 void test_build_handles_nil() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
   check_eq(cells.front(), nil);
-  resetState();
+  checkState();
 }
 
 void test_build_handles_nil2() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"nil")))));
   check_eq(cells.front(), nil);
-  resetState();
+  checkState();
 }
 
 void test_build_handles_number() {
@@ -1628,7 +1628,7 @@ void test_build_handles_number() {
   check(isNum(cells.front()));
   check_eq(toNum(cells.front()), 34);
   check_eq(cells.front()->nrefs, 1);
-  resetState();
+  checkState();
 }
 
 void test_build_handles_symbol() {
@@ -1637,7 +1637,7 @@ void test_build_handles_symbol() {
   check(isSym(cells.front()));
   check_eq(toString(cells.front()), L"a");
   check_eq(cells.front()->nrefs, 1);
-  resetState();
+  checkState();
 }
 
 void test_build_handles_quoted_symbol() {
@@ -1651,7 +1651,7 @@ void test_build_handles_quoted_symbol() {
   check_eq(toString(cdr(cells.front())), L"a");
   check_eq(cdr(cells.front())->nrefs, 2);
   rmref(cells.front());
-  resetState();
+  checkState();
 }
 
 void test_build_handles_multiple_atoms() {
@@ -1669,7 +1669,7 @@ void test_build_handles_multiple_atoms() {
   check_eq(c->nrefs, 1);
   check_eq(cdr(c), nil);
 
-  resetState();
+  checkState();
 }
 
 void test_build_handles_form() {
@@ -1691,7 +1691,7 @@ void test_build_handles_form() {
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
-  resetState();
+  checkState();
 }
 
 void test_build_handles_dot() {
@@ -1710,7 +1710,7 @@ void test_build_handles_dot() {
   check_eq(c->nrefs, 2);
 
   rmref(cells.front());
-  resetState();
+  checkState();
 }
 
 void test_build_handles_nested_form() {
@@ -1749,7 +1749,7 @@ void test_build_handles_nested_form() {
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
-  resetState();
+  checkState();
 }
 
 void test_build_handles_strings() {
@@ -1792,7 +1792,7 @@ void test_build_handles_strings() {
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
-  resetState();
+  checkState();
 }
 
 void test_build_handles_syms() {
@@ -1840,7 +1840,7 @@ void test_build_handles_syms() {
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
-  resetState();
+  checkState();
 }
 
 void test_build_handles_quotes() {
@@ -1876,7 +1876,7 @@ void test_build_handles_quotes() {
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
-  resetState();
+  checkState();
 }
 
 
@@ -1997,7 +1997,7 @@ void test_lookup_returns_dynamic_binding() {
   endDynamicScope(sym);
   check_eq(sym->nrefs, 1);
   check_eq(val->nrefs, 1);
-  resetState();
+  checkState();
 }
 
 void test_lookup_returns_lexical_binding() {
@@ -2013,7 +2013,7 @@ void test_lookup_returns_lexical_binding() {
   endLexicalScope();
   check_eq(sym->nrefs, 1);
   check_eq(val->nrefs, 1);
-  resetState();
+  checkState();
 }
 
 void test_lexical_binding_always_overrides_dynamic() {
@@ -2043,7 +2043,7 @@ void test_lexical_binding_always_overrides_dynamic() {
   check_eq(sym->nrefs, 1);
   check_eq(val->nrefs, 1);
   check_eq(dynVal->nrefs, 1);
-  resetState();
+  checkState();
 }
 
 void test_nil_lexical_binding_works() {
@@ -2056,7 +2056,7 @@ void test_nil_lexical_binding_works() {
         check_eq(lookup(sym), nil);
     endLexicalScope();
   endDynamicScope(sym);
-  resetState();
+  checkState();
 }
 
 void test_lexical_scopes_nest_correctly() {
@@ -2108,7 +2108,7 @@ void test_lexical_scopes_nest_correctly() {
   check_eq(val->nrefs, 1);
   check_eq(val2->nrefs, 1);
   check_eq(dynVal->nrefs, 1);
-  resetState();
+  checkState();
 }
 
 void test_lower_lexical_scopes_are_available() {
@@ -2123,7 +2123,7 @@ void test_lower_lexical_scopes_are_available() {
         check_eq(lookup(sym), val);
       endLexicalScope();
   endLexicalScope();
-  resetState();
+  checkState();
 }
 
 
@@ -2205,7 +2205,7 @@ void test_bindArgs_handles_vararg() {
   rmref(result);
   rmref(args);
   rmref(params);
-  resetState();
+  checkState();
 }
 
 cell* eval(cell* expr) {
@@ -2263,7 +2263,7 @@ void test_nil_evals_to_itself() {
   check_eq(cells.size(), 1);
   check_eq(eval(cells.front()), nil);
   rmref(cells.front());
-  resetState();
+  checkState();
 }
 
 void test_num_evals_to_itself() {
@@ -2271,7 +2271,7 @@ void test_num_evals_to_itself() {
   check_eq(cells.size(), 1);
   check_eq(eval(cells.front()), cells.front());
   rmref(cells.front());
-  resetState();
+  checkState();
 }
 
 void test_string_evals_to_itself() {
@@ -2279,7 +2279,7 @@ void test_string_evals_to_itself() {
   check_eq(cells.size(), 1);
   check_eq(eval(cells.front()), cells.front());
   rmref(cells.front());
-  resetState();
+  checkState();
 }
 
 void test_eval_handles_quoted_atoms() {
@@ -2289,7 +2289,7 @@ void test_eval_handles_quoted_atoms() {
   check_eq(eval(cells.back()), newNum(34));
   rmref(cells.front());
   rmref(cells.back());
-  resetState();
+  checkState();
 }
 
 void test_eval_handles_quoted_lists() {
@@ -2300,7 +2300,7 @@ void test_eval_handles_quoted_lists() {
   check_eq(car(c), newSym(L"b"));
   check_eq(cdr(c), nil);
   rmref(cells.front());
-  resetState();
+  checkState();
 }
 
 void test_eval_handles_simple_lambda() {
@@ -2314,7 +2314,7 @@ void test_eval_handles_simple_lambda() {
   check_eq(lambda->cdr->cdr->cdr, nil);
   rmref(cells.front());
   rmref(lambda);
-  resetState();
+  checkState();
 }
 
 void test_eval_handles_closure() {
@@ -2334,7 +2334,7 @@ void test_eval_handles_closure() {
   rmref(c);
   check_eq(newLexicalScope->nrefs, 0);
   rmref(cells.front());
-  resetState();
+  checkState();
 }
 
 void test_eval_handles_lambda_calls() {
@@ -2343,7 +2343,7 @@ void test_eval_handles_lambda_calls() {
   check_eq(result, newNum(34));
   rmref(call);
   rmref(result);
-  resetState();
+  checkState();
 }
 
 void test_eval_expands_syms_in_lambda_bodies() {
@@ -2354,7 +2354,7 @@ void test_eval_expands_syms_in_lambda_bodies() {
   endDynamicScope(newSym(L"a"));
   rmref(lambda);
   rmref(result);
-  resetState();
+  checkState();
 }
 
 void test_eval_handles_assigned_lambda_calls() {
@@ -2367,7 +2367,7 @@ void test_eval_handles_assigned_lambda_calls() {
   rmref(result);
   rmref(call);
   rmref(lambda);
-  resetState();
+  checkState();
 }
 
 void test_eval_expands_lexically_scoped_syms_in_lambda_bodies() {
@@ -2379,7 +2379,7 @@ void test_eval_expands_lexically_scoped_syms_in_lambda_bodies() {
   endLexicalScope();
   rmref(result);
   rmref(call);
-  resetState();
+  checkState();
 }
 
 void test_eval_expands_syms_in_original_lexical_scope() {
@@ -2397,7 +2397,7 @@ void test_eval_expands_syms_in_original_lexical_scope() {
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
   endDynamicScope(newSym(L"a"));
-  resetState();
+  checkState();
 }
 
 void test_eval_expands_args_in_caller_scope() {
@@ -2415,7 +2415,7 @@ void test_eval_expands_args_in_caller_scope() {
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
   endDynamicScope(newSym(L"a"));
-  resetState();
+  checkState();
 }
 
 void test_eval_doesnt_eval_quoted_params() {
@@ -2433,7 +2433,7 @@ void test_eval_doesnt_eval_quoted_params() {
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
   endDynamicScope(newSym(L"a"));
-  resetState();
+  checkState();
 }
 
 void test_eval_handles_quoted_param_list() {
@@ -2451,7 +2451,7 @@ void test_eval_handles_quoted_param_list() {
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
   endDynamicScope(newSym(L"a"));
-  resetState();
+  checkState();
 }
 
 void test_eval_handles_multiple_args() {
@@ -2464,7 +2464,7 @@ void test_eval_handles_multiple_args() {
   rmref(call);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
-  resetState();
+  checkState();
 }
 
 void test_eval_handles_multiple_body_exprs() {
@@ -2477,7 +2477,7 @@ void test_eval_handles_multiple_body_exprs() {
   rmref(call);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
-  resetState();
+  checkState();
 }
 
 void test_eval_handles_vararg_param() {
@@ -2487,7 +2487,7 @@ void test_eval_handles_vararg_param() {
   check_eq(car(result), newNum(1));
   rmref(result);
   rmref(call);
-  resetState();
+  checkState();
 }
 
 
@@ -2517,7 +2517,7 @@ void test_eval_handles_vararg_param() {
                                     heapStart = currCell;
                                   }
 
-                                  void resetState() { // just for tests
+                                  void checkState() {
                                     clearLiteralTables();
                                     checkUnfreed();
 
