@@ -2199,10 +2199,11 @@ cell* bindArgs(cell* params, cell* args) {
 void test_bindArgs_handles_vararg() {
   cell* params = buildCells(parse(parenthesize(tokenize(teststream(L"a"))))).front();
   cell* args = buildCells(parse(parenthesize(tokenize(teststream(L"(1)"))))).front();
-  cell* result = unsafeGet(bindArgs(params, args), newSym(L"a"));
+  cell* scope = bindArgs(params, args);
+  cell* result = unsafeGet(scope, newSym(L"a"));
   check_eq(car(result), newNum(1));
   check_eq(cdr(result), nil);
-  rmref(result);
+  rmref(scope);
   rmref(args);
   rmref(params);
   checkState();
