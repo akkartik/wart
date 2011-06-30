@@ -2511,12 +2511,6 @@ void test_eval_handles_vararg_param() {
                                         cerr << endl;
                                   }
 
-                                  void setupState() {
-                                    setupNil();
-                                    setupLexicalScope();
-                                    heapStart = currCell;
-                                  }
-
                                   void checkState() {
                                     clearLiteralTables();
                                     checkUnfreed();
@@ -2528,6 +2522,11 @@ void test_eval_handles_vararg_param() {
                                       curr->init();
                                     currCell = heapStart;
                                   }
+
+void setupState() {
+  setupNil();
+  setupLexicalScope();
+}
 
 int main(int argc, ascii* argv[]) {
   setupState();
