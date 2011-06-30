@@ -1215,7 +1215,7 @@ cell* newCell() {
 }
 
 void checkUnfreed() {
-  int n = currCell-heapStart;
+  int n = currCell-heapStart-1; // ignore empty currLexicalScopes
   for (; freelist; freelist = freelist->cdr)
     --n;
   if (n > 0) cerr << n << " cells unfreed" << endl;
@@ -2515,12 +2515,13 @@ void test_eval_handles_vararg_param() {
                                     clearLiteralTables();
                                     checkUnfreed();
 
-                                    dynamics.clear(); // leaks memory for strings and tables
-                                    setupLexicalScope();
+                                    // forcibly reinit
                                     freelist = NULL;
                                     for(cell* curr=currCell; curr >= heapStart; --curr)
                                       curr->init();
                                     currCell = heapStart;
+                                    dynamics.clear(); // leaks memory for strings and tables
+                                    setupLexicalScope();
                                   }
 
 void setupState() {
