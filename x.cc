@@ -1449,17 +1449,48 @@ cell* cdr(cell* x) {
 }
 
 void setCar(cell* x, cell* y) {
-  if (isCons(car(x)))
+  if (isCons(x))
     rmref(car(x));
   x->car = y;
   mkref(y);
 }
 
 void setCdr(cell* x, cell* y) {
-  if (cdr(x) != nil)
-    rmref(cdr(x));
+  rmref(cdr(x));
   x->cdr = y;
   mkref(y);
+}
+
+void test_setCar_decrements_nrefs() {
+  cell* cons = newCell();
+  cell* car = newCell();
+  check_eq(car->nrefs, 0);
+  cell* newCar = newCell();
+  check_eq(newCar->nrefs, 0);
+  setCar(cons, car);
+  check_eq(car->nrefs, 1);
+  check_eq(newCar->nrefs, 0);
+  setCar(cons, newCar);
+  check_eq(car->nrefs, 0);
+  check_eq(newCar->nrefs, 1);
+  rmref(cons);
+  checkState();
+}
+
+void test_setCar_decrements_nrefs_for_non_cons() {
+  cell* cons = newCell();
+  cell* num = newNum(23);
+  check_eq(num->nrefs, 1);
+  cell* newCar = newCell();
+  check_eq(newCar->nrefs, 0);
+  setCar(cons, num);
+  check_eq(num->nrefs, 2);
+  check_eq(newCar->nrefs, 0);
+  setCar(cons, newCar);
+  check_eq(num->nrefs, 1);
+  check_eq(newCar->nrefs, 1);
+  rmref(cons);
+  checkState();
 }
 
                                   void unsafeSet(cell* t, cell* k, cell* val, bool deleteNils) {
