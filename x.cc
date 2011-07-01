@@ -2220,17 +2220,6 @@ void test_lower_lexical_scopes_are_available() {
                                     return cell;
                                   }
 
-                                  extern cell* eval(cell*);
-
-                                  cell* eval_all(cell* arg) {
-                                    if (arg == nil) return arg;
-                                    if (!isCons(arg)) return eval(arg);
-                                    cell* result = newCell();
-                                    setCar(result, eval(car(arg)));
-                                    setCdr(result, eval_all(cdr(arg)));
-                                    return result;
-                                  }
-
 void bindArg(cell* scope, cell* param, cell* arg, bool quoted) {
   if (param == nil) return;
 
@@ -2253,8 +2242,6 @@ cell* bindArgs(cell* params, cell* args) {
   return scope;
 }
 
-// eval each arg or not, depending on quotes in params
-// eval each arg in rest, then return a list
 void test_bindArgs_handles_vararg() {
   cell* params = buildCells(parse(parenthesize(tokenize(teststream(L"a"))))).front();
   cell* args = buildCells(parse(parenthesize(tokenize(teststream(L"(1)"))))).front();
@@ -2266,6 +2253,8 @@ void test_bindArgs_handles_vararg() {
   rmref(params);
   checkState();
 }
+
+                                  extern cell* eval(cell*);
 
                                   cell* eval_args(cell* params, cell* args) {
                                     if (params == nil) return nil;
