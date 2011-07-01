@@ -2257,7 +2257,7 @@ void test_bindArgs_handles_vararg() {
                                   extern cell* eval(cell*);
 
                                   cell* eval_args(cell* params, cell* args) {
-                                    if (params == nil) return nil;
+                                    if (args == nil) return nil;
                                     if (isQuoted(params)) return args;
                                     setCdr(args, eval_args(cdr(params), cdr(args)));
                                     if (!isCons(params) || !isQuoted(car(params))) {
@@ -2611,6 +2611,21 @@ void test_eval_handles_quoted_destructured_params() {
   cell* result = eval(call);
   check(isNum(result));
   check_eq(toNum(result), 2);
+  rmref(result);
+  rmref(call);
+  checkState();
+}
+
+void test_eval_handles_rest_params() {
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda (a b . c) c) 1 2 3 4 5)"))))).front();
+  cell* result = eval(call);
+  check(isCons(result));
+  check(isNum(car(result)));
+  check_eq(toNum(car(result)), 3);
+  check(isNum(car(cdr(result))));
+  check_eq(toNum(car(cdr(result))), 4);
+  check_eq(toNum(car(cdr(cdr(result)))), 5);
+  check_eq(cdr(cdr(cdr(result))), nil);
   rmref(result);
   rmref(call);
   checkState();
