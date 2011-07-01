@@ -2318,7 +2318,6 @@ cell* eval(cell* expr) {
   for (cell* form = callee_body(lambda); form != nil; form = cdr(form))
     result = eval(form->car);
 
-  rmref(lambda);
   endLexicalScope();
   endDynamicScope(newSym(L"currLexicalScope"));
   return result;
@@ -2547,6 +2546,15 @@ void test_eval_handles_vararg_param() {
 
 void test_eval_evals_args() {
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda (f) (f)) (lambda () 34))"))))).front();
+  cell* result = eval(call);
+  check(isNum(result));
+  check_eq(toNum(result), 34);
+  rmref(call);
+  checkState();
+}
+
+void test_eval_doesnt_leak_body_evals() {
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda (f) (f) (f)) (lambda () 34))"))))).front();
   cell* result = eval(call);
   check(isNum(result));
   check_eq(toNum(result), 34);
