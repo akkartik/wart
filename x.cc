@@ -2304,8 +2304,6 @@ cell* eval(cell* expr) {
   }
 
   cell* lambda = eval(car(expr));
-  mkref(lambda); // XXX: why? introduced 258
-
   cell* evald_args = eval_args(sig(lambda), call_args(expr));
   // construct a new scope with args based on current scope and sig
   cell* newScope = bindArgs(sig(lambda), evald_args);
@@ -2316,11 +2314,8 @@ cell* eval(cell* expr) {
 
   // eval all forms in body; save result of final form
   cell* result = nil;
-  for (cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
-    // XXX: why no rmref here? deleted 295
+  for (cell* form = callee_body(lambda); form != nil; form = cdr(form))
     result = eval(form->car);
-  }
-  rmref(lambda); // XXX: why? introduced 251
 
   endLexicalScope();
   endDynamicScope(newSym(L"currLexicalScope"));
@@ -2400,7 +2395,6 @@ void test_eval_handles_closure() {
   check_eq(car(cdr(result)), nil);
   check_eq(car(car(cdr(cdr(result)))), newNum(34));
   check_eq(cdr(cdr(cdr(result))), newLexicalScope);
-  rmref(result); // XXX: why?
   check_eq(newLexicalScope->nrefs, 0);
   rmref(cells.front());
   checkState();
