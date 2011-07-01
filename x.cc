@@ -2605,6 +2605,16 @@ void test_eval_handles_destructured_params() {
   checkState();
 }
 
+void test_eval_handles_quoted_destructured_params() {
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda ('(a b)) b) (1 2))"))))).front();
+  cell* result = eval(call);
+  check(isNum(result));
+  check_eq(toNum(result), 2);
+  rmref(result);
+  rmref(call);
+  checkState();
+}
+
 
 
                                   typedef void (*testfunc)(void);
