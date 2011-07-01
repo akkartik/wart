@@ -2179,13 +2179,10 @@ void bindArg(cell* scope, cell* param, cell* arg, bool quoted) {
     return;
   }
 
-  if (isSym(param) || isQuoted(param)) {
-    cell* result = (quoted || isQuoted(param)) ? arg : eval_all(arg);
-    addLexicalBinding(scope, unQuote(param), result);
-  }
-  else {
+  if (isSym(param) || isQuoted(param))
+    addLexicalBinding(scope, unQuote(param), arg);
+  else
     bindArg(scope, car(param), car(arg), quoted);
-  }
 
   bindArg(scope, cdr(param), cdr(arg), quoted);
 }
@@ -2206,10 +2203,17 @@ void test_bindArgs_handles_vararg() {
   check_eq(car(result), newNum(1));
   check_eq(cdr(result), nil);
   rmref(scope);
-  rmref(args);
   rmref(params);
   checkState();
 }
+
+                                  cell* eval_args(cell* params, cell* args) {
+                                    if (params == nil) return nil;
+                                    setCdr(args, eval_args(cdr(params), cdr(args)));
+                                    if (!isQuoted(car(params)))
+                                      setCar(args, eval(car(args)));
+                                    return args;
+                                  }
 
 cell* eval(cell* expr) {
   if (!expr)
@@ -2242,8 +2246,9 @@ cell* eval(cell* expr) {
   cell* lambda = eval(car(expr));
   mkref(lambda);
 
+  cell* evald_args = eval_args(sig(lambda), call_args(expr));
   // construct a new scope with args based on current scope and sig
-  cell* newScope = bindArgs(sig(lambda), call_args(expr));
+  cell* newScope = bindArgs(sig(lambda), evald_args);
   // swap in the function's lexical environment
   newDynamicScope(L"currLexicalScope", callee_env(lambda));
   // throw the new scope on it
@@ -2488,6 +2493,16 @@ void test_eval_handles_vararg_param() {
   cell* result = eval(call);
   check(isCons(result));
   check_eq(car(result), newNum(1));
+  rmref(result);
+  rmref(call);
+  checkState();
+}
+
+void test_eval_evals_args() {
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda (f) (f)) (lambda () 34))"))))).front();
+  cell* result = eval(call);
+  check(isCons(result));
+  check_eq(car(result), newNum(34));
   rmref(result);
   rmref(call);
   checkState();
