@@ -1221,6 +1221,7 @@ void checkUnfreed() {
   check(n == 0);
 }
 
+                                  extern void resetState();
                                   extern void checkState();
 
                                   extern void rmref(cell*);
@@ -2512,23 +2513,25 @@ void test_eval_handles_vararg_param() {
                                         cerr << endl;
                                   }
 
-                                  void checkState() {
-                                    clearLiteralTables();
-                                    checkUnfreed();
-
-                                    // forcibly reinit
-                                    freelist = NULL;
-                                    for(cell* curr=currCell; curr >= heapStart; --curr)
-                                      curr->init();
-                                    currCell = heapStart;
-                                    dynamics.clear(); // leaks memory for strings and tables
-                                    setupLexicalScope();
-                                  }
-
 void setupState() {
   setupNil();
   setupLexicalScope();
 }
+
+void resetState() {
+  freelist = NULL;
+  for(cell* curr=currCell; curr >= heapStart; --curr)
+    curr->init();
+  currCell = heapStart;
+  dynamics.clear(); // leaks memory for strings and tables
+  setupLexicalScope();
+}
+
+                                  void checkState() {
+                                    clearLiteralTables();
+                                    checkUnfreed();
+                                    resetState();
+                                  }
 
 int main(int argc, ascii* argv[]) {
   setupState();
