@@ -2595,6 +2595,16 @@ void test_eval_doesnt_leak_body_evals() {
   checkState();
 }
 
+void test_eval_handles_destructured_params() {
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda ((a b)) b) '(1 2))"))))).front();
+  cell* result = eval(call);
+  check(isNum(result));
+  check_eq(toNum(result), 2);
+  rmref(result);
+  rmref(call);
+  checkState();
+}
+
 
 
                                   typedef void (*testfunc)(void);
