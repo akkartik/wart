@@ -1247,10 +1247,11 @@ struct Table {
   }
 };
 
-void mkref(cell* c) {
-  if (c == nil) return;
+cell* mkref(cell* c) {
+  if (c == nil) return nil;
   dbg << "mkref: " << c << " " << c->nrefs << endl;
   ++c->nrefs;
+  return c;
 }
 
 void rmref(cell* c) {
@@ -2270,8 +2271,10 @@ void test_bindArgs_handles_vararg() {
                                     if (params == nil) return nil;
                                     if (isQuoted(params)) return args;
                                     setCdr(args, eval_args(cdr(params), cdr(args)));
-                                    if (!isCons(params) || !isQuoted(car(params)))
+                                    if (!isCons(params) || !isQuoted(car(params))) {
                                       setCar(args, eval(car(args)));
+                                      rmref(car(args));
+                                    }
                                     return args;
                                   }
 
@@ -2283,13 +2286,13 @@ cell* eval(cell* expr) {
     return nil;
 
   if (isSym(expr))
-    return lookup(expr);
+    return mkref(lookup(expr));
 
   if (isAtom(expr))
-    return expr;
+    return mkref(expr);
 
   if (isQuoted(expr))
-    return expr->cdr;
+    return mkref(expr->cdr);
 
   // lambda expressions get the current lexical scope attached to them
   if (car(expr) == newSym(L"lambda")) {
@@ -2315,18 +2318,24 @@ cell* eval(cell* expr) {
 
   // eval all forms in body; save result of final form
   cell* result = nil;
-  for (cell* form = callee_body(lambda); form != nil; form = cdr(form))
+  for (cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
     result = eval(form->car);
+    rmref(result);
+  }
 
+  rmref(lambda);
   endLexicalScope();
   endDynamicScope(newSym(L"currLexicalScope"));
+  mkref(result);
   return result;
 }
 
 void test_nil_evals_to_itself() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
   check_eq(cells.size(), 1);
-  check_eq(eval(cells.front()), nil);
+  cell* result = eval(cells.front());
+  check_eq(result, nil);
+  rmref(result);
   rmref(cells.front());
   checkState();
 }
@@ -2334,7 +2343,9 @@ void test_nil_evals_to_itself() {
 void test_num_evals_to_itself() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34")))));
   check_eq(cells.size(), 1);
-  check_eq(eval(cells.front()), cells.front());
+  cell* result = eval(cells.front());
+  check_eq(result, cells.front());
+  rmref(result);
   rmref(cells.front());
   checkState();
 }
@@ -2342,7 +2353,9 @@ void test_num_evals_to_itself() {
 void test_string_evals_to_itself() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"\"ac bd\"")))));
   check_eq(cells.size(), 1);
-  check_eq(eval(cells.front()), cells.front());
+  cell* result = eval(cells.front());
+  check_eq(result, cells.front());
+  rmref(result);
   rmref(cells.front());
   checkState();
 }
@@ -2350,8 +2363,12 @@ void test_string_evals_to_itself() {
 void test_eval_handles_quoted_atoms() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'a '34")))));
   check_eq(cells.size(), 2);
-  check_eq(eval(cells.front()), newSym(L"a"));
-  check_eq(eval(cells.back()), newNum(34));
+  cell* result = eval(cells.front());
+  check_eq(result, newSym(L"a"));
+  rmref(result);
+  result = eval(cells.back());
+  check_eq(result, newNum(34));
+  rmref(result);
   rmref(cells.front());
   rmref(cells.back());
   checkState();
@@ -2359,11 +2376,11 @@ void test_eval_handles_quoted_atoms() {
 
 void test_eval_handles_quoted_lists() {
   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'(a b)")))));
-  cell* c = eval(cells.front());
-  check_eq(car(c), newSym(L"a"));
-  c = cdr(c);
-  check_eq(car(c), newSym(L"b"));
-  check_eq(cdr(c), nil);
+  cell* result = eval(cells.front());
+  check_eq(car(result), newSym(L"a"));
+  check_eq(car(cdr(result)), newSym(L"b"));
+  check_eq(cdr(cdr(result)), nil);
+  rmref(result);
   rmref(cells.front());
   checkState();
 }
@@ -2377,8 +2394,8 @@ void test_eval_handles_simple_lambda() {
   check(isCons(lambda->cdr->cdr->car));
   check_eq(lambda->cdr->cdr->car->car, newNum(34));
   check_eq(lambda->cdr->cdr->cdr, nil);
-  rmref(cells.front());
   rmref(lambda);
+  rmref(cells.front());
   checkState();
 }
 
@@ -2396,7 +2413,7 @@ void test_eval_handles_closure() {
   check_eq(car(cdr(result)), nil);
   check_eq(car(car(cdr(cdr(result)))), newNum(34));
   check_eq(cdr(cdr(cdr(result))), newLexicalScope);
-  rmref(result); // simulate deletion of the closure
+  rmref(result);
   check_eq(newLexicalScope->nrefs, 0);
   rmref(cells.front());
   checkState();
@@ -2406,6 +2423,7 @@ void test_eval_handles_lambda_calls() {
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () 34))"))))).front();
   cell* result = eval(call);
   check_eq(result, newNum(34));
+  rmref(result);
   rmref(call);
   checkState();
 }
@@ -2416,18 +2434,22 @@ void test_eval_expands_syms_in_lambda_bodies() {
   cell* result = eval(lambda);
   check_eq(result, newNum(34));
   endDynamicScope(newSym(L"a"));
+  rmref(result);
   rmref(lambda);
   checkState();
 }
 
 void test_eval_handles_assigned_lambda_calls() {
   cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)"))))).front();
-  newDynamicScope(L"f", eval(lambda));
+  cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
     cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
     cell* result = eval(call);
     check_eq(result, newNum(34));
   endDynamicScope(newSym(L"f"));
+  rmref(result);
   rmref(call);
+  rmref(f);
   rmref(lambda);
   checkState();
 }
@@ -2439,6 +2461,7 @@ void test_eval_expands_lexically_scoped_syms_in_lambda_bodies() {
     cell* result = eval(call);
     check_eq(result, newNum(34));
   endLexicalScope();
+  rmref(result);
   rmref(call);
   checkState();
 }
@@ -2448,12 +2471,15 @@ void test_eval_expands_syms_in_original_lexical_scope() {
   cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () a)"))))).front();
   newLexicalScope();
   addLexicalBinding(newSym(L"a"), newNum(34));
-    newDynamicScope(L"f", eval(lambda));
+    cell* f = eval(lambda);
+    newDynamicScope(L"f", f);
   endLexicalScope();
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
   cell* result = eval(call);
   check_eq(result, newNum(34));
+  rmref(result);
   rmref(call);
+  rmref(f);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
   endDynamicScope(newSym(L"a"));
@@ -2465,12 +2491,15 @@ void test_eval_expands_args_in_caller_scope() {
   cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda (arg1) arg1)"))))).front();
   newLexicalScope();
   addLexicalBinding(newSym(L"arg1"), newNum(34));
-    newDynamicScope(L"f", eval(lambda));
+    cell* f = eval(lambda);
+    newDynamicScope(L"f", f);
   endLexicalScope();
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f a)"))))).front();
   cell* result = eval(call);
   check_eq(result, newNum(23));
+  rmref(result);
   rmref(call);
+  rmref(f);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
   endDynamicScope(newSym(L"a"));
@@ -2482,12 +2511,15 @@ void test_eval_doesnt_eval_quoted_params() {
   cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda ('arg1) arg1)"))))).front();
   newLexicalScope();
   addLexicalBinding(newSym(L"arg1"), newNum(34));
-    newDynamicScope(L"f", eval(lambda));
+    cell* f = eval(lambda);
+    newDynamicScope(L"f", f);
   endLexicalScope();
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f a)"))))).front();
   cell* result = eval(call);
   check_eq(result, newSym(L"a"));
+  rmref(result);
   rmref(call);
+  rmref(f);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
   endDynamicScope(newSym(L"a"));
@@ -2499,12 +2531,15 @@ void test_eval_handles_quoted_param_list() {
   cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda '(arg1) arg1)"))))).front();
   newLexicalScope();
   addLexicalBinding(newSym(L"arg1"), newNum(34));
-    newDynamicScope(L"f", eval(lambda));
+    cell* f = eval(lambda);
+    newDynamicScope(L"f", f);
   endLexicalScope();
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f a)"))))).front();
   cell* result = eval(call);
   check_eq(result, newSym(L"a"));
+  rmref(result);
   rmref(call);
+  rmref(f);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
   endDynamicScope(newSym(L"a"));
@@ -2513,11 +2548,14 @@ void test_eval_handles_quoted_param_list() {
 
 void test_eval_handles_multiple_args() {
   cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda (a b) b)"))))).front();
-  newDynamicScope(L"f", eval(lambda));
+  cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f 1 2)"))))).front();
   cell* result = eval(call);
   check_eq(result, newNum(2));
+  rmref(result);
   rmref(call);
+  rmref(f);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
   checkState();
@@ -2525,11 +2563,14 @@ void test_eval_handles_multiple_args() {
 
 void test_eval_handles_multiple_body_exprs() {
   cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 1 2)"))))).front();
-  newDynamicScope(L"f", eval(lambda));
+  cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
   cell* result = eval(call);
   check_eq(result, newNum(2));
+  rmref(result);
   rmref(call);
+  rmref(f);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
   checkState();
@@ -2540,6 +2581,7 @@ void test_eval_handles_vararg_param() {
   cell* result = eval(call);
   check(isCons(result));
   check_eq(car(result), newNum(1));
+  rmref(result);
   rmref(call);
   checkState();
 }
@@ -2549,6 +2591,7 @@ void test_eval_evals_args() {
   cell* result = eval(call);
   check(isNum(result));
   check_eq(toNum(result), 34);
+  rmref(result);
   rmref(call);
   checkState();
 }
@@ -2558,6 +2601,7 @@ void test_eval_doesnt_leak_body_evals() {
   cell* result = eval(call);
   check(isNum(result));
   check_eq(toNum(result), 34);
+  rmref(result);
   rmref(call);
   checkState();
 }
