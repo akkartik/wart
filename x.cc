@@ -1254,7 +1254,8 @@ void mkref(cell* c) {
 }
 
 void rmref(cell* c) {
-  if (!c) cerr << "rmref: cell should never point to NULL\n" << DIE;
+  if (!c)
+    cerr << "rmref: cell should never point to NULL\n" << DIE;
   if (c == nil) return;
   dbg << endl << "rmref: " << c << ": " << c->nrefs << " " << c->type << endl;
 
