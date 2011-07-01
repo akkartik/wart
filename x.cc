@@ -2270,7 +2270,7 @@ void test_bindArgs_handles_vararg() {
                                     if (params == nil) return nil;
                                     if (isQuoted(params)) return args;
                                     setCdr(args, eval_args(cdr(params), cdr(args)));
-                                    if (!isQuoted(car(params)))
+                                    if (!isCons(params) || !isQuoted(car(params)))
                                       setCar(args, eval(car(args)));
                                     return args;
                                   }
