@@ -2304,7 +2304,7 @@ cell* eval(cell* expr) {
   }
 
   cell* lambda = eval(car(expr));
-  mkref(lambda);
+  mkref(lambda); // XXX: why?
 
   cell* evald_args = eval_args(sig(lambda), call_args(expr));
   // construct a new scope with args based on current scope and sig
@@ -2318,7 +2318,7 @@ cell* eval(cell* expr) {
   cell* result = nil;
   for (cell* form = callee_body(lambda); form != nil; form = cdr(form))
     result = eval(form->car);
-  rmref(lambda);
+  rmref(lambda); // XXX: why?
 
   endLexicalScope();
   endDynamicScope(newSym(L"currLexicalScope"));
