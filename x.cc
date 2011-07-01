@@ -2552,7 +2552,7 @@ void test_eval_handles_vararg_param() {
   cell* result = eval(call);
   check(isCons(result));
   check_eq(car(result), newNum(1));
-  rmref(result);
+//?   rmref(result);
   rmref(call);
   checkState();
 }
