@@ -2398,7 +2398,7 @@ void test_eval_handles_closure() {
   check_eq(car(cdr(c)), nil);
   check_eq(car(car(cdr(cdr(c)))), newNum(34));
   check_eq(cdr(cdr(cdr(c))), newLexicalScope);
-  rmref(c);
+  rmref(c); // XXX: why?
   check_eq(newLexicalScope->nrefs, 0);
   rmref(cells.front());
   checkState();
@@ -2409,7 +2409,6 @@ void test_eval_handles_lambda_calls() {
   cell* result = eval(call);
   check_eq(result, newNum(34));
   rmref(call);
-  rmref(result);
   checkState();
 }
 
@@ -2420,7 +2419,6 @@ void test_eval_expands_syms_in_lambda_bodies() {
   check_eq(result, newNum(34));
   endDynamicScope(newSym(L"a"));
   rmref(lambda);
-  rmref(result);
   checkState();
 }
 
@@ -2431,7 +2429,6 @@ void test_eval_handles_assigned_lambda_calls() {
     cell* result = eval(call);
     check_eq(result, newNum(34));
   endDynamicScope(newSym(L"f"));
-  rmref(result);
   rmref(call);
   rmref(lambda);
   checkState();
@@ -2444,7 +2441,6 @@ void test_eval_expands_lexically_scoped_syms_in_lambda_bodies() {
     cell* result = eval(call);
     check_eq(result, newNum(34));
   endLexicalScope();
-  rmref(result);
   rmref(call);
   checkState();
 }
@@ -2459,7 +2455,6 @@ void test_eval_expands_syms_in_original_lexical_scope() {
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
   cell* result = eval(call);
   check_eq(result, newNum(34));
-  rmref(result);
   rmref(call);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
@@ -2477,7 +2472,6 @@ void test_eval_expands_args_in_caller_scope() {
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f a)"))))).front();
   cell* result = eval(call);
   check_eq(result, newNum(23));
-  rmref(result);
   rmref(call);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
@@ -2495,7 +2489,6 @@ void test_eval_doesnt_eval_quoted_params() {
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f a)"))))).front();
   cell* result = eval(call);
   check_eq(result, newSym(L"a"));
-  rmref(result);
   rmref(call);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
@@ -2513,7 +2506,6 @@ void test_eval_handles_quoted_param_list() {
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f a)"))))).front();
   cell* result = eval(call);
   check_eq(result, newSym(L"a"));
-  rmref(result);
   rmref(call);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
@@ -2527,7 +2519,6 @@ void test_eval_handles_multiple_args() {
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f 1 2)"))))).front();
   cell* result = eval(call);
   check_eq(result, newNum(2));
-  rmref(result);
   rmref(call);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
@@ -2540,7 +2531,6 @@ void test_eval_handles_multiple_body_exprs() {
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
   cell* result = eval(call);
   check_eq(result, newNum(2));
-  rmref(result);
   rmref(call);
   rmref(lambda);
   endDynamicScope(newSym(L"f"));
@@ -2552,7 +2542,6 @@ void test_eval_handles_vararg_param() {
   cell* result = eval(call);
   check(isCons(result));
   check_eq(car(result), newNum(1));
-//?   rmref(result);
   rmref(call);
   checkState();
 }
@@ -2562,7 +2551,6 @@ void test_eval_evals_args() {
   cell* result = eval(call);
   check(isNum(result));
   check_eq(toNum(result), 34);
-  rmref(result);
   rmref(call);
   checkState();
 }
