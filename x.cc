@@ -2300,6 +2300,7 @@ cell* eval(cell* expr) {
     setCdr(cdr(ans), newCell());
     setCar(cdr(cdr(ans)), body(expr));
     setCdr(cdr(cdr(ans)), currLexicalScopes.top());
+    mkref(ans);
     return ans;
   }
 
@@ -2317,6 +2318,7 @@ cell* eval(cell* expr) {
   for (cell* form = callee_body(lambda); form != nil; form = cdr(form))
     result = eval(form->car);
 
+  rmref(lambda);
   endLexicalScope();
   endDynamicScope(newSym(L"currLexicalScope"));
   return result;
@@ -2381,42 +2383,43 @@ void test_eval_handles_simple_lambda() {
   checkState();
 }
 
-//? void test_eval_handles_closure() {
-//?   list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
-//?   check_eq(cells.size(), 1);
-//?   newLexicalScope();
-//?     cell* newLexicalScope = currLexicalScopes.top();
-//?     check_eq(newLexicalScope->nrefs, 2);
-//?     cell* result = eval(cells.front());
-//?     check_eq(newLexicalScope->nrefs, 3);
-//?   endLexicalScope();
-//?   check_eq(newLexicalScope->nrefs, 1);
-//?   check_eq(car(result), newSym(L"lambda"));
-//?   check_eq(car(cdr(result)), nil);
-//?   check_eq(car(car(cdr(cdr(result)))), newNum(34));
-//?   check_eq(cdr(cdr(cdr(result))), newLexicalScope);
-//?   check_eq(newLexicalScope->nrefs, 0);
-//?   rmref(cells.front());
-//?   checkState();
-//? }
+void test_eval_handles_closure() {
+  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
+  check_eq(cells.size(), 1);
+  newLexicalScope();
+    cell* newLexicalScope = currLexicalScopes.top();
+    check_eq(newLexicalScope->nrefs, 2);
+    cell* result = eval(cells.front());
+    check_eq(newLexicalScope->nrefs, 3);
+  endLexicalScope();
+  check_eq(newLexicalScope->nrefs, 1);
+  check_eq(car(result), newSym(L"lambda"));
+  check_eq(car(cdr(result)), nil);
+  check_eq(car(car(cdr(cdr(result)))), newNum(34));
+  check_eq(cdr(cdr(cdr(result))), newLexicalScope);
+  rmref(result); // simulate deletion of the closure
+  check_eq(newLexicalScope->nrefs, 0);
+  rmref(cells.front());
+  checkState();
+}
 
-//? void test_eval_handles_lambda_calls() {
-//?   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () 34))"))))).front();
-//?   cell* result = eval(call);
-//?   check_eq(result, newNum(34));
-//?   rmref(call);
-//?   checkState();
-//? }
+void test_eval_handles_lambda_calls() {
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () 34))"))))).front();
+  cell* result = eval(call);
+  check_eq(result, newNum(34));
+  rmref(call);
+  checkState();
+}
 
-//? void test_eval_expands_syms_in_lambda_bodies() {
-//?   cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () a))"))))).front();
-//?   newDynamicScope(L"a", newNum(34));
-//?   cell* result = eval(lambda);
-//?   check_eq(result, newNum(34));
-//?   endDynamicScope(newSym(L"a"));
-//?   rmref(lambda);
-//?   checkState();
-//? }
+void test_eval_expands_syms_in_lambda_bodies() {
+  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () a))"))))).front();
+  newDynamicScope(L"a", newNum(34));
+  cell* result = eval(lambda);
+  check_eq(result, newNum(34));
+  endDynamicScope(newSym(L"a"));
+  rmref(lambda);
+  checkState();
+}
 
 void test_eval_handles_assigned_lambda_calls() {
   cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)"))))).front();
@@ -2430,16 +2433,16 @@ void test_eval_handles_assigned_lambda_calls() {
   checkState();
 }
 
-//? void test_eval_expands_lexically_scoped_syms_in_lambda_bodies() {
-//?   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () a))"))))).front();
-//?   newLexicalScope();
-//?     addLexicalBinding(newSym(L"a"), newNum(34));
-//?     cell* result = eval(call);
-//?     check_eq(result, newNum(34));
-//?   endLexicalScope();
-//?   rmref(call);
-//?   checkState();
-//? }
+void test_eval_expands_lexically_scoped_syms_in_lambda_bodies() {
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () a))"))))).front();
+  newLexicalScope();
+    addLexicalBinding(newSym(L"a"), newNum(34));
+    cell* result = eval(call);
+    check_eq(result, newNum(34));
+  endLexicalScope();
+  rmref(call);
+  checkState();
+}
 
 void test_eval_expands_syms_in_original_lexical_scope() {
   newDynamicScope(L"a", newNum(23));
@@ -2533,23 +2536,23 @@ void test_eval_handles_multiple_body_exprs() {
   checkState();
 }
 
-//? void test_eval_handles_vararg_param() {
-//?   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda args args) 1)"))))).front();
-//?   cell* result = eval(call);
-//?   check(isCons(result));
-//?   check_eq(car(result), newNum(1));
-//?   rmref(call);
-//?   checkState();
-//? }
+void test_eval_handles_vararg_param() {
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda args args) 1)"))))).front();
+  cell* result = eval(call);
+  check(isCons(result));
+  check_eq(car(result), newNum(1));
+  rmref(call);
+  checkState();
+}
 
-//? void test_eval_evals_args() {
-//?   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda (f) (f)) (lambda () 34))"))))).front();
-//?   cell* result = eval(call);
-//?   check(isNum(result));
-//?   check_eq(toNum(result), 34);
-//?   rmref(call);
-//?   checkState();
-//? }
+void test_eval_evals_args() {
+  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda (f) (f)) (lambda () 34))"))))).front();
+  cell* result = eval(call);
+  check(isNum(result));
+  check_eq(toNum(result), 34);
+  rmref(call);
+  checkState();
+}
 
 
 
