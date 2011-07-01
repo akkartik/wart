@@ -2261,8 +2261,9 @@ void test_bindArgs_handles_vararg() {
                                     if (isQuoted(params)) return args;
                                     setCdr(args, eval_args(cdr(params), cdr(args)));
                                     if (!isCons(params) || !isQuoted(car(params))) {
-                                      setCar(args, eval(car(args)));
-                                      rmref(car(args));
+                                      cell* result = eval(car(args));
+                                      setCar(args, result);
+                                      rmref(result);
                                     }
                                     return args;
                                   }
