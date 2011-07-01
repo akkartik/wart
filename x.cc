@@ -2390,15 +2390,15 @@ void test_eval_handles_closure() {
   newLexicalScope();
     cell* newLexicalScope = currLexicalScopes.top();
     check_eq(newLexicalScope->nrefs, 2);
-    cell* c = eval(cells.front());
+    cell* result = eval(cells.front());
     check_eq(newLexicalScope->nrefs, 3);
   endLexicalScope();
   check_eq(newLexicalScope->nrefs, 1);
-  check_eq(car(c), newSym(L"lambda"));
-  check_eq(car(cdr(c)), nil);
-  check_eq(car(car(cdr(cdr(c)))), newNum(34));
-  check_eq(cdr(cdr(cdr(c))), newLexicalScope);
-  rmref(c); // XXX: why?
+  check_eq(car(result), newSym(L"lambda"));
+  check_eq(car(cdr(result)), nil);
+  check_eq(car(car(cdr(cdr(result)))), newNum(34));
+  check_eq(cdr(cdr(cdr(result))), newLexicalScope);
+  rmref(result); // XXX: why?
   check_eq(newLexicalScope->nrefs, 0);
   rmref(cells.front());
   checkState();
