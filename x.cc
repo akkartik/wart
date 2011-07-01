@@ -1449,16 +1449,16 @@ cell* cdr(cell* x) {
 }
 
 void setCar(cell* x, cell* y) {
+  mkref(y);
   if (isCons(x))
     rmref(car(x));
   x->car = y;
-  mkref(y);
 }
 
 void setCdr(cell* x, cell* y) {
+  mkref(y);
   rmref(cdr(x));
   x->cdr = y;
-  mkref(y);
 }
 
 void test_setCar_decrements_nrefs() {
@@ -1489,6 +1489,34 @@ void test_setCar_decrements_nrefs_for_non_cons() {
   setCar(cons, newCar);
   check_eq(num->nrefs, 1);
   check_eq(newCar->nrefs, 1);
+  rmref(cons);
+  checkState();
+}
+
+void test_setCar_is_idempotent() {
+  cell* cons = newCell();
+  cell* car = newCell();
+  check_eq(car->nrefs, 0);
+  setCar(cons, car);
+  check_eq(car->nrefs, 1);
+  setCar(cons, car);
+  check_eq(car->nrefs, 1);
+  check(car->car);
+  check(car->cdr);
+  rmref(cons);
+  checkState();
+}
+
+void test_setCdr_is_idempotent() {
+  cell* cons = newCell();
+  cell* cdr = newCell();
+  check_eq(cdr->nrefs, 0);
+  setCdr(cons, cdr);
+  check_eq(cdr->nrefs, 1);
+  setCdr(cons, cdr);
+  check_eq(cdr->nrefs, 1);
+  check(cdr->car);
+  check(cdr->cdr);
   rmref(cons);
   checkState();
 }
