@@ -2320,7 +2320,6 @@ cell* eval(cell* expr) {
     result = eval(form->car);
   rmref(lambda);
 
-  mkref(result);
   endLexicalScope();
   endDynamicScope(newSym(L"currLexicalScope"));
   return result;
@@ -2561,8 +2560,8 @@ void test_eval_handles_vararg_param() {
 void test_eval_evals_args() {
   cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda (f) (f)) (lambda () 34))"))))).front();
   cell* result = eval(call);
-  check(isCons(result));
-  check_eq(car(result), newNum(34));
+  check(isNum(result));
+  check_eq(toNum(result), 34);
   rmref(result);
   rmref(call);
   checkState();
