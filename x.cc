@@ -1145,12 +1145,12 @@ void test_parse_handles_nested_forms() {
 
 //// data
 
-                                  struct cell;
-                                  extern cell* nil;
+                                  struct Cell;
+                                  extern Cell* nil;
 
-struct cell {
-  cell* car;
-  cell* cdr;
+struct Cell {
+  Cell* car;
+  Cell* cdr;
   long type;
     #define CONS 0
     #define NUM 1
@@ -1158,12 +1158,12 @@ struct cell {
     #define STRING 3
     #define TABLE 4
   long nrefs;
-  cell() :car(nil), cdr(nil), type(CONS), nrefs(0) {}
+  Cell() :car(nil), cdr(nil), type(CONS), nrefs(0) {}
   void init() { car=cdr=nil, type=CONS, nrefs=0; }
   void clear() { car=cdr=NULL, type=CONS, nrefs=0; }
 };
 
-cell* nil = new cell;
+Cell* nil = new Cell;
 void setupNil() {
   nil->car = nil->cdr = nil;
 }
@@ -1175,28 +1175,28 @@ void test_pointers_from_nil_are_nil() {
 
 
 
-#define HEAPCELLS (1024*1024/sizeof(cell)) // 1MB
+#define HEAPCELLS (1024*1024/sizeof(Cell)) // 1MB
 struct Heap {
-  cell cells[HEAPCELLS];
+  Cell Cells[HEAPCELLS];
   Heap *next;
   Heap() :next(NULL) {}
 };
 
 Heap* currHeap = new Heap();
-cell* heapStart = &currHeap->cells[0];
-cell* heapEnd = &currHeap->cells[HEAPCELLS];
-cell* currCell = heapStart;
-cell* freelist = NULL;
+Cell* heapStart = &currHeap->Cells[0];
+Cell* heapEnd = &currHeap->Cells[HEAPCELLS];
+Cell* currCell = heapStart;
+Cell* freelist = NULL;
 
 void growHeap() {
   currHeap = currHeap->next = new Heap();
   if (!currHeap) cerr << "Out of memory" << endl << DIE;
-  currCell = &currHeap->cells[0];
-  heapEnd = &currHeap->cells[HEAPCELLS];
+  currCell = &currHeap->Cells[0];
+  heapEnd = &currHeap->Cells[HEAPCELLS];
 }
 
-cell* newCell() {
-  cell* result = NULL;
+Cell* newCell() {
+  Cell* result = NULL;
   if (freelist) {
     result = freelist;
     freelist = freelist->cdr;
@@ -1224,10 +1224,10 @@ void checkUnfreed() {
                                   extern void resetState();
                                   extern void checkState();
 
-                                  extern void rmref(cell*);
+                                  extern void rmref(Cell*);
 
 void test_newCell_has_nil_car_and_cdr() {
-  cell* x = newCell();
+  Cell* x = newCell();
   check_eq(x->car, nil);
   check_eq(x->cdr, nil);
   rmref(x);
@@ -1237,24 +1237,24 @@ void test_newCell_has_nil_car_and_cdr() {
 
 
 struct Table {
-  hash_map<long, cell*> table;
+  hash_map<long, Cell*> table;
   ~Table() {
-    for (hash_map<long, cell*>::iterator p = table.begin(); p != table.end(); ++p) {
+    for (hash_map<long, Cell*>::iterator p = table.begin(); p != table.end(); ++p) {
       if (!p->second) continue;
-      rmref((cell*)p->first);
+      rmref((Cell*)p->first);
       rmref(p->second);
     }
   }
 };
 
-cell* mkref(cell* c) {
+Cell* mkref(Cell* c) {
   if (c == nil) return nil;
   dbg << "mkref: " << c << " " << c->nrefs << endl;
   ++c->nrefs;
   return c;
 }
 
-void rmref(cell* c) {
+void rmref(Cell* c) {
   if (!c)
     cerr << "rmref: cell should never point to NULL\n" << DIE;
   if (c == nil) return;
@@ -1291,7 +1291,7 @@ void rmref(cell* c) {
 }
 
 void test_rmref_frees_space() {
-  cell* c = newCell();
+  Cell* c = newCell();
   check_eq(c->car, nil);
   check_eq(freelist, NULL);
   rmref(c);
@@ -1301,9 +1301,9 @@ void test_rmref_frees_space() {
 }
 
 void test_rmref_handles_nums() {
-  cell* c = newCell();
+  Cell* c = newCell();
   c->type = NUM;
-  c->car = (cell*)34;
+  c->car = (Cell*)34;
   rmref(c);
   check(!c->car);
   check_eq(freelist, c);
@@ -1312,38 +1312,38 @@ void test_rmref_handles_nums() {
 
 
 
-                                  hash_map<long, cell*> numLiterals;
-                                  cell* intern(long x) {
+                                  hash_map<long, Cell*> numLiterals;
+                                  Cell* intern(long x) {
                                     if (numLiterals[x]) {
                                       dbg << endl << "reuse: " << x << " " << numLiterals[x] << endl;
                                       return numLiterals[x];
                                     }
                                     numLiterals[x] = newCell();
-                                    numLiterals[x]->car = (cell*)x;
+                                    numLiterals[x]->car = (Cell*)x;
                                     numLiterals[x]->type = NUM;
                                     mkref(numLiterals[x]);
                                     dbg << endl << "new: " << x << " " << numLiterals[x] << endl;
                                     return numLiterals[x];
                                   }
 
-cell* newNum(long x) {
+Cell* newNum(long x) {
   return intern(x);
 }
 
-bool isNum(cell* x) {
+bool isNum(Cell* x) {
   return x->type == NUM;
 }
 
-long toNum(cell* x) {
+long toNum(Cell* x) {
   if (!isNum(x)) return 0;
   return (long)x->car;
 }
 
-bool isCons(cell* x) {
+bool isCons(Cell* x) {
   return x != nil && x->type == CONS;
 }
 
-bool isAtom(cell* x) {
+bool isAtom(Cell* x) {
   return x->type != CONS && x->type != TABLE;
 }
 
@@ -1367,28 +1367,28 @@ bool isAtom(cell* x) {
                                   class StringMap :public hash_map<string, Data, strHash, strEq>{};
 
 
-                                  StringMap<cell*> stringLiterals;
-                                  cell* intern(string x) {
+                                  StringMap<Cell*> stringLiterals;
+                                  Cell* intern(string x) {
                                     if (stringLiterals[x]) {
                                       dbg << endl << "reuse: " << x << endl;
                                       return stringLiterals[x];
                                     }
                                     stringLiterals[x] = newCell();
                                     dbg << endl << "new: " << x << " " << stringLiterals[x] << endl;
-                                    stringLiterals[x]->car = (cell*)new string(x); // not aligned like cells; can fragment memory
+                                    stringLiterals[x]->car = (Cell*)new string(x); // not aligned like cells; can fragment memory
                                     mkref(stringLiterals[x]);
                                     return stringLiterals[x];
                                   }
 
                                   void clearLiteralTables() { // just for testing
-                                    for (hash_map<long, cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
+                                    for (hash_map<long, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
                                       if (p->second->nrefs > 1)
                                         cerr << "forcing unintern: " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
                                       while (p->second->nrefs > 0)
                                         rmref(p->second);
                                     }
                                     numLiterals.clear();
-                                    for (StringMap<cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
+                                    for (StringMap<Cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
                                       if (p->first == L"currLexicalScope") continue; // memory leak
                                       if (p->second->nrefs > 1)
                                         cerr << "forcing unintern: " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
@@ -1398,46 +1398,46 @@ bool isAtom(cell* x) {
                                     stringLiterals.clear();
                                   }
 
-cell* newSym(string x) {
-  cell* result = intern(x);
+Cell* newSym(string x) {
+  Cell* result = intern(x);
   result->type = SYM;
   return result;
 }
 
-bool isSym(cell* x) {
+bool isSym(Cell* x) {
   return x->type == SYM;
 }
 
-cell* newString(string x) {
-  cell* result = intern(x);
+Cell* newString(string x) {
+  Cell* result = intern(x);
   result->type = STRING;
   return result;
 }
 
-bool isString(cell* x) {
+bool isString(Cell* x) {
   return x->type == STRING;
 }
 
-string toString(cell* x) {
+string toString(Cell* x) {
   if (!isString(x) && !isSym(x))
     return L"";
   return *(string*)x->car;
 }
 
-cell* newTable() {
-  cell* result = newCell();
+Cell* newTable() {
+  Cell* result = newCell();
   result->type = TABLE;
-  result->car = (cell*)new Table();
+  result->car = (Cell*)new Table();
   return result;
 }
 
-bool isTable(cell* x) {
+bool isTable(Cell* x) {
   return x->type == TABLE;
 }
 
 
 
-cell* car(cell* x) {
+Cell* car(Cell* x) {
   if (x->type != CONS) {
     cerr << "car of non-cons" << endl;
     return nil;
@@ -1445,28 +1445,28 @@ cell* car(cell* x) {
   return x->car;
 }
 
-cell* cdr(cell* x) {
+Cell* cdr(Cell* x) {
   return x->cdr;
 }
 
-void setCar(cell* x, cell* y) {
+void setCar(Cell* x, Cell* y) {
   mkref(y);
   if (isCons(x))
     rmref(car(x));
   x->car = y;
 }
 
-void setCdr(cell* x, cell* y) {
+void setCdr(Cell* x, Cell* y) {
   mkref(y);
   rmref(cdr(x));
   x->cdr = y;
 }
 
 void test_setCar_decrements_nrefs() {
-  cell* cons = newCell();
-  cell* car = newCell();
+  Cell* cons = newCell();
+  Cell* car = newCell();
   check_eq(car->nrefs, 0);
-  cell* newCar = newCell();
+  Cell* newCar = newCell();
   check_eq(newCar->nrefs, 0);
   setCar(cons, car);
   check_eq(car->nrefs, 1);
@@ -1479,10 +1479,10 @@ void test_setCar_decrements_nrefs() {
 }
 
 void test_setCar_decrements_nrefs_for_non_cons() {
-  cell* cons = newCell();
-  cell* num = newNum(23);
+  Cell* cons = newCell();
+  Cell* num = newNum(23);
   check_eq(num->nrefs, 1);
-  cell* newCar = newCell();
+  Cell* newCar = newCell();
   check_eq(newCar->nrefs, 0);
   setCar(cons, num);
   check_eq(num->nrefs, 2);
@@ -1495,8 +1495,8 @@ void test_setCar_decrements_nrefs_for_non_cons() {
 }
 
 void test_setCar_is_idempotent() {
-  cell* cons = newCell();
-  cell* car = newCell();
+  Cell* cons = newCell();
+  Cell* car = newCell();
   check_eq(car->nrefs, 0);
   setCar(cons, car);
   check_eq(car->nrefs, 1);
@@ -1509,8 +1509,8 @@ void test_setCar_is_idempotent() {
 }
 
 void test_setCdr_is_idempotent() {
-  cell* cons = newCell();
-  cell* cdr = newCell();
+  Cell* cons = newCell();
+  Cell* cdr = newCell();
   check_eq(cdr->nrefs, 0);
   setCdr(cons, cdr);
   check_eq(cdr->nrefs, 1);
@@ -1522,12 +1522,12 @@ void test_setCdr_is_idempotent() {
   checkState();
 }
 
-                                  void unsafeSet(cell* t, cell* k, cell* val, bool deleteNils) {
+                                  void unsafeSet(Cell* t, Cell* k, Cell* val, bool deleteNils) {
                                     if (!isTable(t)) {
                                       cerr << "set on a non-table" << endl;
                                       return;
                                     }
-                                    hash_map<long, cell*>& table = ((Table*)t->car)->table;
+                                    hash_map<long, Cell*>& table = ((Table*)t->car)->table;
                                     long key = (long)k;
                                     if (table[key])
                                       rmref(table[key]);
@@ -1541,39 +1541,39 @@ void test_setCdr_is_idempotent() {
                                     table[key] = val;
                                   }
 
-void set(cell* t, cell* k, cell* val) {
+void set(Cell* t, Cell* k, Cell* val) {
   unsafeSet(t, k, val, true);
 }
 
-                                  cell* unsafeGet(cell* t, cell* k) {
+                                  Cell* unsafeGet(Cell* t, Cell* k) {
                                     if (!isTable(t)) {
                                       cerr << "get on a non-table" << endl;
                                       return nil;
                                     }
-                                    hash_map<long, cell*>& table = ((Table*)t->car)->table;
+                                    hash_map<long, Cell*>& table = ((Table*)t->car)->table;
                                     long key = (long)k;
                                     return table[key];
                                   }
 
-cell* get(cell* t, cell* k) {
-  cell* result = unsafeGet(t, k);
+Cell* get(Cell* t, Cell* k) {
+  Cell* result = unsafeGet(t, k);
   if (!result) return nil;
   return result;
 }
 
 
 
-                                  ostream& operator<<(ostream& os, cell* c);
+                                  ostream& operator<<(ostream& os, Cell* c);
 
                                   ostream& operator<<(ostream& os, Table* t) {
                                     os << "{" << endl;
-                                    for (hash_map<long, cell*>::iterator p = t->table.begin(); p != t->table.end(); ++p) {
-                                      os << (cell*)p->first << ": " << p->second << endl;
+                                    for (hash_map<long, Cell*>::iterator p = t->table.begin(); p != t->table.end(); ++p) {
+                                      os << (Cell*)p->first << ": " << p->second << endl;
                                     }
                                     return os << "}" << endl;
                                   }
 
-                                  ostream& operator<<(ostream& os, cell* c) {
+                                  ostream& operator<<(ostream& os, Cell* c) {
                                     if (c == NULL) return os << "NULLNULLNULL";
                                     if (c == nil) return os << "nil";
                                     switch(c->type) {
@@ -1593,25 +1593,25 @@ cell* get(cell* t, cell* k) {
                                     return os;
                                   }
 
-ostream& operator<<(ostream& os, list<cell*> l) {
-  for (list<cell*>::iterator p = l.begin(); p != l.end(); ++p)
+ostream& operator<<(ostream& os, list<Cell*> l) {
+  for (list<Cell*>::iterator p = l.begin(); p != l.end(); ++p)
     os << *p;
   return os << endl;
 }
 
 
 
-                                  extern cell* buildCell(AstNode);
+                                  extern Cell* buildCell(AstNode);
 
-list<cell*> buildCells(list<AstNode> in) {
-  list<cell*> result;
+list<Cell*> buildCells(list<AstNode> in) {
+  list<Cell*> result;
   if (in.empty()) return result;
   for (list<AstNode>::iterator p = in.begin(); p != in.end(); ++p)
     result.push_back(buildCell(*p));
   return result;
 }
 
-cell* buildCell(AstNode n) {
+Cell* buildCell(AstNode n) {
   if (n.isNil())
     return nil;
 
@@ -1631,14 +1631,14 @@ cell* buildCell(AstNode n) {
 
   if (n.elems.size() == 2 && (n.elems.front() == L"'" || n.elems.front() == L"`")
       && n.elems.back().isAtom()) {
-    cell* newForm = newCell();
+    Cell* newForm = newCell();
     setCar(newForm, buildCell(n.elems.front()));
     setCdr(newForm, buildCell(n.elems.back()));
     return newForm;
   }
 
-  cell* newForm = NULL;
-  cell* curr = NULL;
+  Cell* newForm = NULL;
+  Cell* curr = NULL;
   for (list<AstNode>::iterator q = n.elems.begin(); q != n.elems.end(); ++q) {
     if (q->atom == L"(")
       continue;
@@ -1667,65 +1667,65 @@ cell* buildCell(AstNode n) {
 }
 
 void test_build_handles_empty_input() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"")))));
-  check(cells.empty());
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"")))));
+  check(Cells.empty());
   checkState();
 }
 
 void test_build_handles_nil() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
-  check_eq(cells.front(), nil);
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
+  check_eq(Cells.front(), nil);
   checkState();
 }
 
 void test_build_handles_nil2() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"nil")))));
-  check_eq(cells.front(), nil);
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"nil")))));
+  check_eq(Cells.front(), nil);
   checkState();
 }
 
 void test_build_handles_number() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34")))));
-  check_eq(cells.size(), 1);
-  check(isNum(cells.front()));
-  check_eq(toNum(cells.front()), 34);
-  check_eq(cells.front()->nrefs, 1);
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"34")))));
+  check_eq(Cells.size(), 1);
+  check(isNum(Cells.front()));
+  check_eq(toNum(Cells.front()), 34);
+  check_eq(Cells.front()->nrefs, 1);
   checkState();
 }
 
 void test_build_handles_symbol() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"a")))));
-  check_eq(cells.size(), 1);
-  check(isSym(cells.front()));
-  check_eq(toString(cells.front()), L"a");
-  check_eq(cells.front()->nrefs, 1);
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"a")))));
+  check_eq(Cells.size(), 1);
+  check(isSym(Cells.front()));
+  check_eq(toString(Cells.front()), L"a");
+  check_eq(Cells.front()->nrefs, 1);
   checkState();
 }
 
 void test_build_handles_quoted_symbol() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'a")))));
-  check_eq(cells.size(), 1);
-  check(isCons(cells.front()));
-  check(isSym(car(cells.front())));
-  check_eq(toString(car(cells.front())), L"'");
-  check_eq(car(cells.front())->nrefs, 2);
-  check(isSym(car(cells.front())));
-  check_eq(toString(cdr(cells.front())), L"a");
-  check_eq(cdr(cells.front())->nrefs, 2);
-  rmref(cells.front());
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"'a")))));
+  check_eq(Cells.size(), 1);
+  check(isCons(Cells.front()));
+  check(isSym(car(Cells.front())));
+  check_eq(toString(car(Cells.front())), L"'");
+  check_eq(car(Cells.front())->nrefs, 2);
+  check(isSym(car(Cells.front())));
+  check_eq(toString(cdr(Cells.front())), L"a");
+  check_eq(cdr(Cells.front())->nrefs, 2);
+  rmref(Cells.front());
   checkState();
 }
 
 void test_build_handles_multiple_atoms() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34\n35")))));
-  check_eq(cells.size(), 2);
-  cell* c = cells.front();
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"34\n35")))));
+  check_eq(Cells.size(), 2);
+  Cell* c = Cells.front();
   check(isNum(c));
   check_eq(toNum(c), 34);
   check_eq(c->nrefs, 1);
   check_eq(cdr(c), nil);
 
-  c = cells.back();
+  c = Cells.back();
   check(isNum(c));
   check_eq(toNum(c), 35);
   check_eq(c->nrefs, 1);
@@ -1735,9 +1735,9 @@ void test_build_handles_multiple_atoms() {
 }
 
 void test_build_handles_form() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34 35")))));
-  check_eq(cells.size(), 1);
-  cell* c = cells.front();
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"34 35")))));
+  check_eq(Cells.size(), 1);
+  Cell* c = Cells.front();
   check(isCons(c));
   check_eq(c->nrefs, 0);
   check(isNum(car(c)));
@@ -1752,14 +1752,14 @@ void test_build_handles_form() {
   check_eq(car(c)->nrefs, 2);
   check_eq(cdr(c), nil);
 
-  rmref(cells.front());
+  rmref(Cells.front());
   checkState();
 }
 
 void test_build_handles_dot() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34 . 35")))));
-  check_eq(cells.size(), 1);
-  cell* c = cells.front();
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"34 . 35")))));
+  check_eq(Cells.size(), 1);
+  Cell* c = Cells.front();
   check(isCons(c));
   check_eq(c->nrefs, 0);
   check(isNum(car(c)));
@@ -1771,14 +1771,14 @@ void test_build_handles_dot() {
   check_eq(toNum(c), 35);
   check_eq(c->nrefs, 2);
 
-  rmref(cells.front());
+  rmref(Cells.front());
   checkState();
 }
 
 void test_build_handles_nested_form() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 23))")))));
-  check_eq(cells.size(), 1);
-  cell* c = cells.front();
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 23))")))));
+  check_eq(Cells.size(), 1);
+  Cell* c = Cells.front();
   check(isCons(c));
   check_eq(c->nrefs, 0);
   check(isNum(car(c)));
@@ -1795,7 +1795,7 @@ void test_build_handles_nested_form() {
   c = cdr(c);
   check(isCons(c));
   check_eq(c->nrefs, 1);
-    cell* c2 = car(c);
+    Cell* c2 = car(c);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
     check(isNum(c2->car));
@@ -1810,14 +1810,14 @@ void test_build_handles_nested_form() {
     check_eq(c2->cdr, nil);
   check_eq(cdr(c), nil);
 
-  rmref(cells.front());
+  rmref(Cells.front());
   checkState();
 }
 
 void test_build_handles_strings() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 \"abc\" 23))")))));
-  check_eq(cells.size(), 1);
-  cell* c = cells.front();
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 \"abc\" 23))")))));
+  check_eq(Cells.size(), 1);
+  Cell* c = Cells.front();
   check(isCons(c));
   check_eq(c->nrefs, 0);
   check(isNum(car(c)));
@@ -1832,7 +1832,7 @@ void test_build_handles_strings() {
   c = cdr(c);
   check(isCons(c));
   check_eq(c->nrefs, 1);
-    cell* c2 = car(c);
+    Cell* c2 = car(c);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
     check(isNum(c2->car));
@@ -1853,14 +1853,14 @@ void test_build_handles_strings() {
     check_eq(c2->cdr, nil);
   check_eq(cdr(c), nil);
 
-  rmref(cells.front());
+  rmref(Cells.front());
   checkState();
 }
 
 void test_build_handles_syms() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 \"abc\" 3de 23))")))));
-  check_eq(cells.size(), 1);
-  cell* c = cells.front();
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 \"abc\" 3de 23))")))));
+  check_eq(Cells.size(), 1);
+  Cell* c = Cells.front();
   check(isCons(c));
   check_eq(c->nrefs, 0);
   check(isNum(car(c)));
@@ -1874,7 +1874,7 @@ void test_build_handles_syms() {
   check_eq(car(c)->nrefs, 2);
   c = cdr(c);
   check(isCons(c));
-    cell* c2 = car(c);
+    Cell* c2 = car(c);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
     check(isNum(c2->car));
@@ -1901,14 +1901,14 @@ void test_build_handles_syms() {
     check_eq(c2->cdr, nil);
   check_eq(cdr(c), nil);
 
-  rmref(cells.front());
+  rmref(Cells.front());
   checkState();
 }
 
 void test_build_handles_quotes() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"`(34 ,35)")))));
-  check_eq(cells.size(), 1);
-  cell* c = cells.front();
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"`(34 ,35)")))));
+  check_eq(Cells.size(), 1);
+  Cell* c = Cells.front();
   check(isCons(c));
   check_eq(c->nrefs, 0);
   check(isSym(car(c)));
@@ -1922,7 +1922,7 @@ void test_build_handles_quotes() {
   check_eq(car(c)->nrefs, 2);
   c = cdr(c);
   check(isCons(c));
-    cell* c2 = car(c);
+    Cell* c2 = car(c);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
     check(isSym(c2->car));
@@ -1937,7 +1937,7 @@ void test_build_handles_quotes() {
     check_eq(c2->cdr, nil);
   check_eq(cdr(c), nil);
 
-  rmref(cells.front());
+  rmref(Cells.front());
   checkState();
 }
 
@@ -1945,25 +1945,25 @@ void test_build_handles_quotes() {
 
 //// bindings
 
-                                  hash_map<long, stack<cell*> > dynamics;
-                                  cell* lookupDynamicBinding(cell* sym) {
-                                    stack<cell*> bindings = dynamics[(long)sym];
+                                  hash_map<long, stack<Cell*> > dynamics;
+                                  Cell* lookupDynamicBinding(Cell* sym) {
+                                    stack<Cell*> bindings = dynamics[(long)sym];
                                     if (bindings.empty()) return NULL;
                                     return bindings.top();
                                   }
 
-                                  void newDynamicScope(cell* sym, cell* val) {
+                                  void newDynamicScope(Cell* sym, Cell* val) {
                                     mkref(sym);
                                     mkref(val);
                                     dynamics[(long)sym].push(val);
                                   }
 
-                                  void newDynamicScope(string s, cell* val) {
+                                  void newDynamicScope(string s, Cell* val) {
                                     newDynamicScope(newSym(s), val);
                                   }
 
-                                  void endDynamicScope(cell* sym) {
-                                    stack<cell*>& bindings = dynamics[(long)sym];
+                                  void endDynamicScope(Cell* sym) {
+                                    stack<Cell*>& bindings = dynamics[(long)sym];
                                     if (bindings.empty()) {
                                       cerr << "No dynamic binding for " << sym << endl;
                                       return;
@@ -1973,8 +1973,8 @@ void test_build_handles_quotes() {
                                     bindings.pop();
                                   }
 
-                                  void assignDynamicVar(cell* sym, cell* val) {
-                                    stack<cell*>& bindings = dynamics[(long)sym];
+                                  void assignDynamicVar(Cell* sym, Cell* val) {
+                                    stack<Cell*>& bindings = dynamics[(long)sym];
                                     if (bindings.empty()) {
                                       cerr << "No dynamic binding to assign for " << sym << endl;
                                       return;
@@ -1993,13 +1993,13 @@ void test_build_handles_quotes() {
 
                                   void test_lexical_scope_has_nil_cdr_on_startup() {
                                     check_eq(currLexicalScopes.size(), 1);
-                                    cell* currLexicalScope = currLexicalScopes.top();
+                                    Cell* currLexicalScope = currLexicalScopes.top();
                                     check_eq(currLexicalScope->cdr, nil);
                                   }
 
-                                  cell* lookupLexicalBinding(cell* sym) {
-                                    for (cell* scope = currLexicalScopes.top(); scope != nil; scope = scope->cdr) {
-                                      cell* result = unsafeGet(scope, sym);
+                                  Cell* lookupLexicalBinding(Cell* sym) {
+                                    for (Cell* scope = currLexicalScopes.top(); scope != nil; scope = scope->cdr) {
+                                      Cell* result = unsafeGet(scope, sym);
                                       if (result) return result;
                                     }
                                     return NULL;
@@ -2008,8 +2008,8 @@ void test_build_handles_quotes() {
                                   // entering and leaving lexical scopes *assigns the current dynamic*
                                   // binding of the currLexicalScope sym.
                                   // Calling functions will create new dynamic bindings.
-                                  void newLexicalScope(cell* newScope) {
-                                    cell* oldScope = currLexicalScopes.top();
+                                  void newLexicalScope(Cell* newScope) {
+                                    Cell* oldScope = currLexicalScopes.top();
                                     dbg << "new lexical scope: " << newScope << endl;
                                     setCdr(newScope, oldScope);
                                     mkref(newScope);
@@ -2020,26 +2020,26 @@ void test_build_handles_quotes() {
                                   }
 
                                   void endLexicalScope() {
-                                    cell* currScope = currLexicalScopes.top();
+                                    Cell* currScope = currLexicalScopes.top();
                                     if (currScope == nil)
                                       cerr << "No lexical scope to end" << endl << DIE;
                                     dbg << "end lexical scope: " << currScope << endl;
-                                    cell* oldScope = cdr(currScope);
+                                    Cell* oldScope = cdr(currScope);
                                     rmref(currScope);
                                     assignDynamicVar(newSym(L"currLexicalScope"), oldScope);
                                   }
 
-                                  void addLexicalBinding(cell* scope, cell* sym, cell* val) {
+                                  void addLexicalBinding(Cell* scope, Cell* sym, Cell* val) {
                                     dbg << "creating binding: " << (void*)scope << " " << sym << endl;
                                     if (unsafeGet(scope, sym)) cerr << "Can't rebind within a lexical scope" << endl << DIE;
                                     unsafeSet(scope, sym, val, false);
                                   }
-                                  void addLexicalBinding(cell* sym, cell* val) {
+                                  void addLexicalBinding(Cell* sym, Cell* val) {
                                     addLexicalBinding(currLexicalScopes.top(), sym, val);
                                   }
 
-cell* lookup(cell* sym) {
-  cell* result = lookupLexicalBinding(sym);
+Cell* lookup(Cell* sym) {
+  Cell* result = lookupLexicalBinding(sym);
   if (result) return result;
   result = lookupDynamicBinding(sym);
   if (result) return result;
@@ -2048,9 +2048,9 @@ cell* lookup(cell* sym) {
 }
 
 void test_lookup_returns_dynamic_binding() {
-  cell* sym = newSym(L"a");
+  Cell* sym = newSym(L"a");
   check_eq(sym->nrefs, 1);
-  cell* val = newNum(34);
+  Cell* val = newNum(34);
   check_eq(val->nrefs, 1);
   newDynamicScope(sym, val);
     check_eq(lookup(sym), val);
@@ -2063,9 +2063,9 @@ void test_lookup_returns_dynamic_binding() {
 }
 
 void test_lookup_returns_lexical_binding() {
-  cell* sym = newSym(L"a");
+  Cell* sym = newSym(L"a");
   check_eq(sym->nrefs, 1);
-  cell* val = newNum(34);
+  Cell* val = newNum(34);
   check_eq(val->nrefs, 1);
   newLexicalScope();
     addLexicalBinding(sym, val);
@@ -2079,11 +2079,11 @@ void test_lookup_returns_lexical_binding() {
 }
 
 void test_lexical_binding_always_overrides_dynamic() {
-  cell* sym = newSym(L"a");
+  Cell* sym = newSym(L"a");
   check_eq(sym->nrefs, 1);
-  cell* val = newNum(34);
+  Cell* val = newNum(34);
   check_eq(val->nrefs, 1);
-  cell* dynVal = newNum(35);
+  Cell* dynVal = newNum(35);
   check_eq(dynVal->nrefs, 1);
   newDynamicScope(sym, dynVal);
     check_eq(sym->nrefs, 2);
@@ -2109,9 +2109,9 @@ void test_lexical_binding_always_overrides_dynamic() {
 }
 
 void test_nil_lexical_binding_works() {
-  cell* sym = newSym(L"a");
+  Cell* sym = newSym(L"a");
   check_eq(sym->nrefs, 1);
-  cell* dynVal = newNum(35);
+  Cell* dynVal = newNum(35);
   newDynamicScope(sym, dynVal);
     newLexicalScope();
       addLexicalBinding(sym, nil);
@@ -2122,13 +2122,13 @@ void test_nil_lexical_binding_works() {
 }
 
 void test_lexical_scopes_nest_correctly() {
-  cell* sym = newSym(L"a");
+  Cell* sym = newSym(L"a");
   check_eq(sym->nrefs, 1);
-  cell* val = newNum(34);
+  Cell* val = newNum(34);
   check_eq(val->nrefs, 1);
-  cell* val2 = newNum(35);
+  Cell* val2 = newNum(35);
   check_eq(val->nrefs, 1);
-  cell* dynVal = newNum(36);
+  Cell* dynVal = newNum(36);
   check_eq(dynVal->nrefs, 1);
   newDynamicScope(sym, dynVal);
     check_eq(sym->nrefs, 2);
@@ -2174,9 +2174,9 @@ void test_lexical_scopes_nest_correctly() {
 }
 
 void test_lower_lexical_scopes_are_available() {
-  cell* sym = newSym(L"a");
+  Cell* sym = newSym(L"a");
   check_eq(sym->nrefs, 1);
-  cell* val = newNum(34);
+  Cell* val = newNum(34);
   check_eq(val->nrefs, 1);
   newLexicalScope();
     addLexicalBinding(sym, val);
@@ -2190,37 +2190,37 @@ void test_lower_lexical_scopes_are_available() {
 
 
 
-                                  cell* sig(cell* lambda) {
+                                  Cell* sig(Cell* lambda) {
                                     return car(cdr(lambda));
                                   }
 
-                                  cell* body(cell* lambda) {
+                                  Cell* body(Cell* lambda) {
                                     return cdr(cdr(lambda));
                                   }
 
-                                  cell* callee_body(cell* callee) {
+                                  Cell* callee_body(Cell* callee) {
                                     return car(cdr(cdr(callee)));
                                   }
 
-                                  cell* callee_env(cell* callee) {
+                                  Cell* callee_env(Cell* callee) {
                                     return cdr(cdr(cdr(callee)));
                                   }
 
-                                  cell* call_args(cell* call) {
+                                  Cell* call_args(Cell* call) {
                                     return cdr(call);
                                   }
 
-                                  bool isQuoted(cell* cell) {
-                                    return isCons(cell) && car(cell) == newSym(L"'");
+                                  bool isQuoted(Cell* Cell) {
+                                    return isCons(Cell) && car(Cell) == newSym(L"'");
                                   }
 
-                                  cell* unQuote(cell* cell) {
-                                    if (isQuoted(cell))
-                                      return cdr(cell);
-                                    return cell;
+                                  Cell* unQuote(Cell* Cell) {
+                                    if (isQuoted(Cell))
+                                      return cdr(Cell);
+                                    return Cell;
                                   }
 
-void bindArg(cell* scope, cell* param, cell* arg, bool quoted) {
+void bindArg(Cell* scope, Cell* param, Cell* arg, bool quoted) {
   if (param == nil) return;
 
   if (isQuoted(param)) {
@@ -2236,17 +2236,17 @@ void bindArg(cell* scope, cell* param, cell* arg, bool quoted) {
   bindArg(scope, cdr(param), cdr(arg), quoted);
 }
 
-cell* bindArgs(cell* params, cell* args) {
-  cell* scope = newTable();
+Cell* bindArgs(Cell* params, Cell* args) {
+  Cell* scope = newTable();
   bindArg(scope, params, args, false);
   return scope;
 }
 
 void test_bindArgs_handles_vararg() {
-  cell* params = buildCells(parse(parenthesize(tokenize(teststream(L"a"))))).front();
-  cell* args = buildCells(parse(parenthesize(tokenize(teststream(L"(1)"))))).front();
-  cell* scope = bindArgs(params, args);
-  cell* result = unsafeGet(scope, newSym(L"a"));
+  Cell* params = buildCells(parse(parenthesize(tokenize(teststream(L"a"))))).front();
+  Cell* args = buildCells(parse(parenthesize(tokenize(teststream(L"(1)"))))).front();
+  Cell* scope = bindArgs(params, args);
+  Cell* result = unsafeGet(scope, newSym(L"a"));
   check_eq(car(result), newNum(1));
   check_eq(cdr(result), nil);
   rmref(scope);
@@ -2254,21 +2254,21 @@ void test_bindArgs_handles_vararg() {
   checkState();
 }
 
-                                  extern cell* eval(cell*);
+                                  extern Cell* eval(Cell*);
 
-                                  cell* eval_args(cell* params, cell* args) {
+                                  Cell* eval_args(Cell* params, Cell* args) {
                                     if (args == nil) return nil;
                                     if (isQuoted(params)) return args;
                                     setCdr(args, eval_args(cdr(params), cdr(args)));
                                     if (!isCons(params) || !isQuoted(car(params))) {
-                                      cell* result = eval(car(args));
+                                      Cell* result = eval(car(args));
                                       setCar(args, result);
                                       rmref(result);
                                     }
                                     return args;
                                   }
 
-cell* eval(cell* expr) {
+Cell* eval(Cell* expr) {
   if (!expr)
     cerr << "eval: cell should never be NULL" << endl << DIE;
 
@@ -2286,7 +2286,7 @@ cell* eval(cell* expr) {
 
   // lambda expressions get the current lexical scope attached to them
   if (car(expr) == newSym(L"lambda")) {
-    cell* ans = newCell();
+    Cell* ans = newCell();
     setCar(ans, car(expr));
     setCdr(ans, newCell());
     setCar(cdr(ans), sig(expr));
@@ -2297,18 +2297,18 @@ cell* eval(cell* expr) {
     return ans;
   }
 
-  cell* lambda = eval(car(expr));
-  cell* evald_args = eval_args(sig(lambda), call_args(expr));
+  Cell* lambda = eval(car(expr));
+  Cell* evald_args = eval_args(sig(lambda), call_args(expr));
   // construct a new scope with args based on current scope and sig
-  cell* newScope = bindArgs(sig(lambda), evald_args);
+  Cell* newScope = bindArgs(sig(lambda), evald_args);
   // swap in the function's lexical environment
   newDynamicScope(L"currLexicalScope", callee_env(lambda));
   // throw the new scope on it
   newLexicalScope(newScope);
 
   // eval all forms in body; save result of final form
-  cell* result = nil;
-  for (cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
+  Cell* result = nil;
+  for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
     result = eval(form->car);
     rmref(result);
   }
@@ -2321,81 +2321,81 @@ cell* eval(cell* expr) {
 }
 
 void test_nil_evals_to_itself() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
-  check_eq(cells.size(), 1);
-  cell* result = eval(cells.front());
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
+  check_eq(Cells.size(), 1);
+  Cell* result = eval(Cells.front());
   check_eq(result, nil);
   rmref(result);
-  rmref(cells.front());
+  rmref(Cells.front());
   checkState();
 }
 
 void test_num_evals_to_itself() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34")))));
-  check_eq(cells.size(), 1);
-  cell* result = eval(cells.front());
-  check_eq(result, cells.front());
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"34")))));
+  check_eq(Cells.size(), 1);
+  Cell* result = eval(Cells.front());
+  check_eq(result, Cells.front());
   rmref(result);
-  rmref(cells.front());
+  rmref(Cells.front());
   checkState();
 }
 
 void test_string_evals_to_itself() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"\"ac bd\"")))));
-  check_eq(cells.size(), 1);
-  cell* result = eval(cells.front());
-  check_eq(result, cells.front());
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"\"ac bd\"")))));
+  check_eq(Cells.size(), 1);
+  Cell* result = eval(Cells.front());
+  check_eq(result, Cells.front());
   rmref(result);
-  rmref(cells.front());
+  rmref(Cells.front());
   checkState();
 }
 
 void test_eval_handles_quoted_atoms() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'a '34")))));
-  check_eq(cells.size(), 2);
-  cell* result = eval(cells.front());
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"'a '34")))));
+  check_eq(Cells.size(), 2);
+  Cell* result = eval(Cells.front());
   check_eq(result, newSym(L"a"));
   rmref(result);
-  result = eval(cells.back());
+  result = eval(Cells.back());
   check_eq(result, newNum(34));
   rmref(result);
-  rmref(cells.front());
-  rmref(cells.back());
+  rmref(Cells.front());
+  rmref(Cells.back());
   checkState();
 }
 
 void test_eval_handles_quoted_lists() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'(a b)")))));
-  cell* result = eval(cells.front());
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"'(a b)")))));
+  Cell* result = eval(Cells.front());
   check_eq(car(result), newSym(L"a"));
   check_eq(car(cdr(result)), newSym(L"b"));
   check_eq(cdr(cdr(result)), nil);
   rmref(result);
-  rmref(cells.front());
+  rmref(Cells.front());
   checkState();
 }
 
 void test_eval_handles_simple_lambda() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
-  check_eq(cells.size(), 1);
-  cell* lambda = eval(cells.front());
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
+  check_eq(Cells.size(), 1);
+  Cell* lambda = eval(Cells.front());
   check_eq(lambda->car, newSym(L"lambda"));
   check_eq(lambda->cdr->car, nil);
   check(isCons(lambda->cdr->cdr->car));
   check_eq(lambda->cdr->cdr->car->car, newNum(34));
   check_eq(lambda->cdr->cdr->cdr, nil);
   rmref(lambda);
-  rmref(cells.front());
+  rmref(Cells.front());
   checkState();
 }
 
 void test_eval_handles_closure() {
-  list<cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
-  check_eq(cells.size(), 1);
+  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
+  check_eq(Cells.size(), 1);
   newLexicalScope();
-    cell* newLexicalScope = currLexicalScopes.top();
+    Cell* newLexicalScope = currLexicalScopes.top();
     check_eq(newLexicalScope->nrefs, 2);
-    cell* result = eval(cells.front());
+    Cell* result = eval(Cells.front());
     check_eq(newLexicalScope->nrefs, 3);
   endLexicalScope();
   check_eq(newLexicalScope->nrefs, 1);
@@ -2405,13 +2405,13 @@ void test_eval_handles_closure() {
   check_eq(cdr(cdr(cdr(result))), newLexicalScope);
   rmref(result);
   check_eq(newLexicalScope->nrefs, 0);
-  rmref(cells.front());
+  rmref(Cells.front());
   checkState();
 }
 
 void test_eval_handles_lambda_calls() {
-  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () 34))"))))).front();
-  cell* result = eval(call);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () 34))"))))).front();
+  Cell* result = eval(call);
   check_eq(result, newNum(34));
   rmref(result);
   rmref(call);
@@ -2419,9 +2419,9 @@ void test_eval_handles_lambda_calls() {
 }
 
 void test_eval_expands_syms_in_lambda_bodies() {
-  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () a))"))))).front();
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () a))"))))).front();
   newDynamicScope(L"a", newNum(34));
-  cell* result = eval(lambda);
+  Cell* result = eval(lambda);
   check_eq(result, newNum(34));
   endDynamicScope(newSym(L"a"));
   rmref(result);
@@ -2430,11 +2430,11 @@ void test_eval_expands_syms_in_lambda_bodies() {
 }
 
 void test_eval_handles_assigned_lambda_calls() {
-  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)"))))).front();
-  cell* f = eval(lambda);
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)"))))).front();
+  Cell* f = eval(lambda);
   newDynamicScope(L"f", f);
-    cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
-    cell* result = eval(call);
+    Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
+    Cell* result = eval(call);
     check_eq(result, newNum(34));
   endDynamicScope(newSym(L"f"));
   rmref(result);
@@ -2445,10 +2445,10 @@ void test_eval_handles_assigned_lambda_calls() {
 }
 
 void test_eval_expands_lexically_scoped_syms_in_lambda_bodies() {
-  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () a))"))))).front();
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda () a))"))))).front();
   newLexicalScope();
     addLexicalBinding(newSym(L"a"), newNum(34));
-    cell* result = eval(call);
+    Cell* result = eval(call);
     check_eq(result, newNum(34));
   endLexicalScope();
   rmref(result);
@@ -2458,14 +2458,14 @@ void test_eval_expands_lexically_scoped_syms_in_lambda_bodies() {
 
 void test_eval_expands_syms_in_original_lexical_scope() {
   newDynamicScope(L"a", newNum(23));
-  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () a)"))))).front();
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () a)"))))).front();
   newLexicalScope();
   addLexicalBinding(newSym(L"a"), newNum(34));
-    cell* f = eval(lambda);
+    Cell* f = eval(lambda);
     newDynamicScope(L"f", f);
   endLexicalScope();
-  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
-  cell* result = eval(call);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
+  Cell* result = eval(call);
   check_eq(result, newNum(34));
   rmref(result);
   rmref(call);
@@ -2478,14 +2478,14 @@ void test_eval_expands_syms_in_original_lexical_scope() {
 
 void test_eval_expands_args_in_caller_scope() {
   newDynamicScope(L"a", newNum(23));
-  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda (arg1) arg1)"))))).front();
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda (arg1) arg1)"))))).front();
   newLexicalScope();
   addLexicalBinding(newSym(L"arg1"), newNum(34));
-    cell* f = eval(lambda);
+    Cell* f = eval(lambda);
     newDynamicScope(L"f", f);
   endLexicalScope();
-  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f a)"))))).front();
-  cell* result = eval(call);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f a)"))))).front();
+  Cell* result = eval(call);
   check_eq(result, newNum(23));
   rmref(result);
   rmref(call);
@@ -2498,14 +2498,14 @@ void test_eval_expands_args_in_caller_scope() {
 
 void test_eval_doesnt_eval_quoted_params() {
   newDynamicScope(L"a", newNum(23));
-  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda ('arg1) arg1)"))))).front();
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda ('arg1) arg1)"))))).front();
   newLexicalScope();
   addLexicalBinding(newSym(L"arg1"), newNum(34));
-    cell* f = eval(lambda);
+    Cell* f = eval(lambda);
     newDynamicScope(L"f", f);
   endLexicalScope();
-  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f a)"))))).front();
-  cell* result = eval(call);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f a)"))))).front();
+  Cell* result = eval(call);
   check_eq(result, newSym(L"a"));
   rmref(result);
   rmref(call);
@@ -2518,14 +2518,14 @@ void test_eval_doesnt_eval_quoted_params() {
 
 void test_eval_handles_quoted_param_list() {
   newDynamicScope(L"a", newNum(23));
-  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda '(arg1) arg1)"))))).front();
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda '(arg1) arg1)"))))).front();
   newLexicalScope();
   addLexicalBinding(newSym(L"arg1"), newNum(34));
-    cell* f = eval(lambda);
+    Cell* f = eval(lambda);
     newDynamicScope(L"f", f);
   endLexicalScope();
-  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f a)"))))).front();
-  cell* result = eval(call);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f a)"))))).front();
+  Cell* result = eval(call);
   check_eq(result, newSym(L"a"));
   rmref(result);
   rmref(call);
@@ -2537,11 +2537,11 @@ void test_eval_handles_quoted_param_list() {
 }
 
 void test_eval_handles_multiple_args() {
-  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda (a b) b)"))))).front();
-  cell* f = eval(lambda);
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda (a b) b)"))))).front();
+  Cell* f = eval(lambda);
   newDynamicScope(L"f", f);
-  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f 1 2)"))))).front();
-  cell* result = eval(call);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f 1 2)"))))).front();
+  Cell* result = eval(call);
   check_eq(result, newNum(2));
   rmref(result);
   rmref(call);
@@ -2552,11 +2552,11 @@ void test_eval_handles_multiple_args() {
 }
 
 void test_eval_handles_multiple_body_exprs() {
-  cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 1 2)"))))).front();
-  cell* f = eval(lambda);
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 1 2)"))))).front();
+  Cell* f = eval(lambda);
   newDynamicScope(L"f", f);
-  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
-  cell* result = eval(call);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
+  Cell* result = eval(call);
   check_eq(result, newNum(2));
   rmref(result);
   rmref(call);
@@ -2567,8 +2567,8 @@ void test_eval_handles_multiple_body_exprs() {
 }
 
 void test_eval_handles_vararg_param() {
-  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda args args) 1)"))))).front();
-  cell* result = eval(call);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda args args) 1)"))))).front();
+  Cell* result = eval(call);
   check(isCons(result));
   check_eq(car(result), newNum(1));
   rmref(result);
@@ -2577,8 +2577,8 @@ void test_eval_handles_vararg_param() {
 }
 
 void test_eval_evals_args() {
-  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda (f) (f)) (lambda () 34))"))))).front();
-  cell* result = eval(call);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda (f) (f)) (lambda () 34))"))))).front();
+  Cell* result = eval(call);
   check(isNum(result));
   check_eq(toNum(result), 34);
   rmref(result);
@@ -2587,8 +2587,8 @@ void test_eval_evals_args() {
 }
 
 void test_eval_doesnt_leak_body_evals() {
-  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda (f) (f) (f)) (lambda () 34))"))))).front();
-  cell* result = eval(call);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda (f) (f) (f)) (lambda () 34))"))))).front();
+  Cell* result = eval(call);
   check(isNum(result));
   check_eq(toNum(result), 34);
   rmref(result);
@@ -2597,8 +2597,8 @@ void test_eval_doesnt_leak_body_evals() {
 }
 
 void test_eval_handles_destructured_params() {
-  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda ((a b)) b) '(1 2))"))))).front();
-  cell* result = eval(call);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda ((a b)) b) '(1 2))"))))).front();
+  Cell* result = eval(call);
   check(isNum(result));
   check_eq(toNum(result), 2);
   rmref(result);
@@ -2607,8 +2607,8 @@ void test_eval_handles_destructured_params() {
 }
 
 void test_eval_handles_quoted_destructured_params() {
-  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda ('(a b)) b) (1 2))"))))).front();
-  cell* result = eval(call);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda ('(a b)) b) (1 2))"))))).front();
+  Cell* result = eval(call);
   check(isNum(result));
   check_eq(toNum(result), 2);
   rmref(result);
@@ -2617,8 +2617,8 @@ void test_eval_handles_quoted_destructured_params() {
 }
 
 void test_eval_handles_rest_params() {
-  cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda (a b . c) c) 1 2 3 4 5)"))))).front();
-  cell* result = eval(call);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda (a b . c) c) 1 2 3 4 5)"))))).front();
+  Cell* result = eval(call);
   check(isCons(result));
   check(isNum(car(result)));
   check_eq(toNum(car(result)), 3);
@@ -2659,7 +2659,7 @@ void setupState() {
 
 void resetState() {
   freelist = NULL;
-  for(cell* curr=currCell; curr >= heapStart; --curr)
+  for(Cell* curr=currCell; curr >= heapStart; --curr)
     curr->init();
   currCell = heapStart;
   dynamics.clear(); // leaks memory for strings and tables
@@ -2706,4 +2706,4 @@ int main(int argc, ascii* argv[]) {
 //  no function prototypes
 //  indented functions are deemphasized, would be pushed farther down if C permitted
 //  no new except in tests
-//  immutable objects; copy everywhere; no references or pointers except cell*
+//  immutable objects; copy everywhere; no references or pointers except Cell*
