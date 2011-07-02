@@ -1312,6 +1312,25 @@ void test_rmref_handles_nums() {
 
 
 
+bool isCons(Cell* x) {
+  return x != nil && x->type == CONS;
+}
+
+bool isAtom(Cell* x) {
+  return x->type != CONS && x->type != TABLE;
+}
+
+Cell* newTable() {
+  Cell* result = newCell();
+  result->type = TABLE;
+  result->car = (Cell*)new Table();
+  return result;
+}
+
+bool isTable(Cell* x) {
+  return x->type == TABLE;
+}
+
                                   hash_map<long, Cell*> numLiterals;
                                   Cell* intern(long x) {
                                     if (numLiterals[x]) {
@@ -1337,14 +1356,6 @@ bool isNum(Cell* x) {
 long toNum(Cell* x) {
   if (!isNum(x)) return 0;
   return (long)x->car;
-}
-
-bool isCons(Cell* x) {
-  return x != nil && x->type == CONS;
-}
-
-bool isAtom(Cell* x) {
-  return x->type != CONS && x->type != TABLE;
 }
 
                                   struct strEq {
@@ -1422,17 +1433,6 @@ string toString(Cell* x) {
   if (!isString(x) && !isSym(x))
     return L"";
   return *(string*)x->car;
-}
-
-Cell* newTable() {
-  Cell* result = newCell();
-  result->type = TABLE;
-  result->car = (Cell*)new Table();
-  return result;
-}
-
-bool isTable(Cell* x) {
-  return x->type == TABLE;
 }
 
 
