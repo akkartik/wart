@@ -2280,6 +2280,8 @@ Cell* eval(Cell* expr) {
   if (expr == nil)
     return nil;
 
+  // Every path through eval must mkref the return value exactly once.
+  // This implies rmref'ing the result of nested evals.
   if (isSym(expr))
     return mkref(lookup(expr));
 
