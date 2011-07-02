@@ -1156,6 +1156,7 @@ struct Cell {
     #define SYM 2
     #define STRING 3
     #define TABLE 4
+    #define PRIM_FUNC 5
   long nrefs;
   Cell() :car(nil), cdr(nil), type(CONS), nrefs(0) {}
   void init() { car=cdr=nil, type=CONS, nrefs=0; }
@@ -1414,6 +1415,24 @@ string toString(Cell* x) {
   if (!isString(x) && !isSym(x))
     return L"";
   return *(string*)x->car;
+}
+
+typedef Cell* (*PrimFunc)(void);
+Cell* newPrimFunc(PrimFunc f) {
+  Cell* result = newCell();
+  result->type = PRIM_FUNC;
+  result->car = (Cell*)f;
+  return result;
+}
+
+bool isPrimFunc(Cell* x) {
+  return x->type == PRIM_FUNC;
+}
+
+PrimFunc toPrimFunc(Cell* x) {
+  if (!isPrimFunc(x))
+    cerr << "Not a compiled function" << endl << DIE;
+  return (PrimFunc)x->car;
 }
 
 
@@ -2286,9 +2305,14 @@ Cell* eval(Cell* expr) {
 
   // eval all forms in body; save result of final form
   Cell* result = nil;
-  for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
-    rmref(result);
-    result = eval(car(form));
+  if (isPrimFunc(car(lambda))) {
+    result = toPrimFunc(car(lambda))();
+  }
+  else {
+    for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
+      rmref(result);
+      result = eval(car(form));
+    }
   }
 
   endLexicalScope();
