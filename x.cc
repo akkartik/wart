@@ -2294,14 +2294,14 @@ Cell* eval(Cell* expr) {
   // eval all forms in body; save result of final form
   Cell* result = nil;
   for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
-    result = eval(form->car);
     rmref(result);
+    result = eval(form->car);
   }
 
   rmref(lambda);
   endLexicalScope();
   endDynamicScope(newSym(L"currLexicalScope"));
-  return mkref(result);
+  return result;
 }
 
 void test_nil_evals_to_itself() {
