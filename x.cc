@@ -45,7 +45,7 @@
 
 
 
-//// tokenize. newlines and indent matter.
+//// tokenize input including newlines and indent
 
 enum TokenType {
   NON_WHITESPACE,
@@ -124,10 +124,9 @@ ostream& operator<<(ostream& os, Token p) {
                                   }
                                   Die DIE;
 
-// counts number of whitespace chars between next non-whitespace char and previous newline
 // BEWARE: tab = 1 space; don't mix the two
-//
-// But do track whether the final indent char is a space. Sometimes you want to wrap a long form.
+// But do track whether the final indent char is a space. Sometimes you want
+// to wrap a long form.
 const int LAST_CHAR_IS_SPACE = 100;
 int countIndent(istream& in) {
   int count = 0;
@@ -497,7 +496,7 @@ void test_tokenize_suppresses_initial_whitespace_lines() {
 
 
 
-//// insert explicit parens based on indentation.
+//// insert explicit parens based on indentation
 
 #define inc(p) { ++p; if (p == end) return p; }
 #define pop(l) { l.pop_front(); if (l.empty()) break; }
@@ -993,7 +992,7 @@ void test_parenthesize_wraps_when_indented_by_one_space() {
 
 
 
-//// parse
+//// construct parse tree out of tokens
 
 struct AstNode {
   Token atom;
@@ -1143,7 +1142,7 @@ void test_parse_handles_nested_forms() {
 
 
 
-//// data
+//// cell: core lisp data structure with ref-counted garbage collection
 
                                   struct Cell;
                                   extern Cell* nil;
@@ -1391,24 +1390,6 @@ long toNum(Cell* x) {
                                     return stringLiterals[x];
                                   }
 
-                                  void clearLiteralTables() { // just for testing
-                                    for (hash_map<long, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
-                                      if (p->second->nrefs > 1)
-                                        cerr << "forcing unintern: " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
-                                      while (p->second->nrefs > 0)
-                                        rmref(p->second);
-                                    }
-                                    numLiterals.clear();
-                                    for (StringMap<Cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
-                                      if (p->first == L"currLexicalScope") continue; // memory leak
-                                      if (p->second->nrefs > 1)
-                                        cerr << "forcing unintern: " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
-                                      while (p->second->nrefs > 0)
-                                        rmref(p->second);
-                                    }
-                                    stringLiterals.clear();
-                                  }
-
 Cell* newSym(string x) {
   Cell* result = intern(x);
   result->type = SYM;
@@ -1600,6 +1581,8 @@ ostream& operator<<(ostream& os, list<Cell*> l) {
 }
 
 
+
+//// construct parse tree out of cells
 
                                   extern Cell* buildCell(AstNode);
 
@@ -1943,7 +1926,7 @@ void test_build_handles_quotes() {
 
 
 
-//// bindings
+//// manage symbol bindings
 
                                   hash_map<long, stack<Cell*> > dynamics;
                                   Cell* lookupDynamicBinding(Cell* sym) {
@@ -2190,6 +2173,8 @@ void test_lower_lexical_scopes_are_available() {
 
 
 
+//// eval: lookup symbols, respect quotes, rewrite lambda calls
+
                                   Cell* sig(Cell* lambda) {
                                     return car(cdr(lambda));
                                   }
@@ -2284,8 +2269,8 @@ Cell* eval(Cell* expr) {
   if (isQuoted(expr))
     return mkref(expr->cdr);
 
-  // lambda expressions get the current lexical scope attached to them
   if (car(expr) == newSym(L"lambda")) {
+    // attach current lexical scope
     Cell* ans = newCell();
     setCar(ans, car(expr));
     setCdr(ans, newCell());
@@ -2297,6 +2282,7 @@ Cell* eval(Cell* expr) {
     return ans;
   }
 
+  // expr is a function call
   Cell* lambda = eval(car(expr));
   Cell* evald_args = eval_args(sig(lambda), call_args(expr));
   // construct a new scope with args based on current scope and sig
@@ -2657,14 +2643,32 @@ void setupState() {
   setupLexicalScope();
 }
 
-void resetState() {
-  freelist = NULL;
-  for(Cell* curr=currCell; curr >= heapStart; --curr)
-    curr->init();
-  currCell = heapStart;
-  dynamics.clear(); // leaks memory for strings and tables
-  setupLexicalScope();
-}
+                                  void resetState() {
+                                    freelist = NULL;
+                                    for(Cell* curr=currCell; curr >= heapStart; --curr)
+                                      curr->init();
+                                    currCell = heapStart;
+                                    dynamics.clear(); // leaks memory for strings and tables
+                                    setupLexicalScope();
+                                  }
+
+                                  void clearLiteralTables() {
+                                    for (hash_map<long, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
+                                      if (p->second->nrefs > 1)
+                                        cerr << "forcing unintern: " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
+                                      while (p->second->nrefs > 0)
+                                        rmref(p->second);
+                                    }
+                                    numLiterals.clear();
+                                    for (StringMap<Cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
+                                      if (p->first == L"currLexicalScope") continue; // memory leak
+                                      if (p->second->nrefs > 1)
+                                        cerr << "forcing unintern: " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
+                                      while (p->second->nrefs > 0)
+                                        rmref(p->second);
+                                    }
+                                    stringLiterals.clear();
+                                  }
 
                                   void checkState() {
                                     clearLiteralTables();
