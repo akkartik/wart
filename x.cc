@@ -2642,6 +2642,28 @@ void test_eval_handles_rest_params() {
   checkState();
 }
 
+Cell* primCons() {
+  Cell* result = newCell();
+  setCar(result, lookup(L"x"));
+  setCdr(result, lookup(L"y"));
+  return result;
+}
+
+void test_eval_handles_compiled_function() {
+  Cell* cons_impl = newCell();
+  setCar(cons_impl, newPrimFunc(primCons));
+  setCdr(cons_impl, buildCells(parse(parenthesize(tokenize(teststream(L"((x y))"))))).front()); // no body, no env
+  newDynamicScope(L"cons", cons_impl);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"cons 1 2"))))).front();
+  Cell* result = eval(call);
+  check_eq(car(result), newNum(1));
+  check_eq(cdr(result), newNum(2));
+  rmref(result);
+  rmref(call);
+  endDynamicScope(L"cons");
+  checkState();
+}
+
 
 
                                   typedef void (*testfunc)(void);
