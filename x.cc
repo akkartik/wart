@@ -2278,8 +2278,7 @@ Cell* eval(Cell* expr) {
     setCdr(cdr(ans), newCell());
     setCar(cdr(cdr(ans)), body(expr));
     setCdr(cdr(cdr(ans)), currLexicalScopes.top());
-    mkref(ans);
-    return ans;
+    return mkref(ans);
   }
 
   // expr is a function call
@@ -2302,8 +2301,7 @@ Cell* eval(Cell* expr) {
   rmref(lambda);
   endLexicalScope();
   endDynamicScope(newSym(L"currLexicalScope"));
-  mkref(result);
-  return result;
+  return mkref(result);
 }
 
 void test_nil_evals_to_itself() {
