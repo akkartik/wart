@@ -1271,15 +1271,16 @@ void rmref(Cell* c) {
   case STRING:
   case SYM:
     dbg << "  delete: " << *(string*)c->car << endl;
-    delete (string*)c->car;
-    break;
+    delete (string*)c->car; break;
+  case CONS:
+    rmref(c->car); break;
   case TABLE:
     dbg << "  delete table" << endl;
-    delete (Table*)c->car;
-    break;
-  case CONS:
+    delete (Table*)c->car; break;
+  case PRIM_FUNC:
+    break; // compiled functions don't need freeing
   default:
-    rmref(c->car);
+    cerr << "Can't rmref type " << c->type << endl << DIE;
   }
 
   dbg << "  freeing " << c << endl;
@@ -1317,7 +1318,7 @@ bool isCons(Cell* x) {
 }
 
 bool isAtom(Cell* x) {
-  return x->type != CONS && x->type != TABLE;
+  return x == nil || x->type == NUM || x->type == STRING || x->type == SYM;
 }
 
 Cell* newTable() {
@@ -1583,12 +1584,11 @@ Cell* get(Cell* t, Cell* k) {
                                     case STRING:
                                       os << toString(c); break;
                                     case TABLE:
-                                      os << (Table*)c->car;
-                                      os << cdr(c);
-                                      break;
+                                      os << (Table*)c->car << cdr(c); break;
                                     case CONS:
+                                      os << L"<" << car(c) << " . " << cdr(c) << L">"; break;
                                     default:
-                                      os << L"<" << car(c) << " . " << cdr(c) << L">";
+                                      os << "Can't print type " << c->type << endl << DIE;
                                     }
                                     return os;
                                   }
