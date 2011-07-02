@@ -2169,26 +2169,6 @@ void test_lower_lexical_scopes_are_available() {
 
 //// eval: lookup symbols, respect quotes, rewrite lambda calls
 
-                                  Cell* sig(Cell* lambda) {
-                                    return car(cdr(lambda));
-                                  }
-
-                                  Cell* body(Cell* lambda) {
-                                    return cdr(cdr(lambda));
-                                  }
-
-                                  Cell* callee_body(Cell* callee) {
-                                    return car(cdr(cdr(callee)));
-                                  }
-
-                                  Cell* callee_env(Cell* callee) {
-                                    return cdr(cdr(cdr(callee)));
-                                  }
-
-                                  Cell* call_args(Cell* call) {
-                                    return cdr(call);
-                                  }
-
                                   bool isQuoted(Cell* Cell) {
                                     return isCons(Cell) && car(Cell) == newSym(L"'");
                                   }
@@ -2231,6 +2211,26 @@ void test_bindArgs_handles_vararg() {
   rmref(params);
   checkState();
 }
+
+                                  Cell* sig(Cell* lambda) {
+                                    return car(cdr(lambda));
+                                  }
+
+                                  Cell* body(Cell* lambda) {
+                                    return cdr(cdr(lambda));
+                                  }
+
+                                  Cell* callee_body(Cell* callee) {
+                                    return car(cdr(cdr(callee)));
+                                  }
+
+                                  Cell* callee_env(Cell* callee) {
+                                    return cdr(cdr(cdr(callee)));
+                                  }
+
+                                  Cell* call_args(Cell* call) {
+                                    return cdr(call);
+                                  }
 
                                   extern Cell* eval(Cell*);
 
