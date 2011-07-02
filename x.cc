@@ -1440,7 +1440,7 @@ PrimFunc toPrimFunc(Cell* x) {
 
 Cell* car(Cell* x) {
   if (x->type != CONS) {
-    cerr << "car of non-cons" << endl;
+    cerr << "car of non-cons: " << x->type << endl;
     return nil;
   }
   return x->car;
@@ -1975,6 +1975,10 @@ void test_build_handles_quotes() {
                                     bindings.pop();
                                   }
 
+                                  void endDynamicScope(string s) {
+                                    endDynamicScope(newSym(s));
+                                  }
+
                                   void assignDynamicVar(Cell* sym, Cell* val) {
                                     stack<Cell*>& bindings = dynamics[(long)sym];
                                     if (bindings.empty()) {
@@ -2041,6 +2045,10 @@ Cell* lookup(Cell* sym) {
   if (result) return result;
   cerr << "No binding for " << toString(sym) << endl;
   return nil;
+}
+
+Cell* lookup(string s) {
+  return lookup(newSym(s));
 }
 
 void test_lookup_returns_dynamic_binding() {
@@ -2670,7 +2678,7 @@ void setupState() {
                                   void clearLiteralTables() {
                                     for (hash_map<long, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
                                       if (p->second->nrefs > 1)
-                                        cerr << "forcing unintern: " << (void*)p->second << " " << (long)cdr(p->second) << " " << p->second->nrefs << endl;
+                                        cerr << "forcing unintern: " << p->first << ": " << (void*)p->second << " " << (long)cdr(p->second) << " " << p->second->nrefs << endl;
                                       while (p->second->nrefs > 0)
                                         rmref(p->second);
                                     }
@@ -2678,7 +2686,7 @@ void setupState() {
                                     for (StringMap<Cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
                                       if (p->first == L"currLexicalScope") continue; // memory leak
                                       if (p->second->nrefs > 1)
-                                        cerr << "forcing unintern: " << (void*)p->second << " " << *(string*)car(p->second) << " " << p->second->nrefs << endl;
+                                        cerr << "forcing unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)car(p->second) << " " << p->second->nrefs << endl;
                                       while (p->second->nrefs > 0)
                                         rmref(p->second);
                                     }
