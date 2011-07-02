@@ -2291,9 +2291,9 @@ Cell* eval(Cell* expr) {
     result = eval(form->car);
   }
 
-  rmref(lambda);
   endLexicalScope();
   endDynamicScope(newSym(L"currLexicalScope"));
+  rmref(lambda);
   return result;
 }
 
