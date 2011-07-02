@@ -1477,28 +1477,28 @@ void test_setCar_decrements_nrefs_for_non_cons() {
 
 void test_setCar_is_idempotent() {
   Cell* cons = newCell();
-  Cell* car = newCell();
-  check_eq(car->nrefs, 0);
-  setCar(cons, car);
-  check_eq(car->nrefs, 1);
-  setCar(cons, car);
-  check_eq(car->nrefs, 1);
-  check(car->car);
-  check(car->cdr);
+  Cell* x = newCell();
+  check_eq(x->nrefs, 0);
+  setCar(cons, x);
+  check_eq(x->nrefs, 1);
+  setCar(cons, x);
+  check_eq(x->nrefs, 1);
+  check(car(x));
+  check(cdr(x));
   rmref(cons);
   checkState();
 }
 
 void test_setCdr_is_idempotent() {
   Cell* cons = newCell();
-  Cell* cdr = newCell();
-  check_eq(cdr->nrefs, 0);
-  setCdr(cons, cdr);
-  check_eq(cdr->nrefs, 1);
-  setCdr(cons, cdr);
-  check_eq(cdr->nrefs, 1);
-  check(cdr->car);
-  check(cdr->cdr);
+  Cell* x = newCell();
+  check_eq(x->nrefs, 0);
+  setCdr(cons, x);
+  check_eq(x->nrefs, 1);
+  setCdr(cons, x);
+  check_eq(x->nrefs, 1);
+  check(car(x));
+  check(cdr(x));
   rmref(cons);
   checkState();
 }
@@ -1781,16 +1781,16 @@ void test_build_handles_nested_form() {
     Cell* c2 = car(c);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
-    check(isNum(c2->car));
-    check_eq(toNum(c2->car), 33);
-    check_eq(c2->car->nrefs, 2);
-    c2 = c2->cdr;
+    check(isNum(car(c2)));
+    check_eq(toNum(car(c2)), 33);
+    check_eq(car(c2)->nrefs, 2);
+    c2 = cdr(c2);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
-    check(isNum(c2->car));
-    check_eq(toNum(c2->car), 23);
-    check_eq(c2->car->nrefs, 2);
-    check_eq(c2->cdr, nil);
+    check(isNum(car(c2)));
+    check_eq(toNum(car(c2)), 23);
+    check_eq(car(c2)->nrefs, 2);
+    check_eq(cdr(c2), nil);
   check_eq(cdr(c), nil);
 
   rmref(Cells.front());
@@ -1818,22 +1818,22 @@ void test_build_handles_strings() {
     Cell* c2 = car(c);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
-    check(isNum(c2->car));
-    check_eq(toNum(c2->car), 33);
-    check_eq(c2->car->nrefs, 2);
-    c2 = c2->cdr;
+    check(isNum(car(c2)));
+    check_eq(toNum(car(c2)), 33);
+    check_eq(car(c2)->nrefs, 2);
+    c2 = cdr(c2);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
-    check(isString(c2->car));
-    check_eq(toString(c2->car), L"\"abc\"");
-    check_eq(c2->car->nrefs, 2);
-    c2 = c2->cdr;
+    check(isString(car(c2)));
+    check_eq(toString(car(c2)), L"\"abc\"");
+    check_eq(car(c2)->nrefs, 2);
+    c2 = cdr(c2);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
-    check(isNum(c2->car));
-    check_eq(toNum(c2->car), 23);
-    check_eq(c2->car->nrefs, 2);
-    check_eq(c2->cdr, nil);
+    check(isNum(car(c2)));
+    check_eq(toNum(car(c2)), 23);
+    check_eq(car(c2)->nrefs, 2);
+    check_eq(cdr(c2), nil);
   check_eq(cdr(c), nil);
 
   rmref(Cells.front());
@@ -1860,28 +1860,28 @@ void test_build_handles_syms() {
     Cell* c2 = car(c);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
-    check(isNum(c2->car));
-    check_eq(toNum(c2->car), 33);
-    check_eq(c2->car->nrefs, 2);
-    c2 = c2->cdr;
+    check(isNum(car(c2)));
+    check_eq(toNum(car(c2)), 33);
+    check_eq(car(c2)->nrefs, 2);
+    c2 = cdr(c2);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
-    check(isString(c2->car));
-    check_eq(toString(c2->car), L"\"abc\"");
-    check_eq(c2->car->nrefs, 2);
-    c2 = c2->cdr;
+    check(isString(car(c2)));
+    check_eq(toString(car(c2)), L"\"abc\"");
+    check_eq(car(c2)->nrefs, 2);
+    c2 = cdr(c2);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
-    check(isSym(c2->car));
-    check_eq(toString(c2->car), L"3de");
-    check_eq(c2->car->nrefs, 2);
-    c2 = c2->cdr;
+    check(isSym(car(c2)));
+    check_eq(toString(car(c2)), L"3de");
+    check_eq(car(c2)->nrefs, 2);
+    c2 = cdr(c2);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
-    check(isNum(c2->car));
-    check_eq(toNum(c2->car), 23);
-    check_eq(c2->car->nrefs, 2);
-    check_eq(c2->cdr, nil);
+    check(isNum(car(c2)));
+    check_eq(toNum(car(c2)), 23);
+    check_eq(car(c2)->nrefs, 2);
+    check_eq(cdr(c2), nil);
   check_eq(cdr(c), nil);
 
   rmref(Cells.front());
@@ -1908,16 +1908,16 @@ void test_build_handles_quotes() {
     Cell* c2 = car(c);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
-    check(isSym(c2->car));
-    check_eq(toString(c2->car), L",");
-    check_eq(c2->car->nrefs, 2);
-    c2 = c2->cdr;
+    check(isSym(car(c2)));
+    check_eq(toString(car(c2)), L",");
+    check_eq(car(c2)->nrefs, 2);
+    c2 = cdr(c2);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
-    check(isNum(c2->car));
-    check_eq(toNum(c2->car), 35);
-    check_eq(c2->car->nrefs, 2);
-    check_eq(c2->cdr, nil);
+    check(isNum(car(c2)));
+    check_eq(toNum(car(c2)), 35);
+    check_eq(car(c2)->nrefs, 2);
+    check_eq(cdr(c2), nil);
   check_eq(cdr(c), nil);
 
   rmref(Cells.front());
@@ -1977,11 +1977,11 @@ void test_build_handles_quotes() {
                                   void test_lexical_scope_has_nil_cdr_on_startup() {
                                     check_eq(currLexicalScopes.size(), 1);
                                     Cell* currLexicalScope = currLexicalScopes.top();
-                                    check_eq(currLexicalScope->cdr, nil);
+                                    check_eq(cdr(currLexicalScope), nil);
                                   }
 
                                   Cell* lookupLexicalBinding(Cell* sym) {
-                                    for (Cell* scope = currLexicalScopes.top(); scope != nil; scope = scope->cdr) {
+                                    for (Cell* scope = currLexicalScopes.top(); scope != nil; scope = cdr(scope)) {
                                       Cell* result = unsafeGet(scope, sym);
                                       if (result) return result;
                                     }
@@ -2122,7 +2122,7 @@ void test_lexical_scopes_nest_correctly() {
         check_eq(val2->nrefs, 1);
         check_eq(dynVal->nrefs, 2);
         newLexicalScope();
-          check_eq(currLexicalScopes.top()->cdr->nrefs, 2);
+          check_eq(cdr(currLexicalScopes.top())->nrefs, 2);
           check_eq(currLexicalScopes.top()->nrefs, 2);
           addLexicalBinding(sym, val2);
             check_eq(lookup(sym), val2);
@@ -2260,7 +2260,7 @@ Cell* eval(Cell* expr) {
     return mkref(expr);
 
   if (isQuoted(expr))
-    return mkref(expr->cdr);
+    return mkref(cdr(expr));
 
   if (car(expr) == newSym(L"lambda")) {
     // attach current lexical scope
@@ -2288,7 +2288,7 @@ Cell* eval(Cell* expr) {
   Cell* result = nil;
   for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
     rmref(result);
-    result = eval(form->car);
+    result = eval(car(form));
   }
 
   endLexicalScope();
@@ -2356,11 +2356,11 @@ void test_eval_handles_simple_lambda() {
   list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
   check_eq(Cells.size(), 1);
   Cell* lambda = eval(Cells.front());
-  check_eq(lambda->car, newSym(L"lambda"));
-  check_eq(lambda->cdr->car, nil);
-  check(isCons(lambda->cdr->cdr->car));
-  check_eq(lambda->cdr->cdr->car->car, newNum(34));
-  check_eq(lambda->cdr->cdr->cdr, nil);
+  check_eq(car(lambda), newSym(L"lambda"));
+  check_eq(car(cdr(lambda)), nil);
+  check(isCons(car(cdr(cdr(lambda)))));
+  check_eq(car(car(cdr(cdr(lambda)))), newNum(34));
+  check_eq(cdr(cdr(cdr(lambda))), nil);
   rmref(lambda);
   rmref(Cells.front());
   checkState();
@@ -2646,7 +2646,7 @@ void setupState() {
                                   void clearLiteralTables() {
                                     for (hash_map<long, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
                                       if (p->second->nrefs > 1)
-                                        cerr << "forcing unintern: " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
+                                        cerr << "forcing unintern: " << (void*)p->second << " " << (long)cdr(p->second) << " " << p->second->nrefs << endl;
                                       while (p->second->nrefs > 0)
                                         rmref(p->second);
                                     }
@@ -2654,7 +2654,7 @@ void setupState() {
                                     for (StringMap<Cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
                                       if (p->first == L"currLexicalScope") continue; // memory leak
                                       if (p->second->nrefs > 1)
-                                        cerr << "forcing unintern: " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
+                                        cerr << "forcing unintern: " << (void*)p->second << " " << *(string*)car(p->second) << " " << p->second->nrefs << endl;
                                       while (p->second->nrefs > 0)
                                         rmref(p->second);
                                     }
