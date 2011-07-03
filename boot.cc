@@ -2641,7 +2641,7 @@ void test_eval_handles_rest_params() {
 
                                   #define COMPILE_PRIM_FUNC(name, params, body) \
                                     Cell* primFunc_##name() { \
-                                      Cell* result = newCell(); /* implicit result */ \
+                                      Cell* result = nil; /* implicit result */ \
                                       body \
                                       return result; \
                                     }
