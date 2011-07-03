@@ -4,7 +4,7 @@ COMPILE_PRIM_FUNC(cons, (x y),
   setCdr(result, lookup(L"y"));
 )
 
-void test_eval_handles_compiled_function() {
+void test_cons_works() {
   Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"cons 1 2"))))).front();
   Cell* result = eval(call);
   check_eq(car(result), newNum(1));
