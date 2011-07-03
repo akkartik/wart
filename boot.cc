@@ -2639,7 +2639,7 @@ void test_eval_handles_rest_params() {
 
 //// compiled functions
 
-                                  #define COMPILE_PRIM_FUNC(name, params, body) \
+                                  #define COMPILE_PRIM_FUNC(op, name, params, body) \
                                     Cell* primFunc_##name() { \
                                       Cell* result = nil; /* implicit result */ \
                                       body \
