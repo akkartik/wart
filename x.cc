@@ -1214,13 +1214,6 @@ Cell* newCell() {
   return result;
 }
 
-void checkUnfreed() {
-  int n = currCell-heapStart-1; // ignore empty currLexicalScopes
-  for (; freelist; freelist = freelist->cdr)
-    --n;
-  check_eq(n, 0);
-}
-
                                   extern void rmref(Cell*);
                                   extern void checkState();
 
@@ -2717,14 +2710,6 @@ void teardownPrimFuncs() {
                                         cerr << endl;
                                   }
 
-                                  void resetState() {
-                                    freelist = NULL;
-                                    for(Cell* curr=currCell; curr >= heapStart; --curr)
-                                      curr->init();
-                                    currCell = heapStart;
-                                    dynamics.clear(); // leaks memory for strings and tables
-                                  }
-
                                   void clearLiteralTables() {
                                     for (hash_map<long, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
                                       if (p->second->nrefs > 1)
@@ -2741,6 +2726,21 @@ void teardownPrimFuncs() {
                                         rmref(p->second);
                                     }
                                     stringLiterals.clear();
+                                  }
+
+                                  void checkUnfreed() {
+                                    int n = currCell-heapStart-1; // ignore empty currLexicalScopes
+                                    for (; freelist; freelist = freelist->cdr)
+                                      --n;
+                                    check_eq(n, 0);
+                                  }
+
+                                  void resetState() {
+                                    freelist = NULL;
+                                    for(Cell* curr=currCell; curr >= heapStart; --curr)
+                                      curr->init();
+                                    currCell = heapStart;
+                                    dynamics.clear(); // leaks memory for strings and tables
                                   }
 
 void setupState() {
