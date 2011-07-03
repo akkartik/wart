@@ -10,7 +10,7 @@ prim_func_list: x.cc
 	@grep "^COMPILE_PRIM_FUNC" x.cc |perl -pwe 's/COMPILE_PRIM_FUNC\(([^,]*), ([^,]*),$$/{ L"$$1", L"$$2", primFunc_$$1 },/' > prim_func_list
 
 test_list: x.cc
-	@grep -h "^[[:space:]]*void test" *.cc |perl -pwe 's/^\s*void (.*)\(\) {$$/$$1,/' > test_list
+	@grep -h "^[[:space:]]*void test" x.cc |perl -pwe 's/^\s*void (.*)\(\) {$$/$$1,/' > test_list
 
 clean:
 	rm -rf a.out* prim_func_list test_list
