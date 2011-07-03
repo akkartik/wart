@@ -2328,7 +2328,7 @@ Cell* eval(Cell* expr) {
   endLexicalScope();
   endDynamicScope(newSym(L"currLexicalScope"));
   rmref(lambda);
-  return result;
+  return result; // already mkref'd
 }
 
 void test_nil_evals_to_itself() {
