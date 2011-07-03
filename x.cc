@@ -1221,9 +1221,8 @@ void checkUnfreed() {
   check_eq(n, 0);
 }
 
-                                  extern void checkState();
-
                                   extern void rmref(Cell*);
+                                  extern void checkState();
 
 void test_newCell_has_nil_car_and_cdr() {
   Cell* x = newCell();
@@ -1521,6 +1520,8 @@ void test_setCdr_is_idempotent() {
   rmref(cons);
   checkState();
 }
+
+
 
                                   void unsafeSet(Cell* t, Cell* k, Cell* val, bool deleteNils) {
                                     if (!isTable(t)) {
@@ -2667,6 +2668,8 @@ void test_eval_handles_compiled_function() {
   checkState();
 }
 
+
+
 struct PrimFuncMetadata {
   string name;
   string params;
@@ -2693,6 +2696,8 @@ void teardownPrimFuncs() {
 
 
 
+                                  //// test harness
+
                                   typedef void (*testfunc)(void);
 
                                   const testfunc tests[] = {
@@ -2711,12 +2716,6 @@ void teardownPrimFuncs() {
                                         if (numFailures > 1) cerr << "s";
                                         cerr << endl;
                                   }
-
-void setupState() {
-  setupNil();
-  setupLexicalScope();
-  setupPrimFuncs();
-}
 
                                   void resetState() {
                                     freelist = NULL;
@@ -2744,6 +2743,12 @@ void setupState() {
                                     stringLiterals.clear();
                                   }
 
+void setupState() {
+  setupNil();
+  setupLexicalScope();
+  setupPrimFuncs();
+}
+
                                   void checkState() {
                                     teardownPrimFuncs();
                                     clearLiteralTables();
@@ -2752,6 +2757,8 @@ void setupState() {
                                     resetState();
                                     setupState();
                                   }
+
+
 
 int main(int argc, ascii* argv[]) {
   setupState();
