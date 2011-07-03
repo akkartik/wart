@@ -2702,7 +2702,7 @@ void setupState() {
                                   void clearLiteralTables() {
                                     for (hash_map<long, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
                                       if (p->second->nrefs > 1)
-                                        cerr << "forcing unintern: " << p->first << ": " << (void*)p->second << " " << (long)cdr(p->second) << " " << p->second->nrefs << endl;
+                                        cerr << "forcing unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
                                       while (p->second->nrefs > 0)
                                         rmref(p->second);
                                     }
@@ -2710,7 +2710,7 @@ void setupState() {
                                     for (StringMap<Cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
                                       if (p->first == L"currLexicalScope") continue; // memory leak
                                       if (p->second->nrefs > 1)
-                                        cerr << "forcing unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)car(p->second) << " " << p->second->nrefs << endl;
+                                        cerr << "forcing unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
                                       while (p->second->nrefs > 0)
                                         rmref(p->second);
                                     }
