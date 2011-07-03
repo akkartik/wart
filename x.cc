@@ -1221,7 +1221,6 @@ void checkUnfreed() {
   check_eq(n, 0);
 }
 
-                                  extern void resetState();
                                   extern void checkState();
 
                                   extern void rmref(Cell*);
@@ -2696,7 +2695,6 @@ void setupState() {
                                       curr->init();
                                     currCell = heapStart;
                                     dynamics.clear(); // leaks memory for strings and tables
-                                    setupLexicalScope();
                                   }
 
                                   void clearLiteralTables() {
@@ -2720,7 +2718,9 @@ void setupState() {
                                   void checkState() {
                                     clearLiteralTables();
                                     checkUnfreed();
+
                                     resetState();
+                                    setupState();
                                   }
 
 int main(int argc, ascii* argv[]) {
