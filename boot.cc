@@ -222,7 +222,9 @@ int main(int argc, ascii* argv[]) {
     interactive = true;
     while (!cin.eof()) {
       cout << "wart> ";
-      cout << eval(buildCells(parse(parenthesize(tokenize(cin)))).front()) << endl;
+      Cell* result = eval(buildCells(parse(parenthesize(tokenize(cin)))).front());
+      cout << result << endl;
+      rmref(result);
     }
   }
   return 0;
