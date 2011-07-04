@@ -1,42 +1,48 @@
-                                  #include<cstdio>
-                                  #include<list>
-                                  using std::list;
-                                  #include<stack>
-                                  using std::stack;
-                                  #include <ext/hash_map>
-                                  using __gnu_cxx::hash_map;
-                                  using __gnu_cxx::hash;
+#include<cstdio>
+#include<list>
+using std::list;
+#include<stack>
+using std::stack;
+#include <ext/hash_map>
+using __gnu_cxx::hash_map;
+using __gnu_cxx::hash;
 
-                                  #define __unused__ __attribute__((unused))
+
 
-                                  // use wide strings everywhere
+// unicode strings everywhere
 
-                                  #include<string>
-                                  typedef std::wstring string;
+#include<string>
+typedef std::wstring string;
 
-                                  #include<iostream>
-                                  typedef std::wistream istream;
-                                  typedef std::wostream ostream;
-                                  #define cin std::wcin
-                                  #define cout std::wcout
-                                  #define cerr std::wcerr
-                                  using std::endl;
+#include<iostream>
+typedef std::wistream istream;
+typedef std::wostream ostream;
+#define cin std::wcin
+#define cout std::wcout
+#define cerr std::wcerr
+using std::endl;
 
-                                  #include<sstream>
-                                  typedef std::wstringstream stringstream;
-                                  typedef std::wostringstream ostringstream;
+#include<sstream>
+typedef std::wstringstream stringstream;
+typedef std::wostringstream ostringstream;
 
-                                  typedef char ascii;
-                                  #define char wchar_t // must come after all system includes
+typedef char ascii;
+#define char wchar_t // must come after all system includes
 
-                                  bool debug = false;
-                                  #define dbg if(debug) cerr
+
 
-                                  class Die {};
-                                  ostream& operator<<(ostream& os __unused__, Die die __unused__) {
-                                    exit(1);
-                                  }
-                                  Die DIE;
+bool debug = false;
+#define dbg if(debug) cerr
+
+#define __unused__ __attribute__((unused))
+
+class Die {};
+ostream& operator<<(ostream& os __unused__, Die die __unused__) {
+  exit(1);
+}
+Die DIE;
+
+
 
 bool runningTests = false;
 int numFailures = 0;
@@ -62,9 +68,13 @@ stringstream& teststream(string s) {
 
 void checkState();
 
-#include "boot_list"
-
 
+
+// bootstrapping phases
+
+#include "boot_list" // cc files containing 'boot'
+
+// compiled primitive ops
 
 #define COMPILE_PRIM_FUNC(op, name, params, body) \
   Cell* primFunc_##name() { \
@@ -73,7 +83,7 @@ void checkState();
     return result; \
   }
 
-#include "op_list"
+#include "op_list" // cc files not containing 'boot'
 
 struct PrimFuncMetadata {
   string name;
@@ -101,59 +111,61 @@ void teardownPrimFuncs() {
 
 
 
-                                  //// test harness
+typedef void (*testfunc)(void);
 
-                                  typedef void (*testfunc)(void);
+const testfunc tests[] = {
+  #include"test_list"
+};
 
-                                  const testfunc tests[] = {
-                                    #include"test_list"
-                                  };
+void runTests() {
+  runningTests = true; // never reset
+  for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
+    (*tests[i])();
+  }
+  cerr << endl;
+  if (numFailures == 0) return;
 
-                                  void runTests() {
-                                    runningTests = true; // never reset
-                                    for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
-                                      (*tests[i])();
-                                    }
-                                    cerr << endl;
-                                    if (numFailures == 0) return;
+  cerr << numFailures << " failure";
+      if (numFailures > 1) cerr << "s";
+      cerr << endl;
+}
 
-                                    cerr << numFailures << " failure";
-                                        if (numFailures > 1) cerr << "s";
-                                        cerr << endl;
-                                  }
+
 
-                                  void clearLiteralTables() {
-                                    for (hash_map<long, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
-                                      if (p->second->nrefs > 1)
-                                        cerr << "forcing unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
-                                      while (p->second->nrefs > 0)
-                                        rmref(p->second);
-                                    }
-                                    numLiterals.clear();
-                                    for (StringMap<Cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
-                                      if (p->first == L"currLexicalScope") continue; // memory leak
-                                      if (p->second->nrefs > 1)
-                                        cerr << "forcing unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
-                                      while (p->second->nrefs > 0)
-                                        rmref(p->second);
-                                    }
-                                    stringLiterals.clear();
-                                  }
+// post-test teardown
 
-                                  void checkUnfreed() {
-                                    int n = currCell-heapStart-1; // ignore empty currLexicalScopes
-                                    for (; freelist; freelist = freelist->cdr)
-                                      --n;
-                                    check_eq(n, 0);
-                                  }
+void clearLiteralTables() {
+  for (hash_map<long, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
+    if (p->second->nrefs > 1)
+      cerr << "forcing unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
+    while (p->second->nrefs > 0)
+      rmref(p->second);
+  }
+  numLiterals.clear();
+  for (StringMap<Cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
+    if (p->first == L"currLexicalScope") continue; // memory leak
+    if (p->second->nrefs > 1)
+      cerr << "forcing unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
+    while (p->second->nrefs > 0)
+      rmref(p->second);
+  }
+  stringLiterals.clear();
+}
 
-                                  void resetState() {
-                                    freelist = NULL;
-                                    for(Cell* curr=currCell; curr >= heapStart; --curr)
-                                      curr->init();
-                                    currCell = heapStart;
-                                    dynamics.clear(); // leaks memory for strings and tables
-                                  }
+void checkUnfreed() {
+  int n = currCell-heapStart-1; // ignore empty currLexicalScopes
+  for (; freelist; freelist = freelist->cdr)
+    --n;
+  check_eq(n, 0);
+}
+
+void resetState() {
+  freelist = NULL;
+  for(Cell* curr=currCell; curr >= heapStart; --curr)
+    curr->init();
+  currCell = heapStart;
+  dynamics.clear(); // leaks memory for strings and tables
+}
 
 void setupState() {
   setupNil();
@@ -161,14 +173,14 @@ void setupState() {
   setupPrimFuncs();
 }
 
-                                  void checkState() {
-                                    teardownPrimFuncs();
-                                    clearLiteralTables();
-                                    checkUnfreed();
+void checkState() {
+  teardownPrimFuncs();
+  clearLiteralTables();
+  checkUnfreed();
 
-                                    resetState();
-                                    setupState();
-                                  }
+  resetState();
+  setupState();
+}
 
 
 
