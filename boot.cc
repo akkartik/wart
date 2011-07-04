@@ -1,4 +1,6 @@
 #include<cstdio>
+#include<vector>
+using std::vector;
 #include<list>
 using std::list;
 #include<stack>
@@ -25,6 +27,10 @@ using std::endl;
 #include<sstream>
 typedef std::wstringstream stringstream;
 typedef std::wostringstream ostringstream;
+
+#include <fstream>
+typedef std::wifstream ifstream;
+typedef std::wofstream ofstream;
 
 typedef char ascii;
 #define char wchar_t // must come after all system includes
