@@ -1,3 +1,9 @@
+void test_lexical_scope_has_nil_cdr_on_startup() {
+  check_eq(currLexicalScopes.size(), 1);
+  Cell* currLexicalScope = currLexicalScopes.top();
+  check_eq(cdr(currLexicalScope), nil);
+}
+
 void test_lookup_returns_dynamic_binding() {
   Cell* sym = newSym(L"a");
   check_eq(sym->nrefs, 1);

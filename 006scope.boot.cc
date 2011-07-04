@@ -50,12 +50,6 @@ void setupLexicalScope() {
   newDynamicScope(L"currLexicalScope", nil);
 }
 
-void test_lexical_scope_has_nil_cdr_on_startup() {
-  check_eq(currLexicalScopes.size(), 1);
-  Cell* currLexicalScope = currLexicalScopes.top();
-  check_eq(cdr(currLexicalScope), nil);
-}
-
 Cell* lookupLexicalBinding(Cell* sym) {
   for (Cell* scope = currLexicalScopes.top(); scope != nil; scope = cdr(scope)) {
     Cell* result = unsafeGet(scope, sym);
