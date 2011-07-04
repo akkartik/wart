@@ -11,10 +11,10 @@ test_list: *.test.cc
 	@grep -h "^[[:space:]]*void test" *.test.cc |perl -pwe 's/^\s*void (.*)\(\) {$$/$$1,/' > test_list
 
 boot_list: *.cc
-	@ls *.cc |grep .boot |perl -pwe 's/^/#include "/' |perl -pwe 's/$$/"/' > boot_list
+	@ls *.cc |grep .boot |perl -pwe 's/.*/#include "$$&"/' > boot_list
 
 op_list: *.cc
-	@ls *.cc |grep -v boot |perl -pwe 's/^/#include "/' |perl -pwe 's/$$/"/' > op_list
+	@ls *.cc |grep -v boot |perl -pwe 's/.*/#include "$$&"/' > op_list
 
 clean:
 	rm -rf wart_bin* *_list
