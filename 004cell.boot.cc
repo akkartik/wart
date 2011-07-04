@@ -24,6 +24,14 @@ void setupNil() {
   nil->car = nil->cdr = nil;
 }
 
+bool isCons(Cell* x) {
+  return x != nil && x->type == CONS;
+}
+
+bool isAtom(Cell* x) {
+  return x == nil || x->type == NUM || x->type == STRING || x->type == SYM;
+}
+
 
 
 #define HEAPCELLS (1024*1024/sizeof(Cell)) // 1MB
@@ -96,7 +104,8 @@ void rmref(Cell* c) {
   --c->nrefs;
   if (c->nrefs > 0) return;
 
-  if (c->type != CONS && !runningTests) cerr << "deleted atom" << endl;
+  if (isAtom(c) && !runningTests)
+    cerr << "deleted atom: " << c->type << endl;
 
   switch (c->type) {
   case NUM:
@@ -125,14 +134,6 @@ void rmref(Cell* c) {
 }
 
 
-
-bool isCons(Cell* x) {
-  return x != nil && x->type == CONS;
-}
-
-bool isAtom(Cell* x) {
-  return x == nil || x->type == NUM || x->type == STRING || x->type == SYM;
-}
 
 Cell* newTable() {
   Cell* result = newCell();
