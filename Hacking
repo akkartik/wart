@@ -1,0 +1,42 @@
+== Garbage-collection
+
+wart frees up unused memory using reference-counting
+(http://en.wikipedia.org/wiki/Reference_counting). Every Cell tracks the
+number of incoming pointers to it using a field called nrefs.
+
+wart must increment/decrement nrefs when saving a Cell inside another: in the
+car or cdr, or inside a Table.
+
+Tests thoroughly audit nrefs using checkState, in order to detect errors as
+soon as possible.
+
+eval takes pains to increment the nrefs of *exactly* one Cell across all
+paths. Nested calls to eval decrement nrefs of the result unless they return
+it. Structure any functions returning Cells the same way.
+
+If you hack on wart and forget to decrement nrefs you have a memory leak. If
+you forget to increment nrefs you have something worse: a prematurely
+garbage-collected cell that may now be used for something else entirely. Old
+pointers to it can no longer rely on what it contains; they may clobber or try
+to interpret arbitrary data as a string or a Table. All bets are off. wart
+tries to loudly detect this insidious class of error as immediately as
+possible. Every time a Cell is freed it resets its pointers to NULL; when it's
+reused its pointers are initialized to nil. If wart ever complains that it ran
+across NULL, it means I or you forgot to decrement nrefs somewhere. All bets
+are off.
+
+== Generated _lists
+
+To run its tests wart needs a list of tests to run. It constructs such a list
+on the fly during compilation. Several other places use the same trick. The
+set of files to compile is auto-generated, as is the list of compiled
+primitives wart knows about. This means you can add new COMPILE_PRIM_FUNC
+operators, or entirely new code in .cc files, and they'll be automatically
+included next time you run wart.
+
+== Strings
+
+The wart interpreter pervasively uses wide characters
+(http://en.wikipedia.org/wiki/Wide_character) to enable unicode. All string,
+char, stream and IO types are not what they may seem at first. char is
+wchar_t, string is wstring, and so on.
