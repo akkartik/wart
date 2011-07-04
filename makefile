@@ -1,7 +1,6 @@
 C=10
 wart_bin: boot_list op_list prim_func_list test_list
 	@echo `git whatchanged -p -$C |grep "^[+ -][^+-]" |perl -pwe 's/(.).*/$$1/' |uniq |grep "+" |wc -l` hunks added in last $C commits
-	@echo naked assignments: `grep "\->car = " *.cc |wc -l` car, `grep "\->cdr = " *.cc |wc -l` cdr
 	g++ -g -Wall -Wextra boot.cc -o wart_bin
 	@echo
 

@@ -89,7 +89,7 @@ Cell* mkref(Cell* c) {
 
 void rmref(Cell* c) {
   if (!c)
-    cerr << "rmref: cell should never point to NULL\n" << DIE;
+    cerr << "fatal: a cell was prematurely garbage-collected.\n" << DIE;
   if (c == nil) return;
   dbg << endl << "rmref: " << c << ": " << c->nrefs << " " << c->type << endl;
 
