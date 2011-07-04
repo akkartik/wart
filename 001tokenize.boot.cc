@@ -70,12 +70,6 @@ ostream& operator<<(ostream& os, Token p) {
                                     return in.eof();
                                   }
 
-                                  class Die {};
-                                  ostream& operator<<(ostream& os __unused__, Die die __unused__) {
-                                    exit(1);
-                                  }
-                                  Die DIE;
-
 // BEWARE: tab = 1 space; don't mix the two
 // But do track whether the final indent char is a space. Sometimes you want
 // to wrap a long form.

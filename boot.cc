@@ -32,6 +32,12 @@
                                   bool debug = false;
                                   #define dbg if(debug) cerr
 
+                                  class Die {};
+                                  ostream& operator<<(ostream& os __unused__, Die die __unused__) {
+                                    exit(1);
+                                  }
+                                  Die DIE;
+
 bool runningTests = false;
 int numFailures = 0;
 
