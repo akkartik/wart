@@ -70,6 +70,8 @@ void checkState();
 
 
 
+bool interactive = false;
+
 // bootstrapping phases
 
 #include "boot_list" // cc files containing 'boot'
@@ -211,8 +213,11 @@ int main(int argc, ascii* argv[]) {
   case 5:
     cout << eval(buildCells(parse(parenthesize(tokenize(cin)))).front()) << endl; break;
   default:
-    while (!cin.eof())
+    interactive = true;
+    while (!cin.eof()) {
+      cout << "wart> ";
       cout << eval(buildCells(parse(parenthesize(tokenize(cin)))).front()) << endl;
+    }
   }
   return 0;
 }

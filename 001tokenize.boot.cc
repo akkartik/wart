@@ -55,6 +55,9 @@ ostream& operator<<(ostream& os, Token p) {
 }
 
 
+
+bool stopTokenizing = false;
+
                                   void skip(istream& in) {
                                     char dummy;
                                     in >> dummy;
@@ -66,6 +69,7 @@ ostream& operator<<(ostream& os, Token p) {
                                   }
 
                                   bool eof(istream& in) {
+                                    if (stopTokenizing) return true;
                                     in.peek();
                                     return in.eof();
                                   }
@@ -86,6 +90,8 @@ int countIndent(istream& in) {
     ++count;
     if (c == L'\n')
       count = 0;
+    if (c == L'\n' && interactive)
+      stopTokenizing = true;
   }
   if (count >= LAST_CHAR_IS_SPACE)
     cerr << L"eek, too much indent\n" << DIE;
@@ -165,6 +171,8 @@ Token parseToken(istream& in) {
     // otherwise prevIndentLevel == indentLevel; fall through
   }
 
+  if (stopTokenizing) return Token::sol();
+
   ostringstream out;
   switch (in.peek()) { // now can't be whitespace
     case L'"':
@@ -192,6 +200,7 @@ Token parseToken(istream& in) {
 }
 
 list<Token> tokenize(istream& in) {
+  stopTokenizing = false;
   indentLevel = 0;
   in >> std::noskipws;
   list<Token> result;
