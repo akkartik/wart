@@ -25,6 +25,8 @@ reused its pointers are initialized to nil. If wart ever complains that it ran
 across NULL, it means I or you forgot to decrement nrefs somewhere. All bets
 are off.
 
+If you ever encounter NULL, debug=true is your friend. Use it judiciously.
+
 == Generated _lists
 
 To run its tests wart needs a list of tests to run. It constructs such a list
