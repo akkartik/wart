@@ -40,7 +40,7 @@ void test_build_handles_quoted_symbol() {
   check(isCons(Cells.front()));
   check(isSym(car(Cells.front())));
   check_eq(toString(car(Cells.front())), L"'");
-  check_eq(car(Cells.front())->nrefs, 2);
+  // nrefs of quote depends on number of compiled functions with quoted params
   check(isSym(car(Cells.front())));
   check_eq(toString(cdr(Cells.front())), L"a");
   check_eq(cdr(Cells.front())->nrefs, 2);
