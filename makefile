@@ -5,7 +5,7 @@ wart_bin: boot_list op_list prim_func_list test_list
 	@echo
 
 prim_func_list: *.cc
-	@grep -h "^COMPILE_PRIM_FUNC" *.cc |perl -pwe 's/.*COMPILE_PRIM_FUNC\(([^,]*), ([^,]*),$$/{ L"$$1", L"$$2", primFunc_$$1 },/' > prim_func_list
+	@grep -h "^COMPILE_PRIM_FUNC" *.cc |perl -pwe 's/.*COMPILE_PRIM_FUNC\(([^,]*), ([^,]*),$$/{ L"$$1", $$2, primFunc_$$1 },/' > prim_func_list
 
 test_list: *.test.cc
 	@grep -h "^[[:space:]]*void test" *.test.cc |perl -pwe 's/^\s*void (.*)\(\) {$$/$$1,/' > test_list
