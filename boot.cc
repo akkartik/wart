@@ -207,8 +207,11 @@ int main(int argc, ascii* argv[]) {
   case 3:
     cout << parse(parenthesize(tokenize(cin))); break;
   case 4:
-  default:
     cout << buildCells(parse(parenthesize(tokenize(cin)))); break;
+  case 5:
+    cout << eval(buildCells(parse(parenthesize(tokenize(cin)))).front()); break;
+  default:
+    ;
   }
   return 0;
 }
