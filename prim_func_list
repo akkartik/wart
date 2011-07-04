@@ -1,2 +1,0 @@
-{ L"cons", L"(x y)", primFunc_cons },
-{ L"+", L"(x y)", primFunc_plus },

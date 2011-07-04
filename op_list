@@ -1,4 +1,0 @@
-#include "010cons.cc"
-#include "010cons.test.cc"
-#include "011arith.cc"
-#include "011arith.test.cc"
