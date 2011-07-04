@@ -76,7 +76,7 @@ void checkState();
 
 // compiled primitive ops
 
-#define COMPILE_PRIM_FUNC(op, name, params, body) \
+#define COMPILE_PRIM_FUNC(name, params, body) \
   Cell* primFunc_##name() { \
     Cell* result = nil; /* implicit result */ \
     body \
