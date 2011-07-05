@@ -127,12 +127,14 @@ const testfunc tests[] = {
 
 void runTests() {
   runningTests = true; // never reset
-  for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
+  for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i)
     (*tests[i])();
-  }
+
+  loadFiles(".wart"); // after GC tests
+  loadFiles(".test");
+
   cerr << endl;
   if (numFailures == 0) return;
-
   cerr << numFailures << " failure";
       if (numFailures > 1) cerr << "s";
       cerr << endl;
@@ -207,7 +209,7 @@ int main(int argc, ascii* argv[]) {
     }
   }
 
-  loadFiles();
+  loadFiles(".wart");
 
   switch (pass) {
   case 1:
