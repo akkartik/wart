@@ -3,6 +3,11 @@ void test_parse_handles_empty_input() {
   check(ast.empty());
 }
 
+void test_parse_handles_trailing_comments() {
+  list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"; ab"))));
+  check(ast.empty());
+}
+
 void test_parse_handles_atom() {
   list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"34"))));
   list<AstNode>::iterator p = ast.begin();

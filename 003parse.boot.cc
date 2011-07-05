@@ -51,8 +51,10 @@ ostream& operator<<(ostream& os, AstNode x) {
 list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterator end, list<AstNode>& out) {
   if (curr == end) return curr;
 
-  while (curr->token[0] == L';')
+  while (curr != end && curr->token[0] == L';')
     ++curr;
+
+  if (curr == end) return curr;
 
   if (*curr == L")") cerr << "Unbalanced (" << endl << DIE;
 
