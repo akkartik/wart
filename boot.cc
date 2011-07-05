@@ -207,6 +207,8 @@ int main(int argc, ascii* argv[]) {
     }
   }
 
+  loadFiles();
+
   switch (pass) {
   case 1:
     cout << tokenize(cin); break;

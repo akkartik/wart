@@ -8,8 +8,5 @@ vector<ascii> toAscii(string s) {
 }
 
 COMPILE_PRIM_FUNC(load, L"(f)",
-  ifstream f(&toAscii(toString(lookup(L"f")))[0]);
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(f))));
-  for (list<Cell*>::iterator p = cells.begin(); p != cells.end(); ++p)
-    rmref(eval(*p));
+  loadFile(&toAscii(toString(lookup(L"f")))[0]);
 )
