@@ -200,8 +200,30 @@ Token parseToken(istream& in) {
   return Token::of(out.rdbuf()->str());
 }
 
+
+int replParenCount = 0;
+bool endOfReplExpr(list<Token> tokens) {
+  if (!interactive) return false;
+  if (tokens.empty()) return false;
+
+  if (tokens.back() == L"(") ++replParenCount;
+  if (tokens.back() == L")") --replParenCount;
+
+  list<Token>::iterator firstNonSpace = tokens.begin();
+  // inefficient, but saves a global. it's just the repl.
+  while (whitespace(firstNonSpace->type)) {
+    ++firstNonSpace;
+    if (firstNonSpace == tokens.end())
+      return stopTokenizing;
+  }
+
+  if (*firstNonSpace == L"(" && replParenCount == 0)
+    stopTokenizing = true;
+  return stopTokenizing;
+}
+
 list<Token> tokenize(istream& in) {
-  stopTokenizing = false;
+  stopTokenizing=false, replParenCount=0;
   indentLevel = 0;
   in >> std::noskipws;
   list<Token> result;
@@ -210,6 +232,7 @@ list<Token> tokenize(istream& in) {
   while (!eof(in)) {
     result.push_back(parseToken(in));
     prevTokenType = result.back().type;
+    if(endOfReplExpr(result)) break;
   }
 
   while(!result.empty()

@@ -219,6 +219,10 @@ int main(int argc, ascii* argv[]) {
   case 5:
     cout << eval(buildCells(parse(parenthesize(tokenize(cin)))).front()) << endl; break;
   default:
+    // no unit tests for interactive repl, so manual QA:
+    //   <CR> at the prompt shouldn't quit
+    //   expr that doesn't start with paren should eval on empty line
+    //   expr that starts with paren should eval on close
     interactive = true;
     while (!cin.eof()) {
       cout << "wart> ";
