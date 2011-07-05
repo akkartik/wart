@@ -226,7 +226,9 @@ int main(int argc, ascii* argv[]) {
     interactive = true;
     while (!cin.eof()) {
       cout << "wart> ";
-      Cell* result = eval(buildCells(parse(parenthesize(tokenize(cin)))).front());
+      list<Cell*> form = buildCells(parse(parenthesize(tokenize(cin))));
+      if (form.empty()) continue;
+      Cell* result = eval(form.front());
       cout << result << endl;
       rmref(result);
     }
