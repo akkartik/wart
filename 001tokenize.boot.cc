@@ -70,7 +70,8 @@ bool stopTokenizing = false;
 
                                   bool eof(istream& in) {
                                     if (stopTokenizing) return true;
-                                    in.peek();
+                                    char c = in.peek(); // set eof bit
+                                    if (c == -1) return true;
                                     return in.eof();
                                   }
 
