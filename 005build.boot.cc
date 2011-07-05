@@ -28,7 +28,8 @@ Cell* buildCell(AstNode n) {
     return newSym(n.atom.token);
   }
 
-  if (n.elems.size() == 2 && (n.elems.front() == L"'" || n.elems.front() == L"`")
+  if (n.elems.size() == 2
+      && (n.elems.front() == L"'" || n.elems.front() == L"`" || n.elems.front() == L",")
       && n.elems.back().isAtom()) {
     Cell* newForm = newCell();
     setCar(newForm, buildCell(n.elems.front()));

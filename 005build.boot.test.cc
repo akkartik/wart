@@ -245,7 +245,7 @@ void test_build_handles_syms() {
 }
 
 void test_build_handles_quotes() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"`(34 ,35)")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"`(34 ,(35) ,36)")))));
   check_eq(cells.size(), 1);
   Cell* c = cells.front();
   check(isCons(c));
@@ -266,7 +266,6 @@ void test_build_handles_quotes() {
     check_eq(c2->nrefs, 1);
     check(isSym(car(c2)));
     check_eq(toString(car(c2)), L",");
-    check_eq(car(c2)->nrefs, 2);
     c2 = cdr(c2);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
@@ -274,6 +273,15 @@ void test_build_handles_quotes() {
     check_eq(toNum(car(c2)), 35);
     check_eq(car(c2)->nrefs, 2);
     check_eq(cdr(c2), nil);
+  c = cdr(c);
+  check(isCons(c));
+    c2 = car(c);
+    check(isCons(c2));
+    check_eq(c2->nrefs, 1);
+    check(isSym(car(c2)));
+    check_eq(toString(car(c2)), L",");
+    check_eq(toNum(cdr(c2)), 36);
+    check_eq(cdr(c2)->nrefs, 2);
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
