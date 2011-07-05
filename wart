@@ -1,3 +1,3 @@
 #!/usr/bin/env zsh
 
-make --silent && wart_bin $*
+make --silent && { rlwrap wart_bin $* || wart_bin $* }
