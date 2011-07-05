@@ -334,19 +334,20 @@ Cell* get(Cell* t, Cell* k) {
                                     if (c == NULL) return os << "NULLNULLNULL";
                                     if (c == nil) return os << "nil";
                                     switch(c->type) {
+                                    case CONS:
+                                      return os << L"<" << car(c) << " . " << cdr(c) << L">";
                                     case NUM:
-                                      os << toNum(c); break;
+                                      return os << toNum(c);
                                     case SYM:
                                     case STRING:
-                                      os << toString(c); break;
+                                      return os << toString(c);
                                     case TABLE:
-                                      os << (Table*)c->car << cdr(c); break;
-                                    case CONS:
-                                      os << L"<" << car(c) << " . " << cdr(c) << L">"; break;
+                                      return os << (Table*)c->car << cdr(c);
+                                    case PRIM_FUNC:
+                                      return os << "#compiled" << endl;
                                     default:
-                                      os << "Can't print type " << c->type << endl << DIE;
+                                      return os << "Can't print type " << c->type << endl << DIE;
                                     }
-                                    return os;
                                   }
 
 ostream& operator<<(ostream& os, list<Cell*> l) {
