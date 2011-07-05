@@ -1,7 +1,8 @@
 //// eval: lookup symbols, respect quotes, rewrite lambda calls
 
                                   bool isQuoted(Cell* cell) {
-                                    return isCons(cell) && car(cell) == newSym(L"'");
+                                    return isCons(cell)
+                                        && (car(cell) == newSym(L"'") || car(cell) == newSym(L"`"));
                                   }
 
                                   Cell* unQuote(Cell* cell) {
