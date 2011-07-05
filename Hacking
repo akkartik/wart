@@ -14,8 +14,8 @@ eval takes pains to increment the nrefs of *exactly* one Cell across all
 paths. Nested calls to eval decrement nrefs of the result unless they return
 it. Structure any functions returning Cells the same way.
 
-If you hack on wart and forget to decrement nrefs you have a memory leak. If
-you forget to increment nrefs you have something worse: a prematurely
+If you hack on wart's cc files and forget to decrement nrefs you have a memory
+leak. If you forget to increment nrefs you have something worse: a prematurely
 garbage-collected cell that may now be used for something else entirely. Old
 pointers to it can no longer rely on what it contains; they may clobber or try
 to interpret arbitrary data as a string or a Table. All bets are off. wart
@@ -41,4 +41,5 @@ included next time you run wart.
 The wart interpreter pervasively uses wide characters
 (http://en.wikipedia.org/wiki/Wide_character) to enable unicode. All string,
 char, stream and IO types are not what they may seem at first. char is
-wchar_t, string is wstring, and so on.
+wchar_t, string is wstring, and so on. A few places that can't use wide
+characters use type ascii.
