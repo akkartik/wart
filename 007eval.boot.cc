@@ -63,6 +63,20 @@ void bindArgs(Cell* params, Cell* args) {
                                     return args;
                                   }
 
+                                  bool isComma(Cell* x) {
+                                    return isCons(x) && car(x) == newSym(L",");
+                                  }
+
+                                  Cell* processUnquotes(Cell* x) {
+                                    if (!isCons(x)) return x;
+                                    if (isComma(car(x))) {
+                                      setCar(x, eval(cdr(car(x))));
+                                      rmref(car(x));
+                                    }
+                                    processUnquotes(cdr(x));
+                                    return x;
+                                  }
+
 Cell* eval(Cell* expr) {
   if (!expr)
     cerr << "eval: cell should never be NULL" << endl << DIE;
@@ -79,7 +93,7 @@ Cell* eval(Cell* expr) {
     return mkref(expr);
 
   if (isQuoted(expr))
-    return mkref(cdr(expr));
+    return mkref(processUnquotes(cdr(expr)));
 
   if (car(expr) == newSym(L"lambda")) {
     // attach current lexical scope

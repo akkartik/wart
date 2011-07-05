@@ -79,6 +79,19 @@ void test_eval_handles_backquoted_lists() {
   checkState();
 }
 
+void test_eval_handles_unquote() {
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"`(a ,b)")))));
+  newDynamicScope(L"b", newNum(34));
+  Cell* result = eval(cells.front());
+  check_eq(car(result), newSym(L"a"));
+  check_eq(car(cdr(result)), newNum(34));
+  check_eq(cdr(cdr(result)), nil);
+  rmref(result);
+  endDynamicScope(L"b");
+  rmref(cells.front());
+  checkState();
+}
+
 void test_eval_handles_simple_lambda() {
   list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
   check_eq(cells.size(), 1);
