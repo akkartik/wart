@@ -14,81 +14,81 @@ void test_bindArgs_handles_vararg() {
 
 
 void test_nil_evals_to_itself() {
-  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
-  check_eq(Cells.size(), 1);
-  Cell* result = eval(Cells.front());
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
+  check_eq(cells.size(), 1);
+  Cell* result = eval(cells.front());
   check_eq(result, nil);
   rmref(result);
-  rmref(Cells.front());
+  rmref(cells.front());
   checkState();
 }
 
 void test_num_evals_to_itself() {
-  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"34")))));
-  check_eq(Cells.size(), 1);
-  Cell* result = eval(Cells.front());
-  check_eq(result, Cells.front());
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34")))));
+  check_eq(cells.size(), 1);
+  Cell* result = eval(cells.front());
+  check_eq(result, cells.front());
   rmref(result);
-  rmref(Cells.front());
+  rmref(cells.front());
   checkState();
 }
 
 void test_string_evals_to_itself() {
-  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"\"ac bd\"")))));
-  check_eq(Cells.size(), 1);
-  Cell* result = eval(Cells.front());
-  check_eq(result, Cells.front());
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"\"ac bd\"")))));
+  check_eq(cells.size(), 1);
+  Cell* result = eval(cells.front());
+  check_eq(result, cells.front());
   rmref(result);
-  rmref(Cells.front());
+  rmref(cells.front());
   checkState();
 }
 
 void test_eval_handles_quoted_atoms() {
-  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"'a '34")))));
-  check_eq(Cells.size(), 2);
-  Cell* result = eval(Cells.front());
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'a '34")))));
+  check_eq(cells.size(), 2);
+  Cell* result = eval(cells.front());
   check_eq(result, newSym(L"a"));
   rmref(result);
-  result = eval(Cells.back());
+  result = eval(cells.back());
   check_eq(result, newNum(34));
   rmref(result);
-  rmref(Cells.front());
-  rmref(Cells.back());
+  rmref(cells.front());
+  rmref(cells.back());
   checkState();
 }
 
 void test_eval_handles_quoted_lists() {
-  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"'(a b)")))));
-  Cell* result = eval(Cells.front());
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'(a b)")))));
+  Cell* result = eval(cells.front());
   check_eq(car(result), newSym(L"a"));
   check_eq(car(cdr(result)), newSym(L"b"));
   check_eq(cdr(cdr(result)), nil);
   rmref(result);
-  rmref(Cells.front());
+  rmref(cells.front());
   checkState();
 }
 
 void test_eval_handles_simple_lambda() {
-  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
-  check_eq(Cells.size(), 1);
-  Cell* lambda = eval(Cells.front());
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
+  check_eq(cells.size(), 1);
+  Cell* lambda = eval(cells.front());
   check_eq(car(lambda), newSym(L"lambda"));
   check_eq(car(cdr(lambda)), nil);
   check(isCons(car(cdr(cdr(lambda)))));
   check_eq(car(car(cdr(cdr(lambda)))), newNum(34));
   check_eq(cdr(cdr(cdr(lambda))), nil);
   rmref(lambda);
-  rmref(Cells.front());
+  rmref(cells.front());
   checkState();
 }
 
 void test_eval_handles_closure() {
-  list<Cell*> Cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
-  check_eq(Cells.size(), 1);
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
+  check_eq(cells.size(), 1);
   newLexicalScope();
     Cell* newLexicalScope = currLexicalScopes.top();
     check_eq(newLexicalScope->nrefs, 2);
-    Cell* result = eval(Cells.front());
+    Cell* result = eval(cells.front());
     check_eq(newLexicalScope->nrefs, 3);
   endLexicalScope();
   check_eq(newLexicalScope->nrefs, 1);
@@ -98,7 +98,7 @@ void test_eval_handles_closure() {
   check_eq(cdr(cdr(cdr(result))), newLexicalScope);
   rmref(result);
   check_eq(newLexicalScope->nrefs, 0);
-  rmref(Cells.front());
+  rmref(cells.front());
   checkState();
 }
 

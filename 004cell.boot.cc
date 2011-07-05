@@ -36,22 +36,22 @@ bool isAtom(Cell* x) {
 
 #define HEAPCELLS (1024*1024/sizeof(Cell)) // 1MB
 struct Heap {
-  Cell Cells[HEAPCELLS];
+  Cell cells[HEAPCELLS];
   Heap *next;
   Heap() :next(NULL) {}
 };
 
 Heap* currHeap = new Heap();
-Cell* heapStart = &currHeap->Cells[0];
-Cell* heapEnd = &currHeap->Cells[HEAPCELLS];
+Cell* heapStart = &currHeap->cells[0];
+Cell* heapEnd = &currHeap->cells[HEAPCELLS];
 Cell* currCell = heapStart;
 Cell* freelist = NULL;
 
 void growHeap() {
   currHeap = currHeap->next = new Heap();
   if (!currHeap) cerr << "Out of memory" << endl << DIE;
-  currCell = &currHeap->Cells[0];
-  heapEnd = &currHeap->Cells[HEAPCELLS];
+  currCell = &currHeap->cells[0];
+  heapEnd = &currHeap->cells[HEAPCELLS];
 }
 
 Cell* newCell() {
