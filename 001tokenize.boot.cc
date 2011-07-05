@@ -56,7 +56,7 @@ ostream& operator<<(ostream& os, Token p) {
 
 
 
-bool stopTokenizing = false;
+bool stopTokenizing = false; // interactive repl; everything this touches is a hack
 
                                   void skip(istream& in) {
                                     char dummy;
@@ -200,7 +200,6 @@ Token parseToken(istream& in) {
   return Token::of(out.rdbuf()->str());
 }
 
-
 int replParenCount = 0;
 bool endOfReplExpr(list<Token> tokens) {
   if (!interactive) return false;
@@ -217,8 +216,10 @@ bool endOfReplExpr(list<Token> tokens) {
       return stopTokenizing;
   }
 
-  if (*firstNonSpace == L"(" && replParenCount == 0)
+  if (*firstNonSpace == L"(" && replParenCount == 0) {
     stopTokenizing = true;
+    cin.get(); // newline
+  }
   return stopTokenizing;
 }
 
