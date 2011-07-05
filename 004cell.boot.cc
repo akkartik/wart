@@ -105,7 +105,7 @@ void rmref(Cell* c) {
   if (c->nrefs > 0) return;
 
   if (isAtom(c) && !runningTests)
-    cerr << "deleted atom: " << c->type << endl;
+    cerr << "deleted atom of type " << c->type << endl;
 
   switch (c->type) {
   case NUM:
