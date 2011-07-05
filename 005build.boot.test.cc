@@ -174,7 +174,7 @@ void test_build_handles_strings() {
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
     check(isString(car(c2)));
-    check_eq(toString(car(c2)), L"\"abc\"");
+    check_eq(toString(car(c2)), L"abc");
     check_eq(car(c2)->nrefs, 2);
     c2 = cdr(c2);
     check(isCons(c2));
@@ -216,7 +216,7 @@ void test_build_handles_syms() {
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
     check(isString(car(c2)));
-    check_eq(toString(car(c2)), L"\"abc\"");
+    check_eq(toString(car(c2)), L"abc");
     check_eq(car(c2)->nrefs, 2);
     c2 = cdr(c2);
     check(isCons(c2));

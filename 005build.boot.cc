@@ -24,7 +24,7 @@ Cell* buildCell(AstNode n) {
       return newNum(v);
 
     if (n.atom.token.c_str()[0] == L'"')
-      return newString(n.atom.token);
+      return newString(n.atom.token.substr(1, n.atom.token.length()-2));
     return newSym(n.atom.token);
   }
 
