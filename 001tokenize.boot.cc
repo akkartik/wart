@@ -113,7 +113,7 @@ int countIndent(istream& in) {
                                     char c;
                                     while (!eof(in)) {
                                       in >> c;
-                                      // keep this list sync'd with the parseToken switch below
+                                      // keep this list sync'd with the nextToken switch below
                                       if (isspace(c) || c == L',' || c == ';'
                                           || c == L'(' || c == L')' || c == L'\'' || c == L'"') {
                                         in.putback(c);
@@ -149,7 +149,7 @@ int countIndent(istream& in) {
 
 int indentLevel = 0;
 TokenType prevTokenType = START_OF_LINE;
-Token parseToken(istream& in) {
+Token nextToken(istream& in) {
   if (prevTokenType != START_OF_LINE) {
     skipWhitespace(in);
     if (in.peek() == L'\n') {
@@ -231,7 +231,7 @@ list<Token> tokenize(istream& in) {
   result.push_back(Token::sol());
   prevTokenType = START_OF_LINE;
   while (!eof(in)) {
-    result.push_back(parseToken(in));
+    result.push_back(nextToken(in));
     prevTokenType = result.back().type;
     if(endOfReplExpr(result)) break;
   }
