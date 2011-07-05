@@ -5,12 +5,6 @@
                                         && (car(cell) == newSym(L"'") || car(cell) == newSym(L"`"));
                                   }
 
-                                  Cell* unQuote(Cell* cell) {
-                                    if (isQuoted(cell))
-                                      return cdr(cell);
-                                    return cell;
-                                  }
-
 void bindArgs(Cell* params, Cell* args, bool quoted) {
   if (params == nil) return;
 
@@ -19,8 +13,10 @@ void bindArgs(Cell* params, Cell* args, bool quoted) {
     return;
   }
 
-  if (isSym(params) || isQuoted(params))
-    addLexicalBinding(unQuote(params), args);
+  if (isSym(params))
+    addLexicalBinding(params, args);
+  else if (isQuoted(params))
+    addLexicalBinding(cdr(params), args);
   else
     bindArgs(car(params), car(args), quoted);
 
