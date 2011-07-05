@@ -217,7 +217,9 @@ bool isSym(Cell* x) {
 }
 
 Cell* newString(string x) {
-  Cell* result = intern(x);
+  dbg << endl << "new string: " << x << endl;
+  Cell* result = newCell();
+  result->car = (Cell*)new string(x);
   result->type = STRING;
   return result;
 }

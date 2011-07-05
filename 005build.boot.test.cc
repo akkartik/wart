@@ -34,6 +34,13 @@ void test_build_handles_symbol() {
   checkState();
 }
 
+void test_build_doesnt_mix_symbols_and_strings() {
+  Cell* s = newString(L"a");
+  check(s != newSym(L"a"));
+  rmref(s);
+  checkState();
+}
+
 void test_build_handles_quoted_symbol() {
   list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'a")))));
   check_eq(cells.size(), 1);
@@ -175,7 +182,7 @@ void test_build_handles_strings() {
     check_eq(c2->nrefs, 1);
     check(isString(car(c2)));
     check_eq(toString(car(c2)), L"abc");
-    check_eq(car(c2)->nrefs, 2);
+    check_eq(car(c2)->nrefs, 1);
     c2 = cdr(c2);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);
@@ -217,7 +224,7 @@ void test_build_handles_syms() {
     check_eq(c2->nrefs, 1);
     check(isString(car(c2)));
     check_eq(toString(car(c2)), L"abc");
-    check_eq(car(c2)->nrefs, 2);
+    check_eq(car(c2)->nrefs, 1);
     c2 = cdr(c2);
     check(isCons(c2));
     check_eq(c2->nrefs, 1);

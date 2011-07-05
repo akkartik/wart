@@ -39,7 +39,7 @@ void test_string_evals_to_itself() {
   Cell* result = eval(cells.front());
   check_eq(result, cells.front());
   rmref(result);
-  rmref(cells.front());
+  // HACK: just a string by itself doesn't need rmref'ing
   checkState();
 }
 
