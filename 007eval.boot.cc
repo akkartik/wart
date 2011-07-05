@@ -67,11 +67,26 @@ void bindArgs(Cell* params, Cell* args) {
                                     return isCons(x) && car(x) == newSym(L",");
                                   }
 
+                                  bool isSplice(Cell* x) {
+                                    return isCons(x) && car(x) == newSym(L",@");
+                                  }
+
                                   Cell* processUnquotes(Cell* x) {
                                     if (!isCons(x)) return x;
                                     if (isComma(car(x))) {
                                       setCar(x, eval(cdr(car(x))));
                                       rmref(car(x));
+                                    }
+                                    else if (isSplice(car(x))) {
+                                      Cell* rest = mkref(cdr(x));
+                                      Cell* snip = eval(cdr(car(x)));
+                                      setCar(x, car(snip));
+                                      setCdr(x, cdr(snip));
+                                      rmref(snip);
+                                      while (cdr(x) != nil)
+                                        x = cdr(x);
+                                      setCdr(x, rest);
+                                      rmref(rest);
                                     }
                                     processUnquotes(cdr(x));
                                     return x;
