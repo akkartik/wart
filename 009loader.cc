@@ -11,15 +11,23 @@ void loadFile(ascii* filename) {
     rmref(*p);
 }
 
+                                  vector<ascii*> sortedFiles(const ascii* dirname, const ascii* ext) {
+                                    vector<ascii*> result;
+                                    DIR* dir = opendir(dirname);
+                                    for (dirent* ent = readdir(dir); ent; ent = readdir(dir)) {
+                                      unsigned int n = strlen(ent->d_name), extn = strlen(ext);
+                                      if (n < extn) continue;
+                                      if (strncmp(&ent->d_name[n-extn], ext, extn)) continue;
+                                      if (!isdigit(ent->d_name[0])) continue;
+                                      result.push_back(ent->d_name);
+                                    }
+                                    closedir(dir);
+                                    sort(result.begin(), result.end());
+                                    return result;
+                                  }
+
 void loadFiles(const ascii* ext) {
-  struct dirent *ent;
-  DIR* dir = opendir(".");
-  while ((ent = readdir(dir)) != NULL) {
-    unsigned int n = strlen(ent->d_name), extn = strlen(ext);
-    if (n < extn) continue;
-    if (strncmp(&ent->d_name[n-extn], ext, extn)) continue;
-    if (!isdigit(ent->d_name[0])) continue;
-    loadFile(ent->d_name);
-  }
-  closedir(dir);
+  vector<ascii*> files = sortedFiles(".", ext);
+  for (vector<ascii*>::iterator p = files.begin(); p != files.end(); ++p)
+    loadFile(*p);
 }
