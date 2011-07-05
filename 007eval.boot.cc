@@ -5,26 +5,20 @@
                                         && (car(cell) == newSym(L"'") || car(cell) == newSym(L"`"));
                                   }
 
-void bindArgs(Cell* params, Cell* args, bool quoted) {
+void bindArgs(Cell* params, Cell* args) {
   if (params == nil) return;
 
   if (isQuoted(params)) {
-    bindArgs(cdr(params), args, true);
+    bindArgs(cdr(params), args);
     return;
   }
 
   if (isSym(params))
     addLexicalBinding(params, args);
-  else if (isQuoted(params))
-    addLexicalBinding(cdr(params), args);
   else
-    bindArgs(car(params), car(args), quoted);
+    bindArgs(car(params), car(args));
 
-  bindArgs(cdr(params), cdr(args), quoted);
-}
-
-void bindArgs(Cell* params, Cell* args) {
-  bindArgs(params, args, false);
+  bindArgs(cdr(params), cdr(args));
 }
 
 
