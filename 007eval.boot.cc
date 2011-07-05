@@ -1,13 +1,13 @@
 //// eval: lookup symbols, respect quotes, rewrite lambda calls
 
-                                  bool isQuoted(Cell* Cell) {
-                                    return isCons(Cell) && car(Cell) == newSym(L"'");
+                                  bool isQuoted(Cell* cell) {
+                                    return isCons(cell) && car(cell) == newSym(L"'");
                                   }
 
-                                  Cell* unQuote(Cell* Cell) {
-                                    if (isQuoted(Cell))
-                                      return cdr(Cell);
-                                    return Cell;
+                                  Cell* unQuote(Cell* cell) {
+                                    if (isQuoted(cell))
+                                      return cdr(cell);
+                                    return cell;
                                   }
 
 void bindArgs(Cell* params, Cell* args, bool quoted) {
