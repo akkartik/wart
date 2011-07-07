@@ -1,4 +1,5 @@
 #include<cstdio>
+#include<cstring>
 #include<vector>
 using std::vector;
 #include<list>
