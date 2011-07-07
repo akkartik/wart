@@ -200,7 +200,7 @@ void dumpUnfreed() {
     if (!x->car) continue;
     if (x == newSym(L"currLexicalScope")) continue;
     if (numRefsRemaining[(long)x] > 1) continue;
-    cerr << "unfreed: " << (void*)x << " " << numRefsRemaining[(long)x] << " " << x->nrefs << " " << x << endl;
+    cerr << "unfreed: " << (void*)x << " " << x << endl;
   }
 }
 
