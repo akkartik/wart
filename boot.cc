@@ -5,7 +5,7 @@ using std::vector;
 using std::list;
 #include<stack>
 using std::stack;
-#include <ext/hash_map>
+#include<ext/hash_map>
 using __gnu_cxx::hash_map;
 using __gnu_cxx::hash;
 
@@ -28,7 +28,7 @@ using std::endl;
 typedef std::wstringstream stringstream;
 typedef std::wostringstream ostringstream;
 
-#include <fstream>
+#include<fstream>
 typedef std::wifstream ifstream;
 typedef std::wofstream ofstream;
 
@@ -122,7 +122,7 @@ void teardownPrimFuncs() {
 typedef void (*testfunc)(void);
 
 const testfunc tests[] = {
-  #include"test_list"
+  #include "test_list"
 };
 
 void runTests() {
