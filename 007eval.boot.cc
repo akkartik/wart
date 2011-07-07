@@ -141,5 +141,3 @@ Cell* eval(Cell* expr) {
   rmref(lambda);
   return result; // already mkref'd
 }
-
-
