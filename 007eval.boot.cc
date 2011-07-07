@@ -133,6 +133,8 @@ Cell* eval(Cell* expr) {
   newLexicalScope();
   bindArgs(sig(lambda), evald_args);
 
+  YieldException* yield = NULL;
+
   // eval all forms in body; save result of final form
   Cell* result = nil;
   if (isPrimFunc(car(lambda))) {
@@ -145,13 +147,17 @@ Cell* eval(Cell* expr) {
         result = eval(car(form));
       }
     } catch (YieldException* e) {
-      if (car(lambda) != newSym(L"collect")) throw e;
-      result = mkref(e->val);
+      // slinky up the call stack until you find the collect
+      if (car(lambda) != newSym(L"collect"))
+        yield = e;
+      else
+        result = mkref(e->val);
     }
   }
 
   endLexicalScope();
   endDynamicScope(newSym(L"currLexicalScope"));
   rmref(lambda);
+  if (yield) throw yield;
   return result; // already mkref'd
 }
