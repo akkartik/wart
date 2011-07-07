@@ -193,7 +193,7 @@ void checkLiteralTables() {
 void dumpUnfreed() {
   hash_set<long> done;
   done.insert((long)newSym(L"currLexicalScope"));
-  for (Cell* x = heapStart; x != currCell; ++x) {
+  for (Cell* x = currCell; x >= heapStart; --x) {
     if (!x->car) continue;
     if (done.find((long)x) != done.end()) continue;
     cerr << "unfreed: " << (void*)x << " " << x->nrefs << " " << x << endl;
