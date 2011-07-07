@@ -9,6 +9,8 @@ using std::stack;
 #include<ext/hash_map>
 using __gnu_cxx::hash_map;
 using __gnu_cxx::hash;
+#include<ext/hash_set>
+using __gnu_cxx::hash_set;
 #include<exception>
 
 
@@ -162,15 +164,49 @@ void checkLiteralTables() {
   }
 }
 
+                                  void mark_all_cells(Cell* x, hash_set<long>& done) {
+                                    if (x == nil) return;
+                                    done.insert((long)x);
+                                    switch (x->type) {
+                                    case NUM:
+                                    case STRING:
+                                    case SYM:
+                                      break;
+                                    case CONS:
+                                      mark_all_cells(car(x), done); break;
+                                    case TABLE: {
+                                      Table* t = (Table*)x->car;
+                                      for (hash_map<long, Cell*>::iterator p = t->table.begin(); p != t->table.end(); ++p) {
+                                        mark_all_cells((Cell*)p->first, done);
+                                        mark_all_cells(p->second, done);
+                                      }
+                                      break;
+                                    }
+                                    case PRIM_FUNC:
+                                      break;
+                                    default:
+                                      cerr << "Can't mark type " << x->type << endl << DIE;
+                                    }
+                                    mark_all_cells(cdr(x), done);
+                                  }
+
+void dumpUnfreed() {
+  hash_set<long> done;
+  done.insert((long)newSym(L"currLexicalScope"));
+  for (Cell* x = heapStart; x != currCell; ++x) {
+    if (!x->car) continue;
+    if (done.find((long)x) != done.end()) continue;
+    cerr << "unfreed: " << (void*)x << " " << x->nrefs << " " << x << endl;
+    mark_all_cells(x, done);
+  }
+}
+
 void checkUnfreed() {
   int n = currCell-heapStart-1; // ignore empty currLexicalScopes
   for (; freelist; freelist = freelist->cdr)
     --n;
   check_eq(n, 0);
-  if (n > 0)
-    for (Cell* x = heapStart; x != currCell; ++x)
-      if (x->car && x != newSym(L"currLexicalScope"))
-        cerr << "unfreed: " << (void*)x << " " << x << endl;
+  if (n > 0) dumpUnfreed();
 }
 
 void resetState() {
