@@ -86,6 +86,11 @@ void bindArgs(Cell* params, Cell* args) {
                                     return x;
                                   }
 
+                                  struct YieldException :public std::exception {
+                                    Cell* val;
+                                    YieldException(Cell* x) :val(x) {}
+                                  };
+
 Cell* eval(Cell* expr) {
   if (!expr)
     cerr << "eval: cell should never be NULL" << endl << DIE;
@@ -102,7 +107,7 @@ Cell* eval(Cell* expr) {
   if (isQuoted(expr))
     return mkref(processUnquotes(cdr(expr)));
 
-  if (car(expr) == newSym(L"lambda")) {
+  if (car(expr) == newSym(L"lambda") || car(expr) == newSym(L"collect")) {
     // attach current lexical scope
     Cell* ans = newCell();
     setCar(ans, car(expr));
@@ -112,6 +117,10 @@ Cell* eval(Cell* expr) {
     setCar(cdr(cdr(ans)), body(expr));
     setCdr(cdr(cdr(ans)), currLexicalScopes.top());
     return mkref(ans);
+  }
+
+  if (car(expr) == newSym(L"yield")) {
+    throw new YieldException(car(cdr(expr)));
   }
 
   // expr is a function call
@@ -130,9 +139,14 @@ Cell* eval(Cell* expr) {
     result = mkref(toPrimFunc(car(lambda))());
   }
   else {
-    for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
-      rmref(result);
-      result = eval(car(form));
+    try {
+      for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
+        rmref(result);
+        result = eval(car(form));
+      }
+    } catch (YieldException* e) {
+      if (car(lambda) != newSym(L"collect")) throw e;
+      result = mkref(e->val);
     }
   }
 

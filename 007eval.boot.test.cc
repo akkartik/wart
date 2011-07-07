@@ -361,3 +361,18 @@ void test_eval_handles_rest_params() {
   rmref(call);
   checkState();
 }
+
+void test_eval_handles_yield_inside_collect() {
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(collect () (yield 1))"))))).front();
+  Cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
+  Cell* result = eval(call);
+  check_eq(result, newNum(1));
+  rmref(result);
+  rmref(call);
+  rmref(f);
+  rmref(lambda);
+  endDynamicScope(newSym(L"f"));
+  checkState();
+}
