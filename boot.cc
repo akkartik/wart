@@ -146,22 +146,20 @@ void runTests() {
 
 // post-test teardown
 
-void clearLiteralTables() {
+void checkLiteralTables() {
   for (hash_map<long, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
     if (p->second->nrefs > 1)
-      cerr << "forcing unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
-    while (p->second->nrefs > 0)
+      cerr << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
+    if (p->second->nrefs > 0)
       rmref(p->second);
   }
-  numLiterals.clear();
   for (StringMap<Cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
     if (p->first == L"currLexicalScope") continue; // memory leak
     if (p->second->nrefs > 1)
-      cerr << "forcing unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
-    while (p->second->nrefs > 0)
+      cerr << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
+    if (p->second->nrefs > 0)
       rmref(p->second);
   }
-  stringLiterals.clear();
 }
 
 void checkUnfreed() {
@@ -176,6 +174,8 @@ void checkUnfreed() {
 }
 
 void resetState() {
+  numLiterals.clear();
+  stringLiterals.clear();
   freelist = NULL;
   for(Cell* curr=currCell; curr >= heapStart; --curr)
     curr->init();
@@ -191,7 +191,7 @@ void setupState() {
 
 void checkState() {
   teardownPrimFuncs();
-  clearLiteralTables();
+  checkLiteralTables();
   checkUnfreed();
 
   resetState();
