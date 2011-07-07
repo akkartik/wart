@@ -151,8 +151,10 @@ Cell* eval(Cell* expr) {
       // slinky up the call stack until you find the collect
       if (car(lambda) != newSym(L"collect"))
         yield = e;
-      else
+      else {
         result = mkref(e->val);
+        delete e;
+      }
     }
   }
 
