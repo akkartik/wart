@@ -86,9 +86,9 @@ void bindArgs(Cell* params, Cell* args) {
                                     return x;
                                   }
 
-                                  struct YieldException :public std::exception {
+                                  struct Yield :public std::exception {
                                     Cell* val;
-                                    YieldException(Cell* x) :val(x) {}
+                                    Yield(Cell* x) :val(x) {}
                                   };
 
 Cell* eval(Cell* expr) {
@@ -120,7 +120,7 @@ Cell* eval(Cell* expr) {
   }
 
   if (car(expr) == newSym(L"yield")) {
-    throw new YieldException(car(cdr(expr)));
+    throw new Yield(car(cdr(expr)));
   }
 
   // expr is a function call
@@ -133,9 +133,10 @@ Cell* eval(Cell* expr) {
   newLexicalScope();
   bindArgs(sig(lambda), evald_args);
 
-  YieldException* yield = NULL;
+  Yield* yield=NULL;
 
-  // eval all forms in body; save result of final form
+  // eval all forms in body (unless short-circuited by yield)
+  // save result of final form
   Cell* result = nil;
   if (isPrimFunc(car(lambda))) {
     result = mkref(toPrimFunc(car(lambda))());
@@ -146,7 +147,7 @@ Cell* eval(Cell* expr) {
         rmref(result);
         result = eval(car(form));
       }
-    } catch (YieldException* e) {
+    } catch (Yield* e) {
       // slinky up the call stack until you find the collect
       if (car(lambda) != newSym(L"collect"))
         yield = e;
