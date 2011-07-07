@@ -164,21 +164,21 @@ void checkLiteralTables() {
   }
 }
 
-                                  void mark_all_cells(Cell* x, hash_set<long>& done) {
+                                  void mark_all_cells(Cell* x, hash_map<long, long>& mark) {
                                     if (x == nil) return;
-                                    done.insert((long)x);
+                                    ++mark[(long)x];
                                     switch (x->type) {
                                     case NUM:
                                     case STRING:
                                     case SYM:
                                       break;
                                     case CONS:
-                                      mark_all_cells(car(x), done); break;
+                                      mark_all_cells(car(x), mark); break;
                                     case TABLE: {
                                       Table* t = (Table*)x->car;
                                       for (hash_map<long, Cell*>::iterator p = t->table.begin(); p != t->table.end(); ++p) {
-                                        mark_all_cells((Cell*)p->first, done);
-                                        mark_all_cells(p->second, done);
+                                        mark_all_cells((Cell*)p->first, mark);
+                                        mark_all_cells(p->second, mark);
                                       }
                                       break;
                                     }
@@ -187,17 +187,20 @@ void checkLiteralTables() {
                                     default:
                                       cerr << "Can't mark type " << x->type << endl << DIE;
                                     }
-                                    mark_all_cells(cdr(x), done);
+                                    mark_all_cells(cdr(x), mark);
                                   }
 
 void dumpUnfreed() {
-  hash_set<long> done;
-  done.insert((long)newSym(L"currLexicalScope"));
-  for (Cell* x = currCell; x >= heapStart; --x) {
+  hash_map<long, long> numRefsRemaining;
+  for (Cell* x = heapStart; x < currCell; ++x) {
     if (!x->car) continue;
-    if (done.find((long)x) != done.end()) continue;
-    cerr << "unfreed: " << (void*)x << " " << x->nrefs << " " << x << endl;
-    mark_all_cells(x, done);
+    mark_all_cells(x, numRefsRemaining);
+  }
+  for (Cell* x = heapStart; x < currCell; ++x) {
+    if (!x->car) continue;
+    if (x == newSym(L"currLexicalScope")) continue;
+    if (numRefsRemaining[(long)x] > 1) continue;
+    cerr << "unfreed: " << (void*)x << " " << numRefsRemaining[(long)x] << " " << x->nrefs << " " << x << endl;
   }
 }
 
