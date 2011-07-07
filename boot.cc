@@ -167,6 +167,10 @@ void checkUnfreed() {
   for (; freelist; freelist = freelist->cdr)
     --n;
   check_eq(n, 0);
+  if (n > 0)
+    for (Cell* x = heapStart; x != currCell; ++x)
+      if (x->car && toString(x) != L"currLexicalScope")
+        cerr << "unfreed: " << (void*)x << " " << x << endl;
 }
 
 void resetState() {
