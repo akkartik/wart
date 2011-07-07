@@ -169,7 +169,7 @@ void checkUnfreed() {
   check_eq(n, 0);
   if (n > 0)
     for (Cell* x = heapStart; x != currCell; ++x)
-      if (x->car && toString(x) != L"currLexicalScope")
+      if (x->car && x != newSym(L"currLexicalScope"))
         cerr << "unfreed: " << (void*)x << " " << x << endl;
 }
 
