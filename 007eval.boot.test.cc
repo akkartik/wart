@@ -391,3 +391,21 @@ void test_eval_handles_nested_yield() {
   endDynamicScope(newSym(L"f"));
   checkState();
 }
+
+void test_eval_restarts_collect_after_last_yield() {
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(collect () (yield 1) (yield 2))"))))).front();
+  Cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
+  Cell* result = eval(call);
+  check_eq(result, newNum(1));
+  rmref(result);
+  result = eval(call);
+  check_eq(result, newNum(2));
+  rmref(result);
+  rmref(call);
+  rmref(f);
+  rmref(lambda);
+  endDynamicScope(newSym(L"f"));
+  checkState();
+}
