@@ -86,11 +86,6 @@ void bindArgs(Cell* params, Cell* args) {
                                     return x;
                                   }
 
-                                  struct Yield :public std::exception {
-                                    Cell* val;
-                                    Yield(Cell* x) :val(x) {}
-                                  };
-
 Cell* eval(Cell* expr) {
   if (!expr)
     cerr << "eval: cell should never be NULL" << endl << DIE;
@@ -119,10 +114,6 @@ Cell* eval(Cell* expr) {
     return mkref(ans);
   }
 
-  if (car(expr) == newSym(L"yield")) {
-    throw new Yield(car(cdr(expr)));
-  }
-
   // expr is a function call
   Cell* lambda = eval(car(expr));
   // eval all its args in the current lexical scope
@@ -133,34 +124,20 @@ Cell* eval(Cell* expr) {
   newLexicalScope();
   bindArgs(sig(lambda), evald_args);
 
-  Yield* yield=NULL;
-
-  // eval all forms in body (unless short-circuited by yield)
-  // save result of final form
+  // eval all forms in body, save result of final form
   Cell* result = nil;
   if (isPrimFunc(car(lambda))) {
     result = mkref(toPrimFunc(car(lambda))());
   }
   else {
-    try {
-      for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
-        rmref(result);
-        result = eval(car(form));
-      }
-    } catch (Yield* e) {
-      // slinky up the call stack until you find the collect
-      if (car(lambda) != newSym(L"collect"))
-        yield = e;
-      else {
-        result = mkref(e->val);
-        delete e;
-      }
+    for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
+      rmref(result);
+      result = eval(car(form));
     }
   }
 
   endLexicalScope();
   endDynamicScope(newSym(L"currLexicalScope"));
   rmref(lambda);
-  if (yield) throw yield;
   return result; // already mkref'd
 }
