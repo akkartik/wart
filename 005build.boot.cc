@@ -35,11 +35,8 @@ Cell* buildCell(AstNode n) {
       setCdr(newForm, buildCell(n.elems.back()));
     }
     else {
-      list<AstNode>::iterator q = n.elems.begin();
-      ++q;
-      list<AstNode> n2;
-      copy(q, n.elems.end(), inserter(n2, n2.begin()));
-      setCdr(newForm, buildCell(n2));
+      n.elems.pop_front();
+      setCdr(newForm, buildCell(n));
     }
     return newForm;
   }
