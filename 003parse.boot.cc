@@ -48,6 +48,10 @@ ostream& operator<<(ostream& os, AstNode x) {
   return os << endl;
 }
 
+                                  bool isQuoteOrUnquote(Token x) {
+                                    return x == L"'" || x == L"`" || x == L"," || x == L",@";
+                                  }
+
 list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterator end, list<AstNode>& out) {
   if (curr == end) return curr;
 
@@ -58,13 +62,13 @@ list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterato
 
   if (*curr == L")") cerr << "Unbalanced (" << endl << DIE;
 
-  if (*curr != L"(" && *curr != L"'" && *curr != L"`" && *curr != L"," && *curr != L",@") {
+  if (*curr != L"(" && !isQuoteOrUnquote(*curr)) {
     out.push_back(AstNode::of(*curr));
     return ++curr;
   }
 
   list<AstNode> subform;
-  if (*curr != L"(") { // quote/comma
+  while (curr != end && isQuoteOrUnquote(*curr)) {
     subform.push_back(*curr);
     ++curr;
   }
