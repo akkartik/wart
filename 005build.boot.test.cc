@@ -48,9 +48,29 @@ void test_build_handles_quoted_symbol() {
   check(isSym(car(cells.front())));
   check_eq(toString(car(cells.front())), L"'");
   // nrefs of quote depends on number of compiled functions with quoted params
-  check(isSym(car(cells.front())));
+  check(isSym(cdr(cells.front())));
   check_eq(toString(cdr(cells.front())), L"a");
   check_eq(cdr(cells.front())->nrefs, 2);
+  rmref(cells.front());
+  checkState();
+}
+
+void test_build_handles_nested_quote() {
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"',a")))));
+  check_eq(cells.size(), 1);
+  Cell* c = cells.front();
+  check(isCons(c));
+  check(isSym(car(c)));
+  check_eq(toString(car(c)), L"'");
+  // nrefs of quote depends on number of compiled functions with quoted params
+  c = cdr(c);
+  check(isSym(car(c)));
+  check_eq(toString(car(c)), L",");
+  // nrefs of quote depends on number of compiled functions with quoted params
+  c = cdr(c);
+  check(isSym(c));
+  check_eq(toString(c), L"a");
+  check_eq(c->nrefs, 2);
   rmref(cells.front());
   checkState();
 }

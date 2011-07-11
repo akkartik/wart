@@ -28,12 +28,19 @@ Cell* buildCell(AstNode n) {
     return newSym(n.atom.token);
   }
 
-  if (n.elems.size() == 2
-      && (n.elems.front() == L"'" || n.elems.front() == L"`" || n.elems.front() == L"," || n.elems.front() == L",@")
-      && n.elems.back().isAtom()) {
+  if (n.elems.front() == L"'" || n.elems.front() == L"`" || n.elems.front() == L"," || n.elems.front() == L",@") {
     Cell* newForm = newCell();
     setCar(newForm, buildCell(n.elems.front()));
-    setCdr(newForm, buildCell(n.elems.back()));
+    if (n.elems.size() == 2) {
+      setCdr(newForm, buildCell(n.elems.back()));
+    }
+    else {
+      list<AstNode>::iterator q = n.elems.begin();
+      ++q;
+      list<AstNode> n2;
+      copy(q, n.elems.end(), inserter(n2, n2.begin()));
+      setCdr(newForm, buildCell(n2));
+    }
     return newForm;
   }
 
