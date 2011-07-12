@@ -75,7 +75,7 @@ Cell* newCell() {
 
 
 
-extern void rmref(Cell*);
+                                  extern Cell* rmref(Cell*);
 
 struct Table {
   hash_map<long, Cell*> table;
@@ -95,14 +95,14 @@ Cell* mkref(Cell* c) {
   return c;
 }
 
-void rmref(Cell* c) {
+Cell* rmref(Cell* c) {
   if (!c)
     cerr << "fatal: a cell was prematurely garbage-collected.\n" << DIE;
-  if (c == nil) return;
+  if (c == nil) return c;
   dbg << endl << "rmref: " << c << ": " << c->nrefs << " " << c->type << endl;
 
   --c->nrefs;
-  if (c->nrefs > 0) return;
+  if (c->nrefs > 0) return c;
 
   if (isAtom(c) && !runningTests)
     cerr << "deleted atom of type " << c->type << endl;
@@ -131,6 +131,7 @@ void rmref(Cell* c) {
   c->clear();
   c->cdr = freelist;
   freelist = c;
+  return NULL;
 }
 
 
