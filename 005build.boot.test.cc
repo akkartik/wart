@@ -1,3 +1,5 @@
+// check all nrefs except quotes/unquotes
+
 void test_build_handles_empty_input() {
   list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"")))));
   check(cells.empty());
@@ -47,7 +49,6 @@ void test_build_handles_quoted_symbol() {
   check(isCons(cells.front()));
   check(isSym(car(cells.front())));
   check_eq(toString(car(cells.front())), L"'");
-  // nrefs of quote depends on number of compiled functions with quoted params
   check(isSym(cdr(cells.front())));
   check_eq(toString(cdr(cells.front())), L"a");
   check_eq(cdr(cells.front())->nrefs, 2);
@@ -62,11 +63,9 @@ void test_build_handles_nested_quote() {
   check(isCons(c));
   check(isSym(car(c)));
   check_eq(toString(car(c)), L"'");
-  // nrefs of quote depends on number of compiled functions with quoted params
   c = cdr(c);
   check(isSym(car(c)));
   check_eq(toString(car(c)), L",");
-  // nrefs of quote depends on number of compiled functions with quoted params
   c = cdr(c);
   check(isSym(c));
   check_eq(toString(c), L"a");
@@ -265,7 +264,7 @@ void test_build_handles_syms() {
 }
 
 void test_build_handles_quotes() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"`(34 ,(35) ,36 ,@37)")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"`(34 ,(35) ,36 ,@37 ,'(a))")))));
   check_eq(cells.size(), 1);
   Cell* c = cells.front();
   check(isCons(c));
@@ -311,6 +310,24 @@ void test_build_handles_quotes() {
     check_eq(toString(car(c2)), L",@");
     check_eq(toNum(cdr(c2)), 37);
     check_eq(cdr(c2)->nrefs, 2);
+  c = cdr(c);
+  check(isCons(c));
+    c2 = car(c);
+    check(isCons(c2));
+    check_eq(c2->nrefs, 1);
+    check(isSym(car(c2)));
+    check_eq(toString(car(c2)), L",");
+    check_eq(cdr(c2)->nrefs, 1);
+    c2 = cdr(c2);
+    check(isCons(c2));
+    check(isSym(car(c2)));
+    check_eq(toString(car(c2)), L"'");
+    c2 = cdr(c2);
+    check(isCons(c2));
+    check(isSym(car(c2)));
+    check_eq(toString(car(c2)), L"a");
+    check_eq(car(c2)->nrefs, 2);
+    check_eq(cdr(c2), nil);
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
