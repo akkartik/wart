@@ -44,10 +44,14 @@ Cell* buildCell(AstNode n) {
   Cell* newForm = NULL;
   Cell* curr = NULL;
   for (list<AstNode>::iterator q = n.elems.begin(); q != n.elems.end(); ++q) {
-    if (q->atom == L"(")
+    if (q->atom == L"(") {
+      if (q != n.elems.begin()) cerr << "Syntax error: ( not at start of expr" << endl << DIE;
       continue;
-    if (q->atom == L")")
+    }
+    if (q->atom == L")") {
+      if (++q != n.elems.end()) cerr << "Syntax error: ) not at end of expr" << endl << DIE;
       break;
+    }
 
     if (q->atom == L".") {
       ++q;
