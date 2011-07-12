@@ -10,14 +10,19 @@ list<Cell*> buildCells(list<AstNode> in) {
   return result;
 }
 
+                                  bool isQuoteOrUnquote(AstNode n) {
+                                    return n == L"'" || n == L"`" || n == L"," || n == L",@";
+                                  }
+
 Cell* buildCell(AstNode n) {
   if (n.isNil())
     return nil;
+  if (n.elems.front() == L")") {
+    if (n.elems.size() > 1) cerr << "Syntax error: ) not at end of expr" << endl << DIE;
+    return nil;
+  }
 
   if (n.isAtom()) {
-    if (n.atom.token == L")")
-      cerr << "Syntax error: unbalanced )" << endl << DIE;
-
     char* end;
     long v = wcstol(n.atom.token.c_str(), &end, 0);
     if (*end == L'\0')
@@ -25,50 +30,30 @@ Cell* buildCell(AstNode n) {
 
     if (n.atom.token.c_str()[0] == L'"')
       return newString(n.atom.token.substr(1, n.atom.token.length()-2));
+
     return newSym(n.atom.token);
   }
 
-  if (n.elems.front() == L"'" || n.elems.front() == L"`" || n.elems.front() == L"," || n.elems.front() == L",@") {
-    Cell* newForm = newCell();
-    setCar(newForm, buildCell(n.elems.front()));
-    if (n.elems.size() == 2) {
-      setCdr(newForm, buildCell(n.elems.back()));
-    }
-    else {
-      n.elems.pop_front();
-      setCdr(newForm, buildCell(n));
-    }
-    return newForm;
+  list<AstNode>::iterator first = n.elems.begin();
+  if (*first == L"(") {
+    n.elems.pop_front();
+    return buildCell(n);
   }
 
-  Cell* newForm = NULL;
-  Cell* curr = NULL;
-  for (list<AstNode>::iterator q = n.elems.begin(); q != n.elems.end(); ++q) {
-    if (q->atom == L"(") {
-      if (q != n.elems.begin()) cerr << "Syntax error: ( not at start of expr" << endl << DIE;
-      continue;
-    }
-    if (q->atom == L")") {
-      if (++q != n.elems.end()) cerr << "Syntax error: ) not at end of expr" << endl << DIE;
-      break;
-    }
+  Cell* newForm = newCell();
+  setCar(newForm, buildCell(n.elems.front()));
 
-    if (q->atom == L".") {
-      ++q;
-      if (!curr) cerr << "Syntax error: dot at start of expression" << endl << DIE;
-      setCdr(curr, buildCell(*q));
-      break;
-    }
-
-    if (!curr) {
-      newForm = curr = newCell();
-    }
-    else {
-      setCdr(curr, newCell());
-      curr = cdr(curr);
-    }
-
-    setCar(curr, buildCell(*q));
+  list<AstNode>::iterator next = first; ++next;
+  if (*next == L".") {
+    if (n.elems.size() == 2) cerr << "Syntax error: . can't terminate expr" << endl << DIE;
+    setCdr(newForm, buildCell(*++next)); // dotted pair
+  }
+  else if (isQuoteOrUnquote(*first) && n.elems.size() == 2) {
+    setCdr(newForm, buildCell(*next)); // dotted pair
+  }
+  else {
+    n.elems.pop_front();
+    setCdr(newForm, buildCell(n));
   }
 
   return newForm;
