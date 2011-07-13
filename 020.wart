@@ -1,3 +1,8 @@
-assign foo (lambda() 34)
+assign mac (lambda '(name params . body)
+  (eval `(assign ,name (lambda ',params
+                         (eval ,@body)))))
 
-_prn foo
+mac foo(x)
+  `(add 1 ,x)
+
+_prn (foo 3)
