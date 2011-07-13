@@ -1,7 +1,0 @@
-(test "call expands compositions"
-  :valueof (macex1 '(call (wart-compose incf foo) x))
-  :should be '(call incf (call foo x)))
-
-(test "call expands compositions - 2"
-  :valueof (let ((a (lambda(x) 34))) (macex1 '(call (wart-compose a incf) x)))
-  :should be '(call a (call incf x)))

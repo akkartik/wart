@@ -1,8 +1,0 @@
-(defvar *yield* [error (join "yield outside collect: " _)])
-(def yield(_) (call *yield* _))
-
-(mac collect body
-  `(withs (,$acc (queue)
-           *yield* [enq ,$acc _])
-     ,@body
-     (as cons ,$acc)))

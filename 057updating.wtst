@@ -1,7 +1,0 @@
-(test "updating works"
-  :valueof (ret counter 0
-             (ret max 0
-               (each elem '(1 3 2 6 5)
-                  (updating max :with elem :unless >=
-                    (++ counter max)))))
-  :should be 10)

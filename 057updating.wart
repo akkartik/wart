@@ -1,9 +1,0 @@
-(mac updating (place ? with t unless 'iso . body)
-  `(unless (call ,unless ,place ,with)
-     (= ,place ,with)
-     ,@body))
-
-(mac firsttime(place . body)
-  `(updating ,place
-      :body
-        ,@body))

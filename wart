@@ -1,22 +1,10 @@
 #!/usr/bin/env zsh
 
-# ldb usually pops up when wart has infinite recursion and blows the stack
-export COMMON_ARGS="--disable-ldb --noinform --userinit sbclrc"
+make --silent || exit 1
 
-if [ $# -eq 0 ]
+if rlwrap ls >&/dev/null
 then
-  rlwrap -q '"' sbcl `echo $COMMON_ARGS` --load boot
-elif [[ $1 == 'test' ]]
-then
-  rlwrap -q '"' sbcl `echo $COMMON_ARGS` --load test --eval '(quit)'
+  wart_bin $*
 else
-  (
-    for i in $*
-    do
-      echo "(load \"$i\")"
-    done
-    echo "(quit)"
-  ) > .wartbatch
-  rlwrap -q '"' sbcl `echo $COMMON_ARGS` --eval '(setf batch-mode* t)' --load boot --load .wartbatch
-  rm .wartbatch
+  rlwrap wart_bin $*
 fi

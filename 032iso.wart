@@ -1,9 +1,0 @@
-(redef iso(x y)
-  (or (equal x y)
-      (and (consp x)
-           (consp y)
-           (iso car.x car.y)
-           (iso cdr.x cdr.y))))
-
-(def iso(x y) :case (not (or atom.x listp.x))
-  (iso (as cons x) (as cons y)))

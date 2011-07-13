@@ -1,9 +1,0 @@
-(test "memo works"
-  :valueof (withs (counter 0
-                   f (memo (fn(x)
-                       ++.counter
-                       x)))
-             (repeat 3
-               f.3)
-             counter)
-  :should be 1)

@@ -1,2 +1,0 @@
-(def l(file)
-  (call load^join str.file ".wart"))

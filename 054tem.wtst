@@ -1,8 +1,0 @@
-(wt-eval '(deftem t1() a "abc" b "def"))
-(test "inst uses templates for per-key defaults"
-  :valueof (inst 't1 'b 34 'd 42)
-  :should be (table a "abc" b 34 d 42))
-
-(test "templates serialize to plain tables"
-  :valueof (tostring (write (inst 't1 'a 2 'c 9)))
-  :should be "(tagged hash-table ((c 9) (b \"def\") (a 2)))")

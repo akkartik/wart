@@ -1,5 +1,0 @@
-(test "rand generates uniform numbers"
-  :valueof (let l (call vals^freq^n-of 16000 (rand 16))
-             ; 16 states, 16000 values, 1000 values/state on average
-             (> 1100 max.l 1000 min.l 900))
-  :should be t)
