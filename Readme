@@ -1,0 +1,26 @@
+Feedback: wart@akkartik.com
+
+This thoroughly unit-tested interpreter takes wart off Common Lisp and makes
+it a lisp-1 with fexprs and case-sensitive strings. Still in progress.
+
+You'll need gcc.
+
+To run:
+  $ wart
+  wart>
+Hit ctrl-D to quit.
+
+To run tests:
+  $ wart test
+  $ # success
+
+Oh, and you can use syntactically-significant whitespace.
+  def foo()
+    34
+Conventionally-indented lisp will still work.
+  (def foo() 34)
+  (def foo()
+    34)
+
+If you start skipping parens you may need to hit an extra <enter> at the repl
+to trigger eval.
