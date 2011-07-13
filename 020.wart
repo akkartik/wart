@@ -4,8 +4,3 @@ assign mac (lambda '(name params . body)
 
 mac def(name params . body)
   `(assign ,name (lambda ,params ,@body))
-
-def foo()
-  34
-
-_prn (foo)
