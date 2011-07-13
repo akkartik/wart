@@ -2,7 +2,10 @@ assign mac (lambda '(name params . body)
   (eval `(assign ,name (lambda ',params
                          (eval ,@body)))))
 
-mac foo(x)
-  `(add 1 ,x)
+mac def(name params . body)
+  `(assign ,name (lambda ,params ,@body))
 
-_prn (foo 3)
+def foo()
+  34
+
+_prn (foo)
