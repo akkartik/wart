@@ -147,6 +147,11 @@ bool isTable(Cell* x) {
   return x->type == TABLE;
 }
 
+Table* toTable(Cell* x) {
+  if (!isTable(x)) return NULL;
+  return (Table*)x->car;
+}
+
                                   hash_map<long, Cell*> numLiterals;
                                   Cell* intern(long x) {
                                     if (numLiterals[x]) {
