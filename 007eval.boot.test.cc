@@ -106,6 +106,34 @@ void test_eval_handles_splice() {
   checkState();
 }
 
+void test_eval_quotes_quote_comma() {
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"`(a ',b)")))));
+  newDynamicScope(L"b", newSym(L"x"));
+  Cell* result = eval(cells.front());
+  check_eq(car(result), newSym(L"a"));
+  check(isCons(car(cdr(result))));
+  check_eq(car(car(cdr(result))), newSym(L"'"));
+  check_eq(cdr(car(cdr(result))), newSym(L"x"));
+  check_eq(cdr(cdr(result)), nil);
+  rmref(result);
+  endDynamicScope(L"b");
+  rmref(cells.front());
+  checkState();
+}
+
+void test_eval_evals_comma_quote() {
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"`(a ,'b)")))));
+  newDynamicScope(L"b", newSym(L"x"));
+  Cell* result = eval(cells.front());
+  check_eq(car(result), newSym(L"a"));
+  check_eq(car(cdr(result)), newSym(L"b"));
+  check_eq(cdr(cdr(result)), nil);
+  rmref(result);
+  endDynamicScope(L"b");
+  rmref(cells.front());
+  checkState();
+}
+
 void test_eval_handles_simple_lambda() {
   list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
   check_eq(cells.size(), 1);

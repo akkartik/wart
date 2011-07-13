@@ -57,32 +57,28 @@ void bindArgs(Cell* params, Cell* args) {
                                     return args;
                                   }
 
-                                  bool isComma(Cell* x) {
-                                    return isCons(x) && car(x) == newSym(L",");
-                                  }
-
-                                  bool isSplice(Cell* x) {
-                                    return isCons(x) && car(x) == newSym(L",@");
-                                  }
-
                                   Cell* processUnquotes(Cell* x) {
                                     if (!isCons(x)) return x;
-                                    if (isComma(car(x))) {
-                                      setCar(x, eval(cdr(car(x))));
-                                      rmref(car(x));
-                                    }
-                                    else if (isSplice(car(x))) {
+
+                                    if (car(x) == newSym(L","))
+                                      return rmref(eval(cdr(x)));
+
+                                    if (isCons(car(x)) && car(car(x)) == newSym(L",@")) {
                                       Cell* rest = mkref(cdr(x));
                                       Cell* snip = eval(cdr(car(x)));
                                       setCar(x, car(snip));
                                       setCdr(x, cdr(snip));
                                       rmref(snip);
-                                      while (cdr(x) != nil)
-                                        x = cdr(x);
-                                      setCdr(x, rest);
+                                      Cell* y = x;
+                                      while (cdr(y) != nil)
+                                        y = cdr(y);
+                                      setCdr(y, processUnquotes(rest));
                                       rmref(rest);
+                                      return x;
                                     }
-                                    processUnquotes(cdr(x));
+
+                                    setCar(x, processUnquotes(car(x)));
+                                    setCdr(x, processUnquotes(cdr(x)));
                                     return x;
                                   }
 
