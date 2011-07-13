@@ -1,0 +1,10 @@
+#!/usr/bin/env zsh
+
+make --silent || exit 1
+
+if rlwrap ls >&/dev/null
+then
+  wart_bin $*
+else
+  rlwrap wart_bin $*
+fi

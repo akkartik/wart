@@ -1,0 +1,6 @@
+assign mac (lambda '(name params . body)
+  (eval `(assign ,name (lambda ',params
+                         (eval ,@body)))))
+
+mac def(name params . body)
+  `(assign ,name (lambda ,params ,@body))
