@@ -46,15 +46,3 @@ The wart interpreter pervasively uses wide characters
 char, stream and IO types are not what they may seem at first. char is
 wchar_t, string is wstring, and so on. A few places that can't use wide
 characters use type ascii.
-
-== Whitespace-sensitivity
-
-Any line with multiple words and no initial paren is a candidate for
-paren-insertion. Later indented lines are included in the parens until an
-unindented line. Empty lines are skipped.
-
-Sometimes you'll want to continue a long literal list without inserting
-parens. Insert one extra space of indent like so:
-
-  (a b c
-   d e f)
