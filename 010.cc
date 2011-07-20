@@ -42,3 +42,10 @@ COMPILE_PRIM_FUNC(_prn, L"(x)",
   result = lookup(L"x");
   cout << result << endl;
 )
+
+COMPILE_PRIM_FUNC(_if, L"(cond 'then 'else)",
+  if (lookup(L"cond") != nil)
+    result = eval(lookup(L"then"));
+  else
+    result = eval(lookup(L"else"));
+)
