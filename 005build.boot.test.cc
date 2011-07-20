@@ -27,7 +27,7 @@ void test_build_handles_number() {
   checkState();
 }
 
-void test_build_handles_symbol() {
+void test_build_handles_sym() {
   list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"a")))));
   check_eq(cells.size(), 1);
   check(isSym(cells.front()));
@@ -36,14 +36,14 @@ void test_build_handles_symbol() {
   checkState();
 }
 
-void test_build_doesnt_mix_symbols_and_strings() {
+void test_build_doesnt_mix_syms_and_strings() {
   Cell* s = newString(L"a");
   check(s != newSym(L"a"));
   rmref(s);
   checkState();
 }
 
-void test_build_handles_quoted_symbol() {
+void test_build_handles_quoted_sym() {
   list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'a")))));
   check_eq(cells.size(), 1);
   check(isCons(cells.front()));
