@@ -12,6 +12,20 @@ COMPILE_PRIM_FUNC(cdr, L"(x)",
   result = cdr(lookup(L"x"));
 )
 
+COMPILE_PRIM_FUNC(_isCons, L"(x)",
+  result = lookup(L"x");
+  if (!isCons(result))
+    result = nil;
+)
+
+COMPILE_PRIM_FUNC(_isNil, L"(x)",
+  result = lookup(L"x");
+  if (result == nil)
+    result = newSym(L"t");
+  else
+    result = nil;
+)
+
 COMPILE_PRIM_FUNC(assign, L"('x y)",
   result = lookup(L"y");
   Cell* x = lookup(L"x");
@@ -48,4 +62,15 @@ COMPILE_PRIM_FUNC(_if, L"(cond 'then 'else)",
     result = eval(lookup(L"then"));
   else
     result = eval(lookup(L"else"));
+)
+
+COMPILE_PRIM_FUNC(_atom_equal, L"(x y)",
+  Cell* x = lookup(L"x");
+  Cell* y = lookup(L"y");
+  if (x == y)
+    result = x;
+  else if (isString(x) && isString(y) && toString(x) == toString(y))
+    result = x;
+  else
+    result = nil;
 )
