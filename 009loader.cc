@@ -19,7 +19,9 @@ void loadFile(ascii* filename) {
                                       if (n < extn) continue;
                                       if (strncmp(&ent->d_name[n-extn], ext, extn)) continue;
                                       if (!isdigit(ent->d_name[0])) continue;
-                                      result.push_back(ent->d_name);
+                                      ascii* s = new ascii[strlen(ent->d_name)];
+                                      strcpy(s, ent->d_name);
+                                      result.push_back(s);
                                     }
                                     closedir(dir);
                                     sort(result.begin(), result.end());
@@ -27,8 +29,7 @@ void loadFile(ascii* filename) {
                                   }
 
 void loadFiles(const ascii* ext) {
-  vector<ascii*> files; // = sortedFiles(".", ext);
-  files.push_back("020.wart");
+  vector<ascii*> files = sortedFiles(".", ext);
   cerr << "Before: " << endl;
   for (vector<ascii*>::iterator q = files.begin(); q != files.end(); ++q)
     cerr << *q << endl;
