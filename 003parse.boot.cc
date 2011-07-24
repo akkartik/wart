@@ -59,8 +59,7 @@ list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterato
     ++curr;
 
   if (curr == end) return curr;
-
-  if (*curr == L")") cerr << "Unbalanced (" << endl << DIE;
+  if (*curr == L")") return curr; // can cause an infinite loop on syntax error
 
   if (*curr != L"(" && !isQuoteOrUnquote(*curr)) {
     out.push_back(AstNode::of(*curr));

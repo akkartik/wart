@@ -56,6 +56,27 @@ void test_parse_handles_nested_forms() {
   check(p == ast.front().elems.end());
 }
 
+void test_parse_handles_nested_forms_with_comments() {
+  list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"(a b (c d ;\n))"))));
+  check_eq(ast.size(), 1);
+  check(ast.front().isList());
+  list<AstNode>::iterator p = ast.front().elems.begin();
+  check_eq(*p, Token::of(L"(")); ++p;
+  check_eq(*p, Token::of(L"a")); ++p;
+  check_eq(*p, Token::of(L"b")); ++p;
+  check(p->isList());
+    list<AstNode> ast2 = p->elems; ++p;
+    list<AstNode>::iterator q = ast2.begin();
+    check_eq(*q, Token::of(L"(")); ++q;
+    check_eq(*q, Token::of(L"c")); ++q;
+    check_eq(*q, Token::of(L"d")); ++q;
+    check_eq(*q, Token::of(L")")); ++q;
+    check(q == ast2.end());
+
+  check_eq(*p, Token::of(L")")); ++p;
+  check(p == ast.front().elems.end());
+}
+
 void test_parse_handles_quotes() {
   list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"34 `(2 ,b) ',35 ,',36 ,'a"))));
   check_eq(ast.size(), 1);
