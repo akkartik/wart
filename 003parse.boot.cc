@@ -55,11 +55,12 @@ ostream& operator<<(ostream& os, AstNode x) {
 list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterator end, list<AstNode>& out) {
   if (curr == end) return curr;
 
-  while (curr != end && curr->token[0] == L';')
+  while (curr->token[0] == L';') {
     ++curr;
+    if (curr == end || *curr == L")") return curr;
+  }
 
-  if (curr == end) return curr;
-  if (*curr == L")") return curr; // can cause an infinite loop on syntax error
+  if (*curr == L")") cerr << "Unbalanced (" << endl << DIE;
 
   if (*curr != L"(" && !isQuoteOrUnquote(*curr)) {
     out.push_back(AstNode::of(*curr));
