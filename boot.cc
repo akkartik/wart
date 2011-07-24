@@ -41,8 +41,9 @@ typedef char ascii;
 
 
 
-bool debug = false;
-#define dbg if(debug) cerr
+int debug = 0;
+#define dbg if(debug == 1) cerr
+#define dbg2 if(debug == 2) cerr
 
 #define __unused__ __attribute__((unused))
 
