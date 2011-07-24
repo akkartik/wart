@@ -27,7 +27,8 @@ void loadFile(ascii* filename) {
                                   }
 
 void loadFiles(const ascii* ext) {
-  vector<ascii*> files = sortedFiles(".", ext);
+  vector<ascii*> files; // = sortedFiles(".", ext);
+  files.push_back("020.wart");
   cerr << "Before: " << endl;
   for (vector<ascii*>::iterator q = files.begin(); q != files.end(); ++q)
     cerr << *q << endl;
