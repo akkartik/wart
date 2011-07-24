@@ -31,7 +31,9 @@ void loadFiles(const ascii* ext) {
   cerr << "Before: " << endl;
   for (vector<ascii*>::iterator q = files.begin(); q != files.end(); ++q)
     cerr << *q << endl;
-  ifstream f(files.front());
+  ascii x[1024];
+  strcpy(x, files.front());
+  ifstream f(x); //files.front());
   f.peek();
   cerr << "After: " << endl;
   for (vector<ascii*>::iterator q = files.begin(); q != files.end(); ++q)
