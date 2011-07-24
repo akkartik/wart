@@ -47,14 +47,22 @@ void bindArgs(Cell* params, Cell* args) {
 
                                   Cell* eval_args(Cell* params, Cell* args) {
                                     if (args == nil) return nil;
-                                    if (isQuoted(params)) return args;
-                                    setCdr(args, eval_args(cdr(params), cdr(args)));
-                                    if (!isCons(params) || !isQuoted(car(params))) {
-                                      Cell* result = eval(car(args));
-                                      setCar(args, result);
-                                      rmref(result);
+                                    Cell* result = newCell();
+                                    if (isQuoted(params)) {
+                                      setCar(result, car(args));
+                                      setCdr(result, cdr(args));
+                                      return mkref(result);
                                     }
-                                    return args;
+                                    setCdr(result, eval_args(cdr(params), cdr(args)));
+                                    rmref(cdr(result));
+                                    if (!isCons(params) || !isQuoted(car(params))) {
+                                      setCar(result, eval(car(args)));
+                                      rmref(car(result));
+                                    }
+                                    else {
+                                      setCar(result, car(args));
+                                    }
+                                    return mkref(result);
                                   }
 
                                   Cell* processUnquotes(Cell* x) {
@@ -134,6 +142,7 @@ Cell* eval(Cell* expr) {
 
   endLexicalScope();
   endDynamicScope(newSym(L"currLexicalScope"));
+  rmref(evald_args);
   rmref(lambda);
   return result; // already mkref'd
 }
