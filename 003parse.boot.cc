@@ -60,7 +60,7 @@ list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterato
     if (curr == end || *curr == L")") return curr;
   }
 
-  if (*curr == L")") cerr << "Unbalanced (" << endl << DIE;
+  if (*curr == L")") cerr << "Unbalanced )" << endl << DIE;
 
   if (*curr != L"(" && !isQuoteOrUnquote(*curr)) {
     out.push_back(AstNode::of(*curr));
