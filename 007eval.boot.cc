@@ -98,7 +98,7 @@ Cell* eval(Cell* expr) {
   if (isQuoted(expr))
     return mkref(processUnquotes(cdr(expr)));
 
-  if (car(expr) == newSym(L"lambda") || car(expr) == newSym(L"collect")) {
+  if (car(expr) == newSym(L"lambda")) {
     // attach current lexical scope
     Cell* ans = newCell();
     setCar(ans, car(expr));
