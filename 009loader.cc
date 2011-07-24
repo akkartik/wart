@@ -19,7 +19,7 @@ void loadFile(ascii* filename) {
                                       if (n < extn) continue;
                                       if (strncmp(&ent->d_name[n-extn], ext, extn)) continue;
                                       if (!isdigit(ent->d_name[0])) continue;
-                                      ascii* s = new ascii[strlen(ent->d_name)];
+                                      ascii* s = new ascii[strlen(ent->d_name)]; // leak
                                       strcpy(s, ent->d_name);
                                       result.push_back(s);
                                     }

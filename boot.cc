@@ -157,7 +157,7 @@ void checkLiteralTables() {
       rmref(p->second);
   }
   for (StringMap<Cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
-    if (p->first == L"currLexicalScope") continue; // memory leak
+    if (p->first == L"currLexicalScope") continue; // leak
     if (p->second->nrefs > 1)
       cerr << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
     if (p->second->nrefs > 0)
