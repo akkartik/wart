@@ -90,6 +90,11 @@ void bindArgs(Cell* params, Cell* args) {
                                     return x;
                                   }
 
+                                  bool isFunc(Cell* x) {
+                                    return isCons(x)
+                                      && (isPrimFunc(car(x)) || (car(x) == newSym(L"lambda")));
+                                  }
+
 Cell* eval(Cell* expr) {
   if (!expr)
     cerr << "eval: cell should never be NULL" << endl << DIE;
@@ -123,6 +128,8 @@ Cell* eval(Cell* expr) {
 
   // expr is a function call
   Cell* lambda = eval(car(expr));
+  if (!isFunc(lambda))
+    cerr << "not a function call: " << expr << endl << DIE;
   // eval all its args in the current lexical scope
   Cell* evald_args = eval_args(sig(lambda), call_args(expr));
   // swap in the function's lexical environment
