@@ -262,7 +262,7 @@ PrimFunc toPrimFunc(Cell* x) {
 
 Cell* car(Cell* x) {
   if (x->type != CONS) {
-    cerr << "car of non-cons: " << x->type << endl;
+    cerr << "car of non-cons, type " << x->type << endl;
     return nil;
   }
   return x->car;
