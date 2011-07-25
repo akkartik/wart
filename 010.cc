@@ -35,10 +35,6 @@ COMPILE_PRIM_FUNC(assign, L"('x y)",
     assignDynamicVar(x, result);
 )
 
-COMPILE_PRIM_FUNC(eval, L"(x)",
-  result = eval(lookup(L"x"));
-)
-
 // HACK because there's no wifstream(wstring) constructor
 // will only work with strings containing ascii characters
 vector<ascii> toAscii(string s) {
