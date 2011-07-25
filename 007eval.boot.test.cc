@@ -389,3 +389,51 @@ void test_eval_handles_rest_params() {
   rmref(call);
   checkState();
 }
+
+                                  Cell* copyList(Cell* x) {
+                                    if (!isCons(x)) return x;
+                                    Cell* result = newCell();
+                                    setCar(result, copyList(car(x)));
+                                    setCdr(result, copyList(cdr(x)));
+                                    return result;
+                                  }
+
+                                  bool equalList(Cell* a, Cell* b) {
+                                    if (!isCons(a)) return a == b;
+                                    return equalList(car(a), car(b))
+                                        && equalList(cdr(a), cdr(b));
+                                  }
+
+void test_eval_doesnt_modify_lambda() {
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda(x) (eval x))"))))).front();
+  Cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
+  Cell* oldf = copyList(f);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f 34)"))))).front();
+  Cell* result = eval(call);
+  check(equalList(f, oldf));
+  rmref(result);
+  rmref(call);
+  rmref(f);
+  rmref(oldf);
+  rmref(lambda);
+  endDynamicScope(newSym(L"f"));
+  checkState();
+}
+
+void test_eval_doesnt_modify_lambda2() {
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda(x) (eval x))"))))).front();
+  Cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
+  Cell* oldf = copyList(f);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f '(cons 3 4))"))))).front();
+  Cell* result = eval(call);
+  check(equalList(f, oldf));
+  rmref(result);
+  rmref(call);
+  rmref(f);
+  rmref(oldf);
+  rmref(lambda);
+  endDynamicScope(newSym(L"f"));
+  checkState();
+}
