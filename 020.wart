@@ -1,12 +1,11 @@
-assign mac (lambda '(name params . body)
-  (eval `(assign ,name (lambda ',params
-                         (eval ,@body)))))
+((lambda()
+  (assign foo1 (lambda(x)
+                 (car (cdr x))))))
 
-mac def(name params . body)
-  `(assign ,name (lambda ,params ,@body))
+((lambda()
+   assign foo2 (lambda(x)
+                 (car (cdr x)))))
 
-(assign cons? _isCons)
+(foo1)
 
-(assign nil? _isNil)
-(assign not nil?)
-(assign no nil?)
+;? (foo2)
