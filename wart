@@ -4,7 +4,7 @@ make --silent || exit 1
 
 if rlwrap ls >&/dev/null
 then
-  wart_bin $*
-else
   rlwrap wart_bin $*
+else
+  wart_bin $*
 fi
