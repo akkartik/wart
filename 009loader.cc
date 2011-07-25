@@ -5,8 +5,11 @@
 void loadFile(ascii* filename) {
   ifstream f(filename);
   list<Cell*> cells = buildCells(parse(parenthesize(tokenize(f))));
-  for (list<Cell*>::iterator p = cells.begin(); p != cells.end(); ++p)
+  cerr << "load: " << filename << endl;
+  for (list<Cell*>::iterator p = cells.begin(); p != cells.end(); ++p) {
+    cerr << " : " << *p << endl;
     rmref(eval(*p));
+  }
   for (list<Cell*>::iterator p = cells.begin(); p != cells.end(); ++p)
     rmref(*p);
 }
