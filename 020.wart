@@ -1,12 +1,12 @@
+assign cons? _isCons
+
+assign nil? _isNil
+assign not nil?
+assign no nil?
+
 assign mac (lambda '(name params . body)
   (eval `(assign ,name (lambda ',params
                          (eval ,@body)))))
 
 mac def(name params . body)
   `(assign ,name (lambda ,params ,@body))
-
-assign cons? _isCons
-
-assign nil? _isNil
-assign not nil?
-assign no nil?
