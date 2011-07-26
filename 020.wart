@@ -12,6 +12,7 @@ mac def(name params . body)
   `(assign ,name (lambda ,params ,@body))
 
 def foo(x)
+  _prn 34
   x
 
 _prn (foo 3)
