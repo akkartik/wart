@@ -10,3 +10,8 @@ assign mac (lambda '(name params . body)
 
 mac def(name params . body)
   `(assign ,name (lambda ,params ,@body))
+
+def foo(x)
+  x
+
+_prn (foo 3)
