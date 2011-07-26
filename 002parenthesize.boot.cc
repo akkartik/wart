@@ -73,10 +73,14 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
                                     return Token::sol();
                                   }
 
-                                  Token firstTokenInLine(list<Token> line) {
-                                    for (list<Token>::iterator p = line.begin(); p != line.end(); ++p)
+                                  Token nthTokenInLine(list<Token> line, int n) {
+                                    int i = 0;
+                                    for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
                                       if (!whitespace(p->type))
+                                        ++i;
+                                      if (i == n)
                                         return *p;
+                                    }
                                     return Token::sol();
                                   }
 
@@ -96,7 +100,7 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
                                   }
 
                                   bool alreadyGrouped(list<Token> line) {
-                                    Token firstToken = firstTokenInLine(line);
+                                    Token firstToken = nthTokenInLine(line, 1);
                                     return firstToken == L"(" || firstToken == L"'" || firstToken == L"`";
                                   }
 
