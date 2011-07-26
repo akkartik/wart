@@ -85,9 +85,10 @@ void bindArgs(Cell* params, Cell* args) {
                                       return x;
                                     }
 
-                                    setCar(x, processUnquotes(car(x)));
-                                    setCdr(x, processUnquotes(cdr(x)));
-                                    return x;
+                                    Cell* result = newCell();
+                                    setCar(result, processUnquotes(car(x)));
+                                    setCdr(result, processUnquotes(cdr(x)));
+                                    return result;
                                   }
 
                                   bool isFunc(Cell* x) {
