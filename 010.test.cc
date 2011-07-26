@@ -17,9 +17,3 @@ void test_assign_to_lambda() {
   rmref(lambda);
   checkState();
 }
-
-void test_foo() {
-  check(equalList(
-      buildCells(parse(parenthesize(tokenize(teststream(L"((lambda()\n   assign foo2 (lambda(x)\n                 (car (cdr x)))))\n\n(foo2)"))))).front(),
-      buildCells(parse(parenthesize(tokenize(teststream(L"((lambda()\n   (assign foo2 (lambda(x)\n                 (car (cdr x))))))\n\n(foo2)"))))).front()));
-}
