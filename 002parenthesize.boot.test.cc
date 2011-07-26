@@ -226,6 +226,23 @@ void test_parenthesize_groups_across_indent3() {
   check(p == tokens.end());
 }
 
+void test_parenthesize_groups_nested_indents() {
+  list<Token> tokens = parenthesize(tokenize(teststream(L"a b c\n  d e\n    f\ny")));
+  list<Token>::iterator p = tokens.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"d"); ++p;
+  check_eq(*p, L"e"); ++p;
+  check_eq(*p, L"f"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L"y"); ++p;
+  check(p == tokens.end());
+}
+
 void test_parenthesize_handles_quotes_and_comments() {
   list<Token> tokens = parenthesize(tokenize(teststream(L"a b c  \n  '(d ef)\n\n  g ;abc")));
   list<Token>::iterator p = tokens.begin();
