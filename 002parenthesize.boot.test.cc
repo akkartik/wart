@@ -353,3 +353,20 @@ void test_parenthesize_wraps_when_indented_by_one_space() {
   check_eq(*p, L")"); ++p;
   check(p == tokens.end());
 }
+
+
+
+void checkTokensMatchSub(const ascii* msg, list<Token> x0, list<Token> x1) {
+  bool pass = true;
+  for (list<Token>::iterator p0 = x0.begin(), p1 = x1.begin(); p0 != x0.end() && p1 != x1.end(); ++p0, ++p1)
+    if (*p0 != *p1) pass = false;
+  if (pass) return;
+  cerr << endl << x0.size() << " " << x1.size() << endl;
+  for (list<Token>::iterator p0 = x0.begin(), p1 = x1.begin(); p0 != x0.end() && p1 != x1.end(); ++p0, ++p1)
+    if (*p0 == *p1)
+      cerr << *p0 << endl;
+    else
+      cerr << "F " << msg << " expected " << *p0 << " got " << *p1 << endl;
+}
+
+#define checkTokensMatch(x, y) checkTokensMatchSub(__FUNCTION__, x, y)
