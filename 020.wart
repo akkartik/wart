@@ -10,3 +10,9 @@ assign mac (lambda '(name params . body)
 
 mac def(name params . body)
   `(assign ,name (lambda ,params ,@body))
+
+def cadr(x)
+  (car (cdr x))
+
+def cddr(x)
+  (cdr (cdr x))
