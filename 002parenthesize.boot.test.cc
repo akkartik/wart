@@ -343,17 +343,8 @@ void test_parenthesize_wraps_when_indented_by_one_space() {
 }
 
 void test_foo() {
-  list<Token> x0 = parenthesize(tokenize(teststream(L"(a\n  (a a)\n(a)")));
-  list<Token> x1 = parenthesize(tokenize(teststream(L"(a\n   a a\n(a)")));
-  for (list<Token>::iterator p0 = x0.begin(), p1 = x1.begin(); p0 != x0.end() && p1 != x1.end(); ++p0, ++p1) {
-    if (*p0 == *p1) continue;
-    cerr << endl << "F test_foo: expected " << *p0 << " got " << *p1 << endl;
-  }
-}
-
-void test_foo2() {
-  list<Token> x0 = parenthesize(tokenize(teststream(L"(a\n  (a a\n    x))\n(y)")));
-  list<Token> x1 = parenthesize(tokenize(teststream(L"(a\n  a a\n    x)\n(y)")));
+  list<Token> x0 = parenthesize(tokenize(teststream(L"  (a a\n    a)\ny")));
+  list<Token> x1 = parenthesize(tokenize(teststream(L"  a a\n    a\ny")));
 
   bool fail = false;
   for (list<Token>::iterator p0 = x0.begin(), p1 = x1.begin(); p0 != x0.end() && p1 != x1.end(); ++p0, ++p1)
@@ -361,10 +352,11 @@ void test_foo2() {
   if (!fail)
     return;
 
+  cerr << endl << x0.size() << " " << x1.size() << endl;
   for (list<Token>::iterator p0 = x0.begin(), p1 = x1.begin(); p0 != x0.end() && p1 != x1.end(); ++p0, ++p1) {
     if (*p0 == *p1)
-      cerr << endl << *p0 << endl;
+      cerr << *p0 << endl;
     else
-      cerr << endl << "F test_foo: expected " << *p0 << " got " << *p1 << endl;
+      cerr << "F test_foo: expected " << *p0 << " got " << *p1 << endl;
   }
 }
