@@ -154,7 +154,7 @@ Cell* eval(Cell* expr) {
   }
 
   endLexicalScope();
-  endDynamicScope(newSym(L"currLexicalScope"));
+  endDynamicScope(L"currLexicalScope");
   rmref(evald_args);
   rmref(lambda);
   return result; // already mkref'd

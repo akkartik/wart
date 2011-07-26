@@ -182,7 +182,7 @@ void test_eval_expands_syms_in_lambda_bodies() {
   newDynamicScope(L"a", newNum(34));
   Cell* result = eval(lambda);
   check_eq(result, newNum(34));
-  endDynamicScope(newSym(L"a"));
+  endDynamicScope(L"a");
   rmref(result);
   rmref(lambda);
   checkState();
@@ -195,7 +195,7 @@ void test_eval_handles_assigned_lambda_calls() {
     Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f)"))))).front();
     Cell* result = eval(call);
     check_eq(result, newNum(34));
-  endDynamicScope(newSym(L"f"));
+  endDynamicScope(L"f");
   rmref(result);
   rmref(call);
   rmref(f);
@@ -230,8 +230,8 @@ void test_eval_expands_syms_in_original_lexical_scope() {
   rmref(call);
   rmref(f);
   rmref(lambda);
-  endDynamicScope(newSym(L"f"));
-  endDynamicScope(newSym(L"a"));
+  endDynamicScope(L"f");
+  endDynamicScope(L"a");
   checkState();
 }
 
@@ -250,8 +250,8 @@ void test_eval_expands_args_in_caller_scope() {
   rmref(call);
   rmref(f);
   rmref(lambda);
-  endDynamicScope(newSym(L"f"));
-  endDynamicScope(newSym(L"a"));
+  endDynamicScope(L"f");
+  endDynamicScope(L"a");
   checkState();
 }
 
@@ -270,8 +270,8 @@ void test_eval_doesnt_eval_quoted_params() {
   rmref(call);
   rmref(f);
   rmref(lambda);
-  endDynamicScope(newSym(L"f"));
-  endDynamicScope(newSym(L"a"));
+  endDynamicScope(L"f");
+  endDynamicScope(L"a");
   checkState();
 }
 
@@ -290,8 +290,8 @@ void test_eval_handles_quoted_param_list() {
   rmref(call);
   rmref(f);
   rmref(lambda);
-  endDynamicScope(newSym(L"f"));
-  endDynamicScope(newSym(L"a"));
+  endDynamicScope(L"f");
+  endDynamicScope(L"a");
   checkState();
 }
 
@@ -306,7 +306,7 @@ void test_eval_handles_multiple_args() {
   rmref(call);
   rmref(f);
   rmref(lambda);
-  endDynamicScope(newSym(L"f"));
+  endDynamicScope(L"f");
   checkState();
 }
 
@@ -321,7 +321,7 @@ void test_eval_handles_multiple_body_exprs() {
   rmref(call);
   rmref(f);
   rmref(lambda);
-  endDynamicScope(newSym(L"f"));
+  endDynamicScope(L"f");
   checkState();
 }
 
@@ -417,7 +417,7 @@ void test_eval_doesnt_modify_lambda() {
   rmref(f);
   rmref(oldf);
   rmref(lambda);
-  endDynamicScope(newSym(L"f"));
+  endDynamicScope(L"f");
   checkState();
 }
 
@@ -434,7 +434,7 @@ void test_eval_doesnt_modify_lambda2() {
   rmref(f);
   rmref(oldf);
   rmref(lambda);
-  endDynamicScope(newSym(L"f"));
+  endDynamicScope(L"f");
   checkState();
 }
 
@@ -488,7 +488,7 @@ void test_eval_handles_eval() {
   check_eq(result, newNum(34));
   rmref(result);
   rmref(call);
-  endDynamicScope(newSym(L"x"));
-  endDynamicScope(newSym(L"a"));
+  endDynamicScope(L"x");
+  endDynamicScope(L"a");
   checkState();
 }
