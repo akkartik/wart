@@ -65,6 +65,12 @@ void bindArgs(Cell* params, Cell* args) {
                                     return mkref(result);
                                   }
 
+                                  void append(Cell* x, Cell* y) {
+                                    while(cdr(x) != nil)
+                                      x = cdr(x);
+                                    setCdr(x, y);
+                                  }
+
                                   Cell* processUnquotes(Cell* x) {
                                     if (!isCons(x)) return x;
 
@@ -72,17 +78,9 @@ void bindArgs(Cell* params, Cell* args) {
                                       return rmref(eval(cdr(x)));
 
                                     if (isCons(car(x)) && car(car(x)) == newSym(L",@")) {
-                                      Cell* rest = mkref(cdr(x));
-                                      Cell* snip = eval(cdr(car(x)));
-                                      setCar(x, car(snip));
-                                      setCdr(x, cdr(snip));
-                                      rmref(snip);
-                                      Cell* y = x;
-                                      while (cdr(y) != nil)
-                                        y = cdr(y);
-                                      setCdr(y, processUnquotes(rest));
-                                      rmref(rest);
-                                      return x;
+                                      Cell* result = rmref(eval(cdr(car(x))));
+                                      append(result, processUnquotes(cdr(x)));
+                                      return result;
                                     }
 
                                     Cell* result = newCell();

@@ -459,6 +459,27 @@ void test_eval_doesnt_modify_lambda3() {
   checkState();
 }
 
+void test_eval_doesnt_modify_lambda4() {
+  newDynamicScope(L"a", newNum(3));
+  newDynamicScope(L"b", newNum(4));
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda y `(assign ,@y))"))))).front();
+  Cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
+  Cell* oldf = copyList(f);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f a b)"))))).front();
+  Cell* result = eval(call);
+  check(equalList(f, oldf));
+  rmref(result);
+  rmref(call);
+  rmref(oldf);
+  endDynamicScope(L"f");
+  rmref(f);
+  rmref(lambda);
+  endDynamicScope(L"b");
+  endDynamicScope(L"a");
+  checkState();
+}
+
 void test_eval_handles_eval() {
   newDynamicScope(L"a", newNum(34));
   newDynamicScope(L"x", newSym(L"a"));
