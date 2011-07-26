@@ -101,7 +101,9 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
 
                                   bool alreadyGrouped(list<Token> line) {
                                     Token firstToken = nthTokenInLine(line, 1);
-                                    return firstToken == L"(" || firstToken == L"'" || firstToken == L"`";
+                                    Token secondToken = nthTokenInLine(line, 2);
+                                    return firstToken == L"(" || firstToken == L"'" || firstToken == L"`"
+                                        || (firstToken == L"," && secondToken == L"(");
                                   }
 
 list<Token> parenthesize(list<Token> in) {
