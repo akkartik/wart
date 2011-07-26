@@ -37,7 +37,7 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
                                   ostream& operator<<(ostream& os, list<Token> l) {
                                     bool prevWasOpen = true;
                                     for (list<Token>::iterator p = l.begin(); p != l.end(); ++p) {
-                                      if (!(*p == L")" || prevWasOpen)) os << " ";
+                                      if (*p != L")" && !prevWasOpen) os << " ";
                                       prevWasOpen = (*p == L"(" || *p == L"'" || *p == L"," || *p == L",@");
 
                                       if (*p == START_OF_LINE || p->token[0] == L';')
