@@ -6,7 +6,7 @@ assign no nil?
 
 assign mac (lambda '(name params . body)
   (eval `(assign ,name (lambda ',params
-                         (eval ,@body)))))
+                         (eval ((lambda() ,@body)))))))
 
 mac def(name params . body)
   _prn 34
