@@ -24,13 +24,8 @@ def cddr(x)
 ; (if nil 35 36) => 36
 ; (if nil 35 36 37) => 37
 mac if args
-  _if (no args)
-    nil
-    _if (no (cdr args))
-      (car args)
-      _if (no (cddr args))
-        `(_if ,(car args)
-           ,(cadr args))
-        `(_if ,(car args)
-           ,(cadr args)
-           (if ,@(cddr args)))
+  _if (no (cdr args))
+    (car args)
+    `(_if ,(car args)
+       ,(cadr args)
+       (if ,@(cddr args)))
