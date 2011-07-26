@@ -19,15 +19,7 @@ void test_assign_to_lambda() {
 }
 
 void test_foo() {
-//?   cerr << endl << parse(parenthesize(tokenize(teststream(L"((lambda()\n   (assign foo (lambda()\n        34))))"))));
-//?   cerr << endl << parse(parenthesize(tokenize(teststream(L"((lambda()\n    assign foo (lambda()\n        34)))"))));
-
-  cerr << endl << buildCells(parse(parenthesize(tokenize(teststream(L"((lambda()\n  (assign foo (lambda(x)\n                 (car (cdr x))))))"))))).front();
-  cerr << endl << buildCells(parse(parenthesize(tokenize(teststream(L"((lambda()\n   assign foo (lambda(x)\n                 (car (cdr x)))))"))))).front();
   check(equalList(
-    buildCells(parse(parenthesize(tokenize(teststream(L"((lambda()\n  (assign foo (lambda(x)\n                 (car (cdr x))))))"))))).front(),
-    buildCells(parse(parenthesize(tokenize(teststream(L"((lambda()\n   assign foo (lambda(x)\n                 (car (cdr x)))))"))))).front()));
-  cerr << endl << eval(buildCells(parse(parenthesize(tokenize(teststream(L"((lambda()\n  (assign foo (lambda(x)\n                 (car (cdr x))))))"))))).front());
-  cerr << endl << eval(buildCells(parse(parenthesize(tokenize(teststream(L"((lambda()\n   assign foo (lambda(x)\n                 (car (cdr x)))))"))))).front());
-  exit(0);
+      buildCells(parse(parenthesize(tokenize(teststream(L"((lambda()\n   assign foo2 (lambda(x)\n                 (car (cdr x)))))\n\n(foo2)"))))).front(),
+      buildCells(parse(parenthesize(tokenize(teststream(L"((lambda()\n   (assign foo2 (lambda(x)\n                 (car (cdr x))))))\n\n(foo2)"))))).front()));
 }
