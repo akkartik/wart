@@ -111,9 +111,6 @@ Cell* eval(Cell* expr) {
   if (isQuoted(expr))
     return mkref(processUnquotes(cdr(expr)));
 
-  if (car(expr) == newSym(L"eval"))
-    return eval(car(cdr(expr)));
-
   if (car(expr) == newSym(L"lambda")) {
     // attach current lexical scope
     Cell* ans = newCell();
@@ -124,6 +121,13 @@ Cell* eval(Cell* expr) {
     setCar(cdr(cdr(ans)), body(expr));
     setCdr(cdr(cdr(ans)), currLexicalScopes.top());
     return mkref(ans);
+  }
+
+  if (car(expr) == newSym(L"eval")) {
+    Cell* arg = eval(car(cdr(expr)));
+    Cell* result = eval(arg);
+    rmref(arg);
+    return result;
   }
 
   // expr is a function call
