@@ -61,9 +61,9 @@ COMPILE_PRIM_FUNC(_if, L"'(cond then else)",
   endLexicalScope();
   endDynamicScope(L"currLexicalScope");
   if (rmref(eval(cond)) != nil)
-    result = rmref(eval(then));
+    result = eval(then);
   else
-    result = rmref(eval(rest));
+    result = eval(rest);
   newDynamicScope(L"currLexicalScope", nil);
   newLexicalScope();
 )
