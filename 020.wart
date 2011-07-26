@@ -9,10 +9,10 @@ assign mac (lambda '(name params . body)
                          (eval ,@body)))))
 
 mac def(name params . body)
+  _prn 34
   `(assign ,name (lambda ,params ,@body))
 
 def foo(x)
-  _prn 34
   x
 
 _prn (foo 3)
