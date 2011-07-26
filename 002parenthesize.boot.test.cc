@@ -258,6 +258,25 @@ void test_parenthesize_wraps_around_outdents2() {
   check(p == tokens.end());
 }
 
+void test_parenthesize_wraps_around_too_much_outdent() {
+  list<Token> x0 = parenthesize(tokenize(teststream(L"  (a a\n    a)\ny")));
+  list<Token> x1 = parenthesize(tokenize(teststream(L"  a a\n    a\ny")));
+
+  bool fail = false;
+  for (list<Token>::iterator p0 = x0.begin(), p1 = x1.begin(); p0 != x0.end() && p1 != x1.end(); ++p0, ++p1)
+    if (*p0 != *p1) fail = true;
+  if (!fail)
+    return;
+
+  cerr << endl << x0.size() << " " << x1.size() << endl;
+  for (list<Token>::iterator p0 = x0.begin(), p1 = x1.begin(); p0 != x0.end() && p1 != x1.end(); ++p0, ++p1) {
+    if (*p0 == *p1)
+      cerr << *p0 << endl;
+    else
+      cerr << "F test_foo: expected " << *p0 << " got " << *p1 << endl;
+  }
+}
+
 void test_parenthesize_wraps_across_comments() {
   list<Token> tokens = parenthesize(tokenize(teststream(L"def foo\n    ;a b c\n  d e\nnewdef")));
   list<Token>::iterator p = tokens.begin();
@@ -340,23 +359,4 @@ void test_parenthesize_wraps_when_indented_by_one_space() {
   check_eq(*p, L"f"); ++p;
   check_eq(*p, L")"); ++p;
   check(p == tokens.end());
-}
-
-void test_foo() {
-  list<Token> x0 = parenthesize(tokenize(teststream(L"  (a a\n    a)\ny")));
-  list<Token> x1 = parenthesize(tokenize(teststream(L"  a a\n    a\ny")));
-
-  bool fail = false;
-  for (list<Token>::iterator p0 = x0.begin(), p1 = x1.begin(); p0 != x0.end() && p1 != x1.end(); ++p0, ++p1)
-    if (*p0 != *p1) fail = true;
-  if (!fail)
-    return;
-
-  cerr << endl << x0.size() << " " << x1.size() << endl;
-  for (list<Token>::iterator p0 = x0.begin(), p1 = x1.begin(); p0 != x0.end() && p1 != x1.end(); ++p0, ++p1) {
-    if (*p0 == *p1)
-      cerr << *p0 << endl;
-    else
-      cerr << "F test_foo: expected " << *p0 << " got " << *p1 << endl;
-  }
 }

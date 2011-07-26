@@ -138,7 +138,7 @@ list<Token> parenthesize(list<Token> in) {
     }
 
     if (nextLineIndent == OUTDENT
-        && !parenStack.empty() && parenStack.top() == nextLineIndent.indentLevel) {
+        && !parenStack.empty() && parenStack.top() >= nextLineIndent.indentLevel) {
       // close paren for a previous line
       add(result, Token::of(L")"));
       parenStack.pop();
