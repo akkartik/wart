@@ -86,3 +86,7 @@ COMPILE_PRIM_FUNC(_atom_equal, L"(x y)",
     result = nil;
   mkref(result);
 )
+
+COMPILE_PRIM_FUNC(debug, L"(x)",
+  debug = toNum(lookup(L"x"));
+)
