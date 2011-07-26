@@ -2,20 +2,24 @@ COMPILE_PRIM_FUNC(cons, L"(x y)",
   result = newCell();
   setCar(result, lookup(L"x"));
   setCdr(result, lookup(L"y"));
+  mkref(result);
 )
 
 COMPILE_PRIM_FUNC(car, L"(x)",
   result = car(lookup(L"x"));
+  mkref(result);
 )
 
 COMPILE_PRIM_FUNC(cdr, L"(x)",
   result = cdr(lookup(L"x"));
+  mkref(result);
 )
 
 COMPILE_PRIM_FUNC(_isCons, L"(x)",
   result = lookup(L"x");
   if (!isCons(result))
     result = nil;
+  mkref(result);
 )
 
 COMPILE_PRIM_FUNC(_isNil, L"(x)",
@@ -24,6 +28,7 @@ COMPILE_PRIM_FUNC(_isNil, L"(x)",
     result = newSym(L"t");
   else
     result = nil;
+  mkref(result);
 )
 
 COMPILE_PRIM_FUNC(assign, L"('x y)",
@@ -33,6 +38,7 @@ COMPILE_PRIM_FUNC(assign, L"('x y)",
     newDynamicScope(x, result);
   else
     assignDynamicVar(x, result);
+  mkref(result);
 )
 
 // HACK because there's no wifstream(wstring) constructor
@@ -51,6 +57,7 @@ COMPILE_PRIM_FUNC(load, L"(f)",
 COMPILE_PRIM_FUNC(_prn, L"(x)",
   result = lookup(L"x");
   cout << result << endl;
+  mkref(result);
 )
 
 COMPILE_PRIM_FUNC(_if, L"'(cond then else)",
@@ -77,4 +84,5 @@ COMPILE_PRIM_FUNC(_atom_equal, L"(x y)",
     result = x;
   else
     result = nil;
+  mkref(result);
 )

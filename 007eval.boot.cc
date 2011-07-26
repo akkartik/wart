@@ -144,7 +144,7 @@ Cell* eval(Cell* expr) {
   // eval all forms in body, save result of final form
   Cell* result = nil;
   if (isPrimFunc(car(lambda))) {
-    result = mkref(toPrimFunc(car(lambda))());
+    result = toPrimFunc(car(lambda))(); // all primFuncs must mkref
   }
   else {
     for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
