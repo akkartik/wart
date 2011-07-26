@@ -95,6 +95,11 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
                                     return (*q == L"(");
                                   }
 
+                                  bool alreadyGrouped(list<Token> line) {
+                                    Token firstToken = firstTokenInLine(line);
+                                    return firstToken == L"(" || firstToken == L"'" || firstToken == L"`";
+                                  }
+
 list<Token> parenthesize(list<Token> in) {
   list<Token> result;
   stack<int> parenStack;
@@ -108,9 +113,8 @@ list<Token> parenthesize(list<Token> in) {
     prevLineIndent=thisLineIndent, thisLineIndent=indentBefore(line), nextLineIndent=indentAfter(line);
 
     bool insertedParenThisLine = false;
-    Token firstToken = firstTokenInLine(line);
     if (!suppressInsert && numWordsInLine(line) > 1
-        && firstToken != L"(" && firstToken != L"'" && firstToken != L"`"
+        && !alreadyGrouped(line)
         && !(thisLineIndent.indentLevel == prevLineIndent.indentLevel+1 && thisLineIndent.type == MAYBE_WRAP)) {
       // open paren
       add(result, Token::of(L"("));
