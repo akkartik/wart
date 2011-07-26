@@ -348,7 +348,7 @@ Cell* get(Cell* t, Cell* k) {
                                     case STRING:
                                       return os << toString(c);
                                     case TABLE:
-                                      return os << (Table*)c->car << cdr(c);
+                                      return os << (Table*)c->car << (cdr(c) == nil ? newString(L"") : cdr(c));
                                     case PRIM_FUNC:
                                       return os << "#compiled" << endl;
                                     default:
