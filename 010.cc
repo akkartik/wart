@@ -53,11 +53,19 @@ COMPILE_PRIM_FUNC(_prn, L"(x)",
   cout << result << endl;
 )
 
-COMPILE_PRIM_FUNC(_if, L"(cond 'then 'else)",
-  if (lookup(L"cond") != nil)
-    result = eval(lookup(L"then"));
+COMPILE_PRIM_FUNC(_if, L"'(cond then else)",
+  Cell* cond = lookup(L"cond");
+  Cell* then = lookup(L"then");
+  Cell* rest = lookup(L"else");
+  // now evaluate in caller's lexical scope
+  endLexicalScope();
+  endDynamicScope(L"currLexicalScope");
+  if (rmref(eval(cond)) != nil)
+    result = rmref(eval(then));
   else
-    result = eval(lookup(L"else"));
+    result = rmref(eval(rest));
+  newDynamicScope(L"currLexicalScope", nil);
+  newLexicalScope();
 )
 
 COMPILE_PRIM_FUNC(_atom_equal, L"(x y)",

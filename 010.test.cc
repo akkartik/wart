@@ -17,3 +17,18 @@ void test_assign_to_lambda() {
   rmref(lambda);
   checkState();
 }
+
+void test_if_sees_args_in_then_and_else() {
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda(x) (_if 34 x))"))))).front();
+  Cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(f 35)"))))).front();
+  Cell* result = eval(call);
+  check_eq(result, newNum(35));
+  rmref(result);
+  rmref(call);
+  endDynamicScope(L"f");
+  rmref(f);
+  rmref(lambda);
+  checkState();
+}
