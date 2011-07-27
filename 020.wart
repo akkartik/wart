@@ -35,7 +35,3 @@ mac if args
     `(_if ,(car args)
        ,(cadr args)
        (if ,@(cddr args)))
-
-_prn ""
-(mac foo(x) x)
-((lambda(y) (foo y)) 34)
