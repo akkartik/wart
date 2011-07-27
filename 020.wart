@@ -49,6 +49,7 @@ mac or args
       (car args)
       `(or ,@(cdr args))
 
+; ((lambda(x) (and 3 x 4)) nil) => nil
 mac and args
   _if (no args)
     ''t
@@ -56,5 +57,3 @@ mac and args
       _if (cdr args)
         `(and ,@(cdr args))
         (car args)
-
-_prn ((lambda(x) (and 3 x 4)) nil) ; should be nil!
