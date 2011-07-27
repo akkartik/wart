@@ -8,9 +8,9 @@ assign macex (lambda '(name params . body)
   `(assign ,name (lambda ',params
                    (eval ((lambda() ,@body))))))
 
-assign mac (lambda '(name params . body)
-  (eval `(assign ,name (lambda ',params
-                         (eval ((lambda() ,@body)))))))
+assign mac (elambda '(name params . body)
+  `(assign ,name (elambda ',params
+                   ((lambda() ,@body)))))
 
 mac def(name params . body)
   `(assign ,name (lambda ,params ,@body))

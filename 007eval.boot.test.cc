@@ -492,3 +492,18 @@ void test_eval_handles_eval() {
   endDynamicScope(L"a");
   checkState();
 }
+
+void test_eval_handles_elambda() {
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(elambda('x) x)"))))).front();
+  Cell* foo = eval(lambda);
+  newDynamicScope(L"foo", foo);
+  Cell* lambda2 = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda(y) (foo y)) 3)"))))).front();
+  Cell* result = eval(lambda2);
+  check_eq(result, newNum(3));
+  rmref(result);
+  rmref(lambda2);
+  endDynamicScope(L"foo");
+  rmref(foo);
+  rmref(lambda);
+  checkState();
+}
