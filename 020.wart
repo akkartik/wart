@@ -19,7 +19,9 @@ def cddr(x)
 
 ; (if) => nil
 ; (if 34) => 34
+; ((lambda(x) (if x)) 34) => 34
 ; (if 34 35) => 35
+; (assign x 34) (if x 35) => 35
 ; (if 34 35 36) => 35
 ; (if nil 35 36) => 36
 ; (if nil 35 36 37) => 37
@@ -29,3 +31,6 @@ mac if args
     `(_if ,(car args)
        ,(cadr args)
        (if ,@(cddr args)))
+_prn ""
+debug 2
+((lambda(x) (if x)) 34)

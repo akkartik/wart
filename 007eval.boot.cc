@@ -5,20 +5,28 @@
                                         && (car(cell) == newSym(L"'") || car(cell) == newSym(L"`"));
                                   }
 
-void bindArgs(Cell* params, Cell* args) {
+void bindArgs(Cell* params, Cell* args, Cell* expr) {
   if (params == nil) return;
+  if (expr != nil)
+    dbg2 << expr << ": bind " << params << endl;
 
   if (isQuoted(params)) {
-    bindArgs(cdr(params), args);
+    bindArgs(cdr(params), args, expr);
     return;
   }
 
-  if (isSym(params))
+  if (isSym(params)) {
+    dbg2 << expr << ":   to " << args << endl;
     addLexicalBinding(params, args);
+  }
   else
-    bindArgs(car(params), car(args));
+    bindArgs(car(params), car(args), expr);
 
-  bindArgs(cdr(params), cdr(args));
+  bindArgs(cdr(params), cdr(args), expr);
+}
+
+void bindArgs(Cell* params, Cell* args) {
+  bindArgs(params, args, nil);
 }
 
 
@@ -135,11 +143,13 @@ Cell* eval(Cell* expr) {
     cerr << "not a function call: " << expr << endl << DIE;
   // eval all its args in the current lexical scope
   Cell* evald_args = eval_args(sig(lambda), call_args(expr));
+  dbg2 << expr << ": " << "args " << evald_args << endl;
+  dbg2 << currLexicalScopes.top() << endl;
   // swap in the function's lexical environment
   newDynamicScope(L"currLexicalScope", callee_env(lambda));
   // now bind its params to args in the new environment
   newLexicalScope();
-  bindArgs(sig(lambda), evald_args);
+  bindArgs(sig(lambda), evald_args, expr);
 
   // eval all forms in body, save result of final form
   Cell* result = nil;

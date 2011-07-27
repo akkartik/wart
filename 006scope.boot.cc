@@ -91,6 +91,7 @@ Cell* lookup(Cell* sym) {
   result = lookupDynamicBinding(sym);
   if (result) return result;
   cerr << "No binding for " << toString(sym) << endl;
+  cerr << currLexicalScopes.top() << endl;
   return nil;
 }
 
