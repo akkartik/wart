@@ -4,6 +4,10 @@ assign nil? _isNil
 assign not nil?
 assign no nil?
 
+assign macex (lambda '(name params . body)
+  `(assign ,name (lambda ',params
+                   (eval ((lambda() ,@body))))))
+
 assign mac (lambda '(name params . body)
   (eval `(assign ,name (lambda ',params
                          (eval ((lambda() ,@body)))))))
