@@ -63,3 +63,15 @@ mac and args
       if (cdr args)
         `(if ,(car args) (and ,@(cdr args)))
         (car args)
+
+; (iso 3 3) => 3
+; (iso nil nil) => t
+; (iso 3 4) => nil
+; (iso '(1) '(1)) => '(1)
+; (iso '(1) '(1 2)) => nil
+def iso(a b)
+  or (_atom_equal a b)
+    and (cons? a)
+        (cons? b)
+        (iso (car a) (car b))
+        (iso (cdr a) (cdr b))

@@ -78,7 +78,9 @@ COMPILE_PRIM_FUNC(_if, L"'(cond then else)",
 COMPILE_PRIM_FUNC(_atom_equal, L"(x y)",
   Cell* x = lookup(L"x");
   Cell* y = lookup(L"y");
-  if (x == y)
+  if (x == nil && y == nil)
+    result = newSym(L"t");
+  else if (x == y)
     result = x;
   else if (isString(x) && isString(y) && toString(x) == toString(y))
     result = x;
