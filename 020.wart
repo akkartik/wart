@@ -48,3 +48,11 @@ mac or args
     _if (car args)
       (car args)
       `(or ,@(cdr args))
+
+mac and args
+  _if (no args)
+    ''t
+    _if (car args)
+      _if (cdr args)
+        `(and ,@(cdr args))
+        (car args)
