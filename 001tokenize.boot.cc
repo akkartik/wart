@@ -238,6 +238,7 @@ list<Token> tokenize(istream& in) {
   prevTokenType = START_OF_LINE;
   while (!eof(in)) {
     result.push_back(nextToken(in));
+    if (result.back().token[0] == L';') result.pop_back();
     prevTokenType = result.back().type;
     if(endOfReplExpr(result)) break;
   }

@@ -102,14 +102,11 @@ void test_tokenize_handles_comment() {
   check_eq(*p, L")"); ++p;
   check_eq(*p, L"'"); ++p;
   check_eq(*p, L",@"); ++p;
-  check_eq(*p, L";abc def ghi"); ++p;
 }
 
 void test_tokenize_ends_comment_at_newline() {
   list<Token> tokens = tokenize(teststream(L";abc def ghi\nabc"));
   list<Token>::iterator p = tokens.begin();
-  check_eq(*p, START_OF_LINE); ++p;
-  check_eq(*p, L";abc def ghi"); ++p;
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, L"abc"); ++p;
   check(p == tokens.end());
@@ -137,7 +134,6 @@ void test_tokenize_handles_sexpr() {
   check_eq(*p, L")"); ++p;
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, L"abc"); ++p;
-  check_eq(*p, L";def ghi"); ++p;
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, L"abc"); ++p;
   check(p == tokens.end());
@@ -223,5 +219,17 @@ void test_tokenize_suppresses_initial_whitespace_lines() {
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, INDENT); ++p;
   check_eq(*p, L"def"); ++p;
+  check(p == tokens.end());
+}
+
+void test_tokenize_suppresses_comments() {
+  list<Token> tokens = tokenize(teststream(L"abc\n;abc\ndef\nghi"));
+  list<Token>::iterator p = tokens.begin();
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, L"abc"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, L"def"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, L"ghi"); ++p;
   check(p == tokens.end());
 }

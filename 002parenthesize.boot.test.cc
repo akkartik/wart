@@ -256,7 +256,6 @@ void test_parenthesize_handles_quotes_and_comments() {
   check_eq(*p, L"ef"); ++p;
   check_eq(*p, L")"); ++p;
   check_eq(*p, L"g"); ++p;
-  check_eq(*p, L";abc"); ++p;
   check_eq(*p, L")"); ++p;
   check(p == tokens.end());
 }
@@ -274,7 +273,6 @@ void test_parenthesize_wraps_around_outdents() {
   check_eq(*p, L"ef"); ++p;
   check_eq(*p, L")"); ++p;
   check_eq(*p, L"g"); ++p;
-  check_eq(*p, L";abc"); ++p;
   check_eq(*p, L")"); ++p;
   check(p == tokens.end());
 }
@@ -312,12 +310,11 @@ void test_parenthesize_wraps_around_too_much_outdent() {
 }
 
 void test_parenthesize_wraps_across_comments() {
-  list<Token> tokens = parenthesize(tokenize(teststream(L"def foo\n    ;a b c\n  d e\nnewdef")));
+  list<Token> tokens = parenthesize(tokenize(teststream(L"def foo\n;a b c\n  d e\nnewdef")));
   list<Token>::iterator p = tokens.begin();
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"def"); ++p;
   check_eq(*p, L"foo"); ++p;
-  check_eq(*p, L";a b c"); ++p;
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"d"); ++p;
   check_eq(*p, L"e"); ++p;
@@ -333,7 +330,6 @@ void test_parenthesize_wraps_inside_parens() {
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"def"); ++p;
   check_eq(*p, L"foo"); ++p;
-  check_eq(*p, L";a b c"); ++p;
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"d"); ++p;
   check_eq(*p, L"e"); ++p;
@@ -350,7 +346,6 @@ void test_parenthesize_wraps_inside_parens2() {
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"def"); ++p;
   check_eq(*p, L"foo"); ++p;
-  check_eq(*p, L";a b c"); ++p;
   check_eq(*p, L"("); ++p;
   check_eq(*p, L"d"); ++p;
   check_eq(*p, L"e"); ++p;
