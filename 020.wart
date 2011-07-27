@@ -44,8 +44,8 @@ mac if args
 ; (or nil 3 4) => 3
 ; (or nil (_prn 3) (_prn 4)) => 3 after printing just 3
 mac or args
-  _if args
-    _if (car args)
+  if args
+    if (car args)
       (car args)
       `(or ,@(cdr args))
 
@@ -57,9 +57,9 @@ mac or args
 ; ((lambda(x) (and 3 x 4)) nil) => nil
 ; (and (_prn 3) nil) => nil after printing 3
 mac and args
-  _if (no args)
+  if (no args)
     ''t
-    _if (car args)
-      _if (cdr args)
+    if (car args)
+      if (cdr args)
         `(if ,(car args) (and ,@(cdr args)))
         (car args)
