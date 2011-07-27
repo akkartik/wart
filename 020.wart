@@ -61,5 +61,5 @@ mac and args
     ''t
     _if (car args)
       _if (cdr args)
-        `(and ,@(cdr args))
+        `(if ,(car args) (and ,@(cdr args)))
         (car args)
