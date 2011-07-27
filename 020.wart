@@ -45,9 +45,9 @@ mac if args
 ; (or nil (_prn 3) (_prn 4)) => 3 after printing just 3
 mac or args
   if args
-    if (car args)
-      (car args)
-      `(or ,@(cdr args))
+    `(if ,(car args)
+       ,(car args)
+       (or ,@(cdr args)))
 
 ; (and) => t
 ; (and nil) => nil
