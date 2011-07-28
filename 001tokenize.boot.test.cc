@@ -134,6 +134,7 @@ void test_tokenize_handles_sexpr() {
   check_eq(*p, L")"); ++p;
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, L"abc"); ++p;
+  check_eq(*p, L";def ghi"); ++p;
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, L"abc"); ++p;
   check(p == tokens.end());
@@ -231,5 +232,26 @@ void test_tokenize_suppresses_comments() {
   check_eq(*p, L"def"); ++p;
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, L"ghi"); ++p;
+  check(p == tokens.end());
+}
+
+void test_tokenize_suppresses_comments2() {
+  list<Token> tokens = tokenize(teststream(L"a b\n  c\n;abc\ndef\n  ghi\n\njkl"));
+  list<Token>::iterator p = tokens.begin();
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, INDENT); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, OUTDENT); ++p;
+  check_eq(*p, L"def"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, INDENT); ++p;
+  check_eq(*p, L"ghi"); ++p;
+  check_eq(*p, START_OF_LINE); ++p;
+  check_eq(*p, OUTDENT); ++p;
+  check_eq(*p, L"jkl"); ++p;
   check(p == tokens.end());
 }
