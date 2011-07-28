@@ -141,6 +141,17 @@ int countIndent(istream& in) {
                                     }
                                   }
 
+                                  void slurpComment(istream& in) {
+                                    char c;
+                                    while (!eof(in)) {
+                                      in >> c;
+                                      if (c == L'\n') {
+                                        in.putback(c);
+                                        break;
+                                      }
+                                    }
+                                  }
+
                                   void slurpComment(istream& in, ostream& out) {
                                     char c;
                                     while (!eof(in)) {
@@ -156,6 +167,7 @@ int countIndent(istream& in) {
 int indentLevel = 0;
 TokenType prevTokenType = START_OF_LINE;
 Token nextToken(istream& in) {
+restart:
   if (prevTokenType != START_OF_LINE) {
     skipWhitespace(in);
     if (in.peek() == L'\n') {
@@ -166,10 +178,9 @@ Token nextToken(istream& in) {
 
   if (prevTokenType == START_OF_LINE) {
     int currIndentLevel = countIndent(in);
-    if (in.peek() == L';') { // parse comments before updating indentLevel
-      ostringstream out;
-      slurpComment(in, out);
-      return Token::of(out.rdbuf()->str());
+    if (in.peek() == L';') {
+      slurpComment(in);
+      goto restart;
     }
     int prevIndentLevel = indentLevel;
     indentLevel = currIndentLevel;
