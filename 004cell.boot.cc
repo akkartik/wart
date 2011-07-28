@@ -351,7 +351,7 @@ Cell* get(Cell* t, Cell* k) {
                                     case TABLE:
                                       return os << (Table*)c->car << (cdr(c) == nil ? newString(L"") : cdr(c));
                                     case PRIM_FUNC:
-                                      return os << "#compiled" << endl;
+                                      return os << "#compiled";
                                     default:
                                       return os << "Can't print type " << c->type << endl << DIE;
                                     }
