@@ -256,7 +256,6 @@ void test_parenthesize_handles_quotes_and_comments() {
   check_eq(*p, L"ef"); ++p;
   check_eq(*p, L")"); ++p;
   check_eq(*p, L"g"); ++p;
-  check_eq(*p, L";abc"); ++p;
   check_eq(*p, L")"); ++p;
   check(p == tokens.end());
 }
@@ -274,7 +273,6 @@ void test_parenthesize_wraps_around_outdents() {
   check_eq(*p, L"ef"); ++p;
   check_eq(*p, L")"); ++p;
   check_eq(*p, L"g"); ++p;
-  check_eq(*p, L";abc"); ++p;
   check_eq(*p, L")"); ++p;
   check(p == tokens.end());
 }

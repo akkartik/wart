@@ -152,18 +152,6 @@ int countIndent(istream& in) {
                                     }
                                   }
 
-                                  void slurpComment(istream& in, ostream& out) {
-                                    char c;
-                                    while (!eof(in)) {
-                                      in >> c;
-                                      if (c == L'\n') {
-                                        in.putback(c);
-                                        break;
-                                      }
-                                      out << c;
-                                    }
-                                  }
-
 int indentLevel = 0;
 TokenType prevTokenType = START_OF_LINE;
 Token nextToken(istream& in) {
@@ -215,7 +203,7 @@ restart:
       break;
 
     case L';':
-      slurpComment(in, out); break;
+      slurpComment(in); goto restart;
 
     default:
       slurpWord(in, out); break;

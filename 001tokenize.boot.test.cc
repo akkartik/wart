@@ -134,7 +134,6 @@ void test_tokenize_handles_sexpr() {
   check_eq(*p, L")"); ++p;
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, L"abc"); ++p;
-  check_eq(*p, L";def ghi"); ++p;
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, L"abc"); ++p;
   check(p == tokens.end());
