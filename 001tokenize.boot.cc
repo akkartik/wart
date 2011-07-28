@@ -166,7 +166,7 @@ restart:
 
   if (prevTokenType == START_OF_LINE) {
     int currIndentLevel = countIndent(in);
-    if (in.peek() == L';') {
+    if (!eof(in) && in.peek() == L';') {
       slurpComment(in);
       goto restart;
     }
