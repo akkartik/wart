@@ -81,3 +81,8 @@ def fact(n)
   if (iso n 0)
     1
     multiply n (fact (subtract n 1))
+
+; let x 3 (add x 1) => 4
+; let (a . b) (cons 3 4) (add a b) => 7
+mac let(var val . body)
+  `((lambda(,var) ,@body) ,val)
