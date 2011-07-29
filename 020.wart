@@ -62,7 +62,7 @@ mac and args
     if (car args)
       if (cdr args)
         `(if ,(car args)
-           (and ,@(cdr args)))
+           and ,@(cdr args))
         (car args)
 
 ; (iso 3 3) => 3
