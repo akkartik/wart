@@ -82,6 +82,9 @@ def fact(n)
     1
     multiply n (fact (subtract n 1))
 
+mac do body
+  `((lambda() ,@body))
+
 ; let x 3 (add x 1) => 4
 ; let (a . b) (cons 3 4) (add a b) => 7
 mac let(var val . body)
