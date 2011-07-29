@@ -58,12 +58,12 @@ mac or args
 ; (and (_prn 3) nil) => nil after printing 3
 mac and args
   if (no args)
-       ''t
-     (car args)
-       if (cdr args)
-         `(if ,(car args)
-            and ,@(cdr args))
-         (car args)
+    ''t
+    if (car args)
+      if (cdr args)
+        `(if ,(car args)
+           and ,@(cdr args))
+        (car args)
 
 ; (iso 3 3) => 3
 ; (iso nil nil) => t
