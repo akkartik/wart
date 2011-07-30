@@ -28,7 +28,7 @@ are off.
 Never assign to car or cdr or inside a table by hand. Use an existing
 primitive: setCar, setCdr, set. They're thoroughly tested.
 
-If you ever encounter NULL, debug=true is your friend. Use it judiciously.
+If you ever encounter NULL, debug=1 is your friend. Use it judiciously.
 
 == Generated _lists
 
