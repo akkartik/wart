@@ -29,7 +29,7 @@ bool isCons(Cell* x) {
 }
 
 bool isAtom(Cell* x) {
-  return x == nil || x->type == NUM || x->type == STRING || x->type == SYM;
+  return x == nil || x->type == NUM || x->type == STRING || x->type == SYM || x->type == PRIM_FUNC;
 }
 
 
