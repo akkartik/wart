@@ -65,28 +65,31 @@ void bindArgs(Cell* params, Cell* args) {
                                     return mkref(result);
                                   }
 
-                                  void append(Cell* x, Cell* y) {
+                                  void appendAndRmref(Cell* x, Cell* y) {
                                     while(cdr(x) != nil)
                                       x = cdr(x);
                                     setCdr(x, y);
+                                    rmref(y);
                                   }
 
                                   Cell* processUnquotes(Cell* x) {
-                                    if (!isCons(x)) return x;
+                                    if (!isCons(x)) return mkref(x);
 
                                     if (car(x) == newSym(L","))
-                                      return rmref(eval(cdr(x)));
+                                      return eval(cdr(x));
 
                                     if (isCons(car(x)) && car(car(x)) == newSym(L",@")) {
-                                      Cell* result = rmref(eval(cdr(car(x))));
-                                      append(result, processUnquotes(cdr(x)));
+                                      Cell* result = eval(cdr(car(x)));
+                                      appendAndRmref(result, processUnquotes(cdr(x)));
                                       return result;
                                     }
 
                                     Cell* result = newCell();
                                     setCar(result, processUnquotes(car(x)));
                                     setCdr(result, processUnquotes(cdr(x)));
-                                    return result;
+                                    rmref(car(result));
+                                    rmref(cdr(result));
+                                    return mkref(result);
                                   }
 
                                   bool isFunc(Cell* x) {
@@ -114,7 +117,7 @@ Cell* eval(Cell* expr) {
     return mkref(expr);
 
   if (isQuoted(expr))
-    return mkref(processUnquotes(cdr(expr)));
+    return processUnquotes(cdr(expr));
 
   if (car(expr) == newSym(L"lambda") || car(expr) == newSym(L"elambda")) {
     // attach current lexical scope

@@ -507,3 +507,18 @@ void test_eval_handles_elambda() {
   rmref(lambda);
   checkState();
 }
+
+void test_eval_handles_higher_order_functions() {
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(elambda'(f args) `(,f ,@(eval args)))"))))).front();
+  Cell* foo = eval(lambda);
+  newDynamicScope(L"foo", foo);
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(foo add '(1 1))"))))).front();
+  Cell* result = eval(call);
+  check_eq(result, newNum(2));
+  rmref(result);
+  rmref(call);
+  endDynamicScope(L"foo");
+  rmref(foo);
+  rmref(lambda);
+  checkState();
+}
