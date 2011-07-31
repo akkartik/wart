@@ -67,10 +67,12 @@ COMPILE_PRIM_FUNC(_if, L"'(cond then else)",
   // now evaluate in caller's lexical scope
   endLexicalScope();
   endDynamicScope(L"currLexicalScope");
-  if (rmref(eval(cond)) != nil)
+  cond = eval(cond);
+  if (cond != nil)
     result = eval(then);
   else
     result = eval(rest);
+  rmref(cond);
   newDynamicScope(L"currLexicalScope", nil);
   newLexicalScope();
 )
