@@ -89,3 +89,7 @@ mac do body
 ; let (a . b) (cons 3 4) (add a b) => 7
 mac let(var val . body)
   `((lambda(,var) ,@body) ,val)
+
+; apply add '(1 2) => 3
+mac apply(f args)
+  `(,f ,@(eval args))
