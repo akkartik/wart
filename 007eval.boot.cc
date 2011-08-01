@@ -138,6 +138,9 @@ Cell* eval(Cell* expr) {
     return result;
   }
 
+  if (isPrimFunc(car(expr)))
+    return mkref(expr);
+
   // expr is a function call
   Cell* lambda = eval(car(expr));
   if (!isFunc(lambda))

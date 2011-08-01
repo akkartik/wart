@@ -91,5 +91,6 @@ mac let(var val . body)
   `((lambda(,var) ,@body) ,val)
 
 ; apply add '(1 2) => 3
-mac apply(f args)
-  `(,f ,@(eval args))
+; let x '(1 2) (apply add x) => 3
+def apply(f args)
+  (eval `(,f ,@args))
