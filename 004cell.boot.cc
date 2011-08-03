@@ -334,7 +334,7 @@ Cell* get(Cell* t, Cell* k) {
                                       if (p->second)
                                         os << (Cell*)p->first << ": " << p->second << endl;
                                     }
-                                    return os << "}" << endl;
+                                    return os << "}";
                                   }
 
                                   ostream& operator<<(ostream& os, Cell* c) {
