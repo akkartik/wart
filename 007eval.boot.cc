@@ -103,6 +103,12 @@ void bindArgs(Cell* params, Cell* args) {
                                     return result;
                                   }
 
+                                  int indent = 0;
+                                  void printIndent() {
+                                    for (int i = 0; i < indent; ++i)
+                                      dbg2 << " ";
+                                  }
+
 Cell* eval(Cell* expr) {
   if (!expr)
     cerr << "eval: cell should never be NULL" << endl << DIE;
