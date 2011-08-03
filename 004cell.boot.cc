@@ -342,7 +342,15 @@ Cell* get(Cell* t, Cell* k) {
                                     if (c == nil) return os << "nil";
                                     switch(c->type) {
                                     case CONS:
-                                      return os << L"<" << car(c) << " . " << cdr(c) << L">";
+                                      if (car(c) == newSym(L"'") || car(c) == newSym(L"`") || car(c) == newSym(L",") || car(c) == newSym(L",@"))
+                                        return os << car(c) << cdr(c);
+                                      os << "(" << car(c);
+                                      for (Cell* curr = cdr(c); curr != nil; curr = cdr(curr))
+                                        if (isCons(curr))
+                                          os << " " << car(curr);
+                                        else
+                                          os << " . " << curr;
+                                      return os << ")";
                                     case NUM:
                                       return os << toNum(c);
                                     case SYM:
