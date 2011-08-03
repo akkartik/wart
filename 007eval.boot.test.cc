@@ -138,11 +138,27 @@ void test_eval_handles_simple_lambda() {
   list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
   check_eq(cells.size(), 1);
   Cell* lambda = eval(cells.front());
-  check_eq(car(lambda), newSym(L"lambda"));
+  check_eq(car(lambda), newSym(L"evald-lambda"));
   check_eq(car(cdr(lambda)), nil);
   check(isCons(car(cdr(cdr(lambda)))));
   check_eq(car(car(cdr(cdr(lambda)))), newNum(34));
   check_eq(cdr(cdr(cdr(lambda))), nil);
+  rmref(lambda);
+  rmref(cells.front());
+  checkState();
+}
+
+void test_eval_on_lambda_is_idempotent() {
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda () 34)")))));
+  check_eq(cells.size(), 1);
+  Cell* lambda = eval(cells.front());
+  Cell* lambda2 = eval(lambda);
+  check_eq(car(lambda2), newSym(L"evald-lambda"));
+  check_eq(car(cdr(lambda2)), nil);
+  check(isCons(car(cdr(cdr(lambda2)))));
+  check_eq(car(car(cdr(cdr(lambda2)))), newNum(34));
+  check_eq(cdr(cdr(cdr(lambda2))), nil);
+  rmref(lambda2);
   rmref(lambda);
   rmref(cells.front());
   checkState();
@@ -158,7 +174,7 @@ void test_eval_handles_closure() {
     check_eq(newLexicalScope->nrefs, 3);
   endLexicalScope();
   check_eq(newLexicalScope->nrefs, 1);
-  check_eq(car(result), newSym(L"lambda"));
+  check_eq(car(result), newSym(L"evald-lambda"));
   check_eq(car(cdr(result)), nil);
   check_eq(car(car(cdr(cdr(result)))), newNum(34));
   check_eq(cdr(cdr(cdr(result))), newLexicalScope);
