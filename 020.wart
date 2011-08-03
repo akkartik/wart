@@ -85,6 +85,10 @@ def fact(n)
 mac do body
   `((lambda() ,@body))
 
+mac when(cond . body)
+  `(if ,cond
+     (do ,@body))
+
 ; let x 3 (add x 1) => 4
 ; let (a . b) (cons 3 4) (add a b) => 7
 mac let(var val . body)
