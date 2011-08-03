@@ -93,7 +93,7 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
                                   }
 
                                   bool parenNotAtStartOfLine(list<Token>::iterator q, list<Token>::iterator begin) {
-                                    if (*begin == START_OF_LINE) begin++;
+                                    while (whitespace(begin->type)) begin++;
                                     if (*begin == L"`") begin++;
                                     if (q == begin) return false;
                                     return (*q == L"(");

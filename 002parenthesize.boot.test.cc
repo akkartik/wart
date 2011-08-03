@@ -355,6 +355,21 @@ void test_parenthesize_wraps_inside_parens2() {
   check(p == tokens.end());
 }
 
+void test_parenthesize_wraps_inside_indented_parens() {
+  list<Token> tokens = parenthesize(tokenize(teststream(L"  (a b c\n    d e)")));
+  list<Token>::iterator p = tokens.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"d"); ++p;
+  check_eq(*p, L"e"); ++p;
+  check_eq(*p, L")"); ++p;
+  check_eq(*p, L")"); ++p;
+  check(p == tokens.end());
+}
+
 void test_parenthesize_wraps_arglists() {
   list<Token> tokens = parenthesize(tokenize(teststream(L"def foo(a b\n    c d)\n  d e\nnewdef")));
   list<Token>::iterator p = tokens.begin();
