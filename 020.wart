@@ -98,3 +98,7 @@ mac let(var val . body)
 ; let x '(1 2) (apply add x) => 3
 def apply(f args)
   (eval `(,f ,@args))
+
+def list args
+  if args
+    cons (car args) (apply list (cdr args))
