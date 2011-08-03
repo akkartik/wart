@@ -101,4 +101,5 @@ def apply(f args)
 
 def list args
   if args
-    cons (car args) (apply list (cdr args))
+    cons (car args)
+         apply list (cdr args)
