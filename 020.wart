@@ -120,3 +120,33 @@ def * xs
 
 def / xs
   reduce divide xs
+
+def map(f xs)
+  if xs
+    cons (f (car xs))
+         map f (cdr xs)
+
+def zip(a b)
+  if (and a b)
+    cons (list (car a) (car b))
+         zip (cdr a) (cdr b)
+
+def pairwise(xs)
+  zip xs (cdr xs)
+
+def trues(xs)
+  if xs
+    if (car xs)
+      trues (cdr xs)
+    1
+
+def all(f xs)
+  trues (map f xs)
+
+def > xs
+  all (lambda((x y)) (greater x y))
+      pairwise xs
+
+def < xs
+  all (lambda((x y)) (not (greater x y)))
+      pairwise xs
