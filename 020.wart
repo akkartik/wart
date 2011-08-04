@@ -58,7 +58,7 @@ mac or args
 ; (and (_prn 3) nil) => nil after printing 3
 mac and args
   if (no args)
-    ''t
+    1
     if (car args)
       if (cdr args)
         `(if ,(car args)

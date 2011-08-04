@@ -25,7 +25,7 @@ COMPILE_PRIM_FUNC(_isCons, L"(x)",
 COMPILE_PRIM_FUNC(_isNil, L"(x)",
   result = lookup(L"x");
   if (result == nil)
-    result = newSym(L"t");
+    result = newNum(1);
   else
     result = nil;
   mkref(result);
@@ -81,7 +81,7 @@ COMPILE_PRIM_FUNC(_atom_equal, L"(x y)",
   Cell* x = lookup(L"x");
   Cell* y = lookup(L"y");
   if (x == nil && y == nil)
-    result = newSym(L"t");
+    result = newNum(1);
   else if (x == y)
     result = x;
   else if (isString(x) && isString(y) && toString(x) == toString(y))
