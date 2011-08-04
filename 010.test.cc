@@ -32,3 +32,21 @@ void test_if_sees_args_in_then_and_else() {
   rmref(lambda);
   checkState();
 }
+
+void test_sym_works_with_one_arg() {
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(sym \"abc\")"))))).front();
+  Cell* result = eval(call);
+  check_eq(result, newSym(L"abc"));
+  rmref(result);
+  rmref(call);
+  checkState();
+}
+
+void test_sym_works_with_multiple_args() {
+  Cell* call = buildCells(parse(parenthesize(tokenize(teststream(L"(sym \"abc\" 42 'def)"))))).front();
+  Cell* result = eval(call);
+  check_eq(result, newSym(L"abc42def"));
+  rmref(result);
+  rmref(call);
+  checkState();
+}

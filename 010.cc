@@ -103,3 +103,11 @@ COMPILE_PRIM_FUNC(uniq, L"(x)",
   result = newSym(os.str());
   mkref(result);
 )
+
+COMPILE_PRIM_FUNC(sym, L"args",
+  ostringstream out;
+  for (Cell* args = lookup(L"args"); args != nil; args = cdr(args))
+    out << car(args);
+  result = newSym(out.str());
+  mkref(result);
+)
