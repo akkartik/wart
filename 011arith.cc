@@ -22,3 +22,9 @@ COMPILE_PRIM_FUNC(modulo, L"(x y)",
   result = newNum(toNum(lookup(L"x"))%toNum(lookup(L"y")));
   mkref(result);
 )
+
+COMPILE_PRIM_FUNC(greater, L"(x y)",
+  if (toNum(lookup(L"x")) > toNum(lookup(L"y")))
+    result = newNum(1);
+  mkref(result);
+)
