@@ -77,11 +77,6 @@ def iso(a b)
         (iso (car a) (car b))
         (iso (cdr a) (cdr b))
 
-def fact(n)
-  if (iso n 0)
-    1
-    multiply n (fact (subtract n 1))
-
 mac do body
   `((lambda() ,@body))
 
