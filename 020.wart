@@ -134,14 +134,12 @@ def zip(a b)
 def pairwise(xs)
   zip xs (cdr xs)
 
-def trues(xs)
-  if xs
-    if (car xs)
-      trues (cdr xs)
-    1
-
 def all(f xs)
-  trues (map f xs)
+  apply and (map f xs)
+
+def some(f xs)
+  apply or (map f xs)
+assign any some
 
 def > xs
   all (lambda((x y)) (greater x y))
