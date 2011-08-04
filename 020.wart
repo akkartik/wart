@@ -103,3 +103,20 @@ def list args
   if args
     cons (car args)
          apply list (cdr args)
+
+def reduce(f xs)
+  if (cddr xs)
+    reduce f (cons (f (car xs) (cadr xs)) (cddr xs))
+    apply f xs
+
+def + xs
+  reduce add xs
+
+def - xs
+  reduce subtract xs
+
+def * xs
+  reduce multiply xs
+
+def / xs
+  reduce divide xs
