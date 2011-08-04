@@ -208,7 +208,7 @@ restart:
     default:
       slurpWord(in, out); break;
   }
-  return Token::of(out.rdbuf()->str());
+  return Token::of(out.str());
 }
 
 int replParenCount = 0;
