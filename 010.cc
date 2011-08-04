@@ -94,3 +94,12 @@ COMPILE_PRIM_FUNC(_atom_equal, L"(x y)",
 COMPILE_PRIM_FUNC(debug, L"(x)",
   debug = toNum(lookup(L"x"));
 )
+
+COMPILE_PRIM_FUNC(uniq, L"(x)",
+  static long counter = 0;
+  Cell* x = lookup(L"x");
+  ostringstream os;
+  os << (x == nil ? L"sym" : toString(x)) << ++counter;
+  result = newSym(os.str());
+  mkref(result);
+)
