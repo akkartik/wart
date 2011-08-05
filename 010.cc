@@ -111,3 +111,8 @@ COMPILE_PRIM_FUNC(sym, L"args",
   result = newSym(out.str());
   mkref(result);
 )
+
+COMPILE_PRIM_FUNC(table, L"()",
+  result = newTable();
+  mkref(result);
+)
