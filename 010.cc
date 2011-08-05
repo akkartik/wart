@@ -116,3 +116,31 @@ COMPILE_PRIM_FUNC(table, L"()",
   result = newTable();
   mkref(result);
 )
+
+COMPILE_PRIM_FUNC(type, L"(x)",
+  Cell* x = lookup(L"x");
+  switch(x->type) {
+  case NUM:
+    result = newSym(L"number"); break;
+  case SYM:
+    result = newSym(L"symbol"); break;
+  case STRING:
+    result = newSym(L"string"); break;
+  case TABLE:
+    result = newSym(L"table"); break;
+  case PRIM_FUNC:
+    result = newSym(L"function"); break;
+  case CONS:
+    if (car(x) == newSym(L"lambda") || car(x) == newSym(L"elambda")
+        || car(x) == newSym(L"evald-lambda") || car(x) == newSym(L"evald-elambda"))
+      result = newSym(L"function");
+    else if (car(x) == newSym(L"type"))
+      result = car(cdr(x));
+    else
+      result = newSym(L"list");
+    break;
+  default:
+    cerr << "Undefined type: " << x->type << endl << DIE;
+  }
+  mkref(result);
+)
