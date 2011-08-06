@@ -153,6 +153,18 @@ void test_parenthesize_groups_quoted_words2() {
   check(p == tokens.end());
 }
 
+void test_parenthesize_groups_quoted_words3() {
+  list<Token> tokens = parenthesize(tokenize(teststream(L"'a b c")));
+  list<Token>::iterator p = tokens.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"'"); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L")"); ++p;
+  check(p == tokens.end());
+}
+
 void test_parenthesize_passes_through_nested_quoted_words() {
   list<Token> tokens = parenthesize(tokenize(teststream(L"a b\n  'c\n  ,d")));
   list<Token>::iterator p = tokens.begin();

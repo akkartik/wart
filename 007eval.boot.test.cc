@@ -44,7 +44,7 @@ void test_string_evals_to_itself() {
 }
 
 void test_eval_handles_quoted_atoms() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'a '34")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'a\n'34")))));
   check_eq(cells.size(), 2);
   Cell* result = eval(cells.front());
   check_eq(result, newSym(L"a"));
