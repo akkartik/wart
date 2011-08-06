@@ -117,6 +117,12 @@ COMPILE_PRIM_FUNC(table, L"()",
   mkref(result);
 )
 
+COMPILE_PRIM_FUNC(_table_set, L"(tab key val)",
+  Cell* t = lookup(L"tab");
+  if (isTable(t))
+    set(t, lookup(L"key"), lookup(L"val"));
+)
+
 COMPILE_PRIM_FUNC(type, L"(x)",
   Cell* x = lookup(L"x");
   switch(x->type) {
