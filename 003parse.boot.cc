@@ -48,14 +48,10 @@ ostream& operator<<(ostream& os, AstNode x) {
   return os << endl;
 }
 
-                                  bool isQuoteOrUnquote(Token x) {
-                                    return x == L"'" || x == L"`" || x == L"," || x == L",@";
-                                  }
-
 list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterator end, list<AstNode>& out) {
   if (curr == end) return curr;
 
-  while (curr->token[0] == L';') {
+  while (isComment(*curr)) {
     ++curr;
     if (curr == end || *curr == L")") return curr;
   }

@@ -30,6 +30,18 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
 
 
 
+                                  bool isParen(Token x) {
+                                    return x == L"(" || x == L")";
+                                  }
+
+                                  bool isQuoteOrUnquote(Token x) {
+                                    return x == L"'" || x == L"`" || x == L"," || x == L",@";
+                                  }
+
+                                  bool isComment(Token x) {
+                                    return !whitespace(x.type) && x.token[0] == L';';
+                                  }
+
                                   bool isIndent(Token t) {
                                     return whitespace(t.type) && t != START_OF_LINE;
                                   }
@@ -38,9 +50,9 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
                                     bool prevWasOpen = true;
                                     for (list<Token>::iterator p = l.begin(); p != l.end(); ++p) {
                                       if (*p != L")" && !prevWasOpen) os << " ";
-                                      prevWasOpen = (*p == L"(" || *p == L"'" || *p == L"," || *p == L",@");
+                                      prevWasOpen = (*p == L"(" || isQuoteOrUnquote(*p));
 
-                                      if (*p == START_OF_LINE || p->token[0] == L';')
+                                      if (*p == START_OF_LINE || isComment(*p))
                                         os << endl;
                                       else if (isIndent(*p))
                                         for (int i=0; i < p->indentLevel; ++i)
@@ -55,8 +67,8 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
                                     int numWords = 0;
                                     for (list<Token>::iterator p = line.begin(); p != line.end(); ++p)
                                       if (!whitespace(p->type)
-                                          && *p != L"(" && *p != L")"
-                                          && p->token[0] != L';')
+                                          && !isParen(*p)
+                                          && !isComment(*p))
                                         ++numWords;
                                     return numWords;
                                   }
