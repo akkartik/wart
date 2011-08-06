@@ -66,9 +66,8 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
                                   int numWordsInLine(list<Token> line) {
                                     int numWords = 0;
                                     for (list<Token>::iterator p = line.begin(); p != line.end(); ++p)
-                                      if (!whitespace(p->type)
-                                          && !isParen(*p)
-                                          && !isComment(*p))
+                                      if (!whitespace(p->type) && !isParen(*p)
+                                          && !isComment(*p) && !isQuoteOrUnquote(*p))
                                         ++numWords;
                                     return numWords;
                                   }
