@@ -143,3 +143,8 @@ def > xs
 def < xs
   all (lambda((x y)) (not (greater x y)))
       pairwise xs
+
+mac ret(var val . body)
+  `(let ,var ,val
+     ,@body
+     ,var)
