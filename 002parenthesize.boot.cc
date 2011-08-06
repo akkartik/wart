@@ -84,17 +84,6 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
                                     return Token::sol();
                                   }
 
-                                  Token nthTokenInLine(list<Token> line, int n) {
-                                    int i = 0;
-                                    for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
-                                      if (!whitespace(p->type))
-                                        ++i;
-                                      if (i == n)
-                                        return *p;
-                                    }
-                                    return Token::sol();
-                                  }
-
                                   int parenCount = 0;
                                   void add(list<Token>& l, Token x) {
                                     if (!whitespace(x.type))
@@ -110,9 +99,20 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
                                     return (*q == L"(");
                                   }
 
+                                  Token nthTokenInLine(list<Token> line, int n) {
+                                    int i = 0;
+                                    for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
+                                      if (!whitespace(p->type))
+                                        ++i;
+                                      if (i == n)
+                                        return *p;
+                                    }
+                                    return Token::sol();
+                                  }
+
                                   bool alreadyGrouped(list<Token> line) {
                                     Token firstToken = nthTokenInLine(line, 1);
-                                    Token secondToken = nthTokenInLine(line, 2);
+                                    Token secondToken = nthTokenInLine(line, 2); // line must have 2 tokens
                                     return firstToken == L"("
                                         || (isQuoteOrUnquote(firstToken) && secondToken == L"(");
                                   }
