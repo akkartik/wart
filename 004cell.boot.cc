@@ -332,7 +332,7 @@ Cell* get(Cell* t, Cell* k) {
                                     os << "{" << endl;
                                     for (hash_map<long, Cell*>::iterator p = t->table.begin(); p != t->table.end(); ++p) {
                                       if (p->second)
-                                        os << (Cell*)p->first << ": " << p->second << endl;
+                                        os << "  " << (Cell*)p->first << ": " << p->second << endl;
                                     }
                                     return os << "}";
                                   }
