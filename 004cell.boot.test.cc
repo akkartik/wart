@@ -92,3 +92,10 @@ void test_setCdr_is_idempotent() {
   rmref(cons);
   checkState();
 }
+
+void test_nil_is_immutable() {
+  setCar(nil, newNum(1));
+  check_eq(car(nil), nil);
+  setCdr(nil, newNum(1));
+  check_eq(cdr(nil), nil);
+}

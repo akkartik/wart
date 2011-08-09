@@ -273,6 +273,7 @@ Cell* cdr(Cell* x) {
 }
 
 void setCar(Cell* x, Cell* y) {
+  if (x == nil) return;
   mkref(y);
   if (isCons(x))
     rmref(car(x));
@@ -280,6 +281,7 @@ void setCar(Cell* x, Cell* y) {
 }
 
 void setCdr(Cell* x, Cell* y) {
+  if (x == nil) return;
   mkref(y);
   rmref(cdr(x));
   x->cdr = y;
