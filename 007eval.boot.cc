@@ -80,6 +80,8 @@ void bindArgs(Cell* params, Cell* args) {
 
                                     if (isCons(car(x)) && car(car(x)) == newSym(L",@")) {
                                       Cell* result = eval(cdr(car(x)));
+                                      if (result == nil)
+                                        return processUnquotes(cdr(x));
                                       appendAndRmref(result, processUnquotes(cdr(x)));
                                       return result;
                                     }

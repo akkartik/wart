@@ -106,6 +106,20 @@ void test_eval_handles_splice() {
   checkState();
 }
 
+void test_eval_handles_splice_of_nil() {
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"`(a ,@b 3)")))));
+  newDynamicScope(L"b", nil);
+  Cell* result = eval(cells.front());
+  check_eq(cdr(nil), nil);
+  check_eq(car(result), newSym(L"a"));
+  check_eq(car(cdr(result)), newNum(3));
+  check_eq(cdr(cdr(result)), nil);
+  rmref(result);
+  endDynamicScope(L"b");
+  rmref(cells.front());
+  checkState();
+}
+
 void test_eval_quotes_quote_comma() {
   list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"`(a ',b)")))));
   newDynamicScope(L"b", newSym(L"x"));
