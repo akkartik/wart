@@ -273,7 +273,10 @@ Cell* cdr(Cell* x) {
 }
 
 void setCar(Cell* x, Cell* y) {
-  if (x == nil) return;
+  if (x == nil) {
+    cerr << "setCar on nil" << endl;
+    return;
+  }
   mkref(y);
   if (isCons(x))
     rmref(car(x));
@@ -281,7 +284,10 @@ void setCar(Cell* x, Cell* y) {
 }
 
 void setCdr(Cell* x, Cell* y) {
-  if (x == nil) return;
+  if (x == nil) {
+    cerr << "setCdr on nil" << endl;
+    return;
+  }
   mkref(y);
   rmref(cdr(x));
   x->cdr = y;
@@ -289,7 +295,7 @@ void setCdr(Cell* x, Cell* y) {
 
                                   void unsafeSet(Cell* t, Cell* k, Cell* val, bool deleteNils) {
                                     if (!isTable(t)) {
-                                      cerr << "set on a non-table" << endl;
+                                      cerr << "set on a non-table: " << t << endl;
                                       return;
                                     }
                                     hash_map<long, Cell*>& table = ((Table*)t->car)->table;
