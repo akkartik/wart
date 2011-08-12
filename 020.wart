@@ -142,3 +142,7 @@ mac ret(var val . body)
   `(let ,var ,val
      ,@body
      ,var)
+
+mac rfn(name params . body)
+  `(ret ,name nil
+      assign ,name (lambda ,params ,@body))
