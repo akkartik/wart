@@ -83,16 +83,10 @@ void checkState();
 
 bool interactive = false;
 
-// bootstrapping phases
-
-#include "boot_list" // cc files containing 'boot'
-
-// compiled primitive ops
-
 #define COMPILE_PRIM_FUNC(op, name, body) \
   Cell* name(Cell* args) { body } /* ignore op; we extract it into prim_func_list */
 
-#include "op_list" // cc files not containing 'boot'
+#include "file_list" // remaining cc files in order
 
 struct PrimFuncMetadata {
   string name;
