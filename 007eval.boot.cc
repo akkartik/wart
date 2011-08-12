@@ -96,13 +96,7 @@ void bindArgs(Cell* params, Cell* args) {
 
                                   bool isFunc(Cell* x) {
                                     return isCons(x)
-                                      && (isPrimFunc(car(x)) || car(x) == newSym(L"evald-lambda") || car(x) == newSym(L"evald-elambda") || car(x) == newSym(L"evald-ilambda"));
-                                  }
-
-                                  Cell* implicitlyEval(Cell* x) {
-                                    Cell* result = eval(x);
-                                    rmref(x);
-                                    return result;
+                                      && (isPrimFunc(car(x)) || car(x) == newSym(L"evald-lambda") || car(x) == newSym(L"evald-ilambda"));
                                   }
 
                                   int indent = 0;
@@ -127,7 +121,7 @@ Cell* eval(Cell* expr) {
   if (isQuoted(expr))
     return processUnquotes(cdr(expr));
 
-  if (car(expr) == newSym(L"lambda") || car(expr) == newSym(L"elambda") || car(expr) == newSym(L"ilambda")) {
+  if (car(expr) == newSym(L"lambda") || car(expr) == newSym(L"ilambda")) {
     // attach current lexical scope
     Cell* ans = newCell();
     setCar(ans, newSym(L"evald-"+toString(car(expr))));
@@ -138,7 +132,7 @@ Cell* eval(Cell* expr) {
     setCdr(cdr(cdr(ans)), currLexicalScopes.top());
     return mkref(ans);
   }
-  else if (car(expr) == newSym(L"evald-lambda") || car(expr) == newSym(L"evald-elambda") || car(expr) == newSym(L"evald-ilambda")) {
+  else if (car(expr) == newSym(L"evald-lambda") || car(expr) == newSym(L"evald-ilambda")) {
     // lexical scope is already attached
     return mkref(expr);
   }
@@ -176,9 +170,6 @@ Cell* eval(Cell* expr) {
   endLexicalScope();
   if (car(lambda) != newSym(L"evald-ilambda"))
     endDynamicScope(L"currLexicalScope");
-
-  if (car(lambda) == newSym(L"evald-elambda"))
-    result = implicitlyEval(result);
 
   rmref(evald_args);
   rmref(lambda);
