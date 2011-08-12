@@ -33,6 +33,16 @@ void test_num_evals_to_itself() {
   checkState();
 }
 
+void test_colonsym_evals_to_itself() {
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L":abc")))));
+  check_eq(cells.size(), 1);
+  Cell* result = eval(cells.front());
+  check_eq(result, cells.front());
+  rmref(result);
+  rmref(cells.front());
+  checkState();
+}
+
 void test_string_evals_to_itself() {
   list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"\"ac bd\"")))));
   check_eq(cells.size(), 1);

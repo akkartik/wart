@@ -23,6 +23,10 @@ void bindArgs(Cell* params, Cell* args) {
 
 
 
+                                  bool isColonSym(Cell* x) {
+                                    return isSym(x) && toString(x)[0] == L':';
+                                  }
+
                                   Cell* sig(Cell* lambda) {
                                     return car(cdr(lambda));
                                   }
@@ -128,6 +132,9 @@ Cell* eval(Cell* expr) {
 
   if (expr == nil)
     return nil;
+
+  if (isColonSym(expr))
+    return mkref(expr);
 
   if (isSym(expr))
     return mkref(lookup(expr));

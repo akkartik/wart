@@ -22,6 +22,7 @@ def cddr(x)
 ; (assign x 34) (if x 35) => 35
 ; (if 34 35 36) => 35
 ; (if nil 35 36) => 36
+; (if nil 35 :else 36) => 36
 ; (if nil 35 36 37) => 37
 mac if args
   _if (no (cdr args))
