@@ -151,6 +151,7 @@ Cell* eval(Cell* expr) {
 
   if (!isFunc(lambda))
     cerr << "not a function call: " << expr << endl << DIE;
+
   // eval all its args in the current lexical scope
   Cell* evald_args = eval_args(sig(lambda), call_args(expr));
   // swap in the function's lexical environment
@@ -159,7 +160,6 @@ Cell* eval(Cell* expr) {
   // now bind its params to args in the new environment
   newLexicalScope();
   bindArgs(sig(lambda), evald_args);
-
   // eval all forms in body, save result of final form
   Cell* result = nil;
   for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
@@ -170,7 +170,6 @@ Cell* eval(Cell* expr) {
   endLexicalScope();
   if (car(lambda) != newSym(L"evald-ilambda"))
     endDynamicScope(L"currLexicalScope");
-
   rmref(evald_args);
   rmref(lambda);
   return result; // already mkref'd
