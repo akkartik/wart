@@ -146,3 +146,6 @@ mac ret(var val . body)
 mac rfn(name params . body)
   `(ret ,name nil
       assign ,name (lambda ,params ,@body))
+
+mac afn(params . body)
+  `(rfn self ,params ,@body)
