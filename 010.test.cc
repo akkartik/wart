@@ -18,6 +18,15 @@ void test_assign_to_lambda() {
   checkState();
 }
 
+void test_assign_lexical_var() {
+  Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"((lambda(x) (assign x 34) x))"))))).front();
+  Cell* call = eval(lambda);
+  check_eq(call, newNum(34));
+  rmref(call);
+  rmref(lambda);
+  checkState();
+}
+
 void test_if_sees_args_in_then_and_else() {
   Cell* lambda = buildCells(parse(parenthesize(tokenize(teststream(L"(lambda(x) (_if 34 x))"))))).front();
   Cell* f = eval(lambda);
