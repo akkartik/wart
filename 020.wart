@@ -71,7 +71,7 @@ mac and args
 ; (iso '(1) '(1)) => '(1)
 ; (iso '(1) '(1 2)) => nil
 def iso(a b)
-  or (_atom_equal a b)
+  or (atom_equal a b)
     and (cons? a)
         (cons? b)
         (iso (car a) (car b))
