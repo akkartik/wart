@@ -144,13 +144,6 @@ Cell* eval(Cell* expr) {
     return mkref(expr);
   }
 
-  if (car(expr) == newSym(L"eval")) {
-    Cell* arg = eval(car(cdr(expr)));
-    Cell* result = eval(arg);
-    rmref(arg);
-    return result;
-  }
-
   if (isPrimFunc(car(expr)))
     return mkref(expr);
 

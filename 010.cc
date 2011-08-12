@@ -1,3 +1,10 @@
+COMPILE_PRIM_FUNC(eval, primFunc_eval,
+  Cell* x = eval(car(args));
+  Cell* result = eval(x);
+  rmref(x);
+  return result; // already mkref'd
+)
+
 COMPILE_PRIM_FUNC(cons, primFunc_cons,
   Cell* x = eval(car(args));
   Cell* y = eval(car(cdr(args)));
