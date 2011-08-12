@@ -1,13 +1,9 @@
 assign not nil?
 assign no nil?
 
-assign macex (lambda '(name params . body)
-  `(assign ,name (lambda ',params
-                   (eval ((lambda() ,@body))))))
-
-assign mac (elambda '(name params . body)
-  `(assign ,name (elambda ',params
-                   ,@body)))
+assign mac (ilambda '(name params . body)
+  (eval `(assign ,name (ilambda ',params
+                         (eval ,@body)))))
 
 mac def(name params . body)
   `(assign ,name (lambda ,params ,@body))

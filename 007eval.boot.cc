@@ -96,7 +96,7 @@ void bindArgs(Cell* params, Cell* args) {
 
                                   bool isFunc(Cell* x) {
                                     return isCons(x)
-                                      && (isPrimFunc(car(x)) || (car(x) == newSym(L"evald-lambda")) || (car(x) == newSym(L"evald-elambda")));
+                                      && (isPrimFunc(car(x)) || car(x) == newSym(L"evald-lambda") || car(x) == newSym(L"evald-elambda") || car(x) == newSym(L"evald-ilambda"));
                                   }
 
                                   Cell* implicitlyEval(Cell* x) {
@@ -127,7 +127,7 @@ Cell* eval(Cell* expr) {
   if (isQuoted(expr))
     return processUnquotes(cdr(expr));
 
-  if (car(expr) == newSym(L"lambda") || car(expr) == newSym(L"elambda")) {
+  if (car(expr) == newSym(L"lambda") || car(expr) == newSym(L"elambda") || car(expr) == newSym(L"ilambda")) {
     // attach current lexical scope
     Cell* ans = newCell();
     setCar(ans, newSym(L"evald-"+toString(car(expr))));
@@ -138,8 +138,7 @@ Cell* eval(Cell* expr) {
     setCdr(cdr(cdr(ans)), currLexicalScopes.top());
     return mkref(ans);
   }
-
-  if (car(expr) == newSym(L"evald-lambda") || car(expr) == newSym(L"evald-elambda")) {
+  else if (car(expr) == newSym(L"evald-lambda") || car(expr) == newSym(L"evald-elambda") || car(expr) == newSym(L"evald-ilambda")) {
     // lexical scope is already attached
     return mkref(expr);
   }
@@ -161,7 +160,8 @@ Cell* eval(Cell* expr) {
   // eval all its args in the current lexical scope
   Cell* evald_args = eval_args(sig(lambda), call_args(expr));
   // swap in the function's lexical environment
-  newDynamicScope(L"currLexicalScope", callee_env(lambda));
+  if (car(lambda) != newSym(L"evald-ilambda"))
+    newDynamicScope(L"currLexicalScope", callee_env(lambda));
   // now bind its params to args in the new environment
   newLexicalScope();
   bindArgs(sig(lambda), evald_args);
@@ -174,7 +174,8 @@ Cell* eval(Cell* expr) {
   }
 
   endLexicalScope();
-  endDynamicScope(L"currLexicalScope");
+  if (car(lambda) != newSym(L"evald-ilambda"))
+    endDynamicScope(L"currLexicalScope");
 
   if (car(lambda) == newSym(L"evald-elambda"))
     result = implicitlyEval(result);
