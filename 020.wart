@@ -160,3 +160,8 @@ def pair(l)
     :else
       (cons (list (car l) (cadr l))
             (pair (cddr l))))
+
+(mac with(params . body)
+  `((lambda ,(map car (pair params))
+     ,@body)
+    ,@(map cadr (pair params))))
