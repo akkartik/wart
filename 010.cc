@@ -1,44 +1,51 @@
-COMPILE_PRIM_FUNC(cons, L"(x y)",
-  result = newCell();
-  setCar(result, lookup(L"x"));
-  setCdr(result, lookup(L"y"));
-  mkref(result);
+COMPILE_PRIM_FUNC(cons, primFunc_cons,
+  Cell* x = eval(car(args));
+  Cell* y = eval(car(cdr(args)));
+  Cell* result = newCell();
+  setCar(result, x);
+  setCdr(result, y);
+  rmref(x);
+  rmref(y);
+  return mkref(result);
 )
 
-COMPILE_PRIM_FUNC(car, L"(x)",
-  result = car(lookup(L"x"));
-  mkref(result);
+COMPILE_PRIM_FUNC(car, primFunc_car,
+  Cell* x = eval(car(args));
+  Cell* result = car(x);
+  rmref(x);
+  return mkref(result);
 )
 
-COMPILE_PRIM_FUNC(cdr, L"(x)",
-  result = cdr(lookup(L"x"));
-  mkref(result);
+COMPILE_PRIM_FUNC(cdr, primFunc_cdr,
+  Cell* x = eval(car(args));
+  Cell* result = mkref(cdr(x));
+  rmref(x);
+  return result; // already mkref'd
 )
 
-COMPILE_PRIM_FUNC(_isCons, L"(x)",
-  result = lookup(L"x");
-  if (!isCons(result))
-    result = nil;
-  mkref(result);
+COMPILE_PRIM_FUNC(cons?, primFunc_isCons,
+  Cell* x = eval(car(args));
+  if (isCons(x))
+    return x; // already mkref'd
+  rmref(x);
+  return nil;
 )
 
-COMPILE_PRIM_FUNC(_isNil, L"(x)",
-  result = lookup(L"x");
-  if (result == nil)
-    result = newNum(1);
+COMPILE_PRIM_FUNC(nil?, primFunc_isNil,
+  Cell* x = eval(car(args));
+  Cell* result = (x == nil ? newNum(1) : nil);
+  rmref(x);
+  return mkref(result);
+)
+
+COMPILE_PRIM_FUNC(assign, primFunc_assign,
+  Cell* var = car(args);
+  Cell* val = eval(car(cdr(args)));
+  if (dynamics[(long)var].empty())
+    newDynamicScope(var, val);
   else
-    result = nil;
-  mkref(result);
-)
-
-COMPILE_PRIM_FUNC(assign, L"('x y)",
-  result = lookup(L"y");
-  Cell* x = lookup(L"x");
-  if (dynamics[(long)x].empty())
-    newDynamicScope(x, result);
-  else
-    assignDynamicVar(x, result);
-  mkref(result);
+    assignDynamicVar(var, val);
+  return val; // already mkref'd
 )
 
                                   // HACK because there's no wifstream(wstring) constructor
@@ -50,36 +57,31 @@ COMPILE_PRIM_FUNC(assign, L"('x y)",
                                     return result;
                                   }
 
-COMPILE_PRIM_FUNC(load, L"(f)",
-  loadFile(&toAscii(toString(lookup(L"f")))[0]);
+COMPILE_PRIM_FUNC(load, primFunc_load,
+  Cell* f = eval(car(args));
+  loadFile(&toAscii(toString(f))[0]);
+  return nil;
 )
 
-COMPILE_PRIM_FUNC(_prn, L"(x)",
-  result = lookup(L"x");
-  cout << result << endl;
-  mkref(result);
+COMPILE_PRIM_FUNC(_prn, primFunc_prn,
+  Cell* x = eval(car(args));
+  cout << x << endl;
+  return x; // already mkref'd
 )
 
-COMPILE_PRIM_FUNC(_if, L"'(cond then else)",
-  Cell* cond = lookup(L"cond");
-  Cell* then = lookup(L"then");
-  Cell* rest = lookup(L"else");
-  // now evaluate in caller's lexical scope
-  endLexicalScope();
-  endDynamicScope(L"currLexicalScope");
-  cond = eval(cond);
-  if (cond != nil)
-    result = eval(then);
-  else
-    result = eval(rest);
+COMPILE_PRIM_FUNC(_if, primFunc_if,
+  Cell* cond = eval(car(args));
+  Cell* then = car(cdr(args));
+  Cell* rest = car(cdr(cdr(args)));
+  Cell* result = (cond != nil) ? eval(then) : eval(rest);
   rmref(cond);
-  newDynamicScope(L"currLexicalScope", nil);
-  newLexicalScope();
+  return result; // already mkref'd
 )
 
-COMPILE_PRIM_FUNC(_atom_equal, L"(x y)",
-  Cell* x = lookup(L"x");
-  Cell* y = lookup(L"y");
+COMPILE_PRIM_FUNC(_atom_equal, primFunc_atom_equal,
+  Cell* x = eval(car(args));
+  Cell* y = eval(car(cdr(args)));
+  Cell* result = nil;
   if (x == nil && y == nil)
     result = newNum(1);
   else if (x == y)
@@ -88,65 +90,76 @@ COMPILE_PRIM_FUNC(_atom_equal, L"(x y)",
     result = x;
   else
     result = nil;
-  mkref(result);
+  return mkref(result);
 )
 
-COMPILE_PRIM_FUNC(debug, L"(x)",
-  debug = toNum(lookup(L"x"));
+COMPILE_PRIM_FUNC(debug, primFunc_debug,
+  debug = toNum(car(args));
+  return nil;
 )
 
-COMPILE_PRIM_FUNC(uniq, L"(x)",
+COMPILE_PRIM_FUNC(uniq, primFunc_uniq,
   static long counter = 0;
-  Cell* x = lookup(L"x");
+  Cell* x = eval(car(args));
   ostringstream os;
   os << (x == nil ? L"sym" : toString(x)) << ++counter;
-  result = newSym(os.str());
-  mkref(result);
+  rmref(x);
+  return mkref(newSym(os.str()));
 )
 
-COMPILE_PRIM_FUNC(sym, L"args",
+COMPILE_PRIM_FUNC(sym, primFunc_sym,
   ostringstream out;
-  for (Cell* args = lookup(L"args"); args != nil; args = cdr(args))
-    out << car(args);
-  result = newSym(out.str());
-  mkref(result);
-)
-
-COMPILE_PRIM_FUNC(table, L"()",
-  result = newTable();
-  mkref(result);
-)
-
-COMPILE_PRIM_FUNC(_table_set, L"(tab key val)",
-  Cell* t = lookup(L"tab");
-  if (isTable(t))
-    set(t, lookup(L"key"), lookup(L"val"));
-)
-
-COMPILE_PRIM_FUNC(type, L"(x)",
-  Cell* x = lookup(L"x");
-  switch(x->type) {
-  case NUM:
-    result = newSym(L"number"); break;
-  case SYM:
-    result = newSym(L"symbol"); break;
-  case STRING:
-    result = newSym(L"string"); break;
-  case TABLE:
-    result = newSym(L"table"); break;
-  case PRIM_FUNC:
-    result = newSym(L"function"); break;
-  case CONS:
-    if (car(x) == newSym(L"lambda") || car(x) == newSym(L"elambda")
-        || car(x) == newSym(L"evald-lambda") || car(x) == newSym(L"evald-elambda"))
-      result = newSym(L"function");
-    else if (car(x) == newSym(L"type"))
-      result = car(cdr(x));
-    else
-      result = newSym(L"list");
-    break;
-  default:
-    cerr << "Undefined type: " << x->type << endl << DIE;
+  Cell* arg = NULL;
+  for (; args != nil; args = cdr(args)) {
+    arg = eval(car(args));
+    out << arg;
+    rmref(arg);
   }
-  mkref(result);
+  return mkref(newSym(out.str()));
+)
+
+COMPILE_PRIM_FUNC(table, primFunc_table,
+  args = args; // ignore warning
+  return mkref(newTable());
+)
+
+COMPILE_PRIM_FUNC(_table_set, primFunc_table_set,
+  Cell* table = eval(car(args));
+  Cell* key = eval(car(cdr(args)));
+  Cell* val = eval(car(cdr(cdr(args))));
+  if (isTable(table))
+    set(table, key, val);
+  rmref(table);
+  rmref(key);
+  return val; // already mkref'd
+)
+
+COMPILE_PRIM_FUNC(type, primFunc_type,
+  Cell* x = eval(car(args));
+  Cell* result = nil;
+  if (x != nil)
+    switch(x->type) {
+    case NUM:
+      result = newSym(L"number"); break;
+    case SYM:
+      result = newSym(L"symbol"); break;
+    case STRING:
+      result = newSym(L"string"); break;
+    case TABLE:
+      result = newSym(L"table"); break;
+    case PRIM_FUNC:
+      result = newSym(L"function"); break;
+    case CONS:
+      if (car(x) == newSym(L"lambda") || car(x) == newSym(L"evald-lambda"))
+        result = newSym(L"function");
+      else if (car(x) == newSym(L"type"))
+        result = car(cdr(x));
+      else
+        result = newSym(L"list");
+      break;
+    default:
+      cerr << "Undefined type: " << x->type << endl << DIE;
+    }
+  rmref(x);
+  return mkref(result);
 )

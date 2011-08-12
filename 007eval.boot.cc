@@ -156,6 +156,13 @@ Cell* eval(Cell* expr) {
 
   // expr is a function call
   Cell* lambda = eval(car(expr));
+  if (isPrimFunc(car(lambda))) {
+    // primFuncs must eval their own args and mkref their result
+    Cell* result = toPrimFunc(car(lambda))(cdr(expr));
+    rmref(lambda);
+    return result;
+  }
+
   if (!isFunc(lambda))
     cerr << "not a function call: " << expr << endl << DIE;
   // eval all its args in the current lexical scope
@@ -168,14 +175,9 @@ Cell* eval(Cell* expr) {
 
   // eval all forms in body, save result of final form
   Cell* result = nil;
-  if (isPrimFunc(car(lambda))) {
-    result = toPrimFunc(car(lambda))(); // all primFuncs must mkref
-  }
-  else {
-    for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
-      rmref(result);
-      result = eval(car(form));
-    }
+  for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
+    rmref(result);
+    result = eval(car(form));
   }
 
   endLexicalScope();

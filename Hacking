@@ -10,9 +10,12 @@ car or cdr, or inside a Table.
 Tests thoroughly audit nrefs using checkState, in order to detect errors as
 soon as possible.
 
-eval takes pains to increment the nrefs of *exactly* one Cell across all
-paths. Nested calls to eval decrement nrefs of the result unless they return
-it. Structure any functions returning Cells the same way.
+eval takes pains to increment the nrefs of *exactly* one Cell (the return
+value) across all paths. Nested calls to eval decrement nrefs of the result
+unless they return it. Structure other functions returning Cells the same way.
+
+The helper for decrementing nrefs is rmref. Calling rmref on a Cell
+can invalidate it, so make sure you're done with it first.
 
 If you hack on wart's cc files and forget to decrement nrefs you have a memory
 leak. If you forget to increment nrefs you have something worse: a prematurely
@@ -46,3 +49,10 @@ The wart interpreter pervasively uses wide characters
 char, stream and IO types are not what they may seem at first. char is
 wchar_t, string is wstring, and so on. A few places that can't use wide
 characters use type ascii.
+
+== Concerns when creating new primitive functions
+
+Wart supports compiled operations using the COMPILE_PRIM_FUNC macro, either
+for performance or to operate in the caller's lexical scope.
+COMPILE_PRIM_FUNC, like eval, is responsible for ensuring that the nrefs of
+exactly one Cell is incremented across all paths.

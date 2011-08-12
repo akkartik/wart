@@ -240,7 +240,7 @@ string toString(Cell* x) {
   return *(string*)x->car;
 }
 
-typedef Cell* (*PrimFunc)(void);
+typedef Cell* (*PrimFunc)(Cell*);
 Cell* newPrimFunc(PrimFunc f) {
   Cell* result = newCell();
   result->type = PRIM_FUNC;

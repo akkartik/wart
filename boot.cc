@@ -89,18 +89,13 @@ bool interactive = false;
 
 // compiled primitive ops
 
-#define COMPILE_PRIM_FUNC(name, params, body) \
-  Cell* primFunc_##name() { \
-    Cell* result = nil; /* implicit result */ \
-    body \
-    return result; \
-  }
+#define COMPILE_PRIM_FUNC(op, name, body) \
+  Cell* name(Cell* args) { body } /* ignore op; we extract it into prim_func_list */
 
 #include "op_list" // cc files not containing 'boot'
 
 struct PrimFuncMetadata {
   string name;
-  string params;
   PrimFunc impl;
 };
 
@@ -112,7 +107,6 @@ void setupPrimFuncs() {
   for (unsigned int i=0; i < sizeof(primFuncs)/sizeof(primFuncs[0]); ++i) {
     Cell* impl = newCell();
     setCar(impl, newPrimFunc(primFuncs[i].impl));
-    setCdr(impl, buildCells(parse(parenthesize(tokenize(teststream(L"("+primFuncs[i].params+L")"))))).front());
     newDynamicScope(primFuncs[i].name, impl);
   }
 }
