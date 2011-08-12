@@ -150,3 +150,13 @@ mac rfn(name params . body)
 
 mac afn(params . body)
   `(rfn self ,params ,@body)
+
+def pair(l)
+  (if
+    (no l)
+      nil
+    (no (cdr l))
+      (list (list (car l)))
+    :else
+      (cons (list (car l) (cadr l))
+            (pair (cddr l))))
