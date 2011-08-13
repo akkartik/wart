@@ -79,6 +79,10 @@ Cell* newCell() {
 
 struct Table {
   hash_map<long, Cell*> table;
+  Cell*& operator[](Cell* c) {
+    return table[(long)c];
+  }
+
   ~Table() {
     for (hash_map<long, Cell*>::iterator p = table.begin(); p != table.end(); ++p) {
       if (!p->second) continue;
@@ -293,21 +297,20 @@ void setCdr(Cell* x, Cell* y) {
   x->cdr = y;
 }
 
-                                  void unsafeSet(Cell* t, Cell* k, Cell* val, bool deleteNils) {
+                                  void unsafeSet(Cell* t, Cell* key, Cell* val, bool deleteNils) {
                                     if (!isTable(t)) {
                                       cerr << "set on a non-table: " << t << endl;
                                       return;
                                     }
-                                    hash_map<long, Cell*>& table = ((Table*)t->car)->table;
-                                    long key = (long)k;
+                                    Table& table = *(Table*)(t->car);
                                     if (table[key])
                                       rmref(table[key]);
                                     if (deleteNils && val == nil) {
-                                      rmref(k);
+                                      rmref(key);
                                       table[key] = NULL;
                                       return;
                                     }
-                                    if (!table[key]) mkref(k);
+                                    if (!table[key]) mkref(key);
                                     mkref(val);
                                     table[key] = val;
                                   }
@@ -316,13 +319,12 @@ void set(Cell* t, Cell* k, Cell* val) {
   unsafeSet(t, k, val, true);
 }
 
-                                  Cell* unsafeGet(Cell* t, Cell* k) {
+                                  Cell* unsafeGet(Cell* t, Cell* key) {
                                     if (!isTable(t)) {
                                       cerr << "get on a non-table" << endl;
                                       return nil;
                                     }
-                                    hash_map<long, Cell*>& table = ((Table*)t->car)->table;
-                                    long key = (long)k;
+                                    Table& table = *(Table*)(t->car);
                                     return table[key];
                                   }
 
