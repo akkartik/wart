@@ -53,6 +53,9 @@ ostream& operator<<(ostream& os __unused__, Die die __unused__) {
 }
 Die DIE;
 
+#define warn cerr << __FILE__ << ":" << __LINE__ << " "
+#define err cerr << "fatal: " << __FILE__ << ":" << __LINE__ << " "
+
 
 
 bool runningTests = false;

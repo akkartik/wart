@@ -49,7 +49,7 @@ Cell* freelist = NULL;
 
 void growHeap() {
   currHeap = currHeap->next = new Heap();
-  if (!currHeap) cerr << "Out of memory" << endl << DIE;
+  if (!currHeap) err << "Out of memory" << endl << DIE;
   currCell = &currHeap->cells[0];
   heapEnd = &currHeap->cells[HEAPCELLS];
 }
@@ -101,7 +101,7 @@ Cell* mkref(Cell* c) {
 
 void rmref(Cell* c) {
   if (!c)
-    cerr << "fatal: " << __FILE__ << ":" << __LINE__ << " a cell was prematurely garbage-collected.\n" << DIE;
+    err << " a cell was prematurely garbage-collected.\n" << DIE;
   if (c == nil) return;
   dbg << endl << "rmref: " << c << ": " << c->nrefs << " " << c->type << endl;
 
@@ -109,7 +109,7 @@ void rmref(Cell* c) {
   if (c->nrefs > 0) return;
 
   if (isAtom(c) && c->type != STRING && !runningTests)
-    cerr << "deleted atom of type " << c->type << endl;
+    warn << "deleted atom of type " << c->type << endl;
 
   switch (c->type) {
   case NUM:
@@ -126,7 +126,7 @@ void rmref(Cell* c) {
   case PRIM_FUNC:
     break; // compiled functions don't need freeing
   default:
-    cerr << "Can't rmref type " << c->type << endl << DIE;
+    err << "Can't rmref type " << c->type << endl << DIE;
   }
 
   dbg << "  freeing " << c << endl;
@@ -258,7 +258,7 @@ bool isPrimFunc(Cell* x) {
 
 PrimFunc toPrimFunc(Cell* x) {
   if (!isPrimFunc(x))
-    cerr << "Not a compiled function" << endl << DIE;
+    err << "Not a compiled function" << endl << DIE;
   return (PrimFunc)x->car;
 }
 
@@ -266,7 +266,7 @@ PrimFunc toPrimFunc(Cell* x) {
 
 Cell* car(Cell* x) {
   if (x->type != CONS) {
-    cerr << "car of non-cons, type " << x->type << endl;
+    warn << "car of non-cons, type " << x -> type << endl;
     return nil;
   }
   return x->car;
@@ -278,7 +278,7 @@ Cell* cdr(Cell* x) {
 
 void setCar(Cell* x, Cell* y) {
   if (x == nil) {
-    cerr << "setCar on nil" << endl;
+    warn << "setCar on nil" << endl;
     return;
   }
   mkref(y);
@@ -289,7 +289,7 @@ void setCar(Cell* x, Cell* y) {
 
 void setCdr(Cell* x, Cell* y) {
   if (x == nil) {
-    cerr << "setCdr on nil" << endl;
+    warn << "setCdr on nil" << endl;
     return;
   }
   mkref(y);
@@ -299,7 +299,7 @@ void setCdr(Cell* x, Cell* y) {
 
                                   void unsafeSet(Cell* t, Cell* key, Cell* val, bool deleteNils) {
                                     if (!isTable(t)) {
-                                      cerr << "set on a non-table: " << t << endl;
+                                      warn << "set on a non-table: " << t << endl;
                                       return;
                                     }
                                     Table& table = *(Table*)(t->car);
@@ -321,7 +321,7 @@ void set(Cell* t, Cell* k, Cell* val) {
 
                                   Cell* unsafeGet(Cell* t, Cell* key) {
                                     if (!isTable(t)) {
-                                      cerr << "get on a non-table" << endl;
+                                      warn << "get on a non-table" << endl;
                                       return nil;
                                     }
                                     Table& table = *(Table*)(t->car);
