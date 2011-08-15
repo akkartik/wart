@@ -108,12 +108,10 @@ COMPILE_PRIM_FUNC(debug, primFunc_debug,
 )
 
 COMPILE_PRIM_FUNC(uniq, primFunc_uniq,
-  static long counter = 0;
   Cell* x = eval(car(args));
-  ostringstream os;
-  os << (x == nil ? L"sym" : toString(x)) << ++counter;
+  Cell* result = genSym(x);
   rmref(x);
-  return mkref(newSym(os.str()));
+  return mkref(result);
 )
 
 COMPILE_PRIM_FUNC(sym, primFunc_sym,
