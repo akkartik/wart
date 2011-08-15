@@ -10,7 +10,7 @@
 Cell* transformDollarVars(Cell* input, Table& map) {
   if (isSym(input) && toString(input)[0] == L'$') {
     if (!map[input])
-      map[input] = mkref(genSym(nil)); // map is temporary
+      map[mkref(input)] = mkref(genSym(nil)); // against destruction of map
     return map[input];
   }
 
