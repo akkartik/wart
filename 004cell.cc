@@ -101,7 +101,7 @@ Cell* mkref(Cell* c) {
 
 void rmref(Cell* c) {
   if (!c)
-    cerr << "fatal: a cell was prematurely garbage-collected.\n" << DIE;
+    cerr << "fatal: " << __FILE__ << ":" << __LINE__ << " a cell was prematurely garbage-collected.\n" << DIE;
   if (c == nil) return;
   dbg << endl << "rmref: " << c << ": " << c->nrefs << " " << c->type << endl;
 
