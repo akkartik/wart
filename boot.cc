@@ -255,7 +255,9 @@ int main(int argc, ascii* argv[]) {
   case 4:
     cout << buildCells(parse(parenthesize(tokenize(cin)))); break;
   case 5:
-    cout << eval(buildCells(parse(parenthesize(tokenize(cin)))).front()) << endl; break;
+    cout << transform(buildCells(parse(parenthesize(tokenize(cin)))).front()) << endl; break;
+  case 6:
+    cout << eval(transform(buildCells(parse(parenthesize(tokenize(cin))))).front()) << endl; break;
   default:
     // no unit tests for interactive repl, so manual QA:
     //   expr that doesn't start with paren should eval on empty line
@@ -263,7 +265,7 @@ int main(int argc, ascii* argv[]) {
     interactive = true;
     while (!cin.eof()) {
       cout << "wart> ";
-      list<Cell*> form = buildCells(parse(parenthesize(tokenize(cin))));
+      list<Cell*> form = wartRead(cin);
       if (form.empty()) continue;
       Cell* result = eval(form.front());
       cout << result << endl;

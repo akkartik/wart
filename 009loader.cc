@@ -2,9 +2,13 @@
 #include<dirent.h>
 #define char wchar_t
 
+list<Cell*> wartRead(istream& f) {
+  return transform(buildCells(parse(parenthesize(tokenize(f)))));
+}
+
 void loadFile(ascii* filename) {
   ifstream f(filename);
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(f))));
+  list<Cell*> cells = wartRead(f);
   for (list<Cell*>::iterator p = cells.begin(); p != cells.end(); ++p)
     rmref(eval(*p));
   for (list<Cell*>::iterator p = cells.begin(); p != cells.end(); ++p)
