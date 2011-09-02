@@ -2,12 +2,12 @@ assign not nil?
 assign no nil?
 
 ; (mac foo(x) `(+ 1 ,x))) (let x 3 (foo x)) => 4
-assign mac (elambda '(name params . body)
-  `(assign ,name (elambda ',params
-                   ,@body)))
+assign mac (lambda '($name $params . $body)
+  eval `(assign ,$name (lambda ',$params
+                         (eval ,@$body))))
 
-mac def(name params . body)
-  `(assign ,name (lambda ,params ,@body))
+mac def($name $params . $body)
+  `(assign ,$name (lambda ,$params ,@$body))
 
 def cadr(x)
   (car (cdr x))
@@ -17,8 +17,8 @@ def cddr(x)
 
 ; let x 3 (add x 1) => 4
 ; let (a . b) (cons 3 4) (add a b) => 7
-mac let(var val . body)
-  `((lambda(,var) ,@body) ,val)
+mac let($var $val . $body)
+  `((lambda(,$var) ,@$body) ,$val)
 
 ; (if) => nil
 ; (if 34) => 34
@@ -29,12 +29,12 @@ mac let(var val . body)
 ; (if nil 35 36) => 36
 ; (if nil 35 :else 36) => 36
 ; (if nil 35 36 37) => 37
-mac if args
-  _if (no (cdr args))
-    (car args)
-    `(_if ,(car args)
-       ,(cadr args)
-       (if ,@(cddr args)))
+mac if $args
+  _if (no (cdr $args))
+    (car $args)
+    `(_if ,(car $args)
+       ,(cadr $args)
+       (if ,@(cddr $args)))
 
 ; (or) => nil
 ; (or nil) => nil
@@ -43,11 +43,11 @@ mac if args
 ; ((lambda(x) (or nil x)) 3) => 3
 ; (or nil 3 4) => 3
 ; (or nil (_prn 3) (_prn 4)) => 3 after printing just 3
-mac or args
-  if args
-    `(if ,(car args)
-       ,(car args)
-       (or ,@(cdr args)))
+mac or $args
+  if $args
+    `(if ,(car $args)
+       ,(car $args)
+       (or ,@(cdr $args)))
 
 ; (and) => t
 ; (and nil) => nil
@@ -56,14 +56,14 @@ mac or args
 ; (and 3 4) => 4
 ; ((lambda(x) (and 3 x 4)) nil) => nil
 ; (and (_prn 3) nil) => nil after printing 3
-mac and args
-  if (no args)
+mac and $args
+  if (no $args)
     1
-    if (car args)
-      if (cdr args)
-        `(if ,(car args)
-           and ,@(cdr args))
-        (car args)
+    if (car $args)
+      if (cdr $args)
+        `(if ,(car $args)
+           and ,@(cdr $args))
+        (car $args)
 
 ; (iso 3 3) => 3
 ; (iso nil nil) => t
@@ -77,12 +77,12 @@ def iso(a b)
         (iso (car a) (car b))
         (iso (cdr a) (cdr b))
 
-mac do body
-  `((lambda() ,@body))
+mac do $body
+  `((lambda() ,@$body))
 
-mac when(cond . body)
-  `(if ,cond
-     (do ,@body))
+mac when($cond . $body)
+  `(if ,$cond
+     (do ,@$body))
 
 ; apply add '(1 2) => 3
 ; let x '(1 2) (apply add x) => 3
@@ -139,17 +139,17 @@ def < xs
   all (lambda((x y)) (not (greater x y)))
       pairwise xs
 
-mac ret(var val . body)
-  `(let ,var ,val
-     ,@body
-     ,var)
+mac ret($var $val . $body)
+  `(let ,$var ,$val
+     ,@$body
+     ,$var)
 
-mac rfn(name params . body)
-  `(ret ,name nil
-      assign ,name (lambda ,params ,@body))
+mac rfn($name $params . $body)
+  `(ret ,$name nil
+      assign ,$name (lambda ,$params ,@$body))
 
-mac afn(params . body)
-  `(rfn self ,params ,@body)
+mac afn($params . $body)
+  `(rfn self ,$params ,@$body)
 
 def pair(l)
   (if
@@ -161,7 +161,7 @@ def pair(l)
       (cons (list (car l) (cadr l))
             (pair (cddr l))))
 
-(mac with(params . body)
-  `((lambda ,(map car (pair params))
-     ,@body)
-    ,@(map cadr (pair params))))
+(mac with($params . $body)
+  `((lambda ,(map car (pair $params))
+     ,@$body)
+    ,@(map cadr (pair $params))))
