@@ -69,8 +69,7 @@ void newLexicalScope() {
   Cell* newScope = newTable();
   dbg << "new lexical scope: " << newScope << endl;
   setCdr(newScope, currLexicalScopes.top());
-  mkref(newScope);
-  assignDynamicVar(newSym(L"currLexicalScope"), newScope);
+  newDynamicScope(newSym(L"currLexicalScope"), newScope);
 }
 
 void endLexicalScope() {
@@ -78,9 +77,7 @@ void endLexicalScope() {
   if (currScope == nil)
     cerr << "No lexical scope to end" << endl << DIE;
   dbg << "end lexical scope: " << currScope << endl;
-  Cell* oldScope = cdr(currScope);
-  rmref(currScope);
-  assignDynamicVar(newSym(L"currLexicalScope"), oldScope);
+  endDynamicScope(newSym(L"currLexicalScope"));
 }
 
 void addLexicalBinding(Cell* sym, Cell* val) {

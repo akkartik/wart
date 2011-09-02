@@ -94,7 +94,7 @@ void test_lexical_scopes_nest_correctly() {
     check_eq(dynVal->nrefs, 2);
     newLexicalScope();
       check(currLexicalScopes.top() != nil);
-      check_eq(currLexicalScopes.top()->nrefs, 2);
+      check_eq(currLexicalScopes.top()->nrefs, 1);
       addLexicalBinding(sym, val);
         check_eq(lookup(sym), val);
         check_eq(sym->nrefs, 3);
@@ -103,7 +103,7 @@ void test_lexical_scopes_nest_correctly() {
         check_eq(dynVal->nrefs, 2);
         newLexicalScope();
           check_eq(cdr(currLexicalScopes.top())->nrefs, 2);
-          check_eq(currLexicalScopes.top()->nrefs, 2);
+          check_eq(currLexicalScopes.top()->nrefs, 1);
           addLexicalBinding(sym, val2);
             check_eq(lookup(sym), val2);
             check_eq(sym->nrefs, 4);
@@ -111,7 +111,7 @@ void test_lexical_scopes_nest_correctly() {
             check_eq(val2->nrefs, 2);
             check_eq(dynVal->nrefs, 2);
         endLexicalScope();
-      check_eq(currLexicalScopes.top()->nrefs, 2);
+      check_eq(currLexicalScopes.top()->nrefs, 1);
       check_eq(sym->nrefs, 3);
       check_eq(val->nrefs, 2);
       check_eq(val2->nrefs, 1);

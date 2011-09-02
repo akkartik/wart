@@ -193,9 +193,9 @@ void test_eval_handles_closure() {
   check_eq(cells.size(), 1);
   newLexicalScope();
     Cell* newLexicalScope = currLexicalScopes.top();
-    check_eq(newLexicalScope->nrefs, 2);
+    check_eq(newLexicalScope->nrefs, 1);
     Cell* result = eval(cells.front());
-    check_eq(newLexicalScope->nrefs, 3);
+    check_eq(newLexicalScope->nrefs, 2);
   endLexicalScope();
   check_eq(newLexicalScope->nrefs, 1);
   check_eq(car(result), newSym(L"evald-lambda"));
