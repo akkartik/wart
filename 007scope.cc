@@ -52,7 +52,11 @@ void setupLexicalScope() {
 
 Cell* lookupLexicalBinding(Cell* sym) {
   for (Cell* scope = currLexicalScopes.top(); scope != nil; scope = cdr(scope)) {
-    Cell* result = unsafeGet(scope, sym);
+    Cell* result = NULL;
+    if (isTable(scope))
+      result = unsafeGet(scope, sym);
+    else if (isCons(scope))
+      result = unsafeGet(car(scope), sym);
     if (result) return result;
   }
   return NULL;
