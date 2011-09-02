@@ -55,7 +55,7 @@ Cell* lookupLexicalBinding(Cell* sym) {
     Cell* result = NULL;
     if (isTable(scope))
       result = unsafeGet(scope, sym);
-    else if (isCons(scope))
+    else if (isCons(scope) && car(scope) != nil)
       result = unsafeGet(car(scope), sym);
     if (result) return result;
   }
