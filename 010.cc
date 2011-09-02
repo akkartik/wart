@@ -48,7 +48,7 @@ COMPILE_PRIM_FUNC(nil?, primFunc_isNil,
 COMPILE_PRIM_FUNC(assign, primFunc_assign,
   Cell* var = car(args);
   Cell* val = eval(car(cdr(args)));
-  if (lookupLexicalBinding(var))
+  if (lookupLexicalBinding(var, currLexicalScopes.top()))
     unsafeSet(currLexicalScopes.top(), var, val, false);
   else if (dynamics[(long)var].empty())
     newDynamicScope(var, val);

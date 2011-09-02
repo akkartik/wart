@@ -50,13 +50,13 @@ void setupLexicalScope() {
   newDynamicScope(L"currLexicalScope", nil);
 }
 
-Cell* lookupLexicalBinding(Cell* sym) {
-  for (Cell* scope = currLexicalScopes.top(); scope != nil; scope = cdr(scope)) {
+Cell* lookupLexicalBinding(Cell* sym, Cell* lexicalScope) {
+  for (Cell* scope = lexicalScope; scope != nil; scope = cdr(scope)) {
     Cell* result = NULL;
     if (isTable(scope))
       result = unsafeGet(scope, sym);
-    else if (isCons(scope) && car(scope) != nil)
-      result = unsafeGet(car(scope), sym);
+    else if (isCons(scope))
+      result = lookupLexicalBinding(sym, car(scope));
     if (result) return result;
   }
   return NULL;
@@ -87,7 +87,7 @@ void addLexicalBinding(Cell* sym, Cell* val) {
 }
 
 Cell* lookup(Cell* sym) {
-  Cell* result = lookupLexicalBinding(sym);
+  Cell* result = lookupLexicalBinding(sym, currLexicalScopes.top());
   if (result) return result;
   result = lookupDynamicBinding(sym);
   if (result) return result;

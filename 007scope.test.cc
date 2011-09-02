@@ -159,3 +159,20 @@ void test_lexical_scope_can_be_a_cons() {
   endLexicalScope();
   checkState();
 }
+
+void test_lookup_nested_cons_lexical_scopes() {
+  Cell* sym = newSym(L"a");
+  check_eq(sym->nrefs, 1);
+  Cell* val = newNum(34);
+  check_eq(val->nrefs, 1);
+  newLexicalScope();
+    addLexicalBinding(sym, val);
+      newLexicalScope();
+        check_eq(lookup(sym), val);
+        newDynamicScope(L"currLexicalScope", newCons(currLexicalScopes.top(), nil));
+          check_eq(lookup(sym), val);
+        endDynamicScope(L"currLexicalScope");
+      endLexicalScope();
+  endLexicalScope();
+  checkState();
+}
