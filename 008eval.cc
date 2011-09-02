@@ -51,12 +51,10 @@ void bindArgs(Cell* params, Cell* args) {
 
                                   Cell* eval_args(Cell* params, Cell* args) {
                                     if (args == nil) return nil;
-                                    Cell* result = newCell();
                                     if (isQuoted(params)) {
-                                      setCar(result, car(args));
-                                      setCdr(result, cdr(args));
-                                      return mkref(result);
+                                      return mkref(newCons(car(args), cdr(args)));
                                     }
+                                    Cell* result = newCell();
                                     setCdr(result, eval_args(cdr(params), cdr(args)));
                                     rmref(cdr(result));
                                     if (!isCons(params) || !isQuoted(car(params))) {
@@ -90,9 +88,7 @@ void bindArgs(Cell* params, Cell* args) {
                                       return result;
                                     }
 
-                                    Cell* result = newCell();
-                                    setCar(result, processUnquotes(car(x)));
-                                    setCdr(result, processUnquotes(cdr(x)));
+                                    Cell* result = newCons(processUnquotes(car(x)), processUnquotes(cdr(x)));
                                     rmref(car(result));
                                     rmref(cdr(result));
                                     return mkref(result);
@@ -110,14 +106,9 @@ void bindArgs(Cell* params, Cell* args) {
                                   }
 
                                   Cell* eval_lambda(Cell* expr) {
-                                    Cell* ans = newCell();
-                                    setCar(ans, newSym(L"evald-"+toString(car(expr))));
-                                    setCdr(ans, newCell());
-                                    setCar(cdr(ans), sig(expr));
-                                    setCdr(cdr(ans), newCell());
-                                    setCar(cdr(cdr(ans)), body(expr));
-                                    setCdr(cdr(cdr(ans)), currLexicalScopes.top());
-                                    return ans;
+                                    return newCons(newSym(L"evald-"+toString(car(expr))),
+                                        newCons(sig(expr),
+                                            newCons(body(expr), currLexicalScopes.top())));
                                   }
 
                                   int indent = 0;

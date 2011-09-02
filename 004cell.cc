@@ -297,6 +297,13 @@ void setCdr(Cell* x, Cell* y) {
   x->cdr = y;
 }
 
+Cell* newCons(Cell* car, Cell* cdr) {
+  Cell* ans = newCell();
+  setCar(ans, car);
+  setCdr(ans, cdr);
+  return ans;
+}
+
                                   void unsafeSet(Cell* t, Cell* key, Cell* val, bool deleteNils) {
                                     if (!isTable(t)) {
                                       warn << "set on a non-table: " << t << endl;
