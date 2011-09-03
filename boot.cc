@@ -81,7 +81,6 @@ stringstream& teststream(string s) {
 }
 
 void init();
-void checkState();
 
 
 
@@ -109,33 +108,6 @@ void setupPrimFuncs() {
 void teardownPrimFuncs() {
   for (unsigned int i=0; i < sizeof(primFuncs)/sizeof(primFuncs[0]); ++i)
     endDynamicScope(primFuncs[i].name);
-}
-
-
-
-typedef void (*testfunc)(void);
-
-const testfunc tests[] = {
-  #include "test_list"
-};
-
-void runTests() {
-  runningTests = true; // never reset
-  for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
-    init();
-    (*tests[i])();
-    checkState();
-  }
-
-  init();
-  loadFiles(".wart"); // after GC tests
-  loadFiles(".test");
-
-  cerr << endl;
-  if (numFailures == 0) return;
-  cerr << numFailures << " failure";
-      if (numFailures > 1) cerr << "s";
-      cerr << endl;
 }
 
 
@@ -216,18 +188,45 @@ void resetState() {
   dynamics.clear(); // leaks memory for strings and tables
 }
 
-void init() {
-  setupNil();
-  setupLexicalScope();
-  setupPrimFuncs();
-}
-
 void checkState() {
   teardownPrimFuncs();
   checkLiteralTables();
   checkUnfreed();
 
   resetState();
+}
+
+
+
+typedef void (*testfunc)(void);
+
+const testfunc tests[] = {
+  #include "test_list"
+};
+
+void runTests() {
+  runningTests = true; // never reset
+  for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
+    init();
+    (*tests[i])();
+    checkState();
+  }
+
+  init();
+  loadFiles(".wart"); // after GC tests
+  loadFiles(".test");
+
+  cerr << endl;
+  if (numFailures == 0) return;
+  cerr << numFailures << " failure";
+      if (numFailures > 1) cerr << "s";
+      cerr << endl;
+}
+
+void init() {
+  setupNil();
+  setupLexicalScope();
+  setupPrimFuncs();
 }
 
 
