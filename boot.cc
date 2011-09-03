@@ -229,49 +229,28 @@ void checkState() {
 
 
 
-int main(int argc, ascii* argv[]) {
+int main(int argc, __unused__ ascii* argv[]) {
   init();
 
-  int pass = 0;
   if (argc > 1) {
-    std::string arg1(argv[1]);
-    if (arg1 == "test") {
-      runTests();
-      return 0;
-    }
-    else if (arg1[0] >= L'0' || arg1[0] <= L'9') {
-      pass = atoi(arg1.c_str());
-    }
+    runTests();
+    return 0;
   }
+
+  // no unit tests for interactive repl, so manual QA:
+  //   expr that doesn't start with paren should eval on empty line
+  //   expr that starts with paren should eval on close
+  interactive = true;
 
   loadFiles(".wart");
 
-  switch (pass) {
-  case 1:
-    cout << tokenize(cin); break;
-  case 2:
-    cout << parenthesize(tokenize(cin)); break;
-  case 3:
-    cout << parse(parenthesize(tokenize(cin))); break;
-  case 4:
-    cout << buildCells(parse(parenthesize(tokenize(cin)))); break;
-  case 5:
-    cout << transform(buildCells(parse(parenthesize(tokenize(cin)))).front()) << endl; break;
-  case 6:
-    cout << eval(transform(buildCells(parse(parenthesize(tokenize(cin))))).front()) << endl; break;
-  default:
-    // no unit tests for interactive repl, so manual QA:
-    //   expr that doesn't start with paren should eval on empty line
-    //   expr that starts with paren should eval on close
-    interactive = true;
-    while (!cin.eof()) {
-      cout << "wart> ";
-      list<Cell*> form = wartRead(cin);
-      if (form.empty()) continue;
-      Cell* result = eval(form.front());
-      cout << result << endl;
-      rmref(result);
-    }
+  while (!cin.eof()) {
+    cout << "wart> ";
+    list<Cell*> form = wartRead(cin);
+    if (form.empty()) continue;
+    Cell* result = eval(form.front());
+    cout << result << endl;
+    rmref(result);
   }
   return 0;
 }
