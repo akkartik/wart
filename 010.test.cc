@@ -28,7 +28,7 @@ void test_assign_lexical_var() {
 }
 
 void test_if_sees_args_in_then_and_else() {
-  Cell* lambda = wartRead(teststream(L"(lambda(x) (_if 34 x))")).front();
+  Cell* lambda = wartRead(teststream(L"(lambda(x) (if 34 x))")).front();
   Cell* f = eval(lambda);
   newDynamicScope(L"f", f);
   Cell* call = wartRead(teststream(L"(f 35)")).front();

@@ -72,13 +72,13 @@ COMPILE_PRIM_FUNC(load, primFunc_load,
   return nil;
 )
 
-COMPILE_PRIM_FUNC(_prn, primFunc_prn,
+COMPILE_PRIM_FUNC(prn, primFunc_prn,
   Cell* x = eval(car(args));
   cout << x << endl;
   return x; // already mkref'd
 )
 
-COMPILE_PRIM_FUNC(_if, primFunc_if,
+COMPILE_PRIM_FUNC(if, primFunc_if,
   Cell* cond = eval(car(args));
   Cell* then = car(cdr(args));
   Cell* rest = car(cdr(cdr(args)));
@@ -130,7 +130,7 @@ COMPILE_PRIM_FUNC(table, primFunc_table,
   return mkref(newTable());
 )
 
-COMPILE_PRIM_FUNC(_table_set, primFunc_table_set,
+COMPILE_PRIM_FUNC(table_set, primFunc_table_set,
   Cell* table = eval(car(args));
   Cell* key = eval(car(cdr(args)));
   Cell* val = eval(car(cdr(cdr(args))));

@@ -29,12 +29,13 @@ mac let($var $val . $body)
 ; (if nil 35 36) => 36
 ; (if nil 35 :else 36) => 36
 ; (if nil 35 36 37) => 37
-mac if $args
-  _if (no (cdr $args))
-    (car $args)
-    `(_if ,(car $args)
-       ,(cadr $args)
-       (if ,@(cddr $args)))
+let $if if
+  mac if $args
+    $if (no (cdr $args))
+      (car $args)
+      `(,$if ,(car $args)
+         ,(cadr $args)
+         (if ,@(cddr $args)))
 
 ; (or) => nil
 ; (or nil) => nil
@@ -42,7 +43,7 @@ mac if $args
 ; (or nil 3) => 3
 ; ((lambda(x) (or nil x)) 3) => 3
 ; (or nil 3 4) => 3
-; (or nil (_prn 3) (_prn 4)) => 3 after printing just 3
+; (or nil (prn 3) (prn 4)) => 3 after printing just 3
 mac or $args
   if $args
     `(if ,(car $args)
@@ -55,7 +56,7 @@ mac or $args
 ; (and nil 3) => nil
 ; (and 3 4) => 4
 ; ((lambda(x) (and 3 x 4)) nil) => nil
-; (and (_prn 3) nil) => nil after printing 3
+; (and (prn 3) nil) => nil after printing 3
 mac and $args
   if (no $args)
     1
