@@ -102,9 +102,8 @@ const PrimFuncMetadata primFuncs[] = {
 };
 
 void setupPrimFuncs() {
-  for (unsigned int i=0; i < sizeof(primFuncs)/sizeof(primFuncs[0]); ++i) {
+  for (unsigned int i=0; i < sizeof(primFuncs)/sizeof(primFuncs[0]); ++i)
     newDynamicScope(primFuncs[i].name, newPrimFunc(primFuncs[i].impl));
-  }
 }
 
 void teardownPrimFuncs() {
