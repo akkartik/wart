@@ -45,10 +45,10 @@ int debug = 0;
 #define dbg if(debug == 1) cerr
 #define dbg2 if(debug == 2) cerr
 
-#define __unused__ __attribute__((unused))
+#define unused __attribute__((unused))
 
 class Die {};
-ostream& operator<<(ostream& os __unused__, Die die __unused__) {
+ostream& operator<<(unused ostream& os, unused Die die) {
   exit(1);
 }
 Die DIE;
@@ -229,7 +229,7 @@ void checkState() {
 
 
 
-int main(int argc, __unused__ ascii* argv[]) {
+int main(int argc, unused ascii* argv[]) {
   init();
 
   if (argc > 1) {
