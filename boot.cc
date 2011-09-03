@@ -279,4 +279,4 @@ int main(int argc, ascii* argv[]) {
 // style:
 //  wide unicode strings everywhere
 //  no function prototypes
-//  immutable objects; copy everywhere; no references or pointers except Cell*
+//  immutable objects; copy everywhere; no pointers except Cell*
