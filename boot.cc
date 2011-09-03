@@ -212,7 +212,7 @@ void resetState() {
   dynamics.clear(); // leaks memory for strings and tables
 }
 
-void setupState() {
+void init() {
   setupNil();
   setupLexicalScope();
   setupPrimFuncs();
@@ -224,13 +224,13 @@ void checkState() {
   checkUnfreed();
 
   resetState();
-  setupState();
+  init();
 }
 
 
 
 int main(int argc, ascii* argv[]) {
-  setupState();
+  init();
 
   int pass = 0;
   if (argc > 1) {
