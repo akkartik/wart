@@ -166,28 +166,3 @@ mac with($params . $body)
   `((lambda ,(map car (pair $params))
      ,@$body)
     ,@(map cadr (pair $params)))
-
-; http://codereview.stackexchange.com/questions/1182/determine-type-of-triangle-in-lisp
-def triangle?(a b c)
-  and (< a (+ b c))
-      (< b (+ c a))
-      (< c (+ a b))
-
-def isosceles?(a b c)
-  or (iso a b)
-     (iso b c)
-     (iso c a)
-
-def equilateral?(a b c)
-  (iso a b c)
-
-def triangle-type(a b c)
-  if
-    (not (triangle? a b c))
-      'fail
-    (isosceles? a b c)
-      'isosceles
-    (equilateral? a b c)
-      'equilateral
-    :else
-      'scalene
