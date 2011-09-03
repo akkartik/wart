@@ -80,6 +80,7 @@ stringstream& teststream(string s) {
   return result;
 }
 
+void init();
 void checkState();
 
 
@@ -121,9 +122,13 @@ const testfunc tests[] = {
 
 void runTests() {
   runningTests = true; // never reset
-  for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i)
+  for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
+    init();
     (*tests[i])();
+    checkState();
+  }
 
+  init();
   loadFiles(".wart"); // after GC tests
   loadFiles(".test");
 
@@ -224,14 +229,11 @@ void checkState() {
   checkUnfreed();
 
   resetState();
-  init();
 }
 
 
 
 int main(int argc, unused ascii* argv[]) {
-  init();
-
   if (argc > 1) {
     runTests();
     return 0;
@@ -242,6 +244,7 @@ int main(int argc, unused ascii* argv[]) {
   //   expr that starts with paren should eval on close
   interactive = true;
 
+  init();
   loadFiles(".wart");
 
   while (!cin.eof()) {

@@ -16,7 +16,6 @@ void test_lookup_returns_dynamic_binding() {
   endDynamicScope(sym);
   check_eq(sym->nrefs, 1);
   check_eq(val->nrefs, 1);
-  checkState();
 }
 
 void test_lookup_returns_lexical_binding() {
@@ -32,7 +31,6 @@ void test_lookup_returns_lexical_binding() {
   endLexicalScope();
   check_eq(sym->nrefs, 1);
   check_eq(val->nrefs, 1);
-  checkState();
 }
 
 void test_lexical_binding_always_overrides_dynamic() {
@@ -62,7 +60,6 @@ void test_lexical_binding_always_overrides_dynamic() {
   check_eq(sym->nrefs, 1);
   check_eq(val->nrefs, 1);
   check_eq(dynVal->nrefs, 1);
-  checkState();
 }
 
 void test_nil_lexical_binding_works() {
@@ -75,7 +72,6 @@ void test_nil_lexical_binding_works() {
         check_eq(lookup(sym), nil);
     endLexicalScope();
   endDynamicScope(sym);
-  checkState();
 }
 
 void test_lexical_scopes_nest_correctly() {
@@ -127,7 +123,6 @@ void test_lexical_scopes_nest_correctly() {
   check_eq(val->nrefs, 1);
   check_eq(val2->nrefs, 1);
   check_eq(dynVal->nrefs, 1);
-  checkState();
 }
 
 void test_lower_lexical_scopes_are_available() {
@@ -142,7 +137,6 @@ void test_lower_lexical_scopes_are_available() {
         check_eq(lookup(sym), val);
       endLexicalScope();
   endLexicalScope();
-  checkState();
 }
 
 void test_lexical_scope_can_be_a_cons() {
@@ -157,7 +151,6 @@ void test_lexical_scope_can_be_a_cons() {
         check_eq(lookup(sym), val);
       endDynamicScope(L"currLexicalScope");
   endLexicalScope();
-  checkState();
 }
 
 void test_lookup_nested_cons_lexical_scopes() {
@@ -174,5 +167,4 @@ void test_lookup_nested_cons_lexical_scopes() {
         endDynamicScope(L"currLexicalScope");
       endLexicalScope();
   endLexicalScope();
-  checkState();
 }

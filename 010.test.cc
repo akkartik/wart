@@ -5,7 +5,6 @@ void test_cons_works() {
   check_eq(cdr(result), newNum(2));
   rmref(result);
   rmref(call);
-  checkState();
 }
 
 void test_assign_to_lambda() {
@@ -15,7 +14,6 @@ void test_assign_to_lambda() {
   endDynamicScope(L"foo");
   rmref(def);
   rmref(lambda);
-  checkState();
 }
 
 void test_assign_lexical_var() {
@@ -24,7 +22,6 @@ void test_assign_lexical_var() {
   check_eq(call, newNum(34));
   rmref(call);
   rmref(lambda);
-  checkState();
 }
 
 void test_if_sees_args_in_then_and_else() {
@@ -39,7 +36,6 @@ void test_if_sees_args_in_then_and_else() {
   endDynamicScope(L"f");
   rmref(f);
   rmref(lambda);
-  checkState();
 }
 
 void test_sym_works_with_one_arg() {
@@ -48,7 +44,6 @@ void test_sym_works_with_one_arg() {
   check_eq(result, newSym(L"abc"));
   rmref(result);
   rmref(call);
-  checkState();
 }
 
 void test_sym_works_with_multiple_args() {
@@ -57,5 +52,4 @@ void test_sym_works_with_multiple_args() {
   check_eq(result, newSym(L"abc42def"));
   rmref(result);
   rmref(call);
-  checkState();
 }

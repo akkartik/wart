@@ -3,19 +3,16 @@
 void test_build_handles_empty_input() {
   list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"")))));
   check(cells.empty());
-  checkState();
 }
 
 void test_build_handles_nil() {
   list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
   check_eq(cells.front(), nil);
-  checkState();
 }
 
 void test_build_handles_nil2() {
   list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"nil")))));
   check_eq(cells.front(), nil);
-  checkState();
 }
 
 void test_build_handles_number() {
@@ -24,7 +21,6 @@ void test_build_handles_number() {
   check(isNum(cells.front()));
   check_eq(toNum(cells.front()), 34);
   check_eq(cells.front()->nrefs, 1);
-  checkState();
 }
 
 void test_build_handles_sym() {
@@ -33,14 +29,12 @@ void test_build_handles_sym() {
   check(isSym(cells.front()));
   check_eq(toString(cells.front()), L"a");
   check_eq(cells.front()->nrefs, 1);
-  checkState();
 }
 
 void test_build_doesnt_mix_syms_and_strings() {
   Cell* s = newString(L"a");
   check(s != newSym(L"a"));
   rmref(s);
-  checkState();
 }
 
 void test_build_handles_quoted_sym() {
@@ -53,7 +47,6 @@ void test_build_handles_quoted_sym() {
   check_eq(toString(cdr(cells.front())), L"a");
   check_eq(cdr(cells.front())->nrefs, 2);
   rmref(cells.front());
-  checkState();
 }
 
 void test_build_handles_nested_quote() {
@@ -71,7 +64,6 @@ void test_build_handles_nested_quote() {
   check_eq(toString(c), L"a");
   check_eq(c->nrefs, 2);
   rmref(cells.front());
-  checkState();
 }
 
 void test_build_handles_multiple_atoms() {
@@ -89,7 +81,6 @@ void test_build_handles_multiple_atoms() {
   check_eq(c->nrefs, 1);
   check_eq(cdr(c), nil);
 
-  checkState();
 }
 
 void test_build_handles_form() {
@@ -111,7 +102,6 @@ void test_build_handles_form() {
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
-  checkState();
 }
 
 void test_build_handles_dot() {
@@ -130,7 +120,6 @@ void test_build_handles_dot() {
   check_eq(c->nrefs, 2);
 
   rmref(cells.front());
-  checkState();
 }
 
 void test_build_handles_nested_form() {
@@ -169,7 +158,6 @@ void test_build_handles_nested_form() {
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
-  checkState();
 }
 
 void test_build_handles_strings() {
@@ -212,7 +200,6 @@ void test_build_handles_strings() {
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
-  checkState();
 }
 
 void test_build_handles_syms() {
@@ -260,7 +247,6 @@ void test_build_handles_syms() {
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
-  checkState();
 }
 
 void test_build_handles_quotes() {
@@ -331,5 +317,4 @@ void test_build_handles_quotes() {
   check_eq(cdr(c), nil);
 
   rmref(cells.front());
-  checkState();
 }

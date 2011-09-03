@@ -8,7 +8,6 @@ void test_newCell_has_nil_car_and_cdr() {
   check_eq(x->car, nil);
   check_eq(x->cdr, nil);
   rmref(x);
-  checkState();
 }
 
 void test_rmref_frees_space() {
@@ -18,7 +17,6 @@ void test_rmref_frees_space() {
   rmref(c);
   check(!c->car);
   check_eq(freelist, c);
-  checkState();
 }
 
 void test_rmref_handles_nums() {
@@ -28,7 +26,6 @@ void test_rmref_handles_nums() {
   rmref(c);
   check(!c->car);
   check_eq(freelist, c);
-  checkState();
 }
 
 
@@ -46,7 +43,6 @@ void test_setCar_decrements_nrefs() {
   check_eq(car->nrefs, 0);
   check_eq(newCar->nrefs, 1);
   rmref(cons);
-  checkState();
 }
 
 void test_setCar_decrements_nrefs_for_non_cons() {
@@ -62,7 +58,6 @@ void test_setCar_decrements_nrefs_for_non_cons() {
   check_eq(num->nrefs, 1);
   check_eq(newCar->nrefs, 1);
   rmref(cons);
-  checkState();
 }
 
 void test_setCar_is_idempotent() {
@@ -76,7 +71,6 @@ void test_setCar_is_idempotent() {
   check(car(x));
   check(cdr(x));
   rmref(cons);
-  checkState();
 }
 
 void test_setCdr_is_idempotent() {
@@ -90,5 +84,4 @@ void test_setCdr_is_idempotent() {
   check(car(x));
   check(cdr(x));
   rmref(cons);
-  checkState();
 }

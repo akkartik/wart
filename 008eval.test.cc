@@ -8,7 +8,6 @@ void test_bindArgs_handles_vararg() {
   check_eq(cdr(result), nil);
   endLexicalScope();
   rmref(params);
-  checkState();
 }
 
 
@@ -20,7 +19,6 @@ void test_nil_evals_to_itself() {
   check_eq(result, nil);
   rmref(result);
   rmref(cells.front());
-  checkState();
 }
 
 void test_num_evals_to_itself() {
@@ -30,7 +28,6 @@ void test_num_evals_to_itself() {
   check_eq(result, cells.front());
   rmref(result);
   rmref(cells.front());
-  checkState();
 }
 
 void test_colonsym_evals_to_itself() {
@@ -40,7 +37,6 @@ void test_colonsym_evals_to_itself() {
   check_eq(result, cells.front());
   rmref(result);
   rmref(cells.front());
-  checkState();
 }
 
 void test_string_evals_to_itself() {
@@ -50,7 +46,6 @@ void test_string_evals_to_itself() {
   check_eq(result, cells.front());
   rmref(result);
   // HACK: just a string by itself doesn't need rmref'ing
-  checkState();
 }
 
 void test_eval_handles_quoted_atoms() {
@@ -64,7 +59,6 @@ void test_eval_handles_quoted_atoms() {
   rmref(result);
   rmref(cells.front());
   rmref(cells.back());
-  checkState();
 }
 
 void test_eval_handles_quoted_lists() {
@@ -75,7 +69,6 @@ void test_eval_handles_quoted_lists() {
   check_eq(cdr(cdr(result)), nil);
   rmref(result);
   rmref(cells.front());
-  checkState();
 }
 
 void test_eval_handles_backquoted_lists() {
@@ -86,7 +79,6 @@ void test_eval_handles_backquoted_lists() {
   check_eq(cdr(cdr(result)), nil);
   rmref(result);
   rmref(cells.front());
-  checkState();
 }
 
 void test_eval_handles_unquote() {
@@ -99,7 +91,6 @@ void test_eval_handles_unquote() {
   rmref(result);
   endDynamicScope(L"b");
   rmref(cells.front());
-  checkState();
 }
 
 void test_eval_handles_splice() {
@@ -113,7 +104,6 @@ void test_eval_handles_splice() {
   rmref(result);
   endDynamicScope(L"b");
   rmref(cells.front());
-  checkState();
 }
 
 void test_eval_handles_splice_of_nil() {
@@ -127,7 +117,6 @@ void test_eval_handles_splice_of_nil() {
   rmref(result);
   endDynamicScope(L"b");
   rmref(cells.front());
-  checkState();
 }
 
 void test_eval_quotes_quote_comma() {
@@ -142,7 +131,6 @@ void test_eval_quotes_quote_comma() {
   rmref(result);
   endDynamicScope(L"b");
   rmref(cells.front());
-  checkState();
 }
 
 void test_eval_evals_comma_quote() {
@@ -155,7 +143,6 @@ void test_eval_evals_comma_quote() {
   rmref(result);
   endDynamicScope(L"b");
   rmref(cells.front());
-  checkState();
 }
 
 void test_eval_handles_simple_lambda() {
@@ -169,7 +156,6 @@ void test_eval_handles_simple_lambda() {
   check_eq(cdr(cdr(cdr(lambda))), nil);
   rmref(lambda);
   rmref(cells.front());
-  checkState();
 }
 
 void test_eval_on_lambda_is_idempotent() {
@@ -185,7 +171,6 @@ void test_eval_on_lambda_is_idempotent() {
   rmref(lambda2);
   rmref(lambda);
   rmref(cells.front());
-  checkState();
 }
 
 void test_eval_handles_closure() {
@@ -205,7 +190,6 @@ void test_eval_handles_closure() {
   rmref(result);
   check_eq(newLexicalScope->nrefs, 0);
   rmref(cells.front());
-  checkState();
 }
 
 void test_eval_handles_lambda_calls() {
@@ -214,7 +198,6 @@ void test_eval_handles_lambda_calls() {
   check_eq(result, newNum(34));
   rmref(result);
   rmref(call);
-  checkState();
 }
 
 void test_eval_expands_syms_in_lambda_bodies() {
@@ -225,7 +208,6 @@ void test_eval_expands_syms_in_lambda_bodies() {
   endDynamicScope(L"a");
   rmref(result);
   rmref(lambda);
-  checkState();
 }
 
 void test_eval_handles_assigned_lambda_calls() {
@@ -240,7 +222,6 @@ void test_eval_handles_assigned_lambda_calls() {
   rmref(call);
   rmref(f);
   rmref(lambda);
-  checkState();
 }
 
 void test_eval_expands_lexically_scoped_syms_in_lambda_bodies() {
@@ -252,7 +233,6 @@ void test_eval_expands_lexically_scoped_syms_in_lambda_bodies() {
   endLexicalScope();
   rmref(result);
   rmref(call);
-  checkState();
 }
 
 void test_eval_expands_syms_in_original_lexical_scope() {
@@ -272,7 +252,6 @@ void test_eval_expands_syms_in_original_lexical_scope() {
   rmref(lambda);
   endDynamicScope(L"f");
   endDynamicScope(L"a");
-  checkState();
 }
 
 void test_eval_expands_args_in_caller_scope() {
@@ -292,7 +271,6 @@ void test_eval_expands_args_in_caller_scope() {
   rmref(lambda);
   endDynamicScope(L"f");
   endDynamicScope(L"a");
-  checkState();
 }
 
 void test_eval_doesnt_eval_quoted_params() {
@@ -312,7 +290,6 @@ void test_eval_doesnt_eval_quoted_params() {
   rmref(lambda);
   endDynamicScope(L"f");
   endDynamicScope(L"a");
-  checkState();
 }
 
 void test_eval_handles_quoted_param_list() {
@@ -332,7 +309,6 @@ void test_eval_handles_quoted_param_list() {
   rmref(lambda);
   endDynamicScope(L"f");
   endDynamicScope(L"a");
-  checkState();
 }
 
 void test_eval_handles_multiple_args() {
@@ -347,7 +323,6 @@ void test_eval_handles_multiple_args() {
   rmref(f);
   rmref(lambda);
   endDynamicScope(L"f");
-  checkState();
 }
 
 void test_eval_handles_multiple_body_exprs() {
@@ -362,7 +337,6 @@ void test_eval_handles_multiple_body_exprs() {
   rmref(f);
   rmref(lambda);
   endDynamicScope(L"f");
-  checkState();
 }
 
 void test_eval_handles_vararg_param() {
@@ -372,7 +346,6 @@ void test_eval_handles_vararg_param() {
   check_eq(car(result), newNum(1));
   rmref(result);
   rmref(call);
-  checkState();
 }
 
 void test_eval_evals_args() {
@@ -382,7 +355,6 @@ void test_eval_evals_args() {
   check_eq(toNum(result), 34);
   rmref(result);
   rmref(call);
-  checkState();
 }
 
 void test_eval_doesnt_leak_body_evals() {
@@ -392,7 +364,6 @@ void test_eval_doesnt_leak_body_evals() {
   check_eq(toNum(result), 34);
   rmref(result);
   rmref(call);
-  checkState();
 }
 
 void test_eval_handles_destructured_params() {
@@ -402,7 +373,6 @@ void test_eval_handles_destructured_params() {
   check_eq(toNum(result), 2);
   rmref(result);
   rmref(call);
-  checkState();
 }
 
 void test_eval_handles_quoted_destructured_params() {
@@ -412,7 +382,6 @@ void test_eval_handles_quoted_destructured_params() {
   check_eq(toNum(result), 2);
   rmref(result);
   rmref(call);
-  checkState();
 }
 
 void test_eval_handles_rest_params() {
@@ -427,7 +396,6 @@ void test_eval_handles_rest_params() {
   check_eq(cdr(cdr(cdr(result))), nil);
   rmref(result);
   rmref(call);
-  checkState();
 }
 
                                   Cell* copyList(Cell* x) {
@@ -458,7 +426,6 @@ void test_eval_doesnt_modify_lambda() {
   rmref(oldf);
   rmref(lambda);
   endDynamicScope(L"f");
-  checkState();
 }
 
 void test_eval_doesnt_modify_lambda2() {
@@ -475,7 +442,6 @@ void test_eval_doesnt_modify_lambda2() {
   rmref(oldf);
   rmref(lambda);
   endDynamicScope(L"f");
-  checkState();
 }
 
 void test_eval_doesnt_modify_lambda3() {
@@ -496,7 +462,6 @@ void test_eval_doesnt_modify_lambda3() {
   rmref(lambda);
   endDynamicScope(L"b");
   endDynamicScope(L"a");
-  checkState();
 }
 
 void test_eval_doesnt_modify_lambda4() {
@@ -517,7 +482,6 @@ void test_eval_doesnt_modify_lambda4() {
   rmref(lambda);
   endDynamicScope(L"b");
   endDynamicScope(L"a");
-  checkState();
 }
 
 void test_eval_handles_eval() {
@@ -530,5 +494,4 @@ void test_eval_handles_eval() {
   rmref(call);
   endDynamicScope(L"x");
   endDynamicScope(L"a");
-  checkState();
 }

@@ -4,5 +4,4 @@ void test_add_works() {
   check_eq(toNum(result), 3);
   rmref(result);
   rmref(call);
-  checkState();
 }
