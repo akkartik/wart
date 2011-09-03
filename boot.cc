@@ -102,9 +102,7 @@ const PrimFuncMetadata primFuncs[] = {
 
 void setupPrimFuncs() {
   for (unsigned int i=0; i < sizeof(primFuncs)/sizeof(primFuncs[0]); ++i) {
-    Cell* impl = newCell();
-    setCar(impl, newPrimFunc(primFuncs[i].impl));
-    newDynamicScope(primFuncs[i].name, impl);
+    newDynamicScope(primFuncs[i].name, newPrimFunc(primFuncs[i].impl));
   }
 }
 
