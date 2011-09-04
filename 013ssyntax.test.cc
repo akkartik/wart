@@ -21,7 +21,7 @@ void test_ssyntax_skips_floats() {
 }
 
 void test_ssyntax_setup() {
-  Cell* def = wartRead(stream(L"ssyntax _._ foo")).front();
+  Cell* def = wartRead(stream(L"ssyntax _._ (foo _ _)")).front();
   eval(def); // needn't rmref; returns nil
   Cell* expr = wartRead(stream(L"a.b")).front();
   check_eq(car(expr), newSym(L"foo"));

@@ -58,7 +58,7 @@ COMPILE_PRIM_FUNC(ssyntax, primFunc_ssyntax,
   if (pos == 0) s.dir = SsyntaxTemplate::BEGINNING;
   else if (pos == pat.length()) s.dir = SsyntaxTemplate::END;
   else s.dir = SsyntaxTemplate::IN_BETWEEN;
-  s.convertedSym = car(cdr(args));
+  s.convertedSym = car(car(cdr(args)));
   ssyntaxTemplates.push_back(s);
   return nil;
 )
