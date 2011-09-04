@@ -1,6 +1,6 @@
 struct SsyntaxTemplate {
   char key;
-  enum { UNARY, MULTIARY } dir;
+  enum { UNARY, MULTIARY } type;
   Cell* convertedSym;
 };
 list<SsyntaxTemplate> ssyntaxTemplates;
@@ -14,10 +14,10 @@ string transformSsyntax(string var, SsyntaxTemplate pat) {
 
   size_t len = var.length();
   if (pos == 0) {
-    if (pat.dir != SsyntaxTemplate::UNARY) return L"";
+    if (pat.type != SsyntaxTemplate::UNARY) return L"";
     return var.substr(1, len);
   }
-  if (pat.dir == SsyntaxTemplate::UNARY) return L"";
+  if (pat.type == SsyntaxTemplate::UNARY) return L"";
 
   if (pos == len-1) {
     var = var+L"nil";
@@ -57,8 +57,8 @@ COMPILE_PRIM_FUNC(ssyntax, primFunc_ssyntax,
 
   SsyntaxTemplate s;
   s.key = pat[pos];
-  if (pos == 0) s.dir = SsyntaxTemplate::UNARY;
-  else s.dir = SsyntaxTemplate::MULTIARY;
+  if (pos == 0) s.type = SsyntaxTemplate::UNARY;
+  else s.type = SsyntaxTemplate::MULTIARY;
   s.convertedSym = car(car(cdr(args)));
   ssyntaxTemplates.push_back(s);
   return nil;
