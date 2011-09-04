@@ -170,6 +170,10 @@ mac with($params . $body)
      ,@$body)
     ,@(map cadr (pair $params)))
 
+mac complement($f)
+  `(lambda $args (no (apply ,$f $args)))
+ssyntax ~_ (complement _)
+
 mac call $args
   $args
 ssyntax _._ (call _ _)
