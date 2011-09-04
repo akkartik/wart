@@ -1,22 +1,22 @@
 void test_parse_handles_empty_input() {
-  list<AstNode> ast = parse(parenthesize(tokenize(teststream(L""))));
+  list<AstNode> ast = parse(parenthesize(tokenize(stream(L""))));
   check(ast.empty());
 }
 
 void test_parse_handles_trailing_comments() {
-  list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"; ab"))));
+  list<AstNode> ast = parse(parenthesize(tokenize(stream(L"; ab"))));
   check(ast.empty());
 }
 
 void test_parse_handles_atom() {
-  list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"34"))));
+  list<AstNode> ast = parse(parenthesize(tokenize(stream(L"34"))));
   list<AstNode>::iterator p = ast.begin();
   check_eq(*p, Token::of(L"34")); ++p;
   check(p == ast.end());
 }
 
 void test_parse_handles_atoms() {
-  list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"34\n\"a b c\""))));
+  list<AstNode> ast = parse(parenthesize(tokenize(stream(L"34\n\"a b c\""))));
   list<AstNode>::iterator p = ast.begin();
   check_eq(*p, Token::of(L"34")); ++p;
   check_eq(*p, Token::of(L"\"a b c\"")); ++p;
@@ -24,7 +24,7 @@ void test_parse_handles_atoms() {
 }
 
 void test_parse_handles_forms() {
-  list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"34 \"a b c\""))));
+  list<AstNode> ast = parse(parenthesize(tokenize(stream(L"34 \"a b c\""))));
   check_eq(ast.size(), 1);
   check(ast.front().isList());
   list<AstNode>::iterator p = ast.front().elems.begin();
@@ -36,7 +36,7 @@ void test_parse_handles_forms() {
 }
 
 void test_parse_handles_nested_forms() {
-  list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"34 (2 3) \"a b c\""))));
+  list<AstNode> ast = parse(parenthesize(tokenize(stream(L"34 (2 3) \"a b c\""))));
   check_eq(ast.size(), 1);
   check(ast.front().isList());
   list<AstNode>::iterator p = ast.front().elems.begin();
@@ -57,7 +57,7 @@ void test_parse_handles_nested_forms() {
 }
 
 void test_parse_handles_nested_forms_with_comments() {
-  list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"(a b (c d ;\n))"))));
+  list<AstNode> ast = parse(parenthesize(tokenize(stream(L"(a b (c d ;\n))"))));
   check_eq(ast.size(), 1);
   check(ast.front().isList());
   list<AstNode>::iterator p = ast.front().elems.begin();
@@ -78,7 +78,7 @@ void test_parse_handles_nested_forms_with_comments() {
 }
 
 void test_parse_handles_quotes() {
-  list<AstNode> ast = parse(parenthesize(tokenize(teststream(L"34 `(2 ,b) ',35 ,',36 ,'a"))));
+  list<AstNode> ast = parse(parenthesize(tokenize(stream(L"34 `(2 ,b) ',35 ,',36 ,'a"))));
   check_eq(ast.size(), 1);
   check(ast.front().isList());
   list<AstNode>::iterator p = ast.front().elems.begin();

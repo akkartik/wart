@@ -74,7 +74,7 @@ int numFailures = 0;
   } \
   else { cerr << "."; fflush(stderr); }
 
-stringstream& teststream(string s) {
+stringstream& stream(string s) {
   stringstream& result = *new stringstream(s);
   result << std::noskipws;
   return result;

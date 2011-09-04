@@ -1,22 +1,22 @@
 // check all nrefs except quotes/unquotes
 
 void test_build_handles_empty_input() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"")))));
   check(cells.empty());
 }
 
 void test_build_handles_nil() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"()")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"()")))));
   check_eq(cells.front(), nil);
 }
 
 void test_build_handles_nil2() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"nil")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"nil")))));
   check_eq(cells.front(), nil);
 }
 
 void test_build_handles_number() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"34")))));
   check_eq(cells.size(), 1);
   check(isNum(cells.front()));
   check_eq(toNum(cells.front()), 34);
@@ -24,7 +24,7 @@ void test_build_handles_number() {
 }
 
 void test_build_handles_sym() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"a")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"a")))));
   check_eq(cells.size(), 1);
   check(isSym(cells.front()));
   check_eq(toString(cells.front()), L"a");
@@ -38,7 +38,7 @@ void test_build_doesnt_mix_syms_and_strings() {
 }
 
 void test_build_handles_quoted_sym() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"'a")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"'a")))));
   check_eq(cells.size(), 1);
   check(isCons(cells.front()));
   check(isSym(car(cells.front())));
@@ -50,7 +50,7 @@ void test_build_handles_quoted_sym() {
 }
 
 void test_build_handles_nested_quote() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"',a")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"',a")))));
   check_eq(cells.size(), 1);
   Cell* c = cells.front();
   check(isCons(c));
@@ -67,7 +67,7 @@ void test_build_handles_nested_quote() {
 }
 
 void test_build_handles_multiple_atoms() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34\n35")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"34\n35")))));
   check_eq(cells.size(), 2);
   Cell* c = cells.front();
   check(isNum(c));
@@ -84,7 +84,7 @@ void test_build_handles_multiple_atoms() {
 }
 
 void test_build_handles_form() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34 35")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"34 35")))));
   check_eq(cells.size(), 1);
   Cell* c = cells.front();
   check(isCons(c));
@@ -105,7 +105,7 @@ void test_build_handles_form() {
 }
 
 void test_build_handles_dot() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"34 . 35")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"34 . 35")))));
   check_eq(cells.size(), 1);
   Cell* c = cells.front();
   check(isCons(c));
@@ -123,7 +123,7 @@ void test_build_handles_dot() {
 }
 
 void test_build_handles_nested_form() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 23))")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"(3 7 (33 23))")))));
   check_eq(cells.size(), 1);
   Cell* c = cells.front();
   check(isCons(c));
@@ -161,7 +161,7 @@ void test_build_handles_nested_form() {
 }
 
 void test_build_handles_strings() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 \"abc\" 23))")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"(3 7 (33 \"abc\" 23))")))));
   check_eq(cells.size(), 1);
   Cell* c = cells.front();
   check(isCons(c));
@@ -203,7 +203,7 @@ void test_build_handles_strings() {
 }
 
 void test_build_handles_syms() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"(3 7 (33 \"abc\" 3de 23))")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"(3 7 (33 \"abc\" 3de 23))")))));
   check_eq(cells.size(), 1);
   Cell* c = cells.front();
   check(isCons(c));
@@ -250,7 +250,7 @@ void test_build_handles_syms() {
 }
 
 void test_build_handles_quotes() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(teststream(L"`(34 ,(35) ,36 ,@37 ,'(a))")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"`(34 ,(35) ,36 ,@37 ,'(a))")))));
   check_eq(cells.size(), 1);
   Cell* c = cells.front();
   check(isCons(c));
