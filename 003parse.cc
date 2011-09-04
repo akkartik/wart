@@ -56,7 +56,7 @@ list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterato
     if (curr == end || *curr == L")") return curr;
   }
 
-  if (*curr == L")") cerr << "Unbalanced )" << endl << DIE;
+  if (*curr == L")") err << "Unbalanced )" << endl << DIE;
 
   if (*curr != L"(" && !isQuoteOrUnquote(*curr)) {
     out.push_back(AstNode::of(*curr));
@@ -74,7 +74,7 @@ list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterato
     ++curr;
     while (curr != end && *curr != L")")
       curr = parseNext(curr, end, subform);
-    if (curr == end) cerr << "Unbalanced (" << endl << DIE;
+    if (curr == end) err << "Unbalanced (" << endl << DIE;
     subform.push_back(*curr);
     ++curr;
   }

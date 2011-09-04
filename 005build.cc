@@ -18,7 +18,7 @@ Cell* buildCell(AstNode n) {
   if (n.isNil())
     return nil;
   if (n.elems.front() == L")") {
-    if (n.elems.size() > 1) cerr << "Syntax error: ) not at end of expr" << endl << DIE;
+    if (n.elems.size() > 1) err << "Syntax error: ) not at end of expr" << endl << DIE;
     return nil;
   }
 
@@ -45,7 +45,7 @@ Cell* buildCell(AstNode n) {
 
   list<AstNode>::iterator next = first; ++next;
   if (*next == L".") {
-    if (n.elems.size() == 2) cerr << "Syntax error: . can't terminate expr" << endl << DIE;
+    if (n.elems.size() == 2) err << "Syntax error: . can't terminate expr" << endl << DIE;
     setCdr(newForm, buildCell(*++next)); // dotted pair
   }
   else if (isQuoteOrUnquote(*first) && n.elems.size() == 2) {

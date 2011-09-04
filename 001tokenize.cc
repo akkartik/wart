@@ -101,7 +101,7 @@ int countIndent(istream& in) {
       stopTokenizing = true;
   }
   if (count >= LAST_CHAR_IS_SPACE)
-    cerr << L"eek, too much indent\n" << DIE;
+    err << L"eek, too much indent" << endl << DIE;
   if (lastCharIsSpace)
     count += LAST_CHAR_IS_SPACE;
   return count;

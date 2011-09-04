@@ -172,7 +172,7 @@ COMPILE_PRIM_FUNC(type, primFunc_type,
         result = newSym(L"list");
       break;
     default:
-      cerr << "Undefined type: " << x->type << endl << DIE;
+      err << "Undefined type: " << x->type << endl << DIE;
     }
   rmref(x);
   return mkref(result);

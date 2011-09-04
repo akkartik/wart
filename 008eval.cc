@@ -119,7 +119,7 @@ void bindArgs(Cell* params, Cell* args) {
 
 Cell* eval(Cell* expr) {
   if (!expr)
-    cerr << "eval: cell should never be NULL" << endl << DIE;
+    err << "eval: cell should never be NULL" << endl << DIE;
 
   if (expr == nil)
     return nil;
@@ -153,7 +153,7 @@ Cell* eval(Cell* expr) {
   }
 
   if (!isFunc(lambda))
-    cerr << "not a function call: " << expr << endl << DIE;
+    err << "not a function call: " << expr << endl << DIE;
 
   // eval all its args in the current lexical scope
   Cell* evald_args = eval_args(sig(lambda), call_args(expr));
