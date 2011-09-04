@@ -61,9 +61,18 @@ COMPILE_PRIM_FUNC(ssyntax, primFunc_ssyntax,
 
   SsyntaxTemplate s;
   s.key = pat[pos];
-  if (pos == 0) s.type = SsyntaxTemplate::UNARY;
-  else s.type = SsyntaxTemplate::MULTIARY;
-  s.convertedSym = car(car(cdr(args)));
+
+  Cell* recipe = car(cdr(args));
+  if (pos == 0)
+    s.type = SsyntaxTemplate::UNARY;
+  else if (pat.find_first_not_of(L"_", pos) == string::npos) // multiary
+    s.type = SsyntaxTemplate::MULTIARY;
+  else if (isCons(car(cdr(recipe))))
+    s.type = SsyntaxTemplate::LEFT_ASSOCIATIVE;
+  else
+    s.type = SsyntaxTemplate::RIGHT_ASSOCIATIVE;
+
+  s.convertedSym = car(recipe);
   ssyntaxTemplates.push_back(s);
   return nil;
 )
