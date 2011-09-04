@@ -166,3 +166,7 @@ mac with($params . $body)
   `((lambda ,(map car (pair $params))
      ,@$body)
     ,@(map cadr (pair $params)))
+
+mac call $args
+  $args
+ssyntax _._ (call _ _)
