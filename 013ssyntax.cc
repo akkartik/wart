@@ -54,6 +54,8 @@ Cell* transform_ssyntax(Cell* input) {
   return input;
 }
 
+
+
 COMPILE_PRIM_FUNC(ssyntax, primFunc_ssyntax,
   string pat = toString(car(args));
   size_t pos = pat.find_first_not_of(L"_");
