@@ -112,6 +112,9 @@ def * xs
 def / xs
   reduce divide xs
 
+def % xs
+  reduce modulo xs
+
 def map(f xs)
   if xs
     cons (f (car xs))
