@@ -1,6 +1,6 @@
 struct SsyntaxTemplate {
   char key;
-  enum { BEGINNING, IN_BETWEEN, END } dir;
+  enum { BEGINNING, IN_BETWEEN } dir;
   Cell* convertedSym;
 };
 list<SsyntaxTemplate> ssyntaxTemplates;
@@ -20,10 +20,8 @@ string transformSsyntax(string var, SsyntaxTemplate pat) {
   if (pat.dir == SsyntaxTemplate::BEGINNING) return L"";
 
   if (pos == len-1) {
-    if (pat.dir != SsyntaxTemplate::END) return L"";
-    return var.substr(0, len-1);
+    var = var+L"nil";
   }
-  if (pat.dir == SsyntaxTemplate::END) return L"";
 
   while (pos != string::npos) {
     var.replace(pos, 1, 1, L' ');
@@ -60,7 +58,6 @@ COMPILE_PRIM_FUNC(ssyntax, primFunc_ssyntax,
   SsyntaxTemplate s;
   s.key = pat[pos];
   if (pos == 0) s.dir = SsyntaxTemplate::BEGINNING;
-  else if (pos == pat.length()) s.dir = SsyntaxTemplate::END;
   else s.dir = SsyntaxTemplate::IN_BETWEEN;
   s.convertedSym = car(car(cdr(args)));
   ssyntaxTemplates.push_back(s);

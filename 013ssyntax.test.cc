@@ -35,6 +35,19 @@ void test_unary_ssyntax() {
   ssyntaxTemplates.clear();
 }
 
+void test_ssyntax_adds_trailing_nil() {
+  SsyntaxTemplate s = {L'.', SsyntaxTemplate::IN_BETWEEN, newSym(L"op")};
+  ssyntaxTemplates.push_back(s);
+  Cell* cons = wartRead(stream(L"a.")).front();
+  check_eq(car(cons), newSym(L"op"));
+  check_eq(car(cdr(cons)), newSym(L"a"));
+  check(isCons(cdr(cdr(cons))));
+  check_eq(car(cdr(cdr(cons))), nil);
+  check_eq(cdr(cdr(cdr(cons))), nil);
+  rmref(cons);
+  ssyntaxTemplates.clear();
+}
+
 void test_ssyntax_setup() {
   Cell* def = wartRead(stream(L"ssyntax _._ (op _ _)")).front();
   eval(def); // needn't rmref; returns nil
