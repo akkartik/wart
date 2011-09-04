@@ -9,7 +9,7 @@ string transformSsyntax(string var, SsyntaxTemplate pat) {
   size_t pos = var.find(pat.key);
   if (pos == string::npos) return L"";
 
-  // avoid detecting 2.4 as ssyntax. Hacky, not unicode-aware.
+  // avoid detecting floats as ssyntax. Hacky, not unicode-aware.
   if (var.find_first_of(L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") == string::npos) return L"";
 
   size_t len = var.length();
