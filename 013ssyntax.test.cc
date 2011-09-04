@@ -60,6 +60,27 @@ void test_multiary_ssyntax() {
   ssyntaxTemplates.clear();
 }
 
+void test_left_associative_ssyntax() {
+  SsyntaxTemplate s = {L'.', SsyntaxTemplate::LEFT_ASSOCIATIVE, newSym(L"op")};
+  ssyntaxTemplates.push_back(s);
+  Cell* cons = wartRead(stream(L"a.b.c")).front();
+  check_eq(car(cons), newSym(L"op"));
+
+  Cell* lhs = car(cdr(cons));
+  check(isCons(lhs));
+  check_eq(car(lhs), newSym(L"op"));
+  check_eq(car(cdr(lhs)), newSym(L"a"));
+  check_eq(car(cdr(cdr(lhs))), newSym(L"b"));
+  check_eq(cdr(cdr(cdr(lhs))), nil);
+
+  Cell* rhs = car(cdr(cdr(cons)));
+  check_eq(rhs, newSym(L"c"));
+
+  check_eq(cdr(cdr(cdr(cons))), nil);
+  rmref(cons);
+  ssyntaxTemplates.clear();
+}
+
 void test_right_associative_ssyntax() {
   SsyntaxTemplate s = {L'.', SsyntaxTemplate::RIGHT_ASSOCIATIVE, newSym(L"op")};
   ssyntaxTemplates.push_back(s);

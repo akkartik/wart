@@ -6,7 +6,7 @@ struct SsyntaxTemplate {
 list<SsyntaxTemplate> ssyntaxTemplates;
 
 string transformSsyntax(string var, SsyntaxTemplate pat) {
-  size_t pos = var.find(pat.key);
+  size_t pos = (pat.type != SsyntaxTemplate::LEFT_ASSOCIATIVE) ? var.find(pat.key) : var.rfind(pat.key);
   if (pos == string::npos) return L"";
 
   // avoid detecting floats as ssyntax. Hacky, not unicode-aware.
