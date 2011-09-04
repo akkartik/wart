@@ -47,6 +47,19 @@ void test_ssyntax_adds_trailing_nil() {
   ssyntaxTemplates.clear();
 }
 
+void test_multiary_ssyntax() {
+  SsyntaxTemplate s = {L'.', SsyntaxTemplate::MULTIARY, newSym(L"op")};
+  ssyntaxTemplates.push_back(s);
+  Cell* cons = wartRead(stream(L"a.b.c")).front();
+  check_eq(car(cons), newSym(L"op"));
+  check_eq(car(cdr(cons)), newSym(L"a"));
+  check_eq(car(cdr(cdr(cons))), newSym(L"b"));
+  check_eq(car(cdr(cdr(cdr(cons)))), newSym(L"c"));
+  check_eq(cdr(cdr(cdr(cdr(cons)))), nil);
+  rmref(cons);
+  ssyntaxTemplates.clear();
+}
+
 void test_multiary_ssyntax_setup() {
   Cell* def = wartRead(stream(L"ssyntax _._ (op _ _)")).front();
   eval(def); // needn't rmref; returns nil
