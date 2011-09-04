@@ -2,6 +2,7 @@
 #include<dirent.h>
 #define char wchar_t
 
+list<Cell*> transform(list<Cell*>);
 list<Cell*> wartRead(istream& f) {
   return transform(buildCells(parse(parenthesize(tokenize(f)))));
 }

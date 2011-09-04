@@ -24,23 +24,3 @@ Cell* transform_dollarVars(Cell* input) {
   Table map; // expand $vars identically within each top-level expression
   return transformDollarVars(input, map);
 }
-
-
-
-typedef Cell* (*transformer)(Cell*);
-const transformer transforms[] = {
-  #include "transform_list"
-};
-
-Cell* transform(Cell* cell) {
-  for (unsigned int i=0; i < sizeof(transforms)/sizeof(transforms[0]); ++i)
-    cell = (*transforms[i])(cell);
-  return cell;
-}
-
-list<Cell*> transform(list<Cell*> input) {
-  list<Cell*> result;
-  for (list<Cell*>::iterator p = input.begin(); p != input.end(); ++p)
-    result.push_back(transform(*p));
-  return result;
-}

@@ -80,8 +80,6 @@ stringstream& teststream(string s) {
   return result;
 }
 
-void init();
-
 
 
 bool interactive = false;
@@ -108,6 +106,26 @@ void setupPrimFuncs() {
 void teardownPrimFuncs() {
   for (unsigned int i=0; i < sizeof(primFuncs)/sizeof(primFuncs[0]); ++i)
     endDynamicScope(primFuncs[i].name);
+}
+
+
+
+typedef Cell* (*transformer)(Cell*);
+const transformer transforms[] = {
+  #include "transform_list"
+};
+
+Cell* transform(Cell* cell) {
+  for (unsigned int i=0; i < sizeof(transforms)/sizeof(transforms[0]); ++i)
+    cell = (*transforms[i])(cell);
+  return cell;
+}
+
+list<Cell*> transform(list<Cell*> input) {
+  list<Cell*> result;
+  for (list<Cell*>::iterator p = input.begin(); p != input.end(); ++p)
+    result.push_back(transform(*p));
+  return result;
 }
 
 
@@ -204,6 +222,7 @@ const testfunc tests[] = {
   #include "test_list"
 };
 
+void init();
 void runTests() {
   runningTests = true; // never reset
   for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
