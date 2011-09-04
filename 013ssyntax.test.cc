@@ -1,5 +1,5 @@
 void test_ssyntax() {
-  SsyntaxTemplate s = {L'.', SsyntaxTemplate::IN_BETWEEN, newSym(L"op")};
+  SsyntaxTemplate s = {L'.', SsyntaxTemplate::MULTIARY, newSym(L"op")};
   ssyntaxTemplates.push_back(s);
   Cell* cons = wartRead(stream(L"a.b")).front();
   check_eq(car(cons), newSym(L"op"));
@@ -11,7 +11,7 @@ void test_ssyntax() {
 }
 
 void test_ssyntax_skips_floats() {
-  SsyntaxTemplate s = {L'.', SsyntaxTemplate::IN_BETWEEN, newSym(L"op")};
+  SsyntaxTemplate s = {L'.', SsyntaxTemplate::MULTIARY, newSym(L"op")};
   ssyntaxTemplates.push_back(s);
   Cell* val = wartRead(stream(L"2.4")).front();
   check(isSym(val)); // fix when we support floats
@@ -21,7 +21,7 @@ void test_ssyntax_skips_floats() {
 }
 
 void test_unary_ssyntax() {
-  SsyntaxTemplate s = {L'.', SsyntaxTemplate::BEGINNING, newSym(L"op")};
+  SsyntaxTemplate s = {L'.', SsyntaxTemplate::UNARY, newSym(L"op")};
   ssyntaxTemplates.push_back(s);
   Cell* sym = wartRead(stream(L"a.b")).front();
   check_eq(sym, newSym(L"a.b")); // doesn't trigger for binary ops
@@ -36,7 +36,7 @@ void test_unary_ssyntax() {
 }
 
 void test_ssyntax_adds_trailing_nil() {
-  SsyntaxTemplate s = {L'.', SsyntaxTemplate::IN_BETWEEN, newSym(L"op")};
+  SsyntaxTemplate s = {L'.', SsyntaxTemplate::MULTIARY, newSym(L"op")};
   ssyntaxTemplates.push_back(s);
   Cell* cons = wartRead(stream(L"a.")).front();
   check_eq(car(cons), newSym(L"op"));
@@ -48,7 +48,7 @@ void test_ssyntax_adds_trailing_nil() {
   ssyntaxTemplates.clear();
 }
 
-void test_ssyntax_setup() {
+void test_multiary_ssyntax_setup() {
   Cell* def = wartRead(stream(L"ssyntax _._ (op _ _)")).front();
   eval(def); // needn't rmref; returns nil
   Cell* expr = wartRead(stream(L"a.b")).front();
