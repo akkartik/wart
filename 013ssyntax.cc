@@ -48,15 +48,17 @@ Cell* transform_ssyntax(Cell* input) {
   return input;
 }
 
-// ssyntax !_ (not _)
-// ssyntax ~_ (negate _)
-// ssyntax _:_ (compose _ _)
-// ssyntax _._ (call _ _)
-// ssyntax _. (call _)
-// ssyntax _!_ (call _ '_)
+COMPILE_PRIM_FUNC(ssyntax, primFunc_ssyntax,
+  string pat = toString(car(args));
+  size_t pos = pat.find_first_not_of(L"_");
+  if (pos == string::npos) return nil;
 
-//? COMPILE_PRIM_FUNC(ssyntax, primFunc_ssyntax,
-//?   string pat = toString(car(args));
-//?   list
-//?   Cell* result = car(cdr(args));
-//? )
+  SsyntaxTemplate s;
+  s.key = pat[pos];
+  if (pos == 0) s.dir = SsyntaxTemplate::BEGINNING;
+  else if (pos == pat.length()) s.dir = SsyntaxTemplate::END;
+  else s.dir = SsyntaxTemplate::IN_BETWEEN;
+  s.convertedSym = car(cdr(args));
+  ssyntaxTemplates.push_back(s);
+  return nil;
+)
