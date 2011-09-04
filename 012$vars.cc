@@ -1,12 +1,3 @@
-//// manage phases that transform cell trees
-
-                                  Cell* genSym(Cell* x) {
-                                    static long counter = 0;
-                                    ostringstream os;
-                                    os << (x == nil ? L"sym" : toString(x)) << ++counter;
-                                    return newSym(os.str());
-                                  }
-
 Cell* transformDollarVars(Cell* input, Table& map) {
   if (isSym(input) && toString(input)[0] == L'$') {
     if (!map[input])

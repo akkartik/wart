@@ -107,6 +107,13 @@ COMPILE_PRIM_FUNC(debug, primFunc_debug,
   return nil;
 )
 
+                                  Cell* genSym(Cell* x) {
+                                    static long counter = 0;
+                                    ostringstream os;
+                                    os << (x == nil ? L"sym" : toString(x)) << ++counter;
+                                    return newSym(os.str());
+                                  }
+
 COMPILE_PRIM_FUNC(uniq, primFunc_uniq,
   Cell* x = eval(car(args));
   Cell* result = genSym(x);
