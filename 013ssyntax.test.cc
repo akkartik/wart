@@ -20,6 +20,17 @@ void test_ssyntax_skips_floats() {
   ssyntaxTemplates.clear();
 }
 
+void test_unary_ssyntax() {
+  SsyntaxTemplate s = {L'.', SsyntaxTemplate::BEGINNING, newSym(L"op")};
+  ssyntaxTemplates.push_back(s);
+  Cell* cons = wartRead(stream(L".b")).front();
+  check_eq(car(cons), newSym(L"op"));
+  check_eq(car(cdr(cons)), newSym(L"b"));
+  check_eq(cdr(cdr(cons)), nil);
+  rmref(cons);
+  ssyntaxTemplates.clear();
+}
+
 void test_ssyntax_setup() {
   Cell* def = wartRead(stream(L"ssyntax _._ (op _ _)")).front();
   eval(def); // needn't rmref; returns nil

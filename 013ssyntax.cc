@@ -34,9 +34,11 @@ Cell* transform_ssyntax(Cell* input) {
   if (isSym(input)) {
     string var = toString(input);
     for (list<SsyntaxTemplate>::iterator p = ssyntaxTemplates.begin(); p != ssyntaxTemplates.end(); ++p) {
-      string args = transformSsyntax(var, *p);
-      if (!args.empty()) {
-        input = newCons(p->convertedSym, wartRead(stream(args)).front());
+      string rest = transformSsyntax(var, *p);
+      if (!rest.empty()) {
+        Cell* args = wartRead(stream(rest)).front();
+        if (!isCons(args)) args = newCons(args, nil); // unary op
+        input = newCons(p->convertedSym, args);
         break;
       }
     }
