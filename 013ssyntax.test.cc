@@ -14,8 +14,7 @@ void test_ssyntax_skips_floats() {
   SsyntaxTemplate s = {L'.', SsyntaxTemplate::MULTIARY, newSym(L"op")};
   ssyntaxTemplates.push_back(s);
   Cell* val = wartRead(stream(L"2.4")).front();
-  check(isSym(val)); // fix when we support floats
-  check_eq(toString(val), L"2.4");
+  check_eq(val, newSym(L"2.4")); // fix when we support floats
   rmref(val);
   ssyntaxTemplates.clear();
 }
