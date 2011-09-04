@@ -23,6 +23,10 @@ void test_ssyntax_skips_floats() {
 void test_unary_ssyntax() {
   SsyntaxTemplate s = {L'.', SsyntaxTemplate::BEGINNING, newSym(L"op")};
   ssyntaxTemplates.push_back(s);
+  Cell* sym = wartRead(stream(L"a.b")).front();
+  check_eq(sym, newSym(L"a.b")); // doesn't trigger for binary ops
+  rmref(sym);
+
   Cell* cons = wartRead(stream(L".b")).front();
   check_eq(car(cons), newSym(L"op"));
   check_eq(car(cdr(cons)), newSym(L"b"));

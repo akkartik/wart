@@ -17,11 +17,13 @@ string transformSsyntax(string var, SsyntaxTemplate pat) {
     if (pat.dir != SsyntaxTemplate::BEGINNING) return L"";
     return var.substr(1, len);
   }
+  if (pat.dir == SsyntaxTemplate::BEGINNING) return L"";
 
   if (pos == len-1) {
     if (pat.dir != SsyntaxTemplate::END) return L"";
     return var.substr(0, len-1);
   }
+  if (pat.dir == SsyntaxTemplate::END) return L"";
 
   while (pos != string::npos) {
     var.replace(pos, 1, 1, L' ');
