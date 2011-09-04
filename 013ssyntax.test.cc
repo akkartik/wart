@@ -136,3 +136,18 @@ void test_left_associative_ssyntax_setup() {
   ssyntaxTemplates.clear();
   rmref(def);
 }
+
+void test_multiary_ssyntax_handles_trailing_ssyntax() {
+  Cell* def = wartRead(stream(L"ssyntax _._ (op _ _)")).front();
+  eval(def); // needn't rmref; returns nil
+  Cell* cons = wartRead(stream(L"a.b.")).front();
+  check_eq(car(cons), newSym(L"op"));
+  check_eq(car(cdr(cons)), newSym(L"a"));
+  check_eq(car(cdr(cdr(cons))), newSym(L"b"));
+  check(isCons(cdr(cdr(cdr(cons)))));
+  check_eq(car(cdr(cdr(cdr(cons)))), nil);
+  check_eq(cdr(cdr(cdr(cdr(cons)))), nil);
+  rmref(cons);
+  ssyntaxTemplates.clear();
+  rmref(def);
+}

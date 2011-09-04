@@ -19,7 +19,7 @@ string transformSsyntax(string var, SsyntaxTemplate pat) {
   }
   if (pat.type == SsyntaxTemplate::UNARY) return L"";
 
-  if (pos == len-1) {
+  if (var[len-1] == pat.key) {
     var = var+L"nil";
   }
 

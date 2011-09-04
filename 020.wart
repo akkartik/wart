@@ -176,8 +176,6 @@ ssyntax ~_ (complement _)
 
 mac call $args
   $args
-ssyntax _._._ (call (call _ _) _)
-
 mac call-quoted($a $b)
   `(,$a ',$b)
-ssyntax _!_!_ (call-quoted (call-quoted _ _) _)
+ssyntax _._!_ (call-quoted (call _ _) _)
