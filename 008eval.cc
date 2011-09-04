@@ -145,9 +145,9 @@ Cell* eval(Cell* expr) {
 
   // expr is a function call
   Cell* lambda = eval(car(expr));
-  if (isPrimFunc(lambda)) {
+  if (isPrimFunc(car(lambda))) {
     // primFuncs must eval their own args and mkref their result
-    Cell* result = toPrimFunc(lambda)(cdr(expr));
+    Cell* result = toPrimFunc(car(lambda))(cdr(expr));
     rmref(lambda);
     return result;
   }
