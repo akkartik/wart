@@ -227,10 +227,17 @@ bool endOfReplExpr(list<Token> tokens) {
       return stopTokenizing;
   }
 
+  // explicit paren
   if (*firstNonSpace == L"(" && replParenCount == 0) {
     stopTokenizing = true;
     cin.get(); // newline
   }
+
+  // single word on a line
+  int numWordsInLine(list<Token> line);
+  if (numWordsInLine(tokens) == 1 && tokens.back() == Token::sol())
+    stopTokenizing = true;
+
   return stopTokenizing;
 }
 

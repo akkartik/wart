@@ -260,7 +260,8 @@ int main(int argc, unused ascii* argv[]) {
   loadFiles(".wart");
 
   // no unit tests for interactive repl, so manual QA:
-  //   expr that doesn't start with paren should eval on empty line
+  //   single-word expr should eval on newline
+  //   multi-word expr that doesn't start with paren should eval on empty line
   //   expr that starts with paren should eval on close
   interactive = true;
 
