@@ -41,7 +41,8 @@ Cell* transform_ssyntax(Cell* input) {
       string rest = transformSsyntax(var, *p);
       if (!rest.empty()) {
         Cell* args = wartRead(stream(rest)).front();
-        if (!isCons(args)) args = newCons(args, nil); // unary op
+        if (!isCons(args))
+          args = newCons(args, nil); // unary op
         input = newCons(p->convertedSym, args);
         break;
       }
