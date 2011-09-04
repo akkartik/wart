@@ -19,10 +19,6 @@ string transformSsyntax(string var, SsyntaxTemplate pat) {
   }
   if (pat.type == SsyntaxTemplate::UNARY) return L"";
 
-  if (var[len-1] == pat.key) {
-    var = var+L"nil";
-  }
-
   if (pat.type != SsyntaxTemplate::MULTIARY) {
     return var.replace(pos, 1, 1, L' ');
   }

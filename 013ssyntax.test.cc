@@ -34,15 +34,13 @@ void test_unary_ssyntax() {
   ssyntaxTemplates.clear();
 }
 
-void test_ssyntax_adds_trailing_nil() {
+void test_trailing_ssyntax() {
   SsyntaxTemplate s = {L'.', SsyntaxTemplate::MULTIARY, newSym(L"op")};
   ssyntaxTemplates.push_back(s);
   Cell* cons = wartRead(stream(L"a.")).front();
   check_eq(car(cons), newSym(L"op"));
   check_eq(car(cdr(cons)), newSym(L"a"));
-  check(isCons(cdr(cdr(cons))));
-  check_eq(car(cdr(cdr(cons))), nil);
-  check_eq(cdr(cdr(cdr(cons))), nil);
+  check_eq(cdr(cdr(cons)), nil);
   rmref(cons);
   ssyntaxTemplates.clear();
 }
@@ -132,21 +130,6 @@ void test_left_associative_ssyntax_setup() {
   check_eq(rhs, newSym(L"c"));
 
   check_eq(cdr(cdr(cdr(cons))), nil);
-  rmref(cons);
-  ssyntaxTemplates.clear();
-  rmref(def);
-}
-
-void test_multiary_ssyntax_handles_trailing_ssyntax() {
-  Cell* def = wartRead(stream(L"ssyntax _._ (op _ _)")).front();
-  eval(def); // needn't rmref; returns nil
-  Cell* cons = wartRead(stream(L"a.b.")).front();
-  check_eq(car(cons), newSym(L"op"));
-  check_eq(car(cdr(cons)), newSym(L"a"));
-  check_eq(car(cdr(cdr(cons))), newSym(L"b"));
-  check(isCons(cdr(cdr(cdr(cons)))));
-  check_eq(car(cdr(cdr(cdr(cons)))), nil);
-  check_eq(cdr(cdr(cdr(cdr(cons)))), nil);
   rmref(cons);
   ssyntaxTemplates.clear();
   rmref(def);
