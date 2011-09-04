@@ -104,11 +104,12 @@ void test_right_associative_ssyntax() {
 void test_multiary_ssyntax_setup() {
   Cell* def = wartRead(stream(L"ssyntax _._ (op _ _)")).front();
   eval(def); // needn't rmref; returns nil
-  Cell* expr = wartRead(stream(L"a.b")).front();
+  Cell* expr = wartRead(stream(L"a.b.c")).front();
   check_eq(car(expr), newSym(L"op"));
   check_eq(car(cdr(expr)), newSym(L"a"));
   check_eq(car(cdr(cdr(expr))), newSym(L"b"));
-  check_eq(cdr(cdr(cdr(expr))), nil);
+  check_eq(car(cdr(cdr(cdr(expr)))), newSym(L"c"));
+  check_eq(cdr(cdr(cdr(cdr(expr)))), nil);
   rmref(expr);
   ssyntaxTemplates.clear();
   rmref(def);
