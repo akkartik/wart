@@ -60,6 +60,26 @@ void test_multiary_ssyntax() {
   ssyntaxTemplates.clear();
 }
 
+void test_right_associative_ssyntax() {
+  SsyntaxTemplate s = {L'.', SsyntaxTemplate::RIGHT_ASSOCIATIVE, newSym(L"op")};
+  ssyntaxTemplates.push_back(s);
+  Cell* cons = wartRead(stream(L"a.b.c")).front();
+  check_eq(car(cons), newSym(L"op"));
+
+  Cell* lhs = car(cdr(cons));
+  check_eq(lhs, newSym(L"a"));
+
+  Cell* rhs = car(cdr(cdr(cons)));
+  check(isCons(rhs));
+  check_eq(car(rhs), newSym(L"op"));
+  check_eq(car(cdr(rhs)), newSym(L"b"));
+  check_eq(car(cdr(cdr(rhs))), newSym(L"c"));
+
+  check_eq(cdr(cdr(cdr(cons))), nil);
+  rmref(cons);
+  ssyntaxTemplates.clear();
+}
+
 void test_multiary_ssyntax_setup() {
   Cell* def = wartRead(stream(L"ssyntax _._ (op _ _)")).front();
   eval(def); // needn't rmref; returns nil

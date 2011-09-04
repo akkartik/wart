@@ -1,6 +1,6 @@
 struct SsyntaxTemplate {
   char key;
-  enum { UNARY, MULTIARY } type;
+  enum { UNARY, LEFT_ASSOCIATIVE, RIGHT_ASSOCIATIVE, MULTIARY } type;
   Cell* convertedSym;
 };
 list<SsyntaxTemplate> ssyntaxTemplates;
@@ -21,6 +21,10 @@ string transformSsyntax(string var, SsyntaxTemplate pat) {
 
   if (pos == len-1) {
     var = var+L"nil";
+  }
+
+  if (pat.type != SsyntaxTemplate::MULTIARY) {
+    return var.replace(pos, 1, 1, L' ');
   }
 
   while (pos != string::npos) {
