@@ -256,13 +256,13 @@ int main(int argc, unused ascii* argv[]) {
     return 0;
   }
 
+  init();
+  loadFiles(".wart");
+
   // no unit tests for interactive repl, so manual QA:
   //   expr that doesn't start with paren should eval on empty line
   //   expr that starts with paren should eval on close
   interactive = true;
-
-  init();
-  loadFiles(".wart");
 
   while (!cin.eof()) {
     cout << "wart> ";
