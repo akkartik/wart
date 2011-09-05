@@ -1,48 +1,52 @@
-struct SsyntaxTemplate {
-  char key;
-  enum { UNARY, LEFT_ASSOCIATIVE, RIGHT_ASSOCIATIVE, MULTIARY } type;
-  Cell* convertedSym;
-};
-list<SsyntaxTemplate> ssyntaxTemplates;
+Cell* transformNot(string var) {
+  var.replace(0, 1, L"not ");
+  return wartRead(stream(var)).front();
+}
 
-string transformSsyntax(string var, SsyntaxTemplate pat) {
-  size_t pos = (pat.type != SsyntaxTemplate::LEFT_ASSOCIATIVE) ? var.find(pat.key) : var.rfind(pat.key);
-  if (pos == string::npos) return L"";
+Cell* transformCompose(string var) {
+  var.replace(var.rfind(L':'), 1, L" ");
+  return wartRead(stream(L"compose "+var)).front();
+}
 
-  // avoid detecting floats as ssyntax. Hacky, not unicode-aware.
-  if (var.find_first_of(L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") == string::npos) return L"";
+Cell* transformCall(string var) {
+  if (var.find_first_of(L".!", var.length()-1) != string::npos)
+    var = var+L"nil";
 
-  size_t len = var.length();
-  if (pos == 0) {
-    if (pat.type != SsyntaxTemplate::UNARY) return L"";
-    return var.substr(1, len);
-  }
-  if (pat.type == SsyntaxTemplate::UNARY) return L"";
+  size_t dot = var.rfind(L'.');
+  size_t bang = var.rfind(L'!');
+  if (bang != string::npos && bang > dot)
+    var.replace(bang, 1, L" '");
+  else
+    var.replace(dot, 1, L" ");
+  return wartRead(stream(var)).front();
+}
 
-  if (pat.type != SsyntaxTemplate::MULTIARY) {
-    return var.replace(pos, 1, 1, L' ');
-  }
+Cell* transformAndf(string var) {
+  var.replace(var.rfind(L'&'), 1, L" ");
+  return wartRead(stream(L"andf "+var)).front();
+}
 
-  while (pos != string::npos) {
-    var.replace(pos, 1, 1, L' ');
-    pos = var.find(pat.key, pos);
-  }
-  return var;
+Cell* transformComplement(string var) {
+  var.replace(0, 1, L"complement ");
+  return wartRead(stream(var)).front();
 }
 
 Cell* transform_ssyntax(Cell* input) {
   if (isSym(input)) {
     string var = toString(input);
-    for (list<SsyntaxTemplate>::iterator p = ssyntaxTemplates.begin(); p != ssyntaxTemplates.end(); ++p) {
-      string rest = transformSsyntax(var, *p);
-      if (!rest.empty()) {
-        Cell* args = wartRead(stream(rest)).front();
-        if (!isCons(args))
-          args = newCons(args, nil); // unary op
-        input = newCons(p->convertedSym, args);
-        break;
-      }
-    }
+    // avoid detecting floats as ssyntax. Hacky, not unicode-aware.
+    if (var.find_first_of(L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") == string::npos)
+      ;
+    else if (var[0] == L'!')
+      input = transformNot(var);
+    else if (var[0] != L':' && var.find(L':') != string::npos)
+      input = transformCompose(var);
+    else if (var.find(L'.') != string::npos || var.find(L'!') != string::npos)
+      input = transformCall(var);
+    else if (var.find(L'&') != string::npos)
+      input = transformAndf(var);
+    else if (var[0] == L'~')
+      input = transformComplement(var);
   }
 
   if (!isCons(input)) return input; // no tables or primFuncs in static code
@@ -50,28 +54,3 @@ Cell* transform_ssyntax(Cell* input) {
   setCdr(input, transform_ssyntax(cdr(input)));
   return input;
 }
-
-
-
-COMPILE_PRIM_FUNC(ssyntax, primFunc_ssyntax,
-  string pat = toString(car(args));
-  size_t pos = pat.find_first_not_of(L"_");
-  if (pos == string::npos) return nil;
-
-  SsyntaxTemplate s;
-  s.key = pat[pos];
-
-  Cell* recipe = car(cdr(args));
-  if (pos == 0)
-    s.type = SsyntaxTemplate::UNARY;
-  else if (pat.find_first_not_of(L"_", pos+1) == string::npos)
-    s.type = SsyntaxTemplate::MULTIARY;
-  else if (isCons(car(cdr(recipe))))
-    s.type = SsyntaxTemplate::LEFT_ASSOCIATIVE;
-  else
-    s.type = SsyntaxTemplate::RIGHT_ASSOCIATIVE;
-
-  s.convertedSym = car(recipe);
-  ssyntaxTemplates.push_back(s);
-  return nil;
-)

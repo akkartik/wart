@@ -169,14 +169,3 @@ mac with($params . $body)
   `((lambda ,(map car (pair $params))
      ,@$body)
     ,@(map cadr (pair $params)))
-
-mac complement($f)
-  `(lambda $args (no (apply ,$f $args)))
-ssyntax ~_ (complement _)
-
-mac call $args
-  $args
-ssyntax _._ (call _ _)
-mac call-quoted($a $b)
-  `(,$a ',$b)
-ssyntax _!_ (call-quoted _ _)
