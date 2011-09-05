@@ -1,7 +1,7 @@
 Feedback: wart@akkartik.com
 
 This thoroughly unit-tested interpreter takes wart off Common Lisp and makes
-it a lisp-1 with fexprs and case-sensitive strings. Still in progress. A
+it a lisp-1 with fexprs and case-sensitive symbols. Still in progress. A
 half-assed measurement found factorial in wart to be a thousand times slower
 than in arc.
 
