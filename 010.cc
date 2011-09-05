@@ -38,7 +38,7 @@ COMPILE_PRIM_FUNC(cons?, primFunc_isCons,
   return nil;
 )
 
-COMPILE_PRIM_FUNC(nil?, primFunc_isNil,
+COMPILE_PRIM_FUNC(not, primFunc_not,
   Cell* x = eval(car(args));
   Cell* result = (x == nil ? newNum(1) : nil);
   rmref(x);

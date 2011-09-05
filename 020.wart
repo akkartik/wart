@@ -1,4 +1,4 @@
-assign not nil?
+assign nil? not
 assign no nil?
 
 ; (mac foo(x) `(+ 1 ,x))) (let x 3 (foo x)) => 4
