@@ -87,6 +87,7 @@ mac when($cond . $body)
 
 ; apply add '(1 2) => 3
 ; let x '(1 2) (apply add x) => 3
+; apply cons '(1 (2)) => (1 2)
 def apply(f args)
   (eval `(,f ,@args))
 
