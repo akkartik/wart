@@ -129,6 +129,19 @@ void test_parenthesize_groups_words_on_single_line() {
   check(p == tokens.end());
 }
 
+void test_parenthesize_groups_words_on_accidentally_indented_line() {
+  debug = 1;
+  list<Token> tokens = parenthesize(tokenize(stream(L" a b c")));
+  debug = 0;
+  list<Token>::iterator p = tokens.begin();
+  check_eq(*p, L"("); ++p;
+  check_eq(*p, L"a"); ++p;
+  check_eq(*p, L"b"); ++p;
+  check_eq(*p, L"c"); ++p;
+  check_eq(*p, L")"); ++p;
+  check(p == tokens.end());
+}
+
 void test_parenthesize_groups_quoted_words() {
   list<Token> tokens = parenthesize(tokenize(stream(L",a b c")));
   list<Token>::iterator p = tokens.begin();

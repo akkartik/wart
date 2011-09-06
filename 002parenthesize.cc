@@ -132,7 +132,7 @@ list<Token> parenthesize(list<Token> in) {
     bool insertedParenThisLine = false;
     if (!suppressInsert && numWordsInLine(line) > 1
         && !alreadyGrouped(line)
-        && !(thisLineIndent.indentLevel == prevLineIndent.indentLevel+1 && thisLineIndent.type == MAYBE_WRAP)) {
+        && !(p != in.begin() && thisLineIndent.indentLevel == prevLineIndent.indentLevel+1 && thisLineIndent.type == MAYBE_WRAP)) {
       // open paren
       add(result, Token::of(L"("));
       parenStack.push(thisLineIndent.indentLevel);
