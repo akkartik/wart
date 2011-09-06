@@ -170,3 +170,13 @@ mac with($params . $body)
   `((lambda ,(map car (pair $params))
      ,@$body)
     ,@(map cadr (pair $params)))
+
+(def bar (x) x)
+
+(def foo (x)
+  (bar x))
+
+(foo 5)
+
+(let bar nil
+  (prn (foo 5)))

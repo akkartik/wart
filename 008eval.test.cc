@@ -153,7 +153,7 @@ void test_eval_handles_simple_lambda() {
   check_eq(car(cdr(lambda)), nil);
   check(isCons(car(cdr(cdr(lambda)))));
   check_eq(car(car(cdr(cdr(lambda)))), newNum(34));
-  check_eq(cdr(cdr(cdr(lambda))), nil);
+  check_eq(cdr(cdr(cdr(lambda))), newSym(L"dynamicScope"));
   rmref(lambda);
   rmref(cells.front());
 }
@@ -167,7 +167,7 @@ void test_eval_on_lambda_is_idempotent() {
   check_eq(car(cdr(lambda2)), nil);
   check(isCons(car(cdr(cdr(lambda2)))));
   check_eq(car(car(cdr(cdr(lambda2)))), newNum(34));
-  check_eq(cdr(cdr(cdr(lambda2))), nil);
+  check_eq(cdr(cdr(cdr(lambda2))), newSym(L"dynamicScope"));
   rmref(lambda2);
   rmref(lambda);
   rmref(cells.front());

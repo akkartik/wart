@@ -10,7 +10,7 @@ void test_cons_works() {
 void test_assign_to_lambda() {
   Cell* lambda = wartRead(stream(L"assign foo (lambda() 34)")).front();
   Cell* def = eval(lambda);
-  check_eq(callee_env(lookup(L"foo")), nil);
+  check_eq(callee_env(lookup(L"foo")), newSym(L"dynamicScope"));
   endDynamicScope(L"foo");
   rmref(def);
   rmref(lambda);

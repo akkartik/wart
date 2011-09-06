@@ -48,14 +48,17 @@ void assignDynamicVar(Cell* sym, Cell* val) {
 #define currLexicalScopes dynamics[(long)newSym(L"currLexicalScope")]
 hash_set<long> initialSyms;
 void setupLexicalScope() {
-  newDynamicScope(L"currLexicalScope", nil);
+  newDynamicScope(L"currLexicalScope", newSym(L"dynamicScope"));
   initialSyms.insert((long)newSym(L"currLexicalScope"));
+  initialSyms.insert((long)newSym(L"dynamicScope"));
 }
 
 Cell* lookupLexicalBinding(Cell* sym, Cell* lexicalScope) {
   for (Cell* scope = lexicalScope; scope != nil; scope = cdr(scope)) {
     Cell* result = NULL;
-    if (isTable(scope))
+    if (scope == newSym(L"dynamicScope"))
+      result = lookupDynamicBinding(sym);
+    else if (isTable(scope))
       result = unsafeGet(scope, sym);
     else if (isCons(scope))
       result = lookupLexicalBinding(sym, car(scope));
@@ -90,8 +93,6 @@ void addLexicalBinding(Cell* sym, Cell* val) {
 
 Cell* lookup(Cell* sym) {
   Cell* result = lookupLexicalBinding(sym, currLexicalScopes.top());
-  if (result) return result;
-  result = lookupDynamicBinding(sym);
   if (result) return result;
   warn << "No binding for " << toString(sym) << endl;
   warn << currLexicalScopes.top() << endl;
