@@ -67,6 +67,20 @@ Cell* lookupLexicalBinding(Cell* sym, Cell* lexicalScope) {
   return NULL;
 }
 
+Cell* scopeContainingBinding(Cell* sym, Cell* lexicalScope) {
+  for (Cell* scope = lexicalScope; scope != nil; scope = cdr(scope)) {
+    if (scope == newSym(L"dynamicScope") && lookupDynamicBinding(sym))
+      return scope;
+    else if (isTable(scope) && unsafeGet(scope, sym))
+      return scope;
+    else if (isCons(scope)) {
+      Cell* result = scopeContainingBinding(sym, car(scope));
+      if (result) return result;
+    }
+  }
+  return NULL;
+}
+
 // entering and leaving lexical scopes *assigns the current dynamic*
 // binding of the currLexicalScope sym.
 // Calling functions will create new dynamic bindings.
