@@ -140,7 +140,7 @@ void checkLiteralTables() {
       rmref(p->second);
   }
   for (StringMap<Cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
-    if (p->first == L"currLexicalScope") continue; // leak
+    if (initialSyms.find((long)p->second) != initialSyms.end()) continue;
     if (p->second->nrefs > 1)
       cerr << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
     if (p->second->nrefs > 0)
@@ -182,14 +182,14 @@ void dumpUnfreed() {
   }
   for (Cell* x = heapStart; x < currCell; ++x) {
     if (!x->car) continue;
-    if (x == newSym(L"currLexicalScope")) continue;
+    if (initialSyms.find((long)x) != initialSyms.end()) continue;
     if (numRefsRemaining[(long)x] > 1) continue;
     cerr << "unfreed: " << (void*)x << " " << x << endl;
   }
 }
 
 void checkUnfreed() {
-  int n = currCell-heapStart-1; // ignore empty currLexicalScopes
+  int n = currCell-heapStart-initialSyms.size();
   for (; freelist; freelist = freelist->cdr)
     --n;
   check_eq(n, 0);
