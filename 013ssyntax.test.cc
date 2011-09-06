@@ -45,9 +45,11 @@ void test_trailing_dot() {
 }
 
 void test_bang_is_call() {
-  Cell* cons = wartRead(stream(L"a.b")).front();
+  Cell* cons = wartRead(stream(L"a!b")).front();
   check_eq(car(cons), newSym(L"a"));
-  check_eq(car(cdr(cons)), newSym(L"b"));
+  check(isCons(car(cdr(cons))));
+  check_eq(car(car(cdr(cons))), newSym(L"'"));
+  check_eq(cdr(car(cdr(cons))), newSym(L"b"));
   check_eq(cdr(cdr(cons)), nil);
   rmref(cons);
 }

@@ -14,7 +14,7 @@ Cell* transformCall(string var) {
 
   size_t dot = var.rfind(L'.');
   size_t bang = var.rfind(L'!');
-  if (bang != string::npos && bang > dot)
+  if (bang != string::npos && (dot == string::npos || bang > dot))
     var.replace(bang, 1, L" '");
   else
     var.replace(dot, 1, L" ");
