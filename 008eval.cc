@@ -140,6 +140,13 @@ void bindArgs(Cell* params, Cell* args) {
                                       dbg2 << " ";
                                   }
 
+Cell* eval_eval(Cell* args) {
+  Cell* x = eval(car(args));
+  Cell* result = eval(x);
+  rmref(x);
+  return result;
+}
+
 Cell* eval(Cell* expr) {
   if (!expr)
     err << "eval: cell should never be NULL" << endl << DIE;
@@ -165,6 +172,9 @@ Cell* eval(Cell* expr) {
   else if (isFunc(expr))
     // lexical scope is already attached
     return mkref(expr);
+
+  if (car(expr) == newSym(L"eval"))
+    return eval_eval(cdr(expr)); // already mkref'd
 
   // expr is a function call
   Cell* lambda = eval(car(expr));
