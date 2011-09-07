@@ -164,7 +164,7 @@ Cell* eval(Cell* expr) {
     return mkref(expr);
 
   if (isQuoted(expr))
-    return processUnquotes(cdr(expr));
+    return processUnquotes(cdr(expr)); // already mkref'd
 
   if (car(expr) == newSym(L"lambda"))
     // attach current lexical scope
@@ -182,7 +182,7 @@ Cell* eval(Cell* expr) {
     // primFuncs must eval their own args and mkref their result
     Cell* result = toPrimFunc(car(lambda))(cdr(expr));
     rmref(lambda);
-    return result;
+    return result; // already mkref'd
   }
 
   if (!isFunc(lambda))
