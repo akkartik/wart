@@ -199,7 +199,7 @@ void test_build_handles_syms() {
 }
 
 void test_build_handles_quotes() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"`(34 ,(35) ,36 ,@37 ,'(a))")))));
+  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"`(34 ,(35) ,36 ,@37 @,38 ,'(a))")))));
   check_eq(cells.size(), 1);
   Cell* c = cells.front();
   check_eq(c->nrefs, 0);
@@ -230,6 +230,13 @@ void test_build_handles_quotes() {
     check_eq(car(c2), newSym(L",@"));
     check_eq(cdr(c2), newNum(37));
     check_eq(cdr(c2)->nrefs, 2);
+  c = cdr(c);
+    c2 = car(c);
+    check_eq(c2->nrefs, 1);
+    check_eq(car(c2), newSym(L"@"));
+    check_eq(car(cdr(c2)), newSym(L","));
+    check_eq(cdr(cdr(c2)), newNum(38));
+    check_eq(cdr(cdr(c2))->nrefs, 2);
   c = cdr(c);
     c2 = car(c);
     check_eq(c2->nrefs, 1);
