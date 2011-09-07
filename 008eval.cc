@@ -147,6 +147,22 @@ Cell* eval_eval(Cell* args) {
   return result;
 }
 
+Cell* eval_assign(Cell* args) {
+  Cell* var = car(args);
+  Cell* val = eval(car(cdr(args)));
+  Cell* currLexicalScope = currLexicalScopes.top();
+  if (isCons(currLexicalScope))
+    currLexicalScope = car(currLexicalScope); // ignore caller scopes
+  Cell* scope = scopeContainingBinding(var, currLexicalScope);
+  if (!scope)
+    newDynamicScope(var, val);
+  else if (scope == newSym(L"dynamicScope"))
+    assignDynamicVar(var, val);
+  else
+    unsafeSet(currLexicalScopes.top(), var, val, false);
+  return val;
+}
+
 Cell* eval(Cell* expr) {
   if (!expr)
     err << "eval: cell should never be NULL" << endl << DIE;
@@ -175,6 +191,9 @@ Cell* eval(Cell* expr) {
 
   if (car(expr) == newSym(L"eval"))
     return eval_eval(cdr(expr)); // already mkref'd
+
+  if (car(expr) == newSym(L"assign"))
+    return eval_assign(cdr(expr)); // already mkref'd
 
   // expr is a function call
   Cell* lambda = eval(car(expr));

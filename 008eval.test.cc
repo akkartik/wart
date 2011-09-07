@@ -505,3 +505,63 @@ void test_eval_handles_eval() {
   endDynamicScope(L"x");
   endDynamicScope(L"a");
 }
+
+void test_assign_to_lambda() {
+  Cell* lambda = wartRead(stream(L"assign foo (lambda() 34)")).front();
+  Cell* def = eval(lambda);
+  check_eq(callee_env(lookup(L"foo")), newSym(L"dynamicScope"));
+  endDynamicScope(L"foo");
+  rmref(def);
+  rmref(lambda);
+}
+
+void test_assign_lexical_var() {
+  Cell* lambda = wartRead(stream(L"((lambda(x) (assign x 34) x))")).front();
+  Cell* call = eval(lambda);
+  check_eq(call, newNum(34));
+  rmref(call);
+  rmref(lambda);
+}
+
+void test_assign_overrides_dynamic_vars() {
+  Cell* init1 = wartRead(stream(L"assign x 3")).front();
+  Cell* call1 = eval(init1);
+  Cell* init2 = wartRead(stream(L"assign x 5")).front();
+  Cell* call2 = eval(init2);
+  check_eq(lookup(L"x"), newNum(5));
+  endDynamicScope(L"x");
+  rmref(call2);
+  rmref(init2);
+  rmref(call1);
+  rmref(init1);
+}
+
+void test_assign_overrides_within_lexical_scope() {
+  Cell* init1 = wartRead(stream(L"assign x 3")).front();
+  Cell* call1 = eval(init1);
+  Cell* init2 = wartRead(stream(L"((lambda() (assign x 5)))")).front();
+  Cell* call2 = eval(init2);
+  check_eq(lookup(L"x"), newNum(5));
+  endDynamicScope(L"x");
+  rmref(call2);
+  rmref(init2);
+  rmref(call1);
+  rmref(init1);
+}
+
+void test_assign_never_overrides_lexical_vars_in_caller_scope() {
+  Cell* lambda = wartRead(stream(L"((lambda(x) (assign y x)) 34)")).front();
+  Cell* def = eval(lambda);
+  check_eq(lookup(L"y"), newNum(34));
+  endDynamicScope(L"y");
+  rmref(def);
+  rmref(lambda);
+}
+
+void test_assign_overrides_lexical_var() {
+  Cell* lambda = wartRead(stream(L"((lambda(x) (assign x 34) (assign x 35) x) 34)")).front();
+  Cell* call = eval(lambda);
+  check_eq(call, newNum(35));
+  rmref(call);
+  rmref(lambda);
+}

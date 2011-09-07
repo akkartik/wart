@@ -38,22 +38,6 @@ COMPILE_PRIM_FUNC(not, primFunc_not,
   return mkref(result);
 )
 
-COMPILE_PRIM_FUNC(assign, primFunc_assign,
-  Cell* var = car(args);
-  Cell* val = eval(car(cdr(args)));
-  Cell* currLexicalScope = currLexicalScopes.top();
-  if (isCons(currLexicalScope))
-    currLexicalScope = car(currLexicalScope);
-  Cell* scope = scopeContainingBinding(var, currLexicalScope);
-  if (!scope)
-    newDynamicScope(var, val);
-  else if (scope != newSym(L"dynamicScope"))
-    unsafeSet(currLexicalScopes.top(), var, val, false);
-  else
-    assignDynamicVar(var, val);
-  return val; // already mkref'd
-)
-
                                   // HACK because there's no wifstream(wstring) constructor
                                   // will only work with strings containing ascii characters
                                   vector<ascii> toAscii(string s) {
