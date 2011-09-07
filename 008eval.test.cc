@@ -106,15 +106,18 @@ void test_eval_handles_splice() {
   rmref(cells.front());
 }
 
-//? void test_eval_handles_splice2() {
-//?   list<Cell*> cells = wartRead(stream(L"(add @b)"));
-//?   newDynamicScope(L"b", wartRead(stream(L"3 4")).front());
-//?   Cell* result = eval(cells.front());
-//?   check_eq(result, newNum(7));
-//?   rmref(result);
-//?   endDynamicScope(L"b");
-//?   rmref(cells.front());
-//? }
+void test_eval_handles_splice2() {
+  list<Cell*> cells = wartRead(stream(L"(add @b)"));
+  cerr << cells.front() << endl;
+  newDynamicScope(L"b", wartRead(stream(L"3 4")).front());
+  debug = 2;
+  Cell* result = eval(cells.front());
+  debug = 0;
+  check_eq(result, newNum(7));
+  rmref(result);
+  endDynamicScope(L"b");
+  rmref(cells.front());
+}
 
 void test_eval_handles_splice_of_nil() {
   list<Cell*> cells = wartRead(stream(L"`(a ,@b 3)"));

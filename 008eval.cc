@@ -47,34 +47,35 @@ void bindArgs(Cell* params, Cell* args) {
                                     return cdr(call);
                                   }
 
-                                  bool isUnquotedSplice(Cell* expr) {
-                                    return isCons(expr) && car(expr) == newSym(L"@");
-                                  }
-
-                                  Cell* afterSplice(Cell* expr) {
-                                    return cdr(expr);
-                                  }
-
                                   extern Cell* eval(Cell*);
+
+                                  void append(Cell* x, Cell* y) {
+                                    while(cdr(x) != nil)
+                                      x = cdr(x);
+                                    setCdr(x, y);
+                                  }
+
+                                  void expandSplice(Cell* expr) {
+                                    for (Cell* rest = cdr(expr); isCons(rest); rest=cdr(rest), expr=cdr(expr)) {
+                                      Cell* next = car(rest);
+                                      if (!isCons(next)) continue;
+                                      if (car(next) != newSym(L"@")) continue;
+
+                                      Cell* result = eval(cdr(next));
+                                      if (!isCons(result))
+                                        warn << "No cons to splice in " << next << endl;
+
+                                      mkref(rest);
+                                      setCdr(expr, result);
+                                      append(expr, cdr(rest));
+                                      rmref(rest);
+                                    }
+                                  }
 
                                   Cell* eval_args(Cell* params, Cell* args) {
                                     if (args == nil) return nil;
                                     if (isQuoted(params)) {
                                       return mkref(args);
-                                    }
-
-                                    if (isUnquotedSplice(car(args))) {
-                                      Cell* result = eval(afterSplice(car(args)));
-                                      if (!isCons(result))
-                                        warn << "No cons to splice: " << car(args) << endl;
-                                      Cell* curr = result;
-                                      while (cdr(curr) != nil) {
-                                        params = cdr(params);
-                                        curr = cdr(curr);
-                                      }
-                                      setCdr(curr, eval_args(params, cdr(args)));
-                                      rmref(cdr(curr));
-                                      return mkref(result);
                                     }
 
                                     Cell* result = newCell();
@@ -155,6 +156,10 @@ Cell* eval(Cell* expr) {
 
   if (isAtom(expr))
     return mkref(expr);
+
+  dbg2 << expr << endl;
+  expandSplice(expr);
+  dbg2 << expr << endl;
 
   if (isQuoted(expr))
     return processUnquotes(cdr(expr)); // already mkref'd

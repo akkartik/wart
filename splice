@@ -1,0 +1,59 @@
+don't hardcode what needs overriding; hardcode as little as possible
+don't eval args inside primFuncs; you can't use splice inside them
+
+== Example 1
+assign x '(1 2)
++ @x
+
+  => (+ @(1 2))
+  => (+ 1 2)
+  => 3
+
+== Example 2
+assign x 1
+assign y 2
+assign a x
+assign b y
+assign args '(a b)
+cons @args
+
+  => (cons @(a b))
+  => (cons a b)
+  => (a . b)
+
+== Example 3
+
+assign a '((1 2))
+cons 0 @a
+
+  => (cons 0 @((1 2)))
+  => (cons 0 (1 2))
+  => (0 1 2) // KEY: no eval on (1 2)
+
+== Example 4
+
+assign a '(1 2)
+assign b '(a)
+cons 0 @b
+
+  => (cons 0 @(a))
+  => (cons 0 a)
+  => (0 . a) // KEY: no eval/lookup on a
+
+During expand-splice, create new gensyms bound to each arg, and splice the
+gensyms into the arg list. Then let eval go as normal.
+
+Example 4:
+  (cons 0 @b)
+  => (cons 0 xx) // with xx bound to a
+  => (0 . a)
+
+Example 3:
+  (cons 0 @a)
+  => (cons 0 xx) // with xx bound to (1 2)
+  => (0 1 2)
+
+Example 1:
+  (+ @x)
+  => (+ xx yy) // with xx bound to 1 and yy bound to 2
+  => 3
