@@ -35,7 +35,7 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
                                   }
 
                                   bool isQuoteOrUnquote(Token x) {
-                                    return x == L"'" || x == L"`" || x == L"," || x == L",@";
+                                    return x == L"'" || x == L"`" || x == L"," || x == L",@" || x == L"@";
                                   }
 
                                   bool isComment(Token x) {
