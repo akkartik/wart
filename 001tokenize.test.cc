@@ -84,13 +84,17 @@ void test_tokenize_handles_quote_comma_paren() {
 }
 
 void test_tokenize_handles_splice_operator() {
-  list<Token> tokens = tokenize(stream(L"()',@"));
+  list<Token> tokens = tokenize(stream(L"()',@ @, @b"));
   list<Token>::iterator p = tokens.begin();
   check_eq(*p, START_OF_LINE); ++p;
   check_eq(*p, L"("); ++p;
   check_eq(*p, L")"); ++p;
   check_eq(*p, L"'"); ++p;
   check_eq(*p, L",@"); ++p;
+  check_eq(*p, L"@"); ++p;
+  check_eq(*p, L","); ++p;
+  check_eq(*p, L"@"); ++p;
+  check_eq(*p, L"b"); ++p;
   check(p == tokens.end());
 }
 

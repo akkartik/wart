@@ -202,6 +202,9 @@ restart:
         slurpChar(in, out);
       break;
 
+    case L'@':
+      slurpChar(in, out); break;
+
     case L';':
       slurpComment(in); goto restart;
 
