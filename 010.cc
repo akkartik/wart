@@ -1,3 +1,10 @@
+COMPILE_PRIM_FUNC(eval, primFunc_eval,
+  Cell* x = eval(car(args));
+  Cell* result = eval(x);
+  rmref(x);
+  return result; // already mkref'd
+)
+
 COMPILE_PRIM_FUNC(cons, primFunc_cons,
   Cell* x = eval(car(args));
   Cell* y = eval(car(cdr(args)));
@@ -36,6 +43,22 @@ COMPILE_PRIM_FUNC(not, primFunc_not,
   Cell* result = (x == nil ? newNum(1) : nil);
   rmref(x);
   return mkref(result);
+)
+
+COMPILE_PRIM_FUNC(assign, primFunc_assign,
+  Cell* var = car(args);
+  Cell* val = eval(car(cdr(args)));
+  Cell* currLexicalScope = currLexicalScopes.top();
+  if (isCons(currLexicalScope))
+    currLexicalScope = car(currLexicalScope);
+  Cell* scope = scopeContainingBinding(var, currLexicalScope);
+  if (!scope)
+    newDynamicScope(var, val);
+  else if (scope != newSym(L"dynamicScope"))
+    unsafeSet(currLexicalScopes.top(), var, val, false);
+  else
+    assignDynamicVar(var, val);
+  return val; // already mkref'd
 )
 
                                   // HACK because there's no wifstream(wstring) constructor
