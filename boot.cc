@@ -84,6 +84,10 @@ stringstream& stream(string s) {
 
 bool interactive = false;
 
+struct Cell;
+extern Cell* nil;
+typedef Cell* (*PrimFunc)(Cell*);
+
 #define COMPILE_PRIM_FUNC(op, name, body) \
   Cell* name(Cell* args) { body } /* ignore op; we extract it into prim_func_list */
 

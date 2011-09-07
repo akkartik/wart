@@ -1,8 +1,5 @@
 //// cell: core lisp data structure with ref-counted garbage collection
 
-struct Cell;
-extern Cell* nil;
-
 struct Cell {
   Cell* car;
   Cell* cdr;
@@ -244,7 +241,6 @@ string toString(Cell* x) {
   return *(string*)x->car;
 }
 
-typedef Cell* (*PrimFunc)(Cell*);
 Cell* newPrimFunc(PrimFunc f) {
   Cell* result = newCell();
   result->type = PRIM_FUNC;
