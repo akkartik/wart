@@ -58,7 +58,6 @@ void bindArgs(Cell* params, Cell* args) {
                                   extern Cell* eval(Cell*);
 
                                   Cell* eval_args(Cell* params, Cell* args) {
-                                    cerr << args << endl;
                                     if (args == nil) return nil;
                                     if (isQuoted(params)) {
                                       return mkref(args);
