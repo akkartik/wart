@@ -52,7 +52,7 @@ void bindArgs(Cell* params, Cell* args) {
                                   Cell* eval_args(Cell* params, Cell* args) {
                                     if (args == nil) return nil;
                                     if (isQuoted(params)) {
-                                      return mkref(newCons(car(args), cdr(args)));
+                                      return mkref(args);
                                     }
                                     Cell* result = newCell();
                                     setCdr(result, eval_args(cdr(params), cdr(args)));
