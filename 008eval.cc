@@ -47,13 +47,37 @@ void bindArgs(Cell* params, Cell* args) {
                                     return cdr(call);
                                   }
 
+                                  bool isUnquotedSplice(Cell* expr) {
+                                    return isCons(expr) && car(expr) == newSym(L"@");
+                                  }
+
+                                  Cell* afterSplice(Cell* expr) {
+                                    return cdr(expr);
+                                  }
+
                                   extern Cell* eval(Cell*);
 
                                   Cell* eval_args(Cell* params, Cell* args) {
+                                    cerr << args << endl;
                                     if (args == nil) return nil;
                                     if (isQuoted(params)) {
                                       return mkref(args);
                                     }
+
+                                    if (isUnquotedSplice(car(args))) {
+                                      Cell* result = eval(afterSplice(car(args)));
+                                      if (!isCons(result))
+                                        warn << "No cons to splice: " << car(args) << endl;
+                                      Cell* curr = result;
+                                      while (cdr(curr) != nil) {
+                                        params = cdr(params);
+                                        curr = cdr(curr);
+                                      }
+                                      setCdr(curr, eval_args(params, cdr(args)));
+                                      rmref(cdr(curr));
+                                      return mkref(result);
+                                    }
+
                                     Cell* result = newCell();
                                     setCdr(result, eval_args(cdr(params), cdr(args)));
                                     rmref(cdr(result));
