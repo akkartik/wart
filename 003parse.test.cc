@@ -124,3 +124,28 @@ void test_parse_handles_quotes() {
   check_eq(*p, Token::of(L")")); ++p;
   check(p == ast.front().elems.end());
 }
+
+void test_parse_handles_splice() {
+  list<AstNode> ast = parse(parenthesize(tokenize(stream(L"`(2 ,@b @,c)"))));
+  check_eq(ast.size(), 1);
+  check(ast.front().isList());
+  list<AstNode>::iterator p = ast.front().elems.begin();
+  check_eq(*p, Token::of(L"`")); ++p;
+  check_eq(*p, Token::of(L"(")); ++p;
+  check_eq(*p, Token::of(L"2")); ++p;
+  check(p->isList());
+    list<AstNode> ast2 = p->elems; ++p;
+    list<AstNode>::iterator q = ast2.begin();
+    check_eq(*q, Token::of(L",@")); ++q;
+    check_eq(*q, Token::of(L"b")); ++q;
+    check(q == ast2.end());
+  check(p->isList());
+    ast2 = p->elems; ++p;
+    q = ast2.begin();
+    check_eq(*q, Token::of(L"@")); ++q;
+    check_eq(*q, Token::of(L",")); ++q;
+    check_eq(*q, Token::of(L"c")); ++q;
+    check(q == ast2.end());
+  check_eq(*p, Token::of(L")")); ++p;
+  check(p == ast.front().elems.end());
+}
