@@ -42,7 +42,7 @@ ostream& operator<<(ostream& os, AstNode x) {
   bool prevWasOpen = true;
   for (list<AstNode>::iterator p = x.elems.begin(); p != x.elems.end(); ++p) {
     if (!(*p == L")" || prevWasOpen)) os << " ";
-    prevWasOpen = (*p == L"(" || *p == L"'" || *p == L"," || *p == L",@");
+    prevWasOpen = (*p == L"(" || *p == L"'" || *p == L"," || *p == L",@" || *p == L"@");
     os << *p;
   }
   return os << endl;
