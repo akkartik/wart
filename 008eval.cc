@@ -49,6 +49,7 @@ void bindArgs(Cell* params, Cell* args) {
 
                                   extern Cell* eval(Cell*);
 
+                                  // modifies currentLexicalScope; give it a a fresh scope
                                   void expandSplice(Cell* expr) {
                                     for (Cell* rest = cdr(expr); isCons(rest); rest=cdr(rest), expr=cdr(expr)) {
                                       Cell* next = car(rest);
@@ -59,10 +60,18 @@ void bindArgs(Cell* params, Cell* args) {
                                       if (!isCons(result))
                                         warn << "No cons to splice in " << next << endl;
 
-                                      mkref(rest);
-                                      setCdr(expr, result);
-                                      append(expr, cdr(rest));
-                                      rmref(rest);
+                                      // spliced-in args shouldn't get re-eval'd
+                                      // bind a new var to them and splice it in instead
+                                      { mkref(rest);
+                                        Cell *to, *from;
+                                        for (to=result, from=expr; to != nil; to=cdr(to), from=cdr(from)) {
+                                          Cell* newSym = genSym(nil);
+                                          addLexicalBinding(newSym, car(to));
+                                          setCdr(from, newCons(newSym, nil));
+                                        }
+                                        setCdr(from, cdr(rest));
+                                        rmref(rest);
+                                      }
                                     }
                                   }
 
@@ -145,10 +154,6 @@ Cell* eval(Cell* expr) {
   if (isAtom(expr))
     return mkref(expr);
 
-  dbg2 << expr << endl;
-  expandSplice(expr);
-  dbg2 << expr << endl;
-
   if (isQuoted(expr))
     return processUnquotes(cdr(expr)); // already mkref'd
 
@@ -159,12 +164,16 @@ Cell* eval(Cell* expr) {
     // lexical scope is already attached
     return mkref(expr);
 
+  newLexicalScope(); // for variables created by expandSlice
+  expandSplice(expr);
+
   // expr is a function call
   Cell* lambda = eval(car(expr));
   if (isPrimFunc(car(lambda))) {
     // primFuncs must eval their own args and mkref their result
     Cell* result = toPrimFunc(car(lambda))(cdr(expr));
     rmref(lambda);
+    endLexicalScope(); // splice
     return result; // already mkref'd
   }
 
@@ -191,5 +200,6 @@ Cell* eval(Cell* expr) {
 
   rmref(evald_args);
   rmref(lambda);
+  endLexicalScope(); // splice
   return result; // already mkref'd
 }
