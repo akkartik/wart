@@ -49,12 +49,6 @@ void bindArgs(Cell* params, Cell* args) {
 
                                   extern Cell* eval(Cell*);
 
-                                  void append(Cell* x, Cell* y) {
-                                    while(cdr(x) != nil)
-                                      x = cdr(x);
-                                    setCdr(x, y);
-                                  }
-
                                   void expandSplice(Cell* expr) {
                                     for (Cell* rest = cdr(expr); isCons(rest); rest=cdr(rest), expr=cdr(expr)) {
                                       Cell* next = car(rest);
