@@ -11,7 +11,7 @@ list<Cell*> buildCells(list<AstNode> in) {
 }
 
                                   bool isQuoteOrUnquote(AstNode n) {
-                                    return n == L"'" || n == L"`" || n == L"," || n == L",@";
+                                    return n == L"'" || n == L"`" || n == L"," || n == L",@" || n == L"@";
                                   }
 
 Cell* buildCell(AstNode n) {
@@ -53,6 +53,8 @@ Cell* buildCell(AstNode n) {
   }
   else {
     n.elems.pop_front();
+    if (n.elems.empty())
+      err << "Error in parsing " << n << endl << DIE;
     setCdr(newForm, buildCell(n));
   }
 
