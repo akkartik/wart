@@ -54,10 +54,10 @@ COMPILE_PRIM_FUNC(assign, primFunc_assign,
   Cell* scope = scopeContainingBinding(var, currLexicalScope);
   if (!scope)
     newDynamicScope(var, val);
-  else if (scope != newSym(L"dynamicScope"))
-    unsafeSet(scope, var, val, false);
-  else
+  else if (scope == newSym(L"dynamicScope"))
     assignDynamicVar(var, val);
+  else
+    unsafeSet(scope, var, val, false);
   return val; // already mkref'd
 )
 
