@@ -55,7 +55,7 @@ COMPILE_PRIM_FUNC(assign, primFunc_assign,
   if (!scope)
     newDynamicScope(var, val);
   else if (scope != newSym(L"dynamicScope"))
-    unsafeSet(currLexicalScopes.top(), var, val, false);
+    unsafeSet(scope, var, val, false);
   else
     assignDynamicVar(var, val);
   return val; // already mkref'd
