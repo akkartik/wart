@@ -71,7 +71,10 @@ void bindArgs(Cell* params, Cell* args) {
                                         }
                                         setCdr(from, cdr(rest));
                                         rmref(rest);
+                                        expr = from;
+                                        rest = cdr(from);
                                       }
+                                      rmref(result);
                                     }
                                   }
 
