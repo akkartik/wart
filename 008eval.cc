@@ -58,7 +58,6 @@ void bindArgs(Cell* params, Cell* args) {
                                     return false;
                                   }
 
-                                  // eval arg and extrude it onto substrate
                                   Cell* expandSplice(Cell* substrate, Cell* arg) {
                                     if (!isCons(arg) || car(arg) != newSym(L"@")) {
                                       // no splice
@@ -66,17 +65,16 @@ void bindArgs(Cell* params, Cell* args) {
                                       return cdr(substrate);
                                     }
 
-                                    // transplant a new limb by extruding a tip from args
                                     Cell* newLimb = eval(cdr(arg));
                                     if (!isCons(newLimb))
                                       warn << "No cons to splice in " << arg << endl;
 
                                     for (Cell* cell = newLimb; cell != nil; cell=cdr(cell), substrate=cdr(substrate)) {
                                       // spliced-in args shouldn't get re-eval'd
-                                      // bind a new var to them and splice it in instead
-                                      Cell* tip = genSym(nil);
-                                      addLexicalBinding(tip, car(cell));
-                                      setCdr(substrate, newCons(tip, nil));
+                                      // bind a new sym to them and splice it in instead
+                                      Cell* sym = genSym(nil);
+                                      addLexicalBinding(sym, car(cell));
+                                      setCdr(substrate, newCons(sym, nil));
                                     }
 
                                     rmref(newLimb);
