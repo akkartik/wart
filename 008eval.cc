@@ -63,16 +63,14 @@ void bindArgs(Cell* params, Cell* args) {
                                       // spliced-in args shouldn't get re-eval'd
                                       // bind a new var to them and splice it in instead
                                       { mkref(rest);
-                                        Cell *to, *from;
-                                        for (to=result, from=expr; to != nil; to=cdr(to), from=cdr(from)) {
+                                        for (Cell* to=result; to != nil; to=cdr(to), expr=cdr(expr)) {
                                           Cell* newSym = genSym(nil);
                                           addLexicalBinding(newSym, car(to));
-                                          setCdr(from, newCons(newSym, nil));
+                                          setCdr(expr, newCons(newSym, nil));
                                         }
-                                        setCdr(from, cdr(rest));
+                                        setCdr(expr, cdr(rest));
                                         rmref(rest);
-                                        expr = from;
-                                        rest = cdr(from);
+                                        rest = cdr(expr);
                                       }
                                       rmref(result);
                                     }
