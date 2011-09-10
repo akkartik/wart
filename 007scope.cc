@@ -109,7 +109,6 @@ Cell* lookup(Cell* sym) {
   Cell* result = lookupLexicalBinding(sym, currLexicalScopes.top());
   if (result) return result;
   warn << "No binding for " << toString(sym) << endl;
-  warn << currLexicalScopes.top() << endl;
   return nil;
 }
 
