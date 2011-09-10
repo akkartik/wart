@@ -49,33 +49,50 @@ void bindArgs(Cell* params, Cell* args) {
 
                                   extern Cell* eval(Cell*);
 
-                                  // modifies currentLexicalScope; give it a a fresh scope
-                                  void expandSplice(Cell* args) {
-                                    for (Cell* rest = cdr(args); isCons(rest); rest=cdr(rest), args=cdr(args)) {
-                                      Cell* nextArg = car(rest);
-                                      if (!isCons(nextArg)) continue;
-                                      if (car(nextArg) != newSym(L"@")) continue;
-
-                                      // head of rest needs splicing
-                                      Cell* newLimb = eval(cdr(nextArg));
-                                      if (!isCons(newLimb))
-                                        warn << "No cons to splice in " << nextArg << endl;
-
-                                      // transplant a new limb by extruding a tip from args
-                                      { mkref(rest); // we're about to snip off the pointer to it
-                                        for (Cell* cell=newLimb; cell != nil; cell=cdr(cell), args=cdr(args)) {
-                                          // spliced-in args shouldn't get re-eval'd
-                                          // bind a new var to them and splice it in instead
-                                          Cell* tip = genSym(nil);
-                                          addLexicalBinding(tip, car(cell));
-                                          setCdr(args, newCons(tip, nil));
-                                        }
-                                        setCdr(args, cdr(rest)); // reattach the rest of rest
-                                        rmref(rest); // toss the head
-                                      }
-                                      rest = cdr(args);
-                                      rmref(newLimb);
+                                  bool containsSplice(Cell* call) {
+                                    for (Cell* expr = cdr(call); isCons(expr); expr=cdr(expr)) {
+                                      Cell* arg = car(expr);
+                                      if (isCons(arg) && car(arg) == newSym(L"@"))
+                                        return true;
                                     }
+                                    return false;
+                                  }
+
+                                  // eval arg and extrude it onto substrate
+                                  Cell* expandSplice(Cell* substrate, Cell* arg) {
+                                    if (!isCons(arg) || car(arg) != newSym(L"@")) {
+                                      // no splice
+                                      setCdr(substrate, newCons(car(arg), nil));
+                                      return cdr(substrate);
+                                    }
+
+                                    // transplant a new limb by extruding a tip from args
+                                    Cell* newLimb = eval(cdr(arg));
+                                    if (!isCons(newLimb))
+                                      warn << "No cons to splice in " << arg << endl;
+
+                                    for (Cell* cell = newLimb; cell != nil; cell=cdr(cell), substrate=cdr(substrate)) {
+                                      // spliced-in args shouldn't get re-eval'd
+                                      // bind a new var to them and splice it in instead
+                                      Cell* tip = genSym(nil);
+                                      addLexicalBinding(tip, car(cell));
+                                      setCdr(substrate, newCons(tip, nil));
+                                    }
+
+                                    rmref(newLimb);
+                                    return cdr(substrate);
+                                  }
+
+                                  // modifies currentLexicalScope; give it a a fresh scope
+                                  Cell* expandSplices(Cell* call) {
+                                    if (!containsSplice(call)) return call;
+
+                                    Cell* result = newCons(car(call), nil); // we never check function position
+                                    for (Cell *args=cdr(call), *curr=result; args != nil; args=cdr(args))
+                                      curr = expandSplice(curr, car(args));
+                                    rmref(call);
+                                    addLexicalBinding(genSym(nil), result); // hook for GC
+                                    return result;
                                   }
 
                                   Cell* eval_args(Cell* params, Cell* args) {
@@ -168,7 +185,7 @@ Cell* eval(Cell* expr) {
     return mkref(expr);
 
   newLexicalScope(); // for variables created by expandSlice
-  expandSplice(expr);
+  expr = expandSplices(expr);
 
   // expr is a function call
   Cell* lambda = eval(car(expr));
