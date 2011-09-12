@@ -85,11 +85,9 @@ void bindArgs(Cell* params, Cell* args) {
                                   Cell* expandSplices(Cell* call) {
                                     if (!containsSplice(call)) return call;
 
-  dbg2 << "-- " << lookup(L"list") << endl << endl;
                                     Cell* result = newCons(car(call), nil); // we never check function position
                                     for (Cell *args=cdr(call), *curr=result; args != nil; args=cdr(args))
                                       curr = expandSplice(curr, car(args));
-  dbg2 << "-> " << lookup(L"list") << endl << endl;
                                     addLexicalBinding(genSym(nil), result); // hook for GC
                                     return result;
                                   }
