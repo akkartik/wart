@@ -85,12 +85,6 @@ mac when($cond . $body)
   `(if ,$cond
      (do ,@$body))
 
-; apply add '(1 2) => 3
-; let x '(1 2) (apply add x) => 3
-; apply cons '(1 (2)) => (1 2)
-def apply(f args)
-  (eval `(,f ,@args))
-
 def list args
   if args
     cons (car args)
@@ -99,7 +93,7 @@ def list args
 def reduce(f xs)
   if (cddr xs)
     reduce f (cons (f (car xs) (cadr xs)) (cddr xs))
-    apply f xs
+    f @xs
 
 def + xs
   reduce add xs
@@ -130,10 +124,10 @@ def pairwise(xs)
   zip xs (cdr xs)
 
 def all(f xs)
-  apply and (map f xs)
+  and @(map f xs)
 
 def some(f xs)
-  apply or (map f xs)
+  or @(map f xs)
 assign any some
 
 def > xs
