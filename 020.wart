@@ -9,11 +9,12 @@ assign mac (lambda '($name $params . $body)
 mac def($name $params . $body)
   `(assign ,$name (lambda ,$params ,@$body))
 
-def cadr(x)
-  (car (cdr x))
+mac compose($f $g)
+  `(lambda $args
+     (,$f (,$g @$args)))
 
-def cddr(x)
-  (cdr (cdr x))
+assign cadr car:cdr
+assign cddr cdr:cdr
 
 ; let x 3 (add x 1) => 4
 ; let (a . b) (cons 3 4) (add a b) => 7
