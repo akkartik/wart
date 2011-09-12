@@ -66,7 +66,7 @@ void bindArgs(Cell* params, Cell* args) {
                                     }
 
                                     Cell* newLimb = eval(cdr(arg));
-                                    if (!isCons(newLimb))
+                                    if (newLimb != nil && !isCons(newLimb))
                                       warn << "No cons to splice in " << arg << endl;
 
                                     for (Cell* cell = newLimb; cell != nil; cell=cdr(cell), substrate=cdr(substrate)) {
