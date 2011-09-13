@@ -30,14 +30,6 @@ COMPILE_PRIM_FUNC(cdr, primFunc_cdr,
   return result; // already mkref'd
 )
 
-COMPILE_PRIM_FUNC(cons?, primFunc_isCons,
-  Cell* x = eval(car(args));
-  if (isCons(x))
-    return x; // already mkref'd
-  rmref(x);
-  return nil;
-)
-
 COMPILE_PRIM_FUNC(not, primFunc_not,
   Cell* x = eval(car(args));
   Cell* result = (x == nil ? newNum(1) : nil);
