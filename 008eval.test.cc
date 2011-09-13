@@ -1,3 +1,95 @@
+void test_evalArgs_handles_unquoted_param() {
+  newDynamicScope(L"a", newNum(3));
+  Cell* params = mkref(wartRead(stream(L"(x)")).front());
+  Cell* args = mkref(wartRead(stream(L"(a)")).front());
+  Cell* evaldArgs = evalArgs(params, args);
+  checkEq(car(evaldArgs), newNum(3));
+  checkEq(cdr(evaldArgs), nil);
+  rmref(evaldArgs);
+  rmref(args);
+  rmref(params);
+  endDynamicScope(L"a");
+}
+
+void test_evalArgs_handles_quoted_param() {
+  newDynamicScope(L"a", newNum(3));
+  Cell* params = mkref(wartRead(stream(L"('x)")).front());
+  Cell* args = mkref(wartRead(stream(L"(a)")).front());
+  Cell* evaldArgs = evalArgs(params, args);
+  checkEq(car(evaldArgs), newSym(L"a"));
+  checkEq(cdr(evaldArgs), nil);
+  rmref(evaldArgs);
+  rmref(args);
+  rmref(params);
+  endDynamicScope(L"a");
+}
+
+void test_evalArgs_handles_varargs_param() {
+  newDynamicScope(L"a", newNum(3));
+  newDynamicScope(L"b", newNum(4));
+  Cell* params = mkref(wartRead(stream(L"x")).front());
+  Cell* args = mkref(wartRead(stream(L"(a b)")).front());
+  Cell* evaldArgs = evalArgs(params, args);
+  checkEq(car(evaldArgs), newNum(3));
+  checkEq(car(cdr(evaldArgs)), newNum(4));
+  checkEq(cdr(cdr(evaldArgs)), nil);
+  rmref(evaldArgs);
+  rmref(args);
+  rmref(params);
+  endDynamicScope(L"b");
+  endDynamicScope(L"a");
+}
+
+void test_evalArgs_handles_quoted_varargs_param() {
+  newDynamicScope(L"a", newNum(3));
+  newDynamicScope(L"b", newNum(4));
+  Cell* params = mkref(wartRead(stream(L"'x")).front());
+  Cell* args = mkref(wartRead(stream(L"(a b)")).front());
+  Cell* evaldArgs = evalArgs(params, args);
+  checkEq(car(evaldArgs), newSym(L"a"));
+  checkEq(car(cdr(evaldArgs)), newSym(L"b"));
+  checkEq(cdr(cdr(evaldArgs)), nil);
+  rmref(evaldArgs);
+  rmref(args);
+  rmref(params);
+  endDynamicScope(L"b");
+  endDynamicScope(L"a");
+}
+
+void test_evalArgs_handles_rest_param() {
+  newDynamicScope(L"a", newNum(3));
+  newDynamicScope(L"b", newNum(4));
+  Cell* params = mkref(wartRead(stream(L"x . y")).front());
+  Cell* args = mkref(wartRead(stream(L"(a b)")).front());
+  Cell* evaldArgs = evalArgs(params, args);
+  checkEq(car(evaldArgs), newNum(3));
+  checkEq(car(cdr(evaldArgs)), newNum(4));
+  checkEq(cdr(cdr(evaldArgs)), nil);
+  rmref(evaldArgs);
+  rmref(args);
+  rmref(params);
+  endDynamicScope(L"b");
+  endDynamicScope(L"a");
+}
+
+void test_evalArgs_handles_quoted_rest_param() {
+  newDynamicScope(L"a", newNum(3));
+  newDynamicScope(L"b", newNum(4));
+  Cell* params = mkref(wartRead(stream(L"x . 'y")).front());
+  Cell* args = mkref(wartRead(stream(L"(a b)")).front());
+  Cell* evaldArgs = evalArgs(params, args);
+  checkEq(car(evaldArgs), newNum(3));
+  checkEq(car(cdr(evaldArgs)), newSym(L"b"));
+  checkEq(cdr(cdr(evaldArgs)), nil);
+  rmref(evaldArgs);
+  rmref(args);
+  rmref(params);
+  endDynamicScope(L"b");
+  endDynamicScope(L"a");
+}
+
+
+
 void test_bindArgs_handles_vararg() {
   Cell* params = wartRead(stream(L"a")).front();
   Cell* args = wartRead(stream(L"(1)")).front();
