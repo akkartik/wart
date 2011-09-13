@@ -178,6 +178,10 @@ Cell* eval(Cell* expr) {
 
   // expr is a function call
   Cell* lambda = eval(car(expr));
+
+  if (!isFunc(lambda))
+    err << "not a function call: " << expr << endl << DIE;
+
   if (isPrimFunc(car(lambda))) {
     // primFuncs must eval their own args and mkref their result
     Cell* result = toPrimFunc(car(lambda))(cdr(expr));
@@ -185,9 +189,6 @@ Cell* eval(Cell* expr) {
     endLexicalScope(); // splice
     return result; // already mkref'd
   }
-
-  if (!isFunc(lambda))
-    err << "not a function call: " << expr << endl << DIE;
 
   // eval all its args in the current lexical scope
   Cell* evald_args = eval_args(sig(lambda), call_args(expr));
