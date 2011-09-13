@@ -116,17 +116,22 @@ int countIndent(istream& in) {
                                   }
 
                                   const string quoteChars = L",'`@";
+                                  const string ssyntaxChars = L":~!.&"; // disjoint from quoteChars
                                   void slurpWord(istream& in, ostream& out) {
-                                    char c;
+                                    char c, lastc = L'\0';
                                     while (!eof(in)) {
                                       in >> c;
+                                      if (ssyntaxChars.find(lastc) != string::npos
+                                          && quoteChars.find(c) != string::npos)
+                                        ; // wait for ssyntax expansion
                                       // keep this list sync'd with the nextToken switch below
-                                      if (isspace(c) || c == ';' || c == L'(' || c == L')' || c == L'"'
+                                      else if (isspace(c) || c == ';' || c == L'(' || c == L')' || c == L'"'
                                               || quoteChars.find(c) != string::npos) {
                                         in.putback(c);
                                         break;
                                       }
                                       out << c;
+                                      lastc = c;
                                     }
                                   }
 
