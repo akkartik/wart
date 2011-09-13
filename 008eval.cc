@@ -87,7 +87,6 @@ void bindArgs(Cell* params, Cell* args) {
                                     for (Cell *args=cdr(call), *curr=result; args != nil; args=cdr(args))
                                       curr = expandSplice(curr, car(args));
                                     addLexicalBinding(genSym(nil), result); // hook for GC
-                                    // TODO: rmref call?
                                     return result;
                                   }
 

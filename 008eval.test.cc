@@ -116,6 +116,31 @@ void test_eval_handles_splice2() {
   rmref(cells.front());
 }
 
+void test_eval_handles_splice3() {
+  Cell* lambda = wartRead(stream(L"(lambda x (cons @x))")).front();
+  Cell* def = eval(lambda);
+  newDynamicScope(L"f", def);
+  Cell* call1 = wartRead(stream(L"(f 1 2)")).front();
+  Cell* result = eval(call1);
+  check(isCons(result));
+  check_eq(car(result), newNum(1));
+  check_eq(cdr(result), newNum(2));
+  rmref(result);
+
+  Cell* call2 = wartRead(stream(L"(f 3 4)")).front();
+  result = eval(call2);
+  check(isCons(result));
+  check_eq(car(result), newNum(3));
+  check_eq(cdr(result), newNum(4));
+  rmref(result);
+
+  rmref(call2);
+  rmref(call1);
+  endDynamicScope(L"f");
+  rmref(def);
+  rmref(lambda);
+}
+
 void test_eval_handles_splice_of_nil() {
   list<Cell*> cells = wartRead(stream(L"`(a ,@b 3)"));
   newDynamicScope(L"b", nil);
