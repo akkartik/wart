@@ -73,6 +73,7 @@ COMPILE_PRIM_FUNC(assign, primFunc_assign,
 COMPILE_PRIM_FUNC(load, primFunc_load,
   Cell* f = eval(car(args));
   loadFile(&toAscii(toString(f))[0]);
+  rmref(f);
   return nil;
 )
 
@@ -103,6 +104,8 @@ COMPILE_PRIM_FUNC(atom_equal, primFunc_atom_equal,
     result = x;
   else
     result = nil;
+  rmref(x);
+  rmref(y);
   return mkref(result);
 )
 
