@@ -82,10 +82,28 @@ stringstream& stream(string s) {
 
 
 
+struct Token;
 bool interactive = false;
-
+list<Token> tokenize(istream&);
+list<Token> parenthesize(list<Token>);
+struct AstNode;
+list<AstNode> parse(list<Token>);
 struct Cell;
 extern Cell* nil;
+list<Cell*> buildCells(list<AstNode>);
+list<Cell*> transform(list<Cell*>);
+Cell* eval(Cell*);
+
+list<Cell*> buildFromStream(istream& f) {
+  return buildCells(parse(parenthesize(tokenize(f))));
+}
+
+list<Cell*> wartRead(istream& f) {
+  return transform(buildFromStream(f));
+}
+
+
+
 typedef Cell* (*PrimFunc)(Cell*);
 
 #define COMPILE_PRIM_FUNC(op, name, body) \

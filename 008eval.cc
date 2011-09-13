@@ -47,8 +47,6 @@ void bindArgs(Cell* params, Cell* args) {
                                     return cdr(call);
                                   }
 
-                                  extern Cell* eval(Cell*);
-
                                   bool containsSplice(Cell* call) {
                                     for (Cell* expr = cdr(call); isCons(expr); expr=cdr(expr)) {
                                       Cell* arg = car(expr);

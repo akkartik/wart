@@ -1,11 +1,11 @@
 Cell* transformNot(string var) {
   var.replace(0, 1, L"not ");
-  return wartRead(stream(var)).front();
+  return buildFromStream(stream(var)).front();
 }
 
 Cell* transformCompose(string var) {
   var.replace(var.rfind(L':'), 1, L" ");
-  return wartRead(stream(L"compose "+var)).front();
+  return buildFromStream(stream(L"compose "+var)).front();
 }
 
 Cell* transformCall(string var) {
@@ -18,17 +18,17 @@ Cell* transformCall(string var) {
     var.replace(bang, 1, L" '");
   else
     var.replace(dot, 1, L" ");
-  return wartRead(stream(var)).front();
+  return buildFromStream(stream(var)).front();
 }
 
 Cell* transformAndf(string var) {
   var.replace(var.rfind(L'&'), 1, L" ");
-  return wartRead(stream(L"andf "+var)).front();
+  return buildFromStream(stream(L"andf "+var)).front();
 }
 
 Cell* transformComplement(string var) {
   var.replace(0, 1, L"complement ");
-  return wartRead(stream(var)).front();
+  return buildFromStream(stream(var)).front();
 }
 
 Cell* transform_ssyntax(Cell* input) {
