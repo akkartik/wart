@@ -1,4 +1,4 @@
-COMPILE_PRIM_FUNC(add, primFunc_add,
+COMPILE_PRIM_FUNC(+, primFunc_add,
   Cell* x = eval(car(args));
   Cell* y = eval(car(cdr(args)));
   Cell* result = newNum(toNum(x) + toNum(y));
@@ -7,7 +7,7 @@ COMPILE_PRIM_FUNC(add, primFunc_add,
   return mkref(result);
 )
 
-COMPILE_PRIM_FUNC(subtract, primFunc_subtract,
+COMPILE_PRIM_FUNC(-, primFunc_subtract,
   Cell* x = eval(car(args));
   Cell* y = eval(car(cdr(args)));
   Cell* result = newNum(toNum(x) - toNum(y));
@@ -16,7 +16,7 @@ COMPILE_PRIM_FUNC(subtract, primFunc_subtract,
   return mkref(result);
 )
 
-COMPILE_PRIM_FUNC(multiply, primFunc_multiply,
+COMPILE_PRIM_FUNC(*, primFunc_multiply,
   Cell* x = eval(car(args));
   Cell* y = eval(car(cdr(args)));
   Cell* result = newNum(toNum(x) * toNum(y));
@@ -25,7 +25,7 @@ COMPILE_PRIM_FUNC(multiply, primFunc_multiply,
   return mkref(result);
 )
 
-COMPILE_PRIM_FUNC(divide, primFunc_divide,
+COMPILE_PRIM_FUNC(/, primFunc_divide,
   Cell* x = eval(car(args));
   Cell* y = eval(car(cdr(args)));
   Cell* result = newNum(toNum(x) / toNum(y));
@@ -34,7 +34,7 @@ COMPILE_PRIM_FUNC(divide, primFunc_divide,
   return mkref(result);
 )
 
-COMPILE_PRIM_FUNC(modulo, primFunc_modulo,
+COMPILE_PRIM_FUNC(%, primFunc_modulo,
   Cell* x = eval(car(args));
   Cell* y = eval(car(cdr(args)));
   Cell* result = newNum(toNum(x) % toNum(y));
@@ -43,7 +43,7 @@ COMPILE_PRIM_FUNC(modulo, primFunc_modulo,
   return mkref(result);
 )
 
-COMPILE_PRIM_FUNC(greater, primFunc_greater,
+COMPILE_PRIM_FUNC(>, primFunc_greater,
   Cell* x = eval(car(args));
   Cell* y = eval(car(cdr(args)));
   Cell* result = (toNum(x) > toNum(y)) ? newNum(1) : nil;

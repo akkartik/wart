@@ -20,8 +20,8 @@ mac complement($f)
 assign cadr car:cdr
 assign cddr cdr:cdr
 
-; let x 3 (add x 1) => 4
-; let (a . b) (cons 3 4) (add a b) => 7
+; let x 3 (+ x 1) => 4
+; let (a . b) (cons 3 4) (+ a b) => 7
 mac let($var $val . $body)
   `((lambda(,$var) ,@$body) ,$val)
 
@@ -102,20 +102,25 @@ def reduce(f xs)
                    cddr.xs)
     f @xs
 
-def + xs
-  reduce add xs
+let $+ +
+  def + xs
+    reduce $+ xs
 
-def - xs
-  reduce subtract xs
+let $- -
+  def - xs
+    reduce $- xs
 
-def * xs
-  reduce multiply xs
+let $* *
+  def * xs
+    reduce $* xs
 
-def / xs
-  reduce divide xs
+let $/ /
+  def / xs
+    reduce $/ xs
 
-def % xs
-  reduce modulo xs
+let $% %
+  def % xs
+    reduce $% xs
 
 def map(f xs)
   if xs
@@ -137,13 +142,14 @@ def some(f xs)
   or @(map f xs)
 assign any some
 
-def > xs
-  all (lambda((x y)) (greater x y))
-      pairwise.xs
+let $> >
+  def > xs
+    all (lambda((x y)) ($> x y))
+        pairwise.xs
 
-def < xs
-  all (lambda((x y)) (greater y x))
-      pairwise.xs
+  def < xs
+    all (lambda((x y)) ($> y x))
+        pairwise.xs
 
 mac ret($var $val . $body)
   `(let ,$var ,$val
