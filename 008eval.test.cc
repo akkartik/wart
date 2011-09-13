@@ -4,8 +4,8 @@ void test_bindArgs_handles_vararg() {
   newLexicalScope();
   bindArgs(params, args);
   Cell* result = unsafeGet(currLexicalScopes.top(), newSym(L"a"));
-  check_eq(car(result), newNum(1));
-  check_eq(cdr(result), nil);
+  checkEq(car(result), newNum(1));
+  checkEq(cdr(result), nil);
   endLexicalScope();
   rmref(params);
 }
@@ -14,48 +14,48 @@ void test_bindArgs_handles_vararg() {
 
 void test_nil_evals_to_itself() {
   list<Cell*> cells = wartRead(stream(L"()"));
-  check_eq(cells.size(), 1);
+  checkEq(cells.size(), 1);
   Cell* result = eval(cells.front());
-  check_eq(result, nil);
+  checkEq(result, nil);
   rmref(result);
   rmref(cells.front());
 }
 
 void test_num_evals_to_itself() {
   list<Cell*> cells = wartRead(stream(L"34"));
-  check_eq(cells.size(), 1);
+  checkEq(cells.size(), 1);
   Cell* result = eval(cells.front());
-  check_eq(result, cells.front());
+  checkEq(result, cells.front());
   rmref(result);
   rmref(cells.front());
 }
 
 void test_colonsym_evals_to_itself() {
   list<Cell*> cells = wartRead(stream(L":abc"));
-  check_eq(cells.size(), 1);
+  checkEq(cells.size(), 1);
   Cell* result = eval(cells.front());
-  check_eq(result, cells.front());
+  checkEq(result, cells.front());
   rmref(result);
   rmref(cells.front());
 }
 
 void test_string_evals_to_itself() {
   list<Cell*> cells = wartRead(stream(L"\"ac bd\""));
-  check_eq(cells.size(), 1);
+  checkEq(cells.size(), 1);
   Cell* result = eval(cells.front());
-  check_eq(result, cells.front());
+  checkEq(result, cells.front());
   rmref(result);
   // HACK: just a string by itself doesn't need rmref'ing
 }
 
 void test_eval_handles_quoted_atoms() {
   list<Cell*> cells = wartRead(stream(L"'a\n'34"));
-  check_eq(cells.size(), 2);
+  checkEq(cells.size(), 2);
   Cell* result = eval(cells.front());
-  check_eq(result, newSym(L"a"));
+  checkEq(result, newSym(L"a"));
   rmref(result);
   result = eval(cells.back());
-  check_eq(result, newNum(34));
+  checkEq(result, newNum(34));
   rmref(result);
   rmref(cells.front());
   rmref(cells.back());
@@ -64,9 +64,9 @@ void test_eval_handles_quoted_atoms() {
 void test_eval_handles_quoted_lists() {
   list<Cell*> cells = wartRead(stream(L"'(a b)"));
   Cell* result = eval(cells.front());
-  check_eq(car(result), newSym(L"a"));
-  check_eq(car(cdr(result)), newSym(L"b"));
-  check_eq(cdr(cdr(result)), nil);
+  checkEq(car(result), newSym(L"a"));
+  checkEq(car(cdr(result)), newSym(L"b"));
+  checkEq(cdr(cdr(result)), nil);
   rmref(result);
   rmref(cells.front());
 }
@@ -74,9 +74,9 @@ void test_eval_handles_quoted_lists() {
 void test_eval_handles_backquoted_lists() {
   list<Cell*> cells = wartRead(stream(L"`(a b)"));
   Cell* result = eval(cells.front());
-  check_eq(car(result), newSym(L"a"));
-  check_eq(car(cdr(result)), newSym(L"b"));
-  check_eq(cdr(cdr(result)), nil);
+  checkEq(car(result), newSym(L"a"));
+  checkEq(car(cdr(result)), newSym(L"b"));
+  checkEq(cdr(cdr(result)), nil);
   rmref(result);
   rmref(cells.front());
 }
@@ -85,9 +85,9 @@ void test_eval_handles_unquote() {
   list<Cell*> cells = wartRead(stream(L"`(a ,b)"));
   newDynamicScope(L"b", newNum(34));
   Cell* result = eval(cells.front());
-  check_eq(car(result), newSym(L"a"));
-  check_eq(car(cdr(result)), newNum(34));
-  check_eq(cdr(cdr(result)), nil);
+  checkEq(car(result), newSym(L"a"));
+  checkEq(car(cdr(result)), newNum(34));
+  checkEq(cdr(cdr(result)), nil);
   rmref(result);
   endDynamicScope(L"b");
   rmref(cells.front());
@@ -97,10 +97,10 @@ void test_eval_handles_splice() {
   list<Cell*> cells = wartRead(stream(L"`(a ,@b)"));
   newDynamicScope(L"b", wartRead(stream(L"34 35")).front());
   Cell* result = eval(cells.front());
-  check_eq(car(result), newSym(L"a"));
-  check_eq(car(cdr(result)), newNum(34));
-  check_eq(car(cdr(cdr(result))), newNum(35));
-  check_eq(cdr(cdr(cdr(result))), nil);
+  checkEq(car(result), newSym(L"a"));
+  checkEq(car(cdr(result)), newNum(34));
+  checkEq(car(cdr(cdr(result))), newNum(35));
+  checkEq(cdr(cdr(cdr(result))), nil);
   rmref(result);
   endDynamicScope(L"b");
   rmref(cells.front());
@@ -110,7 +110,7 @@ void test_eval_handles_splice2() {
   list<Cell*> cells = wartRead(stream(L"(+ @b)"));
   newDynamicScope(L"b", wartRead(stream(L"3 4")).front());
   Cell* result = eval(cells.front());
-  check_eq(result, newNum(7));
+  checkEq(result, newNum(7));
   rmref(result);
   endDynamicScope(L"b");
   rmref(cells.front());
@@ -123,15 +123,15 @@ void test_eval_handles_splice3() {
   Cell* call1 = wartRead(stream(L"(f 1 2)")).front();
   Cell* result = eval(call1);
   check(isCons(result));
-  check_eq(car(result), newNum(1));
-  check_eq(cdr(result), newNum(2));
+  checkEq(car(result), newNum(1));
+  checkEq(cdr(result), newNum(2));
   rmref(result);
 
   Cell* call2 = wartRead(stream(L"(f 3 4)")).front();
   result = eval(call2);
   check(isCons(result));
-  check_eq(car(result), newNum(3));
-  check_eq(cdr(result), newNum(4));
+  checkEq(car(result), newNum(3));
+  checkEq(cdr(result), newNum(4));
   rmref(result);
 
   rmref(call2);
@@ -145,10 +145,10 @@ void test_eval_handles_splice_of_nil() {
   list<Cell*> cells = wartRead(stream(L"`(a ,@b 3)"));
   newDynamicScope(L"b", nil);
   Cell* result = eval(cells.front());
-  check_eq(cdr(nil), nil);
-  check_eq(car(result), newSym(L"a"));
-  check_eq(car(cdr(result)), newNum(3));
-  check_eq(cdr(cdr(result)), nil);
+  checkEq(cdr(nil), nil);
+  checkEq(car(result), newSym(L"a"));
+  checkEq(car(cdr(result)), newNum(3));
+  checkEq(cdr(cdr(result)), nil);
   rmref(result);
   endDynamicScope(L"b");
   rmref(cells.front());
@@ -158,11 +158,11 @@ void test_eval_quotes_quote_comma() {
   list<Cell*> cells = wartRead(stream(L"`(a ',b)"));
   newDynamicScope(L"b", newSym(L"x"));
   Cell* result = eval(cells.front());
-  check_eq(car(result), newSym(L"a"));
+  checkEq(car(result), newSym(L"a"));
   check(isCons(car(cdr(result))));
-  check_eq(car(car(cdr(result))), newSym(L"'"));
-  check_eq(cdr(car(cdr(result))), newSym(L"x"));
-  check_eq(cdr(cdr(result)), nil);
+  checkEq(car(car(cdr(result))), newSym(L"'"));
+  checkEq(cdr(car(cdr(result))), newSym(L"x"));
+  checkEq(cdr(cdr(result)), nil);
   rmref(result);
   endDynamicScope(L"b");
   rmref(cells.front());
@@ -172,9 +172,9 @@ void test_eval_evals_comma_quote() {
   list<Cell*> cells = wartRead(stream(L"`(a ,'b)"));
   newDynamicScope(L"b", newSym(L"x"));
   Cell* result = eval(cells.front());
-  check_eq(car(result), newSym(L"a"));
-  check_eq(car(cdr(result)), newSym(L"b"));
-  check_eq(cdr(cdr(result)), nil);
+  checkEq(car(result), newSym(L"a"));
+  checkEq(car(cdr(result)), newSym(L"b"));
+  checkEq(cdr(cdr(result)), nil);
   rmref(result);
   endDynamicScope(L"b");
   rmref(cells.front());
@@ -182,27 +182,27 @@ void test_eval_evals_comma_quote() {
 
 void test_eval_handles_simple_lambda() {
   list<Cell*> cells = wartRead(stream(L"(lambda () 34)"));
-  check_eq(cells.size(), 1);
+  checkEq(cells.size(), 1);
   Cell* lambda = eval(cells.front());
-  check_eq(car(lambda), newSym(L"evald-lambda"));
-  check_eq(sig(lambda), nil);
+  checkEq(car(lambda), newSym(L"evald-lambda"));
+  checkEq(sig(lambda), nil);
   check(isCons(calleeBody(lambda)));
-  check_eq(car(calleeBody(lambda)), newNum(34));
-  check_eq(calleeEnv(lambda), newSym(L"dynamicScope"));
+  checkEq(car(calleeBody(lambda)), newNum(34));
+  checkEq(calleeEnv(lambda), newSym(L"dynamicScope"));
   rmref(lambda);
   rmref(cells.front());
 }
 
 void test_eval_on_lambda_is_idempotent() {
   list<Cell*> cells = wartRead(stream(L"(lambda () 34)"));
-  check_eq(cells.size(), 1);
+  checkEq(cells.size(), 1);
   Cell* lambda = eval(cells.front());
   Cell* lambda2 = eval(lambda);
-  check_eq(car(lambda2), newSym(L"evald-lambda"));
-  check_eq(sig(lambda2), nil);
+  checkEq(car(lambda2), newSym(L"evald-lambda"));
+  checkEq(sig(lambda2), nil);
   check(isCons(calleeBody(lambda2)));
-  check_eq(car(calleeBody(lambda2)), newNum(34));
-  check_eq(calleeEnv(lambda2), newSym(L"dynamicScope"));
+  checkEq(car(calleeBody(lambda2)), newNum(34));
+  checkEq(calleeEnv(lambda2), newSym(L"dynamicScope"));
   rmref(lambda2);
   rmref(lambda);
   rmref(cells.front());
@@ -210,27 +210,27 @@ void test_eval_on_lambda_is_idempotent() {
 
 void test_eval_handles_closure() {
   list<Cell*> cells = wartRead(stream(L"(lambda () 34)"));
-  check_eq(cells.size(), 1);
+  checkEq(cells.size(), 1);
   newLexicalScope();
     Cell* newLexicalScope = currLexicalScopes.top();
-    check_eq(newLexicalScope->nrefs, 1);
+    checkEq(newLexicalScope->nrefs, 1);
     Cell* result = eval(cells.front());
-    check_eq(newLexicalScope->nrefs, 2);
+    checkEq(newLexicalScope->nrefs, 2);
   endLexicalScope();
-  check_eq(newLexicalScope->nrefs, 1);
-  check_eq(car(result), newSym(L"evald-lambda"));
-  check_eq(car(cdr(result)), nil);
-  check_eq(car(car(cdr(cdr(result)))), newNum(34));
-  check_eq(cdr(cdr(cdr(result))), newLexicalScope);
+  checkEq(newLexicalScope->nrefs, 1);
+  checkEq(car(result), newSym(L"evald-lambda"));
+  checkEq(car(cdr(result)), nil);
+  checkEq(car(car(cdr(cdr(result)))), newNum(34));
+  checkEq(cdr(cdr(cdr(result))), newLexicalScope);
   rmref(result);
-  check_eq(newLexicalScope->nrefs, 0);
+  checkEq(newLexicalScope->nrefs, 0);
   rmref(cells.front());
 }
 
 void test_eval_handles_lambda_calls() {
   Cell* call = wartRead(stream(L"((lambda () 34))")).front();
   Cell* result = eval(call);
-  check_eq(result, newNum(34));
+  checkEq(result, newNum(34));
   rmref(result);
   rmref(call);
 }
@@ -239,7 +239,7 @@ void test_eval_expands_syms_in_lambda_bodies() {
   Cell* lambda = wartRead(stream(L"((lambda () a))")).front();
   newDynamicScope(L"a", newNum(34));
   Cell* result = eval(lambda);
-  check_eq(result, newNum(34));
+  checkEq(result, newNum(34));
   endDynamicScope(L"a");
   rmref(result);
   rmref(lambda);
@@ -251,7 +251,7 @@ void test_eval_handles_assigned_lambda_calls() {
   newDynamicScope(L"f", f);
     Cell* call = wartRead(stream(L"(f)")).front();
     Cell* result = eval(call);
-    check_eq(result, newNum(34));
+    checkEq(result, newNum(34));
   endDynamicScope(L"f");
   rmref(result);
   rmref(call);
@@ -264,7 +264,7 @@ void test_eval_expands_lexically_scoped_syms_in_lambda_bodies() {
   newLexicalScope();
     addLexicalBinding(newSym(L"a"), newNum(34));
     Cell* result = eval(call);
-    check_eq(result, newNum(34));
+    checkEq(result, newNum(34));
   endLexicalScope();
   rmref(result);
   rmref(call);
@@ -280,7 +280,7 @@ void test_eval_expands_syms_in_original_lexical_scope() {
   endLexicalScope();
   Cell* call = wartRead(stream(L"(f)")).front();
   Cell* result = eval(call);
-  check_eq(result, newNum(34));
+  checkEq(result, newNum(34));
   rmref(result);
   rmref(call);
   rmref(f);
@@ -299,7 +299,7 @@ void test_eval_expands_args_in_caller_scope() {
   endLexicalScope();
   Cell* call = wartRead(stream(L"(f a)")).front();
   Cell* result = eval(call);
-  check_eq(result, newNum(23));
+  checkEq(result, newNum(23));
   rmref(result);
   rmref(call);
   rmref(f);
@@ -318,7 +318,7 @@ void test_eval_doesnt_eval_quoted_params() {
   endLexicalScope();
   Cell* call = wartRead(stream(L"(f a)")).front();
   Cell* result = eval(call);
-  check_eq(result, newSym(L"a"));
+  checkEq(result, newSym(L"a"));
   rmref(result);
   rmref(call);
   rmref(f);
@@ -337,7 +337,7 @@ void test_eval_handles_quoted_param_list() {
   endLexicalScope();
   Cell* call = wartRead(stream(L"(f a)")).front();
   Cell* result = eval(call);
-  check_eq(result, newSym(L"a"));
+  checkEq(result, newSym(L"a"));
   rmref(result);
   rmref(call);
   rmref(f);
@@ -352,7 +352,7 @@ void test_eval_handles_multiple_args() {
   newDynamicScope(L"f", f);
   Cell* call = wartRead(stream(L"(f 1 2)")).front();
   Cell* result = eval(call);
-  check_eq(result, newNum(2));
+  checkEq(result, newNum(2));
   rmref(result);
   rmref(call);
   rmref(f);
@@ -366,7 +366,7 @@ void test_eval_handles_multiple_body_exprs() {
   newDynamicScope(L"f", f);
   Cell* call = wartRead(stream(L"(f)")).front();
   Cell* result = eval(call);
-  check_eq(result, newNum(2));
+  checkEq(result, newNum(2));
   rmref(result);
   rmref(call);
   rmref(f);
@@ -378,7 +378,7 @@ void test_eval_handles_vararg_param() {
   Cell* call = wartRead(stream(L"((lambda args args) 1)")).front();
   Cell* result = eval(call);
   check(isCons(result));
-  check_eq(car(result), newNum(1));
+  checkEq(car(result), newNum(1));
   rmref(result);
   rmref(call);
 }
@@ -387,7 +387,7 @@ void test_eval_evals_args() {
   Cell* call = wartRead(stream(L"((lambda (f) (f)) (lambda () 34))")).front();
   Cell* result = eval(call);
   check(isNum(result));
-  check_eq(toNum(result), 34);
+  checkEq(toNum(result), 34);
   rmref(result);
   rmref(call);
 }
@@ -396,7 +396,7 @@ void test_eval_doesnt_leak_body_evals() {
   Cell* call = wartRead(stream(L"((lambda (f) (f) (f)) (lambda () 34))")).front();
   Cell* result = eval(call);
   check(isNum(result));
-  check_eq(toNum(result), 34);
+  checkEq(toNum(result), 34);
   rmref(result);
   rmref(call);
 }
@@ -405,7 +405,7 @@ void test_eval_handles_destructured_params() {
   Cell* call = wartRead(stream(L"((lambda ((a b)) b) '(1 2))")).front();
   Cell* result = eval(call);
   check(isNum(result));
-  check_eq(toNum(result), 2);
+  checkEq(toNum(result), 2);
   rmref(result);
   rmref(call);
 }
@@ -414,7 +414,7 @@ void test_eval_handles_quoted_destructured_params() {
   Cell* call = wartRead(stream(L"((lambda ('(a b)) b) (1 2))")).front();
   Cell* result = eval(call);
   check(isNum(result));
-  check_eq(toNum(result), 2);
+  checkEq(toNum(result), 2);
   rmref(result);
   rmref(call);
 }
@@ -424,11 +424,11 @@ void test_eval_handles_rest_params() {
   Cell* result = eval(call);
   check(isCons(result));
   check(isNum(car(result)));
-  check_eq(toNum(car(result)), 3);
+  checkEq(toNum(car(result)), 3);
   check(isNum(car(cdr(result))));
-  check_eq(toNum(car(cdr(result))), 4);
-  check_eq(toNum(car(cdr(cdr(result)))), 5);
-  check_eq(cdr(cdr(cdr(result))), nil);
+  checkEq(toNum(car(cdr(result))), 4);
+  checkEq(toNum(car(cdr(cdr(result)))), 5);
+  checkEq(cdr(cdr(cdr(result))), nil);
   rmref(result);
   rmref(call);
 }

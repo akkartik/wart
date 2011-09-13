@@ -67,7 +67,7 @@ int numFailures = 0;
   } \
   else { cerr << "."; fflush(stderr); }
 
-#define check_eq(X, Y) if ((X) != (Y)) { \
+#define checkEq(X, Y) if ((X) != (Y)) { \
     ++numFailures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
     cerr << "  got " << (X) << endl; /* BEWARE: multiple eval */ \
@@ -217,7 +217,7 @@ void checkUnfreed() {
   int n = currCell-heapStart-initialSyms.size();
   for (; freelist; freelist = freelist->cdr)
     --n;
-  check_eq(n, 0);
+  checkEq(n, 0);
   if (n > 0) dumpUnfreed();
 }
 
