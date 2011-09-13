@@ -92,7 +92,7 @@ COMPILE_PRIM_FUNC(if, primFunc_if,
   return result; // already mkref'd
 )
 
-COMPILE_PRIM_FUNC(atom_equal, primFunc_atom_equal,
+COMPILE_PRIM_FUNC(iso, primFunc_iso,
   Cell* x = eval(car(args));
   Cell* y = eval(car(cdr(args)));
   Cell* result = nil;

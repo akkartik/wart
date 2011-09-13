@@ -76,12 +76,13 @@ mac and $args
 ; (iso 3 4) => nil
 ; (iso '(1) '(1)) => '(1)
 ; (iso '(1) '(1 2)) => nil
-def iso(a b)
-  or (atom_equal a b)
-    and cons?.a
-        cons?.b
-        (iso car.a car.b)
-        (iso cdr.a cdr.b)
+let $iso iso
+  def iso(a b)
+    or ($iso a b)
+      and cons?.a
+          cons?.b
+          (iso car.a car.b)
+          (iso cdr.a cdr.b)
 
 mac do $body
   `((lambda() ,@$body))
