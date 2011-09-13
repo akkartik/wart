@@ -35,15 +35,15 @@ void bindArgs(Cell* params, Cell* args) {
                                     return cdr(cdr(lambda));
                                   }
 
-                                  Cell* callee_body(Cell* callee) {
+                                  Cell* calleeBody(Cell* callee) {
                                     return car(cdr(cdr(callee)));
                                   }
 
-                                  Cell* callee_env(Cell* callee) {
+                                  Cell* calleeEnv(Cell* callee) {
                                     return cdr(cdr(cdr(callee)));
                                   }
 
-                                  Cell* call_args(Cell* call) {
+                                  Cell* callArgs(Cell* call) {
                                     return cdr(call);
                                   }
 
@@ -90,14 +90,14 @@ void bindArgs(Cell* params, Cell* args) {
                                     return result;
                                   }
 
-                                  Cell* eval_args(Cell* params, Cell* args) {
+                                  Cell* evalArgs(Cell* params, Cell* args) {
                                     if (args == nil) return nil;
                                     if (isQuoted(params)) {
                                       return mkref(args);
                                     }
 
                                     Cell* result = newCell();
-                                    setCdr(result, eval_args(cdr(params), cdr(args)));
+                                    setCdr(result, evalArgs(cdr(params), cdr(args)));
                                     rmref(cdr(result));
                                     if (!isCons(params) || !isQuoted(car(params))) {
                                       setCar(result, eval(car(args)));
@@ -135,7 +135,7 @@ void bindArgs(Cell* params, Cell* args) {
                                       && (isPrimFunc(car(x)) || car(x) == newSym(L"evald-lambda"));
                                   }
 
-                                  Cell* eval_lambda(Cell* expr) {
+                                  Cell* evalLambda(Cell* expr) {
                                     return newCons(newSym(L"evald-lambda"),
                                         newCons(sig(expr),
                                             newCons(body(expr), currLexicalScopes.top())));
@@ -168,7 +168,7 @@ Cell* eval(Cell* expr) {
 
   if (car(expr) == newSym(L"lambda"))
     // attach current lexical scope
-    return mkref(eval_lambda(expr));
+    return mkref(evalLambda(expr));
   else if (isFunc(expr))
     // lexical scope is already attached
     return mkref(expr);
@@ -181,22 +181,22 @@ Cell* eval(Cell* expr) {
   // eval all its args in the current lexical scope
   newLexicalScope(); // for variables created by expandSlice
   expr = expandSplices(expr);
-  Cell* evald_args = eval_args(sig(lambda), call_args(expr));
+  Cell* evaldArgs = evalArgs(sig(lambda), callArgs(expr));
 
   // swap in the function's lexical environment
   if (!isPrimFunc(car(lambda)))
     newDynamicScope(L"currLexicalScope",
-        newCons(callee_env(lambda), currLexicalScopes.top()));
+        newCons(calleeEnv(lambda), currLexicalScopes.top()));
   // now bind its params to args in the new environment
   newLexicalScope();
-  bindArgs(sig(lambda), evald_args);
+  bindArgs(sig(lambda), evaldArgs);
 
   // eval all forms in body, save result of final form
   Cell* result = nil;
   if (isPrimFunc(car(lambda)))
     result = toPrimFunc(car(lambda))(); // all primFuncs must mkref result
   else
-    for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
+    for (Cell* form = calleeBody(lambda); form != nil; form = cdr(form)) {
       rmref(result);
       result = eval(car(form));
     }
@@ -204,7 +204,7 @@ Cell* eval(Cell* expr) {
   endLexicalScope();
   if (!isPrimFunc(car(lambda)))
     endDynamicScope(L"currLexicalScope");
-  rmref(evald_args);
+  rmref(evaldArgs);
   rmref(lambda);
   endLexicalScope(); // splice
   return result; // already mkref'd

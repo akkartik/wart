@@ -22,7 +22,7 @@ void test_cons_works() {
 void test_assign_to_lambda() {
   Cell* lambda = wartRead(stream(L"assign foo (lambda() 34)")).front();
   Cell* def = eval(lambda);
-  Cell* scope = callee_env(lookup(L"foo"));
+  Cell* scope = calleeEnv(lookup(L"foo"));
   check(isTable(scope));
   hash_map<long, Cell*> h = toTable(scope)->table;
   for (hash_map<long, Cell*>::iterator p = h.begin(); p != h.end(); ++p)

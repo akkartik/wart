@@ -186,9 +186,9 @@ void test_eval_handles_simple_lambda() {
   Cell* lambda = eval(cells.front());
   check_eq(car(lambda), newSym(L"evald-lambda"));
   check_eq(sig(lambda), nil);
-  check(isCons(callee_body(lambda)));
-  check_eq(car(callee_body(lambda)), newNum(34));
-  check_eq(callee_env(lambda), newSym(L"dynamicScope"));
+  check(isCons(calleeBody(lambda)));
+  check_eq(car(calleeBody(lambda)), newNum(34));
+  check_eq(calleeEnv(lambda), newSym(L"dynamicScope"));
   rmref(lambda);
   rmref(cells.front());
 }
@@ -200,9 +200,9 @@ void test_eval_on_lambda_is_idempotent() {
   Cell* lambda2 = eval(lambda);
   check_eq(car(lambda2), newSym(L"evald-lambda"));
   check_eq(sig(lambda2), nil);
-  check(isCons(callee_body(lambda2)));
-  check_eq(car(callee_body(lambda2)), newNum(34));
-  check_eq(callee_env(lambda2), newSym(L"dynamicScope"));
+  check(isCons(calleeBody(lambda2)));
+  check_eq(car(calleeBody(lambda2)), newNum(34));
+  check_eq(calleeEnv(lambda2), newSym(L"dynamicScope"));
   rmref(lambda2);
   rmref(lambda);
   rmref(cells.front());
