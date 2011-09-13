@@ -178,37 +178,33 @@ Cell* eval(Cell* expr) {
 
   // expr is a function call
   Cell* lambda = eval(car(expr));
-
   if (!isFunc(lambda))
     err << "not a function call: " << expr << endl << DIE;
-
-  if (isPrimFunc(car(lambda))) {
-    // primFuncs must eval their own args and mkref their result
-    Cell* result = toPrimFunc(car(lambda))(cdr(expr));
-    rmref(lambda);
-    endLexicalScope(); // splice
-    return result; // already mkref'd
-  }
 
   // eval all its args in the current lexical scope
   Cell* evald_args = eval_args(sig(lambda), call_args(expr));
 
   // swap in the function's lexical environment
-  newDynamicScope(L"currLexicalScope",
-      newCons(callee_env(lambda), currLexicalScopes.top()));
+  if (!isPrimFunc(car(lambda)))
+    newDynamicScope(L"currLexicalScope",
+        newCons(callee_env(lambda), currLexicalScopes.top()));
   // now bind its params to args in the new environment
   newLexicalScope();
   bindArgs(sig(lambda), evald_args);
 
   // eval all forms in body, save result of final form
   Cell* result = nil;
-  for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
-    rmref(result);
-    result = eval(car(form));
-  }
+  if (isPrimFunc(car(lambda)))
+    result = toPrimFunc(car(lambda))(); // all primFuncs must mkref result
+  else
+    for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
+      rmref(result);
+      result = eval(car(form));
+    }
 
   endLexicalScope();
-  endDynamicScope(L"currLexicalScope");
+  if (!isPrimFunc(car(lambda)))
+    endDynamicScope(L"currLexicalScope");
   rmref(evald_args);
   rmref(lambda);
   endLexicalScope(); // splice

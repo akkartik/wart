@@ -9,7 +9,7 @@ file_list: *.cc
 	@ls *.cc |grep test.cc |perl -pwe 's/.*/#include "$$&"/' >> file_list
 
 prim_func_list: *.cc
-	@grep -h "^COMPILE_PRIM_FUNC" *.cc |perl -pwe 's/.*COMPILE_PRIM_FUNC\(([^,]*), ([^,]*),$$/{ L"$$1", $$2 },/' > prim_func_list
+	@grep -h "^COMPILE_PRIM_FUNC" *.cc |perl -pwe 's/.*COMPILE_PRIM_FUNC\(([^,]*), ([^,]*), ([^,]*),$$/{ L"$$1", $$3, $$2 },/' > prim_func_list
 
 test_list: *.test.cc
 	@grep -h "^[[:space:]]*void test_" *.test.cc |perl -pwe 's/^\s*void (.*)\(\) {$$/$$1,/' > test_list

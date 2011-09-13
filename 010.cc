@@ -1,45 +1,31 @@
-COMPILE_PRIM_FUNC(eval, primFunc_eval,
-  Cell* x = eval(car(args));
-  Cell* result = eval(x);
-  rmref(x);
-  return result; // already mkref'd
+// primFuncs take $vars as params
+// We don't do implicit gensyms in primFuncs yet, but should be ok since they
+// can't be found anywhere else, and since primFuncs don't call other
+// primFuncs.
+
+COMPILE_PRIM_FUNC(eval, primFunc_eval, L"($x)",
+  return eval(lookup(L"$x"));
 )
 
-COMPILE_PRIM_FUNC(cons, primFunc_cons,
-  Cell* x = eval(car(args));
-  Cell* y = eval(car(cdr(args)));
-  Cell* result = newCell();
-  setCar(result, x);
-  setCdr(result, y);
-  rmref(x);
-  rmref(y);
-  return mkref(result);
+COMPILE_PRIM_FUNC(cons, primFunc_cons, L"($x $y)",
+  return mkref(newCons(lookup(L"$x"), lookup(L"$y")));
 )
 
-COMPILE_PRIM_FUNC(car, primFunc_car,
-  Cell* x = eval(car(args));
-  Cell* result = car(x);
-  rmref(x);
-  return mkref(result);
+COMPILE_PRIM_FUNC(car, primFunc_car, L"($l)",
+  return mkref(car(lookup(L"$l")));
 )
 
-COMPILE_PRIM_FUNC(cdr, primFunc_cdr,
-  Cell* x = eval(car(args));
-  Cell* result = mkref(cdr(x));
-  rmref(x);
-  return result; // already mkref'd
+COMPILE_PRIM_FUNC(cdr, primFunc_cdr, L"($l)",
+  return mkref(cdr(lookup(L"$l")));
 )
 
-COMPILE_PRIM_FUNC(not, primFunc_not,
-  Cell* x = eval(car(args));
-  Cell* result = (x == nil ? newNum(1) : nil);
-  rmref(x);
-  return mkref(result);
+COMPILE_PRIM_FUNC(not, primFunc_not, L"($x)",
+  return lookup(L"$x") == nil ? mkref(newNum(1)) : nil;
 )
 
-COMPILE_PRIM_FUNC(assign, primFunc_assign,
-  Cell* var = car(args);
-  Cell* val = eval(car(cdr(args)));
+COMPILE_PRIM_FUNC(assign, primFunc_assign, L"('$var $val)",
+  Cell* var = lookup(L"$var");
+  Cell* val = lookup(L"$val");
   Cell* currLexicalScope = currLexicalScopes.top();
   if (isCons(currLexicalScope))
     currLexicalScope = car(currLexicalScope);
@@ -50,7 +36,7 @@ COMPILE_PRIM_FUNC(assign, primFunc_assign,
     assignDynamicVar(var, val);
   else
     unsafeSet(scope, var, val, false);
-  return val; // already mkref'd
+  return mkref(val);
 )
 
                                   // HACK because there's no wifstream(wstring) constructor
@@ -62,37 +48,28 @@ COMPILE_PRIM_FUNC(assign, primFunc_assign,
                                     return result;
                                   }
 
-COMPILE_PRIM_FUNC(load, primFunc_load,
-  Cell* f = eval(car(args));
-  loadFile(&toAscii(toString(f))[0]);
-  rmref(f);
+COMPILE_PRIM_FUNC(load, primFunc_load, L"($f)",
+  loadFile(&toAscii(toString(lookup(L"$f")))[0]);
   return nil;
 )
 
-COMPILE_PRIM_FUNC(prn, primFunc_prn,
-  Cell* x = eval(car(args));
+COMPILE_PRIM_FUNC(prn, primFunc_prn, L"($x)",
+  Cell* x = lookup(L"$x");
   cout << x << endl;
-  return x; // already mkref'd
+  return mkref(x);
 )
 
-COMPILE_PRIM_FUNC(if, primFunc_if,
-  Cell* cond = eval(car(args));
-  Cell* then = car(cdr(args));
-  Cell* rest = car(cdr(cdr(args)));
-  Cell* result = (cond != nil) ? eval(then) : eval(rest);
-  rmref(cond);
-  return result; // already mkref'd
+COMPILE_PRIM_FUNC(if, primFunc_if, L"($cond '$then '$else)",
+  return lookup(L"$cond") != nil ? eval(lookup(L"$then")) : eval(lookup(L"$else"));
 )
 
-COMPILE_PRIM_FUNC(addr, primFunc_addr,
-  Cell* x = eval(car(args));
-  rmref(x);
-  return mkref(newNum((long)x));
+COMPILE_PRIM_FUNC(addr, primFunc_addr, L"($x)",
+  return mkref(newNum((long)lookup(L"$x")));
 )
 
-COMPILE_PRIM_FUNC(iso, primFunc_iso,
-  Cell* x = eval(car(args));
-  Cell* y = eval(car(cdr(args)));
+COMPILE_PRIM_FUNC(iso, primFunc_iso, L"($x $y)",
+  Cell* x = lookup(L"$x");
+  Cell* y = lookup(L"$y");
   Cell* result = nil;
   if (x == nil && y == nil)
     result = newNum(1);
@@ -102,52 +79,40 @@ COMPILE_PRIM_FUNC(iso, primFunc_iso,
     result = x;
   else
     result = nil;
-  rmref(x);
-  rmref(y);
   return mkref(result);
 )
 
-COMPILE_PRIM_FUNC(debug, primFunc_debug,
-  debug = toNum(car(args));
+COMPILE_PRIM_FUNC(debug, primFunc_debug, L"($x)",
+  debug = toNum(lookup(L"$x"));
   return nil;
 )
 
-COMPILE_PRIM_FUNC(uniq, primFunc_uniq,
-  Cell* x = eval(car(args));
-  Cell* result = genSym(x);
-  rmref(x);
-  return mkref(result);
+COMPILE_PRIM_FUNC(uniq, primFunc_uniq, L"($x)",
+  return mkref(genSym(lookup(L"$x")));
 )
 
-COMPILE_PRIM_FUNC(sym, primFunc_sym,
+COMPILE_PRIM_FUNC(sym, primFunc_sym, L"$args",
   ostringstream out;
-  Cell* arg = NULL;
-  for (; args != nil; args = cdr(args)) {
-    arg = eval(car(args));
-    out << arg;
-    rmref(arg);
-  }
+  for (Cell* args = lookup(L"$args"); args != nil; args = cdr(args))
+    out << car(args);
   return mkref(newSym(out.str()));
 )
 
-COMPILE_PRIM_FUNC(table, primFunc_table,
-  args = args; // ignore warning
+COMPILE_PRIM_FUNC(table, primFunc_table, L"()",
   return mkref(newTable());
 )
 
-COMPILE_PRIM_FUNC(table_set, primFunc_table_set,
-  Cell* table = eval(car(args));
-  Cell* key = eval(car(cdr(args)));
-  Cell* val = eval(car(cdr(cdr(args))));
+COMPILE_PRIM_FUNC(table_set, primFunc_table_set, L"($table $key $val)",
+  Cell* table = lookup(L"$table");
+  Cell* key = lookup(L"$key");
+  Cell* val = lookup(L"$val");
   if (isTable(table))
     set(table, key, val);
-  rmref(table);
-  rmref(key);
-  return val; // already mkref'd
+  return mkref(val);
 )
 
-COMPILE_PRIM_FUNC(type, primFunc_type,
-  Cell* x = eval(car(args));
+COMPILE_PRIM_FUNC(type, primFunc_type, L"($x)",
+  Cell* x = lookup(L"$x");
   Cell* result = nil;
   if (x != nil)
     switch(x->type) {
@@ -172,6 +137,5 @@ COMPILE_PRIM_FUNC(type, primFunc_type,
     default:
       err << "Undefined type: " << x->type << endl << DIE;
     }
-  rmref(x);
   return mkref(result);
 )

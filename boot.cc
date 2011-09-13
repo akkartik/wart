@@ -104,15 +104,16 @@ list<Cell*> wartRead(istream& f) {
 
 
 
-typedef Cell* (*PrimFunc)(Cell*);
+typedef Cell* (*PrimFunc)();
 
-#define COMPILE_PRIM_FUNC(op, name, body) \
-  Cell* name(Cell* args) { body } /* ignore op; we extract it into prim_func_list */
+#define COMPILE_PRIM_FUNC(op, name, params, body) \
+  Cell* name() { body } /* we extract op and params into prim_func_list */
 
 #include "file_list" // remaining cc files in order
 
 struct PrimFuncMetadata {
   string name;
+  string params;
   PrimFunc impl;
 };
 
@@ -122,7 +123,9 @@ const PrimFuncMetadata primFuncs[] = {
 
 void setupPrimFuncs() {
   for (unsigned int i=0; i < sizeof(primFuncs)/sizeof(primFuncs[0]); ++i)
-    newDynamicScope(primFuncs[i].name, newCons(newPrimFunc(primFuncs[i].impl), nil));
+    newDynamicScope(primFuncs[i].name,
+        newCons(newPrimFunc(primFuncs[i].impl),
+            newCons(buildFromStream(stream(primFuncs[i].params)).front(), nil)));
 }
 
 void teardownPrimFuncs() {

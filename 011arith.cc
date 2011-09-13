@@ -1,53 +1,23 @@
-COMPILE_PRIM_FUNC(+, primFunc_add,
-  Cell* x = eval(car(args));
-  Cell* y = eval(car(cdr(args)));
-  Cell* result = newNum(toNum(x) + toNum(y));
-  rmref(x);
-  rmref(y);
-  return mkref(result);
+COMPILE_PRIM_FUNC(+, primFunc_add, L"($x $y)",
+  return mkref(newNum(toNum(lookup(L"$x"))+toNum(lookup(L"$y"))));
 )
 
-COMPILE_PRIM_FUNC(-, primFunc_subtract,
-  Cell* x = eval(car(args));
-  Cell* y = eval(car(cdr(args)));
-  Cell* result = newNum(toNum(x) - toNum(y));
-  rmref(x);
-  rmref(y);
-  return mkref(result);
+COMPILE_PRIM_FUNC(-, primFunc_subtract, L"($x $y)",
+  return mkref(newNum(toNum(lookup(L"$x"))-toNum(lookup(L"$y"))));
 )
 
-COMPILE_PRIM_FUNC(*, primFunc_multiply,
-  Cell* x = eval(car(args));
-  Cell* y = eval(car(cdr(args)));
-  Cell* result = newNum(toNum(x) * toNum(y));
-  rmref(x);
-  rmref(y);
-  return mkref(result);
+COMPILE_PRIM_FUNC(*, primFunc_multiply, L"($x $y)",
+  return mkref(newNum(toNum(lookup(L"$x"))*toNum(lookup(L"$y"))));
 )
 
-COMPILE_PRIM_FUNC(/, primFunc_divide,
-  Cell* x = eval(car(args));
-  Cell* y = eval(car(cdr(args)));
-  Cell* result = newNum(toNum(x) / toNum(y));
-  rmref(x);
-  rmref(y);
-  return mkref(result);
+COMPILE_PRIM_FUNC(/, primFunc_divide, L"($x $y)",
+  return mkref(newNum(toNum(lookup(L"$x"))/toNum(lookup(L"$y"))));
 )
 
-COMPILE_PRIM_FUNC(%, primFunc_modulo,
-  Cell* x = eval(car(args));
-  Cell* y = eval(car(cdr(args)));
-  Cell* result = newNum(toNum(x) % toNum(y));
-  rmref(x);
-  rmref(y);
-  return mkref(result);
+COMPILE_PRIM_FUNC(%, primFunc_modulo, L"($x $y)",
+  return mkref(newNum(toNum(lookup(L"$x"))%toNum(lookup(L"$y"))));
 )
 
-COMPILE_PRIM_FUNC(>, primFunc_greater,
-  Cell* x = eval(car(args));
-  Cell* y = eval(car(cdr(args)));
-  Cell* result = (toNum(x) > toNum(y)) ? newNum(1) : nil;
-  rmref(x);
-  rmref(y);
-  return mkref(result);
+COMPILE_PRIM_FUNC(>, primFunc_greater, L"($x $y)",
+  return mkref(newNum(toNum(lookup(L"$x"))>toNum(lookup(L"$y"))));
 )
