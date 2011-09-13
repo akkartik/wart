@@ -192,12 +192,14 @@ Cell* eval(Cell* expr) {
 
   // eval all its args in the current lexical scope
   Cell* evald_args = eval_args(sig(lambda), call_args(expr));
+
   // swap in the function's lexical environment
   newDynamicScope(L"currLexicalScope",
       newCons(callee_env(lambda), currLexicalScopes.top()));
   // now bind its params to args in the new environment
   newLexicalScope();
   bindArgs(sig(lambda), evald_args);
+
   // eval all forms in body, save result of final form
   Cell* result = nil;
   for (Cell* form = callee_body(lambda); form != nil; form = cdr(form)) {
@@ -207,7 +209,6 @@ Cell* eval(Cell* expr) {
 
   endLexicalScope();
   endDynamicScope(L"currLexicalScope");
-
   rmref(evald_args);
   rmref(lambda);
   endLexicalScope(); // splice
