@@ -83,7 +83,7 @@ void test_tokenize_handles_quote_comma_paren() {
   check(p == tokens.end());
 }
 
-void test_tokenize_handles_splice_operator() {
+void test_tokenize_handles_splice_operators() {
   list<Token> tokens = tokenize(stream(L"()',@ @, @b"));
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, START_OF_LINE); ++p;

@@ -93,7 +93,7 @@ void test_eval_handles_unquote() {
   rmref(cells.front());
 }
 
-void test_eval_handles_splice() {
+void test_eval_handles_unquote_splice() {
   list<Cell*> cells = wartRead(stream(L"`(a ,@b)"));
   newDynamicScope(L"b", wartRead(stream(L"34 35")).front());
   Cell* result = eval(cells.front());
@@ -106,7 +106,43 @@ void test_eval_handles_splice() {
   rmref(cells.front());
 }
 
-void test_eval_handles_splice2() {
+void test_eval_handles_unquote_splice_of_nil() {
+  list<Cell*> cells = wartRead(stream(L"`(a ,@b 3)"));
+  newDynamicScope(L"b", nil);
+  Cell* result = eval(cells.front());
+  checkEq(cdr(nil), nil);
+  checkEq(car(result), newSym(L"a"));
+  checkEq(car(cdr(result)), newNum(3));
+  checkEq(cdr(cdr(result)), nil);
+  rmref(result);
+  endDynamicScope(L"b");
+  rmref(cells.front());
+}
+
+void test_eval_handles_quoted_destructured_params() {
+  Cell* call = wartRead(stream(L"((lambda ('(a b)) b) (1 2))")).front();
+  Cell* result = eval(call);
+  check(isNum(result));
+  checkEq(toNum(result), 2);
+  rmref(result);
+  rmref(call);
+}
+
+void test_eval_handles_rest_params() {
+  Cell* call = wartRead(stream(L"((lambda (a b . c) c) 1 2 3 4 5)")).front();
+  Cell* result = eval(call);
+  check(isCons(result));
+  check(isNum(car(result)));
+  checkEq(toNum(car(result)), 3);
+  check(isNum(car(cdr(result))));
+  checkEq(toNum(car(cdr(result))), 4);
+  checkEq(toNum(car(cdr(cdr(result)))), 5);
+  checkEq(cdr(cdr(cdr(result))), nil);
+  rmref(result);
+  rmref(call);
+}
+
+void test_eval_handles_splice() {
   list<Cell*> cells = wartRead(stream(L"(+ @b)"));
   newDynamicScope(L"b", wartRead(stream(L"3 4")).front());
   Cell* result = eval(cells.front());
@@ -116,7 +152,7 @@ void test_eval_handles_splice2() {
   rmref(cells.front());
 }
 
-void test_eval_handles_splice3() {
+void test_eval_handles_splice2() {
   Cell* lambda = wartRead(stream(L"(lambda x (cons @x))")).front();
   Cell* def = eval(lambda);
   newDynamicScope(L"f", def);
@@ -141,17 +177,88 @@ void test_eval_handles_splice3() {
   rmref(lambda);
 }
 
-void test_eval_handles_splice_of_nil() {
-  list<Cell*> cells = wartRead(stream(L"`(a ,@b 3)"));
-  newDynamicScope(L"b", nil);
-  Cell* result = eval(cells.front());
-  checkEq(cdr(nil), nil);
-  checkEq(car(result), newSym(L"a"));
-  checkEq(car(cdr(result)), newNum(3));
-  checkEq(cdr(cdr(result)), nil);
+                                  Cell* copyList(Cell* x) {
+                                    if (!isCons(x)) return x;
+                                    return newCons(copyList(car(x)),
+                                        copyList(cdr(x)));
+                                  }
+
+                                  bool equalList(Cell* a, Cell* b) {
+                                    if (!isCons(a)) return a == b;
+                                    return equalList(car(a), car(b))
+                                        && equalList(cdr(a), cdr(b));
+                                  }
+
+void test_eval_doesnt_modify_lambda() {
+  Cell* lambda = wartRead(stream(L"(lambda(x) (eval x))")).front();
+  Cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
+  Cell* oldf = copyList(f);
+  Cell* call = wartRead(stream(L"(f 34)")).front();
+  Cell* result = eval(call);
+  check(equalList(f, oldf));
   rmref(result);
+  rmref(call);
+  rmref(f);
+  rmref(oldf);
+  rmref(lambda);
+  endDynamicScope(L"f");
+}
+
+void test_eval_doesnt_modify_lambda2() {
+  Cell* lambda = wartRead(stream(L"(lambda(x) (eval x))")).front();
+  Cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
+  Cell* oldf = copyList(f);
+  Cell* call = wartRead(stream(L"(f '(cons 3 4))")).front();
+  Cell* result = eval(call);
+  check(equalList(f, oldf));
+  rmref(result);
+  rmref(call);
+  rmref(f);
+  rmref(oldf);
+  rmref(lambda);
+  endDynamicScope(L"f");
+}
+
+void test_eval_doesnt_modify_lambda3() {
+  newDynamicScope(L"a", newNum(3));
+  newDynamicScope(L"b", newNum(4));
+  Cell* lambda = wartRead(stream(L"(lambda(x y) `(assign ,x ,y))")).front();
+  Cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
+  Cell* oldf = copyList(f);
+  Cell* call = wartRead(stream(L"(f a b)")).front();
+  Cell* result = eval(call);
+  check(equalList(f, oldf));
+  rmref(result);
+  rmref(call);
+  rmref(oldf);
+  endDynamicScope(L"f");
+  rmref(f);
+  rmref(lambda);
   endDynamicScope(L"b");
-  rmref(cells.front());
+  endDynamicScope(L"a");
+}
+
+void test_eval_doesnt_modify_lambda4() {
+  newDynamicScope(L"a", newNum(3));
+  newDynamicScope(L"b", newNum(4));
+  Cell* lambda = wartRead(stream(L"(lambda y `(assign @,y))")).front();
+  Cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
+  Cell* oldf = copyList(f);
+  Cell* call = wartRead(stream(L"(f a b)")).front();
+  Cell* result = eval(call);
+  check(equalList(f, oldf));
+  rmref(result);
+  rmref(call);
+  rmref(oldf);
+  endDynamicScope(L"f");
+  rmref(f);
+  rmref(lambda);
+  endDynamicScope(L"b");
+  endDynamicScope(L"a");
 }
 
 void test_eval_quotes_quote_comma() {
@@ -408,113 +515,4 @@ void test_eval_handles_destructured_params() {
   checkEq(toNum(result), 2);
   rmref(result);
   rmref(call);
-}
-
-void test_eval_handles_quoted_destructured_params() {
-  Cell* call = wartRead(stream(L"((lambda ('(a b)) b) (1 2))")).front();
-  Cell* result = eval(call);
-  check(isNum(result));
-  checkEq(toNum(result), 2);
-  rmref(result);
-  rmref(call);
-}
-
-void test_eval_handles_rest_params() {
-  Cell* call = wartRead(stream(L"((lambda (a b . c) c) 1 2 3 4 5)")).front();
-  Cell* result = eval(call);
-  check(isCons(result));
-  check(isNum(car(result)));
-  checkEq(toNum(car(result)), 3);
-  check(isNum(car(cdr(result))));
-  checkEq(toNum(car(cdr(result))), 4);
-  checkEq(toNum(car(cdr(cdr(result)))), 5);
-  checkEq(cdr(cdr(cdr(result))), nil);
-  rmref(result);
-  rmref(call);
-}
-
-                                  Cell* copyList(Cell* x) {
-                                    if (!isCons(x)) return x;
-                                    Cell* result = newCell();
-                                    setCar(result, copyList(car(x)));
-                                    setCdr(result, copyList(cdr(x)));
-                                    return result;
-                                  }
-
-                                  bool equalList(Cell* a, Cell* b) {
-                                    if (!isCons(a)) return a == b;
-                                    return equalList(car(a), car(b))
-                                        && equalList(cdr(a), cdr(b));
-                                  }
-
-void test_eval_doesnt_modify_lambda() {
-  Cell* lambda = wartRead(stream(L"(lambda(x) (eval x))")).front();
-  Cell* f = eval(lambda);
-  newDynamicScope(L"f", f);
-  Cell* oldf = copyList(f);
-  Cell* call = wartRead(stream(L"(f 34)")).front();
-  Cell* result = eval(call);
-  check(equalList(f, oldf));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(oldf);
-  rmref(lambda);
-  endDynamicScope(L"f");
-}
-
-void test_eval_doesnt_modify_lambda2() {
-  Cell* lambda = wartRead(stream(L"(lambda(x) (eval x))")).front();
-  Cell* f = eval(lambda);
-  newDynamicScope(L"f", f);
-  Cell* oldf = copyList(f);
-  Cell* call = wartRead(stream(L"(f '(cons 3 4))")).front();
-  Cell* result = eval(call);
-  check(equalList(f, oldf));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(oldf);
-  rmref(lambda);
-  endDynamicScope(L"f");
-}
-
-void test_eval_doesnt_modify_lambda3() {
-  newDynamicScope(L"a", newNum(3));
-  newDynamicScope(L"b", newNum(4));
-  Cell* lambda = wartRead(stream(L"(lambda(x y) `(assign ,x ,y))")).front();
-  Cell* f = eval(lambda);
-  newDynamicScope(L"f", f);
-  Cell* oldf = copyList(f);
-  Cell* call = wartRead(stream(L"(f a b)")).front();
-  Cell* result = eval(call);
-  check(equalList(f, oldf));
-  rmref(result);
-  rmref(call);
-  rmref(oldf);
-  endDynamicScope(L"f");
-  rmref(f);
-  rmref(lambda);
-  endDynamicScope(L"b");
-  endDynamicScope(L"a");
-}
-
-void test_eval_doesnt_modify_lambda4() {
-  newDynamicScope(L"a", newNum(3));
-  newDynamicScope(L"b", newNum(4));
-  Cell* lambda = wartRead(stream(L"(lambda y `(assign @,y))")).front();
-  Cell* f = eval(lambda);
-  newDynamicScope(L"f", f);
-  Cell* oldf = copyList(f);
-  Cell* call = wartRead(stream(L"(f a b)")).front();
-  Cell* result = eval(call);
-  check(equalList(f, oldf));
-  rmref(result);
-  rmref(call);
-  rmref(oldf);
-  endDynamicScope(L"f");
-  rmref(f);
-  rmref(lambda);
-  endDynamicScope(L"b");
-  endDynamicScope(L"a");
 }

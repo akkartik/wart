@@ -125,7 +125,7 @@ void test_parse_handles_quotes() {
   check(p == ast.front().elems.end());
 }
 
-void test_parse_handles_splice() {
+void test_parse_handles_splice_operators() {
   list<AstNode> ast = parse(parenthesize(tokenize(stream(L"`(2 ,@b @,c)"))));
   checkEq(ast.size(), 1);
   check(ast.front().isList());
