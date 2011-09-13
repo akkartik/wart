@@ -92,6 +92,12 @@ COMPILE_PRIM_FUNC(if, primFunc_if,
   return result; // already mkref'd
 )
 
+COMPILE_PRIM_FUNC(addr, primFunc_addr,
+  Cell* x = eval(car(args));
+  rmref(x);
+  return mkref(newNum((long)x));
+)
+
 COMPILE_PRIM_FUNC(iso, primFunc_iso,
   Cell* x = eval(car(args));
   Cell* y = eval(car(cdr(args)));
