@@ -5,24 +5,6 @@
                                         && (car(cell) == newSym(L"'") || car(cell) == newSym(L"`"));
                                   }
 
-void bindArgs(Cell* params, Cell* args) {
-  if (params == nil) return;
-
-  if (isQuoted(params)) {
-    bindArgs(cdr(params), args);
-    return;
-  }
-
-  if (isSym(params))
-    addLexicalBinding(params, args);
-  else
-    bindArgs(car(params), car(args));
-
-  bindArgs(cdr(params), cdr(args));
-}
-
-
-
                                   bool isColonSym(Cell* x) {
                                     return isSym(x) && toString(x)[0] == L':';
                                   }
@@ -90,24 +72,41 @@ void bindArgs(Cell* params, Cell* args) {
                                     return result;
                                   }
 
-                                  Cell* evalArgs(Cell* params, Cell* args) {
-                                    if (args == nil) return nil;
-                                    if (isQuoted(params)) {
-                                      return mkref(args);
-                                    }
+Cell* evalArgs(Cell* params, Cell* args) {
+  if (args == nil) return nil;
+  if (isQuoted(params))
+    return mkref(args);
 
-                                    Cell* result = newCell();
-                                    setCdr(result, evalArgs(cdr(params), cdr(args)));
-                                    rmref(cdr(result));
-                                    if (!isCons(params) || !isQuoted(car(params))) {
-                                      setCar(result, eval(car(args)));
-                                      rmref(car(result));
-                                    }
-                                    else {
-                                      setCar(result, car(args));
-                                    }
-                                    return mkref(result);
-                                  }
+  Cell* result = newCell();
+  setCdr(result, evalArgs(cdr(params), cdr(args)));
+  rmref(cdr(result));
+  if (!isCons(params) || !isQuoted(car(params))) {
+    setCar(result, eval(car(args)));
+    rmref(car(result));
+  }
+  else {
+    setCar(result, car(args));
+  }
+  return mkref(result);
+}
+
+void bindArgs(Cell* params, Cell* args) {
+  if (params == nil) return;
+
+  if (isQuoted(params)) {
+    bindArgs(cdr(params), args);
+    return;
+  }
+
+  if (isSym(params))
+    addLexicalBinding(params, args);
+  else
+    bindArgs(car(params), car(args));
+
+  bindArgs(cdr(params), cdr(args));
+}
+
+
 
                                   Cell* processUnquotes(Cell* x) {
                                     if (!isCons(x)) return mkref(x);
