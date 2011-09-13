@@ -241,6 +241,13 @@ string toString(Cell* x) {
   return *(string*)x->car;
 }
 
+Cell* genSym(Cell* x) {
+  static long counter = 0;
+  ostringstream os;
+  os << (x == nil ? L"sym" : toString(x)) << ++counter;
+  return newSym(os.str());
+}
+
 Cell* newPrimFunc(PrimFunc f) {
   Cell* result = newCell();
   result->type = PRIM_FUNC;
@@ -301,13 +308,6 @@ Cell* newCons(Cell* car, Cell* cdr) {
 }
 
 
-
-Cell* genSym(Cell* x) {
-  static long counter = 0;
-  ostringstream os;
-  os << (x == nil ? L"sym" : toString(x)) << ++counter;
-  return newSym(os.str());
-}
 
 void append(Cell* x, Cell* y) {
   while(cdr(x) != nil)
