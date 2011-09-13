@@ -502,7 +502,7 @@ void test_eval_doesnt_modify_lambda3() {
 void test_eval_doesnt_modify_lambda4() {
   newDynamicScope(L"a", newNum(3));
   newDynamicScope(L"b", newNum(4));
-  Cell* lambda = wartRead(stream(L"(lambda y `(assign ,@y))")).front();
+  Cell* lambda = wartRead(stream(L"(lambda y `(assign @,y))")).front();
   Cell* f = eval(lambda);
   newDynamicScope(L"f", f);
   Cell* oldf = copyList(f);
