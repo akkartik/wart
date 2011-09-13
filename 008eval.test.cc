@@ -303,6 +303,28 @@ void test_eval_handles_splice2() {
   rmref(lambda);
 }
 
+void test_eval_handles_splice3() {
+  Cell* lambda = wartRead(stream(L"(lambda (x 'y) (cons x y))")).front();
+  Cell* def = eval(lambda);
+  newDynamicScope(L"f", def);
+  newDynamicScope(L"a", newNum(3));
+  newDynamicScope(L"b", newNum(4));
+  newDynamicScope(L"args", wartRead(stream(L"(a b)")).front());
+  Cell* call = wartRead(stream(L"(f @args)")).front();
+  Cell* result = eval(call);
+  check(isCons(result));
+  checkEq(car(result), newSym(L"a"));
+  checkEq(cdr(result), newSym(L"b"));
+  rmref(result);
+  rmref(call);
+  endDynamicScope(L"args");
+  endDynamicScope(L"b");
+  endDynamicScope(L"a");
+  endDynamicScope(L"f");
+  rmref(def);
+  rmref(lambda);
+}
+
                                   Cell* copyList(Cell* x) {
                                     if (!isCons(x)) return x;
                                     return newCons(copyList(car(x)),
