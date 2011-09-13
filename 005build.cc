@@ -1,15 +1,5 @@
 //// construct parse tree out of cells
 
-extern Cell* buildCell(AstNode);
-
-list<Cell*> buildCells(list<AstNode> in) {
-  list<Cell*> result;
-  if (in.empty()) return result;
-  for (list<AstNode>::iterator p = in.begin(); p != in.end(); ++p)
-    result.push_back(buildCell(*p));
-  return result;
-}
-
                                   bool isQuoteOrUnquote(AstNode n) {
                                     return n == L"'" || n == L"`" || n == L"," || n == L",@" || n == L"@";
                                   }
@@ -59,4 +49,12 @@ Cell* buildCell(AstNode n) {
   }
 
   return newForm;
+}
+
+list<Cell*> buildCells(list<AstNode> in) {
+  list<Cell*> result;
+  if (in.empty()) return result;
+  for (list<AstNode>::iterator p = in.begin(); p != in.end(); ++p)
+    result.push_back(buildCell(*p));
+  return result;
 }
