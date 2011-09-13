@@ -135,12 +135,6 @@ void bindArgs(Cell* params, Cell* args) {
                                       && (isPrimFunc(car(x)) || car(x) == newSym(L"evald-lambda"));
                                   }
 
-                                  Cell* implicitlyEval(Cell* x) {
-                                    Cell* result = eval(x);
-                                    rmref(x);
-                                    return result;
-                                  }
-
                                   Cell* eval_lambda(Cell* expr) {
                                     return newCons(newSym(L"evald-lambda"),
                                         newCons(sig(expr),
