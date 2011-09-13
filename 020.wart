@@ -20,9 +20,6 @@ mac complement($f)
 assign cadr car:cdr
 assign cddr cdr:cdr
 
-def cons?(x)
-  iso 'list type.x
-
 ; let x 3 (add x 1) => 4
 ; let (a . b) (cons 3 4) (add a b) => 7
 mac let($var $val . $body)
@@ -79,13 +76,13 @@ mac and $args
 ; (iso 3 4) => nil
 ; (iso '(1) '(1)) => '(1)
 ; (iso '(1) '(1 2)) => nil
-let $iso iso
+(let $iso iso
   def iso(a b)
     or ($iso a b)
-      and cons?.a
-          cons?.b
+      and ($iso 'list type.a)
+          ($iso 'list type.b)
           (iso car.a car.b)
-          (iso cdr.a cdr.b)
+          (iso cdr.a cdr.b))
 
 mac do $body
   `((lambda() ,@$body))
