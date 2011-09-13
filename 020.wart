@@ -32,11 +32,11 @@ mac let($var $val . $body)
 ; (if nil 35 36 37) => 37
 let $if if
   mac if $args
-    $if (no cdr.$args)
-      (car $args)
-      `(,$if ,(car $args)
-         ,(cadr $args)
-         (if ,@(cddr $args)))
+    $if !cdr.$args
+      car.$args
+      `(,$if ,car.$args
+         ,cadr.$args
+         if ,@cddr.$args)
 
 ; (or) => nil
 ; (or nil) => nil
@@ -47,9 +47,9 @@ let $if if
 ; (or nil (prn 3) (prn 4)) => 3 after printing just 3
 mac or $args
   if $args
-    `(if ,(car $args)
-       ,(car $args)
-       (or ,@(cdr $args)))
+    `(if ,car.$args
+       ,car.$args
+       or ,@cdr.$args)
 
 ; (and) => t
 ; (and nil) => nil
@@ -59,13 +59,13 @@ mac or $args
 ; ((lambda(x) (and 3 x 4)) nil) => nil
 ; (and (prn 3) nil) => nil after printing 3
 mac and $args
-  if (no $args)
+  if !$args
     1
-    if (car $args)
-      if (cdr $args)
-        `(if ,(car $args)
-           and ,@(cdr $args))
-        (car $args)
+    if car.$args
+      if cdr.$args
+        `(if ,car.$args
+           and ,@cdr.$args)
+        car.$args
 
 ; (iso 3 3) => 3
 ; (iso nil nil) => t
@@ -74,10 +74,10 @@ mac and $args
 ; (iso '(1) '(1 2)) => nil
 def iso(a b)
   or (atom_equal a b)
-    and (cons? a)
-        (cons? b)
-        (iso (car a) (car b))
-        (iso (cdr a) (cdr b))
+    and cons?.a
+        cons?.b
+        (iso car.a car.b)
+        (iso cdr.a cdr.b)
 
 mac do $body
   `((lambda() ,@$body))
@@ -88,12 +88,13 @@ mac when($cond . $body)
 
 def list args
   if args
-    cons (car args)
-         list @(cdr args)
+    cons car.args
+         list @cdr.args
 
 def reduce(f xs)
-  if (cddr xs)
-    reduce f (cons (f (car xs) (cadr xs)) (cddr xs))
+  if cddr.xs
+    reduce f (cons (f car.xs cadr.xs)
+                   cddr.xs)
     f @xs
 
 def + xs
@@ -113,16 +114,16 @@ def % xs
 
 def map(f xs)
   if xs
-    cons (f (car xs))
-         map f (cdr xs)
+    cons (f car.xs)
+         map f cdr.xs
 
 def zip(a b)
   if (and a b)
-    cons (list (car a) (car b))
-         zip (cdr a) (cdr b)
+    cons (list car.a car.b)
+         zip cdr.a cdr.b
 
 def pairwise(xs)
-  zip xs (cdr xs)
+  zip xs cdr.xs
 
 def all(f xs)
   and @(map f xs)
@@ -133,11 +134,11 @@ assign any some
 
 def > xs
   all (lambda((x y)) (greater x y))
-      pairwise xs
+      pairwise.xs
 
 def < xs
   all (lambda((x y)) (greater y x))
-      pairwise xs
+      pairwise.xs
 
 mac ret($var $val . $body)
   `(let ,$var ,$val
@@ -153,15 +154,15 @@ mac afn($params . $body)
 
 def pair(l)
   (if
-    (no l)
+    !l
       nil
-    (no (cdr l))
-      (list (list (car l)))
+    !cdr.l
+      list:list car.l
     :else
-      (cons (list (car l) (cadr l))
-            (pair (cddr l))))
+      (cons (list car.l cadr.l)
+            pair cddr.l))
 
 mac with($params . $body)
-  `((lambda ,(map car (pair $params))
+  `((lambda ,(map car pair.$params)
      ,@$body)
-    ,@(map cadr (pair $params)))
+    ,@(map cadr pair.$params))
