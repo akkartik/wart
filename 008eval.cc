@@ -173,15 +173,14 @@ Cell* eval(Cell* expr) {
     // lexical scope is already attached
     return mkref(expr);
 
-  newLexicalScope(); // for variables created by expandSlice
-  expr = expandSplices(expr);
-
   // expr is a function call
   Cell* lambda = eval(car(expr));
   if (!isFunc(lambda))
     err << "not a function call: " << expr << endl << DIE;
 
   // eval all its args in the current lexical scope
+  newLexicalScope(); // for variables created by expandSlice
+  expr = expandSplices(expr);
   Cell* evald_args = eval_args(sig(lambda), call_args(expr));
 
   // swap in the function's lexical environment
