@@ -72,6 +72,16 @@ void test_tokenize_handles_string_with_escape() {
   check(p == tokens.end());
 }
 
+void test_tokenize_handles_quote_comma() {
+  list<Token> tokens = tokenize(stream(L"',35"));
+  list<Token>::iterator p = tokens.begin();
+  checkEq(*p, START_OF_LINE); ++p;
+  checkEq(*p, L"'"); ++p;
+  checkEq(*p, L","); ++p;
+  checkEq(*p, L"35"); ++p;
+  check(p == tokens.end());
+}
+
 void test_tokenize_handles_quote_comma_paren() {
   list<Token> tokens = tokenize(stream(L"(',)"));
   list<Token>::iterator p = tokens.begin();
