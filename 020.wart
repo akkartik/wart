@@ -13,6 +13,10 @@ mac compose($f $g)
   `(lambda $args
      (,$f (,$g @$args)))
 
+mac complement($f)
+  `(lambda $args
+     (no (,$f @$args))) ; TODO no:,$f
+
 assign cadr car:cdr
 assign cddr cdr:cdr
 
@@ -32,7 +36,7 @@ mac let($var $val . $body)
 ; (if nil 35 36 37) => 37
 let $if if
   mac if $args
-    $if !cdr.$args
+    $if (~cdr $args)
       car.$args
       `(,$if ,car.$args
          ,cadr.$args
