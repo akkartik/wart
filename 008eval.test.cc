@@ -122,6 +122,21 @@ void test_evalArgs_handles_spliced_arg() {
   endDynamicScope(L"a");
 }
 
+void test_evalArgs_skips_spliced_args_of_nil() {
+  newDynamicScope(L"a", nil);
+  newDynamicScope(L"b", newNum(4));
+  Cell* params = mkref(wartRead(stream(L"x 'y")).front());
+  Cell* args = mkref(wartRead(stream(L"(@a b)")).front());
+  Cell* evaldArgs = evalArgs(params, args);
+  checkEq(car(evaldArgs), newNum(4));
+  checkEq(cdr(evaldArgs), nil);
+  rmref(evaldArgs);
+  rmref(args);
+  rmref(params);
+  endDynamicScope(L"b");
+  endDynamicScope(L"a");
+}
+
 
 
 void test_bindArgs_handles_vararg() {

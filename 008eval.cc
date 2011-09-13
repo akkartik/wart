@@ -54,6 +54,8 @@
                                   Cell* evalArgs(Cell* params, Cell* args);
                                   Cell* spliceFirst(Cell* params, Cell* args) {
                                     Cell* result = unsplice(car(args));
+                                    if (result == nil)
+                                      return evalArgs(params, cdr(args));
                                     Cell* curr = result;
                                     for (; cdr(curr) != nil; curr=cdr(curr))
                                       params=cdr(params); // don't eval spliced args again, even if param is unquoted
