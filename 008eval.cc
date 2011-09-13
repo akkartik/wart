@@ -51,10 +51,24 @@
                                     return dropPtr(pResult);
                                   }
 
+                                  Cell* evalArgs(Cell* params, Cell* args);
+                                  Cell* spliceFirst(Cell* params, Cell* args) {
+                                    Cell* result = unsplice(car(args));
+                                    Cell* curr = result;
+                                    for (; cdr(curr) != nil; curr=cdr(curr))
+                                      params=cdr(params); // don't eval spliced args again, even if param is unquoted
+                                    setCdr(curr, evalArgs(cdr(params), cdr(args)));
+                                    rmref(cdr(curr));
+                                    return result;
+                                  }
+
 Cell* evalArgs(Cell* params, Cell* args) {
   if (args == nil) return nil;
   if (isQuoted(params))
     return unspliceAll(args); // already mkref'd
+
+  if (isSplice(car(args)))
+    return spliceFirst(params, args); // already mkref'd
 
   Cell* result = newCell();
   setCdr(result, evalArgs(cdr(params), cdr(args)));

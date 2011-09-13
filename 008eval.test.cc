@@ -105,6 +105,23 @@ void test_evalArgs_handles_spliced_vararg_arg() {
   endDynamicScope(L"a");
 }
 
+void test_evalArgs_handles_spliced_arg() {
+  newDynamicScope(L"a", newNum(3));
+  newDynamicScope(L"b", newCons(newNum(4), newCons(newNum(5), nil)));
+  Cell* params = mkref(wartRead(stream(L"(x y 'z)")).front());
+  Cell* args = mkref(wartRead(stream(L"(a @b)")).front());
+  Cell* evaldArgs = evalArgs(params, args);
+  checkEq(car(evaldArgs), newNum(3));
+  checkEq(car(cdr(evaldArgs)), newNum(4));
+  checkEq(car(cdr(cdr(evaldArgs))), newNum(5));
+  checkEq(cdr(cdr(cdr(evaldArgs))), nil);
+  rmref(evaldArgs);
+  rmref(args);
+  rmref(params);
+  endDynamicScope(L"b");
+  endDynamicScope(L"a");
+}
+
 
 
 void test_bindArgs_handles_vararg() {
