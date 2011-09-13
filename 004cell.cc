@@ -309,10 +309,25 @@ Cell* newCons(Cell* car, Cell* cdr) {
 
 
 
+Cell* last(Cell* x) {
+  while(cdr(x) != nil)
+    x = cdr(x);
+  return x;
+}
+
 void append(Cell* x, Cell* y) {
   while(cdr(x) != nil)
     x = cdr(x);
   setCdr(x, y);
+}
+
+// useful idiom: create a dummy cell p, keep
+// appending to it, then return dropPtr(p)
+// which GC's the dummy but mkrefs the rest.
+Cell* dropPtr(Cell* p) {
+  Cell* x = mkref(cdr(p));
+  rmref(p);
+  return x;
 }
 
 

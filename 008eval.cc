@@ -29,53 +29,32 @@
                                     return cdr(call);
                                   }
 
-                                  bool containsSplice(Cell* call) {
-                                    for (Cell* expr = cdr(call); isCons(expr); expr=cdr(expr)) {
-                                      Cell* arg = car(expr);
-                                      if (isCons(arg) && car(arg) == newSym(L"@"))
-                                        return true;
-                                    }
-                                    return false;
+                                  bool isSplice(Cell* arg) {
+                                    return isCons(arg) && car(arg) == newSym(L"@");
                                   }
 
-                                  Cell* expandSplice(Cell* substrate, Cell* arg) {
-                                    if (!isCons(arg) || car(arg) != newSym(L"@")) {
-                                      // no splice
-                                      setCdr(substrate, newCons(car(arg), nil));
-                                      return cdr(substrate);
-                                    }
-
-                                    Cell* newLimb = eval(cdr(arg));
-                                    if (newLimb != nil && !isCons(newLimb))
-                                      warn << "No cons to splice in " << arg << endl;
-
-                                    for (Cell* cell = newLimb; cell != nil; cell=cdr(cell), substrate=cdr(substrate)) {
-                                      // spliced-in args shouldn't get re-eval'd
-                                      // bind a new sym to them and splice it in instead
-                                      Cell* sym = genSym(nil);
-                                      addLexicalBinding(sym, car(cell));
-                                      setCdr(substrate, newCons(sym, nil));
-                                    }
-
-                                    rmref(newLimb);
-                                    return cdr(substrate);
+                                  Cell* unsplice(Cell* arg) {
+                                    return eval(cdr(arg));
                                   }
 
-                                  // modifies currentLexicalScope; give it a a fresh scope
-                                  Cell* expandSplices(Cell* call) {
-                                    if (!containsSplice(call)) return call;
-
-                                    Cell* result = newCons(car(call), nil); // we never check function position
-                                    for (Cell *args=cdr(call), *curr=result; args != nil; args=cdr(args))
-                                      curr = expandSplice(curr, car(args));
-                                    addLexicalBinding(genSym(nil), result); // hook for GC
-                                    return result;
+                                  Cell* unspliceAll(Cell* args) {
+                                    Cell* pResult = newCell();
+                                    for (Cell *curr=pResult, *arg=car(args); args != nil; args=cdr(args), arg=car(args), curr=last(curr)) {
+                                      if (!isSplice(arg)) {
+                                        setCdr(curr, newCons(arg, nil));
+                                        continue;
+                                      }
+                                      Cell* newLimb = unsplice(arg);
+                                      setCdr(curr, newLimb);
+                                      rmref(newLimb);
+                                    }
+                                    return dropPtr(pResult);
                                   }
 
 Cell* evalArgs(Cell* params, Cell* args) {
   if (args == nil) return nil;
   if (isQuoted(params))
-    return mkref(args);
+    return unspliceAll(args); // already mkref'd
 
   Cell* result = newCell();
   setCdr(result, evalArgs(cdr(params), cdr(args)));
@@ -179,7 +158,6 @@ Cell* eval(Cell* expr) {
 
   // eval all its args in the current lexical scope
   newLexicalScope(); // for variables created by expandSlice
-  expr = expandSplices(expr);
   Cell* evaldArgs = evalArgs(sig(lambda), callArgs(expr));
 
   // swap in the function's lexical environment
