@@ -32,7 +32,7 @@ mac let($var $val . $body)
 ; (if nil 35 36 37) => 37
 let $if if
   mac if $args
-    $if (no (cdr $args))
+    $if (no cdr.$args)
       (car $args)
       `(,$if ,(car $args)
          ,(cadr $args)
