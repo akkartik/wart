@@ -173,7 +173,7 @@ void checkLiteralTables() {
   }
 }
 
-                                  void mark_all_cells(Cell* x, hash_map<long, long>& mark) {
+                                  void markAllCells(Cell* x, hash_map<long, long>& mark) {
                                     if (x == nil) return;
                                     ++mark[(long)x];
                                     switch (x->type) {
@@ -182,12 +182,12 @@ void checkLiteralTables() {
                                     case SYM:
                                       break;
                                     case CONS:
-                                      mark_all_cells(car(x), mark); break;
+                                      markAllCells(car(x), mark); break;
                                     case TABLE: {
                                       Table* t = (Table*)x->car;
                                       for (hash_map<long, Cell*>::iterator p = t->table.begin(); p != t->table.end(); ++p) {
-                                        mark_all_cells((Cell*)p->first, mark);
-                                        mark_all_cells(p->second, mark);
+                                        markAllCells((Cell*)p->first, mark);
+                                        markAllCells(p->second, mark);
                                       }
                                       break;
                                     }
@@ -196,14 +196,14 @@ void checkLiteralTables() {
                                     default:
                                       cerr << "Can't mark type " << x->type << endl << DIE;
                                     }
-                                    mark_all_cells(cdr(x), mark);
+                                    markAllCells(cdr(x), mark);
                                   }
 
 void dumpUnfreed() {
   hash_map<long, long> numRefsRemaining;
   for (Cell* x = heapStart; x < currCell; ++x) {
     if (!x->car) continue;
-    mark_all_cells(x, numRefsRemaining);
+    markAllCells(x, numRefsRemaining);
   }
   for (Cell* x = heapStart; x < currCell; ++x) {
     if (!x->car) continue;
