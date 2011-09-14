@@ -163,5 +163,5 @@ COMPILE_PRIM_FUNC(%, primFunc_modulo, L"($x $y)",
 )
 
 COMPILE_PRIM_FUNC(>, primFunc_greater, L"($x $y)",
-  return mkref(newNum(toNum(lookup(L"$x"))>toNum(lookup(L"$y"))));
+  return toNum(lookup(L"$x")) > toNum(lookup(L"$y")) ? lookup(L"$x") : nil;
 )
