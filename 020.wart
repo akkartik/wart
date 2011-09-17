@@ -182,3 +182,12 @@ mac while($test . $body)
   `(when ,$test
      ,@$body
      (while ,$test ,@$body))
+
+def rem(f seq)
+  (if seq
+    (if (~f car.seq)
+      (cons car.seq (rem f cdr.seq))
+      (rem f cdr.seq)))
+
+def keep(f seq)
+  rem ~f seq
