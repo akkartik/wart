@@ -135,12 +135,6 @@ void bindArgs(Cell* params, Cell* args) {
                                             newCons(body(expr), currLexicalScopes.top())));
                                   }
 
-                                  int indent = 0;
-                                  void printIndent() {
-                                    for (int i = 0; i < indent; ++i)
-                                      dbg2 << " ";
-                                  }
-
 Cell* eval(Cell* expr) {
   if (!expr)
     err << "eval: cell should never be NULL" << endl << DIE;
