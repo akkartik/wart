@@ -9,6 +9,11 @@ assign mac (lambda '($name $params . $body)
 mac def($name $params . $body)
   `(assign ,$name (lambda ,$params ,@$body))
 
+assign x 65
+def foo()
+  if (> x 1)
+    assign x (- x 1)
+
 mac compose($f $g)
   `(lambda $args
      (,$f (,$g @$args)))
