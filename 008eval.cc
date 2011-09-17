@@ -115,7 +115,7 @@ void bindArgs(Cell* params, Cell* args) {
                                       if (result == nil) return splice;
                                       append(result, splice);
                                       rmref(splice);
-                                      return result;
+                                      return result; // already mkref'd
                                     }
 
                                     Cell* result = newCons(processUnquotes(car(x)), processUnquotes(cdr(x)));
