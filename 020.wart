@@ -191,3 +191,9 @@ def rem(f seq)
 
 def keep(f seq)
   rem ~f seq
+
+mac iflet($var $expr . $branches)
+  if !$branches
+    $expr
+    `(let ,$var ,$expr
+       (if ,$var ,@$branches))
