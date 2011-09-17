@@ -9,11 +9,6 @@ assign mac (lambda '($name $params . $body)
 mac def($name $params . $body)
   `(assign ,$name (lambda ,$params ,@$body))
 
-assign x 65
-def foo()
-  if (> x 1)
-    assign x (- x 1)
-
 mac compose($f $g)
   `(lambda $args
      (,$f (,$g @$args)))
@@ -182,3 +177,8 @@ mac with($params . $body)
   `((lambda ,(map car pair.$params)
      ,@$body)
     ,@(map cadr pair.$params))
+
+mac while($test . $body)
+  `(when ,$test
+     ,@$body
+     (while ,$test ,@$body))
