@@ -153,6 +153,8 @@ Table* toTable(Cell* x) {
   return (Table*)x->car;
 }
 
+
+
                                   hash_map<long, Cell*> numLiterals;
                                   Cell* intern(long x) {
                                     if (numLiterals[x]) {
@@ -180,6 +182,8 @@ long toNum(Cell* x) {
   return (long)x->car;
 }
 
+
+
                                   struct strEq {
                                     bool operator() (const string& s1, const string& s2) const {
                                       return s1 == s2;
@@ -198,7 +202,6 @@ long toNum(Cell* x) {
 
                                   template<class Data>
                                   class StringMap :public hash_map<string, Data, strHash, strEq>{};
-
 
                                   StringMap<Cell*> stringLiterals;
                                   Cell* intern(string x) {
@@ -247,6 +250,8 @@ Cell* genSym(Cell* x) {
   os << (x == nil ? L"sym" : toString(x)) << ++counter;
   return newSym(os.str());
 }
+
+
 
 Cell* newPrimFunc(PrimFunc f) {
   Cell* result = newCell();
