@@ -195,5 +195,12 @@ def keep(f seq)
 mac iflet($var $expr . $branches)
   if !$branches
     $expr
-    `(let ,$var ,$expr
-       (if ,$var ,@$branches))
+    `(let $tmp ,$expr
+       (if $tmp
+         (let ,$var $tmp
+           ,car.$branches)
+         ,(if cdr.$branches
+            `(iflet ,$var ,@cdr.$branches))))
+
+mac aif($expr . $branches)
+  `(iflet it ,$expr ,@$branches)
