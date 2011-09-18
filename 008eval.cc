@@ -1,8 +1,11 @@
 //// eval: lookup symbols, respect quotes, rewrite lambda calls
 
                                   bool isQuoted(Cell* cell) {
-                                    return isCons(cell)
-                                        && (car(cell) == newSym(L"'") || car(cell) == newSym(L"`"));
+                                    return isCons(cell) && car(cell) == newSym(L"'");
+                                  }
+
+                                  bool isBackQuoted(Cell* cell) {
+                                    return isCons(cell) && car(cell) == newSym(L"`");
                                   }
 
                                   bool isColonSym(Cell* x) {
@@ -152,6 +155,9 @@ Cell* eval(Cell* expr) {
     return mkref(expr);
 
   if (isQuoted(expr))
+    return mkref(cdr(expr));
+
+  if (isBackQuoted(expr))
     return processUnquotes(cdr(expr)); // already mkref'd
 
   if (car(expr) == newSym(L"lambda"))
