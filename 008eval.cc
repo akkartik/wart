@@ -48,7 +48,7 @@
                                       setCdr(curr, newLimb);
                                       rmref(newLimb);
                                     }
-                                    return dropPtr(pResult);
+                                    return dropPtr(pResult); // mkref's
                                   }
 
                                   Cell* evalArgs(Cell* params, Cell* args);
@@ -61,7 +61,7 @@
                                       params=cdr(params); // don't eval spliced args again, even if param is unquoted
                                     setCdr(curr, evalArgs(cdr(params), cdr(args)));
                                     rmref(cdr(curr));
-                                    return result;
+                                    return result; // already mkref'd
                                   }
 
 Cell* evalArgs(Cell* params, Cell* args) {
