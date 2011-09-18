@@ -23,11 +23,7 @@ void test_assign_to_lambda() {
   Cell* lambda = wartRead(stream(L"assign foo (lambda() 34)")).front();
   Cell* def = eval(lambda);
   Cell* scope = calleeEnv(lookup(L"foo"));
-  check(isTable(scope));
-  hash_map<long, Cell*> h = toTable(scope)->table;
-  for (hash_map<long, Cell*>::iterator p = h.begin(); p != h.end(); ++p)
-    check(!p->second);
-  checkEq(scope->cdr, newSym(L"dynamicScope"));
+  checkEq(scope, newSym(L"dynamicScope"));
   endDynamicScope(L"foo");
   rmref(def);
   rmref(lambda);

@@ -167,7 +167,6 @@ Cell* eval(Cell* expr) {
     err << "not a function call: " << expr << endl << DIE;
 
   // eval all its args in the current lexical scope
-  newLexicalScope(); // for variables created by expandSlice
   Cell* evaldArgs = evalArgs(sig(lambda), callArgs(expr));
 
   // swap in the function's lexical environment
@@ -193,6 +192,5 @@ Cell* eval(Cell* expr) {
     endDynamicScope(L"currLexicalScope");
   rmref(evaldArgs);
   rmref(lambda);
-  endLexicalScope(); // splice
   return result; // already mkref'd
 }
