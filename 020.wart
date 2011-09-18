@@ -9,6 +9,7 @@ assign mac (lambda '($name $params . $body)
 mac def($name $params . $body)
   `(assign ,$name (lambda ,$params ,@$body))
 
+; prn:assign x 3
 mac compose($f $g)
   `(lambda $args
      (,$f (,$g @$args)))
