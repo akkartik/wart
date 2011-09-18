@@ -106,22 +106,42 @@ void bindArgs(Cell* params, Cell* args) {
 
 
 
-                                  Cell* processUnquotes(Cell* x) {
+                                  int unquoteDepth(Cell* x) {
+                                    if (!isCons(x) || car(x) != newSym(L","))
+                                      return 0;
+                                    return unquoteDepth(cdr(x))+1;
+                                  }
+
+                                  Cell* stripUnquote(Cell* x) {
+                                    if (!isCons(x) || car(x) != newSym(L","))
+                                      return x;
+                                    return stripUnquote(cdr(x));
+                                  }
+
+                                  Cell* processUnquotes(Cell* x, int depth) {
                                     if (!isCons(x)) return mkref(x);
 
-                                    if (car(x) == newSym(L","))
-                                      return eval(cdr(x));
+                                    if (unquoteDepth(x) == depth)
+                                      return eval(stripUnquote(x));
+                                    else if (car(x) == newSym(L","))
+                                      return mkref(x);
+
+                                    if (isBackQuoted(x)) {
+                                      Cell* result = newCons(car(x), processUnquotes(cdr(x), depth+1));
+                                      rmref(cdr(result));
+                                      return mkref(result);
+                                    }
 
                                     if (isCons(car(x)) && car(car(x)) == newSym(L",@")) {
                                       Cell* result = eval(cdr(car(x)));
-                                      Cell* splice = processUnquotes(cdr(x));
+                                      Cell* splice = processUnquotes(cdr(x), depth);
                                       if (result == nil) return splice;
                                       append(result, splice);
                                       rmref(splice);
                                       return result; // already mkref'd
                                     }
 
-                                    Cell* result = newCons(processUnquotes(car(x)), processUnquotes(cdr(x)));
+                                    Cell* result = newCons(processUnquotes(car(x), depth), processUnquotes(cdr(x), depth));
                                     rmref(car(result));
                                     rmref(cdr(result));
                                     return mkref(result);
@@ -158,7 +178,7 @@ Cell* eval(Cell* expr) {
     return mkref(cdr(expr));
 
   if (isBackQuoted(expr))
-    return processUnquotes(cdr(expr)); // already mkref'd
+    return processUnquotes(cdr(expr), 1); // already mkref'd
 
   if (car(expr) == newSym(L"lambda"))
     // attach current lexical scope

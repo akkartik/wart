@@ -286,6 +286,27 @@ void test_eval_evals_comma_quote() {
   rmref(cells.front());
 }
 
+void test_eval_handles_nested_quotes() {
+  Cell* expr = wartRead(stream(L"`(,a `(,a ,,a))")).front();
+  newDynamicScope(L"a", newSym(L"x"));
+  Cell* result = eval(expr);
+  checkEq(car(result), newSym(L"x"));
+  Cell* nestedExpr = car(cdr(result));
+  check(isCons(nestedExpr));
+  checkEq(car(nestedExpr), newSym(L"`"));
+  check(isCons(cdr(nestedExpr)));
+  Cell* nestedExpr2 = cdr(nestedExpr);
+  check(isCons(car(nestedExpr2)));
+  checkEq(car(car(nestedExpr2)), newSym(L","));
+  checkEq(cdr(car(nestedExpr2)), newSym(L"a"));
+  nestedExpr2 = cdr(nestedExpr2);
+  checkEq(car(nestedExpr2), newSym(L"x"));
+  checkEq(cdr(nestedExpr2), nil);
+  rmref(result);
+  endDynamicScope(L"a");
+  rmref(expr);
+}
+
 void test_eval_handles_quoted_destructured_params() {
   Cell* call = wartRead(stream(L"((lambda ('(a b)) b) (1 2))")).front();
   Cell* result = eval(call);
