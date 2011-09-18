@@ -132,7 +132,7 @@ void bindArgs(Cell* params, Cell* args) {
                                       return mkref(result);
                                     }
 
-                                    if (isCons(car(x)) && car(car(x)) == newSym(L",@")) {
+                                    if (depth == 1 && isCons(car(x)) && car(car(x)) == newSym(L",@")) {
                                       Cell* result = eval(cdr(car(x)));
                                       Cell* splice = processUnquotes(cdr(x), depth);
                                       if (result == nil) return splice;

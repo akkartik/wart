@@ -13,8 +13,8 @@ mac def($name $params . $body)
 ; prn:assign x 3 => x=3
 ; (let a 3 (prn:assign x a)) => x=3
 mac compose($f $g)
-  `(lambda $args
-     (,$f (,$g @$args)))
+  `(lambda '$args
+     eval `(,,$f (,,$g ,@$args)))
 
 mac complement($f)
   `(lambda $args
