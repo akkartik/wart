@@ -260,6 +260,32 @@ void test_eval_handles_unquote_splice_of_nil() {
   rmref(cells.front());
 }
 
+void test_eval_quotes_quote_comma() {
+  list<Cell*> cells = wartRead(stream(L"`(a ',b)"));
+  newDynamicScope(L"b", newSym(L"x"));
+  Cell* result = eval(cells.front());
+  checkEq(car(result), newSym(L"a"));
+  check(isCons(car(cdr(result))));
+  checkEq(car(car(cdr(result))), newSym(L"'"));
+  checkEq(cdr(car(cdr(result))), newSym(L"x"));
+  checkEq(cdr(cdr(result)), nil);
+  rmref(result);
+  endDynamicScope(L"b");
+  rmref(cells.front());
+}
+
+void test_eval_evals_comma_quote() {
+  list<Cell*> cells = wartRead(stream(L"`(a ,'b)"));
+  newDynamicScope(L"b", newSym(L"x"));
+  Cell* result = eval(cells.front());
+  checkEq(car(result), newSym(L"a"));
+  checkEq(car(cdr(result)), newSym(L"b"));
+  checkEq(cdr(cdr(result)), nil);
+  rmref(result);
+  endDynamicScope(L"b");
+  rmref(cells.front());
+}
+
 void test_eval_handles_quoted_destructured_params() {
   Cell* call = wartRead(stream(L"((lambda ('(a b)) b) (1 2))")).front();
   Cell* result = eval(call);
@@ -422,32 +448,6 @@ void test_eval_doesnt_modify_lambda4() {
   rmref(lambda);
   endDynamicScope(L"b");
   endDynamicScope(L"a");
-}
-
-void test_eval_quotes_quote_comma() {
-  list<Cell*> cells = wartRead(stream(L"`(a ',b)"));
-  newDynamicScope(L"b", newSym(L"x"));
-  Cell* result = eval(cells.front());
-  checkEq(car(result), newSym(L"a"));
-  check(isCons(car(cdr(result))));
-  checkEq(car(car(cdr(result))), newSym(L"'"));
-  checkEq(cdr(car(cdr(result))), newSym(L"x"));
-  checkEq(cdr(cdr(result)), nil);
-  rmref(result);
-  endDynamicScope(L"b");
-  rmref(cells.front());
-}
-
-void test_eval_evals_comma_quote() {
-  list<Cell*> cells = wartRead(stream(L"`(a ,'b)"));
-  newDynamicScope(L"b", newSym(L"x"));
-  Cell* result = eval(cells.front());
-  checkEq(car(result), newSym(L"a"));
-  checkEq(car(cdr(result)), newSym(L"b"));
-  checkEq(cdr(cdr(result)), nil);
-  rmref(result);
-  endDynamicScope(L"b");
-  rmref(cells.front());
 }
 
 void test_eval_handles_simple_lambda() {
