@@ -178,6 +178,7 @@ mac with($params . $body)
      ,@$body)
     ,@(map cadr pair.$params))
 
+; while (> x 0) prn.x (assign x (- x 1))
 mac while($test . $body)
   `(when ,$test
      ,@$body
