@@ -10,11 +10,11 @@ mac def($name $params . $body)
   `(assign ,$name (lambda ,$params ,@$body))
 
 mac compose($f $g)
-  `(lambda $args
+  `(lambda '$args
      (,$f (,$g @$args)))
 
 mac complement($f)
-  `(lambda $args
+  `(lambda '$args
      (no:,$f @$args))
 
 assign cadr car:cdr
