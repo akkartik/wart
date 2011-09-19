@@ -229,3 +229,14 @@ mac whilet($var $test . $body)
 
 mac awhile($test . $body)
   `(whilet it ,$test ,@$body)
+
+mac for($var $start $test $update . $body)
+  `(let ,$var ,$start
+     (while ,$test
+       ,@$body
+       ,$update))
+
+mac each($var $expr . $body)
+  `(for $foo ,$expr $foo (assign $foo cdr.$foo)
+      (let ,$var car.$foo
+        ,@$body))
