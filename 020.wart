@@ -12,13 +12,13 @@ mac def($name $params . $body)
 ; ((compose f g) . args <=> (f (g . args))
 ; prn:assign x 3 => x=3
 ; (let a 3 (prn:assign x a)) => x=3
-mac compose($f $g)
-  `(lambda '$args
-     eval `(,,$f (,,$g ,@$args)))
+def compose(f g)
+  lambda '$args
+    eval `(,f (,g ,@$args))
 
-mac complement($f)
-  `(lambda '$args
-     eval `(no:,$f @$args))
+def complement(f)
+  lambda '$args
+    eval `(no:,f ,@$args)
 
 assign cadr car:cdr
 assign cddr cdr:cdr
