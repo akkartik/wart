@@ -17,8 +17,8 @@ mac compose($f $g)
      eval `(,,$f (,,$g ,@$args)))
 
 mac complement($f)
-  `(lambda $args
-     (no:,$f @$args))
+  `(lambda '$args
+     eval `(no:,$f @$args))
 
 assign cadr car:cdr
 assign cddr cdr:cdr
