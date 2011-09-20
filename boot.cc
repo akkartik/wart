@@ -185,7 +185,7 @@ void checkLiteralTables() {
                                       markAllCells(car(x), mark); break;
                                     case TABLE: {
                                       Table* t = (Table*)x->car;
-                                      for (hash_map<long, Cell*>::iterator p = t->table.begin(); p != t->table.end(); ++p) {
+                                      for (CellMap::iterator p = t->table.begin(); p != t->table.end(); ++p) {
                                         markAllCells((Cell*)p->first, mark);
                                         markAllCells(p->second, mark);
                                       }

@@ -72,16 +72,24 @@ Cell* newCell() {
 
 
 
+                                  struct TypeCastCellHash {
+                                    size_t operator()(const Cell* c) const {
+                                      hash<long> h;
+                                      return h((long)c);
+                                    }
+                                  };
+                                  struct CellMap :public hash_map<Cell*, Cell*, TypeCastCellHash> {};
+
                                   extern void rmref(Cell*);
 
 struct Table {
-  hash_map<long, Cell*> table;
+  CellMap table;
   Cell*& operator[](Cell* c) {
-    return table[(long)c];
+    return table[c];
   }
 
   ~Table() {
-    for (hash_map<long, Cell*>::iterator p = table.begin(); p != table.end(); ++p) {
+    for (CellMap::iterator p = table.begin(); p != table.end(); ++p) {
       if (!p->second) continue;
       rmref((Cell*)p->first);
       rmref(p->second);
@@ -384,7 +392,7 @@ Cell* get(Cell* t, Cell* k) {
 
                                   ostream& operator<<(ostream& os, Table* t) {
                                     os << "{" << endl;
-                                    for (hash_map<long, Cell*>::iterator p = t->table.begin(); p != t->table.end(); ++p) {
+                                    for (CellMap::iterator p = t->table.begin(); p != t->table.end(); ++p) {
                                       if (p->second)
                                         os << "  " << (Cell*)p->first << ": " << p->second << endl;
                                     }
