@@ -110,6 +110,15 @@ void test_sym_works_with_multiple_args() {
   rmref(call);
 }
 
+void test_str_works_with_multiple_args() {
+  Cell* call = wartRead(stream(L"(str \"abc\" 42 'def)")).front();
+  Cell* result = eval(call);
+  check(isString(result));
+  checkEq(toString(result), L"abc42def");
+  rmref(result);
+  rmref(call);
+}
+
 
 
 void test_add_works() {
