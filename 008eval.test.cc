@@ -730,3 +730,17 @@ void test_eval_handles_rest_keyword_arg_at_end() {
   rmref(lambda);
   endDynamicScope(L"f");
 }
+
+void test_eval_handles_non_keyword_arg_colon_syms() {
+  Cell* lambda = wartRead(stream(L"(lambda (a b) b)")).front();
+  Cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
+  Cell* call = wartRead(stream(L"(f :x 1)")).front();
+  Cell* result = eval(call);
+  checkEq(result, newNum(1));
+  rmref(result);
+  rmref(call);
+  rmref(f);
+  rmref(lambda);
+  endDynamicScope(L"f");
+}
