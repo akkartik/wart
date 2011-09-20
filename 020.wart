@@ -151,6 +151,10 @@ mac when($cond . $body)
   `(if ,$cond
      (do ,@$body))
 
+mac unless($cond . $body)
+  `(if !,$cond
+     (do ,@$body))
+
 mac iflet($var $expr . $branches)
   if !$branches
     $expr
