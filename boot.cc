@@ -173,9 +173,9 @@ void checkLiteralTables() {
   }
 }
 
-                                  void markAllCells(Cell* x, hash_map<long, long>& mark) {
+                                  void markAllCells(Cell* x, hash_map<Cell*, long, TypeCastCellHash>& mark) {
                                     if (x == nil) return;
-                                    ++mark[(long)x];
+                                    ++mark[x];
                                     switch (x->type) {
                                     case NUM:
                                     case STRING:
@@ -200,7 +200,7 @@ void checkLiteralTables() {
                                   }
 
 void dumpUnfreed() {
-  hash_map<long, long> numRefsRemaining;
+  hash_map<Cell*, long, TypeCastCellHash> numRefsRemaining;
   for (Cell* x = heapStart; x < currCell; ++x) {
     if (!x->car) continue;
     markAllCells(x, numRefsRemaining);
@@ -208,7 +208,7 @@ void dumpUnfreed() {
   for (Cell* x = heapStart; x < currCell; ++x) {
     if (!x->car) continue;
     if (initialSyms.find(x) != initialSyms.end()) continue;
-    if (numRefsRemaining[(long)x] > 1) continue;
+    if (numRefsRemaining[x] > 1) continue;
     cerr << "unfreed: " << (void*)x << " " << x << endl;
   }
 }
