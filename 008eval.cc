@@ -54,7 +54,7 @@
                                         keywordArgs[(long)currArg] = car(args);
                                       }
                                       else {
-                                        setCdr(curr, newCons(car(args), nil));
+                                        addCons(curr, car(args));
                                         curr=cdr(curr);
                                       }
                                     }
@@ -67,12 +67,12 @@
                                       Cell* param = isCons(params) ? car(params) : params;
                                       if (keywordArgs[(long)param]) {
                                         if (isCons(params))
-                                          setCdr(curr, newCons(keywordArgs[(long)param], nil));
+                                          addCons(curr, keywordArgs[(long)param]);
                                         else
                                           setCdr(curr, keywordArgs[(long)param]);
                                       } else {
                                         if (isCons(params))
-                                          setCdr(curr, newCons(car(nonKeywordArgs), nil));
+                                          addCons(curr, car(nonKeywordArgs));
                                         else
                                           setCdr(curr, nonKeywordArgs);
                                         nonKeywordArgs = cdr(nonKeywordArgs);
@@ -103,7 +103,7 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
                                     Cell* pResult = newCell();
                                     for (Cell *curr=pResult, *arg=car(args); args != nil; args=cdr(args), arg=car(args), curr=last(curr)) {
                                       if (!isSplice(arg)) {
-                                        setCdr(curr, newCons(arg, nil));
+                                        addCons(curr, arg);
                                         continue;
                                       }
                                       Cell* newLimb = unsplice(arg);

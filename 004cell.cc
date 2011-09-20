@@ -335,6 +335,10 @@ Cell* dropPtr(Cell* p) {
   return x;
 }
 
+void addCons(Cell* p, Cell* x) {
+  setCdr(p, newCons(x, nil));
+}
+
 
 
                                   void unsafeSet(Cell* t, Cell* key, Cell* val, bool deleteNils) {
