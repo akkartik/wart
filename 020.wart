@@ -2,22 +2,22 @@ assign nil? not
 assign no nil?
 
 ; (mac foo(x) `(+ 1 ,x))) (let x 3 (foo x)) => 4
-assign mac (lambda '($name $params . $body)
-  eval `(assign ,$name (lambda ',$params
+assign mac (fn '($name $params . $body)
+  eval `(assign ,$name (fn ',$params
                          (eval ,@$body))))
 
 mac def($name $params . $body)
-  `(assign ,$name (lambda ,$params ,@$body))
+  `(assign ,$name (fn ,$params ,@$body))
 
 ; ((compose f g) . args <=> (f (g . args))
 ; prn:assign x 3 => x=3
 ; (let a 3 (prn:assign x a)) => x=3
 def compose(f g)
-  lambda '$args
+  fn '$args
     eval `(,f (,g ,@$args))
 
 def complement(f)
-  lambda '$args
+  fn '$args
     eval `(no:,f ,@$args)
 
 assign cadr car:cdr
@@ -26,11 +26,11 @@ assign cddr cdr:cdr
 ; let x 3 (+ x 1) => 4
 ; let (a . b) (cons 3 4) (+ a b) => 7
 mac let($var $val . $body)
-  `((lambda(,$var) ,@$body) ,$val)
+  `((fn(,$var) ,@$body) ,$val)
 
 ; (if) => nil
 ; (if 34) => 34
-; ((lambda(x) (if x)) 34) => 34
+; ((fn(x) (if x)) 34) => 34
 ; (if 34 35) => 35
 ; (assign x 34) (if x 35) => 35
 ; (if 34 35 36) => 35
@@ -49,7 +49,7 @@ let $if if
 ; (or nil) => nil
 ; (or 3) => 3
 ; (or nil 3) => 3
-; ((lambda(x) (or nil x)) 3) => 3
+; ((fn(x) (or nil x)) 3) => 3
 ; (or nil 3 4) => 3
 ; (or nil (prn 3) (prn 4)) => 3 after printing just 3
 mac or $args
@@ -63,7 +63,7 @@ mac or $args
 ; (and 3) => 3
 ; (and nil 3) => nil
 ; (and 3 4) => 4
-; ((lambda(x) (and 3 x 4)) nil) => nil
+; ((fn(x) (and 3 x 4)) nil) => nil
 ; (and (prn 3) nil) => nil after printing 3
 mac and $args
   if !$args
@@ -88,7 +88,7 @@ mac and $args
           (iso cdr.a cdr.b))
 
 mac do $body
-  `((lambda() ,@$body))
+  `((fn() ,@$body))
 
 mac when($cond . $body)
   `(if ,$cond
@@ -147,11 +147,11 @@ assign any some
 
 let $> >
   def > xs
-    all (lambda((x y)) ($> x y))
+    all (fn((x y)) ($> x y))
         pairwise.xs
 
   def < xs
-    all (lambda((x y)) ($> y x))
+    all (fn((x y)) ($> y x))
         pairwise.xs
 
 mac ret($var $val . $body)
@@ -161,7 +161,7 @@ mac ret($var $val . $body)
 
 mac rfn($name $params . $body)
   `(ret ,$name nil
-      assign ,$name (lambda ,$params ,@$body))
+      assign ,$name (fn ,$params ,@$body))
 
 mac afn($params . $body)
   `(rfn self ,$params ,@$body)
@@ -177,7 +177,7 @@ def pair(l)
             pair cddr.l))
 
 mac with($params . $body)
-  `((lambda ,(map car pair.$params)
+  `((fn ,(map car pair.$params)
      ,@$body)
     ,@(map cadr pair.$params))
 

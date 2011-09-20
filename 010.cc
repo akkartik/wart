@@ -127,7 +127,7 @@ COMPILE_PRIM_FUNC(type, primFunc_type, L"($x)",
     case PRIM_FUNC:
       result = newSym(L"function"); break;
     case CONS:
-      if (car(x) == newSym(L"lambda") || car(x) == newSym(L"evald-lambda"))
+      if (car(x) == newSym(L"fn") || car(x) == newSym(L"evald-fn"))
         result = newSym(L"function");
       else if (car(x) == newSym(L"type"))
         result = car(cdr(x));

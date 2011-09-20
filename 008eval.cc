@@ -1,4 +1,4 @@
-//// eval: lookup symbols, respect quotes, rewrite lambda calls
+//// eval: lookup symbols, respect quotes, rewrite fn calls
 
                                   bool isQuoted(Cell* cell) {
                                     return isCons(cell) && car(cell) == newSym(L"'");
@@ -12,12 +12,12 @@
                                     return isSym(x) && toString(x)[0] == L':';
                                   }
 
-                                  Cell* sig(Cell* lambda) {
-                                    return car(cdr(lambda));
+                                  Cell* sig(Cell* fn) {
+                                    return car(cdr(fn));
                                   }
 
-                                  Cell* body(Cell* lambda) {
-                                    return cdr(cdr(lambda));
+                                  Cell* body(Cell* fn) {
+                                    return cdr(cdr(fn));
                                   }
 
                                   Cell* calleeBody(Cell* callee) {
@@ -218,11 +218,11 @@ Cell* processUnquotes(Cell* x, int depth) {
 
                                   bool isFunc(Cell* x) {
                                     return isCons(x)
-                                      && (isPrimFunc(car(x)) || car(x) == newSym(L"evald-lambda"));
+                                      && (isPrimFunc(car(x)) || car(x) == newSym(L"evald-fn"));
                                   }
 
                                   Cell* evalLambda(Cell* expr) {
-                                    return newCons(newSym(L"evald-lambda"),
+                                    return newCons(newSym(L"evald-fn"),
                                         newCons(sig(expr),
                                             newCons(body(expr), currLexicalScopes.top())));
                                   }
@@ -249,7 +249,7 @@ Cell* eval(Cell* expr) {
   if (isBackQuoted(expr))
     return processUnquotes(cdr(expr), 1); // already mkref'd
 
-  if (car(expr) == newSym(L"lambda"))
+  if (car(expr) == newSym(L"fn"))
     // attach current lexical scope
     return mkref(evalLambda(expr));
   else if (isFunc(expr))
@@ -257,37 +257,37 @@ Cell* eval(Cell* expr) {
     return mkref(expr);
 
   // expr is a function call
-  Cell* lambda = eval(car(expr));
-  if (!isFunc(lambda))
+  Cell* fn = eval(car(expr));
+  if (!isFunc(fn))
     err << "not a function call: " << expr << endl << DIE;
 
   // eval all its args in the current lexical scope
-  Cell* realArgs = reorderKeywordArgs(sig(lambda), callArgs(expr));
-  Cell* evaldArgs = evalArgs(sig(lambda), realArgs);
+  Cell* realArgs = reorderKeywordArgs(sig(fn), callArgs(expr));
+  Cell* evaldArgs = evalArgs(sig(fn), realArgs);
 
   // swap in the function's lexical environment
-  if (!isPrimFunc(car(lambda)))
+  if (!isPrimFunc(car(fn)))
     newDynamicScope(L"currLexicalScope",
-        newCons(calleeEnv(lambda), currLexicalScopes.top()));
+        newCons(calleeEnv(fn), currLexicalScopes.top()));
   // now bind its params to args in the new environment
   newLexicalScope();
-  bindArgs(sig(lambda), evaldArgs);
+  bindArgs(sig(fn), evaldArgs);
 
   // eval all forms in body, save result of final form
   Cell* result = nil;
-  if (isPrimFunc(car(lambda)))
-    result = toPrimFunc(car(lambda))(); // all primFuncs must mkref result
+  if (isPrimFunc(car(fn)))
+    result = toPrimFunc(car(fn))(); // all primFuncs must mkref result
   else
-    for (Cell* form = calleeBody(lambda); form != nil; form = cdr(form)) {
+    for (Cell* form = calleeBody(fn); form != nil; form = cdr(form)) {
       rmref(result);
       result = eval(car(form));
     }
 
   endLexicalScope();
-  if (!isPrimFunc(car(lambda)))
+  if (!isPrimFunc(car(fn)))
     endDynamicScope(L"currLexicalScope");
   rmref(evaldArgs);
   rmref(realArgs);
-  rmref(lambda);
+  rmref(fn);
   return result; // already mkref'd
 }
