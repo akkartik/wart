@@ -1,8 +1,8 @@
 //// manage symbol bindings
 
-hash_map<long, stack<Cell*> > dynamics;
+hash_map<Cell*, stack<Cell*>, TypeCastCellHash> dynamics;
 Cell* lookupDynamicBinding(Cell* sym) {
-  stack<Cell*> bindings = dynamics[(long)sym];
+  stack<Cell*> bindings = dynamics[sym];
   if (bindings.empty()) return NULL;
   return bindings.top();
 }
@@ -10,7 +10,7 @@ Cell* lookupDynamicBinding(Cell* sym) {
 void newDynamicScope(Cell* sym, Cell* val) {
   mkref(sym);
   mkref(val);
-  dynamics[(long)sym].push(val);
+  dynamics[sym].push(val);
 }
 
 void newDynamicScope(string s, Cell* val) {
@@ -18,7 +18,7 @@ void newDynamicScope(string s, Cell* val) {
 }
 
 void endDynamicScope(Cell* sym) {
-  stack<Cell*>& bindings = dynamics[(long)sym];
+  stack<Cell*>& bindings = dynamics[sym];
   if (bindings.empty()) {
     warn << "No dynamic binding for " << sym << endl;
     return;
@@ -33,7 +33,7 @@ void endDynamicScope(string s) {
 }
 
 void assignDynamicVar(Cell* sym, Cell* val) {
-  stack<Cell*>& bindings = dynamics[(long)sym];
+  stack<Cell*>& bindings = dynamics[sym];
   if (bindings.empty()) {
     warn << "No dynamic binding to assign for " << sym << endl;
     return;
@@ -45,7 +45,7 @@ void assignDynamicVar(Cell* sym, Cell* val) {
 }
 
 // the current lexical scope is a first-class dynamic variable
-#define currLexicalScopes dynamics[(long)newSym(L"currLexicalScope")]
+#define currLexicalScopes dynamics[newSym(L"currLexicalScope")]
 hash_set<Cell*, TypeCastCellHash> initialSyms;
 void setupLexicalScope() {
   newDynamicScope(L"currLexicalScope", newSym(L"dynamicScope"));
