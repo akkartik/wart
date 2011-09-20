@@ -9,11 +9,6 @@ assign mac (fn '($name $params . $body)
 mac def($name $params . $body)
   `(assign ,$name (fn ,$params ,@$body))
 
-mac proc($name $params . $body)
-  `(def ,$name ,$params
-     ,@$body
-     nil)
-
 ; ((compose f g) . args <=> (f (g . args))
 ; prn:assign x 3 => x=3
 ; (let a 3 (prn:assign x a)) => x=3
@@ -24,6 +19,23 @@ def compose(f g)
 def complement(f)
   fn '$args
     eval `(no:,f ,@$args)
+
+mac proc($name $params . $body)
+  `(def ,$name ,$params
+     ,@$body
+     nil)
+
+mac ret($var $val . $body)
+  `(let ,$var ,$val
+     ,@$body
+     ,$var)
+
+mac rfn($name $params . $body)
+  `(ret ,$name nil
+      assign ,$name (fn ,$params ,@$body))
+
+mac afn($params . $body)
+  `(rfn self ,$params ,@$body)
 
 
 
@@ -98,84 +110,12 @@ mac and $args
           (iso car.a car.b)
           (iso cdr.a cdr.b))
 
-mac do $body
-  `((fn() ,@$body))
-
-mac when($cond . $body)
-  `(if ,$cond
-     (do ,@$body))
-
 def list args
   if args
     cons car.args
          list @cdr.args
 
-def reduce(f xs)
-  if cddr.xs
-    reduce f (cons (f car.xs cadr.xs)
-                   cddr.xs)
-    f @xs
-
-let $+ +
-  def + xs
-    reduce $+ xs
-
-let $- -
-  def - xs
-    reduce $- xs
-
-let $* *
-  def * xs
-    reduce $* xs
-
-let $/ /
-  def / xs
-    reduce $/ xs
-
-let $% %
-  def % xs
-    reduce $% xs
-
-def map(f xs)
-  if xs
-    cons (f car.xs)
-         map f cdr.xs
-
-def zip(a b)
-  if (and a b)
-    cons (list car.a car.b)
-         zip cdr.a cdr.b
-
-def pairwise(xs)
-  zip xs cdr.xs
-
-def all(f xs)
-  and @(map f xs)
-
-def some(f xs)
-  or @(map f xs)
-assign any some
-
-let $> >
-  def > xs
-    all (fn((x y)) ($> x y))
-        pairwise.xs
-
-  def < xs
-    all (fn((x y)) ($> y x))
-        pairwise.xs
-
-mac ret($var $val . $body)
-  `(let ,$var ,$val
-     ,@$body
-     ,$var)
-
-mac rfn($name $params . $body)
-  `(ret ,$name nil
-      assign ,$name (fn ,$params ,@$body))
-
-mac afn($params . $body)
-  `(rfn self ,$params ,@$body)
+
 
 def pair(l)
   (if
@@ -192,11 +132,8 @@ mac with($params . $body)
      ,@$body)
     ,@(map cadr pair.$params))
 
-; while (> x 0) prn.x (assign x (- x 1))
-mac while($test . $body)
-  `(when ,$test
-     ,@$body
-     (while ,$test ,@$body))
+mac do $body
+  `((fn() ,@$body))
 
 def rem(f seq)
   (if seq
@@ -206,6 +143,12 @@ def rem(f seq)
 
 def keep(f seq)
   rem ~f seq
+
+
+
+mac when($cond . $body)
+  `(if ,$cond
+     (do ,@$body))
 
 mac iflet($var $expr . $branches)
   if !$branches
@@ -233,6 +176,12 @@ mac awhen($test . $body)
   `(whenlet it ,$test
       ,@$body)
 
+; while (> x 0) prn.x (assign x (- x 1))
+mac while($test . $body)
+  `(when ,$test
+     ,@$body
+     (while ,$test ,@$body))
+
 mac whilet($var $test . $body)
   `(let ,$var nil
      (while (assign ,$var ,$test)
@@ -257,3 +206,62 @@ let $table table
     ret t ($table)
       (each (k v) pair.args
         (table_set t k v))
+
+
+
+def zip(a b)
+  if (and a b)
+    cons (list car.a car.b)
+         zip cdr.a cdr.b
+
+def pairwise(xs)
+  zip xs cdr.xs
+
+def map(f xs)
+  if xs
+    cons (f car.xs)
+         map f cdr.xs
+
+def reduce(f xs)
+  if cddr.xs
+    reduce f (cons (f car.xs cadr.xs)
+                   cddr.xs)
+    f @xs
+
+def all(f xs)
+  and @(map f xs)
+
+def some(f xs)
+  or @(map f xs)
+assign any some
+
+
+
+let $+ +
+  def + xs
+    reduce $+ xs
+
+let $- -
+  def - xs
+    reduce $- xs
+
+let $* *
+  def * xs
+    reduce $* xs
+
+let $/ /
+  def / xs
+    reduce $/ xs
+
+let $% %
+  def % xs
+    reduce $% xs
+
+let $> >
+  def > xs
+    all (fn((x y)) ($> x y))
+        pairwise.xs
+
+  def < xs
+    all (fn((x y)) ($> y x))
+        pairwise.xs

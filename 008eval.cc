@@ -231,6 +231,8 @@ Cell* eval(Cell* expr) {
   if (!expr)
     err << "eval: cell should never be NULL" << endl << DIE;
 
+  dbg2 << expr << endl;
+
   if (expr == nil)
     return nil;
 
