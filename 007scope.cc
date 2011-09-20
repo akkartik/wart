@@ -46,11 +46,11 @@ void assignDynamicVar(Cell* sym, Cell* val) {
 
 // the current lexical scope is a first-class dynamic variable
 #define currLexicalScopes dynamics[(long)newSym(L"currLexicalScope")]
-hash_set<long> initialSyms;
+hash_set<Cell*, TypeCastCellHash> initialSyms;
 void setupLexicalScope() {
   newDynamicScope(L"currLexicalScope", newSym(L"dynamicScope"));
-  initialSyms.insert((long)newSym(L"currLexicalScope"));
-  initialSyms.insert((long)newSym(L"dynamicScope"));
+  initialSyms.insert(newSym(L"currLexicalScope"));
+  initialSyms.insert(newSym(L"dynamicScope"));
 }
 
 Cell* lookupLexicalBinding(Cell* sym, Cell* lexicalScope) {
