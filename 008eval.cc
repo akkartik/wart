@@ -45,13 +45,13 @@
                                   }
 
                                   // extract keyword args into the hash_map provided; return non-keyword args
-                                  Cell* extractKeywordArgs(Cell* params, Cell* args, hash_map<long, Cell*>& keywordArgs) {
+                                  Cell* extractKeywordArgs(Cell* params, Cell* args, CellMap& keywordArgs) {
                                     Cell *pNonKeywordArgs = newCell(), *curr = pNonKeywordArgs;
                                     for (; args != nil; args=cdr(args)) {
                                       Cell* currArg = keywordArg(params, car(args));
                                       if (currArg != nil) {
                                         args = cdr(args); // skip keyword arg
-                                        keywordArgs[(long)currArg] = car(args);
+                                        keywordArgs[currArg] = car(args);
                                       }
                                       else {
                                         addCons(curr, car(args));
@@ -61,15 +61,15 @@
                                     return dropPtr(pNonKeywordArgs);
                                   }
 
-                                  Cell* argsInParamOrder(Cell* params, Cell* nonKeywordArgs, hash_map<long, Cell*>& keywordArgs) {
+                                  Cell* argsInParamOrder(Cell* params, Cell* nonKeywordArgs, CellMap& keywordArgs) {
                                     Cell* pReconstitutedArgs = newCell();
                                     for (Cell* curr = pReconstitutedArgs; params != nil; curr=cdr(curr), params=cdr(params)) {
                                       Cell* param = isCons(params) ? car(params) : params;
-                                      if (keywordArgs[(long)param]) {
+                                      if (keywordArgs[param]) {
                                         if (isCons(params))
-                                          addCons(curr, keywordArgs[(long)param]);
+                                          addCons(curr, keywordArgs[param]);
                                         else
-                                          setCdr(curr, keywordArgs[(long)param]);
+                                          setCdr(curr, keywordArgs[param]);
                                       } else {
                                         if (isCons(params))
                                           addCons(curr, car(nonKeywordArgs));
@@ -82,7 +82,7 @@
                                   }
 
 Cell* reorderKeywordArgs(Cell* params, Cell* args) {
-  hash_map<long, Cell*> keywordArgs;
+  CellMap keywordArgs;
   Cell* nonKeywordArgs = extractKeywordArgs(params, args, keywordArgs);
   Cell* result = argsInParamOrder(params, nonKeywordArgs, keywordArgs);
   rmref(nonKeywordArgs);
