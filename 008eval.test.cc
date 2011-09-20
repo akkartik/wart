@@ -715,11 +715,11 @@ void test_eval_handles_keyword_args_for_lambdas() {
   endDynamicScope(L"f");
 }
 
-void test_eval_handles_rest_keyword_args_for_lambdas() {
+void test_eval_handles_rest_keyword_arg_at_end() {
   Cell* lambda = wartRead(stream(L"(lambda (a . b) b)")).front();
   Cell* f = eval(lambda);
   newDynamicScope(L"f", f);
-  Cell* call = wartRead(stream(L"(f :b (1 3) 2)")).front();
+  Cell* call = wartRead(stream(L"(f 2 :b 1 3)")).front();
   Cell* result = eval(call);
   checkEq(car(result), newNum(1));
   checkEq(car(cdr(result)), newNum(3));

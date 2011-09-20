@@ -35,12 +35,16 @@
 
 
                                   // doesn't look inside destructured params
-                                  Cell* keywordArg(Cell* params, Cell* arg) {
+                                  Cell* keywordArg(Cell* params, Cell* args) {
+                                    Cell* arg = car(args);
                                     if (!isColonSym(arg)) return nil;
                                     Cell* realArg = newSym(toString(arg).substr(1));
-                                    for (; params != nil; params=cdr(params))
-                                      if (realArg == (isCons(params) ? car(params) : params))
+                                    for (; params != nil; params=cdr(params)) {
+                                      if (realArg == params) // rest keyword arg must be last
+                                        return newSym(L"__wartRestKeywordArg");
+                                      if (isCons(params) && realArg == car(params))
                                         return realArg;
+                                    }
                                     return nil;
                                   }
 
@@ -48,14 +52,18 @@
                                   Cell* extractKeywordArgs(Cell* params, Cell* args, CellMap& keywordArgs) {
                                     Cell *pNonKeywordArgs = newCell(), *curr = pNonKeywordArgs;
                                     for (; args != nil; args=cdr(args)) {
-                                      Cell* currArg = keywordArg(params, car(args));
-                                      if (currArg != nil) {
-                                        args = cdr(args); // skip keyword arg
-                                        keywordArgs[currArg] = car(args);
+                                      Cell* currArg = keywordArg(params, args);
+                                      if (currArg == newSym(L"__wartRestKeywordArg")) {
+                                        setCdr(curr, cdr(args));
+                                        break;
                                       }
-                                      else {
+                                      else if (currArg == nil) {
                                         addCons(curr, car(args));
                                         curr=cdr(curr);
+                                      }
+                                      else {
+                                        args = cdr(args); // skip keyword arg
+                                        keywordArgs[currArg] = car(args);
                                       }
                                     }
                                     return dropPtr(pNonKeywordArgs);
@@ -111,7 +119,7 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
                                     return dropPtr(pResult); // mkref's
                                   }
 
-                                  Cell* evalArgs(Cell* params, Cell* args);
+                                  Cell* evalArgs(Cell*, Cell*);
                                   Cell* spliceFirst(Cell* params, Cell* args) {
                                     Cell* result = unsplice(car(args));
                                     if (result == nil)
