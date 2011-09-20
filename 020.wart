@@ -20,6 +20,12 @@ def complement(f)
   fn '$args
     eval `(no:,f ,@$args)
 
+
+
+def prn args
+  pr:str @args "
+"
+
 assign cadr car:cdr
 assign cddr cdr:cdr
 

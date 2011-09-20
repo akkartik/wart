@@ -53,9 +53,9 @@ COMPILE_PRIM_FUNC(load, primFunc_load, L"($f)",
   return nil;
 )
 
-COMPILE_PRIM_FUNC(prn, primFunc_prn, L"($x)",
+COMPILE_PRIM_FUNC(pr, primFunc_prn, L"($x)",
   Cell* x = lookup(L"$x");
-  cout << x << endl;
+  cout << x;
   return mkref(x);
 )
 
