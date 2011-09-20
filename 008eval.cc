@@ -118,34 +118,36 @@ void bindArgs(Cell* params, Cell* args) {
                                     return stripUnquote(cdr(x));
                                   }
 
-                                  Cell* processUnquotes(Cell* x, int depth) {
-                                    if (!isCons(x)) return mkref(x);
+Cell* processUnquotes(Cell* x, int depth) {
+  if (!isCons(x)) return mkref(x);
 
-                                    if (unquoteDepth(x) == depth)
-                                      return eval(stripUnquote(x));
-                                    else if (car(x) == newSym(L","))
-                                      return mkref(x);
+  if (unquoteDepth(x) == depth)
+    return eval(stripUnquote(x));
+  else if (car(x) == newSym(L","))
+    return mkref(x);
 
-                                    if (isBackQuoted(x)) {
-                                      Cell* result = newCons(car(x), processUnquotes(cdr(x), depth+1));
-                                      rmref(cdr(result));
-                                      return mkref(result);
-                                    }
+  if (isBackQuoted(x)) {
+    Cell* result = newCons(car(x), processUnquotes(cdr(x), depth+1));
+    rmref(cdr(result));
+    return mkref(result);
+  }
 
-                                    if (depth == 1 && isCons(car(x)) && car(car(x)) == newSym(L",@")) {
-                                      Cell* result = eval(cdr(car(x)));
-                                      Cell* splice = processUnquotes(cdr(x), depth);
-                                      if (result == nil) return splice;
-                                      append(result, splice);
-                                      rmref(splice);
-                                      return result; // already mkref'd
-                                    }
+  if (depth == 1 && isCons(car(x)) && car(car(x)) == newSym(L",@")) {
+    Cell* result = eval(cdr(car(x)));
+    Cell* splice = processUnquotes(cdr(x), depth);
+    if (result == nil) return splice;
+    append(result, splice);
+    rmref(splice);
+    return result; // already mkref'd
+  }
 
-                                    Cell* result = newCons(processUnquotes(car(x), depth), processUnquotes(cdr(x), depth));
-                                    rmref(car(result));
-                                    rmref(cdr(result));
-                                    return mkref(result);
-                                  }
+  Cell* result = newCons(processUnquotes(car(x), depth), processUnquotes(cdr(x), depth));
+  rmref(car(result));
+  rmref(cdr(result));
+  return mkref(result);
+}
+
+
 
                                   bool isFunc(Cell* x) {
                                     return isCons(x)
