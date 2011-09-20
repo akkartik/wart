@@ -32,6 +32,65 @@
                                     return cdr(call);
                                   }
 
+
+
+                                  // doesn't look inside destructured params
+                                  Cell* keywordArg(Cell* params, Cell* arg) {
+                                    if (!isColonSym(arg)) return nil;
+                                    Cell* realArg = newSym(toString(arg).substr(1));
+                                    for (; params != nil; params=cdr(params))
+                                      if (realArg == (isCons(params) ? car(params) : params))
+                                        return realArg;
+                                    return nil;
+                                  }
+
+                                  // extract keyword args into the hash_map provided; return non-keyword args
+                                  Cell* extractKeywordArgs(Cell* params, Cell* args, hash_map<long, Cell*>& keywordArgs) {
+                                    Cell *pNonKeywordArgs = newCell(), *curr = pNonKeywordArgs;
+                                    for (; args != nil; args=cdr(args)) {
+                                      Cell* currArg = keywordArg(params, car(args));
+                                      if (currArg != nil) {
+                                        args = cdr(args); // skip keyword arg
+                                        keywordArgs[(long)currArg] = car(args);
+                                      }
+                                      else {
+                                        setCdr(curr, newCons(car(args), nil));
+                                        curr=cdr(curr);
+                                      }
+                                    }
+                                    return dropPtr(pNonKeywordArgs);
+                                  }
+
+                                  Cell* argsInParamOrder(Cell* params, Cell* nonKeywordArgs, hash_map<long, Cell*>& keywordArgs) {
+                                    Cell* pReconstitutedArgs = newCell();
+                                    for (Cell* curr = pReconstitutedArgs; params != nil; curr=cdr(curr), params=cdr(params)) {
+                                      Cell* param = isCons(params) ? car(params) : params;
+                                      if (keywordArgs[(long)param]) {
+                                        if (isCons(params))
+                                          setCdr(curr, newCons(keywordArgs[(long)param], nil));
+                                        else
+                                          setCdr(curr, keywordArgs[(long)param]);
+                                      } else {
+                                        if (isCons(params))
+                                          setCdr(curr, newCons(car(nonKeywordArgs), nil));
+                                        else
+                                          setCdr(curr, nonKeywordArgs);
+                                        nonKeywordArgs = cdr(nonKeywordArgs);
+                                      }
+                                    }
+                                    return dropPtr(pReconstitutedArgs);
+                                  }
+
+Cell* reorderKeywordArgs(Cell* params, Cell* args) {
+  hash_map<long, Cell*> keywordArgs;
+  Cell* nonKeywordArgs = extractKeywordArgs(params, args, keywordArgs);
+  Cell* result = argsInParamOrder(params, nonKeywordArgs, keywordArgs);
+  rmref(nonKeywordArgs);
+  return result;
+}
+
+
+
                                   bool isSplice(Cell* arg) {
                                     return isCons(arg) && car(arg) == newSym(L"@");
                                   }
@@ -195,7 +254,8 @@ Cell* eval(Cell* expr) {
     err << "not a function call: " << expr << endl << DIE;
 
   // eval all its args in the current lexical scope
-  Cell* evaldArgs = evalArgs(sig(lambda), callArgs(expr));
+  Cell* realArgs = reorderKeywordArgs(sig(lambda), callArgs(expr));
+  Cell* evaldArgs = evalArgs(sig(lambda), realArgs);
 
   // swap in the function's lexical environment
   if (!isPrimFunc(car(lambda)))
@@ -219,6 +279,7 @@ Cell* eval(Cell* expr) {
   if (!isPrimFunc(car(lambda)))
     endDynamicScope(L"currLexicalScope");
   rmref(evaldArgs);
+  rmref(realArgs);
   rmref(lambda);
   return result; // already mkref'd
 }

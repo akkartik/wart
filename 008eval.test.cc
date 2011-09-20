@@ -700,3 +700,33 @@ void test_eval_handles_destructured_params() {
   rmref(result);
   rmref(call);
 }
+
+void test_eval_handles_keyword_args_for_lambdas() {
+  Cell* lambda = wartRead(stream(L"(lambda (a b) b)")).front();
+  Cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
+  Cell* call = wartRead(stream(L"(f :b 1 2)")).front();
+  Cell* result = eval(call);
+  checkEq(result, newNum(1));
+  rmref(result);
+  rmref(call);
+  rmref(f);
+  rmref(lambda);
+  endDynamicScope(L"f");
+}
+
+void test_eval_handles_rest_keyword_args_for_lambdas() {
+  Cell* lambda = wartRead(stream(L"(lambda (a . b) b)")).front();
+  Cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
+  Cell* call = wartRead(stream(L"(f :b (1 3) 2)")).front();
+  Cell* result = eval(call);
+  checkEq(car(result), newNum(1));
+  checkEq(car(cdr(result)), newNum(3));
+  checkEq(cdr(cdr(result)), nil);
+  rmref(result);
+  rmref(call);
+  rmref(f);
+  rmref(lambda);
+  endDynamicScope(L"f");
+}
