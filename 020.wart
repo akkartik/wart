@@ -9,6 +9,11 @@ assign mac (fn '($name $params . $body)
 mac def($name $params . $body)
   `(assign ,$name (fn ,$params ,@$body))
 
+mac proc($name $params . $body)
+  `(def ,$name ,$params
+     ,@$body
+     nil)
+
 ; ((compose f g) . args <=> (f (g . args))
 ; prn:assign x 3 => x=3
 ; (let a 3 (prn:assign x a)) => x=3
