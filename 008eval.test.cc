@@ -744,3 +744,19 @@ void test_eval_handles_non_keyword_arg_colon_syms() {
   rmref(lambda);
   endDynamicScope(L"f");
 }
+
+void test_eval_handles_body_keyword_synonym() {
+  Cell* lambda = wartRead(stream(L"(lambda (a . body) body)")).front();
+  Cell* f = eval(lambda);
+  newDynamicScope(L"f", f);
+  Cell* call = wartRead(stream(L"(f 2 :do 1 3)")).front();
+  Cell* result = eval(call);
+  checkEq(car(result), newNum(1));
+  checkEq(car(cdr(result)), newNum(3));
+  checkEq(cdr(cdr(result)), nil);
+  rmref(result);
+  rmref(call);
+  rmref(f);
+  rmref(lambda);
+  endDynamicScope(L"f");
+}

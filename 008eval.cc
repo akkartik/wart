@@ -42,6 +42,8 @@
                                     for (; params != nil; params=cdr(params)) {
                                       if (realArg == params) // rest keyword arg must be last
                                         return newSym(L"__wartRestKeywordArg");
+                                      if (realArg == newSym(L"do") && params == newSym(L"body"))
+                                        return newSym(L"__wartRestKeywordArg");
                                       if (isCons(params) && realArg == car(params))
                                         return realArg;
                                     }
