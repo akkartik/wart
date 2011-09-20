@@ -64,17 +64,15 @@
                                   Cell* argsInParamOrder(Cell* params, Cell* nonKeywordArgs, CellMap& keywordArgs) {
                                     Cell* pReconstitutedArgs = newCell();
                                     for (Cell* curr = pReconstitutedArgs; params != nil; curr=cdr(curr), params=cdr(params)) {
-                                      Cell* param = isCons(params) ? car(params) : params;
-                                      if (keywordArgs[param]) {
-                                        if (isCons(params))
-                                          addCons(curr, keywordArgs[param]);
-                                        else
-                                          setCdr(curr, keywordArgs[param]);
+                                      if (!isCons(params)) {
+                                        setCdr(curr, keywordArgs[params] ? keywordArgs[params] : nonKeywordArgs);
+                                        break;
+                                      }
+
+                                      if (keywordArgs[car(params)]) {
+                                        addCons(curr, keywordArgs[car(params)]);
                                       } else {
-                                        if (isCons(params))
-                                          addCons(curr, car(nonKeywordArgs));
-                                        else
-                                          setCdr(curr, nonKeywordArgs);
+                                        addCons(curr, car(nonKeywordArgs));
                                         nonKeywordArgs = cdr(nonKeywordArgs);
                                       }
                                     }
