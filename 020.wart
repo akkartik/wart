@@ -40,8 +40,8 @@ mac afn($params . $body)
 
 
 def prn args
-  pr:str @args "
-"
+  (pr:str @args "
+")
   car.args
 
 assign cadr car:cdr
