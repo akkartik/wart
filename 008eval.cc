@@ -81,7 +81,8 @@
 
                                       if (keywordArgs[car(params)]) {
                                         addCons(curr, keywordArgs[car(params)]);
-                                      } else {
+                                      }
+                                      else {
                                         addCons(curr, car(nonKeywordArgs));
                                         nonKeywordArgs = cdr(nonKeywordArgs);
                                       }
