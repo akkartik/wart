@@ -110,9 +110,9 @@ int countIndent(istream& in) {
                                     in >> c; out << c;
                                   }
 
-                                  const string quoteChars = L",'`@";
-                                  const string ssyntaxChars = L":~!.&"; // disjoint from quoteChars
                                   void slurpWord(istream& in, ostream& out) {
+                                    const string quoteChars = L",'`@";
+                                    const string ssyntaxChars = L":~!.&"; // disjoint from quoteChars
                                     char c, lastc = L'\0';
                                     while (!eof(in)) {
                                       in >> c;
