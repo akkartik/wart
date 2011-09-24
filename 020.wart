@@ -212,6 +212,14 @@ let $table table
       (each (k v) pair.args
         (table_set t k v))
 
+def test(msg valueof should expected)
+  if (should valueof expected)
+    (pr ".")
+    (do
+      (prn)
+      (prn "F " msg)
+      (prn "  got " valueof))
+
 
 
 def zip(a b)
