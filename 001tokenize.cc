@@ -3,7 +3,7 @@
 enum TokenType {
   NON_WHITESPACE,
   START_OF_LINE,
-  INDENT, MAYBE_WRAP,
+  INDENT,
   OUTDENT,
 };
 
@@ -26,8 +26,8 @@ struct Token {
     Token result(START_OF_LINE, L"", 0);
     return result;
   }
-  static Token indent(int l, bool justOneExtraChar) {
-    Token result(justOneExtraChar ? MAYBE_WRAP : INDENT, L"", l);
+  static Token indent(int l) {
+    Token result(INDENT, L"", l);
     return result;
   }
   static Token outdent(int l) {
@@ -78,27 +78,20 @@ ostream& operator<<(ostream& os, Token p) {
                                     return in.eof();
                                   }
 
-// BEWARE: tab = 1 space; don't mix the two
-// But do track whether the final indent char is a space. Sometimes you want
-// to wrap a long form.
-const int LAST_CHAR_IS_SPACE = 100;
 int countIndent(istream& in) {
   int count = 0;
-  bool lastCharIsSpace = false;
   char c;
   while (!eof(in)) {
     if (!isspace(in.peek()))
       break;
     in >> c;
-    lastCharIsSpace = (c == L' ');
-    ++count;
-    if (c == L'\n')
+    if (c == L'\t')
+      count += 2;
+    else if (c == L'\n')
       count = 0;
+    else
+      count++;
   }
-  if (count >= LAST_CHAR_IS_SPACE)
-    err << L"eek, too much indent" << endl << DIE;
-  if (lastCharIsSpace)
-    count += LAST_CHAR_IS_SPACE;
   return count;
 }
 
@@ -111,8 +104,8 @@ int countIndent(istream& in) {
                                   }
 
                                   void slurpWord(istream& in, ostream& out) {
-                                    const string quoteChars = L",'`@";
-                                    const string ssyntaxChars = L":~!.&"; // disjoint from quoteChars
+                                    static const string quoteChars = L",'`@";
+                                    static const string ssyntaxChars = L":~!.&"; // disjoint from quoteChars
                                     char c, lastc = L'\0';
                                     while (!eof(in)) {
                                       in >> c;
@@ -173,12 +166,8 @@ restart:
     }
     int prevIndentLevel = indentLevel;
     indentLevel = currIndentLevel;
-    bool lastCharIsSpace = (indentLevel >= LAST_CHAR_IS_SPACE);
-    if (lastCharIsSpace) indentLevel -= LAST_CHAR_IS_SPACE;
-    if (indentLevel > prevIndentLevel+1)
-      return Token::indent(indentLevel, false);
-    else if (indentLevel == prevIndentLevel+1)
-      return Token::indent(indentLevel, lastCharIsSpace);
+    if (indentLevel > prevIndentLevel)
+      return Token::indent(indentLevel);
     else if (indentLevel < prevIndentLevel)
       return Token::outdent(indentLevel);
     // otherwise prevIndentLevel == indentLevel; fall through

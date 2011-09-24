@@ -1,11 +1,11 @@
 void test_countIndent() {
   // countIndent requires a non-empty stream
-  checkEq(countIndent(stream(L"\t")), 1);
-  checkEq(countIndent(stream(L" ")), 1+LAST_CHAR_IS_SPACE);
-  checkEq(countIndent(stream(L"   ")), 3+LAST_CHAR_IS_SPACE);
-  checkEq(countIndent(stream(L" \t ")), 3+LAST_CHAR_IS_SPACE); // tab == 1 space
-  checkEq(countIndent(stream(L" \n ")), 1+LAST_CHAR_IS_SPACE); // skip empty lines
-  checkEq(countIndent(stream(L" \r\n  ")), 2+LAST_CHAR_IS_SPACE); // dos
+  checkEq(countIndent(stream(L"\t")), 2);
+  checkEq(countIndent(stream(L" ")), 1);
+  checkEq(countIndent(stream(L"   ")), 3);
+  checkEq(countIndent(stream(L" \t ")), 4);
+  checkEq(countIndent(stream(L" \n ")), 1); // skip empty lines
+  checkEq(countIndent(stream(L" \r\n  ")), 2); // dos
   checkEq(countIndent(stream(L"\n\na")), 0);
 }
 
