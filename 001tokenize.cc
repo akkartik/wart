@@ -1,53 +1,35 @@
 //// tokenize input including newlines and indent
 
-enum TokenType {
-  NON_WHITESPACE,
-  START_OF_LINE,
-  INDENT,
-  OUTDENT,
-};
-
-bool whitespace(TokenType t) {
-  return t != NON_WHITESPACE;
-}
-
+// line contains 1 indent and zero or more regular tokens
 struct Token {
-  TokenType type;
   string token;
-  int indentLevel;
+  int indentLevel; // all tokens on a line share its indentLevel
 
-  Token(const TokenType t, const string x, const int l) :type(t), token(x), indentLevel(l) {}
+  Token(const string x, const int l) :token(x), indentLevel(l) {}
 
   static Token of(string s) {
-    Token result(NON_WHITESPACE, s, 0);
-    return result;
-  }
-  static Token sol() {
-    Token result(START_OF_LINE, L"", 0);
+    Token result(s, 0);
     return result;
   }
   static Token indent(int l) {
-    Token result(INDENT, L"", l);
-    return result;
-  }
-  static Token outdent(int l) {
-    Token result(OUTDENT, L"", l);
+    Token result(L"", l);
     return result;
   }
 
-  bool operator==(string x) {
-    return type == NON_WHITESPACE && token == x;
+  bool isIndent() {
+    return token == L"";
   }
-  bool operator==(TokenType x) {
-    return type == x;
+
+  bool operator==(string x) {
+    return token == x;
+  }
+  bool operator==(int x) {
+    return indentLevel == x;
   }
   bool operator==(Token x) {
-    return type == x.type && token == x.token && indentLevel == x.indentLevel;
+    return token == x.token && indentLevel == x.indentLevel;
   }
   bool operator!=(string x) {
-    return !(*this == x);
-  }
-  bool operator!=(TokenType x) {
     return !(*this == x);
   }
   bool operator!=(Token x) {
@@ -56,8 +38,11 @@ struct Token {
 };
 
 ostream& operator<<(ostream& os, Token p) {
-  if (p.type != NON_WHITESPACE) return os << p.type;
-  else return os << p.token;
+  if (p.token != L"") return os << p.token;
+  os << endl;
+  for (int i = 0; i < p.indentLevel; ++i)
+    os << L"_";
+  return os;
 }
 
 
@@ -135,7 +120,7 @@ int countIndent(istream& in) {
                                     }
                                   }
 
-                                  void slurpComment(istream& in) {
+                                  void skipComment(istream& in) {
                                     char c;
                                     while (!eof(in)) {
                                       in >> c;
@@ -146,32 +131,30 @@ int countIndent(istream& in) {
                                     }
                                   }
 
-int indentLevel = 0;
-TokenType prevTokenType = START_OF_LINE;
-Token nextToken(istream& in) {
-restart:
-  if (prevTokenType != START_OF_LINE) {
-    skipWhitespace(in);
-    if (in.peek() == L'\n') {
-      skip(in);
-      return Token::sol();
-    }
-  }
+                                  int indent(istream& in) {
+                                    int indent = 0;
+                                    char c;
+                                    while (!eof(in) &&
+                                        (isspace(in.peek()) || in.peek() == L';')) {
+                                      in >> c;
+                                      switch(c) {
+                                      case L' ': ++indent; break;
+                                      case L'\t': indent+=2; break;
+                                      case L'\n': indent=0; break;
+                                      case L';':
+                                        skipComment(in);
+                                        indent=0;
+                                      }
+                                    }
+                                    return indent;
+                                  }
 
-  if (prevTokenType == START_OF_LINE) {
-    int currIndentLevel = countIndent(in);
-    if (!eof(in) && in.peek() == L';') {
-      slurpComment(in);
-      goto restart;
-    }
-    int prevIndentLevel = indentLevel;
-    indentLevel = currIndentLevel;
-    if (indentLevel > prevIndentLevel)
-      return Token::indent(indentLevel);
-    else if (indentLevel < prevIndentLevel)
-      return Token::outdent(indentLevel);
-    // otherwise prevIndentLevel == indentLevel; fall through
-  }
+int prevTokenIndentLevel;
+Token nextToken(istream& in) {
+  skipWhitespace(in);
+  if (in.peek() == L'\n' || in.peek() == L';')
+    return Token::indent(indent(in));
+  skipWhitespace(in);
 
   ostringstream out;
   switch (in.peek()) { // now can't be whitespace
@@ -194,7 +177,7 @@ restart:
       slurpChar(in, out); break;
 
     case L';':
-      slurpComment(in); goto restart;
+      break;
 
     default:
       slurpWord(in, out); break;
@@ -203,20 +186,19 @@ restart:
 }
 
 list<Token> tokenize(istream& in) {
-  indentLevel = 0;
+  prevTokenIndentLevel = 0;
   in >> std::noskipws;
+
   list<Token> result;
-  result.push_back(Token::sol());
-  prevTokenType = START_OF_LINE;
+  result.push_back(Token::indent(indent(in)));
   while (!eof(in)) {
     result.push_back(nextToken(in));
-    prevTokenType = result.back().type;
-    if (interactive && prevTokenType == START_OF_LINE && in.peek() == L'\n')
+    prevTokenIndentLevel = result.back().indentLevel;
+    if (interactive && result.back().isIndent() && in.peek() == L'\n')
       break;
   }
 
-  while(!result.empty()
-        && (whitespace(result.back().type) || result.back().token == L""))
+  while(!result.empty() && result.back().token == L"")
     result.pop_back();
   return result;
 }
