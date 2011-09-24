@@ -1,9 +1,10 @@
 Feedback: wart@akkartik.com
 
 This thoroughly unit-tested interpreter takes wart off Common Lisp and makes
-it a lisp-1 with fexprs and case-sensitive symbols. Still in progress. A
-half-assed measurement found factorial in wart to be a thousand times slower
-than in arc.
+it a lisp-1 with syntactically, significant whitespace, fexprs and
+case-sensitive symbols.
+
+Still in progress. Factorial is a thousand times slower than in arc.
 
 You'll need gcc.
 
@@ -17,10 +18,28 @@ To run tests:
   $ wart test
   $ # success
 
-Oh, and you can use syntactically-significant whitespace.
+---
+
+Wart is indentation sensitive:
   def foo()
     34
-Conventionally-indented lisp will still work.
+
+Tabs count as 2 spaces. Don't mix tabs and spaces.
+
+Multi-token lines without leading parens are implicitly grouped with later
+indented lines. Lines with a single token are always left alone. So the '34'
+above isn't a function call. And parens are required in:
+
+  (do
+    something)
+
+Conventional, fully-parenthesized expressions should always work with any
+reasonable indentation.
   (def foo() 34)
   (def foo()
     34)
+
+One special-case: multi-line top-level lists should wrap by exactly one extra
+space to avoid grouping subsequent lines:
+  (one really long
+   lisp data list)

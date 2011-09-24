@@ -1,9 +1,0 @@
-Any line with multiple words and no initial paren is a candidate for
-paren-insertion. Later indented lines are included in the parens until an
-unindented line. Empty lines are skipped when loading files.
-
-Sometimes you'll want to continue a long literal list without inserting
-parens. Insert one extra space of indent like so:
-
-  (a b c
-   d e f)
