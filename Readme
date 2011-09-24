@@ -10,6 +10,7 @@ You'll need gcc.
 To run:
   $ wart
   wart>
+Hit <enter> twice to eval.
 Hit ctrl-D to quit.
 
 To run tests:
@@ -23,6 +24,3 @@ Conventionally-indented lisp will still work.
   (def foo() 34)
   (def foo()
     34)
-
-If you start skipping parens you may need to hit an extra <enter> at the repl
-to trigger eval.

@@ -62,8 +62,6 @@ ostream& operator<<(ostream& os, Token p) {
 
 
 
-bool stopTokenizing = false; // interactive repl; everything this touches is a hack
-
                                   void skip(istream& in) {
                                     char dummy;
                                     in >> dummy;
@@ -75,7 +73,6 @@ bool stopTokenizing = false; // interactive repl; everything this touches is a h
                                   }
 
                                   bool eof(istream& in) {
-                                    if (stopTokenizing) return true;
                                     char c = in.peek(); // set eof bit
                                     if (c == -1) return true;
                                     return in.eof();
@@ -97,8 +94,6 @@ int countIndent(istream& in) {
     ++count;
     if (c == L'\n')
       count = 0;
-    if (c == L'\n' && interactive)
-      stopTokenizing = true;
   }
   if (count >= LAST_CHAR_IS_SPACE)
     err << L"eek, too much indent" << endl << DIE;
@@ -189,8 +184,6 @@ restart:
     // otherwise prevIndentLevel == indentLevel; fall through
   }
 
-  if (stopTokenizing) return Token::sol();
-
   ostringstream out;
   switch (in.peek()) { // now can't be whitespace
     case L'"':
@@ -220,38 +213,7 @@ restart:
   return Token::of(out.str());
 }
 
-int replParenCount = 0;
-bool endOfReplExpr(list<Token> tokens) {
-  if (!interactive) return false;
-  if (tokens.empty()) return false;
-
-  if (tokens.back() == L"(") ++replParenCount;
-  if (tokens.back() == L")") --replParenCount;
-
-  list<Token>::iterator firstNonSpace = tokens.begin();
-  // inefficient, but saves a global. it's just the repl.
-  while (whitespace(firstNonSpace->type)) {
-    ++firstNonSpace;
-    if (firstNonSpace == tokens.end())
-      return stopTokenizing;
-  }
-
-  // explicit paren
-  if (*firstNonSpace == L"(" && replParenCount == 0) {
-    stopTokenizing = true;
-    cin.get(); // newline
-  }
-
-  // single word on a line
-  int numWordsInLine(list<Token> line);
-  if (numWordsInLine(tokens) == 1 && tokens.back() == Token::sol())
-    stopTokenizing = true;
-
-  return stopTokenizing;
-}
-
 list<Token> tokenize(istream& in) {
-  stopTokenizing=false, replParenCount=0;
   indentLevel = 0;
   in >> std::noskipws;
   list<Token> result;
@@ -260,7 +222,8 @@ list<Token> tokenize(istream& in) {
   while (!eof(in)) {
     result.push_back(nextToken(in));
     prevTokenType = result.back().type;
-    if(endOfReplExpr(result)) break;
+    if (interactive && prevTokenType == START_OF_LINE && in.peek() == L'\n')
+      break;
   }
 
   while(!result.empty()

@@ -455,7 +455,7 @@ void test_parenthesize_passes_through_arglists() {
 }
 
 void test_parenthesize_passes_through_when_indented_by_one_space() {
-  list<Token> tokens = parenthesize(tokenize(stream(L"    (a b c\n     d e f)")));
+  list<Token> tokens = parenthesize(tokenize(stream(L"    (a b c\n     d e\n     f g)")));
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, L"("); ++p;
   checkEq(*p, L"a"); ++p;
@@ -464,6 +464,7 @@ void test_parenthesize_passes_through_when_indented_by_one_space() {
   checkEq(*p, L"d"); ++p;
   checkEq(*p, L"e"); ++p;
   checkEq(*p, L"f"); ++p;
+  checkEq(*p, L"g"); ++p;
   checkEq(*p, L")"); ++p;
   check(p == tokens.end());
 }
