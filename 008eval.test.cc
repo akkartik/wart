@@ -760,3 +760,10 @@ void test_eval_handles_body_keyword_synonym() {
   rmref(fn);
   endDynamicScope(L"f");
 }
+
+void test_reorderKeywordArgs_keeps_nil_rest_args() {
+  checkEq(reorderKeywordArgs(newSym(L"a"), nil), nil);
+  Cell* params = newCons(newSym(L"'"), newSym(L"a"));
+  checkEq(reorderKeywordArgs(params, nil), nil);
+  rmref(params);
+}
