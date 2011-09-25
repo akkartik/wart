@@ -66,13 +66,6 @@ mac or $args
        ,car.$args
        or ,@cdr.$args)
 
-; (and) => t
-; (and nil) => nil
-; (and 3) => 3
-; (and nil 3) => nil
-; (and 3 4) => 4
-; ((fn(x) (and 3 x 4)) nil) => nil
-; (and (prn 3) nil) => nil after printing 3
 mac and $args
   if !$args
     1
@@ -82,11 +75,6 @@ mac and $args
            and ,@cdr.$args)
         car.$args
 
-; (iso 3 3) => 3
-; (iso nil nil) => t
-; (iso 3 4) => nil
-; (iso '(1) '(1)) => '(1)
-; (iso '(1) '(1 2)) => nil
 (let $iso iso
   def iso(a b)
     or ($iso a b)

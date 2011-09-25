@@ -71,3 +71,82 @@
               (let x 3
                 or.x))
  :should be 3)
+
+
+
+(test "and handles 0 args"
+ :valueof (and)
+ :should be 1)
+
+(test "and handles nil arg"
+ :valueof and.nil
+ :should be nil)
+
+(test "and handles non-nil arg"
+ :valueof and.3
+ :should be 3)
+
+(test "and handles 2 args"
+ :valueof (and nil 3)
+ :should be nil)
+
+(test "and handles 2 non-nil args"
+ :valueof (and 3 4)
+ :should be 4)
+
+(test "and handles lexical scope"
+ :valueof ((fn(x) (and 3 x 4)) nil)
+ :should be nil)
+
+(test "and short-circuits"
+ :valueof (ret x 0
+            (and (assign x 3)
+                 nil
+                 (assign x 4)))
+
+ :should be 3)
+
+(test "and handles dynamic scope"
+ :valueof (do (assign x 35)
+              (and x 36))
+ :should be 36)
+
+
+
+(test "iso handles nils"
+ :valueof (iso nil 3)
+ :should be nil)
+
+(test "iso compares nils"
+ :valueof (iso nil nil)
+ :should ~be nil)
+
+(test "iso handles ints"
+ :valueof (iso 3 4)
+ :should be nil)
+
+(test "iso handles ints - 2"
+ :valueof (iso 3 3)
+ :should ~be nil)
+
+(test "iso handles strings"
+ :valueof (iso "a" "b")
+ :should be nil)
+
+(test "iso handles strings - 2"
+ :valueof (iso "a" "a")
+ :should ~be nil)
+
+(test "iso handles lists"
+ :valueof (iso list.1 list.2)
+ :should be nil)
+
+(test "iso handles lists - 2"
+ :valueof (iso list.1 list.1)
+ :should ~be nil)
+
+
+
+(test "arithmetic is varargs"
+ :valueof (+ 1 2 3 (* 1 2 2))
+ :should be 10)
