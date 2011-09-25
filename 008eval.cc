@@ -4,6 +4,10 @@
                                     return isCons(cell) && car(cell) == newSym(L"'");
                                   }
 
+                                  Cell* stripQuote(Cell* cell) {
+                                    return isQuoted(cell) ? cdr(cell) : cell;
+                                  }
+
                                   bool isBackQuoted(Cell* cell) {
                                     return isCons(cell) && car(cell) == newSym(L"`");
                                   }
@@ -73,6 +77,7 @@
 
                                   Cell* argsInParamOrder(Cell* params, Cell* nonKeywordArgs, CellMap& keywordArgs) {
                                     Cell* pReconstitutedArgs = newCell();
+                                    params = stripQuote(params);
                                     for (Cell* curr = pReconstitutedArgs; params != nil; curr=cdr(curr), params=cdr(params)) {
                                       if (!isCons(params)) {
                                         setCdr(curr, keywordArgs[params] ? keywordArgs[params] : nonKeywordArgs);
@@ -246,8 +251,6 @@ Cell* processUnquotes(Cell* x, int depth) {
 Cell* eval(Cell* expr) {
   if (!expr)
     err << "eval: cell should never be NULL" << endl << DIE;
-
-  dbg2 << expr << endl;
 
   if (expr == nil)
     return nil;
