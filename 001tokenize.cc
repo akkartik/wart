@@ -2,10 +2,24 @@
 
 // line contains 1 indent and zero or more regular tokens
 struct Token {
-  string token;
+  string* token; // pointer only because mac os has a buggy string-copy
   int indentLevel; // all tokens on a line share its indentLevel
 
-  Token(const string x, const int l) :token(x), indentLevel(l) {}
+  Token(const string x, const int l) :indentLevel(l) {
+    token = new string(x);
+  }
+  ~Token() {
+    delete token;
+  }
+  Token(const Token& rhs) :indentLevel(rhs.indentLevel){
+    token = new string(*rhs.token);
+  }
+  Token& operator=(const Token& rhs) {
+    if (this == &rhs) return *this;
+    token = new string(*rhs.token);
+    indentLevel = rhs.indentLevel;
+    return *this;
+  }
 
   static Token of(string s) {
     Token result(s, 0);
@@ -17,17 +31,17 @@ struct Token {
   }
 
   bool isIndent() {
-    return token == L"";
+    return *token == L"";
   }
 
   bool operator==(string x) {
-    return token == x;
+    return *token == x;
   }
   bool operator==(int x) {
     return indentLevel == x;
   }
   bool operator==(Token x) {
-    return token == x.token && indentLevel == x.indentLevel;
+    return *token == *x.token && indentLevel == x.indentLevel;
   }
   bool operator!=(string x) {
     return !(*this == x);
@@ -38,7 +52,7 @@ struct Token {
 };
 
 ostream& operator<<(ostream& os, Token p) {
-  if (p.token != L"") return os << p.token;
+  if (*p.token != L"") return os << *p.token;
   os << endl;
   for (int i = 0; i < p.indentLevel; ++i)
     os << L"_";
@@ -198,7 +212,7 @@ list<Token> tokenize(istream& in) {
       break;
   }
 
-  while(!result.empty() && result.back().token == L"")
+  while(!result.empty() && *result.back().token == L"")
     result.pop_back();
   return result;
 }
