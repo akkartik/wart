@@ -65,3 +65,9 @@
  :valueof (ret x nil
             (or 3 (assign x 4)))
  :should be nil)
+
+(test "lexical scope overrides dynamic scope inside macros"
+ :valueof (do (assign x 35)
+              (let x 3
+                or.x))
+ :should be 3)

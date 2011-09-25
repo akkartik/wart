@@ -3,8 +3,8 @@ assign no nil?
 
 ; (mac foo(x) `(+ 1 ,x))) (let x 3 (foo x)) => 4
 assign mac (fn '($name $params . $body)
-  eval `(assign ,$name (fn ',$params
-                         (eval ,@$body))))
+  eval `(assign ,$name (inline (fn ',$params
+                         (eval ,@$body)))))
 
 mac def($name $params . $body)
   `(assign ,$name (fn ,$params ,@$body))
