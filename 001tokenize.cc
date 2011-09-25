@@ -82,11 +82,10 @@ ostream& operator<<(ostream& os, Token p) {
 
 int countIndent(istream& in) {
   int count = 0;
-  char c;
   while (!eof(in)) {
     if (!isspace(in.peek()))
       break;
-    in >> c;
+    char c = in.get();
     if (c == L'\t')
       count += 2;
     else if (c == L'\n')
@@ -101,16 +100,15 @@ int countIndent(istream& in) {
 
                                   // slurp functions read a token when you're sure to be at it
                                   void slurpChar(istream& in, ostream& out) {
-                                    char c;
-                                    in >> c; out << c;
+                                    out << (char)in.get();
                                   }
 
                                   void slurpWord(istream& in, ostream& out) {
                                     static const string quoteChars = L",'`@";
                                     static const string ssyntaxChars = L":~!.&"; // disjoint from quoteChars
-                                    char c, lastc = L'\0';
+                                    char lastc = L'\0';
                                     while (!eof(in)) {
-                                      in >> c;
+                                      char c = in.get();
                                       if (ssyntaxChars.find(lastc) != string::npos
                                           && quoteChars.find(c) != string::npos)
                                         ; // wait for ssyntax expansion
@@ -127,9 +125,9 @@ int countIndent(istream& in) {
 
                                   void slurpString(istream& in, ostream& out) {
                                     slurpChar(in, out); // initial quote
-                                    char c;
                                     while (!eof(in)) {
-                                      in >> c; out << c;
+                                      char c = in.get();
+                                      out << c;
                                       if (c == L'\\')
                                         slurpChar(in, out); // blindly read next
                                       else if (c == L'"')
@@ -138,9 +136,8 @@ int countIndent(istream& in) {
                                   }
 
                                   void skipComment(istream& in) {
-                                    char c;
                                     while (!eof(in)) {
-                                      in >> c;
+                                      char c = in.get();
                                       if (c == L'\n') {
                                         in.putback(c);
                                         break;
@@ -150,10 +147,9 @@ int countIndent(istream& in) {
 
                                   int indent(istream& in) {
                                     int indent = 0;
-                                    char c;
                                     while (!eof(in) &&
                                         (isspace(in.peek()) || in.peek() == L';')) {
-                                      in >> c;
+                                      char c = in.get();
                                       switch(c) {
                                       case L' ': ++indent; break;
                                       case L'\t': indent+=2; break;
