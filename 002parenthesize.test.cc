@@ -3,10 +3,10 @@ void test_slurpNextLine_adds_all_words_in_next_line() {
   list<Token> line;
   slurpNextLine(line, tokens.begin(), tokens.end());
   list<Token>::iterator p = line.begin();
-  checkEq(*p, START_OF_LINE); ++p;
+  checkEq(*p, Token::indent(0)); ++p;
   checkEq(*p, L"abc"); ++p;
   checkEq(*p, L"def"); ++p;
-  checkEq(*p, START_OF_LINE); ++p;
+  checkEq(*p, Token::indent(0)); ++p;
   check(p == line.end());
 }
 
@@ -15,12 +15,10 @@ void test_slurpNextLine_includes_indent_for_current_and_next_line() {
   list<Token> line;
   slurpNextLine(line, tokens.begin(), tokens.end());
   list<Token>::iterator p = line.begin();
-  checkEq(*p, START_OF_LINE); ++p;
-  checkEq(*p, INDENT); ++p;
+  checkEq(*p, Token::indent(2)); ++p;
   checkEq(*p, L"abc"); ++p;
   checkEq(*p, L"def"); ++p;
-  checkEq(*p, START_OF_LINE); ++p;
-  checkEq(*p, OUTDENT); ++p;
+  checkEq(*p, Token::indent(0)); ++p;
   check(p == line.end());
 }
 
@@ -30,12 +28,10 @@ void test_slurpNextLine_deletes_previous_line_on_recall() {
   list<Token>::iterator q = slurpNextLine(line, tokens.begin(), tokens.end());
   slurpNextLine(line, q, tokens.end());
   list<Token>::iterator p = line.begin();
-  checkEq(*p, START_OF_LINE); ++p;
-  checkEq(*p, OUTDENT); ++p;
+  checkEq(*p, Token::indent(0)); ++p;
   checkEq(*p, L"ghi"); ++p;
   checkEq(*p, L"jkl"); ++p;
-  checkEq(*p, START_OF_LINE); ++p;
-  checkEq(*p, INDENT); ++p;
+  checkEq(*p, Token::indent(2)); ++p;
   check(p == line.end());
 }
 
