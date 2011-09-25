@@ -216,6 +216,7 @@ def test(msg valueof should expected)
   if (should valueof expected)
     (pr ".")
     (do
+      (incFailures)
       (prn)
       (prn "F " msg)
       (prn "  got " valueof))

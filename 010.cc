@@ -87,6 +87,11 @@ COMPILE_PRIM_FUNC(debug, primFunc_debug, L"($x)",
   return nil;
 )
 
+COMPILE_PRIM_FUNC(incFailures, primFunc_incTests, L"()",
+  ++numFailures;
+  return nil;
+)
+
 COMPILE_PRIM_FUNC(uniq, primFunc_uniq, L"($x)",
   return mkref(genSym(lookup(L"$x")));
 )
