@@ -5,7 +5,7 @@ struct AstNode {
   list<AstNode> elems;
 
   AstNode(Token t) :atom(t) {}
-  AstNode(list<AstNode> l) :atom(Token::sol()), elems(l) {}
+  AstNode(list<AstNode> l) :atom(Token::indent(0)), elems(l) {}
   static AstNode of(Token t) {
     AstNode result(t);
     return result;
@@ -27,7 +27,7 @@ struct AstNode {
   }
 
   bool operator==(Token x) {
-    return elems.empty() && atom == x.token; // whitespace should be gone by now.
+    return elems.empty() && atom == *x.token; // whitespace should be gone by now.
   }
   bool operator==(string x) {
     return elems.empty() && atom == x;
@@ -50,11 +50,6 @@ ostream& operator<<(ostream& os, AstNode x) {
 
 list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterator end, list<AstNode>& out) {
   if (curr == end) return curr;
-
-  while (isComment(*curr)) {
-    ++curr;
-    if (curr == end || *curr == L")") return curr;
-  }
 
   if (*curr == L")") err << "Unbalanced )" << endl << DIE;
 
