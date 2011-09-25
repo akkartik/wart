@@ -80,24 +80,6 @@ ostream& operator<<(ostream& os, Token p) {
                                     return in.eof();
                                   }
 
-int countIndent(istream& in) {
-  int count = 0;
-  while (!eof(in)) {
-    if (!isspace(in.peek()))
-      break;
-    char c = in.get();
-    if (c == L'\t')
-      count += 2;
-    else if (c == L'\n')
-      count = 0;
-    else
-      count++;
-  }
-  return count;
-}
-
-
-
                                   // slurp functions read a token when you're sure to be at it
                                   void slurpChar(istream& in, ostream& out) {
                                     out << (char)in.get();
