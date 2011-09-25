@@ -22,11 +22,14 @@ struct Token {
   }
 
   static Token of(string s) {
-    Token result(s, 0);
+    return of(s, 0);
+  }
+  static Token of(string s, int indent) {
+    Token result(s, indent);
     return result;
   }
-  static Token indent(int l) {
-    Token result(L"", l);
+  static Token indent(int indent) {
+    Token result(L"", indent);
     return result;
   }
 
@@ -196,7 +199,7 @@ Token nextToken(istream& in) {
     default:
       slurpWord(in, out); break;
   }
-  return Token::of(out.str());
+  return Token::of(out.str(), prevTokenIndentLevel);
 }
 
 list<Token> tokenize(istream& in) {

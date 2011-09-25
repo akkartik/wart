@@ -48,7 +48,7 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
                                           os << " ";
                                       }
                                       else {
-                                        os << *p;
+                                        os << *p << "("<<p->indentLevel<<")";
                                       }
                                     }
                                     return os << endl;
