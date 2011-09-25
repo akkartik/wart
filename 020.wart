@@ -220,6 +220,7 @@ def test(msg valueof should expected)
       (prn)
       (prn "F " msg)
       (prn "  got " valueof))
+assign be iso
 
 
 
@@ -279,3 +280,4 @@ let $> >
   def < xs
     all (fn((x y)) ($> y x))
         pairwise.xs
+assign exceed >

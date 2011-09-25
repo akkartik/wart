@@ -1,7 +1,3 @@
-(test "foo"
- :valueof (+ 1 1)
- :should iso 2)
-
-(test "foo2"
- :valueof (+ 1 1)
- :should iso 4)
+(test "if works with 0 args"
+ :valueof (if)
+ :should be nil)
