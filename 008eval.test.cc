@@ -553,7 +553,7 @@ void test_eval_handles_assigned_fn_calls() {
 void test_eval_expands_lexically_scoped_syms_in_fn_bodies() {
   Cell* call = wartRead(stream(L"((fn () a))")).front();
   newLexicalScope();
-    addLexicalBinding(newSym(L"a"), newNum(34));
+    addLexicalBinding(L"a", newNum(34));
     Cell* result = eval(call);
     checkEq(result, newNum(34));
   endLexicalScope();
@@ -565,7 +565,7 @@ void test_eval_expands_syms_in_original_lexical_scope() {
   newDynamicScope(L"a", newNum(23));
   Cell* fn = wartRead(stream(L"(fn () a)")).front();
   newLexicalScope();
-  addLexicalBinding(newSym(L"a"), newNum(34));
+  addLexicalBinding(L"a", newNum(34));
     Cell* f = eval(fn);
     newDynamicScope(L"f", f);
   endLexicalScope();
@@ -584,7 +584,7 @@ void test_eval_expands_args_in_caller_scope() {
   newDynamicScope(L"a", newNum(23));
   Cell* fn = wartRead(stream(L"(fn (arg1) arg1)")).front();
   newLexicalScope();
-  addLexicalBinding(newSym(L"arg1"), newNum(34));
+  addLexicalBinding(L"arg1", newNum(34));
     Cell* f = eval(fn);
     newDynamicScope(L"f", f);
   endLexicalScope();
@@ -603,7 +603,7 @@ void test_eval_doesnt_eval_quoted_params() {
   newDynamicScope(L"a", newNum(23));
   Cell* fn = wartRead(stream(L"(fn ('arg1) arg1)")).front();
   newLexicalScope();
-  addLexicalBinding(newSym(L"arg1"), newNum(34));
+  addLexicalBinding(L"arg1", newNum(34));
     Cell* f = eval(fn);
     newDynamicScope(L"f", f);
   endLexicalScope();
@@ -622,7 +622,7 @@ void test_eval_handles_quoted_param_list() {
   newDynamicScope(L"a", newNum(23));
   Cell* fn = wartRead(stream(L"(fn '(arg1) arg1)")).front();
   newLexicalScope();
-  addLexicalBinding(newSym(L"arg1"), newNum(34));
+  addLexicalBinding(L"arg1", newNum(34));
     Cell* f = eval(fn);
     newDynamicScope(L"f", f);
   endLexicalScope();

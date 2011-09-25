@@ -104,6 +104,9 @@ void addLexicalBinding(Cell* sym, Cell* val) {
   if (unsafeGet(currLexicalScopes.top(), sym)) err << "Can't rebind within a lexical scope" << endl << DIE;
   unsafeSet(currLexicalScopes.top(), sym, val, false);
 }
+void addLexicalBinding(string var, Cell* val) {
+  addLexicalBinding(newSym(var), val);
+}
 
 Cell* lookup(Cell* sym) {
   Cell* result = lookupLexicalBinding(sym, currLexicalScopes.top());
