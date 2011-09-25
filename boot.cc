@@ -284,12 +284,7 @@ int main(int argc, unused ascii* argv[]) {
   init();
   loadFiles(".wart");
 
-  // no unit tests for interactive repl, so manual QA:
-  //   single-word expr should eval on newline
-  //   multi-word expr that doesn't start with paren should eval on empty line
-  //   expr that starts with paren should eval on close
-  interactive = true;
-
+  interactive = true; // trigger eval on empty lines
   while (!cin.eof()) {
     cout << "wart> ";
     list<Cell*> form = wartRead(cin);
