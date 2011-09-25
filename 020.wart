@@ -62,9 +62,10 @@ let $if if
 
 mac or $args
   if $args
-    `(if ,car.$args
-       ,car.$args
-       or ,@cdr.$args)
+    `(let $x ,car.$args
+       if $x
+         $x
+         or ,@cdr.$args)
 
 mac and $args
   if !$args
