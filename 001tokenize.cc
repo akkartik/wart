@@ -148,11 +148,17 @@ int countIndent(istream& in) {
                                     }
                                   }
 
+                                  bool quit = false;
                                   int indent(istream& in) {
                                     int indent = 0;
                                     char c;
                                     while (!eof(in) &&
                                         (isspace(in.peek()) || in.peek() == L';')) {
+                                      if (interactive && c == L'\n' && in.peek() == L'\n') {
+                                        quit = true;
+                                        return 0;
+                                      }
+
                                       in >> c;
                                       switch(c) {
                                       case L' ': ++indent; break;
@@ -168,11 +174,6 @@ int countIndent(istream& in) {
 
 int prevTokenIndentLevel;
 Token nextToken(istream& in) {
-  skipWhitespace(in);
-  if (in.peek() == L'\n' || in.peek() == L';')
-    return Token::indent(indent(in));
-  skipWhitespace(in);
-
   ostringstream out;
   switch (in.peek()) { // now can't be whitespace
     case L'"':
@@ -204,15 +205,19 @@ Token nextToken(istream& in) {
 
 list<Token> tokenize(istream& in) {
   prevTokenIndentLevel = 0;
+  quit = false;
   in >> std::noskipws;
 
   list<Token> result;
   result.push_back(Token::indent(indent(in)));
   while (!eof(in)) {
     prevTokenIndentLevel = result.back().indentLevel;
-    result.push_back(nextToken(in));
-    if (interactive && result.back().isIndent() && in.peek() == L'\n')
-      break;
+    if (in.peek() == L'\n' || in.peek() == L';')
+      result.push_back(Token::indent(indent(in)));
+    else
+      result.push_back(nextToken(in));
+    if (quit) break;
+    skipWhitespace(in);
   }
 
   while(!result.empty() && *result.back().token == L"")
