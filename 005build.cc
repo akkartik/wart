@@ -7,21 +7,21 @@
 Cell* buildCell(AstNode n) {
   if (n.isNil())
     return nil;
-  if (n.elems.front() == L")") {
+  if (n.isList() && n.elems.front() == L")") {
     if (n.elems.size() > 1) err << "Syntax error: ) not at end of expr" << endl << DIE;
     return nil;
   }
 
   if (n.isAtom()) {
     char* end;
-    long v = wcstol(n.atom.token.c_str(), &end, 0);
+    long v = wcstol(n.atom.token->c_str(), &end, 0);
     if (*end == L'\0')
       return newNum(v);
 
-    if (n.atom.token.c_str()[0] == L'"')
-      return newString(n.atom.token.substr(1, n.atom.token.length()-2));
+    if (n.atom.token->c_str()[0] == L'"')
+      return newString(n.atom.token->substr(1, n.atom.token->length()-2));
 
-    return newSym(n.atom.token);
+    return newSym(*n.atom.token);
   }
 
   list<AstNode>::iterator first = n.elems.begin();
