@@ -1,3 +1,67 @@
 (test "if works with 0 args"
  :valueof (if)
  :should be nil)
+
+(test "if works with 1 arg"
+ :valueof if.3
+ :should be 3)
+
+(test "if works with 2 args"
+ :valueof (if 3 4)
+ :should be 4)
+
+(test "if works with then branch"
+ :valueof (if 3 4 5)
+ :should be 4)
+
+(test "if works with else branch"
+ :valueof (if nil 4 5)
+ :should be 5)
+
+(test "if works with 4 args"
+ :valueof (if nil 4 5)
+ :should be 5)
+
+(test "if works with 5 args"
+ :valueof (if nil 4 5 6)
+ :should be 6)
+
+(test "if works with :else"
+ :valueof (if nil 4 :else 6)
+ :should be 6)
+
+(test "if works with lexical scope"
+ :valueof (let x 34 (if x))
+ :should be 34)
+
+(test "if works with dynamic scope"
+ :valueof (do (assign x 34)
+              (if x 35))
+ :should be 35)
+
+
+
+(test "or works with 0 args"
+ :valueof or.
+ :should be nil)
+
+(test "or works with nil arg"
+ :valueof or.nil
+ :should be nil)
+
+(test "or works with non-nil arg"
+ :valueof or.3
+ :should ~be nil)
+
+(test "or works with 2 args"
+ :valueof (or nil 3)
+ :should be 3)
+
+(test "or works with multiple non-nil args"
+ :valueof (or 3 4)
+ :should be 3)
+
+(test "or short-circuits on first non-nil arg"
+ :valueof (ret x nil
+            (or 3 (assign x 4)))
+ :should be nil)
