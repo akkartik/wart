@@ -40,8 +40,8 @@ mac afn($params . $body)
 
 
 def prn args
-  (pr:str @args "
-")
+  (pr (str @args "
+"))
   car.args
 
 assign cadr car:cdr
@@ -192,6 +192,11 @@ def test(msg valueof should expected)
       (prn)
       (prn "F " msg)
       (prn "  got " valueof))
+
+def pending-test'(msg valueof should expected)
+  prn.
+  (prn "pending: " msg)
+
 assign be iso
 
 
