@@ -7,19 +7,6 @@ COMPILE_PRIM_FUNC(eval, primFunc_eval, L"($x)",
   return eval(lookup(L"$x"));
 )
 
-// eval in 'inline' mode: see caller lexical scopes before dynamic bindings
-COMPILE_PRIM_FUNC(inline, primFunc_inline, L"'$args",
-  Cell* args = lookup(L"$args");
-  Cell* result = nil;
-  newDynamicScope(L"currLexicalScope", nil);
-    for (; args != nil; args=cdr(args)) {
-      rmref(result);
-      result = eval(car(args));
-    }
-  endDynamicScope(L"currLexicalScope");
-  return result; // already mkref'd
-)
-
 COMPILE_PRIM_FUNC(cons, primFunc_cons, L"($x $y)",
   return mkref(newCons(lookup(L"$x"), lookup(L"$y")));
 )

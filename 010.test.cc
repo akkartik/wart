@@ -10,25 +10,6 @@ void test_eval_handles_eval() {
   endDynamicScope(L"a");
 }
 
-void test_inline_sees_caller_scope_before_dynamic_vars() {
-  newDynamicScope(L"x", newNum(34));
-  Cell* def = wartRead(stream(L"(inline (fn() x))")).front();
-  Cell* fn = eval(def);
-  newDynamicScope(L"f", fn);
-  newLexicalScope();
-    addLexicalBinding(L"x", newNum(3));
-    Cell* call = wartRead(stream(L"(f)")).front();
-    Cell* result = eval(call);
-    checkEq(result, newNum(3));
-    rmref(result);
-    rmref(call);
-  endLexicalScope();
-  endDynamicScope(L"f");
-  rmref(fn);
-  rmref(def);
-  endDynamicScope(L"x");
-}
-
 void test_cons_works() {
   Cell* call = wartRead(stream(L"cons 1 2")).front();
   Cell* result = eval(call);
