@@ -224,6 +224,19 @@ Cell* processUnquotes(Cell* x, int depth) {
                                       && (isPrimFunc(car(x)) || car(x) == newSym(L"evald-fn"));
                                   }
 
+                                  void inlineCurrLexicalScope() {
+                                    if (currLexicalScopes.top() == newSym(L"dynamic")) {
+                                      assignDynamicVar(newSym(L"currLexicalScope"), nil);
+                                      return;
+                                    }
+                                    for (Cell* scope = currLexicalScopes.top(); scope != nil; scope = cdr(scope)) { // Don't modify caller scopes
+                                      if (isCons(scope) && car(scope) == newSym(L"dynamicScope"))
+                                        setCar(scope, nil);
+                                      if (cdr(scope) == newSym(L"dynamicScope"))
+                                        setCdr(scope, nil);
+                                    }
+                                  }
+
                                   Cell* evalLambda(Cell* expr) {
                                     return newCons(newSym(L"evald-fn"),
                                         newCons(sig(expr),
@@ -254,7 +267,11 @@ Cell* eval(Cell* expr) {
   if (isBackQuoted(expr))
     return processUnquotes(cdr(expr), 1); // already mkref'd
 
-  if (car(expr) == newSym(L"fn"))
+  // experimental fix for macros
+  if (car(expr) == newSym(L"ifn") && !isCons(currLexicalScopes.top()))
+    inlineCurrLexicalScope(); // destructive: will mess with outer scopes
+
+  if (car(expr) == newSym(L"fn") || car(expr) == newSym(L"ifn"))
     // attach current lexical scope
     return mkref(evalLambda(expr));
   else if (isFunc(expr))
