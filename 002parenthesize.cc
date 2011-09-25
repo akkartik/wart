@@ -96,6 +96,7 @@ list<Token> parenthesize(list<Token> in) {
   list<Token> result;
   stack<int> implicitParenStack;
   int suppressInsert = 0;
+  int explicitParenIndentLevel = 0;
 
   list<Token> line;
   Token prevLineIndent=Token::indent(0), thisLineIndent=Token::indent(0), nextLineIndent=Token::indent(0);
@@ -107,7 +108,7 @@ list<Token> parenthesize(list<Token> in) {
     bool insertedParenThisLine = false;
     if (!suppressInsert && numWordsInLine(line) > 1
         && !alreadyGrouped(line)
-        && !(p != in.begin() && thisLineIndent.indentLevel == prevLineIndent.indentLevel+1 && thisLineIndent.isIndent())) {
+        && !(p != in.begin() && thisLineIndent.indentLevel == explicitParenIndentLevel+1 && thisLineIndent.isIndent())) {
       // open paren
       add(result, Token::of(L"("));
       implicitParenStack.push(thisLineIndent.indentLevel);
@@ -117,6 +118,9 @@ list<Token> parenthesize(list<Token> in) {
     // copy line tokens
     for (list<Token>::iterator q = line.begin(); q != line.end(); ++q) {
       add(result, *q);
+
+      if (*q == L"(")
+        explicitParenIndentLevel = q->indentLevel;
 
       if (parenNotAtStartOfLine(q, line.begin()))
         suppressInsert = parenCount; // no more paren-insertion until it closes

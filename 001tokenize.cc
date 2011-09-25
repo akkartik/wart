@@ -209,8 +209,8 @@ list<Token> tokenize(istream& in) {
   list<Token> result;
   result.push_back(Token::indent(indent(in)));
   while (!eof(in)) {
-    result.push_back(nextToken(in));
     prevTokenIndentLevel = result.back().indentLevel;
+    result.push_back(nextToken(in));
     if (interactive && result.back().isIndent() && in.peek() == L'\n')
       break;
   }
