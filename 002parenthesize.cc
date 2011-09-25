@@ -94,7 +94,7 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
 
 list<Token> parenthesize(list<Token> in) {
   list<Token> result;
-  stack<int> parenStack;
+  stack<int> implicitParenStack;
   int suppressInsert = 0;
 
   list<Token> line;
@@ -110,7 +110,7 @@ list<Token> parenthesize(list<Token> in) {
         && !(p != in.begin() && thisLineIndent.indentLevel == prevLineIndent.indentLevel+1 && thisLineIndent.isIndent())) {
       // open paren
       add(result, Token::of(L"("));
-      parenStack.push(thisLineIndent.indentLevel);
+      implicitParenStack.push(thisLineIndent.indentLevel);
       insertedParenThisLine = true;
     }
 
@@ -130,18 +130,18 @@ list<Token> parenthesize(list<Token> in) {
     if (nextLineIndent.indentLevel <= thisLineIndent.indentLevel && insertedParenThisLine) {
       // close paren for this line
       add(result, Token::of(L")"));
-      parenStack.pop();
+      implicitParenStack.pop();
     }
 
     if (nextLineIndent.indentLevel < thisLineIndent.indentLevel)
-      while (!parenStack.empty() && parenStack.top() >= nextLineIndent.indentLevel) {
+      while (!implicitParenStack.empty() && implicitParenStack.top() >= nextLineIndent.indentLevel) {
         // close paren for a previous line
         add(result, Token::of(L")"));
-        parenStack.pop();
+        implicitParenStack.pop();
       }
   }
 
-  for (unsigned int i=0; i < parenStack.size(); ++i)
+  for (unsigned int i=0; i < implicitParenStack.size(); ++i)
     result.push_back(Token::of(L")"));
   return result;
 }
