@@ -10,7 +10,7 @@ Cell* transformCompose(string var) {
 
 Cell* transformCall(string var) {
   if (var.find_first_of(L".!", var.length()-1) != string::npos)
-    var = var+L"nil";
+    return newCons(newSym(var.substr(0, var.length()-1)), nil);
 
   size_t dot = var.rfind(L'.');
   size_t bang = var.rfind(L'!');

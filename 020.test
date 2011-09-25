@@ -75,7 +75,7 @@
 
 
 (test "and handles 0 args"
- :valueof (and)
+ :valueof and.
  :should be 1)
 
 (test "and handles nil arg"
