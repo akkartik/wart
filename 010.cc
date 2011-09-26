@@ -1,7 +1,7 @@
-// primFuncs take $vars as params
-// We don't do implicit gensyms in primFuncs yet, but should be ok since they
-// can't be found anywhere else, and since primFuncs don't call other
-// primFuncs.
+//// Compiled primitives
+
+// primFuncs take $vars as params.
+// $vars needn't turn into gensyms if primFuncs don't call each other.
 
 COMPILE_PRIM_FUNC(eval, primFunc_eval, L"($x)",
   return eval(lookup(L"$x"));

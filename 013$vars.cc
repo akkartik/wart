@@ -1,3 +1,5 @@
+//// implicit gensyms: $vars turn into unique syms before they're eval'd
+
 Cell* transformDollarVars(Cell* input, Table& map) {
   if (isSym(input) && toString(input)[0] == L'$') {
     if (!map[input])

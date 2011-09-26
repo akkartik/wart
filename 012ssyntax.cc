@@ -1,3 +1,5 @@
+//// simple syntax shorthands transforming syms into forms
+
 Cell* transformNot(string var) {
   var.replace(0, 1, L"not ");
   return buildFromStream(stream(var)).front();
