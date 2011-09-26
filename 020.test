@@ -163,6 +163,6 @@
  :valueof (pair '(1 2 3 4 5))
  :should be '((1 2) (3 4) (5)))
 
-(pending-test "@splice doesn't work with compose"
+(pending-test "@splice works with compose"
  :valueof (car:cons @'(1 (2 3)))
  :should be 1)
