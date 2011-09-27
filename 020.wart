@@ -260,8 +260,8 @@ let $> >
         pairwise.xs
 assign exceed >
 
-mac ++(n)
-  `(assign ,n (+ ,n 1))
+mac ++($n)
+  `(assign ,$n (+ ,$n 1))
 
-mac --(n)
-  `(assign ,n (- ,n 1))
+mac --($n)
+  `(assign ,$n (- ,$n 1))
