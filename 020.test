@@ -18,13 +18,17 @@
  :valueof (if nil 4 5)
  :should be 5)
 
-(test "if handles 4 args"
+(test "if handles 3 args"
  :valueof (if nil 4 5)
  :should be 5)
 
-(test "if handles 5 args"
+(test "if handles 4 args"
  :valueof (if nil 4 5 6)
  :should be 6)
+
+(test "if handles 5 args"
+ :valueof (if nil 4 nil 6 7)
+ :should be 7)
 
 (test "if handles :else"
  :valueof (if nil 4 :else 6)
