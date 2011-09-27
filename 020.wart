@@ -214,12 +214,6 @@ let $table table
       each (k v) pair.args
         (table_set t k v)
 
-def annotate(type expr)
-  (list 'type type expr)
-
-def queue()
-  (annotate 'queue (list nil nil 0))
-
 
 
 def zip(a b)
