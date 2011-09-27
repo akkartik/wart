@@ -13,18 +13,17 @@ void loadFile(ascii* filename) {
 
                                   vector<ascii*> sortedFiles(const ascii* dirname, const ascii* ext) {
                                     vector<ascii*> result;
-                                    DIR* dir = opendir(dirname);
-                                    for (dirent* ent = readdir(dir); ent; ent = readdir(dir)) {
-                                      unsigned int n = strlen(ent->d_name), extn = strlen(ext);
+                                    dirent** files;
+                                    int numFiles = scandir(dirname, &files, NULL, alphasort);
+                                    for (int i = 0; i < numFiles; ++i) {
+                                      unsigned int n = strlen(files[i]->d_name), extn = strlen(ext);
                                       if (n < extn) continue;
-                                      if (strncmp(&ent->d_name[n-extn], ext, extn)) continue;
-                                      if (!isdigit(ent->d_name[0])) continue;
-                                      ascii* s = new ascii[strlen(ent->d_name)]; // leak
-                                      strcpy(s, ent->d_name);
+                                      if (strncmp(&files[i]->d_name[n-extn], ext, extn)) continue;
+                                      if (!isdigit(files[i]->d_name[0])) continue;
+                                      ascii* s = new ascii[strlen(files[i]->d_name)]; // leak
+                                      strcpy(s, files[i]->d_name);
                                       result.push_back(s);
                                     }
-                                    closedir(dir);
-                                    sort(result.begin(), result.end());
                                     return result;
                                   }
 
