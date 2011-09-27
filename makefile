@@ -1,12 +1,14 @@
 C=10
-wart_bin: file_list prim_func_list test_list transform_list
+wart_bin: file_list transform_list prim_func_list test_list test_file_list
 	@echo `git whatchanged -p -$C |grep "^[+ -][^+-]" |perl -pwe 's/(.).*/$$1/' |uniq |grep "+" |wc -l` hunks added in last $C commits
 	g++ -g -Wall -Wextra boot.cc -o wart_bin
 	@echo
 
 file_list: *.cc
 	@ls *.cc |grep -wv "boot.cc\|test.cc" |perl -pwe 's/.*/#include "$$&"/' > file_list
-	@ls *.cc |grep test.cc |perl -pwe 's/.*/#include "$$&"/' >> file_list
+
+test_file_list: *.cc
+	@ls *.cc |grep test.cc |perl -pwe 's/.*/#include "$$&"/' > test_file_list
 
 prim_func_list: *.cc
 	@grep -h "^COMPILE_PRIM_FUNC" *.cc |perl -pwe 's/.*COMPILE_PRIM_FUNC\(([^,]*), ([^,]*), ([^,]*),$$/{ L"$$1", $$3, $$2 },/' > prim_func_list

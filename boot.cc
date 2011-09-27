@@ -41,6 +41,8 @@ typedef char ascii;
 
 
 
+// generate traces for debugging
+
 int debug = 0;
 #define dbg if(debug == 1) cerr
 #define dbg2 if(debug == 2) cerr
@@ -58,29 +60,16 @@ Die DIE;
 
 
 
+// phases of the interpreter
+
 bool runningTests = false;
 int numFailures = 0;
-
-#define check(X) if (!(X)) { \
-    ++numFailures; \
-    cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
-  } \
-  else { cerr << "."; fflush(stderr); }
-
-#define checkEq(X, Y) if ((X) != (Y)) { \
-    ++numFailures; \
-    cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
-    cerr << "  got " << (X) << endl; /* BEWARE: multiple eval */ \
-  } \
-  else { cerr << "."; fflush(stderr); }
 
 stringstream& stream(string s) {
   stringstream& result = *new stringstream(s);
   result << std::noskipws;
   return result;
 }
-
-
 
 struct Token;
 bool interactive = false;
@@ -91,25 +80,29 @@ list<AstNode> parse(list<Token>);
 struct Cell;
 extern Cell* nil;
 list<Cell*> buildCells(list<AstNode>);
-list<Cell*> transform(list<Cell*>);
-Cell* eval(Cell*);
 
 list<Cell*> buildFromStream(istream& f) {
   return buildCells(parse(parenthesize(tokenize(f))));
 }
 
+list<Cell*> transform(list<Cell*>);
+
 list<Cell*> wartRead(istream& f) {
   return transform(buildFromStream(f));
 }
 
+Cell* eval(Cell*);
+
 
 
-typedef Cell* (*PrimFunc)();
+// pre-compiled primitives
 
 #define COMPILE_PRIM_FUNC(op, name, params, body) \
   Cell* name() { body } /* we extract op and params into prim_func_list */
 
-#include "file_list" // remaining cc files in order
+typedef Cell* (*PrimFunc)();
+
+#include "file_list" // rest of the interpreter
 
 struct PrimFuncMetadata {
   string name;
@@ -134,6 +127,8 @@ void teardownPrimFuncs() {
 }
 
 
+
+// transform code before eval (ssyntax, etc.)
 
 typedef Cell* (*transformer)(Cell*);
 const transformer transforms[] = {
@@ -217,8 +212,10 @@ void checkUnfreed() {
   int n = currCell-heapStart-initialSyms.size();
   for (; freelist; freelist = freelist->cdr)
     --n;
-  checkEq(n, 0);
-  if (n > 0) dumpUnfreed();
+  if (n > 0) {
+    warn << "Memory leak!\n";
+    dumpUnfreed();
+  }
 }
 
 void resetState() {
@@ -241,8 +238,24 @@ void checkState() {
 
 
 
-typedef void (*testfunc)(void);
+// test harness
 
+#define check(X) if (!(X)) { \
+    ++numFailures; \
+    cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
+  } \
+  else { cerr << "."; fflush(stderr); }
+
+#define checkEq(X, Y) if ((X) != (Y)) { \
+    ++numFailures; \
+    cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
+    cerr << "  got " << (X) << endl; /* BEWARE: multiple eval */ \
+  } \
+  else { cerr << "."; fflush(stderr); }
+
+#include "test_file_list"
+
+typedef void (*testfunc)(void);
 const testfunc tests[] = {
   #include "test_list"
 };
@@ -267,13 +280,13 @@ void runTests() {
       cerr << endl;
 }
 
+
+
 void init() {
   setupNil();
   setupLexicalScope();
   setupPrimFuncs();
 }
-
-
 
 int main(int argc, unused ascii* argv[]) {
   if (argc > 1) {
@@ -298,5 +311,5 @@ int main(int argc, unused ascii* argv[]) {
 
 // style:
 //  wide unicode strings everywhere
-//  no function prototypes
+//  minimal function prototypes
 //  immutable objects; copy everywhere; no pointers except Cell*
