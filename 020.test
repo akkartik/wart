@@ -159,10 +159,6 @@
 
 
 
-(test "arithmetic is varargs"
- :valueof (+ 1 2 3 (* 1 2 2))
- :should be 10)
-
 (test "pair works"
  :valueof (pair '(1 2 3 4 5))
  :should be '((1 2) (3 4) (5)))
@@ -170,10 +166,6 @@
 (pending-test "@splice works with compose"
  :valueof (car:cons @'(1 (2 3)))
  :should be 1)
-
-(test "increment works with lexical vars"
- :valueof (ret x 3 ++.x)
- :should be 4)
 
 (test "collect/yield works"
  :valueof (collect:for i 1 (< i 4) ++.i yield.i)

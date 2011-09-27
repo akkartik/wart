@@ -1,0 +1,7 @@
+(test "arithmetic is varargs"
+ :valueof (+ 1 2 3 (* 1 2 2))
+ :should be 10)
+
+(test "increment works with lexical vars"
+ :valueof (ret x 3 ++.x)
+ :should be 4)
