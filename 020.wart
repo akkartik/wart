@@ -58,7 +58,7 @@ let $if if
       car.$args
       `(,$if ,car.$args
          ,cadr.$args
-         if ,@cddr.$args)
+         (if ,@cddr.$args))
 
 mac or $args
   if $args
@@ -71,10 +71,10 @@ mac and $args
   if !$args
     1
     if car.$args
-      if cdr.$args
+      if !cdr.$args
+        car.$args
         `(if ,car.$args
            and ,@cdr.$args)
-        car.$args
 
 (let $iso iso
   def iso(a b)
@@ -86,8 +86,8 @@ mac and $args
 
 def list args
   if args
-    cons car.args
-         list @cdr.args
+    (cons car.args
+          (list @cdr.args))
 
 def test(msg valueof should expected)
   if (should valueof expected)
@@ -111,7 +111,7 @@ def pair(l)
     !l
       nil
     !cdr.l
-      list:list car.l
+      (list:list car.l)
     :else
       (cons (list car.l cadr.l)
             pair cddr.l))
@@ -141,7 +141,7 @@ def rem(f seq)
       (rem f cdr.seq)
 
 def keep(f seq)
-  rem ~f seq
+  (rem ~f seq)
 
 
 
@@ -214,32 +214,39 @@ let $table table
       each (k v) pair.args
         (table_set t k v)
 
+def annotate(type expr)
+  (list 'type type expr)
+
+def queue()
+  (annotate 'queue (list nil nil 0))
+
 
 
 def zip(a b)
   if (and a b)
-    cons (list car.a car.b)
-         zip cdr.a cdr.b
+    (cons (list car.a car.b)
+          (zip cdr.a cdr.b))
 
 def pairwise(xs)
-  zip xs cdr.xs
+  (zip xs cdr.xs)
 
 def map(f xs)
   if xs
-    cons (f car.xs)
-         map f cdr.xs
+    (cons (f car.xs)
+          (map f cdr.xs))
 
 def reduce(f xs)
   if cddr.xs
-    reduce f (cons (f car.xs cadr.xs)
-                   cddr.xs)
-    f @xs
+    (reduce f (cons (f car.xs cadr.xs)
+                   cddr.xs))
+    (f @xs)
 
 def all(f xs)
-  and @(map f xs)
+  (and @(map f xs))
 
 def some(f xs)
-  or @(map f xs)
+  (or @(map f xs))
+
 assign any some
 
 mac zap($f $x)
@@ -256,11 +263,13 @@ mac pop($xs)
 def rev(xs acc)
   if !xs
     acc
-    rev cdr.xs (cons car.xs acc)
+    (rev cdr.xs
+         (cons car.xs acc))
 
 mac collect $body
-  `(withs ($acc nil
-           yield (fn(_) (push _ $acc)))
+  `(withs ($acc   nil
+           yield  (fn(_)
+                    (push _ $acc)))
      ,@$body
      rev.$acc)
 
@@ -268,33 +277,33 @@ mac collect $body
 
 let $+ +
   def + xs
-    reduce $+ xs
+    (reduce $+ xs)
 
 let $- -
   def - xs
-    reduce $- xs
+    (reduce $- xs)
 
 let $* *
   def * xs
-    reduce $* xs
+    (reduce $* xs)
 
 let $/ /
   def / xs
-    reduce $/ xs
+    (reduce $/ xs)
 
 let $% %
   def % xs
-    reduce $% xs
+    (reduce $% xs)
 
 let $> >
   def > xs
-    all (fn((x y)) ($> x y))
-        pairwise.xs
+    (all (fn((x y)) ($> x y))
+         pairwise.xs)
 
   def < xs
-    all (fn((x y)) ($> y x))
-        pairwise.xs
-assign exceed >
+    (all (fn((x y)) ($> y x))
+         pairwise.xs)
+assign exceed > ; for testing
 
 mac ++($n)
   `(assign ,$n (+ ,$n 1))
