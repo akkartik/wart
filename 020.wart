@@ -109,6 +109,10 @@ mac with($params . $body)
 mac do $body
   `((fn() ,@$body))
 
+mac do1 $body
+  `(ret $ret ,car.$body
+     ,@cdr.$body)
+
 def rem(f seq)
   (if seq
     (if (~f car.seq)
