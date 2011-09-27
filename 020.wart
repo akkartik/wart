@@ -89,6 +89,21 @@ def list args
     cons car.args
          list @cdr.args
 
+def test(msg valueof should expected)
+  if (should valueof expected)
+    (pr ".")
+    (do
+      (incFailures)
+      (prn)
+      (prn "F " msg)
+      (prn "  got " valueof))
+
+def pending-test'(msg valueof should expected)
+  prn.
+  (prn "pending: " msg)
+
+assign be iso
+
 
 
 def pair(l)
@@ -194,21 +209,6 @@ let $table table
     ret t ($table)
       (each (k v) pair.args
         (table_set t k v))
-
-def test(msg valueof should expected)
-  if (should valueof expected)
-    (pr ".")
-    (do
-      (incFailures)
-      (prn)
-      (prn "F " msg)
-      (prn "  got " valueof))
-
-def pending-test'(msg valueof should expected)
-  prn.
-  (prn "pending: " msg)
-
-assign be iso
 
 
 
