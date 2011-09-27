@@ -34,3 +34,16 @@ mac ++($n)
 
 mac --($n)
   `(assign ,$n (- ,$n 1))
+
+
+
+def zero?(n)
+  (iso n 0)
+
+def divides(nr dr)
+  (zero?:% nr dr)
+
+def even?(n)
+  (divides n 2)
+
+assign odd? ~even?

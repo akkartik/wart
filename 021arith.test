@@ -5,3 +5,11 @@
 (test "increment works with lexical vars"
  :valueof (ret x 3 ++.x)
  :should be 4)
+
+(test "divides works"
+ :valueof (divides 3 2)
+ :should be nil)
+
+(test "divides works - 2"
+ :valueof (divides 4 2)
+ :should ~be nil)
