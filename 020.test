@@ -174,3 +174,7 @@
 (test "increment works with lexical vars"
  :valueof (ret x 3 ++.x)
  :should be 4)
+
+(test "collect/yield works"
+ :valueof (collect:for i 1 (< i 4) ++.i yield.i)
+ :should be '(1 2 3))

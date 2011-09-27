@@ -238,6 +238,28 @@ def some(f xs)
   or @(map f xs)
 assign any some
 
+mac zap($f $x)
+  `(assign ,$x (,$f ,$x))
+
+mac push($x $xs)
+  `(assign ,$xs (cons ,$x ,$xs))
+
+mac pop($xs)
+  `(do1
+     (car ,$xs)
+     (zap cdr ,$xs))
+
+def rev(xs acc)
+  if !xs
+    acc
+    rev cdr.xs (cons car.xs acc)
+
+mac collect $body
+  `(withs ($acc nil
+           yield (fn(_) (push _ $acc)))
+     ,@$body
+     rev.$acc)
+
 
 
 let $+ +
