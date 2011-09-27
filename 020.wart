@@ -135,10 +135,10 @@ mac do1 $body
      ,@cdr.$body)
 
 def rem(f seq)
-  (if seq
-    (if (~f car.seq)
+  if seq
+    if (~f car.seq)
       (cons car.seq (rem f cdr.seq))
-      (rem f cdr.seq)))
+      (rem f cdr.seq)
 
 def keep(f seq)
   rem ~f seq
@@ -157,11 +157,11 @@ mac iflet($var $expr . $branches)
   if !$branches
     $expr
     `(let $tmp ,$expr
-       (if $tmp
+       if $tmp
          (let ,$var $tmp
            ,car.$branches)
          ,(if cdr.$branches
-            `(iflet ,$var ,@cdr.$branches))))
+            `(iflet ,$var ,@cdr.$branches)))
 
 mac aif($expr . $branches)
   `(iflet it ,$expr ,@$branches)
@@ -172,8 +172,8 @@ mac whenlet($var $test . $body)
 
 mac whenlet($var $test . $body)
   `(let ,$var ,$test
-     (when ,$var
-       ,@$body))
+     when ,$var
+       ,@$body)
 
 mac awhen($test . $body)
   `(whenlet it ,$test
@@ -183,32 +183,36 @@ mac awhen($test . $body)
 mac while($test . $body)
   `(when ,$test
      ,@$body
-     (while ,$test ,@$body))
+     while ,$test
+       ,@$body)
 
 mac whilet($var $test . $body)
   `(let ,$var nil
-     (while (assign ,$var ,$test)
-        ,@$body))
+     while (assign ,$var ,$test)
+       ,@$body)
 
 mac awhile($test . $body)
-  `(whilet it ,$test ,@$body)
+  `(whilet it ,$test
+     ,@$body)
 
 mac for($var $start $test $update . $body)
   `(let ,$var ,$start
-     (while ,$test
+     while ,$test
        ,@$body
-       ,$update))
+       ,$update)
 
 mac each($var $expr . $body)
   `(for $foo ,$expr $foo (assign $foo cdr.$foo)
-      (let ,$var car.$foo
-        ,@$body))
+      let ,$var car.$foo
+        ,@$body)
+
+
 
 let $table table
   def table args
     ret t ($table)
-      (each (k v) pair.args
-        (table_set t k v))
+      each (k v) pair.args
+        (table_set t k v)
 
 
 
