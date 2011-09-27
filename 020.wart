@@ -106,6 +106,12 @@ mac with($params . $body)
      ,@$body)
     ,@(map cadr pair.$params))
 
+mac withs($params . $body)
+  if !$params
+    `(do ,@$body)
+    `(let ,car.$params ,cadr.$params
+       (withs ,cddr.$params ,@$body))
+
 mac do $body
   `((fn() ,@$body))
 
