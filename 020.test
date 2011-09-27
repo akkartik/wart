@@ -55,7 +55,7 @@
 
 (test "or handles non-nil arg"
  :valueof or.3
- :should ~be nil)
+ :should be 3)
 
 (test "or handles 2 args"
  :valueof (or nil 3)
@@ -88,7 +88,7 @@
 
 (test "and handles 0 args"
  :valueof and.
- :should be 1)
+ :should ~be nil)
 
 (test "and handles nil arg"
  :valueof and.nil
