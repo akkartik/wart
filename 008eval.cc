@@ -54,7 +54,7 @@
                                     return nil;
                                   }
 
-                                  // extract keyword args into the hash_map provided; return non-keyword args
+                                  // extract keyword args into the CellMap provided; return non-keyword args
                                   Cell* extractKeywordArgs(Cell* params, Cell* args, CellMap& keywordArgs) {
                                     Cell *pNonKeywordArgs = newCell(), *curr = pNonKeywordArgs;
                                     for (; args != nil; args=cdr(args)) {
