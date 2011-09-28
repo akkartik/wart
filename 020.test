@@ -172,20 +172,8 @@
  :should be '(1 2 4))
 
 (test "keep works"
- :valueof (keep no '(1 2 nil 4 nil))
- :should be '(nil nil))
-
-(test "keep works - 2"
- :valueof (keep no '(nil 1 2 nil 4 nil))
- :should be '(nil nil))
-
-(test "keep works - 3"
  :valueof (keep odd? '(11 12 13))
  :should be '(11 13))
-
-(test "keep works - 4"
- :valueof (keep no '(12 13 14))
- :should be '(13))
 
 (test "collect/yield works"
  :valueof (collect:for i 1 (< i 4) ++.i yield.i)
