@@ -141,7 +141,9 @@ def rem(f seq)
       (rem f cdr.seq)
 
 def keep(f seq)
-  (rem ~f seq)
+  (rem (fn (_) ~f._) seq)
+;?   (rem (fn'(_) ~f._) seq) ; TODO why does this fail
+;?   (rem ~f seq)
 
 
 

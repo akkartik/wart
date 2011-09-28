@@ -167,6 +167,14 @@
  :valueof (car:cons @'(1 (2 3)))
  :should be 1)
 
+(test "rem works"
+ :valueof (rem no '(1 2 nil 4 nil))
+ :should be '(1 2 4))
+
+(test "keep works"
+ :valueof (keep no '(1 2 nil 4 nil))
+ :should be '(nil nil))
+
 (test "collect/yield works"
  :valueof (collect:for i 1 (< i 4) ++.i yield.i)
  :should be '(1 2 3))
