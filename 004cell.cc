@@ -80,7 +80,8 @@ Cell* newCell() {
                                   };
                                   struct CellMap :public hash_map<Cell*, Cell*, TypeCastCellHash> {};
 
-                                  extern void rmref(Cell*);
+                                  void rmref(Cell*);
+                                  void dump(Cell*, ostream&);
 
 struct Table {
   CellMap table;
@@ -113,8 +114,9 @@ void rmref(Cell* c) {
   --c->nrefs;
   if (c->nrefs > 0) return;
 
-  if (isAtom(c) && c->type != STRING && !runningTests)
-    warn << "deleted atom of type " << c->type << endl;
+  if (isAtom(c) && c->type != STRING && !runningTests) {
+    warn << "deleted atom: "; dump(c, cerr); cerr << endl;
+  }
 
   switch (c->type) {
   case NUM:
@@ -186,7 +188,10 @@ bool isNum(Cell* x) {
 }
 
 long toNum(Cell* x) {
-  if (!isNum(x)) return 0;
+  if (!isNum(x)) {
+    warn << "not a number: "; dump(x, cerr); cerr << endl;
+    return 0;
+  }
   return (long)x->car;
 }
 
@@ -247,8 +252,10 @@ bool isString(Cell* x) {
 }
 
 string toString(Cell* x) {
-  if (!isString(x) && !isSym(x))
+  if (!isString(x) && !isSym(x)) {
+    warn << "can't convert to string: "; dump(x, cerr); cerr << endl;
     return L"";
+  }
   return *(string*)x->car;
 }
 
@@ -428,6 +435,10 @@ Cell* get(Cell* t, Cell* k) {
                                     default:
                                       return os << "Can't print type " << c->type << endl << DIE;
                                     }
+                                  }
+
+                                  void dump(Cell* x, ostream& os) {
+                                    os << x;
                                   }
 
 ostream& operator<<(ostream& os, list<Cell*> l) {
