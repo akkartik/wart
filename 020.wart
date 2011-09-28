@@ -136,9 +136,9 @@ mac do1 $body
 
 def rem(f seq)
   if seq
-    if (~f car.seq)
-      (cons car.seq (rem f cdr.seq))
+    if (f car.seq)
       (rem f cdr.seq)
+      (cons car.seq (rem f cdr.seq))
 
 def keep(f seq)
   (rem (fn (_) ~f._) seq)
