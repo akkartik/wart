@@ -16,9 +16,8 @@ def compose($f $g)
   fn '$args
     eval `(,$f (,$g ,@$args))
 
-def complement($f)
-  fn '$args
-    eval `(no:,$f ,@$args)
+def complement(f)
+  (compose no f)
 
 mac proc($name $params . $body)
   `(def ,$name ,$params
