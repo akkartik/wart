@@ -140,11 +140,7 @@ def rem(f seq)
       (cons car.seq (rem f cdr.seq))
 
 def keep(f seq)
-  (rem (fn'(_) ; remove the quote and this works. Why?
-         (eval `(do
-                 (prn _)
-                 (,no (,f _)))))
-       seq)
+  (rem ~f seq)
 
 
 
