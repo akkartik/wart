@@ -79,6 +79,7 @@ struct AstNode;
 list<AstNode> parse(list<Token>);
 struct Cell;
 extern Cell* nil;
+ostream& operator<<(ostream&, Cell*);
 list<Cell*> buildCells(list<AstNode>);
 
 list<Cell*> buildFromStream(istream& f) {
