@@ -170,6 +170,9 @@
  :valueof (rem no '(1 2 nil 4 nil))
  :should be '(1 2 4))
 
+(prn:rem (fn(_) prn._ ~odd?._) '(11 12 13))
+(prn:keep (fn(_) prn._ odd?._) '(11 12 13))
+
 (test "keep works"
  :valueof (keep odd? '(11 12 13))
  :should be '(11 13))
