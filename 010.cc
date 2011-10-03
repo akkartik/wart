@@ -39,27 +39,6 @@ COMPILE_PRIM_FUNC(assign, primFunc_assign, L"('$var $val)",
   return mkref(val);
 )
 
-                                  // HACK because there's no wifstream(wstring) constructor
-                                  // will only work with strings containing ascii characters
-                                  vector<ascii> toAscii(string s) {
-                                    vector<ascii> result;
-                                    for (string::iterator p = s.begin(); p != s.end(); ++p)
-                                      result.push_back(*p);
-                                    return result;
-                                  }
-
-COMPILE_PRIM_FUNC(load, primFunc_load, L"($f)",
-  loadFile(&toAscii(toString(lookup(L"$f")))[0]);
-  return nil;
-)
-
-COMPILE_PRIM_FUNC(pr, primFunc_prn, L"($x)",
-  Cell* x = lookup(L"$x");
-  cout << x;
-  cout.flush();
-  return mkref(x);
-)
-
 COMPILE_PRIM_FUNC(if, primFunc_if, L"($cond '$then '$else)",
   return lookup(L"$cond") != nil ? eval(lookup(L"$then")) : eval(lookup(L"$else"));
 )
@@ -83,6 +62,29 @@ COMPILE_PRIM_FUNC(iso, primFunc_iso, L"($x $y)",
   return mkref(result);
 )
 
+
+
+                                  // HACK because there's no wifstream(wstring) constructor
+                                  // will only work with strings containing ascii characters
+                                  vector<ascii> toAscii(string s) {
+                                    vector<ascii> result;
+                                    for (string::iterator p = s.begin(); p != s.end(); ++p)
+                                      result.push_back(*p);
+                                    return result;
+                                  }
+
+COMPILE_PRIM_FUNC(load, primFunc_load, L"($f)",
+  loadFile(&toAscii(toString(lookup(L"$f")))[0]);
+  return nil;
+)
+
+COMPILE_PRIM_FUNC(pr, primFunc_prn, L"($x)",
+  Cell* x = lookup(L"$x");
+  cout << x;
+  cout.flush();
+  return mkref(x);
+)
+
 COMPILE_PRIM_FUNC(debug, primFunc_debug, L"($x)",
   debug = toNum(lookup(L"$x"));
   return nil;
@@ -92,6 +94,13 @@ COMPILE_PRIM_FUNC(incFailures, primFunc_incTests, L"()",
   ++numFailures;
   return nil;
 )
+
+COMPILE_PRIM_FUNC(dumpScope, primFunc_dumpScope, L"()",
+  cerr << currLexicalScopes.top() << endl;
+  return nil;
+)
+
+
 
 COMPILE_PRIM_FUNC(uniq, primFunc_uniq, L"($x)",
   return mkref(genSym(lookup(L"$x")));
