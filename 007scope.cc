@@ -53,6 +53,30 @@ void setupLexicalScope() {
   initialSyms.insert(newSym(L"dynamicScope"));
 }
 
+void dumpScopesContainingBinding(Cell* scope, Cell* sym, list<bool> path) {
+  if (scope == nil) return;
+  Cell* result = NULL;
+  if (scope == newSym(L"dynamicScope"))
+    result = lookupDynamicBinding(sym);
+  else if (isTable(scope))
+    result = unsafeGet(scope, sym);
+
+  if (result) {
+    for (list<bool>::iterator p = path.begin(); p != path.end(); ++p)
+      cerr << *p;
+    cerr << ": " << result << endl;
+  }
+
+  if (isCons(scope)) {
+    path.push_back(false);
+    dumpScopesContainingBinding(car(scope), sym, path);
+    path.pop_back();
+  }
+
+  path.push_back(true);
+  dumpScopesContainingBinding(cdr(scope), sym, path);
+}
+
 Cell* lookupLexicalBinding(Cell* sym, Cell* lexicalScope) {
   for (Cell* scope = lexicalScope; scope != nil; scope = cdr(scope)) {
     Cell* result = NULL;
@@ -109,6 +133,9 @@ void addLexicalBinding(string var, Cell* val) {
 }
 
 Cell* lookup(Cell* sym) {
+  list<bool> path;
+  if (debug == 2 && sym == newSym(L"seq"))
+    dumpScopesContainingBinding(currLexicalScopes.top(), sym, path);
   Cell* result = lookupLexicalBinding(sym, currLexicalScopes.top());
   if (result) return result;
   warn << "No binding for " << toString(sym) << endl;

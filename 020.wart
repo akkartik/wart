@@ -139,8 +139,9 @@ def rem(f seq)
       (rem f cdr.seq)
       (cons car.seq (rem f cdr.seq))
 
-def keep(f seq2)
-  (rem ~f seq2)
+def keep(f seq)
+  debug.2
+  (rem ~f seq)
 
 
 
