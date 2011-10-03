@@ -399,7 +399,12 @@ Cell* get(Cell* t, Cell* k) {
                                     os << "{";
                                     for (CellMap::iterator p = t->table.begin(); p != t->table.end(); ++p) {
                                       if (p->second)
-                                        if ((Cell*)p->first == newSym(L"seq"))
+                                        if ((Cell*)p->first == newSym(L"$wartScopeBelongsTo")
+                                            && isCons(car(p->second)))
+                                          os << car(car(p->second)) << ": ";
+                                        else if ((Cell*)p->first == newSym(L"$wartScopeBelongsTo"))
+                                          os << car(p->second) << ": ";
+                                        else if ((Cell*)p->first == newSym(L"seq"))
                                           os << (Cell*)p->first << ":" << p->second << ", ";
                                         else
                                           os << (Cell*)p->first << ", ";
