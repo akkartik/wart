@@ -90,7 +90,7 @@ def list args
 
 def test(msg valueof should expected)
   if (should valueof expected)
-    (pr ".")
+    (pr "_")
     (do
       (incFailures)
       (prn)
