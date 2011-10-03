@@ -396,12 +396,12 @@ Cell* get(Cell* t, Cell* k) {
                                   ostream& operator<<(ostream& os, Cell* c);
 
                                   ostream& operator<<(ostream& os, Table* t) {
-                                    os << "{" << endl;
+                                    os << "{";
                                     for (CellMap::iterator p = t->table.begin(); p != t->table.end(); ++p) {
                                       if (p->second)
-                                        os << "  " << (Cell*)p->first << ": " << p->second << endl;
+                                        os << (Cell*)p->first << ", ";
                                     }
-                                    return os << "}";
+                                    return os << "}" << endl;
                                   }
 
                                   ostream& operator<<(ostream& os, Cell* c) {
@@ -424,9 +424,9 @@ Cell* get(Cell* t, Cell* k) {
                                     case STRING:
                                       return os << toString(c);
                                     case TABLE:
-                                      os << (Table*)c->car;
+                                      os << "(" << (Table*)c->car;
                                       if (cdr(c) != nil)
-                                        os << cdr(c);
+                                        os << " . " << cdr(c) << ")";
                                       return os;
                                     case PRIM_FUNC:
                                       return os << "#compiled";
