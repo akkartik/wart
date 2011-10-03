@@ -296,7 +296,6 @@ Cell* eval(Cell* expr) {
         newCons(calleeEnv(fn), currLexicalScopes.top()));
   // now bind its params to args in the new environment
   newLexicalScope();
-  addLexicalBinding(L"$wartScopeBelongsTo", mkref(expr));
   bindArgs(sig(fn), evaldArgs);
 
   // eval all forms in body, save result of final form
