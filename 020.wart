@@ -231,7 +231,7 @@ def map(f xs)
 def reduce(f xs)
   if cddr.xs
     (reduce f (cons (f car.xs cadr.xs)
-                   cddr.xs))
+                    cddr.xs))
     (f @xs)
 
 def all(f xs)
