@@ -399,7 +399,10 @@ Cell* get(Cell* t, Cell* k) {
                                     os << "{";
                                     for (CellMap::iterator p = t->table.begin(); p != t->table.end(); ++p) {
                                       if (p->second)
-                                        os << (Cell*)p->first << ", ";
+                                        if ((Cell*)p->first == newSym(L"seq"))
+                                          os << (Cell*)p->first << ":" << p->second << ", ";
+                                        else
+                                          os << (Cell*)p->first << ", ";
                                     }
                                     return os << "}" << endl;
                                   }
