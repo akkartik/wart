@@ -125,28 +125,35 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
 }
 
                                   void dumpBindings(Cell* scope, Cell* sym, list<bool> path) {
-                                    if (scope == nil) return;
+                                    list<Cell*> callees;
+                                    for (; scope != nil; scope=cdr(scope)) {
+                                      Cell* result = NULL;
+                                      if (scope == newSym(L"dynamicScope"))
+                                        result = lookupDynamicBinding(sym);
+                                      else if (isTable(scope))
+                                        result = unsafeGet(scope, sym);
 
-                                    Cell* result = NULL;
-                                    if (scope == newSym(L"dynamicScope"))
-                                      result = lookupDynamicBinding(sym);
-                                    else if (isTable(scope))
-                                      result = unsafeGet(scope, sym);
+                                      if (result) {
+                                        for (list<bool>::iterator p = path.begin(); p != path.end(); ++p)
+                                          cerr << *p;
+                                        cerr << ": " << result << endl;
+                                      }
 
-                                    if (result) {
-                                      for (list<bool>::iterator p = path.begin(); p != path.end(); ++p)
-                                        cerr << *p;
-                                      cerr << ": " << result << endl;
+                                      callees.push_back(scope);
+                                      path.push_back(true);
                                     }
 
-                                    path.push_back(true);
-                                    dumpBindings(cdr(scope), sym, path);
-                                    path.pop_back();
+                                    for (list<Cell*>::iterator p = callees.begin(); p != callees.end(); ++p)
+                                      path.pop_back();
 
-                                    if (!isCons(scope)) return;
+                                    for (list<Cell*>::iterator p = callees.begin(); p != callees.end(); ++p) {
+                                      if (!isCons(*p)) continue;
+                                      path.push_back(false);
+                                        dumpBindings(car(*p), sym, path);
+                                      path.pop_back();
 
-                                    path.push_back(false);
-                                    dumpBindings(car(scope), sym, path);
+                                      path.push_back(true);
+                                    }
                                   }
 
 Cell* lookup(Cell* sym) {
