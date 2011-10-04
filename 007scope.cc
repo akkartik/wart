@@ -53,6 +53,33 @@ void setupLexicalScope() {
   initialSyms.insert(newSym(L"dynamicScope"));
 }
 
+// entering and leaving lexical scopes *assigns the current dynamic*
+// binding of the currLexicalScope sym.
+// Calling functions will create new dynamic bindings.
+void newLexicalScope() {
+  Cell* newScope = newTable();
+  dbg << "new lexical scope: " << newScope << endl;
+  setCdr(newScope, currLexicalScopes.top());
+  newDynamicScope(newSym(L"currLexicalScope"), newScope);
+}
+
+void endLexicalScope() {
+  Cell* currScope = currLexicalScopes.top();
+  if (currScope == nil)
+    err << "No lexical scope to end" << endl << DIE;
+  dbg << "end lexical scope: " << currScope << endl;
+  endDynamicScope(newSym(L"currLexicalScope"));
+}
+
+void addLexicalBinding(Cell* sym, Cell* val) {
+  dbg << "creating binding: " << (void*)currLexicalScopes.top() << " " << sym << endl;
+  if (unsafeGet(currLexicalScopes.top(), sym)) err << "Can't rebind within a lexical scope" << endl << DIE;
+  unsafeSet(currLexicalScopes.top(), sym, val, false);
+}
+void addLexicalBinding(string var, Cell* val) {
+  addLexicalBinding(newSym(var), val);
+}
+
 void dumpScopesContainingBinding(Cell* scope, Cell* sym, list<bool> path) {
   if (scope == nil) return;
 
@@ -106,33 +133,6 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
   if (result) return result;
   if (isCons(scope)) return scopeContainingBinding(sym, car(scope));
   return NULL;
-}
-
-// entering and leaving lexical scopes *assigns the current dynamic*
-// binding of the currLexicalScope sym.
-// Calling functions will create new dynamic bindings.
-void newLexicalScope() {
-  Cell* newScope = newTable();
-  dbg << "new lexical scope: " << newScope << endl;
-  setCdr(newScope, currLexicalScopes.top());
-  newDynamicScope(newSym(L"currLexicalScope"), newScope);
-}
-
-void endLexicalScope() {
-  Cell* currScope = currLexicalScopes.top();
-  if (currScope == nil)
-    err << "No lexical scope to end" << endl << DIE;
-  dbg << "end lexical scope: " << currScope << endl;
-  endDynamicScope(newSym(L"currLexicalScope"));
-}
-
-void addLexicalBinding(Cell* sym, Cell* val) {
-  dbg << "creating binding: " << (void*)currLexicalScopes.top() << " " << sym << endl;
-  if (unsafeGet(currLexicalScopes.top(), sym)) err << "Can't rebind within a lexical scope" << endl << DIE;
-  unsafeSet(currLexicalScopes.top(), sym, val, false);
-}
-void addLexicalBinding(string var, Cell* val) {
-  addLexicalBinding(newSym(var), val);
 }
 
 Cell* lookup(Cell* sym) {
