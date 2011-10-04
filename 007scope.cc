@@ -85,32 +85,42 @@ void addLexicalBinding(string var, Cell* val) {
 
 
 Cell* lookupLexicalBinding(Cell* sym, Cell* scope) {
-  if (scope == nil) return NULL;
-
   Cell* result = NULL;
-  if (scope == newSym(L"dynamicScope"))
-    result = lookupDynamicBinding(sym);
-  else if (isTable(scope))
-    result = unsafeGet(scope, sym);
-  if (result) return result;
+  list<Cell*> callees;
+  for (; scope != nil; scope = cdr(scope)) {
+    if (scope == newSym(L"dynamicScope"))
+      result = lookupDynamicBinding(sym);
+    else if (isTable(scope))
+      result = unsafeGet(scope, sym);
+    if (result) return result;
 
-  result = lookupLexicalBinding(sym, cdr(scope));
-  if (result) return result;
-  if (isCons(scope)) return lookupLexicalBinding(sym, car(scope));
+    if (isCons(scope))
+      callees.push_back(scope);
+  }
+
+  for (list<Cell*>::iterator p = callees.begin(); p != callees.end(); ++p) {
+    result = lookupLexicalBinding(sym, car(*p));
+    if (result) return result;
+  }
   return NULL;
 }
 
 Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
-  if (scope == nil) return NULL;
+  list<Cell*> callees;
+  for (; scope != nil; scope = cdr(scope)) {
+    if (scope == newSym(L"dynamicScope") && lookupDynamicBinding(sym))
+      return scope;
+    if (isTable(scope) && unsafeGet(scope, sym))
+      return scope;
 
-  if (scope == newSym(L"dynamicScope") && lookupDynamicBinding(sym))
-    return scope;
-  if (isTable(scope) && unsafeGet(scope, sym))
-    return scope;
+    if (isCons(scope))
+      callees.push_back(scope);
+  }
 
-  Cell* result = scopeContainingBinding(sym, cdr(scope));
-  if (result) return result;
-  if (isCons(scope)) return scopeContainingBinding(sym, car(scope));
+  for (list<Cell*>::iterator p = callees.begin(); p != callees.end(); ++p) {
+    Cell* result = scopeContainingBinding(sym, car(*p));
+    if (result) return result;
+  }
   return NULL;
 }
 
