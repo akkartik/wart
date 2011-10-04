@@ -44,6 +44,8 @@ void assignDynamicVar(Cell* sym, Cell* val) {
   bindings.push(val);
 }
 
+
+
 // the current lexical scope is a first-class dynamic variable
 #define currLexicalScopes dynamics[newSym(L"currLexicalScope")]
 hash_set<Cell*, TypeCastCellHash> initialSyms;
@@ -80,30 +82,7 @@ void addLexicalBinding(string var, Cell* val) {
   addLexicalBinding(newSym(var), val);
 }
 
-void dumpScopesContainingBinding(Cell* scope, Cell* sym, list<bool> path) {
-  if (scope == nil) return;
-
-  Cell* result = NULL;
-  if (scope == newSym(L"dynamicScope"))
-    result = lookupDynamicBinding(sym);
-  else if (isTable(scope))
-    result = unsafeGet(scope, sym);
-
-  if (result) {
-    for (list<bool>::iterator p = path.begin(); p != path.end(); ++p)
-      cerr << *p;
-    cerr << ": " << result << endl;
-  }
-
-  path.push_back(true);
-  dumpScopesContainingBinding(cdr(scope), sym, path);
-  path.pop_back();
-
-  if (!isCons(scope)) return;
-
-  path.push_back(false);
-  dumpScopesContainingBinding(car(scope), sym, path);
-}
+
 
 Cell* lookupLexicalBinding(Cell* sym, Cell* scope) {
   if (scope == nil) return NULL;
@@ -134,6 +113,31 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
   if (isCons(scope)) return scopeContainingBinding(sym, car(scope));
   return NULL;
 }
+
+                                  void dumpScopesContainingBinding(Cell* scope, Cell* sym, list<bool> path) {
+                                    if (scope == nil) return;
+
+                                    Cell* result = NULL;
+                                    if (scope == newSym(L"dynamicScope"))
+                                      result = lookupDynamicBinding(sym);
+                                    else if (isTable(scope))
+                                      result = unsafeGet(scope, sym);
+
+                                    if (result) {
+                                      for (list<bool>::iterator p = path.begin(); p != path.end(); ++p)
+                                        cerr << *p;
+                                      cerr << ": " << result << endl;
+                                    }
+
+                                    path.push_back(true);
+                                    dumpScopesContainingBinding(cdr(scope), sym, path);
+                                    path.pop_back();
+
+                                    if (!isCons(scope)) return;
+
+                                    path.push_back(false);
+                                    dumpScopesContainingBinding(car(scope), sym, path);
+                                  }
 
 Cell* lookup(Cell* sym) {
   list<bool> path;
