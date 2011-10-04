@@ -293,7 +293,7 @@ Cell* eval(Cell* expr) {
   // swap in the function's lexical environment
   if (!isPrimFunc(car(fn)))
     newDynamicScope(L"currLexicalScope",
-        newCons(calleeEnv(fn), currLexicalScopes.top()));
+        newCons(currLexicalScopes.top(), calleeEnv(fn)));
   // now bind its params to args in the new environment
   newLexicalScope();
   bindArgs(sig(fn), evaldArgs);

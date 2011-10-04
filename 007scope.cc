@@ -55,6 +55,7 @@ void setupLexicalScope() {
 
 void dumpScopesContainingBinding(Cell* scope, Cell* sym, list<bool> path) {
   if (scope == nil) return;
+
   Cell* result = NULL;
   if (scope == newSym(L"dynamicScope"))
     result = lookupDynamicBinding(sym);
@@ -67,41 +68,43 @@ void dumpScopesContainingBinding(Cell* scope, Cell* sym, list<bool> path) {
     cerr << ": " << result << endl;
   }
 
-  if (isCons(scope)) {
-    path.push_back(false);
-    dumpScopesContainingBinding(car(scope), sym, path);
-    path.pop_back();
-  }
-
   path.push_back(true);
   dumpScopesContainingBinding(cdr(scope), sym, path);
+  path.pop_back();
+
+  if (!isCons(scope)) return;
+
+  path.push_back(false);
+  dumpScopesContainingBinding(car(scope), sym, path);
 }
 
-Cell* lookupLexicalBinding(Cell* sym, Cell* lexicalScope) {
-  for (Cell* scope = lexicalScope; scope != nil; scope = cdr(scope)) {
-    Cell* result = NULL;
-    if (scope == newSym(L"dynamicScope"))
-      result = lookupDynamicBinding(sym);
-    else if (isTable(scope))
-      result = unsafeGet(scope, sym);
-    else if (isCons(scope))
-      result = lookupLexicalBinding(sym, car(scope));
-    if (result) return result;
-  }
+Cell* lookupLexicalBinding(Cell* sym, Cell* scope) {
+  if (scope == nil) return NULL;
+
+  Cell* result = NULL;
+  if (scope == newSym(L"dynamicScope"))
+    result = lookupDynamicBinding(sym);
+  else if (isTable(scope))
+    result = unsafeGet(scope, sym);
+  if (result) return result;
+
+  result = lookupLexicalBinding(sym, cdr(scope));
+  if (result) return result;
+  if (isCons(scope)) return lookupLexicalBinding(sym, car(scope));
   return NULL;
 }
 
-Cell* scopeContainingBinding(Cell* sym, Cell* lexicalScope) {
-  for (Cell* scope = lexicalScope; scope != nil; scope = cdr(scope)) {
-    if (scope == newSym(L"dynamicScope") && lookupDynamicBinding(sym))
-      return scope;
-    else if (isTable(scope) && unsafeGet(scope, sym))
-      return scope;
-    else if (isCons(scope)) {
-      Cell* result = scopeContainingBinding(sym, car(scope));
-      if (result) return result;
-    }
-  }
+Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
+  if (scope == nil) return NULL;
+
+  if (scope == newSym(L"dynamicScope") && lookupDynamicBinding(sym))
+    return scope;
+  if (isTable(scope) && unsafeGet(scope, sym))
+    return scope;
+
+  Cell* result = scopeContainingBinding(sym, cdr(scope));
+  if (result) return result;
+  if (isCons(scope)) return scopeContainingBinding(sym, car(scope));
   return NULL;
 }
 
