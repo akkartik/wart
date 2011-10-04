@@ -94,11 +94,11 @@ Cell* lookupLexicalBinding(Cell* sym, Cell* scope) {
       result = unsafeGet(scope, sym);
     if (result) return result;
 
-    if (isCons(scope))
-      callees.push_back(scope);
+    callees.push_back(scope);
   }
 
   for (list<Cell*>::iterator p = callees.begin(); p != callees.end(); ++p) {
+    if (!isCons(*p)) continue;
     result = lookupLexicalBinding(sym, car(*p));
     if (result) return result;
   }
