@@ -133,21 +133,13 @@ mac do1 $body
   `(ret $ret ,car.$body
      ,@cdr.$body)
 
-assign db -10000
-
 def rem(f seq)
-  when seq
-    ++.db
-    (if (iso db 2)
-      debug.2)
-    if (do1 (f car.seq)
-            debug.0)
+  if seq
+    if (f car.seq)
       (rem f cdr.seq)
       (cons car.seq (rem f cdr.seq))
 
 def keep(f seq)
-  prn.
-  assign db 0
   (rem ~f seq)
 
 

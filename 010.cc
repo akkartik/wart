@@ -95,11 +95,6 @@ COMPILE_PRIM_FUNC(incFailures, primFunc_incTests, L"()",
   return nil;
 )
 
-COMPILE_PRIM_FUNC(dumpScope, primFunc_dumpScope, L"()",
-  cerr << currLexicalScopes.top() << endl;
-  return nil;
-)
-
 
 
 COMPILE_PRIM_FUNC(uniq, primFunc_uniq, L"($x)",

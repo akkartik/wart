@@ -124,42 +124,7 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
   return NULL;
 }
 
-                                  void dumpBindings(Cell* scope, Cell* sym, list<bool> path) {
-                                    list<Cell*> callees;
-                                    for (; scope != nil; scope=cdr(scope)) {
-                                      Cell* result = NULL;
-                                      if (scope == newSym(L"dynamicScope"))
-                                        result = lookupDynamicBinding(sym);
-                                      else if (isTable(scope))
-                                        result = unsafeGet(scope, sym);
-
-                                      if (result) {
-                                        for (list<bool>::iterator p = path.begin(); p != path.end(); ++p)
-                                          cerr << *p;
-                                        cerr << ": " << result << endl;
-                                      }
-
-                                      callees.push_back(scope);
-                                      path.push_back(true);
-                                    }
-
-                                    for (list<Cell*>::iterator p = callees.begin(); p != callees.end(); ++p)
-                                      path.pop_back();
-
-                                    for (list<Cell*>::iterator p = callees.begin(); p != callees.end(); ++p) {
-                                      if (!isCons(*p)) continue;
-                                      path.push_back(false);
-                                        dumpBindings(car(*p), sym, path);
-                                      path.pop_back();
-
-                                      path.push_back(true);
-                                    }
-                                  }
-
 Cell* lookup(Cell* sym) {
-  list<bool> path;
-  if (debug == 2 && sym == newSym(L"seq"))
-    dumpBindings(currLexicalScopes.top(), sym, path);
   Cell* result = lookupLexicalBinding(sym, currLexicalScopes.top());
   if (result) return result;
   warn << "No binding for " << toString(sym) << endl;
