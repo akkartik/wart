@@ -12,9 +12,9 @@ mac def($name $params . $body)
 ; ((compose f g) . args <=> (f (g . args))
 ; prn:assign x 3 => x=3
 ; (let a 3 (prn:assign x a)) => x=3
-def compose($f $g)
-  fn '$args
-    eval `(,$f (,$g ,@$args))
+def compose(f g)
+  ifn '$args
+    eval `(,f (,g ,@$args))
 
 def complement(f)
   (compose no f)
