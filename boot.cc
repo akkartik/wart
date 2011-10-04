@@ -245,14 +245,14 @@ void checkState() {
     ++numFailures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
   } \
-  else { cerr << "_"; fflush(stderr); }
+  else { cerr << "|"; fflush(stderr); }
 
 #define checkEq(X, Y) if ((X) != (Y)) { \
     ++numFailures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
     cerr << "  got " << (X) << endl; /* BEWARE: multiple eval */ \
   } \
-  else { cerr << "_"; fflush(stderr); }
+  else { cerr << "|"; fflush(stderr); }
 
 #include "test_file_list"
 
