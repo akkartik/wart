@@ -146,6 +146,7 @@ def rem(f seq)
       (cons car.seq (rem f cdr.seq))
 
 def keep(f seq)
+  prn.
   assign db 0
   (rem ~f seq)
   debug.0
