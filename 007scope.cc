@@ -124,7 +124,7 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
   return NULL;
 }
 
-                                  void dumpScopesContainingBinding(Cell* scope, Cell* sym, list<bool> path) {
+                                  void dumpBindings(Cell* scope, Cell* sym, list<bool> path) {
                                     if (scope == nil) return;
 
                                     Cell* result = NULL;
@@ -140,19 +140,19 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
                                     }
 
                                     path.push_back(true);
-                                    dumpScopesContainingBinding(cdr(scope), sym, path);
+                                    dumpBindings(cdr(scope), sym, path);
                                     path.pop_back();
 
                                     if (!isCons(scope)) return;
 
                                     path.push_back(false);
-                                    dumpScopesContainingBinding(car(scope), sym, path);
+                                    dumpBindings(car(scope), sym, path);
                                   }
 
 Cell* lookup(Cell* sym) {
   list<bool> path;
   if (debug == 2 && sym == newSym(L"seq"))
-    dumpScopesContainingBinding(currLexicalScopes.top(), sym, path);
+    dumpBindings(currLexicalScopes.top(), sym, path);
   Cell* result = lookupLexicalBinding(sym, currLexicalScopes.top());
   if (result) return result;
   warn << "No binding for " << toString(sym) << endl;
