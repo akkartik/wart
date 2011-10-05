@@ -1,13 +1,3 @@
-def fact(n)
-  if zero?.n
-    1
-    (* n (fact:- n 1))
-
-repeat 8
-  prn fact.10
-
-quit.
-
 let n 1
   ((afn()
     date.

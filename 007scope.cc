@@ -84,7 +84,9 @@ void addLexicalBinding(string var, Cell* val) {
 
 
 
+long numLexicalLookups = 0;
 Cell* lookupLexicalBinding(Cell* sym, Cell* scope) {
+  ++numLexicalLookups;
   Cell* result = NULL;
   list<Cell*> callees;
   for (; scope != nil; scope = cdr(scope)) {
@@ -124,7 +126,9 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
   return NULL;
 }
 
+long numLookups = 0;
 Cell* lookup(Cell* sym) {
+  ++numLookups;
   Cell* result = lookupLexicalBinding(sym, currLexicalScopes.top());
   if (result) return result;
   warn << "No binding for " << toString(sym) << endl;
