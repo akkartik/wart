@@ -6,8 +6,8 @@ mac euler(msg expr)
 euler "1. Add all the natural numbers below one thousand that are multiples of 3 or 5."
   let n 1
     ((afn()
-      ++.n
       when (< n 15)
+        ++.n
         self.))
 
 quit.
