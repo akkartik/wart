@@ -1,5 +1,6 @@
 #include<cstdio>
 #include<cstring>
+#include<time.h>
 #include<vector>
 using std::vector;
 #include<list>

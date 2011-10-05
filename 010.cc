@@ -95,6 +95,24 @@ COMPILE_PRIM_FUNC(incFailures, primFunc_incTests, L"()",
   return nil;
 )
 
+COMPILE_PRIM_FUNC(date, primFunc_date, L"()",
+  time_t t = time(NULL);
+  cerr << asctime(localtime(&t)) << endl;
+  return nil;
+)
+
+COMPILE_PRIM_FUNC(time, primFunc_time, L"'($expr)",
+  clock_t start = clock();
+  Cell* result = eval(lookup(L"$expr"));
+  cerr << clock()-start << "/" << CLOCKS_PER_SEC << endl;
+  return result;
+)
+
+COMPILE_PRIM_FUNC(quit, primFunc_quit, L"()",
+  exit(0);
+  return nil;
+)
+
 
 
 COMPILE_PRIM_FUNC(uniq, primFunc_uniq, L"($x)",
