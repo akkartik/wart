@@ -1,21 +1,19 @@
+let n 1
+  ((afn()
+    date.
+    ++.n
+    when (< n 15)
+      self.))
+do date. quit.
+
 mac euler(msg expr)
   `(do
      prn ,msg
      prn "  " ,expr)
 
 euler "1. Add all the natural numbers below one thousand that are multiples of 3 or 5."
-  let n 1
-    ((afn()
-      date.
-      ++.n
-      when (< n 15)
-        self.))
-
-date.
-quit.
-;?   ret ans 0
-;?     for n 1 (< n 30) ++.n
-;?       time prn.n
-;? ;?       time:if (or (time:divides n 3)
-;? ;?              (time:divides n 5))
-;? ;?         (assign ans (+ ans n))
+  ret ans 0
+    for n 1 (< n 30) ++.n
+      if (or (divides n 3)
+             (divides n 5))
+        (assign ans (+ ans n))
