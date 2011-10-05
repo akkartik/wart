@@ -235,8 +235,6 @@ Cell* processUnquotes(Cell* x, int depth) {
                                       return;
                                     }
                                     for (Cell* scope = currLexicalScopes.top(); scope != nil; scope = cdr(scope)) { // Don't modify caller scopes
-                                      if (isCons(scope) && car(scope) == newSym(L"dynamicScope"))
-                                        setCar(scope, nil);
                                       if (cdr(scope) == newSym(L"dynamicScope"))
                                         setCdr(scope, nil);
                                     }
