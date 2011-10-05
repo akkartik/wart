@@ -97,14 +97,15 @@ COMPILE_PRIM_FUNC(incFailures, primFunc_incTests, L"()",
 
 COMPILE_PRIM_FUNC(date, primFunc_date, L"()",
   time_t t = time(NULL);
-  cerr << asctime(localtime(&t)) << endl;
+  cerr << asctime(localtime(&t)) << " " << numEvalCalls << endl;
   return nil;
 )
 
 COMPILE_PRIM_FUNC(time, primFunc_time, L"'($expr)",
   clock_t start = clock();
+  long initialCalls = numEvalCalls;
   Cell* result = eval(lookup(L"$expr"));
-  cerr << clock()-start << "/" << CLOCKS_PER_SEC << endl;
+  cerr << clock()-start << "/" << CLOCKS_PER_SEC << " " << numEvalCalls-initialCalls << endl;
   return result;
 )
 
