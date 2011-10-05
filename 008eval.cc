@@ -246,7 +246,6 @@ Cell* processUnquotes(Cell* x, int depth) {
                                             newCons(body(expr), currLexicalScopes.top())));
                                   }
 
-long numEvalCalls = 0;
 Cell* eval(Cell* expr) {
   if (!expr)
     err << "eval: cell should never be NULL" << endl << DIE;
@@ -273,7 +272,6 @@ Cell* eval(Cell* expr) {
   if (car(expr) == newSym(L"ifn") && !isCons(currLexicalScopes.top()))
     inlineCurrLexicalScope(); // destructive: will mess with outer scopes
 
-  ++numEvalCalls;
   if (car(expr) == newSym(L"fn") || car(expr) == newSym(L"ifn"))
     // attach current lexical scope
     return mkref(evalLambda(expr));
