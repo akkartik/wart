@@ -295,6 +295,8 @@ Cell* eval(Cell* expr) {
   // swap in the function's lexical environment
   if (!isPrimFunc(car(fn)))
     newDynamicScope(L"currLexicalScope",
+        // most lookups will go straight to the cdr;
+        // failed lookups may look at the caller's environment in the car
         newCons(currLexicalScopes.top(), calleeEnv(fn)));
   // now bind its params to args in the new environment
   newLexicalScope();
