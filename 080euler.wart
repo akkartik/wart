@@ -4,7 +4,11 @@ mac euler(msg expr)
      prn "  " ,expr)
 
 euler "1. Add all the natural numbers below one thousand that are multiples of 3 or 5."
-  for n 1 (< n 13) ++.n
+  let n 1
+    ((afn()
+      ++.n
+      if (< n 13)
+        self.))
 
 quit.
 ;?   ret ans 0
