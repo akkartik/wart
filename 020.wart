@@ -201,9 +201,13 @@ mac for($var $start $test $update . $body)
        ,$update)
 
 mac each($var $expr . $body)
-  `(for $foo ,$expr $foo (assign $foo cdr.$foo)
-      let ,$var car.$foo
+  `(for $i ,$expr $i (zap cdr $i)
+      let ,$var car.$i
         ,@$body)
+
+mac repeat($n . $body)
+  `(for $i 0 (< $i ,$n) ++.$i
+     ,@$body)
 
 
 
