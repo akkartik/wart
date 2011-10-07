@@ -1,3 +1,14 @@
+(pending-test "gotcha: don't let def and mac share lexical scopes"
+ :valueof (do
+            (assign x 4)
+            (let x 3
+              (def foo() x)
+              (mac bar() 2)) ; messes with outer scopes
+            foo.)
+ :should be 3)
+
+
+
 (test "if handles 0 args"
  :valueof (if)
  :should be nil)
