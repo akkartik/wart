@@ -32,7 +32,7 @@ COMPILE_PRIM_FUNC(assign, primFunc_assign, L"('$var $val)",
   Cell* scope = scopeContainingBinding(var, currLexicalScope);
   if (!scope)
     newDynamicScope(var, val);
-  else if (scope == newSym(L"dynamicScope"))
+  else if (scope == DYNAMIC_SCOPE)
     assignDynamicVar(var, val);
   else
     unsafeSet(scope, var, val, false);

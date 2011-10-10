@@ -47,12 +47,14 @@ void assignDynamicVar(Cell* sym, Cell* val) {
 
 
 // the current lexical scope is a first-class dynamic variable
-#define currLexicalScopes dynamics[newSym(L"currLexicalScope")]
+Cell *CURR_LEXICAL_SCOPE, *DYNAMIC_SCOPE;
+#define currLexicalScopes dynamics[CURR_LEXICAL_SCOPE]
 hash_set<Cell*, TypeCastCellHash> initialSyms;
 void setupLexicalScope() {
-  newDynamicScope(L"currLexicalScope", newSym(L"dynamicScope"));
-  initialSyms.insert(newSym(L"currLexicalScope"));
-  initialSyms.insert(newSym(L"dynamicScope"));
+  CURR_LEXICAL_SCOPE = newSym(L"currLexicalScope"), DYNAMIC_SCOPE = newSym(L"dynamicScope");
+  newDynamicScope(CURR_LEXICAL_SCOPE, DYNAMIC_SCOPE);
+  initialSyms.insert(CURR_LEXICAL_SCOPE);
+  initialSyms.insert(DYNAMIC_SCOPE);
 }
 
 // entering and leaving lexical scopes *assigns the current dynamic*
@@ -62,7 +64,7 @@ void newLexicalScope() {
   Cell* newScope = newTable();
   dbg << "new lexical scope: " << newScope << endl;
   setCdr(newScope, currLexicalScopes.top());
-  newDynamicScope(newSym(L"currLexicalScope"), newScope);
+  newDynamicScope(CURR_LEXICAL_SCOPE, newScope);
 }
 
 void endLexicalScope() {
@@ -70,7 +72,7 @@ void endLexicalScope() {
   if (currScope == nil)
     err << "No lexical scope to end" << endl << DIE;
   dbg << "end lexical scope: " << currScope << endl;
-  endDynamicScope(newSym(L"currLexicalScope"));
+  endDynamicScope(CURR_LEXICAL_SCOPE);
 }
 
 void addLexicalBinding(Cell* sym, Cell* val) {
@@ -90,7 +92,7 @@ Cell* lookupLexicalBinding(Cell* sym, Cell* scope) {
   Cell* result = NULL;
   list<Cell*> callees;
   for (; scope != nil; scope = cdr(scope)) {
-    if (scope == newSym(L"dynamicScope"))
+    if (scope == DYNAMIC_SCOPE)
       result = lookupDynamicBinding(sym);
     else if (isTable(scope))
       result = unsafeGet(scope, sym);
@@ -110,7 +112,7 @@ Cell* lookupLexicalBinding(Cell* sym, Cell* scope) {
 Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
   list<Cell*> callees;
   for (; scope != nil; scope = cdr(scope)) {
-    if (scope == newSym(L"dynamicScope") && lookupDynamicBinding(sym))
+    if (scope == DYNAMIC_SCOPE && lookupDynamicBinding(sym))
       return scope;
     if (isTable(scope) && unsafeGet(scope, sym))
       return scope;

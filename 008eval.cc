@@ -231,11 +231,11 @@ Cell* processUnquotes(Cell* x, int depth) {
 
                                   void inlineCurrLexicalScope() {
                                     if (currLexicalScopes.top() == newSym(L"dynamic")) {
-                                      assignDynamicVar(newSym(L"currLexicalScope"), nil);
+                                      assignDynamicVar(CURR_LEXICAL_SCOPE, nil);
                                       return;
                                     }
                                     for (Cell* scope = currLexicalScopes.top(); scope != nil; scope = cdr(scope)) { // Don't modify caller scopes
-                                      if (cdr(scope) == newSym(L"dynamicScope"))
+                                      if (cdr(scope) == DYNAMIC_SCOPE)
                                         setCdr(scope, nil);
                                     }
                                   }
