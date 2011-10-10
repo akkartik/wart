@@ -226,7 +226,7 @@ Cell* processUnquotes(Cell* x, int depth) {
 
                                   bool isFunc(Cell* x) {
                                     return isCons(x)
-                                      && (isPrimFunc(car(x)) || car(x) == newSym(L"evald-fn"));
+                                      && (isPrimFunc(car(x)) || car(x) == newSym(L"evald-fn") || car(x) == newSym(L"evald-ifn"));
                                   }
 
                                   void inlineCurrLexicalScope() {
@@ -237,7 +237,7 @@ Cell* processUnquotes(Cell* x, int depth) {
                                   }
 
                                   Cell* evalLambda(Cell* expr) {
-                                    return newCons(newSym(L"evald-fn"),
+                                    return newCons(newSym(L"evald-"+toString(car(expr))),
                                         newCons(sig(expr),
                                             newCons(body(expr), currLexicalScopes.top())));
                                   }
