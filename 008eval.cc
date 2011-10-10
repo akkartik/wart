@@ -285,10 +285,10 @@ Cell* eval(Cell* expr) {
   Cell* evaldArgs = evalArgs(sig(fn), realArgs);
 
   // swap in the function's lexical environment
-  if (!isPrimFunc(car(fn)))
-    newDynamicScope(L"currLexicalScope",
-        // most lookups will go straight to the cdr;
-        // failed lookups may look at the caller's environment in the car
+  if (car(fn) == newSym(L"evald-fn"))
+    newDynamicScope(CURR_LEXICAL_SCOPE, calleeEnv(fn));
+  else if (car(fn) == newSym(L"evald-ifn"))
+    newDynamicScope(CURR_LEXICAL_SCOPE,
         newCons(currLexicalScopes.top(), calleeEnv(fn)));
   // now bind its params to args in the new environment
   newLexicalScope();
