@@ -1,11 +1,3 @@
-let n 1
-  ((afn()
-    date.
-    ++.n
-    when (< n 15)
-      self.))
-do date. quit.
-
 mac euler(msg expr)
   `(do
      prn ,msg

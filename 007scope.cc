@@ -86,9 +86,7 @@ void addLexicalBinding(string var, Cell* val) {
 
 
 
-long numLexicalLookups = 0;
 Cell* lookupLexicalBinding(Cell* sym, Cell* scope) {
-  ++numLexicalLookups;
   Cell* result = NULL;
   list<Cell*> callees;
   for (; scope != nil; scope = cdr(scope)) {
