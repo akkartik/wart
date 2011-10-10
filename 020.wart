@@ -2,8 +2,8 @@ assign nil? not
 assign no nil?
 
 ; (mac foo(x) `(+ 1 ,x))) (let x 3 (foo x)) => 4
-assign mac (ifn '($name $params . $body)
-  eval `(assign ,$name (ifn ',$params
+assign mac (mfn '($name $params . $body)
+  eval `(assign ,$name (mfn ',$params
                          (eval ,@$body))))
 
 mac def($name $params . $body)
@@ -13,7 +13,7 @@ mac def($name $params . $body)
 ; prn:assign x 3 => x=3
 ; (let a 3 (prn:assign x a)) => x=3
 def compose(f g)
-  ifn '$args
+  mfn '$args
     eval `(,f (,g ,@$args))
 
 def complement(f)

@@ -226,7 +226,7 @@ Cell* processUnquotes(Cell* x, int depth) {
 
                                   bool isFunc(Cell* x) {
                                     return isCons(x)
-                                      && (isPrimFunc(car(x)) || car(x) == newSym(L"evald-fn") || car(x) == newSym(L"evald-ifn"));
+                                      && (isPrimFunc(car(x)) || car(x) == newSym(L"evald-fn") || car(x) == newSym(L"evald-mfn"));
                                   }
 
                                   void inlineCurrLexicalScope() {
@@ -265,10 +265,10 @@ Cell* eval(Cell* expr) {
     return processUnquotes(cdr(expr), 1); // already mkref'd
 
   // experimental fix for macros
-  if (car(expr) == newSym(L"ifn") && !isCons(currLexicalScopes.top()))
+  if (car(expr) == newSym(L"mfn") && !isCons(currLexicalScopes.top()))
     inlineCurrLexicalScope(); // destructive: will mess with outer scopes
 
-  if (car(expr) == newSym(L"fn") || car(expr) == newSym(L"ifn"))
+  if (car(expr) == newSym(L"fn") || car(expr) == newSym(L"mfn"))
     // attach current lexical scope
     return mkref(evalLambda(expr));
   else if (isFunc(expr))
@@ -287,7 +287,7 @@ Cell* eval(Cell* expr) {
   // swap in the function's lexical environment
   if (car(fn) == newSym(L"evald-fn"))
     newDynamicScope(CURR_LEXICAL_SCOPE, calleeEnv(fn));
-  else if (car(fn) == newSym(L"evald-ifn"))
+  else if (car(fn) == newSym(L"evald-mfn"))
     newDynamicScope(CURR_LEXICAL_SCOPE,
         newCons(currLexicalScopes.top(), calleeEnv(fn)));
   // now bind its params to args in the new environment
