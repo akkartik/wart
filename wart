@@ -2,9 +2,15 @@
 
 make --silent || exit 1
 
+WART=wart_bin
+if [ -e wart_bin.opt ]
+then
+  WART=wart_bin.opt
+fi
+
 if rlwrap ls >&/dev/null
 then
-  rlwrap -C wart wart_bin $*
+  rlwrap -C wart $WART $*
 else
-  wart_bin $*
+  $WART $*
 fi
