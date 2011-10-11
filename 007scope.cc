@@ -47,14 +47,13 @@ void assignDynamicVar(Cell* sym, Cell* val) {
 
 
 // the current lexical scope is a first-class dynamic variable
-Cell *CURR_LEXICAL_SCOPE, *DYNAMIC_SCOPE;
+Cell* CURR_LEXICAL_SCOPE;
 #define currLexicalScopes dynamics[CURR_LEXICAL_SCOPE]
 hash_set<Cell*, TypeCastCellHash> initialSyms;
 void setupLexicalScope() {
-  CURR_LEXICAL_SCOPE = newSym(L"currLexicalScope"), DYNAMIC_SCOPE = newSym(L"dynamicScope");
-  newDynamicScope(CURR_LEXICAL_SCOPE, DYNAMIC_SCOPE);
+  CURR_LEXICAL_SCOPE = newSym(L"currLexicalScope");
+  newDynamicScope(CURR_LEXICAL_SCOPE, nil);
   initialSyms.insert(CURR_LEXICAL_SCOPE);
-  initialSyms.insert(DYNAMIC_SCOPE);
 }
 
 // entering and leaving lexical scopes *assigns the current dynamic*
@@ -90,7 +89,7 @@ Cell* lookupLexicalBinding(Cell* sym, Cell* scope) {
   Cell* result = NULL;
   list<Cell*> callees;
   for (; scope != nil; scope = cdr(scope)) {
-    if (scope == DYNAMIC_SCOPE)
+    if (scope == nil)
       result = lookupDynamicBinding(sym);
     else if (isTable(scope))
       result = unsafeGet(scope, sym);
@@ -110,7 +109,7 @@ Cell* lookupLexicalBinding(Cell* sym, Cell* scope) {
 Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
   list<Cell*> callees;
   for (; scope != nil; scope = cdr(scope)) {
-    if (scope == DYNAMIC_SCOPE && lookupDynamicBinding(sym))
+    if (scope == nil && lookupDynamicBinding(sym))
       return scope;
     if (isTable(scope) && unsafeGet(scope, sym))
       return scope;
@@ -123,11 +122,15 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
     Cell* result = scopeContainingBinding(sym, car(*p));
     if (result) return result;
   }
+  if (lookupDynamicBinding(sym))
+    return nil;
   return NULL;
 }
 
 Cell* lookup(Cell* sym) {
   Cell* result = lookupLexicalBinding(sym, currLexicalScopes.top());
+  if (result) return result;
+  result = lookupDynamicBinding(sym);
   if (result) return result;
   warn << "No binding for " << toString(sym) << endl;
   return nil;

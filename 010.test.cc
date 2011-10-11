@@ -23,7 +23,7 @@ void test_assign_to_fn() {
   Cell* fn = wartRead(stream(L"assign foo (fn() 34)")).front();
   Cell* def = eval(fn);
   Cell* scope = calleeEnv(lookup(L"foo"));
-  checkEq(scope, newSym(L"dynamicScope"));
+  checkEq(scope, nil);
   endDynamicScope(L"foo");
   rmref(def);
   rmref(fn);

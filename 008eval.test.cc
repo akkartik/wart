@@ -479,7 +479,7 @@ void test_eval_handles_simple_fn() {
   checkEq(sig(fn), nil);
   check(isCons(calleeBody(fn)));
   checkEq(car(calleeBody(fn)), newNum(34));
-  checkEq(calleeEnv(fn), newSym(L"dynamicScope"));
+  checkEq(calleeEnv(fn), nil);
   rmref(fn);
   rmref(cells.front());
 }
@@ -493,7 +493,7 @@ void test_eval_on_fn_is_idempotent() {
   checkEq(sig(fn2), nil);
   check(isCons(calleeBody(fn2)));
   checkEq(car(calleeBody(fn2)), newNum(34));
-  checkEq(calleeEnv(fn2), newSym(L"dynamicScope"));
+  checkEq(calleeEnv(fn2), nil);
   rmref(fn2);
   rmref(fn);
   rmref(cells.front());

@@ -1,4 +1,4 @@
-(pending-test "gotcha: don't let def and mac share lexical scopes"
+(test "gotcha: don't let def and mac share lexical scopes"
  :valueof (do
             (assign x 4)
             (let x 3
