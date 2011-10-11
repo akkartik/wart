@@ -39,6 +39,16 @@ COMPILE_PRIM_FUNC(assign, primFunc_assign, L"('$var $val)",
   return mkref(val);
 )
 
+COMPILE_PRIM_FUNC(set_car, primFunc_set_car, L"($cons $val)",
+  setCar(lookup(L"$cons"), lookup(L"$val"));
+  return mkref(lookup(L"$val"));
+)
+
+COMPILE_PRIM_FUNC(set_cdr, primFunc_set_cdr, L"($cons $val)",
+  setCdr(lookup(L"$cons"), lookup(L"$val"));
+  return mkref(lookup(L"$val"));
+)
+
 COMPILE_PRIM_FUNC(if, primFunc_if, L"($cond '$then '$else)",
   return lookup(L"$cond") != nil ? eval(lookup(L"$then")) : eval(lookup(L"$else"));
 )
