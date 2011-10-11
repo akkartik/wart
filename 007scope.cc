@@ -91,9 +91,7 @@ Cell* lookupLexicalBinding(Cell* sym, Cell* scope) {
   Cell* result = NULL;
   list<Cell*> callees;
   for (; scope != nil; scope = cdr(scope)) {
-    if (scope == nil)
-      result = lookupDynamicBinding(sym);
-    else if (isTable(scope))
+    if (isTable(scope))
       result = unsafeGet(scope, sym);
     if (result) return result;
 
@@ -111,8 +109,6 @@ Cell* lookupLexicalBinding(Cell* sym, Cell* scope) {
 Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
   list<Cell*> callees;
   for (; scope != nil; scope = cdr(scope)) {
-    if (scope == nil && lookupDynamicBinding(sym))
-      return scope;
     if (isTable(scope) && unsafeGet(scope, sym))
       return scope;
 
