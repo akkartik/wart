@@ -275,7 +275,7 @@ def lastcons(l)
 
 
 
-def annotate(type val)
+def tag(type val)
   (list 'type type val)
 
 def rep(x)
