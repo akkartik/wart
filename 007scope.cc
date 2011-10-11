@@ -77,7 +77,8 @@ void endLexicalScope() {
 
 void addLexicalBinding(Cell* sym, Cell* val) {
   dbg << "creating binding: " << (void*)currLexicalScopes.top() << " " << sym << endl;
-  if (unsafeGet(currLexicalScopes.top(), sym)) err << "Can't rebind within a lexical scope" << endl << DIE;
+  if (unsafeGet(currLexicalScopes.top(), sym))
+    err << "Can't rebind within a lexical scope" << endl << DIE;
   unsafeSet(currLexicalScopes.top(), sym, val, false);
 }
 void addLexicalBinding(string var, Cell* val) {
