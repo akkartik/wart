@@ -1,3 +1,12 @@
+(test "lexical scope overrides dynamic scope inside macros"
+ :valueof (do (assign x 35)
+              (mac foo($x) `(car:list ,$x))
+              (let x 3
+                foo.x))
+ :should be 3)
+
+
+
 (test "if handles 0 args"
  :valueof (if)
  :should be nil)
@@ -78,10 +87,10 @@
                     4)))
  :should be 1)
 
-(test "lexical scope overrides dynamic scope inside macros"
+(test "or handles lexical scope"
  :valueof (do (assign x 35)
               (let x 3
-                or.x))
+                (or nil x)))
  :should be 3)
 
 
