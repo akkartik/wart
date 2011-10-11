@@ -133,6 +133,27 @@ COMPILE_PRIM_FUNC(str, primFunc_str, L"$args",
   return mkref(newString(out.str()));
 )
 
+COMPILE_PRIM_FUNC(list_set, primFunc_list_set, L"($list $index $val)",
+  Cell* list = lookup(L"$list");
+  long index = toNum(lookup(L"$index"));
+  Cell* val = lookup(L"$val");
+  for (long i = 0; i < index; ++i) {
+    if (!isCons(list))
+      warn << "can't set non-list: " << list << endl;
+    list=cdr(list);
+  }
+  setCar(list, val);
+  return mkref(val);
+)
+
+COMPILE_PRIM_FUNC(list_get, primFunc_list_get, L"($list $index)",
+  Cell* list = lookup(L"$list");
+  int index = toNum(lookup(L"$index"));
+  for (int i = 0; i < index; ++i)
+    list=cdr(list);
+  return mkref(car(list));
+)
+
 COMPILE_PRIM_FUNC(table, primFunc_table, L"()",
   return mkref(newTable());
 )
