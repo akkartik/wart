@@ -133,6 +133,46 @@ COMPILE_PRIM_FUNC(str, primFunc_str, L"$args",
   return mkref(newString(out.str()));
 )
 
+COMPILE_PRIM_FUNC(string_set, primFunc_string_set, L"($string $index $val)",
+  Cell* str = lookup(L"$string");
+  if (!isString(str)) {
+    warn << "can't set non-string: " << str << endl;
+    return nil;
+  }
+
+  size_t index = toNum(lookup(L"$index"));
+  if (index > ((string*)str->car)->length()) { // append works
+    warn << "string too short: " << str << " " << index << endl;
+    return nil;
+  }
+
+  Cell* val = lookup(L"$val");
+  if (!isString(val))
+    warn << "can't set string with non-string: " << val << endl;
+  string c = toString(val);
+  if (c.length() != 1)
+    warn << "can't set string with string: " << c << endl;
+  else
+    ((string*)str->car)->replace(index, 1, c);
+  return mkref(val);
+)
+
+COMPILE_PRIM_FUNC(string_get, primFunc_string_get, L"($string $index)",
+  Cell* str = lookup(L"$string");
+  if (!isString(str)) {
+    warn << "not a string: " << str << endl;
+    return nil;
+  }
+
+  size_t index = toNum(lookup(L"$index"));
+  if (index > ((string*)str->car)->length()-1) {
+    warn << "no such index in string: " << str << " " << index << endl;
+    return nil;
+  }
+
+  return mkref(newString(toString(str).substr(index, 1)));
+)
+
 COMPILE_PRIM_FUNC(list_set, primFunc_list_set, L"($list $index $val)",
   Cell* list = lookup(L"$list");
   long index = toNum(lookup(L"$index"));
