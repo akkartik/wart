@@ -5,6 +5,13 @@
                 foo.x))
  :should be 3)
 
+(test "don't let caller lexical scopes override dynamic bindings"
+ :valueof (do (def bar(x) x)
+              (mac foo(x) (bar x))
+              (let bar nil
+                foo.3))
+ :should be 3)
+
 
 
 (test "if handles 0 args"

@@ -278,7 +278,9 @@ Cell* eval(Cell* expr) {
     newDynamicScope(CURR_LEXICAL_SCOPE, calleeEnv(fn));
   else if (car(fn) == newSym(L"evald-mfn"))
     newDynamicScope(CURR_LEXICAL_SCOPE,
-        newCons(currLexicalScopes.top(), calleeEnv(fn)));
+        newCons(newCons(newCons(nil, currLexicalScopes.top()),
+                        DYNAMIC_SCOPE),
+                calleeEnv(fn)));
   // now bind its params to args in the new environment
   newLexicalScope();
   bindArgs(sig(fn), evaldArgs);
