@@ -36,6 +36,7 @@ void assignDynamicVar(Cell* sym, Cell* val) {
   stack<Cell*>& bindings = dynamics[sym];
   if (bindings.empty()) {
     warn << "No dynamic binding to assign for " << sym << endl;
+    newDynamicScope(sym, val);
     return;
   }
   rmref(bindings.top());
