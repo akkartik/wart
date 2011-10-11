@@ -275,6 +275,16 @@ def lastcons(l)
 
 
 
+def annotate(type val)
+  (list 'type type val)
+
+def rep(x)
+  if (iso 'type car.x)
+    (list_get x 2)
+    x
+
+
+
 mac collect $body
   `(withs ($acc   nil
            yield  (fn(_)
