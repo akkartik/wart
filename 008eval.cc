@@ -295,7 +295,7 @@ Cell* eval(Cell* expr) {
 
   endLexicalScope();
   if (!isPrimFunc(car(fn)))
-    endDynamicScope(L"currLexicalScope");
+    endDynamicScope(CURR_LEXICAL_SCOPE);
   rmref(evaldArgs);
   rmref(realArgs);
   rmref(fn);
