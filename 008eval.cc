@@ -300,6 +300,7 @@ Cell* eval(Cell* expr) {
   if (!isPrimFunc(car(fn)))
     endDynamicScope(CURR_LEXICAL_SCOPE);
 
+  // macros implicitly eval their result in the caller's scope
   if (car(fn) == newSym(L"evald-mfn"))
     result = implicitlyEval(result);
 
