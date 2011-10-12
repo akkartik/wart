@@ -430,14 +430,16 @@ void test_parenthesize_groups_inside_indented_parens() {
 }
 
 void test_parenthesize_passes_through_arglists() {
-  list<Token> tokens = parenthesize(tokenize(stream(L"def foo(a b\n    c d)\n  d e\nnewdef")));
+  list<Token> tokens = parenthesize(tokenize(stream(L"def foo(a (b)\n    c d)\n  d e\nnewdef")));
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, L"("); ++p;
   checkEq(*p, L"def"); ++p;
   checkEq(*p, L"foo"); ++p;
   checkEq(*p, L"("); ++p;
   checkEq(*p, L"a"); ++p;
+  checkEq(*p, L"("); ++p;
   checkEq(*p, L"b"); ++p;
+  checkEq(*p, L")"); ++p;
   checkEq(*p, L"c"); ++p;
   checkEq(*p, L"d"); ++p;
   checkEq(*p, L")"); ++p;

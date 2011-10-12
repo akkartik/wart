@@ -63,12 +63,9 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
                                     return numWords;
                                   }
 
-                                  int parenCount = 0;
                                   void add(list<Token>& l, Token x) {
                                     if (!x.isIndent())
                                       l.push_back(x);
-                                    if (x == L"(") ++parenCount;
-                                    if (x == L")") --parenCount;
                                   }
 
                                   bool parenNotAtStartOfLine(list<Token>::iterator q, list<Token>::iterator begin) {
@@ -96,7 +93,7 @@ list<Token> parenthesize(list<Token> in) {
   list<Token> result;
   stack<int> explicitParenStack; // parens in the original
   stack<int> implicitParenStack; // parens we inserted
-  int suppressInsert = 0;
+  int argParenCount=0; // depth of unprocessed parens not at start of line
 
   list<Token> line;
   Token prevLineIndent=Token::indent(0), thisLineIndent=Token::indent(0), nextLineIndent=Token::indent(0);
@@ -106,7 +103,7 @@ list<Token> parenthesize(list<Token> in) {
     prevLineIndent=thisLineIndent, thisLineIndent=line.front(), nextLineIndent=line.back();
 
     bool insertedParenThisLine = false;
-    if (!suppressInsert && numWordsInLine(line) > 1
+    if (!argParenCount && numWordsInLine(line) > 1
         && !alreadyGrouped(line)
         && !(p != in.begin() && !explicitParenStack.empty() && thisLineIndent.indentLevel == explicitParenStack.top()+1 && thisLineIndent.isIndent())) {
       // open paren
@@ -124,14 +121,13 @@ list<Token> parenthesize(list<Token> in) {
       if (*q == L")")
         explicitParenStack.pop();
 
-      if (parenNotAtStartOfLine(q, line.begin()))
-        suppressInsert = parenCount; // no more paren-insertion until it closes
-
-      if (*q == L")" && parenCount <= suppressInsert) // it closed
-        suppressInsert = 0;
+      if (*q == L"(" && (parenNotAtStartOfLine(q, line.begin()) || argParenCount))
+        ++argParenCount; // no more paren-insertion until it closes
+      if (*q == L")" && argParenCount) // it closed
+        --argParenCount;
     }
 
-    if (suppressInsert) continue;
+    if (argParenCount) continue;
 
     if (nextLineIndent.indentLevel <= thisLineIndent.indentLevel && insertedParenThisLine) {
       // close paren for this line
