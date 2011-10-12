@@ -309,8 +309,8 @@ def deq(q)
 
 
 mac collect $body
-  `(withs ($acc   nil
+  `(withs ($acc   (queue)
            yield  (fn(_)
-                    (push _ $acc)))
+                    (enq _ $acc)))
      ,@$body
-     rev.$acc)
+     (car rep.$acc))
