@@ -94,8 +94,8 @@ list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, 
 
 list<Token> parenthesize(list<Token> in) {
   list<Token> result;
-  stack<int> implicitParenStack;
-  stack<int> explicitParenStack;
+  stack<int> explicitParenStack; // parens in the original
+  stack<int> implicitParenStack; // parens we inserted
   int suppressInsert = 0;
 
   list<Token> line;
