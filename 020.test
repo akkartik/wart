@@ -1,11 +1,3 @@
-(test "macros have access to caller scope"
- :valueof (do
-            (let x 3
-              (mac foo($x) `(cons x ,$x)))
-            (let y 4
-              (foo y)))
- :should be (cons 3 4))
-
 (test "macro caller scope overrides dynamic scope"
  :valueof (do (assign x 35)
               (mac foo($x) `(car:list ,$x))
@@ -13,7 +5,7 @@
                 foo.x))
  :should be 3)
 
-(pending-test "but macro caller scope doesn't override dynamic function bindings"
+(test "but macro caller scope doesn't override dynamic function bindings"
  :valueof (do (def bar(x) x)
               (mac foo(x) (bar x))
               (let bar nil

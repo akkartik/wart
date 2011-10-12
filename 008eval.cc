@@ -235,6 +235,12 @@ Cell* processUnquotes(Cell* x, int depth) {
                                             newCons(body(expr), currLexicalScopes.top())));
                                   }
 
+                                  Cell* implicitlyEval(Cell* x) {
+                                    Cell* result = eval(x);
+                                    rmref(x);
+                                    return result;
+                                  }
+
 Cell* eval(Cell* expr) {
   if (!expr)
     err << "eval: cell should never be NULL" << endl << DIE;
@@ -274,11 +280,8 @@ Cell* eval(Cell* expr) {
   Cell* evaldArgs = evalArgs(sig(fn), realArgs);
 
   // swap in the function's lexical environment
-  if (car(fn) == newSym(L"evald-fn"))
+  if (!isPrimFunc(car(fn)))
     newDynamicScope(CURR_LEXICAL_SCOPE, calleeEnv(fn));
-  else if (car(fn) == newSym(L"evald-mfn"))
-    newDynamicScope(CURR_LEXICAL_SCOPE,
-        newCons(currLexicalScopes.top(), calleeEnv(fn)));
   // now bind its params to args in the new environment
   newLexicalScope();
   bindArgs(sig(fn), evaldArgs);
@@ -296,6 +299,10 @@ Cell* eval(Cell* expr) {
   endLexicalScope();
   if (!isPrimFunc(car(fn)))
     endDynamicScope(CURR_LEXICAL_SCOPE);
+
+  if (car(fn) == newSym(L"evald-mfn"))
+    result = implicitlyEval(result);
+
   rmref(evaldArgs);
   rmref(realArgs);
   rmref(fn);
