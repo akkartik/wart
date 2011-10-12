@@ -1,19 +1,3 @@
-(test "macro caller scope overrides dynamic scope"
- :valueof (do (assign x 35)
-              (mac foo($x) `(car:list ,$x))
-              (let x 3
-                foo.x))
- :should be 3)
-
-(test "but macro caller scope doesn't override dynamic function bindings"
- :valueof (do (def bar(x) x)
-              (mac foo(x) (bar x))
-              (let bar nil
-                foo.3))
- :should be 3)
-
-
-
 (test "if handles 0 args"
  :valueof (if)
  :should be nil)
