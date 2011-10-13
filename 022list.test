@@ -1,3 +1,11 @@
+(test "lists work in function position"
+ :valueof ((list 1 2 3) 1)
+ :should be 2)
+
+(test "lists work in function position - 2"
+ :valueof (let l '(list 1 2 3) l.3)
+ :should be 3)
+
 (test "rem works"
  :valueof (rem no '(1 2 nil 4 nil))
  :should be '(1 2 4))
