@@ -91,6 +91,18 @@ def list args
     (cons car.args
           (list @cdr.args))
 
+
+
+def tag(type val)
+  (list 'type type val)
+
+def rep(x)
+  if (iso 'type car.x)
+    (list_get x 2)
+    x
+
+
+
 def test(msg valueof should expected)
   if (should valueof expected)
     (pr "|")
@@ -128,189 +140,3 @@ mac withs($params . $body)
     `(do ,@$body)
     `(let ,car.$params ,cadr.$params
        (withs ,cddr.$params ,@$body))
-
-mac do1 $body
-  `(ret $ret ,car.$body
-     ,@cdr.$body)
-
-def rem(f seq)
-  if seq
-    if (f car.seq)
-      (rem f cdr.seq)
-      (cons car.seq (rem f cdr.seq))
-
-def keep(f seq)
-  (rem ~f seq)
-
-
-
-mac when($cond . $body)
-  `(if ,$cond
-     (do ,@$body))
-
-mac unless($cond . $body)
-  `(if !,$cond
-     (do ,@$body))
-
-mac iflet($var $expr . $branches)
-  if !$branches
-    $expr
-    `(let $tmp ,$expr
-       if $tmp
-         (let ,$var $tmp
-           ,car.$branches)
-         ,(if cdr.$branches
-            `(iflet ,$var ,@cdr.$branches)))
-
-mac aif($expr . $branches)
-  `(iflet it ,$expr ,@$branches)
-
-mac whenlet($var $test . $body)
-  `(iflet ,$var ,$test
-      (do ,@$body))
-
-mac whenlet($var $test . $body)
-  `(let ,$var ,$test
-     when ,$var
-       ,@$body)
-
-mac awhen($test . $body)
-  `(whenlet it ,$test
-      ,@$body)
-
-; while (> x 0) prn.x (assign x (- x 1))
-mac while($test . $body)
-  `(when ,$test
-     ,@$body
-     while ,$test
-       ,@$body)
-
-mac whilet($var $test . $body)
-  `(let ,$var nil
-     while (assign ,$var ,$test)
-       ,@$body)
-
-mac awhile($test . $body)
-  `(whilet it ,$test
-     ,@$body)
-
-mac for($var $start $test $update . $body)
-  `(let ,$var ,$start
-     while ,$test
-       ,@$body
-       ,$update)
-
-mac each($var $expr . $body)
-  `(for $i ,$expr $i (zap cdr $i)
-      let ,$var car.$i
-        ,@$body)
-
-mac repeat($n . $body)
-  `(for $i 0 (< $i ,$n) ++.$i
-     ,@$body)
-
-
-
-let $table table
-  def table args
-    ret t ($table)
-      each (k v) pair.args
-        (table_set t k v)
-
-
-
-def zip(a b)
-  if (and a b)
-    (cons (list car.a car.b)
-          (zip cdr.a cdr.b))
-
-def pairwise(xs)
-  (zip xs cdr.xs)
-
-def map(f xs)
-  if xs
-    (cons (f car.xs)
-          (map f cdr.xs))
-
-def reduce(f xs)
-  if cddr.xs
-    (reduce f (cons (f car.xs cadr.xs)
-                    cddr.xs))
-    (f @xs)
-
-def all(f xs)
-  (and @(map f xs))
-
-def some(f xs)
-  (or @(map f xs))
-
-assign any some
-
-mac zap($f $x)
-  `(assign ,$x (,$f ,$x))
-
-mac push($x $xs)
-  `(assign ,$xs (cons ,$x ,$xs))
-
-mac pop($xs)
-  `(do1
-     (car ,$xs)
-     (zap cdr ,$xs))
-
-def rev(xs acc)
-  if !xs
-    acc
-    (rev cdr.xs
-         (cons car.xs acc))
-
-def len(l)
-  if l
-    (+ 1 (len cdr.l))
-    0
-
-def lastcons(l)
-  aif cdr.l
-    lastcons.it
-    l
-
-
-
-def tag(type val)
-  (list 'type type val)
-
-def rep(x)
-  if (iso 'type car.x)
-    (list_get x 2)
-    x
-
-
-
-def queue(l)
-  (tag 'queue (list l lastcons.l len.l))
-
-def enq(x q)
-  ret x
-    let (l last len) rep.q
-      (list_set rep.q 2 (+ len 1))
-      if !l
-        (list_set rep.q 1
-                  (list_set rep.q 0 list.x))
-        (do
-          (set_cdr last list.x)
-          (list_set rep.q 1 cdr.last))
-
-def deq(q)
-  let (l last len) rep.q
-    ret ans car.l
-      unless zero?.len
-        (list_set rep.q 2 (- len 1))
-      (list_set rep.q 0 cdr.l)
-
-
-
-mac collect $body
-  `(withs ($acc   (queue)
-           yield  (fn(_)
-                    (enq _ $acc)))
-     ,@$body
-     (car rep.$acc))

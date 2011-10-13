@@ -1,3 +1,9 @@
+(pending-test "@splice works with compose"
+ :valueof (car:cons @'(1 (2 3)))
+ :should be 1)
+
+
+
 (test "if handles 0 args"
  :valueof (if)
  :should be nil)
@@ -162,22 +168,6 @@
  :valueof (pair '(1 2 3 4 5))
  :should be '((1 2) (3 4) (5)))
 
-(pending-test "@splice works with compose"
- :valueof (car:cons @'(1 (2 3)))
- :should be 1)
-
 (test "withs works"
  :valueof (withs (x 3 y '(1 2 3)) (+ x @y))
  :should be 9)
-
-(test "rem works"
- :valueof (rem no '(1 2 nil 4 nil))
- :should be '(1 2 4))
-
-(test "keep works"
- :valueof (keep odd? '(11 12 13))
- :should be '(11 13))
-
-(test "collect/yield works"
- :valueof (collect:for i 1 (< i 4) ++.i yield.i)
- :should be '(1 2 3))

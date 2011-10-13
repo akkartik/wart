@@ -1,0 +1,66 @@
+mac when($cond . $body)
+  `(if ,$cond
+     (do ,@$body))
+
+mac unless($cond . $body)
+  `(if !,$cond
+     (do ,@$body))
+
+mac iflet($var $expr . $branches)
+  if !$branches
+    $expr
+    `(let $tmp ,$expr
+       if $tmp
+         (let ,$var $tmp
+           ,car.$branches)
+         ,(if cdr.$branches
+            `(iflet ,$var ,@cdr.$branches)))
+
+mac aif($expr . $branches)
+  `(iflet it ,$expr ,@$branches)
+
+mac whenlet($var $test . $body)
+  `(iflet ,$var ,$test
+      (do ,@$body))
+
+mac whenlet($var $test . $body)
+  `(let ,$var ,$test
+     when ,$var
+       ,@$body)
+
+mac awhen($test . $body)
+  `(whenlet it ,$test
+      ,@$body)
+
+
+
+; while (> x 0) prn.x (assign x (- x 1))
+mac while($test . $body)
+  `(when ,$test
+     ,@$body
+     while ,$test
+       ,@$body)
+
+mac whilet($var $test . $body)
+  `(let ,$var nil
+     while (assign ,$var ,$test)
+       ,@$body)
+
+mac awhile($test . $body)
+  `(whilet it ,$test
+     ,@$body)
+
+mac for($var $start $test $update . $body)
+  `(let ,$var ,$start
+     while ,$test
+       ,@$body
+       ,$update)
+
+mac each($var $expr . $body)
+  `(for $i ,$expr $i (zap cdr $i)
+      let ,$var car.$i
+        ,@$body)
+
+mac repeat($n . $body)
+  `(for $i 0 (< $i ,$n) ++.$i
+     ,@$body)

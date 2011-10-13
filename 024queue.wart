@@ -1,0 +1,20 @@
+def queue(l)
+  (tag 'queue (list l lastcons.l len.l))
+
+def enq(x q)
+  ret x
+    let (l last len) rep.q
+      (list_set rep.q 2 (+ len 1))
+      if !l
+        (list_set rep.q 1
+                  (list_set rep.q 0 list.x))
+        (do
+          (set_cdr last list.x)
+          (list_set rep.q 1 cdr.last))
+
+def deq(q)
+  let (l last len) rep.q
+    ret ans car.l
+      unless zero?.len
+        (list_set rep.q 2 (- len 1))
+      (list_set rep.q 0 cdr.l)
