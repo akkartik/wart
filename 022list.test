@@ -13,7 +13,3 @@
 (test "keep works"
  :valueof (keep odd? '(11 12 13))
  :should be '(11 13))
-
-(test "collect/yield works"
- :valueof (collect:for i 1 (< i 4) ++.i yield.i)
- :should be '(1 2 3))
