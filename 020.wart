@@ -17,7 +17,7 @@ def compose(f g)
     `(,f (,g ,@$args))
 
 def complement(f)
-  (compose no f)
+  (compose not f)
 
 mac do $body
   `((fn() ,@$body))
