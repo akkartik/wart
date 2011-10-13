@@ -34,7 +34,6 @@ mac awhen($test . $body)
 
 
 
-; while (> x 0) prn.x (assign x (- x 1))
 mac while($test . $body)
   `(when ,$test
      ,@$body
