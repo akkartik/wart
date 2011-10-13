@@ -1,3 +1,11 @@
+(test "compose works"
+ :valueof ((compose (fn(_) (+ _ 1)) (fn(a b) (+ a b))) 3 4)
+ :should be 8)
+
+(test "compose works with macros"
+ :valueof (ret x nil ((compose if assign) x 3))
+ :should be 3)
+
 (pending-test "@splice works with compose"
  :valueof (car:cons @'(1 (2 3)))
  :should be 1)

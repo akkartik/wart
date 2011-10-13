@@ -6,9 +6,6 @@ assign mac (mfn '($name $params . $body)
 mac def($name $params . $body)
   `(assign ,$name (fn ,$params ,@$body))
 
-; ((compose f g) . args <=> (f (g . args))
-; prn:assign x 3 => x=3
-; (let a 3 (prn:assign x a)) => x=3
 def compose(f g)
   mfn '$args
     `(,f (,g ,@$args))
