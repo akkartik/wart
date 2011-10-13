@@ -177,6 +177,36 @@ Cell* get(Cell* t, Cell* k) {
 
 
 
+Cell* type(Cell* x) {
+  Cell* result = nil;
+  switch(x->type) {
+  case NUM:
+    result = newSym(L"number"); break;
+  case SYM:
+    result = newSym(L"symbol"); break;
+  case STRING:
+    result = newSym(L"string"); break;
+  case TABLE:
+    result = newSym(L"table"); break;
+  case PRIM_FUNC:
+    result = newSym(L"function"); break;
+  case CONS:
+    if (x == nil) break;
+    if (car(x) == newSym(L"fn") || car(x) == newSym(L"evald-fn"))
+      result = newSym(L"function");
+    else if (car(x) == newSym(L"type"))
+      result = car(cdr(x));
+    else
+      result = newSym(L"list");
+    break;
+  default:
+    err << "Undefined type: " << x->type << endl << DIE;
+  }
+  return result;
+}
+
+
+
                                   ostream& operator<<(ostream& os, Cell* c);
 
                                   ostream& operator<<(ostream& os, Table* t) {

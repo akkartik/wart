@@ -226,32 +226,7 @@ COMPILE_PRIM_FUNC(table_get, primFunc_table_get, L"($table $key)",
 )
 
 COMPILE_PRIM_FUNC(type, primFunc_type, L"($x)",
-  Cell* x = lookup(L"$x");
-  Cell* result = nil;
-  if (x != nil)
-    switch(x->type) {
-    case NUM:
-      result = newSym(L"number"); break;
-    case SYM:
-      result = newSym(L"symbol"); break;
-    case STRING:
-      result = newSym(L"string"); break;
-    case TABLE:
-      result = newSym(L"table"); break;
-    case PRIM_FUNC:
-      result = newSym(L"function"); break;
-    case CONS:
-      if (car(x) == newSym(L"fn") || car(x) == newSym(L"evald-fn"))
-        result = newSym(L"function");
-      else if (car(x) == newSym(L"type"))
-        result = car(cdr(x));
-      else
-        result = newSym(L"list");
-      break;
-    default:
-      err << "Undefined type: " << x->type << endl << DIE;
-    }
-  return mkref(result);
+  return mkref(type(lookup(L"$x")));
 )
 
 
