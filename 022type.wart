@@ -17,3 +17,6 @@ mac defcoerce($src $dest $f)
      if (~table_get coercions* ',$dest)
        (table_set coercions* ',$dest (table))
      (table_set (table_get coercions* ',$dest) ',$src ,$f))
+
+mac defcall($src $params . $body)
+  `(defcoerce ,$src function (fn ,$params ,@$body))

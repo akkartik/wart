@@ -1,6 +1,5 @@
-defcoerce list function
-  (fn(_)
-    (fn(idx) (list_get _ idx)))
+defcall list(_)
+  (fn(idx) (list_get _ idx))
 
 mac do1 $body
   `(ret $ret ,car.$body
