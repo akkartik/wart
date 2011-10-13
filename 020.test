@@ -1,3 +1,13 @@
 (pending-test "@splice works with compose"
  :valueof (car:cons @'(1 (2 3)))
  :should be 1)
+
+
+
+(test "let works"
+ :valueof (let x 3 (+ x 1))
+ :should be 4)
+
+(test "let destructures"
+ :valueof (let (a . b) (cons 3 4) (+ a b))
+ :should be 7)

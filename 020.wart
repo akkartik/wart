@@ -16,6 +16,9 @@ def compose(f g)
 def complement(f)
   (compose not f)
 
+mac let($var $val . $body)
+  `((fn(,$var) ,@$body) ,$val)
+
 mac do $body
   `((fn() ,@$body))
 
