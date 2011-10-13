@@ -100,7 +100,7 @@ COMPILE_PRIM_FUNC(debug, primFunc_debug, L"($x)",
   return nil;
 )
 
-COMPILE_PRIM_FUNC(incFailures, primFunc_incTests, L"()",
+COMPILE_PRIM_FUNC(inc_failures, primFunc_incTests, L"()",
   ++numFailures;
   return nil;
 )
