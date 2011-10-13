@@ -2,6 +2,21 @@ let $iso iso ; ignore later refinements
   def isa(x 't)
     ($iso t type.x)
 
+def sym?(_)
+  (isa _ symbol)
+def list?(_)
+  (isa _ list)
+def num?(_)
+  (isa _ number)
+def str?(_)
+  (isa _ string)
+def table?(_)
+  (isa _ table)
+def fn?(_)
+  (isa _ function)
+
+
+
 def tag(type val)
   (list 'type type val)
 
