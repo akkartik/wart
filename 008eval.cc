@@ -241,6 +241,14 @@ Cell* processUnquotes(Cell* x, int depth) {
                                     return result;
                                   }
 
+                                  Cell* functionify(Cell* obj) {
+                                    if (obj == nil) return obj;
+                                    Cell* coerceExpr = newCons(newSym(L"coerce-quoted"), newCons(obj, newCons(newSym(L"function"), nil)));
+                                    rmref(obj);
+                                    Cell* ans = eval(coerceExpr);
+                                    return ans;
+                                  }
+
 Cell* eval(Cell* expr) {
   if (!expr)
     err << "eval: cell should never be NULL" << endl << DIE;
@@ -272,6 +280,8 @@ Cell* eval(Cell* expr) {
 
   // expr is a function call
   Cell* fn = eval(car(expr));
+  if (!isFunc(fn))
+    fn = functionify(fn);
   if (!isFunc(fn))
     err << "not a function call: " << expr << endl << DIE;
 

@@ -104,6 +104,8 @@ def rep(x)
 assign coercions* (table)
 
 def coerce(x 'dest-type)
+  (coerce-quoted x dest-type)
+def coerce-quoted'(x dest-type)
   ((table_get (table_get coercions* dest-type) type.x) x)
 
 mac defcoerce($src $dest $f)
