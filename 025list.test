@@ -1,3 +1,7 @@
+(test "lists coerce to function"
+ :valueof (type:coerce '(1 2 3) function)
+ :should be 'function)
+
 (test "lists work in function position"
  :valueof ((list 1 2 3) 1)
  :should be 2)
