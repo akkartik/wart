@@ -120,8 +120,8 @@ def test(msg valueof should expected)
   if (should valueof expected)
     (pr "|")
     (do
-      (inc_failures)
-      (prn)
+      inc_failures.
+      prn.
       (prn "F " msg)
       (prn "  got " valueof))
 
