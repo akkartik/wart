@@ -101,6 +101,17 @@ def rep(x)
     (list_get x 2)
     x
 
+assign coercions* (table)
+
+def coerce(x 'dest-type)
+  ((table_get (table_get coercions* dest-type) type.x) x)
+
+mac defcoerce($src $dest $f)
+  `(do
+     if (~table_get coercions* ',$dest)
+       (table_set coercions* ',$dest (table))
+     (table_set (table_get coercions* ',$dest) ',$src ,$f))
+
 
 
 def test(msg valueof should expected)
