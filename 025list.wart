@@ -30,8 +30,7 @@ def all(f xs)
 
 def some(f xs)
   (or @(map f xs))
-
-assign any some
+alias any some
 
 def zip(a b)
   if (and a b)

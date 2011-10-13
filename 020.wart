@@ -6,6 +6,10 @@ assign mac (mfn '($name $params . $body)
 mac def($name $params . $body)
   `(assign ,$name (fn ,$params ,@$body))
 
+mac alias(new old)
+  `(def ,new $args
+     (,old @$args))
+
 def compose(f g)
   mfn '$args
     `(,f (,g ,@$args))
@@ -38,9 +42,5 @@ def test(msg valueof should expected)
 def pending-test'(msg valueof should expected)
   prn.
   (prn "pending: " msg)
-
-mac alias(new old)
-  `(def ,new $args
-     (,old @$args))
 
 alias be iso

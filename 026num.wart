@@ -27,7 +27,7 @@ let $% %
     (all (fn((x y)) ($> y x))
          pairwise.xs))
 
-assign exceed > ; for testing
+alias exceed > ; for testing
 
 mac ++($n)
   `(assign ,$n (+ ,$n 1))

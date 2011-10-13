@@ -1,5 +1,5 @@
-assign nil? not
-assign no nil?
+alias nil? not
+alias no not
 
 assign cadr car:cdr
 assign cddr cdr:cdr
