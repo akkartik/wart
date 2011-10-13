@@ -32,7 +32,7 @@ def prn args
 
 def test(msg valueof should expected)
   if (should valueof expected)
-    (pr "|")
+    (pr ",")
     (do
       inc_failures.
       prn.

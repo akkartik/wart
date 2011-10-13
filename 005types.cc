@@ -215,7 +215,7 @@ Cell* type(Cell* x) {
                                       if (p->second)
                                         os << (Cell*)p->first << ", ";
                                     }
-                                    return os << "}" << endl;
+                                    return os << "}";
                                   }
 
                                   ostream& operator<<(ostream& os, Cell* c) {
@@ -240,7 +240,7 @@ Cell* type(Cell* x) {
                                     case TABLE:
                                       os << (Table*)c->car;
                                       if (cdr(c) != nil)
-                                        os << " , " << cdr(c);
+                                        os << "->" << cdr(c);
                                       return os;
                                     case PRIM_FUNC:
                                       return os << "#compiled";
