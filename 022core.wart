@@ -31,8 +31,8 @@ mac and $args
 let $iso iso
   def iso(a b)
     or ($iso a b)
-      and ($iso 'list type.a)
-          ($iso 'list type.b)
+      and (isa a list)
+          (isa a list)
           (iso car.a car.b)
           (iso cdr.a cdr.b)
 

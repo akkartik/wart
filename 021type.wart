@@ -1,3 +1,7 @@
+let $iso iso ; ignore later refinements
+  def isa(x 't)
+    ($iso t type.x)
+
 def tag(type val)
   (list 'type type val)
 
