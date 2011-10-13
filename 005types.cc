@@ -238,9 +238,9 @@ Cell* type(Cell* x) {
                                     case STRING:
                                       return os << toString(c);
                                     case TABLE:
-                                      os << "(" << (Table*)c->car;
+                                      os << (Table*)c->car;
                                       if (cdr(c) != nil)
-                                        os << " . " << cdr(c) << ")";
+                                        os << " , " << cdr(c);
                                       return os;
                                     case PRIM_FUNC:
                                       return os << "#compiled";
