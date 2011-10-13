@@ -129,7 +129,11 @@ def pending-test'(msg valueof should expected)
   prn.
   (prn "pending: " msg)
 
-assign be iso
+mac alias(new old)
+  `(def ,new $args
+     (,old @$args))
+
+alias be iso
 
 
 
