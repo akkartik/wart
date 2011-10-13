@@ -1,0 +1,157 @@
+(test "if handles 0 args"
+ :valueof (if)
+ :should be nil)
+
+(test "if handles 1 arg"
+ :valueof if.3
+ :should be 3)
+
+(test "if handles 2 args"
+ :valueof (if 3 4)
+ :should be 4)
+
+(test "if handles then branch"
+ :valueof (if 3 4 5)
+ :should be 4)
+
+(test "if handles else branch"
+ :valueof (if nil 4 5)
+ :should be 5)
+
+(test "if handles 3 args"
+ :valueof (if nil 4 5)
+ :should be 5)
+
+(test "if handles 4 args"
+ :valueof (if nil 4 5 6)
+ :should be 6)
+
+(test "if handles 5 args"
+ :valueof (if nil 4 nil 6 7)
+ :should be 7)
+
+(test "if handles :else"
+ :valueof (if nil 4 :else 6)
+ :should be 6)
+
+(test "if handles lexical scope"
+ :valueof (let x 34 (if x))
+ :should be 34)
+
+(test "if handles dynamic scope"
+ :valueof (do (assign x 34)
+              (if x 35))
+ :should be 35)
+
+
+
+(test "or handles 0 args"
+ :valueof or.
+ :should be nil)
+
+(test "or handles nil arg"
+ :valueof or.nil
+ :should be nil)
+
+(test "or handles non-nil arg"
+ :valueof or.3
+ :should be 3)
+
+(test "or handles 2 args"
+ :valueof (or nil 3)
+ :should be 3)
+
+(test "or handles multiple non-nil args"
+ :valueof (or 3 4)
+ :should be 3)
+
+(test "or short-circuits on first non-nil arg"
+ :valueof (ret x nil
+            (or 3 (assign x 4)))
+ :should be nil)
+
+(test "or evals each arg at most once"
+ :valueof (ret x 0
+            (or (do (assign x (+ x 1))
+                    3)
+                (do (assign x (+ x 1))
+                    4)))
+ :should be 1)
+
+(test "or handles lexical scope"
+ :valueof (do (assign x 35)
+              (let x 3
+                (or nil x)))
+ :should be 3)
+
+
+
+(test "and handles 0 args"
+ :valueof and.
+ :should ~be nil)
+
+(test "and handles nil arg"
+ :valueof and.nil
+ :should be nil)
+
+(test "and handles non-nil arg"
+ :valueof and.3
+ :should be 3)
+
+(test "and handles 2 args"
+ :valueof (and nil 3)
+ :should be nil)
+
+(test "and handles 2 non-nil args"
+ :valueof (and 3 4)
+ :should be 4)
+
+(test "and handles lexical scope"
+ :valueof ((fn(x) (and 3 x 4)) nil)
+ :should be nil)
+
+(test "and short-circuits"
+ :valueof (ret x 0
+            (and (assign x 3)
+                 nil
+                 (assign x 4)))
+ :should be 3)
+
+(test "and handles dynamic scope"
+ :valueof (do (assign x 35)
+              (and x 36))
+ :should be 36)
+
+
+
+(test "iso handles nils"
+ :valueof (iso nil 3)
+ :should be nil)
+
+(test "iso compares nils"
+ :valueof (iso nil nil)
+ :should ~be nil)
+
+(test "iso handles ints"
+ :valueof (iso 3 4)
+ :should be nil)
+
+(test "iso handles ints - 2"
+ :valueof (iso 3 3)
+ :should ~be nil)
+
+(test "iso handles strings"
+ :valueof (iso "a" "b")
+ :should be nil)
+
+(test "iso handles strings - 2"
+ :valueof (iso "a" "a")
+ :should ~be nil)
+
+(test "iso handles lists"
+ :valueof (iso list.1 list.2)
+ :should be nil)
+
+(test "iso handles lists - 2"
+ :valueof (iso list.1 list.1)
+ :should ~be nil)

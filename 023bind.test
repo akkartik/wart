@@ -1,0 +1,7 @@
+(test "pair works"
+ :valueof (pair '(1 2 3 4 5))
+ :should be '((1 2) (3 4) (5)))
+
+(test "withs works"
+ :valueof (withs (x 3 y '(1 2 3)) (+ x @y))
+ :should be 9)

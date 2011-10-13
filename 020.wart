@@ -1,6 +1,3 @@
-assign nil? not
-assign no nil?
-
 ; (mac foo(x) `(+ 1 ,x))) (let x 3 (foo x)) => 4
 assign mac (mfn '($name $params . $body)
   `(assign ,$name (mfn ',$params
@@ -22,99 +19,12 @@ def complement(f)
 mac do $body
   `((fn() ,@$body))
 
-mac proc($name $params . $body)
-  `(def ,$name ,$params
-     ,@$body
-     nil)
-
-mac ret($var $val . $body)
-  `(let ,$var ,$val
-     ,@$body
-     ,$var)
-
-mac rfn($name $params . $body)
-  `(ret ,$name nil
-      assign ,$name (fn ,$params ,@$body))
-
-mac afn($params . $body)
-  `(rfn self ,$params ,@$body)
-
 
 
 def prn args
   (pr (str @args "
 "))
   car.args
-
-assign cadr car:cdr
-assign cddr cdr:cdr
-
-; let x 3 (+ x 1) => 4
-; let (a . b) (cons 3 4) (+ a b) => 7
-mac let($var $val . $body)
-  `((fn(,$var) ,@$body) ,$val)
-
-let $if if
-  mac if $args
-    $if (~cdr $args)
-      car.$args
-      `(,$if ,car.$args
-         ,cadr.$args
-         (if ,@cddr.$args))
-
-mac or $args
-  if $args
-    `(let $x ,car.$args
-       if $x
-         $x
-         or ,@cdr.$args)
-
-mac and $args
-  if !$args
-    1
-    if car.$args
-      if !cdr.$args
-        car.$args
-        `(if ,car.$args
-           and ,@cdr.$args)
-
-let $iso iso
-  def iso(a b)
-    or ($iso a b)
-      and ($iso 'list type.a)
-          ($iso 'list type.b)
-          (iso car.a car.b)
-          (iso cdr.a cdr.b)
-
-def list args
-  if args
-    (cons car.args
-          (list @cdr.args))
-
-
-
-def tag(type val)
-  (list 'type type val)
-
-def rep(x)
-  if (iso 'type car.x)
-    (list_get x 2)
-    x
-
-assign coercions* (table)
-
-def coerce(x 'dest-type)
-  (coerce-quoted x dest-type)
-def coerce-quoted'(x dest-type)
-  ((table_get (table_get coercions* dest-type) type.x) x)
-
-mac defcoerce($src $dest $f)
-  `(do
-     if (~table_get coercions* ',$dest)
-       (table_set coercions* ',$dest (table))
-     (table_set (table_get coercions* ',$dest) ',$src ,$f))
-
-
 
 def test(msg valueof should expected)
   if (should valueof expected)
@@ -134,26 +44,3 @@ mac alias(new old)
      (,old @$args))
 
 alias be iso
-
-
-
-def pair(l)
-  (if
-    !l
-      nil
-    !cdr.l
-      (list:list car.l)
-    :else
-      (cons (list car.l cadr.l)
-            pair cddr.l))
-
-mac with($params . $body)
-  `((fn ,(map car pair.$params)
-     ,@$body)
-    ,@(map cadr pair.$params))
-
-mac withs($params . $body)
-  if !$params
-    `(do ,@$body)
-    `(let ,car.$params ,cadr.$params
-       (withs ,cddr.$params ,@$body))

@@ -42,16 +42,6 @@ def zip(a b)
 def pairwise(xs)
   (zip xs cdr.xs)
 
-
-
-let $table table
-  def table args
-    ret t ($table)
-      each (k v) pair.args
-        (table_set t k v)
-
-
-
 def rev(xs acc)
   if !xs
     acc

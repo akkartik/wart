@@ -1,0 +1,19 @@
+def tag(type val)
+  (list 'type type val)
+
+def rep(x)
+  if (iso 'type car.x)
+    (list_get x 2)
+    x
+
+def coerce(x 'dest-type)
+  (coerce-quoted x dest-type)
+assign coercions* (table)
+def coerce-quoted'(x dest-type)
+  ((table_get (table_get coercions* dest-type) type.x) x)
+
+mac defcoerce($src $dest $f)
+  `(do
+     if (~table_get coercions* ',$dest)
+       (table_set coercions* ',$dest (table))
+     (table_set (table_get coercions* ',$dest) ',$src ,$f))

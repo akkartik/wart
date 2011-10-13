@@ -1,0 +1,47 @@
+assign nil? not
+assign no nil?
+
+assign cadr car:cdr
+assign cddr cdr:cdr
+
+; let x 3 (+ x 1) => 4
+; let (a . b) (cons 3 4) (+ a b) => 7
+mac let($var $val . $body)
+  `((fn(,$var) ,@$body) ,$val)
+
+let $if if
+  mac if $args
+    $if (~cdr $args)
+      car.$args
+      `(,$if ,car.$args
+         ,cadr.$args
+         (if ,@cddr.$args))
+
+mac or $args
+  if $args
+    `(let $x ,car.$args
+       if $x
+         $x
+         or ,@cdr.$args)
+
+mac and $args
+  if !$args
+    1
+    if car.$args
+      if !cdr.$args
+        car.$args
+        `(if ,car.$args
+           and ,@cdr.$args)
+
+let $iso iso
+  def iso(a b)
+    or ($iso a b)
+      and ($iso 'list type.a)
+          ($iso 'list type.b)
+          (iso car.a car.b)
+          (iso cdr.a cdr.b)
+
+def list args
+  if args
+    (cons car.args
+          (list @cdr.args))

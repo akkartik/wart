@@ -1,0 +1,39 @@
+def pair(l)
+  (if
+    !l
+      nil
+    !cdr.l
+      (list:list car.l)
+    :else
+      (cons (list car.l cadr.l)
+            pair cddr.l))
+
+mac with($params . $body)
+  `((fn ,(map car pair.$params)
+     ,@$body)
+    ,@(map cadr pair.$params))
+
+mac withs($params . $body)
+  if !$params
+    `(do ,@$body)
+    `(let ,car.$params ,cadr.$params
+       (withs ,cddr.$params ,@$body))
+
+
+
+mac proc($name $params . $body)
+  `(def ,$name ,$params
+     ,@$body
+     nil)
+
+mac ret($var $val . $body)
+  `(let ,$var ,$val
+     ,@$body
+     ,$var)
+
+mac rfn($name $params . $body)
+  `(ret ,$name nil
+      assign ,$name (fn ,$params ,@$body))
+
+mac afn($params . $body)
+  `(rfn self ,$params ,@$body)
