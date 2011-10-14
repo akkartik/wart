@@ -245,7 +245,9 @@ Cell* processUnquotes(Cell* x, int depth) {
                                     if (obj == nil) return obj;
                                     Cell* coerceExpr = newCons(newSym(L"coerce-quoted"), newCons(obj, newCons(newSym(L"function"), nil)));
                                     rmref(obj);
-                                    return eval(coerceExpr);
+                                    Cell* ans = eval(coerceExpr);
+                                    rmref(coerceExpr);
+                                    return ans;
                                   }
 
 Cell* eval(Cell* expr) {
