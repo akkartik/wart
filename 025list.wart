@@ -1,5 +1,5 @@
-defcall list(_)
-  (fn(idx) (list_get _ idx))
+defcall list(l idx)
+  (list_get l idx)
 
 defset list(l idx val)
   (list_set l idx val)

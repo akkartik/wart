@@ -38,7 +38,10 @@ mac defcoerce($src $dest $f)
      (table_set (table_get coercions* ',$dest) ',$src ,$f))
 
 mac defcall($type $params . $body)
-  `(defcoerce ,$type function (fn ,$params ,@$body))
+  `(defcoerce ,$type function
+     (fn(,car.$params)
+       (fn ,cdr.$params
+         ,@$body)))
 
 
 
