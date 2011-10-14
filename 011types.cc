@@ -1,4 +1,4 @@
-//// Primitive types
+//// operations on primitive types
 
 COMPILE_PRIM_FUNC(type, primFunc_type, L"($x)",
   return mkref(type(lookup(L"$x")));
@@ -18,6 +18,8 @@ COMPILE_PRIM_FUNC(iso, primFunc_iso, L"($x $y)",
     result = nil;
   return mkref(result);
 )
+
+
 
 COMPILE_PRIM_FUNC(sym, primFunc_sym, L"$args",
   ostringstream out;

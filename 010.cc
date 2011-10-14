@@ -1,4 +1,4 @@
-//// Compiled primitives
+//// core compiled primitives
 
 // primFuncs take $vars as params.
 // $vars needn't turn into gensyms if primFuncs don't call each other.
