@@ -147,7 +147,7 @@ void rmref(Cell* c) {
 
 Cell* car(Cell* x) {
   if (x->type != CONS) {
-    warn << "car of non-cons, type " << x -> type << endl;
+    warn << "car of non-cons: " << x << endl;
     return nil;
   }
   return x->car;
