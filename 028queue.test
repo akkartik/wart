@@ -1,0 +1,3 @@
+(test "enq returns the elem being enqueued"
+ :valueof (enq 3 queue.)
+ :should be 3)
