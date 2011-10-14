@@ -2,7 +2,7 @@ def queue(l)
   (tag 'queue (list l lastcons.l len.l))
 
 def enq(x q)
-  ret x x
+  do1 x
     let (l last len) rep.q
       (= rep.q.2 (+ len 1))
       if !l
