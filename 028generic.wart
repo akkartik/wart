@@ -1,0 +1,23 @@
+; given params, return code to construct the args
+; (arg1 arg2 . body) => `(,arg1 ,arg2 ,@body)
+def unquotify(args)
+  if list?.args
+    `(cons ,car.args ,(unquotify cdr.args))
+    args
+
+let $mac mac
+  mac mac($name $params . $body)
+    if (~iso :case car.$body)
+      `(,$mac ,$name ,$params ,@$body)
+      `(let super ,$name
+         (,$mac ,$name ,$params
+           if ,cadr.$body
+             (do ,@cddr.$body)
+             ,(list 'cons 'super unquotify.$params))) ; call super with params
+
+mac def($name $params . $body) :case (iso :case car.$body)
+  `(let $old ,$name
+     (,super ,$name ,$params
+       if ,cadr.$body
+         (do ,@$body)
+         ($old ,@$params)))
