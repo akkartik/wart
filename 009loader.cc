@@ -20,8 +20,8 @@ void loadFile(ascii* filename) {
                                       if (n < extn) continue;
                                       if (strncmp(&files[i]->d_name[n-extn], ext, extn)) continue;
                                       if (!isdigit(files[i]->d_name[0])) continue;
-                                      ascii* s = new ascii[strlen(files[i]->d_name)]; // leak
-                                      strcpy(s, files[i]->d_name);
+                                      ascii* s = new ascii[n+1]; // leak
+                                      strncpy(s, files[i]->d_name, n+1);
                                       result.push_back(s);
                                     }
                                     return result;
