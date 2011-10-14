@@ -1,4 +1,5 @@
 #!/usr/bin/env zsh
+setopt extendedglob
 
 if [[ $# -eq 0 && `git diff HEAD |wc -l` -gt 0 ]]
 then
@@ -15,8 +16,8 @@ fi
 
 #
 
-index=0
-ls [0-9]*.(lisp|wart) |perl -pwe 's/\..*//' |
+index=1
+ls [0-9](^*test.)cc [0-9]*.wart |sort -n |perl -pwe 's/\..*//' |
   while read file
   do
     while [[ $file != `printf "%03d" $index`* ]]
@@ -36,7 +37,7 @@ root() {
   echo $1 |perl -pwe 's/^[0-9]*//' |perl -pwe 's/\..*//'
 }
 
-index=0
+index=1
 cat .layout |
   while read file
   do
@@ -45,10 +46,10 @@ cat .layout |
       newfile=`printf "%03d" $index``root $file`
       if [[ $newfile != $file ]]
       then
-        [[ -f $file.lisp ]] && git mv $file.lisp $newfile.lisp
-        [[ -f $file.test ]] && git mv $file.test $newfile.test
+        [[ -f $file.cc ]] && git mv $file.cc $newfile.cc
+        [[ -f $file.test.cc ]] && git mv $file.test.cc $newfile.test.cc
         [[ -f $file.wart ]] && git mv $file.wart $newfile.wart
-        [[ -f $file.wtst ]] && git mv $file.wtst $newfile.wtst
+        [[ -f $file.test ]] && git mv $file.test $newfile.test
       fi
     fi
     index=$(($index+1))
