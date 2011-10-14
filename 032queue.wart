@@ -15,3 +15,18 @@ def deq(q)
       unless zero?.len
         (= rep.q.2 (- len 1))
       (= rep.q.0 cdr.l)
+
+let $def def
+  mac def($name $params . $body)
+    if (~iso :case car.$body)
+      `(,$def ,$name ,$params ,@$body)
+      `(let $old ,$name
+         ,$def ,$name ,$params
+           if ,cadr.$body
+             (do ,@$body)
+             ($old ,@$params))
+
+def len(x) :case (isa x queue)
+  rep.x.2
+
+prn:len:queue '(1 2 3 4)
