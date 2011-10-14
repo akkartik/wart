@@ -60,16 +60,3 @@ def lastcons(l)
   aif cdr.l
     lastcons.it
     l
-
-
-
-mac zap($f $x)
-  `(= ,$x (,$f ,$x))
-
-mac push($x $xs)
-  `(= ,$xs (cons ,$x ,$xs))
-
-mac pop($xs)
-  `(do1
-     (car ,$xs)
-     (zap cdr ,$xs))
