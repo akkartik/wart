@@ -20,7 +20,7 @@ void test_cons_works() {
 }
 
 void test_assign_to_fn() {
-  Cell* fn = wartRead(stream(L"assign foo (fn() 34)")).front();
+  Cell* fn = wartRead(stream(L"= foo (fn() 34)")).front();
   Cell* def = eval(fn);
   Cell* scope = calleeEnv(lookup(L"foo"));
   checkEq(scope, nil);
@@ -30,7 +30,7 @@ void test_assign_to_fn() {
 }
 
 void test_assign_lexical_var() {
-  Cell* fn = wartRead(stream(L"((fn(x) (assign x 34) x))")).front();
+  Cell* fn = wartRead(stream(L"((fn(x) (= x 34) x))")).front();
   Cell* call = eval(fn);
   checkEq(call, newNum(34));
   rmref(call);
@@ -38,9 +38,9 @@ void test_assign_lexical_var() {
 }
 
 void test_assign_overrides_dynamic_vars() {
-  Cell* init1 = wartRead(stream(L"assign x 3")).front();
+  Cell* init1 = wartRead(stream(L"= x 3")).front();
   Cell* call1 = eval(init1);
-  Cell* init2 = wartRead(stream(L"assign x 5")).front();
+  Cell* init2 = wartRead(stream(L"= x 5")).front();
   Cell* call2 = eval(init2);
   checkEq(lookup(L"x"), newNum(5));
   endDynamicScope(L"x");
@@ -51,9 +51,9 @@ void test_assign_overrides_dynamic_vars() {
 }
 
 void test_assign_overrides_within_lexical_scope() {
-  Cell* init1 = wartRead(stream(L"assign x 3")).front();
+  Cell* init1 = wartRead(stream(L"= x 3")).front();
   Cell* call1 = eval(init1);
-  Cell* init2 = wartRead(stream(L"((fn() (assign x 5)))")).front();
+  Cell* init2 = wartRead(stream(L"((fn() (= x 5)))")).front();
   Cell* call2 = eval(init2);
   checkEq(lookup(L"x"), newNum(5));
   endDynamicScope(L"x");
@@ -64,7 +64,7 @@ void test_assign_overrides_within_lexical_scope() {
 }
 
 void test_assign_never_overrides_lexical_vars_in_caller_scope() {
-  Cell* fn = wartRead(stream(L"((fn(x) (assign y x)) 34)")).front();
+  Cell* fn = wartRead(stream(L"((fn(x) (= y x)) 34)")).front();
   Cell* def = eval(fn);
   checkEq(lookup(L"y"), newNum(34));
   endDynamicScope(L"y");
@@ -73,7 +73,7 @@ void test_assign_never_overrides_lexical_vars_in_caller_scope() {
 }
 
 void test_assign_overrides_lexical_var() {
-  Cell* fn = wartRead(stream(L"((fn(x) (assign x 34) (assign x 35) x) 34)")).front();
+  Cell* fn = wartRead(stream(L"((fn(x) (= x 34) (= x 35) x) 34)")).front();
   Cell* call = eval(fn);
   checkEq(call, newNum(35));
   rmref(call);

@@ -30,10 +30,10 @@ let $% %
 alias exceed > ; for testing
 
 mac ++($n)
-  `(assign ,$n (+ ,$n 1))
+  `(= ,$n (+ ,$n 1))
 
 mac --($n)
-  `(assign ,$n (- ,$n 1))
+  `(= ,$n (- ,$n 1))
 
 
 
@@ -46,4 +46,4 @@ def divides(nr dr)
 def even?(n)
   (divides n 2)
 
-assign odd? ~even?
+= odd? ~even?

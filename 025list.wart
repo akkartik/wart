@@ -62,10 +62,10 @@ def lastcons(l)
 
 
 mac zap($f $x)
-  `(assign ,$x (,$f ,$x))
+  `(= ,$x (,$f ,$x))
 
 mac push($x $xs)
-  `(assign ,$xs (cons ,$x ,$xs))
+  `(= ,$xs (cons ,$x ,$xs))
 
 mac pop($xs)
   `(do1

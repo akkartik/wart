@@ -42,7 +42,7 @@ mac while($test . $body)
 
 mac whilet($var $test . $body)
   `(let ,$var nil
-     while (assign ,$var ,$test)
+     while (= ,$var ,$test)
        ,@$body)
 
 mac awhile($test . $body)

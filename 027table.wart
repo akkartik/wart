@@ -8,4 +8,4 @@ let $table table
   def table args
     ret h ($table)
       each (k v) pair.args
-        (assign h.k v)
+        (= h.k v)

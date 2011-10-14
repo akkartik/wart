@@ -39,7 +39,7 @@
  :should be 34)
 
 (test "if handles dynamic scope"
- :valueof (do (assign x 34)
+ :valueof (do (= x 34)
               (if x 35))
  :should be 35)
 
@@ -67,19 +67,19 @@
 
 (test "or short-circuits on first non-nil arg"
  :valueof (ret x nil
-            (or 3 (assign x 4)))
+            (or 3 (= x 4)))
  :should be nil)
 
 (test "or evals each arg at most once"
  :valueof (ret x 0
-            (or (do (assign x (+ x 1))
+            (or (do (= x (+ x 1))
                     3)
-                (do (assign x (+ x 1))
+                (do (= x (+ x 1))
                     4)))
  :should be 1)
 
 (test "or handles lexical scope"
- :valueof (do (assign x 35)
+ :valueof (do (= x 35)
               (let x 3
                 (or nil x)))
  :should be 3)
@@ -112,13 +112,13 @@
 
 (test "and short-circuits"
  :valueof (ret x 0
-            (and (assign x 3)
+            (and (= x 3)
                  nil
-                 (assign x 4)))
+                 (= x 4)))
  :should be 3)
 
 (test "and handles dynamic scope"
- :valueof (do (assign x 35)
+ :valueof (do (= x 35)
               (and x 36))
  :should be 36)
 

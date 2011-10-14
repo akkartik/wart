@@ -33,7 +33,8 @@ mac ret($var $val . $body)
 
 mac rfn($name $params . $body)
   `(ret ,$name nil
-      assign ,$name (fn ,$params ,@$body))
+      (= ,$name (fn ,$params
+                  ,@$body)))
 
 mac afn($params . $body)
   `(rfn self ,$params ,@$body)

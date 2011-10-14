@@ -1,8 +1,8 @@
 alias nil? not
 alias no not
 
-assign cadr car:cdr
-assign cddr cdr:cdr
+= cadr car:cdr
+= cddr cdr:cdr
 
 let $if if
   mac if $args

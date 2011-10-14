@@ -4,7 +4,7 @@
             h.3)
  :should be 4)
 
-(test "tables can be =ed to"
+(test "tables can be assigned to"
  :valueof (let h (table)
             (= h.3 4)
             h.3)

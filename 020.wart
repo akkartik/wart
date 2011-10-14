@@ -1,10 +1,10 @@
 ; (mac foo(x) `(+ 1 ,x))) (let x 3 (foo x)) => 4
-assign mac (mfn '($name $params . $body)
-  `(assign ,$name (mfn ',$params
+= mac (mfn '($name $params . $body)
+  `(= ,$name (mfn ',$params
                     ,@$body)))
 
 mac def($name $params . $body)
-  `(assign ,$name (fn ,$params ,@$body))
+  `(= ,$name (fn ,$params ,@$body))
 
 mac alias(new old)
   `(def ,new $args

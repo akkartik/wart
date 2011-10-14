@@ -23,7 +23,7 @@ COMPILE_PRIM_FUNC(not, primFunc_not, L"($x)",
   return lookup(L"$x") == nil ? mkref(newNum(1)) : nil;
 )
 
-COMPILE_PRIM_FUNC(assign, primFunc_assign, L"('$var $val)",
+COMPILE_PRIM_FUNC(=, primFunc_assign, L"('$var $val)",
   Cell* var = lookup(L"$var");
   Cell* val = lookup(L"$val");
   Cell* currLexicalScope = currLexicalScopes.top();

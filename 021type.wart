@@ -27,7 +27,7 @@ def rep(x)
 
 def coerce(x 'dest-type)
   eval `(coerce-quoted ,x ,dest-type)
-assign coercions* (table)
+= coercions* (table)
 def coerce-quoted'(x dest-type)
   ((table_get (table_get coercions* dest-type) type.x) x)
 
@@ -51,8 +51,8 @@ mac defset($type $params . $body)
        (fn ,cdr.$params
          ,@$body)))
 
-let $assign assign
-  mac assign($var $val)
+let $= =
+  mac =($var $val)
     if sym?.$var
-      `(,$assign ,$var ,$val)
+      `(,$= ,$var ,$val)
       `((coerce ,car.$var function=) ,@cdr.$var ,$val)
