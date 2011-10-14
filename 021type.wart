@@ -21,9 +21,9 @@ def tag(type val)
   (list 'type type val)
 
 def rep(x)
-  if (iso 'type car.x)
-    (list_get x 2)
+  if (~iso 'type car.x)
     x
+    (list_get x 2)
 
 def coerce(x 'dest-type)
   eval `(coerce-quoted ,x ,dest-type)
