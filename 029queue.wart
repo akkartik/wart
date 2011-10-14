@@ -6,10 +6,8 @@ def enq(x q)
     let (l last len) rep.q
       (= rep.q.2 (+ len 1))
       if !l
-        (= rep.q.1 (= rep.q.0 list.x))
-        (do
-          (= cdr.last list.x)
-          (= rep.q.1 cdr.last))
+        (= rep.q.1  (= rep.q.0 list.x))
+        (= cdr.last list.x  rep.q.1 cdr.last)
 
 def deq(q)
   let (l last len) rep.q
