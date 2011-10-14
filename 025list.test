@@ -10,6 +10,11 @@
  :valueof (let l '(list 1 2 3) l.3)
  :should be 3)
 
+(test "assign to lists in function position"
+ :valueof (ret l '(1 2 3)
+            (assign l.1 4))
+ :should be '(1 4 3))
+
 (test "rem works"
  :valueof (rem no '(1 2 nil 4 nil))
  :should be '(1 2 4))

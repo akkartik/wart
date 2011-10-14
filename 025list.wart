@@ -1,6 +1,9 @@
 defcall list(_)
   (fn(idx) (list_get _ idx))
 
+defset list(l idx val)
+  (list_set l idx val)
+
 mac do1 $body
   `(ret $ret ,car.$body
      ,@cdr.$body)

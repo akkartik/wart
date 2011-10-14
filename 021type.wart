@@ -42,19 +42,14 @@ mac defcall($type $params . $body)
 
 
 
+mac defset($type $params . $body)
+  `(defcoerce ,$type function=
+     (fn(,car.$params)
+       (fn ,cdr.$params
+         ,@$body)))
+
 let $assign assign
   mac assign($var $val)
     if sym?.$var
       `(,$assign ,$var ,$val)
       `((coerce ,car.$var function=) ,@cdr.$var ,$val)
-
-defcoerce list function=
-  (fn(_)
-    (fn(idx val)
-      (list_set _ idx val)))
-
-let y '(1 2 3)
-  assign y.1 4
-  prn y
-
-quit.
