@@ -16,44 +16,5 @@ def deq(q)
         (= rep.q.2 (- len 1))
       (= rep.q.0 cdr.l)
 
-; given params, return code to construct the args
-; (arg1 arg2 . body) => `(,arg1 ,arg2 ,@body)
-def unquotify(args)
-  if list?.args
-    `(cons ,car.args ,(unquotify cdr.args))
-    args
-
-let $mac mac
-  mac mac($name $params . $body)
-    if (~iso :case car.$body)
-      `(,$mac ,$name ,$params ,@$body)
-      `(let super ,$name
-         (,$mac ,$name ,$params
-           if ,cadr.$body
-             (do ,@cddr.$body)
-             ,(list 'cons 'super unquotify.$params))) ; call super with params
-
-mac def($name $params . $body) :case (iso :case car.$body)
-  `(let $old ,$name
-     (,super ,$name ,$params
-       if ,cadr.$body
-         (do ,@$body)
-         ($old ,@$params)))
-
-;? (let super def
-;?   ((evald-mfn '(name1 params2 . body3) (`(= ,name1 (mfn ',params2 ,@body3)))) def (name114 params115 . body116)
-;?     if (iso :case (car body116))
-;?       (do `(let old117 ,name114
-;?              (,super ,name114 ,params115
-;?                 (if ,(cadr body116)
-;?                   (do ,@body116)
-;?                   (old117 ,@params115)))))
-;?       (cons super (cons name114 (cons params115 body116)))))
-
 def len(x) :case (isa x queue)
   rep.x.2
-
-prn:len:queue '(1 2 3 4)
-
-def foo() 34
-prn foo.

@@ -1,8 +1,8 @@
 ; given params, return code to construct the args
-; (arg1 arg2 . body) => `(,arg1 ,arg2 ,@body)
-def unquotify(args)
+; (mac arg1 arg2 . body) => `(,mac ,arg1 ,arg2 ,@body)
+def construct-macro-call(args)
   if list?.args
-    `(cons ,car.args ,(unquotify cdr.args))
+    `(cons ,car.args ,(construct-macro-call cdr.args))
     args
 
 let $mac mac
@@ -13,7 +13,7 @@ let $mac mac
          (,$mac ,$name ,$params
            if ,cadr.$body
              (do ,@cddr.$body)
-             ,(list 'cons 'super unquotify.$params))) ; call super with params
+             ,(construct-macro-call (cons 'super $params)))) ; call super with params
 
 mac def($name $params . $body) :case (iso :case car.$body)
   `(let $old ,$name
