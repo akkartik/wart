@@ -1,0 +1,11 @@
+(test "tables work in function position"
+ :valueof (let h (table)
+            (table_set h 3 4)
+            h.3)
+ :should be 4)
+
+(test "tables can be =ed to"
+ :valueof (let h (table)
+            (= h.3 4)
+            h.3)
+ :should be 4)

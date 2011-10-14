@@ -1,5 +1,11 @@
+defcall table(h k)
+  (table_get h k)
+
+defset table(h k v)
+  (table_set h k v)
+
 let $table table
   def table args
     ret h ($table)
       each (k v) pair.args
-        (table_set h k v)
+        (assign h.k v)
