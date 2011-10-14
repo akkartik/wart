@@ -4,6 +4,12 @@ defcall list(l idx)
 defset list(l idx val)
   (list_set l idx val)
 
+def= car(l x)
+  (set_car l x)
+
+def= cdr(l x)
+  (set_cdr l x)
+
 mac do1 $body
   `(ret $ret ,car.$body
      ,@cdr.$body)

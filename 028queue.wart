@@ -8,7 +8,7 @@ def enq(x q)
       if !l
         (= rep.q.1 (= rep.q.0 list.x))
         (do
-          (set_cdr last list.x)
+          (= cdr.last list.x)
           (= rep.q.1 cdr.last))
 
 def deq(q)
