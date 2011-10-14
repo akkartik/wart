@@ -16,15 +16,22 @@ def deq(q)
         (= rep.q.2 (- len 1))
       (= rep.q.0 cdr.l)
 
-let $def def
-  mac def($name $params . $body)
+let $mac mac
+  mac mac($name $params . $body)
     if (~iso :case car.$body)
-      `(,$def ,$name ,$params ,@$body)
-      `(let $old ,$name
-         ,$def ,$name ,$params
+      `(,$mac ,$name ,$params ,@$body)
+      `(let super ,$name
+         (,$mac ,$name ,$params
            if ,cadr.$body
-             (do ,@$body)
-             ($old ,@$params))
+             (do ,@cddr.$body)
+             (super ,@$params)))
+
+mac def($name $params . $body) :case (iso :case car.$body)
+  `(let $old ,$name
+     (,super ,$name ,$params
+       if ,cadr.$body
+         (do ,@$body)
+         ($old ,@$params)))
 
 def len(x) :case (isa x queue)
   rep.x.2
