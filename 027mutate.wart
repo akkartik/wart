@@ -14,3 +14,7 @@ mac push($x $xs)
 mac pop($xs)
   `(do1 car.,$xs
      (zap cdr ,$xs))
+
+mac or=($var $val)
+  `(unless ,$var
+     (= ,$var ,$val))

@@ -3,3 +3,9 @@
             (= x 1 y 2)
             (cons x y))
  :should be '(1 . 2))
+
+(test "or= works"
+ :valueof (ret x nil
+            (or= x 3)
+            (or= x ++.x))
+ :should be 3)
