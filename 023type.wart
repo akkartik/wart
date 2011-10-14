@@ -1,7 +1,3 @@
-let $iso iso ; ignore later refinements
-  def isa(x 't)
-    ($iso t type.x)
-
 def sym?(_)
   (isa _ symbol)
 def list?(_)

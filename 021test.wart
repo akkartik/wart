@@ -1,0 +1,16 @@
+def test(msg valueof should expected)
+  if (should valueof expected)
+    (pr ",")
+    (do
+      inc_failures.
+      prn.
+      (prn "F " msg)
+      (prn "  got " valueof))
+
+def pending-test'(msg valueof should expected)
+  prn.
+  (prn "pending: " msg)
+
+alias be iso
+alias exceed >
+; verb for <?

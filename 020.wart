@@ -6,7 +6,7 @@
 mac def($name $params . $body)
   `(= ,$name (fn ,$params ,@$body))
 
-mac alias(new old)
+mac alias(new old) ; include later refinements
   `(def ,new $args
      (,old @$args))
 
@@ -23,24 +23,19 @@ mac let($var $val . $body)
 mac do $body
   `((fn() ,@$body))
 
-
+def list args
+  if args
+    (cons car.args
+          (list @cdr.args))
+
+let $iso iso ; ignore later refinements
+  def isa(x 't)
+    ($iso t type.x)
+
+= cadr car:cdr
+= cddr cdr:cdr
 
 def prn args
   (pr (str @args "
 "))
   car.args
-
-def test(msg valueof should expected)
-  if (should valueof expected)
-    (pr ",")
-    (do
-      inc_failures.
-      prn.
-      (prn "F " msg)
-      (prn "  got " valueof))
-
-def pending-test'(msg valueof should expected)
-  prn.
-  (prn "pending: " msg)
-
-alias be iso
