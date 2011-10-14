@@ -1,5 +1,5 @@
 let $table table
   def table args
-    ret t ($table)
+    ret h ($table)
       each (k v) pair.args
-        (table_set t k v)
+        (table_set h k v)
