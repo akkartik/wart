@@ -10,10 +10,6 @@ def= car(l x)
 def= cdr(l x)
   (set_cdr l x)
 
-mac do1 $body
-  `(ret $ret ,car.$body
-     ,@cdr.$body)
-
 def rem(f seq)
   if seq
     if (f car.seq)

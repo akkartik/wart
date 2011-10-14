@@ -1,3 +1,7 @@
+mac do1 $body
+  `(ret $ret ,car.$body
+     ,@cdr.$body)
+
 mac when($cond . $body)
   `(if ,$cond
      (do ,@$body))
