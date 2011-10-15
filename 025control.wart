@@ -64,9 +64,17 @@ mac each($var $expr . $body)
       let ,$var car.$i
         ,@$body)
 
+mac on($var $expr . $body)
+  `(for ($i index) (list ,$expr 0) $i (do (zap cdr $i) ++.index)
+     let ,$var car.$i
+      ,@$body)
+
 mac repeat($n . $body)
   `(for $i 0 (< $i ,$n) ++.$i
      ,@$body)
+
+mac forever $body
+  `(while 1 ,@$body)
 
 
 
