@@ -32,3 +32,8 @@ let $iso iso
           (isa a list)
           (iso car.a car.b)
           (iso cdr.a cdr.b)
+
+def copy(x)
+  if cons?.x
+    (cons (copy car.x) (copy cdr.x))
+    x
