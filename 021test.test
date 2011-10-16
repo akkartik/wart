@@ -1,0 +1,5 @@
+(test "test using keyword args"
+ :valueof (+ 1 1)
+ :should be 2)
+
+(test "test using positional args" iso (+ 1 1) 2)
