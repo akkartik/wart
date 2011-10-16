@@ -38,6 +38,22 @@
 
 
 
+                                  bool match(Cell* arg, Cell* param) {
+                                    if (arg == param) return true;
+                                    if (!isSym(arg)) return false;
+
+                                    string name = toString(param);
+                                    if (name.find(L'/') == string::npos)
+                                      return false;
+
+                                    string expected = toString(arg);
+                                    char ns[name.length()+1];
+                                    wcscpy(ns, name.c_str());
+                                    for (char *tmp, *tok = wcstok(ns, L"/", &tmp); tok; tok=wcstok(NULL, L"/", &tmp))
+                                      if (expected == tok) return true;
+                                    return false;
+                                  }
+
                                   // doesn't look inside destructured params
                                   Cell* keywordArg(Cell* arg, Cell* params) {
                                     if (!isColonSym(arg)) return nil;
@@ -47,8 +63,10 @@
                                         return newSym(L"__wartRestKeywordArg");
                                       if (realArg == newSym(L"do") && params == newSym(L"body"))
                                         return newSym(L"__wartRestKeywordArg");
-                                      if (isCons(params) && realArg == stripQuote(car(params)))
-                                        return realArg;
+                                      if (!isCons(params)) continue;
+                                      Cell* param = stripQuote(car(params));
+                                      if (match(realArg, param))
+                                        return param;
                                     }
                                     return nil;
                                   }
