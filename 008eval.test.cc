@@ -741,6 +741,20 @@ void test_eval_handles_keyword_args_for_fns2() {
   endDynamicScope(L"f");
 }
 
+void test_fns_can_have_params_starting_with_slash() {
+  Cell* fn = wartRead(stream(L"(fn (/) /)")).front();
+  Cell* f = eval(fn);
+  newDynamicScope(L"f", f);
+  Cell* call = wartRead(stream(L"(f 2)")).front();
+  Cell* result = eval(call);
+  checkEq(result, newNum(2));
+  rmref(result);
+  rmref(call);
+  rmref(f);
+  rmref(fn);
+  endDynamicScope(L"f");
+}
+
 void test_eval_handles_quoted_keyword_args_for_fns() {
   Cell* fn = wartRead(stream(L"(fn (a b 'c) c)")).front();
   Cell* f = eval(fn);
