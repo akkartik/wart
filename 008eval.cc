@@ -47,7 +47,7 @@
                                         return newSym(L"__wartRestKeywordArg");
                                       if (realArg == newSym(L"do") && params == newSym(L"body"))
                                         return newSym(L"__wartRestKeywordArg");
-                                      if (isCons(params) && realArg == car(params))
+                                      if (isCons(params) && realArg == stripQuote(car(params)))
                                         return realArg;
                                     }
                                     return nil;
@@ -83,8 +83,9 @@
                                         break;
                                       }
 
-                                      if (keywordArgs[car(params)]) {
-                                        addCons(curr, keywordArgs[car(params)]);
+                                      Cell* param = stripQuote(car(params));
+                                      if (keywordArgs[param]) {
+                                        addCons(curr, keywordArgs[param]);
                                       }
                                       else {
                                         addCons(curr, car(nonKeywordArgs));

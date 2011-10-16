@@ -714,10 +714,10 @@ void test_eval_handles_destructured_params() {
 }
 
 void test_eval_handles_keyword_args_for_fns() {
-  Cell* fn = wartRead(stream(L"(fn (a b) b)")).front();
+  Cell* fn = wartRead(stream(L"(fn (a b c) c)")).front();
   Cell* f = eval(fn);
   newDynamicScope(L"f", f);
-  Cell* call = wartRead(stream(L"(f :b 1 2)")).front();
+  Cell* call = wartRead(stream(L"(f :c 1 2)")).front();
   Cell* result = eval(call);
   checkEq(result, newNum(1));
   rmref(result);
@@ -728,10 +728,10 @@ void test_eval_handles_keyword_args_for_fns() {
 }
 
 void test_eval_handles_quoted_keyword_args_for_fns() {
-  Cell* fn = wartRead(stream(L"(fn (a 'b) b)")).front();
+  Cell* fn = wartRead(stream(L"(fn (a b 'c) c)")).front();
   Cell* f = eval(fn);
   newDynamicScope(L"f", f);
-  Cell* call = wartRead(stream(L"(f :b 1 2)")).front();
+  Cell* call = wartRead(stream(L"(f :c 1 2)")).front();
   Cell* result = eval(call);
   checkEq(result, newNum(1));
   rmref(result);
