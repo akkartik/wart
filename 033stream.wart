@@ -1,0 +1,6 @@
+def prn args
+  each arg args
+    pr.arg
+  pr "
+"
+  car.args
