@@ -1,4 +1,4 @@
-def test(msg expr/valueof pred/should expected)
+def test(msg pred/should expr/valueof expected)
   if (pred expr expected)
     (pr ",")
     (do
