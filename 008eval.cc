@@ -43,7 +43,7 @@
                                     if (!isSym(arg)) return false;
 
                                     string name = toString(param);
-                                    if (name.find(L'/') == string::npos || name.find('/') == 0)
+                                    if (name.find(L'/') == string::npos || name.find(L'/') == 0)
                                       return false;
 
                                     string expected = toString(arg);
@@ -184,7 +184,7 @@ Cell* evalArgs(Cell* params, Cell* args) {
                                   // split param sym at '/' and bind all resulting syms to val
                                   void bindArg(Cell* param, Cell* val) {
                                     string name = toString(param);
-                                    if (name.find(L'/') == string::npos || name.find('/') == 0) {
+                                    if (name.find(L'/') == string::npos || name.find(L'/') == 0) {
                                       addLexicalBinding(param, val);
                                       return;
                                     }
