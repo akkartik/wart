@@ -151,6 +151,18 @@ void test_bindArgs_handles_vararg() {
   rmref(params);
 }
 
+void test_bindArgs_binds_multiple_params() {
+  Cell* params = wartRead(stream(L"(a/b)")).front();
+  Cell* args = wartRead(stream(L"(1)")).front();
+  newLexicalScope();
+  bindArgs(params, args);
+  checkEq(unsafeGet(currLexicalScopes.top(), newSym(L"a")), newNum(1));
+  checkEq(unsafeGet(currLexicalScopes.top(), newSym(L"b")), newNum(1));
+  endLexicalScope();
+  rmref(args);
+  rmref(params);
+}
+
 
 
 void test_nil_evals_to_itself() {

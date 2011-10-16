@@ -163,6 +163,20 @@ Cell* evalArgs(Cell* params, Cell* args) {
   return mkref(result);
 }
 
+                                  // split param sym at '/' and bind all resulting syms to val
+                                  void bindArg(Cell* param, Cell* val) {
+                                    string name = toString(param);
+                                    if (name.find(L'/') == string::npos) {
+                                      addLexicalBinding(param, val);
+                                      return;
+                                    }
+
+                                    char ns[name.length()+1];
+                                    wcscpy(ns, name.c_str());
+                                    for (char *tmp, *tok = wcstok(ns, L"/", &tmp); tok; tok=wcstok(NULL, L"/", &tmp))
+                                      addLexicalBinding(newSym(tok), val);
+                                  }
+
 void bindArgs(Cell* params, Cell* args) {
   if (params == nil) return;
 
@@ -172,7 +186,7 @@ void bindArgs(Cell* params, Cell* args) {
   }
 
   if (isSym(params))
-    addLexicalBinding(params, args);
+    bindArg(params, args);
   else
     bindArgs(car(params), car(args));
 
