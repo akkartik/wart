@@ -39,8 +39,7 @@
 
 
                                   // doesn't look inside destructured params
-                                  Cell* keywordArg(Cell* params, Cell* args) {
-                                    Cell* arg = car(args);
+                                  Cell* keywordArg(Cell* arg, Cell* params) {
                                     if (!isColonSym(arg)) return nil;
                                     Cell* realArg = newSym(toString(arg).substr(1));
                                     for (; params != nil; params=cdr(params)) {
@@ -58,7 +57,7 @@
                                   Cell* extractKeywordArgs(Cell* params, Cell* args, CellMap& keywordArgs) {
                                     Cell *pNonKeywordArgs = newCell(), *curr = pNonKeywordArgs;
                                     for (; args != nil; args=cdr(args)) {
-                                      Cell* currArg = keywordArg(params, args);
+                                      Cell* currArg = keywordArg(car(args), params);
                                       if (currArg == newSym(L"__wartRestKeywordArg")) {
                                         setCdr(curr, cdr(args));
                                         break;
