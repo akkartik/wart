@@ -3,7 +3,11 @@ defcall string(s idx)
     = idx (+ len.s idx)
   (string_get s idx)
 
-defset string(s idx val)
+defset string(s idx end val)
   if (< idx 0)
     = idx (+ len.s idx)
-  (string_set s idx val)
+  if !val
+    = val end  end (+ idx 1)
+  if (< end 0)
+    = end (+ len.s end)
+  (string_splice s idx end val)

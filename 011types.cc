@@ -46,27 +46,24 @@ COMPILE_PRIM_FUNC(str, primFunc_str, L"$args",
   return mkref(newString(out.str()));
 )
 
-COMPILE_PRIM_FUNC(string_set, primFunc_string_set, L"($string $index $val)",
+COMPILE_PRIM_FUNC(string_splice, primFunc_string_set, L"($string $start $end $val)",
   Cell* str = lookup(L"$string");
   if (!isString(str)) {
     warn << "can't set non-string: " << str << endl;
     return nil;
   }
 
-  size_t index = toNum(lookup(L"$index"));
-  if (index > ((string*)str->car)->length()) { // append works
-    warn << "string too short: " << str << " " << index << endl;
+  size_t start = toNum(lookup(L"$start"));
+  size_t end = toNum(lookup(L"$end"));
+  if (start > ((string*)str->car)->length()) { // append works
+    warn << "string too short: " << str << " " << start << endl;
     return nil;
   }
 
   Cell* val = lookup(L"$val");
   if (!isString(val))
     warn << "can't set string with non-string: " << val << endl;
-  string c = toString(val);
-  if (c.length() != 1)
-    warn << "can't set string with string: " << c << endl;
-  else
-    ((string*)str->car)->replace(index, 1, c);
+  ((string*)str->car)->replace(start, end-start, toString(val));
   return mkref(val);
 )
 

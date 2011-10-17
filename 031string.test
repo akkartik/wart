@@ -19,3 +19,13 @@
  :valueof (ret s "abc"
             (= s.-1 "z"))
  :should be "abz")
+
+(test "string ranges can be spliced"
+ :valueof (ret s "abcdefgh"
+            (= (s 1 5) "xy"))
+ :should be "axyfgh")
+
+(test "string ranges can be spliced - 2"
+ :valueof (ret s "abcdefgh"
+            (= (s -4 -1) "xy"))
+ :should be "abcdxyh")
