@@ -18,3 +18,13 @@ mac pop($xs)
 mac or=($var $val)
   `(unless ,$var
      (= ,$var ,$val))
+
+mac shift $args ; multiply-evals to maintain places
+  `(= ,@(zip-flat $args cdr.$args))
+
+mac rotate $args
+  `(let $tmp ,car.$args
+     shift ,@$args $tmp)
+
+mac swap($x $y)
+  `(rotate ,$x ,$y)

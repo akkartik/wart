@@ -48,6 +48,10 @@ def zip(a b)
     (cons (list car.a car.b)
           (zip cdr.a cdr.b))
 
+def zip-flat(a b)
+  if (and a b)
+    `(,car.a ,car.b ,@(zip-flat cdr.a cdr.b))
+
 def pairwise(xs)
   (zip xs cdr.xs)
 
