@@ -11,6 +11,8 @@ defcall list(l idx end)
   (list_get l idx end)
 
 defset list(l idx val)
+  if (< idx 0)
+    = idx (+ len.l idx)
   (list_set l idx val)
 
 def= car(l x)
