@@ -1,0 +1,5 @@
+defcall string(s idx)
+  (string_get s idx)
+
+defset string(s idx val)
+  (string_set s idx val)
