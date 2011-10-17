@@ -4,6 +4,8 @@ def len(l)
     0
 
 defcall list(l idx)
+  if (< idx 0)
+    = idx (+ len.l idx)
   (list_get l idx)
 
 defset list(l idx val)

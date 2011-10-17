@@ -10,6 +10,10 @@
  :valueof (let l '(list 1 2 3) l.3)
  :should be 3)
 
+(test "lists can take negative indices"
+ :valueof (let l '(1 2 3) l.-1)
+ :should be 3)
+
 (test "lists can be assigned to"
  :valueof (ret l '(1 2 3)
             (= l.1 4))
