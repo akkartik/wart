@@ -1,0 +1,3 @@
+(test "len works on strings"
+ :valueof (len "abcdefgh")
+ :should be 8)

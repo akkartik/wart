@@ -19,6 +19,17 @@ COMPILE_PRIM_FUNC(iso, primFunc_iso, L"($x $y)",
   return mkref(result);
 )
 
+COMPILE_PRIM_FUNC(len, primFunc_len, L"($x)",
+  Cell* x = lookup(L"$x");
+  if (isString(x))
+    return mkref(newNum(toString(x).length()));
+
+  int ans = 0;
+  for (; x != nil; x=cdr(x))
+    ++ans;
+  return mkref(newNum(ans));
+)
+
 
 
 COMPILE_PRIM_FUNC(sym, primFunc_sym, L"$args",
