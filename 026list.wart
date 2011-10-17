@@ -3,10 +3,12 @@ def len(l)
     (+ 1 (len cdr.l))
     0
 
-defcall list(l idx)
+defcall list(l idx end)
   if (< idx 0)
     = idx (+ len.l idx)
-  (list_get l idx)
+  if (and end (< end 0))
+    = end (+ len.l end)
+  (list_get l idx end)
 
 defset list(l idx val)
   (list_set l idx val)

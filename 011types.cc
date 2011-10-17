@@ -88,12 +88,20 @@ COMPILE_PRIM_FUNC(list_set, primFunc_list_set, L"($list $index $val)",
   return mkref(val);
 )
 
-COMPILE_PRIM_FUNC(list_get, primFunc_list_get, L"($list $index)",
+COMPILE_PRIM_FUNC(list_get, primFunc_list_get, L"($list $index $end)",
   Cell* list = lookup(L"$list");
   int index = toNum(lookup(L"$index"));
   for (int i = 0; i < index; ++i)
     list=cdr(list);
-  return mkref(car(list));
+  if (lookup(L"$end") == nil)
+    return mkref(car(list));
+
+  int end = toNum(lookup(L"$end"));
+  Cell* pResult = newCell();
+  Cell* curr = pResult;
+  for (int i = index; i < end && list != nil; ++i, list=cdr(list), curr=cdr(curr))
+    addCons(curr, car(list));
+  return dropPtr(pResult);
 )
 
 COMPILE_PRIM_FUNC(table, primFunc_table, L"()",
