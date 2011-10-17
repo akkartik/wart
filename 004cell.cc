@@ -199,9 +199,8 @@ void append(Cell* x, Cell* y) {
   setCdr(x, y);
 }
 
-// useful idiom: create a dummy cell p, keep
-// appending to it, then return dropPtr(p)
-// which GC's the dummy but mkrefs the rest.
+// useful idiom: create a dummy cell p, keep appending to it using addCons,
+// then return dropPtr(p) which GC's the dummy but mkrefs the rest.
 Cell* dropPtr(Cell* p) {
   Cell* x = mkref(cdr(p));
   rmref(p);
