@@ -1,3 +1,21 @@
 (test "len works on strings"
  :valueof (len "abcdefgh")
  :should be 8)
+
+(test "strings work in function position"
+ :valueof ("abcd" 2)
+ :should be "c")
+
+(test "strings can take negative indices"
+ :valueof ("abcd" -3)
+ :should be "b")
+
+(test "strings can be assigned to"
+ :valueof (ret s "abc"
+            (= s.1 "z"))
+ :should be "azc")
+
+(test "strings can be assigned to"
+ :valueof (ret s "abc"
+            (= s.-1 "z"))
+ :should be "abz")
