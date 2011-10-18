@@ -46,7 +46,7 @@ COMPILE_PRIM_FUNC(str, primFunc_str, L"$args",
   return mkref(newString(out.str()));
 )
 
-COMPILE_PRIM_FUNC(string_splice, primFunc_string_set, L"($string $start $end $val)",
+COMPILE_PRIM_FUNC(string_splice, primFunc_string_splice, L"($string $start $end $val)",
   Cell* str = lookup(L"$string");
   if (!isString(str)) {
     warn << "can't set non-string: " << str << endl;
