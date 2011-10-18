@@ -8,7 +8,7 @@ defcall list(l idx end)
 defset list(l idx val)
   if (< idx 0)
     = idx (+ len.l idx)
-  (list_set l idx val)
+  (list_splice l idx (+ idx 1) list.val)
 
 def= car(l x)
   (set_car l x)

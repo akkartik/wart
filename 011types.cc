@@ -83,16 +83,16 @@ COMPILE_PRIM_FUNC(string_get, primFunc_string_get, L"($string $index)",
   return mkref(newString(toString(str).substr(index, 1)));
 )
 
-COMPILE_PRIM_FUNC(list_set, primFunc_list_set, L"($list $index $val)",
+COMPILE_PRIM_FUNC(list_splice, primFunc_list_splice, L"($list $start $end $val)",
   Cell* list = lookup(L"$list");
-  long index = toNum(lookup(L"$index"));
+  long start = toNum(lookup(L"$start"));
   Cell* val = lookup(L"$val");
-  for (long i = 0; i < index; ++i) {
+  for (long i = 0; i < start; ++i) {
     if (!isCons(list))
       warn << "can't set non-list: " << list << endl;
     list=cdr(list);
   }
-  setCar(list, val);
+  setCar(list, car(val));
   return mkref(val);
 )
 
