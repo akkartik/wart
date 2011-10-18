@@ -101,3 +101,27 @@ void test_list_splice_deletes_entire() {
   rmref(expr);
   endDynamicScope(L"a");
 }
+
+void test_list_splice_returns_list_being_spliced_in() {
+  newDynamicScope(L"a", newCons(newNum(3), newCons(newNum(4), newCons(newNum(5), nil))));
+  Cell* expr = wartRead(stream(L"list_splice a 1 2 '(6 7 8)")).front();
+  Cell* result = eval(expr);
+  Cell* curr = result;
+  checkEq(car(curr), newNum(6)); curr=cdr(curr);
+  checkEq(car(curr), newNum(7)); curr=cdr(curr);
+  checkEq(car(curr), newNum(8)); curr=cdr(curr);
+  checkEq(curr, nil);
+  rmref(result);
+  rmref(expr);
+  endDynamicScope(L"a");
+}
+
+void test_list_splice_returns_elem_if_single() {
+  newDynamicScope(L"a", newCons(newNum(3), newCons(newNum(4), nil)));
+  Cell* expr = wartRead(stream(L"list_splice a 1 2 '(5)")).front();
+  Cell* call = eval(expr);
+  checkEq(call, newNum(5));
+  rmref(call);
+  rmref(expr);
+  endDynamicScope(L"a");
+}

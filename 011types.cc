@@ -101,11 +101,14 @@ COMPILE_PRIM_FUNC(list_splice, primFunc_list_splice, L"('$list $start $end $val)
   else {
     setCar(startPtr, car(val));
     mkref(endPtr);
-    setCdr(startPtr, cdr(val));
+    Cell* val2 = copyList(val);
+    setCdr(startPtr, cdr(val2));
     append(startPtr, endPtr);
+    rmref(val2);
     rmref(endPtr);
   }
 
+  if (cdr(val) == nil) val = car(val);
   rmref(list);
   return mkref(val);
 )
