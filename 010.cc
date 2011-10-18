@@ -19,19 +19,23 @@ COMPILE_PRIM_FUNC(uniq, primFunc_uniq, L"($x)",
   return mkref(genSym(lookup(L"$x")));
 )
 
+                                  void assign(Cell* var, Cell* val) {
+                                    Cell* currLexicalScope = currLexicalScopes.top();
+                                    if (isCons(currLexicalScope))
+                                      currLexicalScope = car(currLexicalScope);
+                                    Cell* scope = scopeContainingBinding(var, currLexicalScope);
+                                    if (!scope)
+                                      newDynamicScope(var, val);
+                                    else if (scope == nil)
+                                      assignDynamicVar(var, val);
+                                    else
+                                      unsafeSet(scope, var, val, false);
+                                  }
+
 COMPILE_PRIM_FUNC(=, primFunc_assign, L"('$var $val)",
   Cell* var = lookup(L"$var");
   Cell* val = lookup(L"$val");
-  Cell* currLexicalScope = currLexicalScopes.top();
-  if (isCons(currLexicalScope))
-    currLexicalScope = car(currLexicalScope);
-  Cell* scope = scopeContainingBinding(var, currLexicalScope);
-  if (!scope)
-    newDynamicScope(var, val);
-  else if (scope == nil)
-    assignDynamicVar(var, val);
-  else
-    unsafeSet(scope, var, val, false);
+  assign(var, val);
   return mkref(val);
 )
 
