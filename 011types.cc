@@ -86,14 +86,26 @@ COMPILE_PRIM_FUNC(string_get, primFunc_string_get, L"($string $index)",
 COMPILE_PRIM_FUNC(list_splice, primFunc_list_splice, L"('$list $start $end $val)",
   Cell* binding = lookup(L"$list");
   Cell* list = eval(binding);
-  Cell* startPtr = nthCdr(list, toNum(lookup(L"$start")));
+  long start = toNum(lookup(L"$start"));
+  Cell* prePtr = nthCdr(list, start-1);
+  Cell* startPtr = nthCdr(list, start);
   Cell* endPtr = nthCdr(list, toNum(lookup(L"$end")));
   Cell* val = lookup(L"$val");
-  setCar(startPtr, car(val));
-  mkref(endPtr);
-  setCdr(startPtr, cdr(val));
-  append(startPtr, endPtr);
-  rmref(endPtr);
+
+  if (val == nil) {
+    if (start == 0)
+      assign(binding, endPtr);
+    else
+      setCdr(prePtr, endPtr);
+  }
+  else {
+    setCar(startPtr, car(val));
+    mkref(endPtr);
+    setCdr(startPtr, cdr(val));
+    append(startPtr, endPtr);
+    rmref(endPtr);
+  }
+
   rmref(list);
   return mkref(val);
 )

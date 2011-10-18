@@ -69,3 +69,35 @@ void test_list_splice_inserts_nil() {
   rmref(expr);
   endDynamicScope(L"a");
 }
+
+void test_list_splice_deletes() {
+  newDynamicScope(L"a", newCons(newNum(3), newCons(newNum(4), nil)));
+  Cell* expr = wartRead(stream(L"list_splice a 1 2 nil")).front();
+  Cell* call = eval(expr);
+  checkEq(car(lookup(L"a")), newNum(3));
+  checkEq(cdr(lookup(L"a")), nil);
+  rmref(call);
+  rmref(expr);
+  endDynamicScope(L"a");
+}
+
+void test_list_splice_deletes_at_start() {
+  newDynamicScope(L"a", newCons(newNum(3), newCons(newNum(4), nil)));
+  Cell* expr = wartRead(stream(L"list_splice a 0 1 nil")).front();
+  Cell* call = eval(expr);
+  checkEq(car(lookup(L"a")), newNum(4));
+  checkEq(cdr(lookup(L"a")), nil);
+  rmref(call);
+  rmref(expr);
+  endDynamicScope(L"a");
+}
+
+void test_list_splice_deletes_entire() {
+  newDynamicScope(L"a", newCons(newNum(3), newCons(newNum(4), nil)));
+  Cell* expr = wartRead(stream(L"list_splice a 0 2 nil")).front();
+  Cell* call = eval(expr);
+  checkEq(lookup(L"a"), nil);
+  rmref(call);
+  rmref(expr);
+  endDynamicScope(L"a");
+}
