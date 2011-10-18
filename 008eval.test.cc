@@ -399,18 +399,6 @@ void test_eval_handles_splice3() {
   rmref(fn);
 }
 
-                                  Cell* copyList(Cell* x) {
-                                    if (!isCons(x)) return x;
-                                    return newCons(copyList(car(x)),
-                                        copyList(cdr(x)));
-                                  }
-
-                                  bool equalList(Cell* a, Cell* b) {
-                                    if (!isCons(a)) return a == b;
-                                    return equalList(car(a), car(b))
-                                        && equalList(cdr(a), cdr(b));
-                                  }
-
 void test_eval_doesnt_modify_fn() {
   Cell* fn = wartRead(stream(L"(fn(x) (eval x))")).front();
   Cell* f = eval(fn);
