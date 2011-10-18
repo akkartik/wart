@@ -90,7 +90,7 @@ COMPILE_PRIM_FUNC(list_splice, primFunc_list_splice, L"($list $start $end $val)"
   for (long i = 0; i < start; ++i) {
     if (!isCons(list))
       warn << "can't set non-list: " << list << endl;
-    list=cdr(list);
+    list = cdr(list);
   }
   setCar(list, car(val));
   return mkref(val);
