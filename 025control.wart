@@ -75,12 +75,3 @@ mac repeat($n . $body)
 
 mac forever $body
   `(while 1 ,@$body)
-
-
-
-mac collect $body
-  `(withs ($acc   (queue)
-           yield  (fn(_)
-                    (enq _ $acc)))
-     ,@$body
-     (car rep.$acc))
