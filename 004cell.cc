@@ -199,6 +199,16 @@ bool equalList(Cell* a, Cell* b) {
       && equalList(cdr(a), cdr(b));
 }
 
+Cell* nthCdr(Cell* x, long n) {
+  Cell* curr = x;
+  for (long idx = n; idx > 0; --idx) {
+    if (!isCons(curr))
+      warn << "list is too short: " << x << " " << n << endl;
+    curr=cdr(curr);
+  }
+  return curr;
+}
+
 Cell* last(Cell* x) {
   while(cdr(x) != nil)
     x = cdr(x);
