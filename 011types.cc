@@ -90,6 +90,10 @@ COMPILE_PRIM_FUNC(list_splice, primFunc_list_splice, L"('$list $start $end $val)
   Cell* endPtr = nthCdr(list, toNum(lookup(L"$end")));
   Cell* val = lookup(L"$val");
   setCar(startPtr, car(val));
+  mkref(endPtr);
+  setCdr(startPtr, cdr(val));
+  append(startPtr, endPtr);
+  rmref(endPtr);
   rmref(list);
   return mkref(val);
 )
