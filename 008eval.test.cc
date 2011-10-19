@@ -206,6 +206,19 @@ void test_processUnquotes_handles_unquote_splice_and_unquote() {
   endDynamicScope(L"a");
 }
 
+void test_processUnquotes_creates_copies_of_any_lists_used() {
+  newDynamicScope(L"a", newCons(newNum(3), nil));
+  newDynamicScope(L"b", newCons(newNum(4), nil));
+  Cell* expr = wartRead(stream(L"(,@a ,b)")).front();
+  Cell* result = processUnquotes(expr, 1);
+  check(isCons(result));
+  check(result != lookup(L"a"))
+  rmref(result);
+  rmref(expr);
+  endDynamicScope(L"b");
+  endDynamicScope(L"a");
+}
+
 
 
 void test_nil_evals_to_itself() {
