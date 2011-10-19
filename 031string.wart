@@ -1,7 +1,9 @@
-defcall string(s idx)
+defcall string(s idx end)
   if (< idx 0)
     = idx (+ len.s idx)
-  (string_get s idx)
+  if (and end (< end 0))
+    = end (+ len.s end)
+  (string_get s idx end)
 
 defset string(s idx end val)
   if (< idx 0)

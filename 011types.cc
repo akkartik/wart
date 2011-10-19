@@ -67,7 +67,7 @@ COMPILE_PRIM_FUNC(string_splice, primFunc_string_splice, L"($string $start $end 
   return mkref(val);
 )
 
-COMPILE_PRIM_FUNC(string_get, primFunc_string_get, L"($string $index)",
+COMPILE_PRIM_FUNC(string_get, primFunc_string_get, L"($string $index $end)",
   Cell* str = lookup(L"$string");
   if (!isString(str)) {
     warn << "not a string: " << str << endl;
@@ -80,7 +80,13 @@ COMPILE_PRIM_FUNC(string_get, primFunc_string_get, L"($string $index)",
     return nil;
   }
 
-  return mkref(newString(toString(str).substr(index, 1)));
+  size_t end = toNum(lookup(L"$end"));
+  if (end > ((string*)str->car)->length()-1) {
+    warn << "no such end-index in string: " << str << " " << end << endl;
+    return nil;
+  }
+
+  return mkref(newString(toString(str).substr(index, end-index)));
 )
 
 COMPILE_PRIM_FUNC(list_splice, primFunc_list_splice, L"('$list $start $end $val)",
