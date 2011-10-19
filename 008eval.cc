@@ -225,15 +225,22 @@ void bindArgs(Cell* params, Cell* args) {
                                     return stripUnquote(cdr(x));
                                   }
 
+// never return the result of an eval, return a copy
 long bbcounter=100;
 Cell* origExpr=nil;
 Cell* processUnquotes(Cell* x, int depth) {
   if (!isCons(x)) return mkref(x);
 
-  if (unquoteDepth(x) == depth)
-    return eval(stripUnquote(x));
-  else if (car(x) == newSym(L","))
+  if (unquoteDepth(x) == depth) {
+    Cell* result = eval(stripUnquote(x));
+    if (!isCons(result)) return result;
+    Cell* resultcopy = copyList(result);
+    rmref(result);
+    return mkref(resultcopy);
+  }
+  else if (car(x) == newSym(L",")) {
     return mkref(x);
+  }
 
   if (isBackQuoted(x)) {
     Cell* result = newCons(car(x), processUnquotes(cdr(x), depth+1));
@@ -244,19 +251,12 @@ Cell* processUnquotes(Cell* x, int depth) {
   if (depth == 1 && isCons(car(x)) && car(car(x)) == newSym(L",@")) {
     Cell* result = eval(cdr(car(x)));
     Cell* splice = processUnquotes(cdr(x), depth);
-    printDepth = 0;
-    cout << ++bbcounter << " 0: " << origExpr << " " << x << " --- " <<
-      ((scopeContainingBinding(newSym(L"foo"), currLexicalScopes.top())) ? lookup(L"foo") : nil) << endl;
     if (result == nil) return splice;
-    printDepth = 0;
-    if (scopeContainingBinding(newSym(L"foo"), currLexicalScopes.top()))
-      cout << ++bbcounter << " 1: " << result << " --- " << lookup(L"foo") << endl;
-    append(result, splice);
-    printDepth = 0;
-    if (scopeContainingBinding(newSym(L"foo"), currLexicalScopes.top()))
-      cout << ++bbcounter << " 2: " << result << " --- " << lookup(L"foo") << endl;
+    Cell* resultcopy = copyList(result);
+    rmref(result);
+    append(resultcopy, splice);
     rmref(splice);
-    return result; // already mkref'd
+    return mkref(resultcopy);
   }
 
   Cell* result = newCons(processUnquotes(car(x), depth), processUnquotes(cdr(x), depth));
