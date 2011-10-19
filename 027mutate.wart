@@ -8,6 +8,12 @@ let $= =
 mac zap($f $x)
   `(= ,$x (,$f ,$x))
 
+; infinite nil generator
+= nils '(nil)   cdr.nils nils
+
+mac wipe $places
+  `(= ,@(zip-flat $places nils))
+
 mac push($x $xs)
   `(= ,$xs (cons ,$x ,$xs))
 
