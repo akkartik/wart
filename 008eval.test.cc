@@ -165,6 +165,49 @@ void test_bindArgs_binds_multiple_params() {
 
 
 
+void test_processUnquotes_handles_unquote() {
+  newDynamicScope(L"a", newNum(3));
+  Cell* expr = wartRead(stream(L"(,a)")).front();
+  Cell* result = processUnquotes(expr, 1);
+  check(isCons(result));
+  checkEq(car(result), newNum(3));
+  checkEq(cdr(result), nil);
+  rmref(result);
+  rmref(expr);
+  endDynamicScope(L"a");
+}
+
+void test_processUnquotes_handles_unquote_splice() {
+  newDynamicScope(L"a", newCons(newNum(3), nil));
+  Cell* expr = wartRead(stream(L"(,@a)")).front();
+  Cell* result = processUnquotes(expr, 1);
+  check(isCons(result));
+  checkEq(car(result), newNum(3));
+  checkEq(cdr(result), nil);
+  rmref(result);
+  rmref(expr);
+  endDynamicScope(L"a");
+}
+
+void test_processUnquotes_handles_unquote_splice_and_unquote() {
+  newDynamicScope(L"a", newCons(newNum(3), nil));
+  newDynamicScope(L"b", newCons(newNum(4), nil));
+  Cell* expr = wartRead(stream(L"(,@a ,b)")).front();
+  Cell* result = processUnquotes(expr, 1);
+  check(isCons(result));
+  checkEq(car(result), newNum(3));
+  check(isCons(car(cdr(result))));
+  checkEq(car(car(cdr(result))), newNum(4));
+  checkEq(cdr(car(cdr(result))), nil);
+  checkEq(cdr(cdr(result)), nil);
+  rmref(result);
+  rmref(expr);
+  endDynamicScope(L"b");
+  endDynamicScope(L"a");
+}
+
+
+
 void test_nil_evals_to_itself() {
   list<Cell*> cells = wartRead(stream(L"()"));
   checkEq(cells.size(), 1);
