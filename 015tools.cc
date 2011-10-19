@@ -20,6 +20,7 @@ COMPILE_PRIM_FUNC(load, primFunc_load, L"($f)",
 
 COMPILE_PRIM_FUNC(pr, primFunc_prn, L"($x)",
   Cell* x = lookup(L"$x");
+  printDepth = 0;
   cout << x;
   cout.flush();
   return mkref(x);
