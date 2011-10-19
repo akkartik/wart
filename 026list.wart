@@ -5,10 +5,16 @@ defcall list(l idx end)
     = end (+ len.l end)
   (list_get l idx end)
 
-defset list(l idx val)
+defset list(l idx end . val)
   if (< idx 0)
     = idx (+ len.l idx)
-  (list_splice l idx (+ idx 1) list.val)
+  if !val
+    ; (= (l idx) val) => (= (l idx idx+1) '(val))
+    = val list.end   end (+ idx 1)
+    = val car.val
+  if (and end (< end 0))
+    = end (+ len.l end)
+  (list_splice l idx end val)
 
 def= car(l x)
   (set_car l x)
