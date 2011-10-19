@@ -59,4 +59,6 @@ let $= =
       (table_get coercions* car.$var)
         `((table_get coercions* ',car.$var) ,@cdr.$var ,$val)
       :else
-        `((coerce ,car.$var function=) ,@cdr.$var ,$val))
+        (do
+          (prn "D: " foo)
+          `((do1 (coerce ,car.$var function=) (prn "E: " foo)) ,@cdr.$var ,$val)))

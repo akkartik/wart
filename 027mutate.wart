@@ -1,9 +1,9 @@
-let $= =
-  mac = $args
-    if $args
-      `(ret $ans ,cadr.$args
-         (,$= ,car.$args $ans)
-         (= ,@cddr.$args))
+;? let $= =
+;?   mac = $args
+;?     if $args
+;?       `(ret $ans ,cadr.$args
+;?          (,$= ,car.$args $ans)
+;?          (= ,@cddr.$args))
 
 mac zap($f $x)
   `(= ,$x (,$f ,$x))
