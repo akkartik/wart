@@ -1,7 +1,0 @@
-= qq list.3
-
-= foo (fn()
-        (= qq.0 (list 1)))
-
-foo.
-prn qq

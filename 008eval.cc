@@ -225,8 +225,6 @@ void bindArgs(Cell* params, Cell* args) {
                                     return stripUnquote(cdr(x));
                                   }
 
-long bbcounter=100;
-Cell* origExpr=nil;
 Cell* processUnquotes(Cell* x, int depth) {
   if (!isCons(x)) return mkref(x);
 
@@ -306,10 +304,8 @@ Cell* eval(Cell* expr) {
   if (isQuoted(expr))
     return mkref(cdr(expr));
 
-  if (isBackQuoted(expr)) {
-    origExpr = expr;
+  if (isBackQuoted(expr))
     return processUnquotes(cdr(expr), 1); // already mkref'd
-  }
 
   if (car(expr) == newSym(L"fn") || car(expr) == newSym(L"mfn"))
     // attach current lexical scope
