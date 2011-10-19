@@ -20,10 +20,7 @@ COMPILE_PRIM_FUNC(uniq, primFunc_uniq, L"($x)",
 )
 
                                   void assign(Cell* var, Cell* val) {
-                                    Cell* currLexicalScope = currLexicalScopes.top();
-                                    if (isCons(currLexicalScope))
-                                      currLexicalScope = car(currLexicalScope);
-                                    Cell* scope = scopeContainingBinding(var, currLexicalScope);
+                                    Cell* scope = scopeContainingBinding(var, currLexicalScopes.top());
                                     if (!scope)
                                       newDynamicScope(var, val);
                                     else if (scope == nil)

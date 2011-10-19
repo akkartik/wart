@@ -89,37 +89,21 @@ void addLexicalBinding(string var, Cell* val) {
 
 Cell* lookupLexicalBinding(Cell* sym, Cell* scope) {
   Cell* result = NULL;
-  list<Cell*> callees;
   for (; scope != nil; scope = cdr(scope)) {
     if (isTable(scope))
       result = unsafeGet(scope, sym);
     if (result) return result;
-
-    if (isCons(scope))
-      callees.push_back(scope);
   }
 
-  for (list<Cell*>::iterator p = callees.begin(); p != callees.end(); ++p) {
-    result = lookupLexicalBinding(sym, car(*p));
-    if (result) return result;
-  }
   return NULL;
 }
 
 Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
-  list<Cell*> callees;
   for (; scope != nil; scope = cdr(scope)) {
     if (isTable(scope) && unsafeGet(scope, sym))
       return scope;
-
-    if (isCons(scope))
-      callees.push_back(scope);
   }
 
-  for (list<Cell*>::iterator p = callees.begin(); p != callees.end(); ++p) {
-    Cell* result = scopeContainingBinding(sym, car(*p));
-    if (result) return result;
-  }
   if (lookupDynamicBinding(sym))
     return nil;
   return NULL;

@@ -138,33 +138,3 @@ void test_lower_lexical_scopes_are_available() {
       endLexicalScope();
   endLexicalScope();
 }
-
-void test_lexical_scope_can_be_a_cons() {
-  Cell* sym = newSym(L"a");
-  checkEq(sym->nrefs, 1);
-  Cell* val = newNum(34);
-  checkEq(val->nrefs, 1);
-  newLexicalScope();
-    addLexicalBinding(sym, val);
-      checkEq(lookup(sym), val);
-      newDynamicScope(L"currLexicalScope", newCons(currLexicalScopes.top(), nil));
-        checkEq(lookup(sym), val);
-      endDynamicScope(L"currLexicalScope");
-  endLexicalScope();
-}
-
-void test_lookup_nested_cons_lexical_scopes() {
-  Cell* sym = newSym(L"a");
-  checkEq(sym->nrefs, 1);
-  Cell* val = newNum(34);
-  checkEq(val->nrefs, 1);
-  newLexicalScope();
-    addLexicalBinding(sym, val);
-      newLexicalScope();
-        checkEq(lookup(sym), val);
-        newDynamicScope(L"currLexicalScope", newCons(currLexicalScopes.top(), nil));
-          checkEq(lookup(sym), val);
-        endDynamicScope(L"currLexicalScope");
-      endLexicalScope();
-  endLexicalScope();
-}
