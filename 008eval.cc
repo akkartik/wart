@@ -225,6 +225,8 @@ void bindArgs(Cell* params, Cell* args) {
                                     return stripUnquote(cdr(x));
                                   }
 
+long bbcounter=100;
+Cell* origExpr=nil;
 Cell* processUnquotes(Cell* x, int depth) {
   if (!isCons(x)) return mkref(x);
 
@@ -242,8 +244,17 @@ Cell* processUnquotes(Cell* x, int depth) {
   if (depth == 1 && isCons(car(x)) && car(car(x)) == newSym(L",@")) {
     Cell* result = eval(cdr(car(x)));
     Cell* splice = processUnquotes(cdr(x), depth);
+    printDepth = 0;
+    cout << ++bbcounter << " 0: " << origExpr << " " << x << " --- " <<
+      ((scopeContainingBinding(newSym(L"foo"), currLexicalScopes.top())) ? lookup(L"foo") : nil) << endl;
     if (result == nil) return splice;
+    printDepth = 0;
+    if (scopeContainingBinding(newSym(L"foo"), currLexicalScopes.top()))
+      cout << ++bbcounter << " 1: " << result << " --- " << lookup(L"foo") << endl;
     append(result, splice);
+    printDepth = 0;
+    if (scopeContainingBinding(newSym(L"foo"), currLexicalScopes.top()))
+      cout << ++bbcounter << " 2: " << result << " --- " << lookup(L"foo") << endl;
     rmref(splice);
     return result; // already mkref'd
   }
@@ -282,7 +293,6 @@ Cell* processUnquotes(Cell* x, int depth) {
                                     return ans;
                                   }
 
-long bbcounter=100;
 Cell* eval(Cell* expr) {
   if (!expr)
     err << "eval: cell should never be NULL" << endl << DIE;
@@ -302,8 +312,10 @@ Cell* eval(Cell* expr) {
   if (isQuoted(expr))
     return mkref(cdr(expr));
 
-  if (isBackQuoted(expr))
+  if (isBackQuoted(expr)) {
+    origExpr = expr;
     return processUnquotes(cdr(expr), 1); // already mkref'd
+  }
 
   if (car(expr) == newSym(L"fn") || car(expr) == newSym(L"mfn"))
     // attach current lexical scope
@@ -319,21 +331,9 @@ Cell* eval(Cell* expr) {
   if (!isFunc(fn))
     err << "not a function call: " << expr << endl << DIE;
 
-  printDepth = 0;
-  if (scopeContainingBinding(newSym(L"foo"), currLexicalScopes.top()))
-    cout << "0: " << expr << " --- " << lookup(L"foo") << endl;
-
   // eval all its args in the current lexical scope
   Cell* realArgs = reorderKeywordArgs(sig(fn), callArgs(expr));
-
-  printDepth = 0;
-  if (scopeContainingBinding(newSym(L"foo"), currLexicalScopes.top()))
-    cout << "1: " << expr << " --- " << lookup(L"foo") << endl;
   Cell* evaldArgs = evalArgs(sig(fn), realArgs);
-
-  printDepth = 0;
-  if (scopeContainingBinding(newSym(L"foo"), currLexicalScopes.top()))
-    cout << "2: " << expr << " --- " << lookup(L"foo") << endl;
 
   // swap in the function's lexical environment
   if (!isPrimFunc(car(fn)))
@@ -349,37 +349,19 @@ Cell* eval(Cell* expr) {
   else
     for (Cell* form = calleeBody(fn); form != nil; form = cdr(form)) {
       rmref(result);
-      printDepth = 0;
-      if (scopeContainingBinding(newSym(L"foo"), currLexicalScopes.top()))
-        cout << "5: " << expr << " --- " << lookup(L"foo") << endl;
       result = eval(car(form));
-      printDepth = 0;
-      if (scopeContainingBinding(newSym(L"foo"), currLexicalScopes.top()))
-        cout << "6: " << expr << " --- " << lookup(L"foo") << endl;
     }
 
   endLexicalScope();
   if (!isPrimFunc(car(fn)))
     endDynamicScope(CURR_LEXICAL_SCOPE);
 
-  printDepth = 0;
-  if (scopeContainingBinding(newSym(L"foo"), currLexicalScopes.top()))
-    cout << "7: " << expr << " --- " << lookup(L"foo") << endl;
-
   // macros implicitly eval their result in the caller's scope
   if (car(fn) == newSym(L"evald-mfn"))
     result = implicitlyEval(result);
 
-  printDepth = 0;
-  if (scopeContainingBinding(newSym(L"foo"), currLexicalScopes.top()))
-    cout << "8: " << expr << " --- " << lookup(L"foo") << endl;
-
   rmref(evaldArgs);
   rmref(realArgs);
   rmref(fn);
-
-  printDepth = 0;
-  if (scopeContainingBinding(newSym(L"foo"), currLexicalScopes.top()))
-    cout << ++bbcounter << ": " << expr << " --- " << lookup(L"foo") << endl;
   return result; // already mkref'd
 }
