@@ -206,7 +206,7 @@ void test_processUnquotes_handles_unquote_splice_and_unquote() {
   endDynamicScope(L"a");
 }
 
-void test_processUnquotes_creates_copies_of_any_lists_used() {
+void test_processUnquotes_splices_copies_of_lists() {
   newDynamicScope(L"a", newCons(newNum(3), nil));
   newDynamicScope(L"b", newCons(newNum(4), nil));
   Cell* expr = wartRead(stream(L"(,@a ,b)")).front();
