@@ -10,6 +10,20 @@ void test_eval_handles_eval() {
   endDynamicScope(L"a");
 }
 
+void test_if_sees_args_in_then_and_else() {
+  Cell* fn = wartRead(stream(L"(fn(x) (if 34 x))")).front();
+  Cell* f = eval(fn);
+  newDynamicScope(L"f", f);
+  Cell* call = wartRead(stream(L"(f 35)")).front();
+  Cell* result = eval(call);
+  checkEq(result, newNum(35));
+  rmref(result);
+  rmref(call);
+  endDynamicScope(L"f");
+  rmref(f);
+  rmref(fn);
+}
+
 void test_cons_works() {
   Cell* call = wartRead(stream(L"cons 1 2")).front();
   Cell* result = eval(call);
@@ -78,53 +92,4 @@ void test_assign_overrides_lexical_var() {
   checkEq(call, newNum(35));
   rmref(call);
   rmref(fn);
-}
-
-void test_if_sees_args_in_then_and_else() {
-  Cell* fn = wartRead(stream(L"(fn(x) (if 34 x))")).front();
-  Cell* f = eval(fn);
-  newDynamicScope(L"f", f);
-  Cell* call = wartRead(stream(L"(f 35)")).front();
-  Cell* result = eval(call);
-  checkEq(result, newNum(35));
-  rmref(result);
-  rmref(call);
-  endDynamicScope(L"f");
-  rmref(f);
-  rmref(fn);
-}
-
-void test_sym_works_with_one_arg() {
-  Cell* call = wartRead(stream(L"(sym \"abc\")")).front();
-  Cell* result = eval(call);
-  checkEq(result, newSym(L"abc"));
-  rmref(result);
-  rmref(call);
-}
-
-void test_sym_works_with_multiple_args() {
-  Cell* call = wartRead(stream(L"(sym \"abc\" 42 'def)")).front();
-  Cell* result = eval(call);
-  checkEq(result, newSym(L"abc42def"));
-  rmref(result);
-  rmref(call);
-}
-
-void test_str_works_with_multiple_args() {
-  Cell* call = wartRead(stream(L"(str \"abc\" 42 'def)")).front();
-  Cell* result = eval(call);
-  check(isString(result));
-  checkEq(toString(result), L"abc42def");
-  rmref(result);
-  rmref(call);
-}
-
-
-
-void test_add_works() {
-  Cell* call = wartRead(stream(L"+ 1 2")).front();
-  Cell* result = eval(call);
-  checkEq(toNum(result), 3);
-  rmref(result);
-  rmref(call);
 }
