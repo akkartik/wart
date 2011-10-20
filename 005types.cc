@@ -222,7 +222,7 @@ Cell* type(Cell* x) {
                                   ostream& operator<<(ostream& os, Cell* c) {
                                     if (c == NULL) return os << "NULLNULLNULL";
                                     if (c == nil) return os << "nil";
-                                    if (++printDepth > 100) return os << "...";
+                                    if (++printDepth > 512) return os << "...";
                                     switch(c->type) {
                                     case CONS:
                                       if (car(c) == newSym(L"'") || car(c) == newSym(L"`") || car(c) == newSym(L",") || car(c) == newSym(L",@"))
