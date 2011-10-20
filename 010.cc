@@ -1,7 +1,8 @@
 //// core compiled primitives
 
-// primFuncs take $vars as params.
-// $vars needn't turn into gensyms if primFuncs don't call each other.
+// these have access to caller scope
+// use $vars to avoid shadowing
+// they never call each other; needn't generate gensyms for $vars
 
 COMPILE_PRIM_FUNC(eval, primFunc_eval, L"($x)",
   return eval(lookup(L"$x"));
