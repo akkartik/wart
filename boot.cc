@@ -305,6 +305,7 @@ int main(int argc, unused ascii* argv[]) {
     list<Cell*> form = wartRead(cin);
     if (form.empty()) continue;
     Cell* result = eval(form.front());
+    printDepth = 0;
     cout << result << endl;
     rmref(result);
   }
