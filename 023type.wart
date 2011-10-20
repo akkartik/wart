@@ -28,35 +28,35 @@ def coerce(x 'dest-type)
 def coerce-quoted'(x dest-type)
   ((table_get (table_get coercions* dest-type) type.x) x)
 
-mac defcoerce($src $dest $f)
+mac defcoerce(src dest f)
   `(do
-     if (~table_get coercions* ',$dest)
-       (table_set coercions* ',$dest (table))
-     (table_set (table_get coercions* ',$dest) ',$src ,$f))
+     if (~table_get coercions* ',dest)
+       (table_set coercions* ',dest (table))
+     (table_set (table_get coercions* ',dest) ',src ,f))
 
-mac defcall($type $params . $body)
-  `(defcoerce ,$type function
-     (fn(,car.$params)
-       (fn ,cdr.$params
-         ,@$body)))
+mac defcall(type params . body)
+  `(defcoerce ,type function
+     (fn(,car.params)
+       (fn ,cdr.params
+         ,@body)))
 
 
 
-mac defset($type $params . $body)
-  `(defcoerce ,$type function=
-     (fn(,car.$params)
-       (fn ,cdr.$params
-         ,@$body)))
+mac defset(type params . body)
+  `(defcoerce ,type function=
+     (fn(,car.params)
+       (fn ,cdr.params
+         ,@body)))
 
-mac def=($op $params . $body)
-  `(table_set coercions* ',$op (fn ,$params ,@$body))
+mac def=(op params . body)
+  `(table_set coercions* ',op (fn ,params ,@body))
 
 let $= =
-  mac =($var $val)
+  mac =(var val)
     (if
-      sym?.$var
-        `(,$= ,$var ,$val)
-      (table_get coercions* car.$var)
-        `((table_get coercions* ',car.$var) ,@cdr.$var ,$val)
+      sym?.var
+        `(,$= ,var ,val)
+      (table_get coercions* car.var)
+        `((table_get coercions* ',car.var) ,@cdr.var ,val)
       :else
-        `((coerce ,car.$var function=) ,@cdr.$var ,$val))
+        `((coerce ,car.var function=) ,@cdr.var ,val))

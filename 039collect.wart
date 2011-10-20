@@ -1,6 +1,6 @@
-mac collect $body
+mac collect body
   `(withs ($acc   (queue)
            yield  (fn(_)
                     (enq _ $acc)))
-     ,@$body
+     ,@body
      (car rep.$acc))

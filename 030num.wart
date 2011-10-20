@@ -27,11 +27,11 @@ let $% %
     (all (fn((x y)) ($> y x))
          pairwise.xs))
 
-mac ++($n)
-  `(= ,$n (+ ,$n 1))
+mac ++(n)
+  `(= ,n (+ ,n 1))
 
-mac --($n)
-  `(= ,$n (- ,$n 1))
+mac --(n)
+  `(= ,n (- ,n 1))
 
 
 

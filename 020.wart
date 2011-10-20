@@ -1,27 +1,27 @@
 ; (mac foo(x) `(+ 1 ,x))) (let x 3 (foo x)) => 4
-= mac (mfn '($name $params . $body)
-  `(= ,$name (mfn ',$params
-                    ,@$body)))
+= mac (mfn '(name params . body)
+  `(= ,name (mfn ',params
+                    ,@body)))
 
-mac def($name $params . $body)
-  `(= ,$name (fn ,$params ,@$body))
+mac def(name params . body)
+  `(= ,name (fn ,params ,@body))
 
 mac alias(new old) ; include later refinements
-  `(def ,new $args
-     (,old @$args))
+  `(def ,new args
+     (,old @args))
 
 def compose(f g)
-  mfn '$args
-    `(,f (,g ,@$args))
+  mfn 'args
+    `(,f (,g ,@args))
 
 def complement(f)
   (compose not f)
 
-mac let($var $val . $body)
-  `((fn(,$var) ,@$body) ,$val)
+mac let(var val . body)
+  `((fn(,var) ,@body) ,val)
 
-mac do $body
-  `((fn() ,@$body))
+mac do body
+  `((fn() ,@body))
 
 def list args
   if args

@@ -8,33 +8,33 @@ def pair(l)
       (cons (list car.l cadr.l)
             pair cddr.l))
 
-mac with($params . $body)
-  `((fn ,(map car pair.$params)
-     ,@$body)
-    ,@(map cadr pair.$params))
+mac with(params . body)
+  `((fn ,(map car pair.params)
+     ,@body)
+    ,@(map cadr pair.params))
 
-mac withs($params . $body)
-  if !$params
-    `(do ,@$body)
-    `(let ,car.$params ,cadr.$params
-       (withs ,cddr.$params ,@$body))
+mac withs(params . body)
+  if !params
+    `(do ,@body)
+    `(let ,car.params ,cadr.params
+       (withs ,cddr.params ,@body))
 
 
 
-mac proc($name $params . $body)
-  `(def ,$name ,$params
-     ,@$body
+mac proc(name params . body)
+  `(def ,name ,params
+     ,@body
      nil)
 
-mac ret($var $val . $body)
-  `(let ,$var ,$val
-     ,@$body
-     ,$var)
+mac ret(var val . body)
+  `(let ,var ,val
+     ,@body
+     ,var)
 
-mac rfn($name $params . $body)
-  `(ret ,$name nil
-      (= ,$name (fn ,$params
-                  ,@$body)))
+mac rfn(name params . body)
+  `(ret ,name nil
+      (= ,name (fn ,params
+                  ,@body)))
 
-mac afn($params . $body)
-  `(rfn self ,$params ,@$body)
+mac afn(params . body)
+  `(rfn self ,params ,@body)

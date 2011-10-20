@@ -1,26 +1,26 @@
 let $if if
-  mac if $args
-    $if (~cdr $args)
-      car.$args
-      `(,$if ,car.$args
-         ,cadr.$args
-         (if ,@cddr.$args))
+  mac if args
+    $if (~cdr args)
+      car.args
+      `(,$if ,car.args
+         ,cadr.args
+         (if ,@cddr.args))
 
-mac or $args
-  if $args
-    `(let $x ,car.$args
+mac or args
+  if args
+    `(let $x ,car.args
        if $x
          $x
-         or ,@cdr.$args)
+         or ,@cdr.args)
 
-mac and $args
-  if !$args
+mac and args
+  if !args
     1
-    if car.$args
-      if !cdr.$args
-        car.$args
-        `(if ,car.$args
-           and ,@cdr.$args)
+    if car.args
+      if !cdr.args
+        car.args
+        `(if ,car.args
+           and ,@cdr.args)
 
 alias nil? not
 alias no not

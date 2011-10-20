@@ -1,36 +1,36 @@
 let $= =
-  mac = $args
-    if $args
-      `(ret $ans ,cadr.$args
-         (,$= ,car.$args $ans)
-         (= ,@cddr.$args))
+  mac = args
+    if args
+      `(ret $ans ,cadr.args
+         (,$= ,car.args $ans)
+         (= ,@cddr.args))
 
-mac zap($f $x)
-  `(= ,$x (,$f ,$x))
+mac zap(f x)
+  `(= ,x (,f ,x))
 
 ; infinite nil generator
 = nils '(nil)   cdr.nils nils
 
-mac wipe $places
-  `(= ,@(zip-flat $places nils))
+mac wipe places
+  `(= ,@(zip-flat places nils))
 
-mac push($x $xs)
-  `(= ,$xs (cons ,$x ,$xs))
+mac push(x xs)
+  `(= ,xs (cons ,x ,xs))
 
-mac pop($xs)
-  `(do1 car.,$xs
-     (zap cdr ,$xs))
+mac pop(xs)
+  `(do1 car.,xs
+     (zap cdr ,xs))
 
-mac or=($var $val)
-  `(unless ,$var
-     (= ,$var ,$val))
+mac or=(var val)
+  `(unless ,var
+     (= ,var ,val))
 
-mac shift $args ; multiply-evals to maintain places
-  `(= ,@(zip-flat $args cdr.$args))
+mac shift args ; multiply-evals to maintain places
+  `(= ,@(zip-flat args cdr.args))
 
-mac rotate $args
-  `(let $tmp ,car.$args
-     shift ,@$args $tmp)
+mac rotate args
+  `(let $tmp ,car.args
+     shift ,@args $tmp)
 
-mac swap($x $y)
-  `(rotate ,$x ,$y)
+mac swap(x y)
+  `(rotate ,x ,y)
