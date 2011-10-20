@@ -36,6 +36,14 @@ COMPILE_PRIM_FUNC(=, primFunc_assign, L"('$var $val)",
   return mkref(val);
 )
 
+COMPILE_PRIM_FUNC(bound?, primFunc_isBound, L"($var)",
+  Cell* var = lookup(L"$var");
+  if (var == nil) return mkref(newNum(1));
+  if (!scopeContainingBinding(var, currLexicalScopes.top()))
+    return nil;
+  return mkref(var);
+)
+
 
 
 COMPILE_PRIM_FUNC(cons, primFunc_cons, L"($x $y)",

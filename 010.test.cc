@@ -93,3 +93,16 @@ void test_assign_overrides_lexical_var() {
   rmref(call);
   rmref(fn);
 }
+
+void test_bound_works() {
+  Cell* call = wartRead(stream(L"bound?!a")).front();
+  Cell* result1 = eval(call);
+  checkEq(result1, nil);
+  newDynamicScope(L"a", newNum(3));
+  Cell* result2 = eval(call);
+  checkEq(result2, newSym(L"a"));
+  rmref(result2);
+  endDynamicScope(L"a");
+  rmref(result1);
+  rmref(call);
+}
