@@ -228,11 +228,14 @@ Cell* type(Cell* x) {
                                       if (car(c) == newSym(L"'") || car(c) == newSym(L"`") || car(c) == newSym(L",") || car(c) == newSym(L",@"))
                                         return os << car(c) << cdr(c);
                                       os << "(" << car(c);
-                                      for (Cell* curr = cdr(c); curr != nil; curr = cdr(curr))
+                                      for (Cell* curr = cdr(c); curr != nil; curr = cdr(curr)) {
+                                        if (++printDepth > 512)
+                                          return os << "...";
                                         if (isCons(curr))
                                           os << " " << car(curr);
                                         else
                                           os << " . " << curr;
+                                      }
                                       return os << ")";
                                     case NUM:
                                       return os << toNum(c);
