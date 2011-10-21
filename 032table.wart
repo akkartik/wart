@@ -1,5 +1,5 @@
-defcall table(h k)
-  (table_get h k)
+defcall table(h k default)
+  (or (table_get h k) default)
 
 defset table((h k) v)
   `(table_set ,h ,k ,v)
