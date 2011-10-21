@@ -25,7 +25,7 @@ mac or=(var val)
   `(unless ,var
      (= ,var ,val))
 
-mac shift args ; multiply-evals to maintain places
+mac shift args ; multiple-eval to maintain places
   `(= ,@(zip-flat args cdr.args))
 
 mac rotate args
