@@ -34,6 +34,7 @@ mac defcoerce(src dest f)
        (table_set coercions* ',dest (table))
      (table_set (table_get coercions* ',dest) ',src ,f))
 
+; arbitrary types in function position
 mac defcall(type params . body)
   `(defcoerce ,type function
      (fn(,car.params)

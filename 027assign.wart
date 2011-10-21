@@ -1,3 +1,5 @@
+; modifying arbitrary types
+; body must return a form that will be macro-eval'd
 mac defset(type params . body)
   `(defcoerce ,type function=
      (mfn ',params
