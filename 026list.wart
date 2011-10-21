@@ -11,13 +11,9 @@ defset list((l idx end) val)
     `(do
 ;?        if (< ,idx 0)
 ;?          = ,idx (+ len.,l ,idx)
-;?        if !,val
-;?          ; (= (l idx) val) => (= (l idx idx+1) '(val))
-;?          = ,val list.,end   ,end (+ ,idx 1)
-;?          = ,val car.,val
 ;?        if (and ,end (< ,end 0))
 ;?          = ,end (+ len.,l ,end)
-       (list_splice ,l ,idx (or ,end (+ ,idx 1)) ,val)))
+       (list_splice ,l ,idx (or ,end (+ ,idx 1)) (if ,end ,val list.,val))))
 
 prn.
 
@@ -38,7 +34,7 @@ prn.
 
 = (l 0 2) '(4)
 prn l
-= (l 0) '(6)
+= (l 0) 6
 prn l
 
 quit.
