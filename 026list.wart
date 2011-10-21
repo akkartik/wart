@@ -1,43 +1,18 @@
+def bounce-index(x l)
+  if (and x (< x 0))
+    (+ len.l x)
+    x
+
 defcall list(l idx end)
-  if (< idx 0)
-    = idx (+ len.l idx)
-  if (and end (< end 0))
-    = end (+ len.l end)
-  (list_get l idx end)
+  (list_get l (bounce-index idx l)
+              (bounce-index end l))
 
 defset list((l idx end) val)
-  (prn l " " idx " " end " " val)
-  (prn
-    `(do
-;?        if (< ,idx 0)
-;?          = ,idx (+ len.,l ,idx)
-;?        if (and ,end (< ,end 0))
-;?          = ,end (+ len.,l ,end)
-       (list_splice ,l ,idx (or ,end (+ ,idx 1)) (if ,end ,val list.,val))))
-
-prn.
-
-;? ;? = l '(1 2 3)
-;? ;? prn "===="
-;? ;? ;? = f (coerce-quoted l function=)
-;? ;? = f (mfn'(l idx end val)
-;? ;?       `(list_splice ,l ,idx ,end ,val))
-;? ;? prn.f
-;? ;? (f l 0 2 nil)
-;? ;? prn l
-;? 
-;? defcoerce list function=
-;?   mfn'(l idx end val)
-;?     `(list_splice ,l ,idx ,end ,val)
-;? prn "===="
-= l '(1 2 3)
-
-= (l 0 2) '(4)
-prn l
-= (l 0) 6
-prn l
-
-quit.
+  `(withs ($idx  (bounce-index ,idx ,l)
+           $end  (bounce-index ,end ,l)
+           $val  (if ,end ,val
+                   list.,val))
+     (list_splice ,l $idx (or $end (+ 1 $idx)) $val))
 
 def= car(l x)
   (set_car l x)
