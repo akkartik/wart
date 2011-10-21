@@ -20,8 +20,7 @@ mac defset(type params . body)
 
 
 ; keyword-based dispatch
-                          ; hack: can't bind non-sym non-conses
-mac =(lhs rhs) :case (and !sym?.lhs (table_get coercions* car.lhs))
+mac =(lhs rhs) :case (and list?.lhs (table_get coercions* car.lhs))
   `((table_get coercions* ',car.lhs) ,@cdr.lhs ,rhs)
 
 ; support new keywords in =
