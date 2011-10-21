@@ -59,4 +59,4 @@ let $= =
         `((table_get coercions* ',car.var) ,@cdr.var ,val)
       :else
         ; multiple-eval in case car.var needs assigning to
-        `((table_get (table_get coercions* 'function=) (type ,car.var)) ,@var ,val))
+        `((table_get (table_get coercions* 'function=) (type ,car.var)) ,var ,val))

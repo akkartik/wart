@@ -5,7 +5,7 @@ defcall list(l idx end)
     = end (+ len.l end)
   (list_get l idx end)
 
-defset list(l idx end val)
+defset list((l idx end) val)
   (prn l " " idx " " end " " val)
   (prn
     `(do
@@ -17,7 +17,7 @@ defset list(l idx end val)
 ;?          = ,val car.,val
 ;?        if (and ,end (< ,end 0))
 ;?          = ,end (+ len.,l ,end)
-       (list_splice ,l ,idx ,end ,val)))
+       (list_splice ,l ,idx (or ,end (+ ,idx 1)) ,val)))
 
 prn.
 
@@ -37,6 +37,8 @@ prn.
 = l '(1 2 3)
 
 = (l 0 2) '(4)
+prn l
+= (l 0) '(6)
 prn l
 
 quit.
