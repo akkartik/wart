@@ -1,10 +1,3 @@
-; freeze sym assignment against future refinements
-let $= =
-  mac =(lhs rhs) :case (sym? lhs)
-    `(,$= ,lhs ,rhs)
-
-
-
 ; basic type-based dispatch
 mac =(lhs rhs) :case list?.lhs
   ; multiple-eval in case car.lhs needs assigning to
