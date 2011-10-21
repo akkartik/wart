@@ -1,8 +1,8 @@
 defcall table(h k)
   (table_get h k)
 
-defset table(h k v)
-  (table_set h k v)
+defset table((h k) v)
+  `(table_set ,h ,k ,v)
 
 let $table table
   def table args
