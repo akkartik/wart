@@ -6,7 +6,7 @@ let $= =
 
 
 ; basic type-based dispatch
-mac =(lhs rhs) :case !sym?.lhs
+mac =(lhs rhs) :case list?.lhs
   ; multiple-eval in case car.lhs needs assigning to
   `((table_get (table_get coercions* 'function=) (type ,car.lhs)) ,lhs ,rhs)
 
