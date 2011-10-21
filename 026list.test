@@ -27,6 +27,8 @@
             (= l.1 4))
  :should be '(1 4 3))
 
+quit.
+
 (test "list ranges can be spliced"
  :valueof (ret l '(1 2 3 4 5 6 7)
             (= (l 1 5) nil))

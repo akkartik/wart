@@ -44,9 +44,8 @@ mac defcall(type params . body)
 
 mac defset(type params . body)
   `(defcoerce ,type function=
-     (fn(,car.params)
-       (fn ,cdr.params
-         ,@body)))
+     (mfn ',params
+       ,@body))
 
 mac def=(op params . body)
   `(table_set coercions* ',op (fn ,params ,@body))
@@ -59,4 +58,5 @@ let $= =
       (table_get coercions* car.var)
         `((table_get coercions* ',car.var) ,@cdr.var ,val)
       :else
-        `((coerce ,car.var function=) ,@cdr.var ,val))
+        ; multiple-eval in case car.var needs assigning to
+        `((table_get (table_get coercions* 'function=) (type ,car.var)) ,@var ,val))

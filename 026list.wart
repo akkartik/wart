@@ -5,16 +5,41 @@ defcall list(l idx end)
     = end (+ len.l end)
   (list_get l idx end)
 
-defset list(l idx end . val)
-  if (< idx 0)
-    = idx (+ len.l idx)
-  if !val
-    ; (= (l idx) val) => (= (l idx idx+1) '(val))
-    = val list.end   end (+ idx 1)
-    = val car.val
-  if (and end (< end 0))
-    = end (+ len.l end)
-  (list_splice l idx end val)
+defset list(l idx end val)
+  (prn l " " idx " " end " " val)
+  (prn
+    `(do
+;?        if (< ,idx 0)
+;?          = ,idx (+ len.,l ,idx)
+;?        if !,val
+;?          ; (= (l idx) val) => (= (l idx idx+1) '(val))
+;?          = ,val list.,end   ,end (+ ,idx 1)
+;?          = ,val car.,val
+;?        if (and ,end (< ,end 0))
+;?          = ,end (+ len.,l ,end)
+       (list_splice ,l ,idx ,end ,val)))
+
+prn.
+
+;? ;? = l '(1 2 3)
+;? ;? prn "===="
+;? ;? ;? = f (coerce-quoted l function=)
+;? ;? = f (mfn'(l idx end val)
+;? ;?       `(list_splice ,l ,idx ,end ,val))
+;? ;? prn.f
+;? ;? (f l 0 2 nil)
+;? ;? prn l
+;? 
+;? defcoerce list function=
+;?   mfn'(l idx end val)
+;?     `(list_splice ,l ,idx ,end ,val)
+;? prn "===="
+= l '(1 2 3)
+
+= (l 0 2) '(4)
+prn l
+
+quit.
 
 def= car(l x)
   (set_car l x)
