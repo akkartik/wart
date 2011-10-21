@@ -52,6 +52,11 @@
             (= (l -4 -1) nil))
  :should be '(1 2 3 7))
 
+(test "list slice assignment can delete at start of list (by rebinding the var)"
+ :valueof (ret l '(1 2 3 4)
+            (= (l 0 2) nil))
+ :should be '(3 4))
+
 (test "nested lists can be assigned to"
  :valueof (ret l '(1 (2 3))
             (= ((l 1) 0) 3))
