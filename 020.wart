@@ -1,10 +1,25 @@
-; (mac foo(x) `(+ 1 ,x))) (let x 3 (foo x)) => 4
-= mac (mfn '(name params . body)
+; (mac! foo(x) `(+ 1 ,x))) (let x 3 (foo x)) => 4
+= mac! (mfn '(name params . body)
   `(= ,name (mfn ',params
                     ,@body)))
 
-mac def(name params . body)
+mac! def!(name params . body)
   `(= ,name (fn ,params ,@body))
+
+def! prn args
+  (pr (str @args "
+"))
+  car.args
+
+mac! def(name params . body)
+  if bound?.name
+    (prn "redef: " name)
+  `(def! ,name ,params ,@body)
+
+mac! mac(name params . body)
+  if bound?.name
+    (prn "redef: " name)
+  `(mac! ,name ,params ,@body)
 
 mac alias(new old) ; include later refinements
   `(def ,new args
@@ -34,8 +49,3 @@ let $iso iso ; ignore later refinements
 
 = cadr car:cdr
 = cddr cdr:cdr
-
-def prn args
-  (pr (str @args "
-"))
-  car.args
