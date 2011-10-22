@@ -175,8 +175,9 @@ Token nextToken(istream& in) {
   return Token::of(out.str(), prevTokenIndentLevel);
 }
 
-                                  bool twoNewlines(istream& in) {
-                                    if (eof(in)) return false;
+                                  bool endOfInput(istream& in) {
+                                    if (eof(in)) return true;
+                                    if (!interactive) return false;
                                     bool ans = false;
                                     char c = in.get();
                                     if (c == '\n' && !eof(in) && in.peek() == '\n')
@@ -191,10 +192,7 @@ list<Token> tokenize(istream& in) {
 
   list<Token> result;
   result.push_back(Token::indent(indent(in)));
-  while (!eof(in)) {
-    if (interactive && twoNewlines(in))
-      break;
-
+  while (!endOfInput(in)) {
     prevTokenIndentLevel = result.back().indentLevel;
     if (in.peek() == L'\n' || in.peek() == L';')
       result.push_back(Token::indent(indent(in)));
