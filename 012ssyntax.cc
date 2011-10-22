@@ -11,11 +11,12 @@ Cell* transformCompose(string var) {
 }
 
 Cell* transformCall(string var) {
-  if (var.find_first_of(L".!", var.length()-1) != string::npos)
-    return newCons(newSym(var.substr(0, var.length()-1)), nil);
+  int end = var.length()-1;
+  if (var.rfind(L'.') == end)
+    return newCons(newSym(var.substr(0, end)), nil);
 
   size_t dot = var.rfind(L'.');
-  size_t bang = var.rfind(L'!');
+  size_t bang = end > 0 ? var.rfind(L'!', end-1) : var.rfind(L'!');
   if (bang != string::npos && (dot == string::npos || bang > dot))
     var.replace(bang, 1, L" '");
   else
@@ -43,7 +44,7 @@ Cell* transform_ssyntax(Cell* input) {
       input = transformNot(var);
     else if (var[0] != L':' && var.find(L':') != string::npos)
       input = transformCompose(var);
-    else if (var.find(L'.') != string::npos || var.find(L'!') != string::npos)
+    else if (var.find(L'.') != string::npos || var.find(L'!') < var.length()-1)
       input = transformCall(var);
     else if (var.find(L'&') != string::npos)
       input = transformAndf(var);

@@ -54,6 +54,12 @@ void test_bang_is_call() {
   rmref(cons);
 }
 
+void test_leave_final_bang_alone() {
+  Cell* var = wartRead(stream(L"a!")).front();
+  checkEq(var, newSym(L"a!"));
+  rmref(var);
+}
+
 void test_call_is_left_associative() {
   Cell* cons = wartRead(stream(L"a.b!c")).front();
   check(isCons(cons));
