@@ -140,18 +140,22 @@ ostream& operator<<(ostream& os, Token p) {
 
                                   int indent(istream& in) {
                                     int indent = 0;
-                                    while (!eof(in) &&
-                                        (isspace(in.peek()) || in.peek() == L';')) {
+                                    while (!eof(in)) {
                                       char c = in.get();
-                                      if (c == L' ') ++indent;
-                                      else if (c == L'\t') indent+=2;
-                                      else if (c == L'\n')
-                                        indent = 0;
-                                      else if (c == L';') {
+                                      if (c == L';') {
                                         skipComment(in);
                                         if (endOfInput(in)) break;
-                                        indent=0;
+                                        indent = 0;
                                       }
+
+                                      else if (!isspace(c)) {
+                                        in.putback(c);
+                                        break;
+                                      }
+
+                                      else if (c == L' ') ++indent;
+                                      else if (c == L'\t') indent+=2;
+                                      else if (c == L'\n') indent=0;
                                     }
                                     return indent;
                                   }
