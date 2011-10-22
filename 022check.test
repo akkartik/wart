@@ -155,3 +155,7 @@
 (test "iso handles lists - 2"
  :valueof (iso list.1 list.1)
  :should ~be nil)
+
+(test "iso handles user-defined types"
+ :valueof (iso '(type foo 3) '(type foo 3))
+ :should ~be nil)

@@ -4,6 +4,13 @@ COMPILE_PRIM_FUNC(type, primFunc_type, L"($x)",
   return mkref(type(lookup(L"$x")));
 )
 
+// list? will not be true of user-defined (type 'foo ...) but cons? will.
+COMPILE_PRIM_FUNC(cons?, primFunc_isCons, L"($x)",
+  Cell* x = lookup(L"$x");
+  if (!isCons(x)) return nil;
+  return mkref(x);
+)
+
 COMPILE_PRIM_FUNC(iso, primFunc_iso, L"($x $y)",
   Cell* x = lookup(L"$x");
   Cell* y = lookup(L"$y");

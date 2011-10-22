@@ -28,8 +28,8 @@ alias no not
 let $iso iso
   def! iso(a b)
     or ($iso a b)
-      and (isa a list)
-          (isa a list)
+      and (cons? a)
+          (cons? b)
           (iso car.a car.b)
           (iso cdr.a cdr.b)
 

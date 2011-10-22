@@ -2,7 +2,6 @@ def sym?(_)
   (isa _ symbol)
 def list?(_)
   (isa _ list)
-alias cons? list?
 def num?(_)
   (isa _ number)
 def str?(_)
