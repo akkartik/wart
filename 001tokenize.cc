@@ -127,6 +127,17 @@ ostream& operator<<(ostream& os, Token p) {
                                     }
                                   }
 
+                                  bool endOfInput(istream& in) {
+                                    if (eof(in)) return true;
+                                    if (!interactive) return false;
+                                    bool ans = false;
+                                    char c = in.get();
+                                    if (c == '\n' && !eof(in) && in.peek() == '\n')
+                                      ans = true;
+                                    in.putback(c);
+                                    return ans;
+                                  }
+
                                   int indent(istream& in) {
                                     int indent = 0;
                                     while (!eof(in) &&
@@ -174,17 +185,6 @@ Token nextToken(istream& in) {
   }
   return Token::of(out.str(), prevTokenIndentLevel);
 }
-
-                                  bool endOfInput(istream& in) {
-                                    if (eof(in)) return true;
-                                    if (!interactive) return false;
-                                    bool ans = false;
-                                    char c = in.get();
-                                    if (c == '\n' && !eof(in) && in.peek() == '\n')
-                                      ans = true;
-                                    in.putback(c);
-                                    return ans;
-                                  }
 
 list<Token> tokenize(istream& in) {
   prevTokenIndentLevel = 0;
