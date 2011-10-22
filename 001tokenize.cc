@@ -145,7 +145,6 @@ ostream& operator<<(ostream& os, Token p) {
                                       if (c == L';') {
                                         skipComment(in);
                                         if (endOfInput(in)) break;
-                                        indent = 0;
                                       }
 
                                       else if (!isspace(c)) {
