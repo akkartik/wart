@@ -149,6 +149,7 @@ ostream& operator<<(ostream& os, Token p) {
                                         indent = 0;
                                       else if (c == L';') {
                                         skipComment(in);
+                                        if (endOfInput(in)) break;
                                         indent=0;
                                       }
                                     }
