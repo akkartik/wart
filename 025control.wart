@@ -27,11 +27,6 @@ mac whenlet(var test . body)
   `(iflet ,var ,test
       (do ,@body))
 
-mac whenlet(var test . body)
-  `(let ,var ,test
-     when ,var
-       ,@body)
-
 mac awhen(test . body)
   `(whenlet it ,test
       ,@body)

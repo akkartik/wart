@@ -5,7 +5,7 @@ defset table((h k) v)
   `(table_set ,h ,k ,v)
 
 let $table table
-  def table args
+  def! table args
     ret h ($table)
       each (k v) pair.args
         (= h.k v)

@@ -6,18 +6,18 @@ def construct-macro-call(args)
     args
 
 let $mac mac
-  mac mac(name params . body)
+  mac! mac(name params . body)
     if (~iso :case car.body)
       `(,$mac ,name ,params ,@body)
       `(let super ,name
-         (,$mac ,name ,params
+         (mac! ,name ,params
            if ,cadr.body
              (do ,@cddr.body)
              ,(construct-macro-call (cons 'super params)))) ; call super with params
 
 mac def(name params . body) :case (iso :case car.body)
   `(let $old ,name
-     (,super ,name ,params
+     (def! ,name ,params
        if ,cadr.body
          (do ,@body)
          ($old ,@params)))

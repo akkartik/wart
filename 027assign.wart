@@ -25,7 +25,7 @@ mac def=(op params . body)
 ; serial assignment
 ; this should be after clauses inspecting args
 let $= =
-  mac = args
+  mac! = args
     if args
       `(ret $ans ,cadr.args
          (,$= ,car.args $ans)

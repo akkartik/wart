@@ -1,29 +1,29 @@
 let $+ +
-  def + xs
+  def! + xs
     (reduce $+ xs)
 
 let $- -
-  def - xs
+  def! - xs
     (reduce $- xs)
 
 let $* *
-  def * xs
+  def! * xs
     (reduce $* xs)
 
 let $/ /
-  def / xs
+  def! / xs
     (reduce $/ xs)
 
 let $% %
-  def % xs
+  def! % xs
     (reduce $% xs)
 
 (let $> >
-  def > xs
+  def! > xs
     (all (fn((x y)) ($> x y))
          pairwise.xs)
 
-  def < xs
+  def! < xs
     (all (fn((x y)) ($> y x))
          pairwise.xs))
 
