@@ -143,11 +143,11 @@ ostream& operator<<(ostream& os, Token p) {
                                     while (!eof(in) &&
                                         (isspace(in.peek()) || in.peek() == L';')) {
                                       char c = in.get();
-                                      switch(c) {
-                                      case L' ': ++indent; break;
-                                      case L'\t': indent+=2; break;
-                                      case L'\n': indent=0; break;
-                                      case L';':
+                                      if (c == L' ') ++indent;
+                                      else if (c == L'\t') indent+=2;
+                                      else if (c == L'\n')
+                                        indent = 0;
+                                      else if (c == L';') {
                                         skipComment(in);
                                         indent=0;
                                       }
