@@ -11,7 +11,7 @@ Cell* transformCompose(string var) {
 }
 
 Cell* transformCall(string var) {
-  int end = var.length()-1;
+  size_t end = var.length()-1;
   if (var.rfind(L'.') == end)
     return newCons(newSym(var.substr(0, end)), nil);
 
