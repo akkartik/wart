@@ -240,8 +240,9 @@ Cell* type(Cell* x) {
                                     case NUM:
                                       return os << toNum(c);
                                     case SYM:
-                                    case STRING:
                                       return os << toString(c);
+                                    case STRING:
+                                      return os << "\"" << toString(c) << "\"";
                                     case TABLE:
                                       os << (Table*)c->car;
                                       if (cdr(c) != nil)
