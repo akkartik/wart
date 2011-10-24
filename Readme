@@ -11,6 +11,7 @@ You'll need gcc.
 To run:
   $ wart
   wart>
+
 Hit <enter> twice to eval.
 Hit ctrl-d to quit.
 
@@ -29,7 +30,6 @@ Tabs count as 2 spaces. Don't mix tabs and spaces.
 Multi-token lines without leading parens are implicitly grouped with later
 indented lines. Lines with a single token are always left alone. So the '34'
 above isn't a function call. And parens are required in:
-
   (do
     something)
 
