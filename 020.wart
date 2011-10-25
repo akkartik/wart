@@ -7,9 +7,13 @@ mac! def!(name params . body)
   `(= ,name (fn ,params ,@body))
 
 def! prn args
-  (pr (str @args "
-"))
-  car.args
+  if args
+    (do
+      pr car.args
+      prn @cdr.args
+      car.args)
+    pr "
+"
 
 mac! def(name params . body)
   if bound?.name
