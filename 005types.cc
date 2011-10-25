@@ -207,8 +207,6 @@ Cell* type(Cell* x) {
 
 
 
-                                  ostream& operator<<(ostream& os, Cell* c);
-
                                   ostream& operator<<(ostream& os, Table* t) {
                                     os << "{";
                                     for (CellMap::iterator p = t->table.begin(); p != t->table.end(); ++p) {
