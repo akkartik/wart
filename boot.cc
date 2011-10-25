@@ -303,10 +303,11 @@ int main(int argc, unused ascii* argv[]) {
   while (!cin.eof()) {
     cout << "wart> ";
     list<Cell*> form = wartRead(cin);
-    if (form.empty()) continue;
-    Cell* result = eval(form.front());
-    write(result, cout); cout << endl;
-    rmref(result);
+    for (list<Cell*>::iterator p = form.begin(); p != form.end(); ++p) {
+      Cell* result = eval(*p);
+      write(result, cout); cout << endl;
+      rmref(result);
+    }
   }
   return 0;
 }
