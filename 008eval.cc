@@ -4,12 +4,16 @@
                                     return isCons(cell) && car(cell) == newSym(L"'");
                                   }
 
-                                  Cell* stripQuote(Cell* cell) {
-                                    return isQuoted(cell) ? cdr(cell) : cell;
-                                  }
-
                                   bool isBackQuoted(Cell* cell) {
                                     return isCons(cell) && car(cell) == newSym(L"`");
+                                  }
+
+                                  bool isSplice(Cell* arg) {
+                                    return isCons(arg) && car(arg) == newSym(L"@");
+                                  }
+
+                                  bool isUnquoteSplice(Cell* arg) {
+                                    return isCons(arg) && car(arg) == newSym(L",@");
                                   }
 
                                   bool isColonSym(Cell* x) {
@@ -37,6 +41,10 @@
                                   }
 
 
+
+                                  Cell* stripQuote(Cell* cell) {
+                                    return isQuoted(cell) ? cdr(cell) : cell;
+                                  }
 
                                   bool paramAliasMatch(Cell* arg, Cell* param) {
                                     if (arg == param) return true;
@@ -125,10 +133,6 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
 
 
 
-                                  bool isSplice(Cell* arg) {
-                                    return isCons(arg) && car(arg) == newSym(L"@");
-                                  }
-
                                   Cell* unsplice(Cell* arg) {
                                     return eval(cdr(arg));
                                   }
@@ -180,6 +184,8 @@ Cell* evalArgs(Cell* params, Cell* args) {
   }
   return mkref(result);
 }
+
+
 
                                   // split param sym at '/' and bind all resulting syms to val
                                   void bindArgAliases(Cell* param, Cell* val) {
@@ -239,7 +245,7 @@ Cell* processUnquotes(Cell* x, int depth) {
     return mkref(result);
   }
 
-  if (depth == 1 && isCons(car(x)) && car(car(x)) == newSym(L",@")) {
+  if (depth == 1 && isUnquoteSplice(car(x))) {
     Cell* result = eval(cdr(car(x)));
     Cell* splice = processUnquotes(cdr(x), depth);
     if (result == nil) return splice;
