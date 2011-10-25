@@ -1,21 +1,3 @@
-void test_sym_works_with_one_arg() {
-  Cell* call = wartRead(stream(L"(sym \"abc\")")).front();
-  Cell* result = eval(call);
-  checkEq(result, newSym(L"abc"));
-  rmref(result);
-  rmref(call);
-}
-
-void test_sym_works_with_multiple_args() {
-  Cell* call = wartRead(stream(L"(sym \"abc\" 42 'def)")).front();
-  Cell* result = eval(call);
-  checkEq(result, newSym(L"abc42def"));
-  rmref(result);
-  rmref(call);
-}
-
-
-
 void test_list_splice_replaces_index() {
   newDynamicScope(L"a", newCons(newNum(3), newCons(newNum(4), nil)));
   Cell* expr = wartRead(stream(L"list_splice a 1 2 '(5)")).front();
@@ -142,14 +124,4 @@ void test_list_splice_returns_elem_if_single() {
   rmref(call);
   rmref(expr);
   endDynamicScope(L"a");
-}
-
-
-
-void test_add_works() {
-  Cell* call = wartRead(stream(L"+ 1 2")).front();
-  Cell* result = eval(call);
-  checkEq(toNum(result), 3);
-  rmref(result);
-  rmref(call);
 }

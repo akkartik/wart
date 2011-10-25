@@ -45,7 +45,33 @@ COMPILE_PRIM_FUNC(bound?, primFunc_isBound, L"($var)",
   return mkref(var);
 )
 
+COMPILE_PRIM_FUNC(type, primFunc_type, L"($x)",
+  return mkref(type(lookup(L"$x")));
+)
+
+COMPILE_PRIM_FUNC(iso, primFunc_iso, L"($x $y)",
+  Cell* x = lookup(L"$x");
+  Cell* y = lookup(L"$y");
+  Cell* result = nil;
+  if (x == nil && y == nil)
+    result = newNum(1);
+  else if (x == y)
+    result = x;
+  else if (isString(x) && isString(y) && toString(x) == toString(y))
+    result = x;
+  else
+    result = nil;
+  return mkref(result);
+)
+
 
+
+// list? will not be true of user-defined (type 'foo ...) but cons? will.
+COMPILE_PRIM_FUNC(cons?, primFunc_isCons, L"($x)",
+  Cell* x = lookup(L"$x");
+  if (!isCons(x)) return nil;
+  return mkref(x);
+)
 
 COMPILE_PRIM_FUNC(cons, primFunc_cons, L"($x $y)",
   return mkref(newCons(lookup(L"$x"), lookup(L"$y")));
@@ -67,4 +93,15 @@ COMPILE_PRIM_FUNC(set_car, primFunc_set_car, L"($cons $val)",
 COMPILE_PRIM_FUNC(set_cdr, primFunc_set_cdr, L"($cons $val)",
   setCdr(lookup(L"$cons"), lookup(L"$val"));
   return mkref(lookup(L"$val"));
+)
+
+COMPILE_PRIM_FUNC(len, primFunc_len, L"($x)",
+  Cell* x = lookup(L"$x");
+  if (isString(x))
+    return mkref(newNum(toString(x).length()));
+
+  int ans = 0;
+  for (; x != nil; x=cdr(x))
+    ++ans;
+  return mkref(newNum(ans));
 )
