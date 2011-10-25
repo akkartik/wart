@@ -188,7 +188,7 @@ Cell* evalArgs(Cell* params, Cell* args) {
 
 
                                   // split param sym at '/' and bind all resulting syms to val
-                                  void bindArgAliases(Cell* param, Cell* val) {
+                                  void bindParamAliases(Cell* param, Cell* val) {
                                     string name = toString(param);
                                     if (name.find(L'/') == string::npos || name.find(L'/') == 0) {
                                       addLexicalBinding(param, val);
@@ -201,20 +201,20 @@ Cell* evalArgs(Cell* params, Cell* args) {
                                       addLexicalBinding(newSym(tok), val);
                                   }
 
-void bindArgs(Cell* params, Cell* args) {
+void bindParams(Cell* params, Cell* args) {
   if (params == nil) return;
 
   if (isQuoted(params)) {
-    bindArgs(cdr(params), args);
+    bindParams(cdr(params), args);
     return;
   }
 
   if (isSym(params))
-    bindArgAliases(params, args);
+    bindParamAliases(params, args);
   else
-    bindArgs(car(params), car(args));
+    bindParams(car(params), car(args));
 
-  bindArgs(cdr(params), cdr(args));
+  bindParams(cdr(params), cdr(args));
 }
 
 
@@ -336,7 +336,7 @@ Cell* eval(Cell* expr) {
     newDynamicScope(CURR_LEXICAL_SCOPE, calleeEnv(fn));
   // now bind its params to args in the new environment
   newLexicalScope();
-  bindArgs(sig(fn), evaldArgs);
+  bindParams(sig(fn), evaldArgs);
 
   // eval all forms in body, save result of final form
   Cell* result = nil;
