@@ -44,22 +44,29 @@ ostream& operator<<(ostream& os, Cell* c) {
   }
 }
 
+void write(Cell* x, ostream& out) {
+  out << x;
+  printDepth=0;
+}
+
+void display(Cell* x, ostream& out) {
+  if (isString(x)) out << toString(x);
+  else out << x;
+  printDepth=0;
+}
+
 
 
 COMPILE_PRIM_FUNC(sym, primFunc_sym, L"$args",
   ostringstream out;
   for (Cell* args = lookup(L"$args"); args != nil; args = cdr(args))
-    if (isString(car(args))) out << toString(car(args));
-    else out << car(args);
-  printDepth=0;
+    display(car(args), out);
   return mkref(newSym(out.str()));
 )
 
 COMPILE_PRIM_FUNC(pr, primFunc_pr, L"($x)",
   Cell* x = lookup(L"$x");
-  if (isString(x)) cout << toString(x);
-  else cout << x;
-  printDepth=0;
+  display(x, cout);
   cout.flush();
   return mkref(x);
 )
