@@ -44,12 +44,6 @@ ostream& operator<<(ostream& os, Cell* c) {
   }
 }
 
-ostream& operator<<(ostream& os, list<Cell*> l) {
-  for (list<Cell*>::iterator p = l.begin(); p != l.end(); ++p)
-    os << *p;
-  return os << endl;
-}
-
 
 
 COMPILE_PRIM_FUNC(sym, primFunc_sym, L"$args",
