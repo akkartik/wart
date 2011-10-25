@@ -14,7 +14,7 @@ ostream& operator<<(ostream& os, Cell* c) {
   if (++printDepth > 512) return os << "...";
   switch(c->type) {
   case CONS:
-    if (car(c) == newSym(L"'") || car(c) == newSym(L"`") || car(c) == newSym(L",") || car(c) == newSym(L",@"))
+    if (car(c) == newSym(L"'") || car(c) == newSym(L"`") || car(c) == newSym(L",") || car(c) == newSym(L",@") || car(c) == newSym(L"@"))
       return os << car(c) << cdr(c);
     os << "(" << car(c);
     for (Cell* curr = cdr(c); curr != nil; curr = cdr(curr)) {
