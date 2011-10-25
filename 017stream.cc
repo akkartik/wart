@@ -61,7 +61,7 @@ COMPILE_PRIM_FUNC(sym, primFunc_sym, L"$args",
   return mkref(newSym(out.str()));
 )
 
-COMPILE_PRIM_FUNC(pr, primFunc_prn, L"($x)",
+COMPILE_PRIM_FUNC(pr, primFunc_pr, L"($x)",
   Cell* x = lookup(L"$x");
   if (isString(x)) cout << toString(x);
   else cout << x;
