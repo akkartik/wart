@@ -38,7 +38,7 @@
 
 
 
-                                  bool match(Cell* arg, Cell* param) {
+                                  bool paramAliasMatch(Cell* arg, Cell* param) {
                                     if (arg == param) return true;
                                     if (!isSym(arg)) return false;
 
@@ -65,7 +65,7 @@
                                         return newSym(L"__wartRestKeywordArg");
                                       if (!isCons(params)) continue;
                                       Cell* param = stripQuote(car(params));
-                                      if (match(realArg, param))
+                                      if (paramAliasMatch(realArg, param))
                                         return param;
                                     }
                                     return nil;
@@ -182,7 +182,7 @@ Cell* evalArgs(Cell* params, Cell* args) {
 }
 
                                   // split param sym at '/' and bind all resulting syms to val
-                                  void bindArg(Cell* param, Cell* val) {
+                                  void bindArgAliases(Cell* param, Cell* val) {
                                     string name = toString(param);
                                     if (name.find(L'/') == string::npos || name.find(L'/') == 0) {
                                       addLexicalBinding(param, val);
@@ -204,7 +204,7 @@ void bindArgs(Cell* params, Cell* args) {
   }
 
   if (isSym(params))
-    bindArg(params, args);
+    bindArgAliases(params, args);
   else
     bindArgs(car(params), car(args));
 
