@@ -46,13 +46,6 @@ COMPILE_PRIM_FUNC(sym, primFunc_sym, L"$args",
   return mkref(newSym(out.str()));
 )
 
-COMPILE_PRIM_FUNC(str, primFunc_str, L"$args",
-  ostringstream out;
-  for (Cell* args = lookup(L"$args"); args != nil; args = cdr(args))
-    out << car(args);
-  return mkref(newString(out.str()));
-)
-
 COMPILE_PRIM_FUNC(string_splice, primFunc_string_splice, L"($string $start $end $val)",
   Cell* str = lookup(L"$string");
   if (!isString(str)) {
