@@ -57,20 +57,20 @@ void display(Cell* x, ostream& out) {
 
 
 
-Cell* newIstream(istream& x) {
+Cell* newIstream(istream* x) {
   return newCons(newSym(L"type"), newCons(newSym(L"stream"),
-            newCons(newNum((long)&x), nil)));
+            newCons(newNum((long)x), nil)));
 }
 
-Cell* newOstream(ostream& x) {
+Cell* newOstream(ostream* x) {
   return newCons(newSym(L"type"), newCons(newSym(L"stream"),
-            newCons(newNum((long)&x), nil)));
+            newCons(newNum((long)x), nil)));
 }
 
 void setupStreams() {
-  newDynamicScope(newSym(L"stdin"), newIstream(cin));
-  newDynamicScope(newSym(L"stdout"), newOstream(cout));
-  newDynamicScope(newSym(L"stderr"), newOstream(cerr));
+  newDynamicScope(newSym(L"stdin"), newIstream(&cin));
+  newDynamicScope(newSym(L"stdout"), newOstream(&cout));
+  newDynamicScope(newSym(L"stderr"), newOstream(&cerr));
 }
 #define STDIN dynamics[newSym(L"stdin")].top()
 #define STDOUT dynamics[newSym(L"stdout")].top()
