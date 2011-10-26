@@ -37,6 +37,16 @@ COMPILE_PRIM_FUNC(=, primFunc_assign, L"('$var $val)",
   return mkref(val);
 )
 
+COMPILE_PRIM_FUNC(dyn_bind, primFunc_dyn_bind, L"('$var $val)",
+  newDynamicScope(lookup(L"$var"), lookup(L"$val"));
+  return nil;
+)
+
+COMPILE_PRIM_FUNC(dyn_unbind, primFunc_dyn_unbind, L"('$var)",
+  endDynamicScope(lookup(L"$var"));
+  return nil;
+)
+
 COMPILE_PRIM_FUNC(bound?, primFunc_isBound, L"($var)",
   Cell* var = lookup(L"$var");
   if (var == nil) return mkref(newNum(1));
