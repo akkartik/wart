@@ -1,0 +1,7 @@
+(mac w/infile(name . body)
+  `(between (dyn_bind stdin (infile ,name)) :and (do close_infile.stdin dyn_unbind.stdin)
+     ,@body))
+
+(mac w/outfile(name . body)
+  `(between (dyn_bind stdout (outfile ,name)) :and (do close_infile.stdout dyn_unbind.stdout)
+     ,@body))
