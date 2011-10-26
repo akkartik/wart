@@ -124,3 +124,25 @@ COMPILE_PRIM_FUNC(read, primFunc_read, L"('$eof)",
   if (toIstream(STDIN).eof()) return lookup(L"$eof");
   return mkref(wartRead(toIstream(STDIN)).front());
 )
+
+COMPILE_PRIM_FUNC(infile, primFunc_infile, L"($name)",
+  return mkref(newIstream(new ifstream(&toAscii(toString(lookup(L"$name")))[0])));
+)
+
+COMPILE_PRIM_FUNC(close_infile, primFunc_close_infile, L"($stream)",
+  ifstream* f = (ifstream*)toNum(car(cdr(cdr(lookup(L"$stream")))));
+  f->close();
+  delete f;
+  return nil;
+)
+
+COMPILE_PRIM_FUNC(outfile, primFunc_outfile, L"($name)",
+  return mkref(newOstream(new ofstream(&toAscii(toString(lookup(L"$name")))[0])));
+)
+
+COMPILE_PRIM_FUNC(close_outfile, primFunc_close_outfile, L"($stream)",
+  ofstream* f = (ofstream*)toNum(car(cdr(cdr(lookup(L"$stream")))));
+  f->close();
+  delete f;
+  return nil;
+)
