@@ -40,6 +40,15 @@ typedef std::wofstream ofstream;
 typedef char ascii;
 #define char wchar_t // must come after all system includes
 
+// HACK because there's no wifstream(wstring) constructor
+// will not work for filenames with non-ascii characters
+vector<ascii> toAscii(string filename) {
+  vector<ascii> result;
+  for (string::iterator p = filename.begin(); p != filename.end(); ++p)
+    result.push_back(*p);
+  return result;
+}
+
 
 
 // generate traces for debugging
