@@ -120,6 +120,7 @@ COMPILE_PRIM_FUNC(write, primFunc_write, L"($x)",
   return mkref(x);
 )
 
-COMPILE_PRIM_FUNC(read, primFunc_read, L"()",
+COMPILE_PRIM_FUNC(read, primFunc_read, L"('$eof)",
+  if (toIstream(STDIN).eof()) return lookup(L"$eof");
   return mkref(wartRead(toIstream(STDIN)).front());
 )
