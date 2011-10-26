@@ -207,6 +207,7 @@ void dumpUnfreed() {
     if (initialSyms.find(x) != initialSyms.end()) continue;
     if (numRefsRemaining[x] > 1) continue;
     cerr << "unfreed: " << (void*)x << " " << x << endl;
+    printDepth=0;
   }
 }
 
