@@ -6,6 +6,9 @@
 mac! def!(name params . body)
   `(= ,name (fn ,params ,@body))
 
+mac! do body
+  `((fn() ,@body))
+
 def! prn args
   if args
     (do
@@ -38,9 +41,6 @@ def complement(f)
 
 mac let(var val . body)
   `((fn(,var) ,@body) ,val)
-
-mac do body
-  `((fn() ,@body))
 
 def list args
   if args
