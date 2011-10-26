@@ -119,3 +119,7 @@ COMPILE_PRIM_FUNC(write, primFunc_write, L"($x)",
   out.flush();
   return mkref(x);
 )
+
+COMPILE_PRIM_FUNC(read, primFunc_read, L"()",
+  return mkref(wartRead(toIstream(STDIN)).front());
+)
