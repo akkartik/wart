@@ -70,3 +70,17 @@ COMPILE_PRIM_FUNC(pr, primFunc_pr, L"($x)",
   cout.flush();
   return mkref(x);
 )
+
+COMPILE_PRIM_FUNC(err, primFunc_err, L"($x)",
+  Cell* x = lookup(L"$x");
+  display(x, cerr);
+  cerr.flush();
+  return mkref(x);
+)
+
+COMPILE_PRIM_FUNC(write, primFunc_write, L"($x)",
+  Cell* x = lookup(L"$x");
+  write(x, cout);
+  cout.flush();
+  return mkref(x);
+)
