@@ -2,6 +2,11 @@ mac do1 body
   `(ret $ret ,car.body
      ,@cdr.body)
 
+mac between(before after/and . body)
+  `(do1
+     (do ,before ,@body)
+     ,after)
+
 mac when(cond . body)
   `(if ,cond
      (do ,@body))

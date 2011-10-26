@@ -27,3 +27,7 @@ mac rotate args
 
 mac swap(x y)
   `(rotate ,x ,y)
+
+mac making(var val . body)
+  `(between (dyn_bind ,var ,val) :and (dyn_unbind ,var)
+     ,@body)

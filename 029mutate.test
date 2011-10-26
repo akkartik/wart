@@ -27,3 +27,12 @@
             (swap x y)
             (list x y))
  :should be '(4 3))
+
+(test "making works"
+ :valueof (do
+            (= x 3)
+            (let f (fn() x)
+              (list f.
+                    (let x 4 f.)
+                    (making x 4 f.))))
+ :should be '(3 3 4))

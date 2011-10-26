@@ -19,13 +19,6 @@ mac withs(params . body)
     `(let ,car.params ,cadr.params
        (withs ,cddr.params ,@body))
 
-mac making(var val . body)
-  `(do
-     (dyn_bind ,var ,val)
-     (do1
-       (do ,@body)
-       (dyn_unbind ,var)))
-
 
 
 mac proc(name params . body)
