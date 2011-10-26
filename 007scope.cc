@@ -47,14 +47,18 @@ void assignDynamicVar(Cell* sym, Cell* val) {
 
 
 
+hash_set<Cell*, TypeCastCellHash> initialSyms;
+void setupInitialSym(Cell* var, Cell* val) {
+  newDynamicScope(var, val);
+  initialSyms.insert(var);
+}
+
 // the current lexical scope is a first-class dynamic variable
 Cell* CURR_LEXICAL_SCOPE;
 #define currLexicalScopes dynamics[CURR_LEXICAL_SCOPE]
-hash_set<Cell*, TypeCastCellHash> initialSyms;
 void setupLexicalScope() {
   CURR_LEXICAL_SCOPE = newSym(L"currLexicalScope");
-  newDynamicScope(CURR_LEXICAL_SCOPE, nil);
-  initialSyms.insert(CURR_LEXICAL_SCOPE);
+  setupInitialSym(CURR_LEXICAL_SCOPE, nil);
 }
 
 // entering and leaving lexical scopes *assigns the current dynamic*
