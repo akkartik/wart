@@ -57,6 +57,38 @@ void display(Cell* x, ostream& out) {
 
 
 
+Cell* newIstream(istream& x) {
+  return newCons(newSym(L"type"), newCons(newSym(L"stream"),
+            newCons(newNum((long)&x), nil)));
+}
+
+Cell* newOstream(ostream& x) {
+  return newCons(newSym(L"type"), newCons(newSym(L"stream"),
+            newCons(newNum((long)&x), nil)));
+}
+
+void setupStreams() {
+  newDynamicScope(newSym(L"stdin"), newIstream(cin));
+  newDynamicScope(newSym(L"stdout"), newOstream(cout));
+  newDynamicScope(newSym(L"stderr"), newOstream(cerr));
+}
+#define STDIN dynamics[newSym(L"stdin")].top()
+#define STDOUT dynamics[newSym(L"stdout")].top()
+#define STDERR dynamics[newSym(L"stderr")].top()
+void teardownStreams() {
+  endDynamicScope(newSym(L"stdin"));
+  endDynamicScope(newSym(L"stdout"));
+  endDynamicScope(newSym(L"stderr"));
+}
+
+istream& toIstream(Cell* x) {
+  return *(istream*)toNum(car(cdr(cdr(x))));
+}
+
+ostream& toOstream(Cell* x) {
+  return *(ostream*)toNum(car(cdr(cdr(x))));
+}
+
 COMPILE_PRIM_FUNC(sym, primFunc_sym, L"$args",
   ostringstream out;
   for (Cell* args = lookup(L"$args"); args != nil; args = cdr(args))
@@ -66,21 +98,24 @@ COMPILE_PRIM_FUNC(sym, primFunc_sym, L"$args",
 
 COMPILE_PRIM_FUNC(pr, primFunc_pr, L"($x)",
   Cell* x = lookup(L"$x");
-  display(x, cout);
-  cout.flush();
+  ostream& out = toOstream(STDOUT);
+  display(x, out);
+  out.flush();
   return mkref(x);
 )
 
 COMPILE_PRIM_FUNC(err, primFunc_err, L"($x)",
   Cell* x = lookup(L"$x");
-  display(x, cerr);
-  cerr.flush();
+  ostream& out = toOstream(STDERR);
+  display(x, out);
+  out.flush();
   return mkref(x);
 )
 
 COMPILE_PRIM_FUNC(write, primFunc_write, L"($x)",
   Cell* x = lookup(L"$x");
-  write(x, cout);
-  cout.flush();
+  ostream& out = toOstream(STDOUT);
+  write(x, out);
+  out.flush();
   return mkref(x);
 )

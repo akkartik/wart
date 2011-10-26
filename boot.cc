@@ -232,6 +232,7 @@ void resetState() {
 }
 
 void checkState() {
+  teardownStreams();
   teardownPrimFuncs();
   checkLiteralTables();
   checkUnfreed();
@@ -288,6 +289,7 @@ void runTests() {
 void init() {
   setupNil();
   setupLexicalScope();
+  setupStreams();
   setupPrimFuncs();
 }
 
