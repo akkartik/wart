@@ -25,13 +25,18 @@ def coerce(x 'dest-type)
   eval `(coerce-quoted ,x ,dest-type)
 = coercions* (table)
 def coerce-quoted'(x dest-type)
-  ((table_get (table_get coercions* dest-type) type.x) x)
+  (if (iso dest-type type.x)
+    x
+    ((table_get (table_get coercions* dest-type) type.x) x))
 
 mac defcoerce(src dest f)
   `(do
      if (~table_get coercions* ',dest)
        (table_set coercions* ',dest (table))
      (table_set (table_get coercions* ',dest) ',src ,f))
+
+defcoerce nil list
+  (fn(_) _)
 
 ; arbitrary types in function position
 mac defcall(type params . body)
