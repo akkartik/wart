@@ -6,3 +6,6 @@ defset string((s idx end) val)
   `(withs ($idx  (bounce-index ,idx ,s)
            $end  (bounce-index ,end ,s))
      (string_splice ,s $idx (or $end (+ 1 $idx)) ,val))
+
+defcoerce string symbol
+  string_to_sym

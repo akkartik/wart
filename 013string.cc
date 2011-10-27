@@ -40,3 +40,7 @@ COMPILE_PRIM_FUNC(string_get, primFunc_string_get, L"($string $index $end)",
 
   return mkref(newString(toString(str).substr(index, end-index)));
 )
+
+COMPILE_PRIM_FUNC(string_to_sym, primFunc_string_to_sym, L"($s)",
+  return mkref(newSym(toString(lookup(L"$s"))));
+)
