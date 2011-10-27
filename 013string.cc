@@ -27,10 +27,8 @@ COMPILE_PRIM_FUNC(string_get, primFunc_string_get, L"($string $index $end)",
   }
 
   size_t index = toNum(lookup(L"$index"));
-  if (index > ((string*)str->car)->length()-1) {
-    warn << "no such index in string: " << str << " " << index << endl;
+  if (index > ((string*)str->car)->length()-1)
     return nil;
-  }
 
   size_t end = (lookup(L"$end") != nil) ? toNum(lookup(L"$end")) : index+1;
   if (end > ((string*)str->car)->length()) {
