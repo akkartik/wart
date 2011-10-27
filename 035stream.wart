@@ -14,3 +14,10 @@
   `(between (dyn_bind stdout outstring.) :and (do close_outfile.stdout dyn_unbind.stdout)
      ,@body
      outstring_buffer.stdout))
+
+def str args
+  (w/outstring
+    (each arg args pr.arg))
+
+def sym args
+  (as symbol (str @args))

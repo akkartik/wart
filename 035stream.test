@@ -1,0 +1,7 @@
+(test "sym works with one arg"
+ :valueof (sym "abc")
+ :should be 'abc)
+
+(test "sym works with multiple args"
+ :valueof (sym "abc" 42 'def)
+ :should be 'abc42def)

@@ -140,13 +140,6 @@ COMPILE_PRIM_FUNC(err, primFunc_err, L"($x)",
   return mkref(x);
 )
 
-COMPILE_PRIM_FUNC(sym, primFunc_sym, L"$args",
-  ostringstream out;
-  for (Cell* args = lookup(L"$args"); args != nil; args = cdr(args))
-    print(car(args), out);
-  return mkref(newSym(out.str()));
-)
-
 COMPILE_PRIM_FUNC(instring, primFunc_instring, L"($s)",
   return mkref(newIstream(new stringstream(toString(lookup(L"$s")))));
 )
