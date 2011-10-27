@@ -49,7 +49,7 @@ void write(Cell* x, ostream& out) {
   printDepth=0;
 }
 
-void display(Cell* x, ostream& out) {
+void print(Cell* x, ostream& out) {
   if (isString(x)) out << toString(x);
   else out << x;
   printDepth=0;
@@ -92,7 +92,7 @@ ostream& toOstream(Cell* x) {
 COMPILE_PRIM_FUNC(pr, primFunc_pr, L"($x)",
   Cell* x = lookup(L"$x");
   ostream& out = toOstream(STDOUT);
-  display(x, out);
+  print(x, out);
   out.flush();
   return mkref(x);
 )
@@ -135,7 +135,7 @@ COMPILE_PRIM_FUNC(close_outfile, primFunc_close_outfile, L"($stream)",
 COMPILE_PRIM_FUNC(err, primFunc_err, L"($x)",
   Cell* x = lookup(L"$x");
   ostream& out = toOstream(STDERR);
-  display(x, out);
+  print(x, out);
   out.flush();
   return mkref(x);
 )
@@ -143,6 +143,6 @@ COMPILE_PRIM_FUNC(err, primFunc_err, L"($x)",
 COMPILE_PRIM_FUNC(sym, primFunc_sym, L"$args",
   ostringstream out;
   for (Cell* args = lookup(L"$args"); args != nil; args = cdr(args))
-    display(car(args), out);
+    print(car(args), out);
   return mkref(newSym(out.str()));
 )
