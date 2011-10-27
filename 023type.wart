@@ -39,3 +39,8 @@ mac defcall(type params . body)
      (fn(,car.params)
        (fn ,cdr.params
          ,@body)))
+
+
+
+mac as(type expr)
+  `(coerce ,expr ,type)
