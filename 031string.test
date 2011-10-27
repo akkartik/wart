@@ -6,6 +6,10 @@
  :valueof ("abcd" 2)
  :should be "c")
 
+(test "strings can index final char"
+ :valueof ("abcd" 3)
+ :should be "d")
+
 (test "strings can take negative indices"
  :valueof ("abcd" -3)
  :should be "b")
