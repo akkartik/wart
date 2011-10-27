@@ -20,6 +20,9 @@ def= car(l x)
 def= cdr(l x)
   (set_cdr l x)
 
+def empty?(l)
+  nil?.l
+
 def rem(f seq)
   if seq
     if (f car.seq)
