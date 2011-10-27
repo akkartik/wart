@@ -69,6 +69,10 @@ mac on(var expr . body)
      let ,var car.$i
       ,@body)
 
+mac forlen(var expr . body)
+  `(for ,var 0 (< ,var len.,expr) ++.,var
+     ,@body)
+
 mac repeat(n . body)
   `(for $i 0 (< $i ,n) ++.$i
      ,@body)

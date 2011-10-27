@@ -9,3 +9,8 @@ defset string((s idx end) val)
 
 defcoerce string symbol
   string_to_sym
+
+mac each(var s . body) :case str?.s
+  `(forlen $i ,s
+     let ,var (,s $i)
+      ,@body)

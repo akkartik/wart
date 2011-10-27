@@ -37,3 +37,9 @@
  :valueof (ret s "abcdefgh"
             (= (s -4 -1) "xy"))
  :should be "abcdxyh")
+
+(test "each works on strings"
+ :valueof (ret ans nil
+            (each c "abc"
+              (push c ans)))
+ :should be '("c" "b" "a"))
