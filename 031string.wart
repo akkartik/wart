@@ -20,3 +20,8 @@ let $each each
          let ,var (,s $i)
            ,@body
        (,$each ,var ,s ,@body))
+
+defcoerce string list
+  (fn(_)
+    (collect:each c _
+      yield.c))
