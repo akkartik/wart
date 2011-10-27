@@ -118,7 +118,8 @@ Cell* lookup(Cell* sym) {
   if (result) return result;
   result = lookupDynamicBinding(sym);
   if (result) return result;
-  warn << "No binding for " << toString(sym) << endl;
+  warn << "No binding for " << toString(sym)
+    << " (if a paren opens in the middle of a line, paren-insertion is disabled until it closes)" << endl;
   return nil;
 }
 
