@@ -146,3 +146,16 @@ COMPILE_PRIM_FUNC(sym, primFunc_sym, L"$args",
     print(car(args), out);
   return mkref(newSym(out.str()));
 )
+
+COMPILE_PRIM_FUNC(instring, primFunc_instring, L"($s)",
+  return mkref(newIstream(new stringstream(toString(lookup(L"$s")))));
+)
+
+COMPILE_PRIM_FUNC(outstring, primFunc_outstring, L"()",
+  return mkref(newOstream(new ostringstream()));
+)
+
+COMPILE_PRIM_FUNC(outstring_buffer, primFunc_outstring_buffer, L"($stream)",
+  ostringstream* s = (ostringstream*)toNum(car(cdr(cdr(lookup(L"$stream")))));
+  return mkref(newString(s->str()));
+)
