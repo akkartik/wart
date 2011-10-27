@@ -38,8 +38,15 @@
             (= (s -4 -1) "xy"))
  :should be "abcdxyh")
 
-(test "each works on strings"
+(test "each works on literal strings"
  :valueof (ret ans nil
             (each c "abc"
               (push c ans)))
+ :should be '("c" "b" "a"))
+
+(test "each works on strings"
+ :valueof (ret ans nil
+            (let s "abc"
+              (each c s
+                (push c ans))))
  :should be '("c" "b" "a"))

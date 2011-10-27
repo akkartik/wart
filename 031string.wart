@@ -13,7 +13,10 @@ defcoerce string symbol
 def empty?(s) :case str?.s
   (iso "" s)
 
-mac each(var s . body) :case str?.s
-  `(forlen $i ,s
-     let ,var (,s $i)
-      ,@body)
+let $each each
+  mac! each(var s . body)
+    `(if str?.,s
+       forlen $i ,s
+         let ,var (,s $i)
+           ,@body
+       (,$each ,var ,s ,@body))
