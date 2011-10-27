@@ -110,6 +110,8 @@ COMPILE_PRIM_FUNC(read, primFunc_read, L"('$eof)",
   return mkref(wartRead(toIstream(STDIN)).front());
 )
 
+
+
 COMPILE_PRIM_FUNC(infile, primFunc_infile, L"($name)",
   return mkref(newIstream(new ifstream(&toAscii(toString(lookup(L"$name")))[0])));
 )
