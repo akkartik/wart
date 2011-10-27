@@ -23,6 +23,9 @@ def= cdr(l x)
 def empty?(l)
   nil?.l
 
+def blank?(l)
+  (or nil?.l empty?.l)
+
 def rem(f seq)
   if seq
     if (f car.seq)
