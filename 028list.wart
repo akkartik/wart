@@ -53,6 +53,9 @@ def some(f xs)
   (or @(map f xs))
 alias any some
 
+def none(f xs)
+  (not (some f xs))
+
 def zip(a b)
   if (and a b)
     (cons (list car.a car.b)

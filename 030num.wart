@@ -18,14 +18,22 @@ let $% %
   def! % xs
     (reduce $% xs)
 
-(let $> >
+let $> >
   def! > xs
     (all (fn((x y)) ($> x y))
          pairwise.xs)
 
   def! < xs
     (all (fn((x y)) ($> y x))
-         pairwise.xs))
+         pairwise.xs)
+
+  def >= xs
+    (none (fn((x y)) ($> y x))
+          pairwise.xs)
+
+  def <= xs
+    (none (fn((x y)) ($> x y))
+          pairwise.xs)
 
 mac ++(n)
   `(= ,n (+ ,n 1))
