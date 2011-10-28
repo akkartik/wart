@@ -1,3 +1,17 @@
+(test "read works"
+ :valueof (making stdin (instring "34 35")
+            read.)
+ :should be '(34 35))
+
+(test "multiple reads work"
+ :valueof (making stdin (instring "34
+35")
+            read.
+            read.)
+ :should be 35)
+
+
+
 (test "sym works with one arg"
  :valueof (sym "abc")
  :should be 'abc)
