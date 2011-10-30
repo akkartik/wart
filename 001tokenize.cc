@@ -159,9 +159,9 @@ ostream& operator<<(ostream& os, Token p) {
                                     return indent;
                                   }
 
-Token nextToken(istream& in, int& prevTokenIndentLevel) {
+Token nextToken(istream& in, int& currIndent) {
   if (in.peek() == L'\n' || in.peek() == L';')
-    return Token::indent(prevTokenIndentLevel=indent(in));
+    return Token::indent(currIndent=indent(in));
 
   ostringstream out;
   switch (in.peek()) { // now can't be whitespace
@@ -186,17 +186,17 @@ Token nextToken(istream& in, int& prevTokenIndentLevel) {
     default:
       slurpWord(in, out); break;
   }
-  return Token::of(out.str(), prevTokenIndentLevel);
+  return Token::of(out.str(), currIndent);
 }
 
 list<Token> tokenize(istream& in) {
-  int prevTokenIndentLevel = 0;
   in >> std::noskipws;
 
   list<Token> result;
-  result.push_back(Token::indent(prevTokenIndentLevel=indent(in)));
+  int currIndent = indent(in);
+  result.push_back(Token::indent(currIndent));
   while (!endOfInput(in)) {
-    result.push_back(nextToken(in, prevTokenIndentLevel));
+    result.push_back(nextToken(in, currIndent));
     skipWhitespace(in);
   }
 
