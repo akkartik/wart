@@ -105,7 +105,7 @@ list<Token> parenthesize(list<Token> in) {
     bool insertedParenThisLine = false;
     if (!argParenCount && numWordsInLine(line) > 1
         && !alreadyGrouped(line)
-        && !(p != in.begin() && !explicitParenStack.empty() && thisLineIndent.indentLevel == explicitParenStack.top()+1 && thisLineIndent.isIndent())) {
+        && !(!explicitParenStack.empty() && thisLineIndent.indentLevel == explicitParenStack.top()+1 && thisLineIndent.isIndent())) {
       // open paren
       add(result, Token::of(L"("));
       implicitParenStack.push(thisLineIndent.indentLevel);
