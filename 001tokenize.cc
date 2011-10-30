@@ -159,7 +159,10 @@ ostream& operator<<(ostream& os, Token p) {
                                     return indent;
                                   }
 
-Token nextToken(istream& in, int prevTokenIndentLevel) {
+Token nextToken(istream& in, int& prevTokenIndentLevel) {
+  if (in.peek() == L'\n' || in.peek() == L';')
+    return Token::indent(prevTokenIndentLevel=indent(in));
+
   ostringstream out;
   switch (in.peek()) { // now can't be whitespace
     case L'"':
@@ -180,9 +183,6 @@ Token nextToken(istream& in, int prevTokenIndentLevel) {
     case L'@':
       slurpChar(in, out); break;
 
-    case L';':
-      break;
-
     default:
       slurpWord(in, out); break;
   }
@@ -194,13 +194,9 @@ list<Token> tokenize(istream& in) {
   in >> std::noskipws;
 
   list<Token> result;
-  result.push_back(Token::indent(indent(in)));
+  result.push_back(Token::indent(prevTokenIndentLevel=indent(in)));
   while (!endOfInput(in)) {
-    prevTokenIndentLevel = result.back().indentLevel;
-    if (in.peek() == L'\n' || in.peek() == L';')
-      result.push_back(Token::indent(indent(in)));
-    else
-      result.push_back(nextToken(in, prevTokenIndentLevel));
+    result.push_back(nextToken(in, prevTokenIndentLevel));
     skipWhitespace(in);
   }
 
