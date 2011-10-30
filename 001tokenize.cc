@@ -160,6 +160,7 @@ ostream& operator<<(ostream& os, Token p) {
                                   }
 
 Token nextToken(istream& in, int& currIndent) {
+  skipWhitespace(in);
   if (in.peek() == L'\n' || in.peek() == L';')
     return Token::indent(currIndent=indent(in));
 
@@ -195,10 +196,8 @@ list<Token> tokenize(istream& in) {
   list<Token> result;
   int currIndent = indent(in);
   result.push_back(Token::indent(currIndent));
-  while (!endOfInput(in)) {
+  while (!endOfInput(in))
     result.push_back(nextToken(in, currIndent));
-    skipWhitespace(in);
-  }
 
   while(!result.empty() && *result.back().token == L"")
     result.pop_back();
