@@ -159,8 +159,7 @@ ostream& operator<<(ostream& os, Token p) {
                                     return indent;
                                   }
 
-int prevTokenIndentLevel;
-Token nextToken(istream& in) {
+Token nextToken(istream& in, int prevTokenIndentLevel) {
   ostringstream out;
   switch (in.peek()) { // now can't be whitespace
     case L'"':
@@ -191,7 +190,7 @@ Token nextToken(istream& in) {
 }
 
 list<Token> tokenize(istream& in) {
-  prevTokenIndentLevel = 0;
+  int prevTokenIndentLevel = 0;
   in >> std::noskipws;
 
   list<Token> result;
@@ -201,7 +200,7 @@ list<Token> tokenize(istream& in) {
     if (in.peek() == L'\n' || in.peek() == L';')
       result.push_back(Token::indent(indent(in)));
     else
-      result.push_back(nextToken(in));
+      result.push_back(nextToken(in, prevTokenIndentLevel));
     skipWhitespace(in);
   }
 
