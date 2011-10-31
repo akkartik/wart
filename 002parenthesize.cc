@@ -89,9 +89,8 @@ list<Token>::iterator slurpNextLine(list<Token>& currLine, list<Token>::iterator
                                         || (isQuoteOrUnquote(firstToken) && secondToken == L"(");
                                   }
 
-                                  bool continuationLine(Token startOfCurrLine, stack<int> parenStack) {
-                                    return !parenStack.empty()
-                                        && startOfCurrLine.indentLevel == parenStack.top()+1;
+                                  bool continuationLine(int currLineIndent, stack<int> parenStack) {
+                                    return !parenStack.empty() && currLineIndent == parenStack.top()+1;
                                   }
 
 list<Token> parenthesize(list<Token> in) {
@@ -106,7 +105,7 @@ list<Token> parenthesize(list<Token> in) {
     Token thisLineIndent=line.front(), nextLineIndent=line.back();
 
     bool insertedParenThisLine = false;
-    if (!argParenCount && numWordsInLine(line) > 1 && !alreadyGrouped(line) && !continuationLine(thisLineIndent, explicitParenStack)) {
+    if (!argParenCount && numWordsInLine(line) > 1 && !alreadyGrouped(line) && !continuationLine(thisLineIndent.indentLevel, explicitParenStack)) {
       // open paren
       add(result, Token::of(L"("));
       implicitParenStack.push(thisLineIndent.indentLevel);
