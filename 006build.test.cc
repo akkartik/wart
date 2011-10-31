@@ -1,29 +1,29 @@
 // check all nrefs except quotes/unquotes
 
 void test_build_handles_empty_input() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"")))));
+  list<Cell*> cells = buildFromStream(stream(L""));
   check(cells.empty());
 }
 
 void test_build_handles_nil() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"()")))));
+  list<Cell*> cells = buildFromStream(stream(L"()"));
   checkEq(cells.front(), nil);
 }
 
 void test_build_handles_nil2() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"nil")))));
+  list<Cell*> cells = buildFromStream(stream(L"nil"));
   checkEq(cells.front(), nil);
 }
 
 void test_build_handles_number() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"34")))));
+  list<Cell*> cells = buildFromStream(stream(L"34"));
   checkEq(cells.size(), 1);
   checkEq(cells.front(), newNum(34));
   checkEq(cells.front()->nrefs, 1);
 }
 
 void test_build_handles_sym() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"a")))));
+  list<Cell*> cells = buildFromStream(stream(L"a"));
   checkEq(cells.size(), 1);
   checkEq(cells.front(), newSym(L"a"));
   checkEq(cells.front()->nrefs, 1);
@@ -36,7 +36,7 @@ void test_build_doesnt_mix_syms_and_strings() {
 }
 
 void test_build_handles_quoted_sym() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"'a")))));
+  list<Cell*> cells = buildFromStream(stream(L"'a"));
   checkEq(cells.size(), 1);
   checkEq(car(cells.front()), newSym(L"'"));
   checkEq(cdr(cells.front()), newSym(L"a"));
@@ -45,7 +45,7 @@ void test_build_handles_quoted_sym() {
 }
 
 void test_build_handles_nested_quote() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"',a")))));
+  list<Cell*> cells = buildFromStream(stream(L"',a"));
   checkEq(cells.size(), 1);
   Cell* c = cells.front();
   checkEq(car(c), newSym(L"'"));
@@ -56,7 +56,7 @@ void test_build_handles_nested_quote() {
 }
 
 void test_build_handles_multiple_atoms() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"34\n35")))));
+  list<Cell*> cells = buildFromStream(stream(L"34\n35"));
   checkEq(cells.size(), 2);
   Cell* c = cells.front();
   checkEq(c, newNum(34));
@@ -71,7 +71,7 @@ void test_build_handles_multiple_atoms() {
 }
 
 void test_build_handles_form() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"34 35")))));
+  list<Cell*> cells = buildFromStream(stream(L"34 35"));
   checkEq(cells.size(), 1);
   Cell* c = cells.front();
   checkEq(c->nrefs, 0);
@@ -88,7 +88,7 @@ void test_build_handles_form() {
 }
 
 void test_build_handles_dot() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"34 . 35")))));
+  list<Cell*> cells = buildFromStream(stream(L"34 . 35"));
   checkEq(cells.size(), 1);
   Cell* c = cells.front();
   checkEq(c->nrefs, 0);
@@ -103,7 +103,7 @@ void test_build_handles_dot() {
 }
 
 void test_build_handles_nested_form() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"(3 7 (33 23))")))));
+  list<Cell*> cells = buildFromStream(stream(L"(3 7 (33 23))"));
   checkEq(cells.size(), 1);
   Cell* c = cells.front();
   checkEq(c->nrefs, 0);
@@ -132,7 +132,7 @@ void test_build_handles_nested_form() {
 }
 
 void test_build_handles_strings() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"(3 7 (33 \"abc\" 23))")))));
+  list<Cell*> cells = buildFromStream(stream(L"(3 7 (33 \"abc\" 23))"));
   checkEq(cells.size(), 1);
   Cell* c = cells.front();
   checkEq(c->nrefs, 0);
@@ -164,7 +164,7 @@ void test_build_handles_strings() {
 }
 
 void test_build_handles_syms() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"(3 7 (33 \"abc\" 3de 23))")))));
+  list<Cell*> cells = buildFromStream(stream(L"(3 7 (33 \"abc\" 3de 23))"));
   checkEq(cells.size(), 1);
   Cell* c = cells.front();
   checkEq(c->nrefs, 0);
@@ -199,7 +199,7 @@ void test_build_handles_syms() {
 }
 
 void test_build_handles_quotes() {
-  list<Cell*> cells = buildCells(parse(parenthesize(tokenize(stream(L"`(34 ,(35) ,36 ,@37 @,38 @39 ,'(a))")))));
+  list<Cell*> cells = buildFromStream(stream(L"`(34 ,(35) ,36 ,@37 @,38 @39 ,'(a))"));
   checkEq(cells.size(), 1);
   Cell* c = cells.front();
   checkEq(c->nrefs, 0);
