@@ -101,10 +101,9 @@ list<Token> parenthesize(list<Token> in) {
   int argParenCount=0; // depth of unprocessed parens not at start of line
 
   list<Token> line;
-  Token thisLineIndent=Token::indent(0), nextLineIndent=Token::indent(0);
   list<Token>::iterator p = slurpNextLine(line, in.begin(), in.end());
   for(; !line.empty(); p=slurpNextLine(line, p, in.end())) {
-    thisLineIndent=line.front(), nextLineIndent=line.back();
+    Token thisLineIndent=line.front(), nextLineIndent=line.back();
 
     bool insertedParenThisLine = false;
     if (!argParenCount && numWordsInLine(line) > 1 && !alreadyGrouped(line) && !continuationLine(thisLineIndent, explicitParenStack)) {
