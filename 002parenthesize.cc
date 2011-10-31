@@ -2,26 +2,26 @@
 
 #define inc(p) { ++p; if (p == end) return p; }
 #define pop(l) { l.pop_front(); if (l.empty()) break; }
-list<Token>::iterator slurpNextLine(list<Token>& line, list<Token>::iterator p, list<Token>::iterator end) {
-  if (!line.empty())
-    line.pop_front(); // indent
-  while (!line.empty() && !line.front().isIndent())
-    pop(line); // tokens
+list<Token>::iterator slurpNextLine(list<Token>& currLine, list<Token>::iterator in, list<Token>::iterator end) {
+  if (!currLine.empty())
+    currLine.pop_front(); // indent
+  while (!currLine.empty() && !currLine.front().isIndent())
+    pop(currLine); // tokens
 
-  if (line.empty() && p != end) { // initial condition
-    line.push_back(*p); // indent;
-    inc(p);
+  if (currLine.empty() && in != end) { // initial condition
+    currLine.push_back(*in); // indent;
+    inc(in);
   }
 
-  while (p != end && !p->isIndent()) {
-    line.push_back(*p);
-    inc(p);
+  while (in != end && !in->isIndent()) {
+    currLine.push_back(*in);
+    inc(in);
   }
-  if (p != end && p->isIndent()) {
-    line.push_back(*p);
-    inc(p);
+  if (in != end && in->isIndent()) {
+    currLine.push_back(*in);
+    inc(in);
   }
-  return p;
+  return in;
 }
 #undef pop
 #undef inc
