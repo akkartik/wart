@@ -102,9 +102,8 @@ list<Token> parenthesize(list<Token> in) {
 
   list<Token> line;
   Token prevLineIndent=Token::indent(0), thisLineIndent=Token::indent(0), nextLineIndent=Token::indent(0);
-  for (list<Token>::iterator p=in.begin(), nextp=slurpNextLine(line, p, in.end());
-        !line.empty();
-        p=nextp, nextp=slurpNextLine(line, p, in.end())) {
+  list<Token>::iterator p = slurpNextLine(line, in.begin(), in.end());
+  for(; !line.empty(); p=slurpNextLine(line, p, in.end())) {
     prevLineIndent=thisLineIndent, thisLineIndent=line.front(), nextLineIndent=line.back();
 
     bool insertedParenThisLine = false;
