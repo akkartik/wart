@@ -8,7 +8,7 @@ list<Token>::iterator slurpNextLine(list<Token>& currLine, list<Token>::iterator
   while (!currLine.empty() && !currLine.front().isIndent())
     pop(currLine); // tokens
 
-  if (currLine.empty() && in != end) { // initial condition
+  if (in != end && currLine.empty()) { // initial condition
     currLine.push_back(*in); // indent;
     inc(in);
   }
