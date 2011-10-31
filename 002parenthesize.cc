@@ -90,7 +90,7 @@ list<Token>::iterator slurpNextLine(list<Token>& currLine, list<Token>::iterator
                                   }
 
                                   bool continuationLine(Token startOfCurrLine, stack<int> parenStack) {
-                                    return startOfCurrLine.isIndent() && !parenStack.empty()
+                                    return !parenStack.empty()
                                         && startOfCurrLine.indentLevel == parenStack.top()+1;
                                   }
 
