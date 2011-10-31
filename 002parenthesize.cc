@@ -102,13 +102,13 @@ list<Token> parenthesize(list<Token> in) {
   list<Token> line;
   list<Token>::iterator p = slurpNextLine(line, in.begin(), in.end());
   for(; !line.empty(); p=slurpNextLine(line, p, in.end())) {
-    Token thisLineIndent=line.front(), nextLineIndent=line.back();
+    int thisLineIndent=line.front().indentLevel, nextLineIndent=line.back().indentLevel;
 
     bool insertedParenThisLine = false;
-    if (!argParenCount && numWordsInLine(line) > 1 && !alreadyGrouped(line) && !continuationLine(thisLineIndent.indentLevel, explicitParenStack)) {
+    if (!argParenCount && numWordsInLine(line) > 1 && !alreadyGrouped(line) && !continuationLine(thisLineIndent, explicitParenStack)) {
       // open paren
       add(result, Token::of(L"("));
-      implicitParenStack.push(thisLineIndent.indentLevel);
+      implicitParenStack.push(thisLineIndent);
       insertedParenThisLine = true;
     }
 
@@ -129,14 +129,14 @@ list<Token> parenthesize(list<Token> in) {
 
     if (argParenCount) continue;
 
-    if (nextLineIndent.indentLevel <= thisLineIndent.indentLevel && insertedParenThisLine) {
+    if (nextLineIndent <= thisLineIndent && insertedParenThisLine) {
       // close paren for this line
       add(result, Token::of(L")"));
       implicitParenStack.pop();
     }
 
-    if (nextLineIndent.indentLevel < thisLineIndent.indentLevel)
-      while (!implicitParenStack.empty() && implicitParenStack.top() >= nextLineIndent.indentLevel) {
+    if (nextLineIndent < thisLineIndent)
+      while (!implicitParenStack.empty() && implicitParenStack.top() >= nextLineIndent) {
         // close paren for a previous line
         add(result, Token::of(L")"));
         implicitParenStack.pop();
