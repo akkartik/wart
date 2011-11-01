@@ -192,13 +192,24 @@ Token nextToken(istream& in, int& currIndent) {
   return Token::of(out.str(), currIndent);
 }
 
-list<Token> tokenize(istream& in) {
-  in >> std::noskipws;
+struct CodeStream {
+  istream& fd;
+  int currIndent;
 
+  CodeStream(istream& in) :fd(in), currIndent(-1) {
+    fd >> std::noskipws;
+  }
+};
+
+Token nextToken(CodeStream& c) {
+  return nextToken(c.fd, c.currIndent);
+}
+
+list<Token> tokenize(istream& in) {
   list<Token> result;
-  int currIndent = -1;
-  while (!endOfInput(in))
-    result.push_back(nextToken(in, currIndent));
+  CodeStream c(in);
+  while (!c.fd.eof())
+    result.push_back(nextToken(c));
 
   while(!result.empty() && *result.back().token == L"")
     result.pop_back();
