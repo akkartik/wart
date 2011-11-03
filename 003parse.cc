@@ -82,6 +82,15 @@ list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterato
   return curr;
 }
 
+AstNode nextAstNode(CodeStream& c) {
+  if (eof(c.fd)) err << "empty input\n" << DIE;
+  list<Token> tokens = nextExpr(c);
+  list<AstNode> result;
+  parseNext(tokens.begin(), tokens.end(), result);
+  if (result.size() != 1) err << "parse error\n" << DIE;
+  return result.front();
+}
+
 list<AstNode> parse(istream& in) {
   CodeStream c(in);
   list<AstNode> result;
