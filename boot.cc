@@ -82,7 +82,6 @@ stringstream& stream(string s) {
 }
 
 bool interactive = false;
-struct AstNode;
 struct Cell;
 extern Cell* nil;
 ostream& operator<<(ostream&, Cell*);
