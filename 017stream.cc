@@ -105,6 +105,11 @@ COMPILE_PRIM_FUNC(write, primFunc_write, L"($x)",
   return mkref(x);
 )
 
+                                  Cell* read(istream& in) {
+                                    CodeStream c(in);
+                                    return read(c);
+                                  }
+
 COMPILE_PRIM_FUNC(read, primFunc_read, L"('$eof)",
   if (toIstream(STDIN).eof())
     return mkref(lookup(L"$eof"));

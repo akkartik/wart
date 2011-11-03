@@ -54,8 +54,3 @@ Cell* buildCell(AstNode n) {
 Cell* nextRawCell(CodeStream c) {
   return buildCell(nextAstNode(c));
 }
-
-Cell* read(istream& in) {
-  CodeStream c(in);
-  return read(c);
-}
