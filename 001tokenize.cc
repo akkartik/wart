@@ -204,11 +204,3 @@ struct CodeStream {
 Token nextToken(CodeStream& c) {
   return nextToken(c.fd, c.currIndent);
 }
-
-list<Token> tokenize(istream& in) {
-  list<Token> result;
-  CodeStream c(in);
-  while (!eof(c.fd))
-    result.push_back(nextToken(c));
-  return result;
-}
