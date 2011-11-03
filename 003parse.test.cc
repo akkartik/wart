@@ -1,13 +1,3 @@
-void test_parse_handles_empty_input() {
-  list<AstNode> ast = parse(stream(L""));
-  check(ast.empty());
-}
-
-void test_parse_handles_trailing_comments() {
-  list<AstNode> ast = parse(stream(L"; ab"));
-  check(ast.empty());
-}
-
 void test_parse_handles_atom() {
   CodeStream c(stream(L"34"));
   checkEq(nextAstNode(c), Token::of(L"34"));

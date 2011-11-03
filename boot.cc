@@ -83,7 +83,6 @@ stringstream& stream(string s) {
 
 bool interactive = false;
 struct AstNode;
-list<AstNode> parse(istream&);
 struct Cell;
 extern Cell* nil;
 ostream& operator<<(ostream&, Cell*);

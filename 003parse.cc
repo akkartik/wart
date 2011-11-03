@@ -90,13 +90,3 @@ AstNode nextAstNode(CodeStream& c) {
   if (result.size() != 1) err << "parse error\n" << DIE;
   return result.front();
 }
-
-list<AstNode> parse(istream& in) {
-  CodeStream c(in);
-  list<AstNode> result;
-  while (!eof(in)) {
-    list<Token> tokens = nextExpr(c);
-    parseNext(tokens.begin(), tokens.end(), result);
-  }
-  return result;
-}
