@@ -55,14 +55,6 @@ Cell* nextRawCell(CodeStream c) {
   return buildCell(nextAstNode(c));
 }
 
-list<Cell*> buildCells(list<AstNode> in) {
-  list<Cell*> result;
-  if (in.empty()) return result;
-  for (list<AstNode>::iterator p = in.begin(); p != in.end(); ++p)
-    result.push_back(buildCell(*p));
-  return result;
-}
-
 list<Cell*> wartRead(istream& f) {
   CodeStream c(f);
   list<Cell*> result;

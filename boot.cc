@@ -89,7 +89,6 @@ extern Cell* nil;
 ostream& operator<<(ostream&, Cell*);
 struct CodeStream;
 Cell* nextRawCell(CodeStream);
-list<Cell*> buildCells(list<AstNode>);
 list<Cell*> transform(list<Cell*>);
 list<Cell*> wartRead(istream& f);
 Cell* eval(Cell*);
