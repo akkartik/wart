@@ -16,6 +16,11 @@ COMPILE_PRIM_FUNC(register_failed_test, primFunc_incTests, L"($msg $expr)",
   return nil;
 )
 
+COMPILE_PRIM_FUNC(mem_usage, primFunc_mem_usage, L"()",
+  int numUnfreed();
+  return mkref(newNum(numUnfreed()));
+)
+
 COMPILE_PRIM_FUNC(date, primFunc_date, L"()",
   time_t t = time(NULL);
   cerr << asctime(localtime(&t));
