@@ -1,0 +1,5 @@
+let $fork fork
+  mac! fork body
+    `(when (zero? ,$fork.)
+       ,@body
+       quit.)
