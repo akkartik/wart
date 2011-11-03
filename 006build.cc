@@ -60,5 +60,5 @@ list<Cell*> wartRead(istream& f) {
   list<Cell*> result;
   while (!eof(f))
     result.push_back(nextRawCell(c));
-  return transform(result);
+  return transformAll(result);
 }

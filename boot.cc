@@ -89,7 +89,7 @@ extern Cell* nil;
 ostream& operator<<(ostream&, Cell*);
 struct CodeStream;
 Cell* nextRawCell(CodeStream);
-list<Cell*> transform(list<Cell*>);
+list<Cell*> transformAll(list<Cell*>);
 list<Cell*> wartRead(istream& f);
 Cell* eval(Cell*);
 
@@ -141,7 +141,7 @@ Cell* transform(Cell* cell) {
   return cell;
 }
 
-list<Cell*> transform(list<Cell*> input) {
+list<Cell*> transformAll(list<Cell*> input) {
   list<Cell*> result;
   for (list<Cell*>::iterator p = input.begin(); p != input.end(); ++p)
     result.push_back(transform(*p));
