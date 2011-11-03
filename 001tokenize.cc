@@ -130,16 +130,16 @@ ostream& operator<<(ostream& os, Token p) {
                                   bool endOfInput(istream& in) {
                                     if (eof(in)) return true;
                                     if (!interactive) return false;
+                                    bool ans = false;
                                     char c = in.get();
-                                    if (eof(in)) return true;
-                                    if (c == '\n' && in.peek() == '\n') {
-                                      in.get();
-                                      return true;
-                                    }
-                                    else {
-                                      in.putback(c);
-                                      return false;
-                                    }
+                                    if (c == '\n' && !eof(in) && in.peek() == '\n')
+                                      ans = true;
+                                    in.putback(c);
+                                    return ans;
+                                  }
+
+                                  void reset(istream& in) {
+                                    in.get(); in.get();
                                   }
 
                                   int indent(istream& in) {

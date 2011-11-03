@@ -129,6 +129,9 @@ list<Token> nextExpr(CodeStream& c) {
 
     if (implicitParenStack.empty() && explicitParenStack.empty() && argParenCount == 0)
       break;
+
+    if (endOfInput(c.fd))
+      break;
   }
 
   for (unsigned int i=0; i < implicitParenStack.size(); ++i)
