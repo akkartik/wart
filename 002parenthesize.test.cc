@@ -1,42 +1,3 @@
-void test_slurpNextLine_adds_all_words_in_next_line() {
-  list<Token> tokens = tokenize(stream(L"abc def\nghi jkl"));
-  list<Token> line;
-  slurpNextLine(line, tokens.begin(), tokens.end());
-  list<Token>::iterator p = line.begin();
-  checkEq(*p, Token::indent(0)); ++p;
-  checkEq(*p, L"abc"); ++p;
-  checkEq(*p, L"def"); ++p;
-  checkEq(*p, Token::indent(0)); ++p;
-  check(p == line.end());
-}
-
-void test_slurpNextLine_includes_indent_for_current_and_next_line() {
-  list<Token> tokens = tokenize(stream(L"  abc def\nghi jkl"));
-  list<Token> line;
-  slurpNextLine(line, tokens.begin(), tokens.end());
-  list<Token>::iterator p = line.begin();
-  checkEq(*p, Token::indent(2)); ++p;
-  checkEq(*p, L"abc"); ++p;
-  checkEq(*p, L"def"); ++p;
-  checkEq(*p, Token::indent(0)); ++p;
-  check(p == line.end());
-}
-
-void test_slurpNextLine_deletes_previous_line_on_recall() {
-  list<Token> tokens = tokenize(stream(L"  abc def\nghi jkl\n  mnop"));
-  list<Token> line;
-  list<Token>::iterator q = slurpNextLine(line, tokens.begin(), tokens.end());
-  slurpNextLine(line, q, tokens.end());
-  list<Token>::iterator p = line.begin();
-  checkEq(*p, Token::indent(0)); ++p;
-  checkEq(*p, L"ghi"); ++p;
-  checkEq(*p, L"jkl"); ++p;
-  checkEq(*p, Token::indent(2)); ++p;
-  check(p == line.end());
-}
-
-
-
 void test_parenthesize_handles_lines_with_initial_parens() {
   CodeStream c(stream(L"(a b c)"));
   list<Token> tokens = nextExpr(c);

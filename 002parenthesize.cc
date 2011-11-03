@@ -1,31 +1,5 @@
 //// insert explicit parens based on indentation
 
-#define inc(p) { ++p; if (p == end) return p; }
-#define pop(l) { l.pop_front(); if (l.empty()) break; }
-list<Token>::iterator slurpNextLine(list<Token>& currLine, list<Token>::iterator in, list<Token>::iterator end) {
-  if (!currLine.empty())
-    currLine.pop_front(); // indent
-  while (!currLine.empty() && !currLine.front().isIndent())
-    pop(currLine); // tokens
-
-  if (in != end && currLine.empty()) { // initial condition
-    currLine.push_back(*in); // indent;
-    inc(in);
-  }
-
-  while (in != end && !in->isIndent()) {
-    currLine.push_back(*in);
-    inc(in);
-  }
-  if (in != end && in->isIndent()) {
-    currLine.push_back(*in);
-    inc(in);
-  }
-  return in;
-}
-#undef pop
-#undef inc
-
 list<Token> nextLine(CodeStream& c) {
   list<Token> result;
   if (c.fd.eof()) return result;
@@ -106,61 +80,6 @@ list<Token> nextLine(CodeStream& c) {
                                   bool continuationLine(int currLineIndent, stack<int> parenStack) {
                                     return !parenStack.empty() && currLineIndent == parenStack.top()+1;
                                   }
-
-list<Token> parenthesize(list<Token> in) {
-  list<Token> result;
-  stack<int> explicitParenStack; // parens in the original
-  stack<int> implicitParenStack; // parens we inserted
-  int argParenCount=0; // depth of unprocessed parens not at start of line
-
-  list<Token> line;
-  list<Token>::iterator p = slurpNextLine(line, in.begin(), in.end());
-  for(; !line.empty(); p=slurpNextLine(line, p, in.end())) {
-    int thisLineIndent=line.front().indentLevel, nextLineIndent=line.back().indentLevel;
-
-    bool insertedParenThisLine = false;
-    if (!argParenCount && numWordsInLine(line) > 1 && !alreadyGrouped(line) && !continuationLine(thisLineIndent, explicitParenStack)) {
-      // open paren
-      add(result, Token::of(L"("));
-      implicitParenStack.push(thisLineIndent);
-      insertedParenThisLine = true;
-    }
-
-    // copy line tokens
-    for (list<Token>::iterator q = line.begin(); q != line.end(); ++q) {
-      add(result, *q);
-
-      if (*q == L"(")
-        explicitParenStack.push(q->indentLevel);
-      if (*q == L")")
-        explicitParenStack.pop();
-
-      if (*q == L"(" && (parenNotAtStartOfLine(q, line.begin()) || argParenCount))
-        ++argParenCount; // no more paren-insertion until it closes
-      if (*q == L")" && argParenCount) // it closed
-        --argParenCount;
-    }
-
-    if (argParenCount) continue;
-
-    if (nextLineIndent <= thisLineIndent && insertedParenThisLine) {
-      // close paren for this line
-      add(result, Token::of(L")"));
-      implicitParenStack.pop();
-    }
-
-    if (nextLineIndent < thisLineIndent)
-      while (!implicitParenStack.empty() && implicitParenStack.top() >= nextLineIndent) {
-        // close paren for a previous line
-        add(result, Token::of(L")"));
-        implicitParenStack.pop();
-      }
-  }
-
-  for (unsigned int i=0; i < implicitParenStack.size(); ++i)
-    result.push_back(Token::of(L")"));
-  return result;
-}
 
 list<Token> nextExpr(CodeStream& c) {
   list<Token> result;
