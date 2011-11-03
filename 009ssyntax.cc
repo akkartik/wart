@@ -2,12 +2,12 @@
 
 Cell* transformNot(string var) {
   var.replace(0, 1, L"not ");
-  return buildFromStream(stream(var)).front();
+  return nextRawCell(CodeStream(stream(var)));
 }
 
 Cell* transformCompose(string var) {
   var.replace(var.rfind(L':'), 1, L" ");
-  return buildFromStream(stream(L"compose "+var)).front();
+  return nextRawCell(stream(L"compose "+var));
 }
 
 Cell* transformCall(string var) {
@@ -21,17 +21,17 @@ Cell* transformCall(string var) {
     var.replace(bang, 1, L" '");
   else
     var.replace(dot, 1, L" ");
-  return buildFromStream(stream(var)).front();
+  return nextRawCell(stream(var));
 }
 
 Cell* transformAndf(string var) {
   var.replace(var.rfind(L'&'), 1, L" ");
-  return buildFromStream(stream(L"andf "+var)).front();
+  return nextRawCell(stream(L"andf "+var));
 }
 
 Cell* transformComplement(string var) {
   var.replace(0, 1, L"complement ");
-  return buildFromStream(stream(var)).front();
+  return nextRawCell(stream(var));
 }
 
 Cell* transform_ssyntax(Cell* input) {

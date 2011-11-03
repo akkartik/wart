@@ -87,6 +87,8 @@ list<AstNode> parse(istream&);
 struct Cell;
 extern Cell* nil;
 ostream& operator<<(ostream&, Cell*);
+struct CodeStream;
+Cell* nextRawCell(CodeStream);
 list<Cell*> buildCells(list<AstNode>);
 
 list<Cell*> buildFromStream(istream& f) {
@@ -126,7 +128,7 @@ void setupPrimFuncs() {
   for (unsigned int i=0; i < sizeof(primFuncs)/sizeof(primFuncs[0]); ++i)
     newDynamicScope(primFuncs[i].name,
         newCons(newPrimFunc(primFuncs[i].impl),
-            newCons(buildFromStream(stream(primFuncs[i].params)).front(), nil)));
+            newCons(nextRawCell(stream(primFuncs[i].params)), nil)));
 }
 
 void teardownPrimFuncs() {
