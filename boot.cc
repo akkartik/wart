@@ -70,7 +70,7 @@ Die DIE;
 
 
 
-// phases of the interpreter
+// interpreter decls
 
 bool runningTests = false;
 int numFailures = 0;
@@ -86,13 +86,7 @@ struct Cell;
 extern Cell* nil;
 ostream& operator<<(ostream&, Cell*);
 struct CodeStream;
-
-Cell* read(CodeStream& c) {
-  Cell* nextRawCell(CodeStream);
-  Cell* transform(Cell*);
-  return transform(nextRawCell(c));
-}
-
+Cell* read(CodeStream& c);
 Cell* eval(Cell*);
 
 
@@ -141,6 +135,10 @@ Cell* transform(Cell* cell) {
   for (unsigned int i=0; i < sizeof(transforms)/sizeof(transforms[0]); ++i)
     cell = (*transforms[i])(cell);
   return cell;
+}
+
+Cell* read(CodeStream& c) {
+  return transform(nextRawCell(c));
 }
 
 
