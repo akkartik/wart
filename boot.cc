@@ -304,7 +304,6 @@ int main(int argc, unused ascii* argv[]) {
     Cell* result = eval(form);
     write(result, cout); cout << endl;
     rmref(result);
-    rmref(form);
   }
   return 0;
 }
