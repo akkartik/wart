@@ -57,7 +57,7 @@ Cell* newCell() {
     result = freelist;
     freelist = freelist->cdr;
     result->init();
-    dbg << endl << "newCell r: " << result << " " << result->type << endl;
+    dbg << endl << "newCell r: " << (void*)result << " " << result->type << endl;
     return result;
   }
 
@@ -66,7 +66,7 @@ Cell* newCell() {
 
   result = currCell;
   ++currCell;
-  dbg << endl << "newCell a: " << result << " " << result->type << endl;
+  dbg << endl << "newCell a: " << (void*)result << " " << result->type << endl;
   return result;
 }
 
@@ -99,7 +99,7 @@ struct Table {
 
 Cell* mkref(Cell* c) {
   if (c == nil) return nil;
-  dbg << "mkref: " << c << " " << c->nrefs << endl;
+  dbg << "mkref: " << (void*)c << " " << c->nrefs << endl;
   ++c->nrefs;
   return c;
 }
@@ -108,13 +108,13 @@ void rmref(Cell* c) {
   if (!c)
     err << " a cell was prematurely garbage-collected." << endl << DIE;
   if (c == nil) return;
-  dbg << endl << "rmref: " << c << ": " << c->nrefs << " " << c->type << endl;
+  dbg << endl << "rmref: " << (void*)c << ": " << c->nrefs << " " << c->type << endl;
 
   --c->nrefs;
   if (c->nrefs > 0) return;
 
   if (isAtom(c) && c->type != STRING && !runningTests)
-    warn << "deleted atom: " << c << endl;
+    warn << "deleted atom: " << (void*)c << endl;
 
   switch (c->type) {
   case NUM:
@@ -134,7 +134,7 @@ void rmref(Cell* c) {
     err << "Can't rmref type " << c->type << endl << DIE;
   }
 
-  dbg << "  freeing " << c << endl;
+  dbg << "  freeing " << (void*)c << endl;
   rmref(c->cdr);
 
   c->clear();

@@ -66,7 +66,7 @@ void setupLexicalScope() {
 // Calling functions will create new dynamic bindings.
 void newLexicalScope() {
   Cell* newScope = newTable();
-  dbg << "new lexical scope: " << newScope << endl;
+  dbg << "new lexical scope: " << (void*)newScope << endl;
   setCdr(newScope, currLexicalScopes.top());
   newDynamicScope(CURR_LEXICAL_SCOPE, newScope);
 }
@@ -75,12 +75,12 @@ void endLexicalScope() {
   Cell* currScope = currLexicalScopes.top();
   if (currScope == nil)
     err << "No lexical scope to end" << endl << DIE;
-  dbg << "end lexical scope: " << currScope << endl;
+  dbg << "end lexical scope: " << (void*)currScope << endl;
   endDynamicScope(CURR_LEXICAL_SCOPE);
 }
 
 void addLexicalBinding(Cell* sym, Cell* val) {
-  dbg << "creating binding: " << (void*)currLexicalScopes.top() << " " << sym << endl;
+  dbg << "creating binding: " << (void*)currLexicalScopes.top() << " " << (void*)sym << endl;
   if (unsafeGet(currLexicalScopes.top(), sym))
     err << "Can't rebind within a lexical scope" << endl << DIE;
   unsafeSet(currLexicalScopes.top(), sym, val, false);

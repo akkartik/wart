@@ -3,14 +3,14 @@
                                   hash_map<long, Cell*> numLiterals;
                                   Cell* intern(long x) {
                                     if (numLiterals[x]) {
-                                      dbg << endl << "reuse: " << x << " " << numLiterals[x] << endl;
+                                      dbg << endl << "reuse: " << x << " " << (void*)numLiterals[x] << endl;
                                       return numLiterals[x];
                                     }
                                     numLiterals[x] = newCell();
                                     numLiterals[x]->car = (Cell*)x;
                                     numLiterals[x]->type = NUM;
                                     mkref(numLiterals[x]);
-                                    dbg << endl << "new: " << x << " " << numLiterals[x] << endl;
+                                    dbg << endl << "new: " << x << " " << (void*)numLiterals[x] << endl;
                                     return numLiterals[x];
                                   }
 
@@ -54,7 +54,7 @@ long toNum(Cell* x) {
                                   StringMap<Cell*> stringLiterals;
                                   Cell* intern(string x) {
                                     if (stringLiterals[x]) {
-                                      dbg << endl << "reuse: " << x << endl;
+                                      dbg << endl << "reuse: " << x << " " << (void*)stringLiterals[x] << endl;
                                       return stringLiterals[x];
                                     }
                                     stringLiterals[x] = newCell();
