@@ -55,10 +55,7 @@ Cell* nextRawCell(CodeStream c) {
   return buildCell(nextAstNode(c));
 }
 
-list<Cell*> wartRead(istream& f) {
-  CodeStream c(f);
-  list<Cell*> result;
-  while (!eof(f))
-    result.push_back(nextRawCell(c));
-  return transformAll(result);
+Cell* read(istream& in) {
+  CodeStream c(in);
+  return read(c);
 }

@@ -89,8 +89,12 @@ extern Cell* nil;
 ostream& operator<<(ostream&, Cell*);
 struct CodeStream;
 Cell* nextRawCell(CodeStream);
-list<Cell*> transformAll(list<Cell*>);
-list<Cell*> wartRead(istream& f);
+Cell* transform(Cell*);
+
+Cell* read(CodeStream& c) {
+  return transform(nextRawCell(c));
+}
+
 Cell* eval(Cell*);
 
 
@@ -139,13 +143,6 @@ Cell* transform(Cell* cell) {
   for (unsigned int i=0; i < sizeof(transforms)/sizeof(transforms[0]); ++i)
     cell = (*transforms[i])(cell);
   return cell;
-}
-
-list<Cell*> transformAll(list<Cell*> input) {
-  list<Cell*> result;
-  for (list<Cell*>::iterator p = input.begin(); p != input.end(); ++p)
-    result.push_back(transform(*p));
-  return result;
 }
 
 
@@ -301,14 +298,14 @@ int main(int argc, unused ascii* argv[]) {
   loadFiles(".wart");
 
   interactive = true; // trigger eval on empty lines
+  CodeStream cs(cin);
   while (!cin.eof()) {
     cout << "wart> ";
-    list<Cell*> form = wartRead(cin);
-    for (list<Cell*>::iterator p = form.begin(); p != form.end(); ++p) {
-      Cell* result = eval(*p);
-      write(result, cout); cout << endl;
-      rmref(result);
-    }
+    Cell* form = read(cs);
+    Cell* result = eval(form);
+    write(result, cout); cout << endl;
+    rmref(result);
+    rmref(form);
   }
   return 0;
 }

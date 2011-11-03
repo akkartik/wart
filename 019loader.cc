@@ -4,11 +4,12 @@
 
 void loadFile(ascii* filename) {
   ifstream f(filename);
-  list<Cell*> cells = wartRead(f);
-  for (list<Cell*>::iterator p = cells.begin(); p != cells.end(); ++p)
-    rmref(eval(*p));
-  for (list<Cell*>::iterator p = cells.begin(); p != cells.end(); ++p)
-    rmref(*p);
+  CodeStream c(f);
+  while (!eof(c.fd)) {
+    Cell* cell = read(c);
+    rmref(eval(cell));
+    rmref(cell);
+  }
 }
 
                                   vector<ascii*> sortedFiles(const ascii* dirname, const ascii* ext) {

@@ -106,16 +106,9 @@ COMPILE_PRIM_FUNC(write, primFunc_write, L"($x)",
 )
 
 COMPILE_PRIM_FUNC(read, primFunc_read, L"('$eof)",
-  static list<Cell*> x;
-  if (x.empty()) {
-    if (toIstream(STDIN).eof())
-      return mkref(lookup(L"$eof"));
-    x = wartRead(toIstream(STDIN));
-  }
-
-  Cell* result = x.front();
-  x.pop_front();
-  return mkref(result);
+  if (toIstream(STDIN).eof())
+    return mkref(lookup(L"$eof"));
+  return mkref(read(toIstream(STDIN)));
 )
 
 
