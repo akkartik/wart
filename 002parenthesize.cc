@@ -26,6 +26,20 @@ list<Token>::iterator slurpNextLine(list<Token>& currLine, list<Token>::iterator
 #undef pop
 #undef inc
 
+list<Token> nextLine(CodeStream& c) {
+  list<Token> result;
+  if (c.fd.eof()) return result;
+
+  if (c.currIndent == -1)
+    result.push_back(Token::indent(c.currIndent=indent(c.fd)));
+  else
+    result.push_back(Token::indent(c.currIndent));
+
+  do { result.push_back(nextToken(c)); }
+  while (!result.back().isIndent());
+  return result;
+}
+
 
 
                                   bool isParen(Token x) {
@@ -145,5 +159,70 @@ list<Token> parenthesize(list<Token> in) {
 
   for (unsigned int i=0; i < implicitParenStack.size(); ++i)
     result.push_back(Token::of(L")"));
+  return result;
+}
+
+list<Token> nextExpr(CodeStream& c) {
+  list<Token> result;
+  stack<int> explicitParenStack; // parens in the original
+  stack<int> implicitParenStack; // parens we inserted
+  int argParenCount=0; // depth of unprocessed parens not at start of line
+  for (list<Token> line = nextLine(c); !line.empty(); line=nextLine(c)) {
+    int thisLineIndent=line.front().indentLevel, nextLineIndent=line.back().indentLevel;
+
+    bool insertedParenThisLine = false;
+    if (!argParenCount && numWordsInLine(line) > 1 && !alreadyGrouped(line) && !continuationLine(thisLineIndent, explicitParenStack)) {
+      // open paren
+      add(result, Token::of(L"("));
+      implicitParenStack.push(thisLineIndent);
+      insertedParenThisLine = true;
+    }
+
+    // copy line tokens
+    for (list<Token>::iterator q = line.begin(); q != line.end(); ++q) {
+      add(result, *q);
+
+      if (*q == L"(")
+        explicitParenStack.push(q->indentLevel);
+      if (*q == L")")
+        explicitParenStack.pop();
+
+      if (*q == L"(" && (parenNotAtStartOfLine(q, line.begin()) || argParenCount))
+        ++argParenCount; // no more paren-insertion until it closes
+      if (*q == L")" && argParenCount) // it closed
+        --argParenCount;
+    }
+
+    if (argParenCount) continue;
+
+    if (nextLineIndent <= thisLineIndent && insertedParenThisLine) {
+      // close paren for this line
+      add(result, Token::of(L")"));
+      implicitParenStack.pop();
+    }
+
+    if (nextLineIndent < thisLineIndent)
+      while (!implicitParenStack.empty() && implicitParenStack.top() >= nextLineIndent) {
+        // close paren for a previous line
+        add(result, Token::of(L")"));
+        implicitParenStack.pop();
+      }
+
+    if (implicitParenStack.empty() && explicitParenStack.empty() && argParenCount == 0)
+      break;
+  }
+
+  for (unsigned int i=0; i < implicitParenStack.size(); ++i)
+    result.push_back(Token::of(L")"));
+  return result;
+}
+
+list<Token> parenthesize(istream& in) {
+  CodeStream c(in);
+  list<Token> result;
+  while (!in.eof()) {
+    list<Token> expr = nextExpr(c);
+    result.splice(result.end(), expr);
+  }
   return result;
 }
