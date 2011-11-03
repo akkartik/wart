@@ -135,13 +135,3 @@ list<Token> nextExpr(CodeStream& c) {
     result.push_back(Token::of(L")"));
   return result;
 }
-
-list<Token> parenthesize(istream& in) {
-  CodeStream c(in);
-  list<Token> result;
-  while (!in.eof()) {
-    list<Token> expr = nextExpr(c);
-    result.splice(result.end(), expr);
-  }
-  return result;
-}

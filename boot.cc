@@ -82,17 +82,15 @@ stringstream& stream(string s) {
 }
 
 bool interactive = false;
-struct Token;
-list<Token> parenthesize(istream& f);
 struct AstNode;
-list<AstNode> parse(list<Token>);
+list<AstNode> parse(istream&);
 struct Cell;
 extern Cell* nil;
 ostream& operator<<(ostream&, Cell*);
 list<Cell*> buildCells(list<AstNode>);
 
 list<Cell*> buildFromStream(istream& f) {
-  return buildCells(parse(parenthesize(f)));
+  return buildCells(parse(f));
 }
 
 list<Cell*> transform(list<Cell*>);

@@ -82,10 +82,12 @@ list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterato
   return curr;
 }
 
-list<AstNode> parse(list<Token> tokens) {
+list<AstNode> parse(istream& in) {
+  CodeStream c(in);
   list<AstNode> result;
-  list<Token>::iterator p=tokens.begin();
-  while (p != tokens.end())
-    p=parseNext(p, tokens.end(), result);
+  while (!eof(in)) {
+    list<Token> tokens = nextExpr(c);
+    parseNext(tokens.begin(), tokens.end(), result);
+  }
   return result;
 }
