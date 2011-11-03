@@ -1,6 +1,6 @@
 void test_tokenize_handles_empty_input() {
-  list<Token> tokens = tokenize(stream(L""));
-  check(tokens.empty());
+  CodeStream c(stream(L""));
+  check(eof(c.fd));
 }
 
 void test_tokenize_always_starts_a_line_with_indent() {
