@@ -205,11 +205,15 @@ void dumpUnfreed() {
   }
 }
 
-void checkUnfreed() {
+int numUnfreed() {
   int n = currCell-heapStart-initialSyms.size();
   for (; freelist; freelist = freelist->cdr)
     --n;
-  if (n > 0) {
+  return n;
+}
+
+void checkUnfreed() {
+  if (numUnfreed() > 0) {
     warn << "Memory leak!\n";
     dumpUnfreed();
   }
@@ -299,6 +303,7 @@ int main(int argc, unused ascii* argv[]) {
   interactive = true; // trigger eval on empty lines
   CodeStream cs(cin);
   while (!cin.eof()) {
+    cout << numUnfreed() << " ";
     cout << "wart> ";
     Cell* form = read(cs);
     Cell* result = eval(form);
