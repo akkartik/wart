@@ -10,13 +10,13 @@ mac! do body
   `((fn() ,@body))
 
 def! prn args
-  if args
+  (if args
     (do
       pr car.args
       prn @cdr.args
       car.args)
-    pr "
-"
+    (pr "
+"))
 
 mac! def(name params . body)
   if bound?.name
