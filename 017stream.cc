@@ -116,10 +116,19 @@ COMPILE_PRIM_FUNC(read, primFunc_read, L"('$eof)",
   return mkref(read(toIstream(STDIN)));
 )
 
+COMPILE_PRIM_FUNC(read-byte, primFunc_read_byte, L"('$eof)",
+  istream& f = toIstream(STDIN);
+  if (f.eof())
+    return mkref(lookup(L"$eof"));
+  char c;
+  f.read(&c, 1);
+  return mkref(newNum((long)c));
+)
+
 
 
 COMPILE_PRIM_FUNC(infile, primFunc_infile, L"($name)",
-  return mkref(newIstream(new ifstream(&toAscii(toString(lookup(L"$name")))[0]/*, std::ios::binary*/)));
+  return mkref(newIstream(new ifstream(&toAscii(toString(lookup(L"$name")))[0], std::ios::binary)));
 )
 
 COMPILE_PRIM_FUNC(close_infile, primFunc_close_infile, L"($stream)",
@@ -130,7 +139,7 @@ COMPILE_PRIM_FUNC(close_infile, primFunc_close_infile, L"($stream)",
 )
 
 COMPILE_PRIM_FUNC(outfile, primFunc_outfile, L"($name)",
-  return mkref(newOstream(new ofstream(&toAscii(toString(lookup(L"$name")))[0]/*, std::ios::binary*/)));
+  return mkref(newOstream(new ofstream(&toAscii(toString(lookup(L"$name")))[0], std::ios::binary)));
 )
 
 COMPILE_PRIM_FUNC(close_outfile, primFunc_close_outfile, L"($stream)",

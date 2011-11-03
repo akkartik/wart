@@ -10,6 +10,12 @@
             read.)
  :should be 35)
 
+(test "read-byte works"
+ :valueof (w/instring "ab"
+            read-byte.
+            read-byte.)
+ :should be 98)
+
 
 
 (test "sym works with one arg"
