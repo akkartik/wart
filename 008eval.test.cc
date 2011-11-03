@@ -1,7 +1,7 @@
 void test_evalArgs_handles_unquoted_param() {
   newDynamicScope(L"a", newNum(3));
-  Cell* params = mkref(read(stream(L"(x)")));
-  Cell* args = mkref(read(stream(L"(a)")));
+  Cell* params = read(stream(L"(x)"));
+  Cell* args = read(stream(L"(a)"));
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newNum(3));
   checkEq(cdr(evaldArgs), nil);
@@ -13,8 +13,8 @@ void test_evalArgs_handles_unquoted_param() {
 
 void test_evalArgs_handles_quoted_param() {
   newDynamicScope(L"a", newNum(3));
-  Cell* params = mkref(read(stream(L"('x)")));
-  Cell* args = mkref(read(stream(L"(a)")));
+  Cell* params = read(stream(L"('x)"));
+  Cell* args = read(stream(L"(a)"));
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newSym(L"a"));
   checkEq(cdr(evaldArgs), nil);
@@ -27,8 +27,8 @@ void test_evalArgs_handles_quoted_param() {
 void test_evalArgs_handles_varargs_param() {
   newDynamicScope(L"a", newNum(3));
   newDynamicScope(L"b", newNum(4));
-  Cell* params = mkref(read(stream(L"x")));
-  Cell* args = mkref(read(stream(L"(a b)")));
+  Cell* params = read(stream(L"x"));
+  Cell* args = read(stream(L"(a b)"));
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newNum(3));
   checkEq(car(cdr(evaldArgs)), newNum(4));
@@ -43,8 +43,8 @@ void test_evalArgs_handles_varargs_param() {
 void test_evalArgs_handles_quoted_varargs_param() {
   newDynamicScope(L"a", newNum(3));
   newDynamicScope(L"b", newNum(4));
-  Cell* params = mkref(read(stream(L"'x")));
-  Cell* args = mkref(read(stream(L"(a b)")));
+  Cell* params = read(stream(L"'x"));
+  Cell* args = read(stream(L"(a b)"));
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newSym(L"a"));
   checkEq(car(cdr(evaldArgs)), newSym(L"b"));
@@ -59,8 +59,8 @@ void test_evalArgs_handles_quoted_varargs_param() {
 void test_evalArgs_handles_rest_param() {
   newDynamicScope(L"a", newNum(3));
   newDynamicScope(L"b", newNum(4));
-  Cell* params = mkref(read(stream(L"x . y")));
-  Cell* args = mkref(read(stream(L"(a b)")));
+  Cell* params = read(stream(L"x . y"));
+  Cell* args = read(stream(L"(a b)"));
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newNum(3));
   checkEq(car(cdr(evaldArgs)), newNum(4));
@@ -75,8 +75,8 @@ void test_evalArgs_handles_rest_param() {
 void test_evalArgs_handles_quoted_rest_param() {
   newDynamicScope(L"a", newNum(3));
   newDynamicScope(L"b", newNum(4));
-  Cell* params = mkref(read(stream(L"x . 'y")));
-  Cell* args = mkref(read(stream(L"(a b)")));
+  Cell* params = read(stream(L"x . 'y"));
+  Cell* args = read(stream(L"(a b)"));
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newNum(3));
   checkEq(car(cdr(evaldArgs)), newSym(L"b"));
@@ -91,8 +91,8 @@ void test_evalArgs_handles_quoted_rest_param() {
 void test_evalArgs_handles_spliced_vararg_arg() {
   newDynamicScope(L"a", newNum(3));
   newDynamicScope(L"b", newCons(newNum(4), newCons(newNum(5), nil)));
-  Cell* params = mkref(read(stream(L"'x")));
-  Cell* args = mkref(read(stream(L"(a @b)")));
+  Cell* params = read(stream(L"'x"));
+  Cell* args = read(stream(L"(a @b)"));
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newSym(L"a"));
   checkEq(car(cdr(evaldArgs)), newNum(4));
@@ -108,8 +108,8 @@ void test_evalArgs_handles_spliced_vararg_arg() {
 void test_evalArgs_handles_spliced_arg() {
   newDynamicScope(L"a", newNum(3));
   newDynamicScope(L"b", newCons(newNum(4), newCons(newNum(5), nil)));
-  Cell* params = mkref(read(stream(L"(x y 'z)")));
-  Cell* args = mkref(read(stream(L"(a @b)")));
+  Cell* params = read(stream(L"(x y 'z)"));
+  Cell* args = read(stream(L"(a @b)"));
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newNum(3));
   checkEq(car(cdr(evaldArgs)), newNum(4));
@@ -125,8 +125,8 @@ void test_evalArgs_handles_spliced_arg() {
 void test_evalArgs_skips_spliced_args_of_nil() {
   newDynamicScope(L"a", nil);
   newDynamicScope(L"b", newNum(4));
-  Cell* params = mkref(read(stream(L"x 'y")));
-  Cell* args = mkref(read(stream(L"(@a b)")));
+  Cell* params = read(stream(L"x 'y"));
+  Cell* args = read(stream(L"(@a b)"));
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newNum(4));
   checkEq(cdr(evaldArgs), nil);
@@ -148,6 +148,7 @@ void test_bindParams_handles_vararg() {
   checkEq(car(result), newNum(1));
   checkEq(cdr(result), nil);
   endLexicalScope();
+  rmref(args);
   rmref(params);
 }
 
@@ -250,7 +251,7 @@ void test_string_evals_to_itself() {
   Cell* result = eval(expr);
   checkEq(result, expr);
   rmref(result);
-  // HACK: just a string by itself doesn't need rmref'ing
+  rmref(expr);
 }
 
 void test_eval_handles_quoted_atoms() {
@@ -301,7 +302,8 @@ void test_eval_handles_unquote() {
 
 void test_eval_handles_unquote_splice() {
   Cell* expr = read(stream(L"`(a ,@b)"));
-  newDynamicScope(L"b", read(stream(L"34 35")));
+  Cell* val = read(stream(L"34 35"));
+  newDynamicScope(L"b", val);
   Cell* result = eval(expr);
   checkEq(car(result), newSym(L"a"));
   checkEq(car(cdr(result)), newNum(34));
@@ -309,6 +311,7 @@ void test_eval_handles_unquote_splice() {
   checkEq(cdr(cdr(cdr(result))), nil);
   rmref(result);
   endDynamicScope(L"b");
+  rmref(val);
   rmref(expr);
 }
 
@@ -397,11 +400,13 @@ void test_eval_handles_rest_params() {
 
 void test_eval_handles_splice() {
   Cell* expr = read(stream(L"(+ @b)"));
-  newDynamicScope(L"b", read(stream(L"3 4")));
+  Cell* val = read(stream(L"3 4"));
+  newDynamicScope(L"b", val);
   Cell* result = eval(expr);
   checkEq(result, newNum(7));
   rmref(result);
   endDynamicScope(L"b");
+  rmref(val);
   rmref(expr);
 }
 
@@ -436,7 +441,8 @@ void test_eval_handles_splice3() {
   newDynamicScope(L"f", def);
   newDynamicScope(L"a", newNum(3));
   newDynamicScope(L"b", newNum(4));
-  newDynamicScope(L"args", read(stream(L"(a b)")));
+  Cell* argval = read(stream(L"(a b)"));
+  newDynamicScope(L"args", argval);
   Cell* call = read(stream(L"(f @args)"));
   Cell* result = eval(call);
   check(isCons(result));
@@ -445,6 +451,7 @@ void test_eval_handles_splice3() {
   rmref(result);
   rmref(call);
   endDynamicScope(L"args");
+  rmref(argval);
   endDynamicScope(L"b");
   endDynamicScope(L"a");
   endDynamicScope(L"f");

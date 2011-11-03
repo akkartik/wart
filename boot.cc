@@ -138,7 +138,8 @@ Cell* transform(Cell* cell) {
 }
 
 Cell* read(CodeStream& c) {
-  return transform(nextRawCell(c));
+  Cell* mkref(Cell*);
+  return mkref(transform(nextRawCell(c)));
 }
 
 
@@ -288,6 +289,7 @@ int main(int argc, unused ascii* argv[]) {
     Cell* result = eval(form);
     write(result, cout); cout << endl;
     rmref(result);
+    rmref(form);
     reset(cin);
   }
   return 0;
