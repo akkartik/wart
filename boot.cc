@@ -90,17 +90,8 @@ ostream& operator<<(ostream&, Cell*);
 struct CodeStream;
 Cell* nextRawCell(CodeStream);
 list<Cell*> buildCells(list<AstNode>);
-
-list<Cell*> buildFromStream(istream& f) {
-  return buildCells(parse(f));
-}
-
 list<Cell*> transform(list<Cell*>);
-
-list<Cell*> wartRead(istream& f) {
-  return transform(buildFromStream(f));
-}
-
+list<Cell*> wartRead(istream& f);
 Cell* eval(Cell*);
 
 

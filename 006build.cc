@@ -62,3 +62,11 @@ list<Cell*> buildCells(list<AstNode> in) {
     result.push_back(buildCell(*p));
   return result;
 }
+
+list<Cell*> wartRead(istream& f) {
+  CodeStream c(f);
+  list<Cell*> result;
+  while (!eof(f))
+    result.push_back(nextRawCell(c));
+  return transform(result);
+}

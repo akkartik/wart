@@ -1,10 +1,5 @@
 // check all nrefs except quotes/unquotes
 
-void test_build_handles_empty_input() {
-  list<Cell*> cells = buildFromStream(stream(L""));
-  check(cells.empty());
-}
-
 void test_build_handles_nil() {
   CodeStream cs(stream(L"()"));
   checkEq(nextRawCell(cs), nil);
