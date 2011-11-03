@@ -86,10 +86,10 @@ struct Cell;
 extern Cell* nil;
 ostream& operator<<(ostream&, Cell*);
 struct CodeStream;
-Cell* nextRawCell(CodeStream);
-Cell* transform(Cell*);
 
 Cell* read(CodeStream& c) {
+  Cell* nextRawCell(CodeStream);
+  Cell* transform(Cell*);
   return transform(nextRawCell(c));
 }
 
