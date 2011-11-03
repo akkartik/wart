@@ -209,13 +209,6 @@ int numUnfreed() {
   return n;
 }
 
-void checkUnfreed() {
-  if (numUnfreed() > 0) {
-    warn << "Memory leak!\n";
-    dumpUnfreed();
-  }
-}
-
 void resetState() {
   numLiterals.clear();
   stringLiterals.clear();
@@ -230,7 +223,10 @@ void checkState() {
   teardownStreams();
   teardownPrimFuncs();
   checkLiteralTables();
-  checkUnfreed();
+  if (numUnfreed() > 0) {
+    warn << "Memory leak!\n";
+    dumpUnfreed();
+  }
 
   resetState();
 }
