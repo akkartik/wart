@@ -197,8 +197,8 @@ void dumpUnfreed() {
   }
 }
 
-int numUnfreed() {
-  int n = currCell-heapStart-initialSyms.size();
+long numUnfreed() {
+  long n = currCell-heapStart-initialSyms.size();
   for (Cell* f = freelist; f; f=f->cdr)
     --n;
   return n;

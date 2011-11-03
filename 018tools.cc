@@ -17,7 +17,7 @@ COMPILE_PRIM_FUNC(register_failed_test, primFunc_incTests, L"($msg $expr)",
 )
 
 COMPILE_PRIM_FUNC(mem_usage, primFunc_mem_usage, L"()",
-  int numUnfreed();
+  long numUnfreed();
   return mkref(newNum(numUnfreed()));
 )
 
