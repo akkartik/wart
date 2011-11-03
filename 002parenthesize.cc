@@ -2,7 +2,7 @@
 
 list<Token> nextLine(CodeStream& c) {
   list<Token> result;
-  if (c.fd.eof()) return result;
+  if (endOfInput(c.fd)) return result;
 
   if (c.currIndent == -1)
     result.push_back(Token::indent(c.currIndent=indent(c.fd)));
@@ -10,7 +10,7 @@ list<Token> nextLine(CodeStream& c) {
     result.push_back(Token::indent(c.currIndent));
 
   do { result.push_back(nextToken(c)); }
-  while (!result.back().isIndent());
+  while (!endOfInput(c.fd) && !result.back().isIndent());
   return result;
 }
 
