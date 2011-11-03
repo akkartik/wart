@@ -47,7 +47,6 @@ void assignDynamicVar(Cell* sym, Cell* val) {
 
 
 
-hash_set<Cell*, TypeCastCellHash> initialSyms;
 void setupInitialSym(Cell* var, Cell* val) {
   newDynamicScope(var, val);
   initialSyms.insert(var);

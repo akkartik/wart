@@ -145,22 +145,6 @@ Cell* read(CodeStream& c) {
 
 // post-test teardown
 
-void checkLiteralTables() {
-  for (hash_map<long, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
-    if (p->second->nrefs > 1)
-      warn << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
-    if (p->second->nrefs > 0)
-      rmref(p->second);
-  }
-  for (StringMap<Cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
-    if (initialSyms.find(p->second) != initialSyms.end()) continue;
-    if (p->second->nrefs > 1)
-      warn << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
-    if (p->second->nrefs > 0)
-      rmref(p->second);
-  }
-}
-
                                   void markAllCells(Cell* x, hash_map<Cell*, long, TypeCastCellHash>& mark) {
                                     if (x == nil) return;
                                     ++mark[x];
@@ -222,7 +206,8 @@ void resetState() {
 void checkState() {
   teardownStreams();
   teardownPrimFuncs();
-  checkLiteralTables();
+  teardownLiteralTables();
+
   if (numUnfreed() > 0) {
     warn << "Memory leak!\n";
     dumpUnfreed();
