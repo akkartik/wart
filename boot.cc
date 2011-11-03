@@ -145,6 +145,16 @@ Cell* read(CodeStream& c) {
 
 // post-test teardown
 
+void resetState() {
+  numLiterals.clear();
+  stringLiterals.clear();
+  freelist = NULL;
+  for(Cell* curr=currCell; curr >= heapStart; --curr)
+    curr->init();
+  currCell = heapStart;
+  dynamics.clear(); // leaks memory for strings and tables
+}
+
                                   void markAllCells(Cell* x, hash_map<Cell*, long, TypeCastCellHash>& mark) {
                                     if (x == nil) return;
                                     ++mark[x];
@@ -191,16 +201,6 @@ int numUnfreed() {
   for (Cell* f = freelist; f; f=f->cdr)
     --n;
   return n;
-}
-
-void resetState() {
-  numLiterals.clear();
-  stringLiterals.clear();
-  freelist = NULL;
-  for(Cell* curr=currCell; curr >= heapStart; --curr)
-    curr->init();
-  currCell = heapStart;
-  dynamics.clear(); // leaks memory for strings and tables
 }
 
 void checkState() {
