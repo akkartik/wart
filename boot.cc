@@ -81,8 +81,8 @@ stringstream& stream(string s) {
   return result;
 }
 
-struct Token;
 bool interactive = false;
+struct Token;
 list<Token> parenthesize(istream& f);
 struct AstNode;
 list<AstNode> parse(list<Token>);
