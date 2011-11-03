@@ -302,10 +302,11 @@ int main(int argc, unused ascii* argv[]) {
 
   interactive = true; // trigger eval on empty lines
   CodeStream cs(cin);
-  while (!cin.eof()) {
+  while (true) {
     cout << numUnfreed() << " ";
     cout << "wart> ";
     Cell* form = read(cs);
+    if (eof(cin)) break;
     Cell* result = eval(form);
     write(result, cout); cout << endl;
     rmref(result);
