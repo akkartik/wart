@@ -1,11 +1,7 @@
 def test(msg pred/should expr/valueof expected)
   if (pred expr expected)
     (pr ",")
-    (do
-      inc_failures.
-      prn.
-      (prn "F " msg)
-      (prn "  got " expr))
+    (register_failed_test msg expr)
 
 def pending-test'(msg expr/valueof pred/should expected)
   prn.

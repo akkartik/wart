@@ -9,8 +9,10 @@ COMPILE_PRIM_FUNC(debug, primFunc_debug, L"($x)",
   return nil;
 )
 
-COMPILE_PRIM_FUNC(inc_failures, primFunc_incTests, L"()",
+COMPILE_PRIM_FUNC(register_failed_test, primFunc_incTests, L"($msg $expr)",
   ++numFailures;
+  cout << endl << "F "; print(lookup(L"$msg"), cout);
+  cout << endl << "  got " << lookup(L"$expr") << endl;
   return nil;
 )
 
