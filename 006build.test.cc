@@ -6,27 +6,33 @@ void test_build_handles_empty_input() {
 }
 
 void test_build_handles_nil() {
-  list<Cell*> cells = buildFromStream(stream(L"()"));
-  checkEq(cells.front(), nil);
+  CodeStream cs(stream(L"()"));
+  checkEq(nextRawCell(cs), nil);
+  check(eof(cs.fd));
 }
 
 void test_build_handles_nil2() {
-  list<Cell*> cells = buildFromStream(stream(L"nil"));
-  checkEq(cells.front(), nil);
+  CodeStream cs(stream(L"nil"));
+  checkEq(nextRawCell(cs), nil);
+  check(eof(cs.fd));
 }
 
 void test_build_handles_number() {
-  list<Cell*> cells = buildFromStream(stream(L"34"));
-  checkEq(cells.size(), 1);
-  checkEq(cells.front(), newNum(34));
-  checkEq(cells.front()->nrefs, 1);
+  CodeStream cs(stream(L"34"));
+  Cell* c = nextRawCell(cs);
+  checkEq(c, newNum(34));
+  checkEq(c->nrefs, 1);
+  rmref(c);
+  check(eof(cs.fd));
 }
 
 void test_build_handles_sym() {
-  list<Cell*> cells = buildFromStream(stream(L"a"));
-  checkEq(cells.size(), 1);
-  checkEq(cells.front(), newSym(L"a"));
-  checkEq(cells.front()->nrefs, 1);
+  CodeStream cs(stream(L"a"));
+  Cell* c = nextRawCell(cs);
+  checkEq(c, newSym(L"a"));
+  checkEq(c->nrefs, 1);
+  rmref(c);
+  check(eof(cs.fd));
 }
 
 void test_build_doesnt_mix_syms_and_strings() {
@@ -36,44 +42,44 @@ void test_build_doesnt_mix_syms_and_strings() {
 }
 
 void test_build_handles_quoted_sym() {
-  list<Cell*> cells = buildFromStream(stream(L"'a"));
-  checkEq(cells.size(), 1);
-  checkEq(car(cells.front()), newSym(L"'"));
-  checkEq(cdr(cells.front()), newSym(L"a"));
-  checkEq(cdr(cells.front())->nrefs, 2);
-  rmref(cells.front());
+  CodeStream cs(stream(L"'a"));
+  Cell* c = nextRawCell(cs);
+  checkEq(car(c), newSym(L"'"));
+  checkEq(cdr(c), newSym(L"a"));
+  checkEq(cdr(c)->nrefs, 2);
+  rmref(c);
+  check(eof(cs.fd));
 }
 
 void test_build_handles_nested_quote() {
-  list<Cell*> cells = buildFromStream(stream(L"',a"));
-  checkEq(cells.size(), 1);
-  Cell* c = cells.front();
+  CodeStream cs(stream(L"',a"));
+  Cell* c = nextRawCell(cs);
   checkEq(car(c), newSym(L"'"));
   checkEq(car(cdr(c)), newSym(L","));
   checkEq(cdr(cdr(c)), newSym(L"a"));
   checkEq(cdr(cdr(c))->nrefs, 2);
-  rmref(cells.front());
+  rmref(c);
+  check(eof(cs.fd));
 }
 
 void test_build_handles_multiple_atoms() {
-  list<Cell*> cells = buildFromStream(stream(L"34\n35"));
-  checkEq(cells.size(), 2);
-  Cell* c = cells.front();
+  CodeStream cs(stream(L"34\n35"));
+  Cell* c = nextRawCell(cs);
   checkEq(c, newNum(34));
   checkEq(c->nrefs, 1);
   checkEq(cdr(c), nil);
 
-  c = cells.back();
+  c = nextRawCell(cs);
   checkEq(c, newNum(35));
   checkEq(c->nrefs, 1);
   checkEq(cdr(c), nil);
 
+  check(eof(cs.fd));
 }
 
 void test_build_handles_form() {
-  list<Cell*> cells = buildFromStream(stream(L"34 35"));
-  checkEq(cells.size(), 1);
-  Cell* c = cells.front();
+  CodeStream cs(stream(L"34 35"));
+  Cell *c=nextRawCell(cs), *origc=c;
   checkEq(c->nrefs, 0);
   checkEq(car(c), newNum(34));
   checkEq(car(c)->nrefs, 2);
@@ -84,13 +90,13 @@ void test_build_handles_form() {
   checkEq(car(c)->nrefs, 2);
 
   checkEq(cdr(c), nil);
-  rmref(cells.front());
+  rmref(origc);
+  check(eof(cs.fd));
 }
 
 void test_build_handles_dot() {
-  list<Cell*> cells = buildFromStream(stream(L"34 . 35"));
-  checkEq(cells.size(), 1);
-  Cell* c = cells.front();
+  CodeStream cs(stream(L"34 . 35"));
+  Cell *c=nextRawCell(cs), *origc=c;
   checkEq(c->nrefs, 0);
   checkEq(car(c), newNum(34));
   checkEq(car(c)->nrefs, 2);
@@ -99,13 +105,13 @@ void test_build_handles_dot() {
   checkEq(c, newNum(35));
   checkEq(c->nrefs, 2);
 
-  rmref(cells.front());
+  rmref(origc);
+  check(eof(cs.fd));
 }
 
 void test_build_handles_nested_form() {
-  list<Cell*> cells = buildFromStream(stream(L"(3 7 (33 23))"));
-  checkEq(cells.size(), 1);
-  Cell* c = cells.front();
+  CodeStream cs(stream(L"(3 7 (33 23))"));
+  Cell *c=nextRawCell(cs), *origc=c;
   checkEq(c->nrefs, 0);
   checkEq(car(c), newNum(3));
   checkEq(car(c)->nrefs, 2);
@@ -128,13 +134,13 @@ void test_build_handles_nested_form() {
     checkEq(cdr(c2), nil);
   checkEq(cdr(c), nil);
 
-  rmref(cells.front());
+  rmref(origc);
+  check(eof(cs.fd));
 }
 
 void test_build_handles_strings() {
-  list<Cell*> cells = buildFromStream(stream(L"(3 7 (33 \"abc\" 23))"));
-  checkEq(cells.size(), 1);
-  Cell* c = cells.front();
+  CodeStream cs(stream(L"(3 7 (33 \"abc\" 23))"));
+  Cell *c=nextRawCell(cs), *origc=c;
   checkEq(c->nrefs, 0);
   checkEq(car(c), newNum(3));
   checkEq(car(c)->nrefs, 2);
@@ -160,13 +166,13 @@ void test_build_handles_strings() {
     checkEq(cdr(c2), nil);
   checkEq(cdr(c), nil);
 
-  rmref(cells.front());
+  rmref(origc);
+  check(eof(cs.fd));
 }
 
 void test_build_handles_syms() {
-  list<Cell*> cells = buildFromStream(stream(L"(3 7 (33 \"abc\" 3de 23))"));
-  checkEq(cells.size(), 1);
-  Cell* c = cells.front();
+  CodeStream cs(stream(L"(3 7 (33 \"abc\" 3de 23))"));
+  Cell *c=nextRawCell(cs), *origc=c;
   checkEq(c->nrefs, 0);
   checkEq(car(c), newNum(3));
   checkEq(car(c)->nrefs, 2);
@@ -195,13 +201,13 @@ void test_build_handles_syms() {
     checkEq(cdr(c2), nil);
   checkEq(cdr(c), nil);
 
-  rmref(cells.front());
+  rmref(origc);
+  check(eof(cs.fd));
 }
 
 void test_build_handles_quotes() {
-  list<Cell*> cells = buildFromStream(stream(L"`(34 ,(35) ,36 ,@37 @,38 @39 ,'(a))"));
-  checkEq(cells.size(), 1);
-  Cell* c = cells.front();
+  CodeStream cs(stream(L"`(34 ,(35) ,36 ,@37 @,38 @39 ,'(a))"));
+  Cell *c=nextRawCell(cs), *origc=c;
   checkEq(c->nrefs, 0);
   checkEq(car(c), newSym(L"`"));
   checkEq(car(c)->nrefs, 2);
@@ -256,5 +262,6 @@ void test_build_handles_quotes() {
     checkEq(cdr(c2), nil);
   checkEq(cdr(c), nil);
 
-  rmref(cells.front());
+  rmref(origc);
+  check(eof(cs.fd));
 }

@@ -51,6 +51,10 @@ Cell* buildCell(AstNode n) {
   return newForm;
 }
 
+Cell* nextRawCell(CodeStream c) {
+  return buildCell(nextAstNode(c));
+}
+
 list<Cell*> buildCells(list<AstNode> in) {
   list<Cell*> result;
   if (in.empty()) return result;
