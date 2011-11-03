@@ -210,8 +210,5 @@ list<Token> tokenize(istream& in) {
   CodeStream c(in);
   while (!eof(c.fd))
     result.push_back(nextToken(c));
-
-  while(!result.empty() && *result.back().token == L"")
-    result.pop_back();
   return result;
 }

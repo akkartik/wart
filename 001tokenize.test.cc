@@ -163,15 +163,6 @@ void test_tokenize_suppresses_trailing_whitespace() {
   check(p == tokens.end());
 }
 
-void test_tokenize_suppresses_terminal_whitespace() {
-  list<Token> tokens = tokenize(stream(L"34 abc\n  "));
-  list<Token>::iterator p = tokens.begin();
-  checkEq(*p, Token::indent(0)); ++p;
-  checkEq(*p, L"34"); ++p;
-  checkEq(*p, L"abc"); ++p;
-  check(p == tokens.end());
-}
-
 void test_tokenize_suppresses_repeated_newline() {
   list<Token> tokens = tokenize(stream(L"34\n\n\"abc \\\"quote def\""));
   list<Token>::iterator p = tokens.begin();
