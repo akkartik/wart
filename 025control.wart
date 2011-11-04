@@ -78,4 +78,4 @@ mac repeat(n . body)
      ,@body)
 
 mac forever body
-  `(while 1 ,@$body)
+  `(while 1 ,@body)
