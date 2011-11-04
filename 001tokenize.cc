@@ -40,14 +40,11 @@ struct Token {
   bool operator==(string x) {
     return *token == x;
   }
-  bool operator==(int x) {
-    return indentLevel == x;
+  bool operator!=(string x) {
+    return !(*this == x);
   }
   bool operator==(Token x) {
     return *token == *x.token && indentLevel == x.indentLevel;
-  }
-  bool operator!=(string x) {
-    return !(*this == x);
   }
   bool operator!=(Token x) {
     return !(*this == x);
