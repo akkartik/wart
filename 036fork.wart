@@ -3,3 +3,11 @@ let $fork fork
     `(when (zero? ,$fork.)
        ,@body
        quit.)
+
+def preforking(n f)
+  (repeat n
+    (fork f.))
+  (forever
+    (wait_for_child)
+    (prn "restart")
+    (fork f.))
