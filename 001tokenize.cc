@@ -54,14 +54,6 @@ struct Token {
   }
 };
 
-ostream& operator<<(ostream& os, Token p) {
-  if (*p.token != L"") return os << *p.token;
-  os << endl;
-  for (int i = 0; i < p.indentLevel; ++i)
-    os << L"_";
-  return os;
-}
-
 
 
                                   void skip(istream& in) {

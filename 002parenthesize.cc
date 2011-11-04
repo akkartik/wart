@@ -24,24 +24,6 @@ list<Token> nextLine(CodeStream& c) {
                                     return x == L"'" || x == L"`" || x == L"," || x == L",@" || x == L"@";
                                   }
 
-                                  ostream& operator<<(ostream& os, list<Token> l) {
-                                    bool prevWasOpen = true;
-                                    for (list<Token>::iterator p = l.begin(); p != l.end(); ++p) {
-                                      if (!p->isIndent() && *p != L")" && !prevWasOpen) os << " ";
-                                      prevWasOpen = (*p == L"(" || isQuoteOrUnquote(*p));
-
-                                      if (p->isIndent()) {
-                                        os << endl;
-                                        for (int i=0; i < p->indentLevel; ++i)
-                                          os << " ";
-                                      }
-                                      else {
-                                        os << *p << "("<<p->indentLevel<<")";
-                                      }
-                                    }
-                                    return os << endl;
-                                  }
-
                                   int numWordsInLine(list<Token> line) {
                                     int numWords = 0;
                                     for (list<Token>::iterator p = line.begin(); p != line.end(); ++p)
