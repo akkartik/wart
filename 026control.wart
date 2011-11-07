@@ -77,5 +77,5 @@ mac repeat(n . body)
   `(for $i 0 (< $i ,n) ++.$i
      ,@body)
 
-mac for(ever . body) :case (iso ever 'ever)
+mac repeat(n . body) :case (iso n :forever)
   `(while 1 ,@body)

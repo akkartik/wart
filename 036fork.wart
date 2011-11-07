@@ -7,7 +7,7 @@ let $fork fork
 def preforking(n f)
   repeat n
     (fork f.)
-  for ever
+  repeat :forever
     (wait_for_child)
     (prn "restart")
     (fork f.)
