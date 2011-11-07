@@ -5,3 +5,9 @@
                 ++.ans
                 --.x)))
  :should be 3)
+
+(test "for works"
+ :valueof (ret ans 0
+            (for x 0 (< x 3) ++.x
+              ++.ans))
+ :should be 3)

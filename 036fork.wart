@@ -5,9 +5,9 @@ let $fork fork
        quit.)
 
 def preforking(n f)
-  (repeat n
-    (fork f.))
-  (forever
+  repeat n
+    (fork f.)
+  for ever
     (wait_for_child)
     (prn "restart")
-    (fork f.))
+    (fork f.)
