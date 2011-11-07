@@ -25,9 +25,9 @@ def coerce(x 'dest-type)
   eval `(coerce-quoted ,x ,dest-type)
 = coercions* (table)
 def coerce-quoted'(x dest-type)
-  (if (iso dest-type type.x)
+  if (iso dest-type type.x)
     x
-    ((table_get (table_get coercions* dest-type) type.x) x))
+    ((table_get (table_get coercions* dest-type) type.x) x)
 
 mac defcoerce(src dest f)
   `(do
