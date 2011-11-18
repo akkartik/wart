@@ -1,11 +1,11 @@
-COMPILE_PRIM_FUNC(table, primFunc_table, L"()",
+COMPILE_PRIM_FUNC(table, primFunc_table, "()",
   return mkref(newTable());
 )
 
-COMPILE_PRIM_FUNC(table_set, primFunc_table_set, L"($table $key $val)",
-  Cell* table = lookup(L"$table");
-  Cell* key = lookup(L"$key");
-  Cell* val = lookup(L"$val");
+COMPILE_PRIM_FUNC(table_set, primFunc_table_set, "($table $key $val)",
+  Cell* table = lookup("$table");
+  Cell* key = lookup("$key");
+  Cell* val = lookup("$val");
   if (isTable(table))
     set(table, key, val);
   else
@@ -13,8 +13,8 @@ COMPILE_PRIM_FUNC(table_set, primFunc_table_set, L"($table $key $val)",
   return mkref(val);
 )
 
-COMPILE_PRIM_FUNC(table_get, primFunc_table_get, L"($table $key)",
-  Cell* table = lookup(L"$table");
-  Cell* key = lookup(L"$key");
+COMPILE_PRIM_FUNC(table_get, primFunc_table_get, "($table $key)",
+  Cell* table = lookup("$table");
+  Cell* key = lookup("$key");
   return mkref(get(table, key));
 )

@@ -5,7 +5,7 @@ void test_lexical_scope_has_nil_cdr_on_startup() {
 }
 
 void test_lookup_returns_dynamic_binding() {
-  Cell* sym = newSym(L"a");
+  Cell* sym = newSym("a");
   checkEq(sym->nrefs, 1);
   Cell* val = newNum(34);
   checkEq(val->nrefs, 1);
@@ -19,7 +19,7 @@ void test_lookup_returns_dynamic_binding() {
 }
 
 void test_lookup_returns_lexical_binding() {
-  Cell* sym = newSym(L"a");
+  Cell* sym = newSym("a");
   checkEq(sym->nrefs, 1);
   Cell* val = newNum(34);
   checkEq(val->nrefs, 1);
@@ -34,7 +34,7 @@ void test_lookup_returns_lexical_binding() {
 }
 
 void test_lexical_binding_always_overrides_dynamic() {
-  Cell* sym = newSym(L"a");
+  Cell* sym = newSym("a");
   checkEq(sym->nrefs, 1);
   Cell* val = newNum(34);
   checkEq(val->nrefs, 1);
@@ -63,7 +63,7 @@ void test_lexical_binding_always_overrides_dynamic() {
 }
 
 void test_nil_lexical_binding_works() {
-  Cell* sym = newSym(L"a");
+  Cell* sym = newSym("a");
   checkEq(sym->nrefs, 1);
   Cell* dynVal = newNum(35);
   newDynamicScope(sym, dynVal);
@@ -75,7 +75,7 @@ void test_nil_lexical_binding_works() {
 }
 
 void test_lexical_scopes_nest_correctly() {
-  Cell* sym = newSym(L"a");
+  Cell* sym = newSym("a");
   checkEq(sym->nrefs, 1);
   Cell* val = newNum(34);
   checkEq(val->nrefs, 1);
@@ -126,7 +126,7 @@ void test_lexical_scopes_nest_correctly() {
 }
 
 void test_lower_lexical_scopes_are_available() {
-  Cell* sym = newSym(L"a");
+  Cell* sym = newSym("a");
   checkEq(sym->nrefs, 1);
   Cell* val = newNum(34);
   checkEq(val->nrefs, 1);

@@ -29,12 +29,12 @@ struct Token {
     return result;
   }
   static Token indent(int indent) {
-    Token result(L"", indent);
+    Token result("", indent);
     return result;
   }
 
   bool isIndent() {
-    return *token == L"";
+    return *token == "";
   }
 
   bool operator==(string x) {
@@ -59,7 +59,7 @@ struct Token {
                                   }
 
                                   void skipWhitespace(istream& in) {
-                                    while (isspace(in.peek()) && in.peek() != L'\n')
+                                    while (isspace(in.peek()) && in.peek() != '\n')
                                       skip(in);
                                   }
 
@@ -75,16 +75,16 @@ struct Token {
                                   }
 
                                   void slurpWord(istream& in, ostream& out) {
-                                    static const string quoteChars = L",'`@";
-                                    static const string ssyntaxChars = L":~!.&"; // disjoint from quoteChars
-                                    char lastc = L'\0';
+                                    static const string quoteChars = ",'`@";
+                                    static const string ssyntaxChars = ":~!.&"; // disjoint from quoteChars
+                                    char lastc = '\0';
                                     while (!eof(in)) {
                                       char c = in.get();
                                       if (ssyntaxChars.find(lastc) != string::npos
                                           && quoteChars.find(c) != string::npos)
                                         ; // wait for ssyntax expansion
                                       // keep this list sync'd with the nextToken switch below
-                                      else if (isspace(c) || c == ';' || c == L'(' || c == L')' || c == L'"'
+                                      else if (isspace(c) || c == ';' || c == '(' || c == ')' || c == '"'
                                               || quoteChars.find(c) != string::npos) {
                                         in.putback(c);
                                         break;
@@ -99,9 +99,9 @@ struct Token {
                                     while (!eof(in)) {
                                       char c = in.get();
                                       out << c;
-                                      if (c == L'\\')
+                                      if (c == '\\')
                                         slurpChar(in, out); // blindly read next
-                                      else if (c == L'"')
+                                      else if (c == '"')
                                         break;
                                     }
                                   }
@@ -109,7 +109,7 @@ struct Token {
                                   void skipComment(istream& in) {
                                     while (!eof(in)) {
                                       char c = in.get();
-                                      if (c == L'\n') {
+                                      if (c == '\n') {
                                         in.putback(c);
                                         break;
                                       }
@@ -135,7 +135,7 @@ struct Token {
                                     int indent = 0;
                                     while (!eof(in)) {
                                       char c = in.get();
-                                      if (c == L';') {
+                                      if (c == ';') {
                                         skipComment(in);
                                         if (endOfInput(in)) break;
                                       }
@@ -145,9 +145,9 @@ struct Token {
                                         break;
                                       }
 
-                                      else if (c == L' ') ++indent;
-                                      else if (c == L'\t') indent+=2;
-                                      else if (c == L'\n') indent=0;
+                                      else if (c == ' ') ++indent;
+                                      else if (c == '\t') indent+=2;
+                                      else if (c == '\n') indent=0;
                                     }
                                     return indent;
                                   }
@@ -156,27 +156,27 @@ Token nextToken(istream& in, int& currIndent) {
   if (currIndent == -1) // initial
     return Token::indent(currIndent=indent(in));
   skipWhitespace(in);
-  if (in.peek() == L'\n' || in.peek() == L';')
+  if (in.peek() == '\n' || in.peek() == ';')
     return Token::indent(currIndent=indent(in));
 
   ostringstream out;
   switch (in.peek()) { // now can't be whitespace
-    case L'"':
+    case '"':
       slurpString(in, out); break;
 
-    case L'(':
-    case L')':
-    case L'\'':
-    case L'`':
+    case '(':
+    case ')':
+    case '\'':
+    case '`':
       slurpChar(in, out); break;
 
-    case L',':
+    case ',':
       slurpChar(in, out);
-      if (in.peek() == L'@')
+      if (in.peek() == '@')
         slurpChar(in, out);
       break;
 
-    case L'@':
+    case '@':
       slurpChar(in, out); break;
 
     default:

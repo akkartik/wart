@@ -14,40 +14,24 @@ using __gnu_cxx::hash;
 using __gnu_cxx::hash_set;
 #include<exception>
 
-
-
-// unicode strings everywhere
-
 #include<string>
-typedef std::wstring string;
+using std::string;
 
 #include<iostream>
-typedef std::wistream istream;
-typedef std::wostream ostream;
-#define cin std::wcin
-#define cout std::wcout
-#define cerr std::wcerr
+using std::istream;
+using std::ostream;
+using std::cin;
+using std::cout;
+using std::cerr;
 using std::endl;
 
 #include<sstream>
-typedef std::wstringstream stringstream;
-typedef std::wostringstream ostringstream;
+using std::stringstream;
+using std::ostringstream;
 
 #include<fstream>
-typedef std::wifstream ifstream;
-typedef std::wofstream ofstream;
-
-typedef char ascii;
-#define char wchar_t // must come after all system includes
-
-// HACK because there's no wifstream(wstring) constructor
-// will not work for filenames with non-ascii characters
-vector<ascii> toAscii(string filename) {
-  vector<ascii> result;
-  for (string::iterator p = filename.begin(); p != filename.end(); ++p)
-    result.push_back(*p);
-  return result;
-}
+using std::ifstream;
+using std::ofstream;
 
 
 
@@ -270,7 +254,7 @@ void init() {
   setupPrimFuncs();
 }
 
-int main(int argc, unused ascii* argv[]) {
+int main(int argc, unused char* argv[]) {
   if (argc > 1) {
     runTests();
     return 0;

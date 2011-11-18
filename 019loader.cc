@@ -1,8 +1,6 @@
-#undef char
 #include<dirent.h>
-#define char wchar_t
 
-void loadFile(ascii* filename) {
+void loadFile(const char* filename) {
   ifstream f(filename);
   CodeStream c(f);
   while (!eof(c.fd)) {
@@ -12,8 +10,8 @@ void loadFile(ascii* filename) {
   }
 }
 
-                                  vector<ascii*> sortedFiles(const ascii* dirname, const ascii* ext) {
-                                    vector<ascii*> result;
+                                  vector<char*> sortedFiles(const char* dirname, const char* ext) {
+                                    vector<char*> result;
                                     dirent** files;
                                     int numFiles = scandir(dirname, &files, NULL, alphasort);
                                     for (int i = 0; i < numFiles; ++i) {
@@ -21,22 +19,22 @@ void loadFile(ascii* filename) {
                                       if (n < extn) continue;
                                       if (strncmp(&files[i]->d_name[n-extn], ext, extn)) continue;
                                       if (!isdigit(files[i]->d_name[0])) continue;
-                                      ascii* s = new ascii[n+1]; // leak
+                                      char* s = new char[n+1]; // leak
                                       strncpy(s, files[i]->d_name, n+1);
                                       result.push_back(s);
                                     }
                                     return result;
                                   }
 
-void loadFiles(const ascii* ext) {
-  vector<ascii*> files = sortedFiles(".", ext);
-  for (vector<ascii*>::iterator p = files.begin(); p != files.end(); ++p)
+void loadFiles(const char* ext) {
+  vector<char*> files = sortedFiles(".", ext);
+  for (vector<char*>::iterator p = files.begin(); p != files.end(); ++p)
     loadFile(*p);
 }
 
 
 
-COMPILE_PRIM_FUNC(load, primFunc_load, L"($f)",
-  loadFile(&toAscii(toString(lookup(L"$f")))[0]);
+COMPILE_PRIM_FUNC(load, primFunc_load, "($f)",
+  loadFile(toString(lookup("$f")).c_str());
   return nil;
 )

@@ -9,12 +9,12 @@
 
 int printDepth = 0;
 ostream& operator<<(ostream& os, Cell* c) {
-  if (c == NULL) return os << "NULLNULLNULL";
+  if (c == NULL) return os << "NULLNULLNUL";
   if (c == nil) return os << "nil";
   if (++printDepth > 512) return os << "...";
   switch(c->type) {
   case CONS:
-    if (car(c) == newSym(L"'") || car(c) == newSym(L"`") || car(c) == newSym(L",") || car(c) == newSym(L",@") || car(c) == newSym(L"@"))
+    if (car(c) == newSym("'") || car(c) == newSym("`") || car(c) == newSym(",") || car(c) == newSym(",@") || car(c) == newSym("@"))
       return os << car(c) << cdr(c);
     os << "(" << car(c);
     for (Cell* curr = cdr(c); curr != nil; curr = cdr(curr)) {
@@ -58,27 +58,27 @@ void print(Cell* x, ostream& out) {
 
 
 Cell* newIstream(istream* x) {
-  return newCons(newSym(L"type"), newCons(newSym(L"stream"),
+  return newCons(newSym("type"), newCons(newSym("stream"),
             newCons(newNum((long)x), nil)));
 }
 
 Cell* newOstream(ostream* x) {
-  return newCons(newSym(L"type"), newCons(newSym(L"stream"),
+  return newCons(newSym("type"), newCons(newSym("stream"),
             newCons(newNum((long)x), nil)));
 }
 
 void setupStreams() {
-  newDynamicScope(newSym(L"stdin"), newIstream(&cin));
-  newDynamicScope(newSym(L"stdout"), newOstream(&cout));
-  newDynamicScope(newSym(L"stderr"), newOstream(&cerr));
+  newDynamicScope(newSym("stdin"), newIstream(&cin));
+  newDynamicScope(newSym("stdout"), newOstream(&cout));
+  newDynamicScope(newSym("stderr"), newOstream(&cerr));
 }
-#define STDIN dynamics[newSym(L"stdin")].top()
-#define STDOUT dynamics[newSym(L"stdout")].top()
-#define STDERR dynamics[newSym(L"stderr")].top()
+#define STDIN dynamics[newSym("stdin")].top()
+#define STDOUT dynamics[newSym("stdout")].top()
+#define STDERR dynamics[newSym("stderr")].top()
 void teardownStreams() {
-  endDynamicScope(newSym(L"stdin"));
-  endDynamicScope(newSym(L"stdout"));
-  endDynamicScope(newSym(L"stderr"));
+  endDynamicScope(newSym("stdin"));
+  endDynamicScope(newSym("stdout"));
+  endDynamicScope(newSym("stderr"));
 }
 
 istream& toIstream(Cell* x) {
@@ -89,16 +89,16 @@ ostream& toOstream(Cell* x) {
   return *(ostream*)toNum(car(cdr(cdr(x))));
 }
 
-COMPILE_PRIM_FUNC(pr, primFunc_pr, L"($x)",
-  Cell* x = lookup(L"$x");
+COMPILE_PRIM_FUNC(pr, primFunc_pr, "($x)",
+  Cell* x = lookup("$x");
   ostream& out = toOstream(STDOUT);
   print(x, out);
   out.flush();
   return mkref(x);
 )
 
-COMPILE_PRIM_FUNC(write, primFunc_write, L"($x)",
-  Cell* x = lookup(L"$x");
+COMPILE_PRIM_FUNC(write, primFunc_write, "($x)",
+  Cell* x = lookup("$x");
   ostream& out = toOstream(STDOUT);
   write(x, out);
   out.flush();
@@ -110,16 +110,16 @@ COMPILE_PRIM_FUNC(write, primFunc_write, L"($x)",
                                     return read(c);
                                   }
 
-COMPILE_PRIM_FUNC(read, primFunc_read, L"('$eof)",
+COMPILE_PRIM_FUNC(read, primFunc_read, "('$eof)",
   if (toIstream(STDIN).eof())
-    return mkref(lookup(L"$eof"));
+    return mkref(lookup("$eof"));
   return mkref(read(toIstream(STDIN)));
 )
 
-COMPILE_PRIM_FUNC(read-byte, primFunc_read_byte, L"('$eof)",
+COMPILE_PRIM_FUNC(read-byte, primFunc_read_byte, "('$eof)",
   istream& f = toIstream(STDIN);
   if (f.eof())
-    return mkref(lookup(L"$eof"));
+    return mkref(lookup("$eof"));
   char c;
   f.read(&c, 1);
   return mkref(newNum((long)c));
@@ -127,45 +127,45 @@ COMPILE_PRIM_FUNC(read-byte, primFunc_read_byte, L"('$eof)",
 
 
 
-COMPILE_PRIM_FUNC(infile, primFunc_infile, L"($name)",
-  return mkref(newIstream(new ifstream(&toAscii(toString(lookup(L"$name")))[0], std::ios::binary)));
+COMPILE_PRIM_FUNC(infile, primFunc_infile, "($name)",
+  return mkref(newIstream(new ifstream(toString(lookup("$name")).c_str(), std::ios::binary)));
 )
 
-COMPILE_PRIM_FUNC(close_infile, primFunc_close_infile, L"($stream)",
-  ifstream* f = (ifstream*)toNum(car(cdr(cdr(lookup(L"$stream")))));
+COMPILE_PRIM_FUNC(close_infile, primFunc_close_infile, "($stream)",
+  ifstream* f = (ifstream*)toNum(car(cdr(cdr(lookup("$stream")))));
   f->close();
   delete f;
   return nil;
 )
 
-COMPILE_PRIM_FUNC(outfile, primFunc_outfile, L"($name)",
-  return mkref(newOstream(new ofstream(&toAscii(toString(lookup(L"$name")))[0], std::ios::binary)));
+COMPILE_PRIM_FUNC(outfile, primFunc_outfile, "($name)",
+  return mkref(newOstream(new ofstream(toString(lookup("$name")).c_str(), std::ios::binary)));
 )
 
-COMPILE_PRIM_FUNC(close_outfile, primFunc_close_outfile, L"($stream)",
-  ofstream* f = (ofstream*)toNum(car(cdr(cdr(lookup(L"$stream")))));
+COMPILE_PRIM_FUNC(close_outfile, primFunc_close_outfile, "($stream)",
+  ofstream* f = (ofstream*)toNum(car(cdr(cdr(lookup("$stream")))));
   f->close();
   delete f;
   return nil;
 )
 
-COMPILE_PRIM_FUNC(err, primFunc_err, L"($x)",
-  Cell* x = lookup(L"$x");
+COMPILE_PRIM_FUNC(err, primFunc_err, "($x)",
+  Cell* x = lookup("$x");
   ostream& out = toOstream(STDERR);
   print(x, out);
   out.flush();
   return mkref(x);
 )
 
-COMPILE_PRIM_FUNC(instring, primFunc_instring, L"($s)",
-  return mkref(newIstream(new stringstream(toString(lookup(L"$s")))));
+COMPILE_PRIM_FUNC(instring, primFunc_instring, "($s)",
+  return mkref(newIstream(new stringstream(toString(lookup("$s")))));
 )
 
-COMPILE_PRIM_FUNC(outstring, primFunc_outstring, L"()",
+COMPILE_PRIM_FUNC(outstring, primFunc_outstring, "()",
   return mkref(newOstream(new ostringstream()));
 )
 
-COMPILE_PRIM_FUNC(outstring_buffer, primFunc_outstring_buffer, L"($stream)",
-  ostringstream* s = (ostringstream*)toNum(car(cdr(cdr(lookup(L"$stream")))));
+COMPILE_PRIM_FUNC(outstring_buffer, primFunc_outstring_buffer, "($stream)",
+  ostringstream* s = (ostringstream*)toNum(car(cdr(cdr(lookup("$stream")))));
   return mkref(newString(s->str()));
 )

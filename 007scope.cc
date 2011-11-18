@@ -51,7 +51,7 @@ void assignDynamicVar(Cell* sym, Cell* val) {
 Cell* CURR_LEXICAL_SCOPE;
 #define currLexicalScopes dynamics[CURR_LEXICAL_SCOPE]
 void setupLexicalScope() {
-  CURR_LEXICAL_SCOPE = newSym(L"currLexicalScope");
+  CURR_LEXICAL_SCOPE = newSym("currLexicalScope");
   newDynamicScope(CURR_LEXICAL_SCOPE, nil);
   initialSyms.insert(CURR_LEXICAL_SCOPE);
 }

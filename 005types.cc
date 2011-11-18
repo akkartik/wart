@@ -89,7 +89,7 @@ bool isString(Cell* x) {
 string toString(Cell* x) {
   if (!isString(x) && !isSym(x)) {
     warn << "can't convert to string: " << x << endl;
-    return L"";
+    return "";
   }
   return *(string*)x->car;
 }
@@ -97,7 +97,7 @@ string toString(Cell* x) {
 Cell* genSym(Cell* x) {
   static long counter = 0;
   ostringstream os;
-  os << (x == nil ? L"sym" : toString(x)) << ++counter;
+  os << (x == nil ? "sym" : toString(x)) << ++counter;
   return newSym(os.str());
 }
 
@@ -200,23 +200,23 @@ Cell* type(Cell* x) {
   Cell* result = nil;
   switch(x->type) {
   case NUM:
-    result = newSym(L"number"); break;
+    result = newSym("number"); break;
   case SYM:
-    result = newSym(L"symbol"); break;
+    result = newSym("symbol"); break;
   case STRING:
-    result = newSym(L"string"); break;
+    result = newSym("string"); break;
   case TABLE:
-    result = newSym(L"table"); break;
+    result = newSym("table"); break;
   case PRIM_FUNC:
-    result = newSym(L"function"); break;
+    result = newSym("function"); break;
   case CONS:
     if (x == nil) break;
-    if (car(x) == newSym(L"fn") || car(x) == newSym(L"evald-fn"))
-      result = newSym(L"function");
-    else if (car(x) == newSym(L"type"))
+    if (car(x) == newSym("fn") || car(x) == newSym("evald-fn"))
+      result = newSym("function");
+    else if (car(x) == newSym("type"))
       result = car(cdr(x));
     else
-      result = newSym(L"list");
+      result = newSym("list");
     break;
   default:
     err << "Undefined type: " << x->type << endl << DIE;

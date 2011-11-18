@@ -42,14 +42,6 @@ primitives wart knows about. This means you can add new COMPILE_PRIM_FUNC
 operators, or entirely new code in .cc files, and they'll be automatically
 included next time you run wart.
 
-== Strings
-
-The wart interpreter pervasively uses wide characters
-(http://en.wikipedia.org/wiki/Wide_character) to enable unicode. All string,
-char, stream and IO types are not what they may seem at first. char is
-wchar_t, string is wstring, and so on. A few places that can't use wide
-characters use type ascii.
-
 == Concerns when creating new primitive functions
 
 Wart supports compiled operations using the COMPILE_PRIM_FUNC macro, either

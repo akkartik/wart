@@ -1,11 +1,11 @@
-COMPILE_PRIM_FUNC(list_splice, primFunc_list_splice, L"('$list $start $end $val)",
-  Cell* binding = lookup(L"$list");
+COMPILE_PRIM_FUNC(list_splice, primFunc_list_splice, "('$list $start $end $val)",
+  Cell* binding = lookup("$list");
   Cell* list = eval(binding);
-  long start = toNum(lookup(L"$start"));
+  long start = toNum(lookup("$start"));
   Cell* prePtr = nthCdr(list, start-1);
   Cell* startPtr = nthCdr(list, start);
-  Cell* endPtr = nthCdr(list, toNum(lookup(L"$end")));
-  Cell* val = lookup(L"$val");
+  Cell* endPtr = nthCdr(list, toNum(lookup("$end")));
+  Cell* val = lookup("$val");
 
   if (val == nil) {
     if (start == 0)
@@ -28,15 +28,15 @@ COMPILE_PRIM_FUNC(list_splice, primFunc_list_splice, L"('$list $start $end $val)
   return mkref(val);
 )
 
-COMPILE_PRIM_FUNC(list_get, primFunc_list_get, L"($list $index $end)",
-  Cell* list = lookup(L"$list");
-  int index = toNum(lookup(L"$index"));
+COMPILE_PRIM_FUNC(list_get, primFunc_list_get, "($list $index $end)",
+  Cell* list = lookup("$list");
+  int index = toNum(lookup("$index"));
   for (int i = 0; i < index; ++i)
     list=cdr(list);
-  if (lookup(L"$end") == nil)
+  if (lookup("$end") == nil)
     return mkref(car(list));
 
-  int end = toNum(lookup(L"$end"));
+  int end = toNum(lookup("$end"));
   Cell* pResult = newCell();
   Cell* curr = pResult;
   for (int i = index; i < end && list != nil; ++i, list=cdr(list), curr=cdr(curr))

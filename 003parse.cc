@@ -22,8 +22,8 @@ struct AstNode {
     return !elems.empty();
   }
   bool isNil() {
-    return atom == L"nil"
-        || (elems.size() == 2 && elems.front() == L"(" && elems.back() == L")");
+    return atom == "nil"
+        || (elems.size() == 2 && elems.front() == "(" && elems.back() == ")");
   }
 
   bool operator==(Token x) {
@@ -41,8 +41,8 @@ ostream& operator<<(ostream& os, AstNode x) {
   if (x.elems.empty()) return os << x.atom;
   bool prevWasOpen = true;
   for (list<AstNode>::iterator p = x.elems.begin(); p != x.elems.end(); ++p) {
-    if (!(*p == L")" || prevWasOpen)) os << " ";
-    prevWasOpen = (*p == L"(" || *p == L"'" || *p == L"," || *p == L",@" || *p == L"@");
+    if (!(*p == ")" || prevWasOpen)) os << " ";
+    prevWasOpen = (*p == "(" || *p == "'" || *p == "," || *p == ",@" || *p == "@");
     os << *p;
   }
   return os << endl;
@@ -51,9 +51,9 @@ ostream& operator<<(ostream& os, AstNode x) {
 list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterator end, list<AstNode>& out) {
   if (curr == end) return curr;
 
-  if (*curr == L")") err << "Unbalanced )" << endl << DIE;
+  if (*curr == ")") err << "Unbalanced )" << endl << DIE;
 
-  if (*curr != L"(" && !isQuoteOrUnquote(*curr)) {
+  if (*curr != "(" && !isQuoteOrUnquote(*curr)) {
     out.push_back(AstNode::of(*curr));
     return ++curr;
   }
@@ -64,10 +64,10 @@ list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterato
     ++curr;
   }
 
-  if (*curr == L"(") {
+  if (*curr == "(") {
     subform.push_back(*curr);
     ++curr;
-    while (curr != end && *curr != L")")
+    while (curr != end && *curr != ")")
       curr = parseNext(curr, end, subform);
     if (curr == end) err << "Unbalanced (" << endl << DIE;
     subform.push_back(*curr);

@@ -1,31 +1,31 @@
 void test_eval_handles_eval() {
-  newDynamicScope(L"a", newNum(34));
-  newDynamicScope(L"x", newSym(L"a"));
-  Cell* call = read(stream(L"(eval x)"));
+  newDynamicScope("a", newNum(34));
+  newDynamicScope("x", newSym("a"));
+  Cell* call = read(stream("(eval x)"));
   Cell* result = eval(call);
   checkEq(result, newNum(34));
   rmref(result);
   rmref(call);
-  endDynamicScope(L"x");
-  endDynamicScope(L"a");
+  endDynamicScope("x");
+  endDynamicScope("a");
 }
 
 void test_if_sees_args_in_then_and_else() {
-  Cell* fn = read(stream(L"(fn(x) (if 34 x))"));
+  Cell* fn = read(stream("(fn(x) (if 34 x))"));
   Cell* f = eval(fn);
-  newDynamicScope(L"f", f);
-  Cell* call = read(stream(L"(f 35)"));
+  newDynamicScope("f", f);
+  Cell* call = read(stream("(f 35)"));
   Cell* result = eval(call);
   checkEq(result, newNum(35));
   rmref(result);
   rmref(call);
-  endDynamicScope(L"f");
+  endDynamicScope("f");
   rmref(f);
   rmref(fn);
 }
 
 void test_cons_works() {
-  Cell* call = read(stream(L"cons 1 2"));
+  Cell* call = read(stream("cons 1 2"));
   Cell* result = eval(call);
   checkEq(car(result), newNum(1));
   checkEq(cdr(result), newNum(2));
@@ -34,17 +34,17 @@ void test_cons_works() {
 }
 
 void test_assign_to_fn() {
-  Cell* fn = read(stream(L"= foo (fn() 34)"));
+  Cell* fn = read(stream("= foo (fn() 34)"));
   Cell* def = eval(fn);
-  Cell* scope = calleeEnv(lookup(L"foo"));
+  Cell* scope = calleeEnv(lookup("foo"));
   checkEq(scope, nil);
-  endDynamicScope(L"foo");
+  endDynamicScope("foo");
   rmref(def);
   rmref(fn);
 }
 
 void test_assign_lexical_var() {
-  Cell* fn = read(stream(L"((fn(x) (= x 34) x))"));
+  Cell* fn = read(stream("((fn(x) (= x 34) x))"));
   Cell* call = eval(fn);
   checkEq(call, newNum(34));
   rmref(call);
@@ -52,12 +52,12 @@ void test_assign_lexical_var() {
 }
 
 void test_assign_overrides_dynamic_vars() {
-  Cell* init1 = read(stream(L"= x 3"));
+  Cell* init1 = read(stream("= x 3"));
   Cell* call1 = eval(init1);
-  Cell* init2 = read(stream(L"= x 5"));
+  Cell* init2 = read(stream("= x 5"));
   Cell* call2 = eval(init2);
-  checkEq(lookup(L"x"), newNum(5));
-  endDynamicScope(L"x");
+  checkEq(lookup("x"), newNum(5));
+  endDynamicScope("x");
   rmref(call2);
   rmref(init2);
   rmref(call1);
@@ -65,12 +65,12 @@ void test_assign_overrides_dynamic_vars() {
 }
 
 void test_assign_overrides_within_lexical_scope() {
-  Cell* init1 = read(stream(L"= x 3"));
+  Cell* init1 = read(stream("= x 3"));
   Cell* call1 = eval(init1);
-  Cell* init2 = read(stream(L"((fn() (= x 5)))"));
+  Cell* init2 = read(stream("((fn() (= x 5)))"));
   Cell* call2 = eval(init2);
-  checkEq(lookup(L"x"), newNum(5));
-  endDynamicScope(L"x");
+  checkEq(lookup("x"), newNum(5));
+  endDynamicScope("x");
   rmref(call2);
   rmref(init2);
   rmref(call1);
@@ -78,16 +78,16 @@ void test_assign_overrides_within_lexical_scope() {
 }
 
 void test_assign_never_overrides_lexical_vars_in_caller_scope() {
-  Cell* fn = read(stream(L"((fn(x) (= y x)) 34)"));
+  Cell* fn = read(stream("((fn(x) (= y x)) 34)"));
   Cell* def = eval(fn);
-  checkEq(lookup(L"y"), newNum(34));
-  endDynamicScope(L"y");
+  checkEq(lookup("y"), newNum(34));
+  endDynamicScope("y");
   rmref(def);
   rmref(fn);
 }
 
 void test_assign_overrides_lexical_var() {
-  Cell* fn = read(stream(L"((fn(x) (= x 34) (= x 35) x) 34)"));
+  Cell* fn = read(stream("((fn(x) (= x 34) (= x 35) x) 34)"));
   Cell* call = eval(fn);
   checkEq(call, newNum(35));
   rmref(call);
@@ -95,14 +95,14 @@ void test_assign_overrides_lexical_var() {
 }
 
 void test_bound_works() {
-  Cell* call = read(stream(L"bound?!a"));
+  Cell* call = read(stream("bound?!a"));
   Cell* result1 = eval(call);
   checkEq(result1, nil);
-  newDynamicScope(L"a", newNum(3));
+  newDynamicScope("a", newNum(3));
   Cell* result2 = eval(call);
-  checkEq(result2, newSym(L"a"));
+  checkEq(result2, newSym("a"));
   rmref(result2);
-  endDynamicScope(L"a");
+  endDynamicScope("a");
   rmref(result1);
   rmref(call);
 }

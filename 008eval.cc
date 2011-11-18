@@ -1,19 +1,19 @@
 //// eval: lookup symbols, respect quotes, rewrite fn calls
 
                                   bool isQuoted(Cell* cell) {
-                                    return isCons(cell) && car(cell) == newSym(L"'");
+                                    return isCons(cell) && car(cell) == newSym("'");
                                   }
 
                                   bool isBackQuoted(Cell* cell) {
-                                    return isCons(cell) && car(cell) == newSym(L"`");
+                                    return isCons(cell) && car(cell) == newSym("`");
                                   }
 
                                   bool isSplice(Cell* arg) {
-                                    return isCons(arg) && car(arg) == newSym(L"@");
+                                    return isCons(arg) && car(arg) == newSym("@");
                                   }
 
                                   bool isUnquoteSplice(Cell* arg) {
-                                    return isCons(arg) && car(arg) == newSym(L",@");
+                                    return isCons(arg) && car(arg) == newSym(",@");
                                   }
 
                                   bool isColonSym(Cell* x) {
@@ -56,8 +56,8 @@
 
                                     string expected = toString(arg);
                                     char ns[name.length()+1];
-                                    wcscpy(ns, name.c_str());
-                                    for (char *tmp, *tok = wcstok(ns, L"/", &tmp); tok; tok=wcstok(NULL, L"/", &tmp))
+                                    strcpy(ns, name.c_str());
+                                    for (char *tok = strtok(ns, "/"); tok; tok=strtok(NULL, "/"))
                                       if (expected == tok) return true;
                                     return false;
                                   }
@@ -68,9 +68,9 @@
                                     Cell* realArg = newSym(toString(arg).substr(1));
                                     for (; params != nil; params=cdr(params)) {
                                       if (realArg == params) // rest keyword arg must be last
-                                        return newSym(L"__wartRestKeywordArg");
-                                      if (realArg == newSym(L"do") && params == newSym(L"body"))
-                                        return newSym(L"__wartRestKeywordArg");
+                                        return newSym("__wartRestKeywordArg");
+                                      if (realArg == newSym("do") && params == newSym("body"))
+                                        return newSym("__wartRestKeywordArg");
                                       if (!isCons(params)) continue;
                                       Cell* param = stripQuote(car(params));
                                       if (paramAliasMatch(realArg, param))
@@ -84,7 +84,7 @@
                                     Cell *pNonKeywordArgs = newCell(), *curr = pNonKeywordArgs;
                                     for (; args != nil; args=cdr(args)) {
                                       Cell* currArg = keywordArg(car(args), params);
-                                      if (currArg == newSym(L"__wartRestKeywordArg")) {
+                                      if (currArg == newSym("__wartRestKeywordArg")) {
                                         setCdr(curr, cdr(args));
                                         break;
                                       }
@@ -196,8 +196,8 @@ Cell* evalArgs(Cell* params, Cell* args) {
                                     }
 
                                     char ns[name.length()+1];
-                                    wcscpy(ns, name.c_str());
-                                    for (char *tmp, *tok = wcstok(ns, L"/", &tmp); tok; tok=wcstok(NULL, L"/", &tmp))
+                                    strcpy(ns, name.c_str());
+                                    for (char *tok = strtok(ns, "/"); tok; tok=strtok(NULL, "/"))
                                       addLexicalBinding(newSym(tok), val);
                                   }
 
@@ -220,13 +220,13 @@ void bindParams(Cell* params, Cell* args) {
 
 
                                   int unquoteDepth(Cell* x) {
-                                    if (!isCons(x) || car(x) != newSym(L","))
+                                    if (!isCons(x) || car(x) != newSym(","))
                                       return 0;
                                     return unquoteDepth(cdr(x))+1;
                                   }
 
                                   Cell* stripUnquote(Cell* x) {
-                                    if (!isCons(x) || car(x) != newSym(L","))
+                                    if (!isCons(x) || car(x) != newSym(","))
                                       return x;
                                     return stripUnquote(cdr(x));
                                   }
@@ -236,7 +236,7 @@ Cell* processUnquotes(Cell* x, int depth) {
 
   if (unquoteDepth(x) == depth)
     return eval(stripUnquote(x));
-  else if (car(x) == newSym(L","))
+  else if (car(x) == newSym(","))
     return mkref(x);
 
   if (isBackQuoted(x)) {
@@ -267,11 +267,11 @@ Cell* processUnquotes(Cell* x, int depth) {
 
                                   bool isFunc(Cell* x) {
                                     return isCons(x)
-                                      && (isPrimFunc(car(x)) || car(x) == newSym(L"evald-fn") || car(x) == newSym(L"evald-mfn"));
+                                      && (isPrimFunc(car(x)) || car(x) == newSym("evald-fn") || car(x) == newSym("evald-mfn"));
                                   }
 
                                   Cell* evalLambda(Cell* expr) {
-                                    return newCons(newSym(L"evald-"+toString(car(expr))),
+                                    return newCons(newSym("evald-"+toString(car(expr))),
                                         newCons(sig(expr),
                                             newCons(body(expr), currLexicalScopes.top())));
                                   }
@@ -284,7 +284,7 @@ Cell* processUnquotes(Cell* x, int depth) {
 
                                   Cell* functionify(Cell* obj) {
                                     if (obj == nil) return obj;
-                                    Cell* coerceExpr = newCons(newSym(L"coerce-quoted"), newCons(obj, newCons(newSym(L"function"), nil)));
+                                    Cell* coerceExpr = newCons(newSym("coerce-quoted"), newCons(obj, newCons(newSym("function"), nil)));
                                     rmref(obj);
                                     Cell* ans = eval(coerceExpr);
                                     rmref(coerceExpr);
@@ -293,7 +293,7 @@ Cell* processUnquotes(Cell* x, int depth) {
 
 Cell* eval(Cell* expr) {
   if (!expr)
-    err << "eval: cell should never be NULL" << endl << DIE;
+    err << "eval: cell should never be NUL" << endl << DIE;
 
   if (expr == nil)
     return nil;
@@ -313,7 +313,7 @@ Cell* eval(Cell* expr) {
   if (isBackQuoted(expr))
     return processUnquotes(cdr(expr), 1); // already mkref'd
 
-  if (car(expr) == newSym(L"fn") || car(expr) == newSym(L"mfn"))
+  if (car(expr) == newSym("fn") || car(expr) == newSym("mfn"))
     // attach current lexical scope
     return mkref(evalLambda(expr));
   else if (isFunc(expr))
@@ -353,7 +353,7 @@ Cell* eval(Cell* expr) {
     endDynamicScope(CURR_LEXICAL_SCOPE);
 
   // macros implicitly eval their result in the caller's scope
-  if (car(fn) == newSym(L"evald-mfn"))
+  if (car(fn) == newSym("evald-mfn"))
     result = implicitlyEval(result);
 
   rmref(evaldArgs);

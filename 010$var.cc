@@ -1,7 +1,7 @@
 //// implicit gensyms: $vars turn into unique syms before they're eval'd
 
 Cell* transformDollarVars(Cell* input, Table& map) {
-  if (isSym(input) && toString(input)[0] == L'$') {
+  if (isSym(input) && toString(input)[0] == '$') {
     if (!map[input])
       map[mkref(input)] = mkref(genSym(newSym(toString(input).substr(1)))); // against destruction of map
     return map[input];

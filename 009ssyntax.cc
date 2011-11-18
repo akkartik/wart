@@ -1,13 +1,13 @@
 //// simple syntax shorthands transforming syms into forms
 
 Cell* transformNot(string var) {
-  var.replace(0, 1, L"not ");
+  var.replace(0, 1, "not ");
   return nextRawCell(CodeStream(stream(var)));
 }
 
 Cell* transformCompose(string var) {
-  var.replace(var.rfind(L':'), 1, L" ");
-  return nextRawCell(stream(L"compose "+var));
+  var.replace(var.rfind(L':'), 1, " ");
+  return nextRawCell(stream("compose "+var));
 }
 
 Cell* transformCall(string var) {
@@ -18,19 +18,19 @@ Cell* transformCall(string var) {
   size_t dot = var.rfind(L'.');
   size_t bang = end > 0 ? var.rfind(L'!', end-1) : var.rfind(L'!');
   if (bang != string::npos && (dot == string::npos || bang > dot))
-    var.replace(bang, 1, L" '");
+    var.replace(bang, 1, " '");
   else
-    var.replace(dot, 1, L" ");
+    var.replace(dot, 1, " ");
   return nextRawCell(stream(var));
 }
 
 Cell* transformAndf(string var) {
-  var.replace(var.rfind(L'&'), 1, L" ");
-  return nextRawCell(stream(L"andf "+var));
+  var.replace(var.rfind(L'&'), 1, " ");
+  return nextRawCell(stream("andf "+var));
 }
 
 Cell* transformComplement(string var) {
-  var.replace(0, 1, L"complement ");
+  var.replace(0, 1, "complement ");
   return nextRawCell(stream(var));
 }
 
@@ -38,7 +38,7 @@ Cell* transform_ssyntax(Cell* input) {
   if (isSym(input)) {
     string var = toString(input);
     // avoid detecting floats as ssyntax. Hacky, not unicode-aware.
-    if (var.find_first_of(L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") == string::npos)
+    if (var.find_first_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") == string::npos)
       ;
     else if (var[0] == L'!')
       input = transformNot(var);
