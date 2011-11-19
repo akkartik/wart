@@ -6,7 +6,7 @@ COMPILE_PRIM_FUNC(fork, primFunc_fork, "()",
 )
 
 COMPILE_PRIM_FUNC(wait_for_child, primFunc_wait_for_child, "()",
-  wait(NULL);
+  wait();
   return nil;
 )
 
