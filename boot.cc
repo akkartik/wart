@@ -54,10 +54,12 @@ Die DIE;
 
 
 
-// interpreter decls
-
 bool runningTests = false;
 int numFailures = 0;
+bool interactive = false;
+int printDepth = 0;
+
+// interpreter decls
 
 stringstream& stream(string s) {
   stringstream& result = *new stringstream(s);
@@ -65,7 +67,6 @@ stringstream& stream(string s) {
   return result;
 }
 
-bool interactive = false;
 struct Cell;
 extern Cell* nil;
 ostream& operator<<(ostream&, Cell*);
