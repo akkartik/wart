@@ -21,6 +21,13 @@ COMPILE_PRIM_FUNC(mem_usage, primFunc_mem_usage, "()",
   return mkref(newNum(numUnfreed()));
 )
 
+COMPILE_PRIM_FUNC(recent_allocs, primFunc_recent_allocs, "()",
+  for (int i = (recentAllocsIdx+1)%NRECENT; i != recentAllocsIdx; i = (i+1)%NRECENT)
+    if (recentAllocs[i] && recentAllocs[i]->car)
+      cout << recentAllocs[i] << endl;
+  return nil;
+)
+
 COMPILE_PRIM_FUNC(date, primFunc_date, "()",
   time_t t = time(NULL);
   cerr << asctime(localtime(&t));
