@@ -269,8 +269,7 @@ int main(int argc, unused char* argv[]) {
   interactive = true; // trigger eval on empty lines
   CodeStream cs(cin);
   while (true) {
-    cout << numUnfreed() << " ";
-    cout << "wart> ";
+    cout << numUnfreed() << " " << numAllocs << " " << "wart> ";
     Cell* form = read(cs);
     if (eof(cin)) break;
     Cell* result = eval(form);
