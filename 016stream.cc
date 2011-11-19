@@ -9,7 +9,7 @@
 
 int printDepth = 0;
 ostream& operator<<(ostream& os, Cell* c) {
-  if (c == NULL) return os << "NULLNULLNUL";
+  if (c == NULL) return os << "NULLNULLNULL";
   if (c == nil) return os << "nil";
   if (++printDepth > 512) return os << "...";
   switch(c->type) {
