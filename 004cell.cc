@@ -11,7 +11,7 @@ struct Cell {
     #define TABLE 4
     #define PRIM_FUNC 5
   long nrefs;
-  Cell() :car(nil), cdr(nil), type(CONS), nrefs(0) {}
+  Cell() :car(NULL), cdr(NULL), type(CONS), nrefs(0) {}
   void init() { car=cdr=nil, type=CONS, nrefs=0; }
   void clear() { car=cdr=NULL, type=CONS, nrefs=0; }
 };
@@ -66,6 +66,7 @@ Cell* newCell() {
 
   result = currCell;
   ++currCell;
+  result->init();
   dbg << endl << "newCell a: " << (void*)result << " " << result->type << endl;
   return result;
 }
