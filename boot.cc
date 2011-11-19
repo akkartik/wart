@@ -133,10 +133,7 @@ Cell* read(CodeStream& c) {
 void resetState() {
   numLiterals.clear();
   stringLiterals.clear();
-  freelist = NULL;
-  for(Cell* curr=currCell; curr >= heapStart; --curr)
-    curr->init();
-  currCell = heapStart;
+  resetHeap();
   dynamics.clear(); // leaks memory for strings and tables
 }
 
@@ -168,21 +165,26 @@ void resetState() {
 
 void dumpUnfreed() {
   unordered_map<Cell*, long> numRefsRemaining;
-  for (Cell* x = heapStart; x < currCell; ++x) {
-    if (!x->car) continue;
-    markAllCells(x, numRefsRemaining);
-  }
-  for (Cell* x = heapStart; x < currCell; ++x) {
-    if (!x->car) continue;
-    if (initialSyms.find(x) != initialSyms.end()) continue;
-    if (numRefsRemaining[x] > 1) continue;
-    cerr << "unfreed: " << (void*)x << " " << x << endl;
-    printDepth=0;
-  }
+  for (Heap* h = firstHeap; h; h=h->next)
+    for (Cell* x = &h->cells[0]; x < &h->cells[HEAPCELLS]; ++x)
+      if (x->car)
+        markAllCells(x, numRefsRemaining);
+
+  for (Heap* h = firstHeap; h; h=h->next)
+    for (Cell* x = &h->cells[0]; x < &h->cells[HEAPCELLS]; ++x) {
+      if (!x->car) continue;
+      if (initialSyms.find(x) != initialSyms.end()) continue;
+      if (numRefsRemaining[x] > 1) continue;
+      cerr << "unfreed: " << (void*)x << " " << x << endl;
+      printDepth=0;
+    }
 }
 
 long numUnfreed() {
-  long n = currCell-heapStart-initialSyms.size();
+  long n = 0;
+  for (Heap* h = firstHeap; h != currHeap; h=h->next)
+    n += HEAPCELLS;
+  n += currCell-initialSyms.size();
   for (Cell* f = freelist; f; f=f->cdr)
     --n;
   return n;

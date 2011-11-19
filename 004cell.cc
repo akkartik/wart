@@ -38,17 +38,27 @@ struct Heap {
   Heap() :next(NULL) {}
 };
 
-Heap* currHeap = new Heap();
-Cell* heapStart = &currHeap->cells[0];
-Cell* heapEnd = &currHeap->cells[HEAPCELLS];
-Cell* currCell = heapStart;
+Heap* firstHeap = new Heap();
+Heap* currHeap = firstHeap;
+long currCell = 0;
 Cell* freelist = NULL;
 
 void growHeap() {
   currHeap = currHeap->next = new Heap();
   if (!currHeap) err << "Out of memory" << endl << DIE;
-  currCell = &currHeap->cells[0];
-  heapEnd = &currHeap->cells[HEAPCELLS];
+  currCell = 0;
+}
+
+void resetHeap(Heap* h=firstHeap) {
+  if (h->next)
+    resetHeap(h->next);
+  delete h;
+  if (h == firstHeap) {
+    firstHeap = new Heap();
+    currHeap = firstHeap;
+    currCell = 0;
+    freelist = NULL;
+  }
 }
 
 Cell* newCell() {
@@ -61,10 +71,10 @@ Cell* newCell() {
     return result;
   }
 
-  if (currCell == heapEnd)
+  if (currCell == HEAPCELLS)
     growHeap();
 
-  result = currCell;
+  result = &currHeap->cells[currCell];
   ++currCell;
   result->init();
   dbg << endl << "newCell a: " << (void*)result << " " << result->type << endl;
