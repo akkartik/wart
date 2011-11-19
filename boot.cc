@@ -1,5 +1,6 @@
 #include<cstdio>
 #include<cstring>
+#include<cstdlib>
 #include<time.h>
 #include<vector>
 using std::vector;
@@ -7,11 +8,10 @@ using std::vector;
 using std::list;
 #include<stack>
 using std::stack;
-#include<ext/hash_map>
-using __gnu_cxx::hash_map;
-using __gnu_cxx::hash;
-#include<ext/hash_set>
-using __gnu_cxx::hash_set;
+#include<tr1/unordered_map>
+using std::tr1::unordered_map;
+#include<tr1/unordered_set>
+using std::tr1::unordered_set;
 #include<exception>
 
 #include<string>
@@ -140,7 +140,7 @@ void resetState() {
   dynamics.clear(); // leaks memory for strings and tables
 }
 
-                                  void markAllCells(Cell* x, hash_map<Cell*, long, TypeCastCellHash>& mark) {
+                                  void markAllCells(Cell* x, unordered_map<Cell*, long>& mark) {
                                     if (x == nil) return;
                                     ++mark[x];
                                     switch (x->type) {
@@ -167,7 +167,7 @@ void resetState() {
                                   }
 
 void dumpUnfreed() {
-  hash_map<Cell*, long, TypeCastCellHash> numRefsRemaining;
+  unordered_map<Cell*, long> numRefsRemaining;
   for (Cell* x = heapStart; x < currCell; ++x) {
     if (!x->car) continue;
     markAllCells(x, numRefsRemaining);

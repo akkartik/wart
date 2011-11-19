@@ -72,13 +72,7 @@ Cell* newCell() {
 
 
 
-                                  struct TypeCastCellHash {
-                                    size_t operator()(const Cell* c) const {
-                                      hash<long> h;
-                                      return h((long)c);
-                                    }
-                                  };
-                                  struct CellMap :public hash_map<Cell*, Cell*, TypeCastCellHash> {};
+                                  typedef unordered_map<Cell*, Cell*> CellMap;
 
                                   void rmref(Cell*);
 

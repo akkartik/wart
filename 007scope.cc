@@ -1,6 +1,6 @@
 //// manage symbol bindings
 
-hash_map<Cell*, stack<Cell*>, TypeCastCellHash> dynamics;
+unordered_map<Cell*, stack<Cell*> > dynamics;
 Cell* lookupDynamicBinding(Cell* sym) {
   stack<Cell*>& bindings = dynamics[sym];
   if (bindings.empty()) return NULL;

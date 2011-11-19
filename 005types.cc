@@ -1,6 +1,6 @@
 //// primitive datatypes
 
-                                  hash_map<long, Cell*> numLiterals;
+                                  unordered_map<long, Cell*> numLiterals;
                                   Cell* intern(long x) {
                                     if (numLiterals[x]) {
                                       dbg << endl << "reuse: " << x << " " << (void*)numLiterals[x] << endl;
@@ -32,24 +32,8 @@ long toNum(Cell* x) {
 
 
 
-                                  struct strEq {
-                                    bool operator() (const string& s1, const string& s2) const {
-                                      return s1 == s2;
-                                    }
-                                  };
-
-                                  struct strHash {
-                                    static hash<char*> h;
-                                    size_t operator() (const string& in) const {
-                                      unsigned long h = 0;
-                                      for (const char* s=in.c_str(); *s; ++s)
-                                        h = 5 * h + *s;
-                                      return size_t(h);
-                                    }
-                                  };
-
                                   template<class Data>
-                                  class StringMap :public hash_map<string, Data, strHash, strEq>{};
+                                  class StringMap :public unordered_map<string, Data>{};
 
                                   StringMap<Cell*> stringLiterals;
                                   Cell* intern(string x) {
@@ -103,9 +87,9 @@ Cell* genSym(Cell* x) {
 
 
 
-hash_set<Cell*, TypeCastCellHash> initialSyms;
+unordered_set<Cell*> initialSyms;
 void teardownLiteralTables() {
-  for (hash_map<long, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
+  for (unordered_map<long, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
     if (p->second->nrefs > 1)
       warn << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
     if (p->second->nrefs > 0)
