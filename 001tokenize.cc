@@ -2,21 +2,16 @@
 
 // line contains 1 indent and zero or more regular tokens
 struct Token {
-  string* token; // pointer only because mac os has a buggy string-copy
+  string token;
   int indentLevel; // all tokens on a line share its indentLevel
 
-  Token(const string x, const int l) :indentLevel(l) {
-    token = new string(x);
-  }
-  ~Token() {
-    delete token;
-  }
-  Token(const Token& rhs) :indentLevel(rhs.indentLevel){
-    token = new string(*rhs.token);
-  }
+  Token(const string x, const int l)
+    :token(x), indentLevel(l) {}
+  Token(const Token& rhs)
+    :token(rhs.token), indentLevel(rhs.indentLevel) {}
   Token& operator=(const Token& rhs) {
     if (this == &rhs) return *this;
-    token = new string(*rhs.token);
+    token = rhs.token;
     indentLevel = rhs.indentLevel;
     return *this;
   }
@@ -34,17 +29,17 @@ struct Token {
   }
 
   bool isIndent() {
-    return *token == "";
+    return token == "";
   }
 
   bool operator==(string x) {
-    return *token == x;
+    return token == x;
   }
   bool operator!=(string x) {
     return !(*this == x);
   }
   bool operator==(Token x) {
-    return *token == *x.token && indentLevel == x.indentLevel;
+    return token == x.token && indentLevel == x.indentLevel;
   }
   bool operator!=(Token x) {
     return !(*this == x);

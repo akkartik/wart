@@ -14,14 +14,14 @@ Cell* buildCell(AstNode n) {
 
   if (n.isAtom()) {
     char* end;
-    long v = strtol(n.atom.token->c_str(), &end, 0);
+    long v = strtol(n.atom.token.c_str(), &end, 0);
     if (*end == '\0')
       return newNum(v);
 
-    if (n.atom.token->c_str()[0] == '"')
-      return newString(n.atom.token->substr(1, n.atom.token->length()-2));
+    if (n.atom.token.c_str()[0] == '"')
+      return newString(n.atom.token.substr(1, n.atom.token.length()-2));
 
-    return newSym(*n.atom.token);
+    return newSym(n.atom.token);
   }
 
   list<AstNode>::iterator first = n.elems.begin();
