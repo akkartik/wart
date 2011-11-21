@@ -4,10 +4,11 @@ let $fork fork
        ,@body
        quit.)
 
-def preforking(n f)
-  repeat n
-    (fork f.)
-  repeat :forever
-    (wait_for_child)
-    (prn "restart")
-    (fork f.)
+mac preforking(n . body)
+  `(do
+      repeat ,n
+        (fork ,@body)
+      repeat :forever
+        (wait_for_child)
+        (prn "restart")
+        (fork ,@body))
