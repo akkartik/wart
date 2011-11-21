@@ -109,8 +109,27 @@ public:
       setg(inBuffer, inBuffer, inBuffer+n);
       return *(unsigned char*)gptr();
    }
+
+   int overflow(unused int c) {
+      return EOF;
+   }
+
+   int sync() {
+      if (pbase() == pptr())
+         return 0;
+
+      int n = write(sockfd, pbase(), pptr()-pbase());
+      if (n < 0) return n;
+
+      setp(outBuffer, outBuffer+BUFSIZ);
+      return 0;
+   }
 };
 
 COMPILE_PRIM_FUNC(infd, primFunc_infd, "($fd)",
   return mkref(newIstream(new iostream(new FdStreamBuf(toNum(lookup("$fd")))))); // leak
+)
+
+COMPILE_PRIM_FUNC(outfd, primFunc_outfd, "($fd)",
+  return mkref(newOstream(new iostream(new FdStreamBuf(toNum(lookup("$fd")))))); // leak
 )

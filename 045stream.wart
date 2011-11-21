@@ -19,6 +19,10 @@
   `(between (dyn_bind stdin infd.,fd) :and (do dyn_bind.stdin close.,fd)
      ,@body))
 
+(mac w/stdout(fd . body)
+  `(between (dyn_bind stdout outfd.,fd) :and (do dyn_bind.stdout close.,fd)
+     ,@body))
+
 def str args
   (w/outstring
     (each arg args pr.arg))

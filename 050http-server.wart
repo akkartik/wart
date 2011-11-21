@@ -1,5 +1,12 @@
-def http-read()
+def http-server()
   let s (make-server-socket "127.0.0.1" 4040)
-    w/stdin socket-accept.s
-      prn read.
+    let client-socket socket-accept.s
+      w/stdin client-socket
+        let (verb url) read.
+          prn url
+          w/stdout client-socket
+            prn "HTTP/1.0 200 OK"
+            prn "Content-type: text/plain"
+            prn.
+            prn "ok"
     close.s
