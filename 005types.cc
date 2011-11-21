@@ -33,7 +33,7 @@ long toNum(Cell* x) {
 
 
                                   template<class Data>
-                                  class StringMap :public unordered_map<string, Data>{};
+                                  struct StringMap :public unordered_map<string, Data>{};
 
                                   StringMap<Cell*> stringLiterals;
                                   Cell* intern(string x) {

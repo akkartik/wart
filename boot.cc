@@ -43,7 +43,7 @@ int debug = 0;
 
 #define unused __attribute__((unused))
 
-class Die {};
+struct Die {};
 ostream& operator<<(unused ostream& os, unused Die die) {
   exit(1);
 }
