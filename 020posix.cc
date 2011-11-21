@@ -42,3 +42,8 @@ COMPILE_PRIM_FUNC(socket-accept, primFunc_socket_accept, "($fd)",
   sockaddr_in s;  socklen_t n = sizeof(sockaddr_in);
   return mkref(newNum(accept(toNum(lookup("$fd")), (sockaddr*)&s, &n)));
 )
+
+COMPILE_PRIM_FUNC(close, primFunc_close, "($fd)",
+  close(toNum(lookup("$fd")));
+  return nil;
+)
