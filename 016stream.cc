@@ -8,26 +8,30 @@ Cell* newOstream(ostream* x) {
             newCons(newNum((long)x), nil)));
 }
 
-void setupStreams() {
-  newDynamicScope(newSym("stdin"), newIstream(&cin));
-  newDynamicScope(newSym("stdout"), newOstream(&cout));
-  newDynamicScope(newSym("stderr"), newOstream(&cerr));
-}
-#define STDIN dynamics[newSym("stdin")].top()
-#define STDOUT dynamics[newSym("stdout")].top()
-#define STDERR dynamics[newSym("stderr")].top()
-void teardownStreams() {
-  endDynamicScope(newSym("stdin"));
-  endDynamicScope(newSym("stdout"));
-  endDynamicScope(newSym("stderr"));
-}
-
 istream& toIstream(Cell* x) {
   return *(istream*)toNum(car(cdr(cdr(x))));
 }
 
 ostream& toOstream(Cell* x) {
   return *(ostream*)toNum(car(cdr(cdr(x))));
+}
+
+
+
+#define STDIN dynamics[newSym("stdin")].top()
+#define STDOUT dynamics[newSym("stdout")].top()
+#define STDERR dynamics[newSym("stderr")].top()
+
+void setupStreams() {
+  newDynamicScope(newSym("stdin"), newIstream(&cin));
+  newDynamicScope(newSym("stdout"), newOstream(&cout));
+  newDynamicScope(newSym("stderr"), newOstream(&cerr));
+}
+
+void teardownStreams() {
+  endDynamicScope(newSym("stdin"));
+  endDynamicScope(newSym("stdout"));
+  endDynamicScope(newSym("stderr"));
 }
 
 
