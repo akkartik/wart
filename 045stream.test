@@ -32,3 +32,7 @@ system "rm _x"
 (test "sym works with multiple args"
  :valueof (sym "abc" 42 'def)
  :should be 'abc42def)
+
+(test "str works with multiple args"
+ :valueof (str 'a 43)
+ :should be "a43")
