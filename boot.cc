@@ -20,6 +20,7 @@ using std::string;
 #include<iostream>
 using std::istream;
 using std::ostream;
+using std::iostream;
 using std::cin;
 using std::cout;
 using std::cerr;

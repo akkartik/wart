@@ -103,7 +103,6 @@ public:
       if (gptr() < egptr())
         return *(unsigned char*)gptr();
 
-      // try and read in some data.
       int n = read(sockfd, inBuffer, BUFSIZ);
       if (n <= 0) return EOF;
 
@@ -113,5 +112,5 @@ public:
 };
 
 COMPILE_PRIM_FUNC(infd, primFunc_infd, "($fd)",
-  return mkref(newIstream(new std::iostream(new FdStreamBuf(toNum(lookup("$fd")))))); // leak
+  return mkref(newIstream(new iostream(new FdStreamBuf(toNum(lookup("$fd")))))); // leak
 )

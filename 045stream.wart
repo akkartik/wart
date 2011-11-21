@@ -15,6 +15,10 @@
      ,@body
      outstring_buffer.stdout))
 
+(mac w/stdin(fd . body)
+  `(between (dyn_bind stdin infd.,fd) :and (do dyn_bind.stdin close.,fd)
+     ,@body))
+
 def str args
   (w/outstring
     (each arg args pr.arg))

@@ -1,0 +1,5 @@
+def http-read()
+  let s (make-server-socket "127.0.0.1" 4040)
+    w/stdin socket-accept.s
+      prn read.
+    close.s
