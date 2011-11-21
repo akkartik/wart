@@ -36,6 +36,7 @@ using std::ofstream;
 
 #include<sys/socket.h>
 #include<netdb.h>
+#include<sys/wait.h>
 
 
 
