@@ -78,3 +78,36 @@ COMPILE_PRIM_FUNC(input_fd, primFunc_input_fd, "($name)",
 COMPILE_PRIM_FUNC(output_fd, primFunc_output_fd, "($name)",
   return mkref(newNum(open(toString(lookup("$name")).c_str(), O_WRONLY)));
 )
+
+// buffer a file descriptor
+struct FdStreamBuf :public std::streambuf {
+public:
+   int sockfd;
+   char inBuffer[BUFSIZ];
+   char outBuffer[BUFSIZ];
+
+   FdStreamBuf(int socket) {
+      sockfd = socket;
+      setg(inBuffer, inBuffer, inBuffer);
+      setp(outBuffer, outBuffer+BUFSIZ);
+   }
+   ~FdStreamBuf() {
+     close(sockfd);
+   }
+
+   int underflow() {
+      if (gptr() < egptr())
+        return *(unsigned char*)gptr();
+
+      // try and read in some data.
+      int n = read(sockfd, inBuffer, BUFSIZ);
+      if (n <= 0) return EOF;
+
+      setg(inBuffer, inBuffer, inBuffer+n);
+      return *(unsigned char*)gptr();
+   }
+};
+
+COMPILE_PRIM_FUNC(infd, primFunc_infd, "($fd)",
+  return mkref(newIstream(new std::iostream(new FdStreamBuf(toNum(lookup("$fd")))))); // leak
+)
