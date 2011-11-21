@@ -34,10 +34,6 @@ using std::ostringstream;
 using std::ifstream;
 using std::ofstream;
 
-#include<sys/socket.h>
-#include<netdb.h>
-#include<sys/wait.h>
-
 
 
 // generate traces for debugging

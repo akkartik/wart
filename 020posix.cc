@@ -6,6 +6,8 @@ COMPILE_PRIM_FUNC(fork, primFunc_fork, "()",
   return mkref(newNum(fork()));
 )
 
+#include<sys/wait.h>
+
 COMPILE_PRIM_FUNC(wait_for_child, primFunc_wait_for_child, "()",
   wait(NULL);
   return nil;
@@ -15,6 +17,9 @@ COMPILE_PRIM_FUNC(sleep, primFunc_sleep, "($n)",
   sleep(toNum(lookup("$n")));
   return nil;
 )
+
+#include<sys/socket.h>
+#include<netdb.h>
 
 COMPILE_PRIM_FUNC(make-socket, primFunc_socket, "($host $port)",
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
