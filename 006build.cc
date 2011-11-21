@@ -8,7 +8,7 @@ Cell* buildCell(AstNode n) {
   if (n.isNil())
     return nil;
   if (n.isList() && n.elems.front() == ")") {
-    if (n.elems.size() > 1) err << "Syntax error: ) not at end of expr" << endl << DIE;
+    if (n.elems.size() > 1) ERR << "Syntax error: ) not at end of expr" << endl << DIE;
     return nil;
   }
 
@@ -35,7 +35,7 @@ Cell* buildCell(AstNode n) {
 
   list<AstNode>::iterator next = first; ++next;
   if (*next == ".") {
-    if (n.elems.size() == 2) err << "Syntax error: . can't terminate expr" << endl << DIE;
+    if (n.elems.size() == 2) ERR << "Syntax error: . can't terminate expr" << endl << DIE;
     setCdr(newForm, buildCell(*++next)); // dotted pair
   }
   else if (isQuoteOrUnquote(*first) && n.elems.size() == 2) {
@@ -44,7 +44,7 @@ Cell* buildCell(AstNode n) {
   else {
     n.elems.pop_front();
     if (n.elems.empty())
-      err << "Error in parsing " << n << endl << DIE;
+      ERR << "Error in parsing " << n << endl << DIE;
     setCdr(newForm, buildCell(n));
   }
 

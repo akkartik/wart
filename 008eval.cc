@@ -293,7 +293,7 @@ Cell* processUnquotes(Cell* x, int depth) {
 
 Cell* eval(Cell* expr) {
   if (!expr)
-    err << "eval: cell should never be NUL" << endl << DIE;
+    ERR << "eval: cell should never be NUL" << endl << DIE;
 
   if (expr == nil)
     return nil;
@@ -325,7 +325,7 @@ Cell* eval(Cell* expr) {
   if (!isFunc(fn))
     fn = functionify(fn);
   if (!isFunc(fn))
-    err << "not a function call: " << expr << endl << DIE;
+    ERR << "not a function call: " << expr << endl << DIE;
 
   // eval all its args in the current lexical scope
   Cell* realArgs = reorderKeywordArgs(sig(fn), callArgs(expr));

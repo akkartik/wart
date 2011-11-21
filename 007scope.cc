@@ -20,7 +20,7 @@ void newDynamicScope(string s, Cell* val) {
 void endDynamicScope(Cell* sym) {
   stack<Cell*>& bindings = dynamics[sym];
   if (bindings.empty()) {
-    warn << "No dynamic binding for " << sym << endl;
+    WARN << "No dynamic binding for " << sym << endl;
     return;
   }
   rmref(sym);
@@ -35,7 +35,7 @@ void endDynamicScope(string s) {
 void assignDynamicVar(Cell* sym, Cell* val) {
   stack<Cell*>& bindings = dynamics[sym];
   if (bindings.empty()) {
-    warn << "No dynamic binding to assign for " << sym << endl;
+    WARN << "No dynamic binding to assign for " << sym << endl;
     newDynamicScope(sym, val);
     return;
   }
@@ -69,7 +69,7 @@ void newLexicalScope() {
 void endLexicalScope() {
   Cell* currScope = currLexicalScopes.top();
   if (currScope == nil)
-    err << "No lexical scope to end" << endl << DIE;
+    ERR << "No lexical scope to end" << endl << DIE;
   dbg << "end lexical scope: " << (void*)currScope << endl;
   endDynamicScope(CURR_LEXICAL_SCOPE);
 }
@@ -77,7 +77,7 @@ void endLexicalScope() {
 void addLexicalBinding(Cell* sym, Cell* val) {
   dbg << "creating binding: " << (void*)currLexicalScopes.top() << " " << (void*)sym << endl;
   if (unsafeGet(currLexicalScopes.top(), sym))
-    err << "Can't rebind within a lexical scope" << endl << DIE;
+    ERR << "Can't rebind within a lexical scope" << endl << DIE;
   unsafeSet(currLexicalScopes.top(), sym, val, false);
 }
 void addLexicalBinding(string var, Cell* val) {
@@ -113,7 +113,7 @@ Cell* lookup(Cell* sym) {
   if (result) return result;
   result = lookupDynamicBinding(sym);
   if (result) return result;
-  warn << "No binding for " << toString(sym)
+  WARN << "No binding for " << toString(sym)
     << " (if a paren opens in the middle of a line, paren-insertion is disabled until it closes)" << endl;
   return nil;
 }

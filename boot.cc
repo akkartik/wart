@@ -54,8 +54,8 @@ ostream& operator<<(unused ostream& os, unused Die die) {
 }
 Die DIE;
 
-#define warn cerr << __FILE__ << ":" << __LINE__ << " "
-#define err cerr << "fatal: " << __FILE__ << ":" << __LINE__ << " "
+#define WARN cerr << __FILE__ << ":" << __LINE__ << " "
+#define ERR cerr << "fatal: " << __FILE__ << ":" << __LINE__ << " "
 
 
 
@@ -202,7 +202,7 @@ void checkState() {
   teardownLiteralTables();
 
   if (numUnfreed() > 0) {
-    warn << "Memory leak!\n";
+    WARN << "Memory leak!\n";
     dumpUnfreed();
   }
 
