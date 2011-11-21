@@ -1,6 +1,10 @@
 #include<sys/socket.h>
 #include<netdb.h>
 
+COMPILE_PRIM_FUNC(system, primFunc_system, "($command)",
+  return mkref(newNum(system(toString(lookup("$command")).c_str())));
+)
+
 COMPILE_PRIM_FUNC(fork, primFunc_fork, "()",
   return mkref(newNum(fork()));
 )
