@@ -86,24 +86,24 @@ COMPILE_PRIM_FUNC(output_fd, primFunc_output_fd, "($name)",
 // buffer a file descriptor
 struct FdStreamBuf :public std::streambuf {
 public:
-   int sockfd;
+   int fd;
    char inBuffer[BUFSIZ];
    char outBuffer[BUFSIZ];
 
-   FdStreamBuf(int socket) {
-      sockfd = socket;
+   FdStreamBuf(int f) {
+      fd = f;
       setg(inBuffer, inBuffer, inBuffer);
       setp(outBuffer, outBuffer+BUFSIZ);
    }
    ~FdStreamBuf() {
-     close(sockfd);
+     close(fd);
    }
 
    int underflow() {
       if (gptr() < egptr())
         return *(unsigned char*)gptr();
 
-      int n = read(sockfd, inBuffer, BUFSIZ);
+      int n = read(fd, inBuffer, BUFSIZ);
       if (n <= 0) return EOF;
 
       setg(inBuffer, inBuffer, inBuffer+n);
@@ -118,7 +118,7 @@ public:
       if (pbase() == pptr())
          return 0;
 
-      int n = write(sockfd, pbase(), pptr()-pbase());
+      int n = write(fd, pbase(), pptr()-pbase());
       if (n < 0) return n;
 
       setp(outBuffer, outBuffer+BUFSIZ);
