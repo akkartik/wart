@@ -3,14 +3,22 @@ mac w/server-socket(socket port . body)
      before close.,socket
        ,@body)
 
-def http-server()
-  w/server-socket s :port 4040
-    let client-socket socket-accept.s
-      w/stdin client-socket
-        let (verb url) read.
-          prn url
-          w/stdout client-socket
-            prn "HTTP/1.0 200 OK"
-            prn "Content-type: text/plain"
-            prn.
-            prn "ok"
+mac accepting(client-socket socket/from . body)
+  `(let ,client-socket socket-accept.,socket
+     ,@body)
+
+def parse-request(client-socket)
+  making stdin infd.client-socket
+    let (verb url) read.
+      url
+
+def http-server(port)
+  w/server-socket s :port (or port 4040)
+    accepting client-socket :from s
+      let url parse-request.client-socket
+        prn url
+        w/stdout client-socket
+          prn "HTTP/1.0 200 OK"
+          prn "Content-type: text/plain"
+          prn.
+          prn "ok"
