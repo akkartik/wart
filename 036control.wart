@@ -7,6 +7,11 @@ mac between(before after/and . body)
      (do ,before ,@body)
      ,after)
 
+mac before(cleanup . body)
+  `(do1
+     (do ,@body)
+     ,cleanup)
+
 mac when(cond . body)
   `(if ,cond
      (do ,@body))

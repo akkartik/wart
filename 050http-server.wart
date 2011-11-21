@@ -1,5 +1,10 @@
+mac w/server-socket(socket port . body)
+  `(let ,socket (make-server-socket "127.0.0.1" ,port)
+     before close.,socket
+       ,@body)
+
 def http-server()
-  let s (make-server-socket "127.0.0.1" 4040)
+  w/server-socket s :port 4040
     let client-socket socket-accept.s
       w/stdin client-socket
         let (verb url) read.
@@ -9,4 +14,3 @@ def http-server()
             prn "Content-type: text/plain"
             prn.
             prn "ok"
-    close.s
