@@ -66,3 +66,15 @@ COMPILE_PRIM_FUNC(outstring_buffer, primFunc_outstring_buffer, "($stream)",
   ostringstream* s = (ostringstream*)toNum(car(cdr(cdr(lookup("$stream")))));
   return mkref(newString(s->str()));
 )
+
+
+
+#include<fcntl.h>
+
+COMPILE_PRIM_FUNC(input_fd, primFunc_input_fd, "($name)",
+  return mkref(newNum(open(toString(lookup("$name")).c_str(), O_RDONLY)));
+)
+
+COMPILE_PRIM_FUNC(output_fd, primFunc_output_fd, "($name)",
+  return mkref(newNum(open(toString(lookup("$name")).c_str(), O_WRONLY)));
+)
