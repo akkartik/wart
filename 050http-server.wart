@@ -4,8 +4,9 @@ mac w/server-socket(socket port . body)
        ,@body)
 
 mac accepting(client-socket socket/from . body)
-  `(let ,client-socket socket-accept.,socket
-     ,@body)
+  `(repeat :forever
+     let ,client-socket socket-accept.,socket
+       ,@body) ; body must close client-socket
 
 def parse-request(client-socket)
   making stdin infd.client-socket
