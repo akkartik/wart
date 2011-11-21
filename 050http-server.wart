@@ -14,13 +14,12 @@ def parse-request(client-socket)
       url
 
 def http-server(port)
-  w/server-socket s :port (or port 4040)
-    preforking 6
-      accepting client-socket :from s
+  w/server-socket socket (or port 4040)
+    preforking 6 ; handler threads
+      accepting client-socket :from socket
         let url parse-request.client-socket
-          prn url
           w/stdout client-socket
             prn "HTTP/1.0 200 OK"
             prn "Content-type: text/plain"
             prn.
-            prn "ok"
+            prn url
