@@ -21,6 +21,8 @@ COMPILE_PRIM_FUNC(sleep, primFunc_sleep, "($n)",
 #include<sys/socket.h>
 #include<netdb.h>
 
+#define PERR(call...) if (call < 0) perror(#call)
+
 COMPILE_PRIM_FUNC(make-socket, primFunc_socket, "($host $port)",
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0) perror("socket() failed");
@@ -28,7 +30,7 @@ COMPILE_PRIM_FUNC(make-socket, primFunc_socket, "($host $port)",
   sockaddr_in s;  s.sin_family = AF_INET;
   bcopy((char*)host->h_addr, (char*)s.sin_addr.s_addr, host->h_length);
   s.sin_port = htons(toNum(lookup("$port")));
-  if (connect(sockfd, (sockaddr*)&s, sizeof(s)) < 0) perror("connect failed");
+  PERR(connect(sockfd, (sockaddr*)&s, sizeof(s)));
   return mkref(newNum(sockfd));
 )
 
@@ -36,11 +38,11 @@ COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($host $port)",
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0) perror("socket() failed");
   int dummy;
-  if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)) < 0) perror("setsockopt failed");
+  PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
   sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
   s.sin_port = htons(toNum(lookup("$port")));
-  if (bind(sockfd, (sockaddr*)&s, sizeof(s)) < 0) perror("bind failed");
-  if (listen(sockfd, 5) < 0) perror("listen failed");
+  PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
+  PERR(listen(sockfd, 5));
   return mkref(newNum(sockfd));
 )
 
