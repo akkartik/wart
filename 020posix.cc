@@ -33,6 +33,8 @@ COMPILE_PRIM_FUNC(make-socket, primFunc_socket, "($host $port)",
 
 COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($host $port)",
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+  if (sockfd < 0) WARN << "socket() failed" << endl;
+  setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, NULL, 0);
   sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
   s.sin_port = htons(toNum(lookup("$port")));
   bind(sockfd, (sockaddr*)&s, sizeof(s));
