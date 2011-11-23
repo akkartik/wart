@@ -3,7 +3,7 @@
 void loadFile(const char* filename) {
   ifstream f(filename);
   CodeStream c(f);
-  while (!eof(c.fd)) {
+  while (!c.fd.eof()) {
     Cell* cell = read(c);
     rmref(eval(cell));
     rmref(cell);

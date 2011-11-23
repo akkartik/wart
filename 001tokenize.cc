@@ -73,8 +73,8 @@ struct Token {
                                     static const string quoteChars = ",'`@";
                                     static const string ssyntaxChars = ":~!.&"; // disjoint from quoteChars
                                     char lastc = '\0';
-                                    while (!eof(in)) {
-                                      char c = in.get();
+                                    char c;
+                                    while (in >> c) {
                                       if (ssyntaxChars.find(lastc) != string::npos
                                           && quoteChars.find(c) != string::npos)
                                         ; // wait for ssyntax expansion
@@ -91,8 +91,8 @@ struct Token {
 
                                   void slurpString(istream& in, ostream& out) {
                                     slurpChar(in, out); // initial quote
-                                    while (!eof(in)) {
-                                      char c = in.get();
+                                    char c;
+                                    while (in >> c) {
                                       out << c;
                                       if (c == '\\')
                                         slurpChar(in, out); // blindly read next
@@ -102,8 +102,8 @@ struct Token {
                                   }
 
                                   void skipComment(istream& in) {
-                                    while (!eof(in)) {
-                                      char c = in.get();
+                                    char c;
+                                    while (in >> c) {
                                       if (c == '\n') {
                                         in.putback(c);
                                         break;
@@ -112,11 +112,11 @@ struct Token {
                                   }
 
                                   bool endOfInput(istream& in) {
-                                    if (eof(in)) return true;
+                                    if (in.eof()) return true;
                                     if (!interactive) return false;
                                     bool ans = false;
                                     char c = in.get();
-                                    if (c == '\n' && !eof(in) && in.peek() == '\n')
+                                    if (c == '\n' && !in.eof() && in.peek() == '\n')
                                       ans = true;
                                     in.putback(c);
                                     return ans;
@@ -128,8 +128,8 @@ struct Token {
 
                                   int indent(istream& in) {
                                     int indent = 0;
-                                    while (!eof(in)) {
-                                      char c = in.get();
+                                    char c;
+                                    while (in >> c) {
                                       if (c == ';') {
                                         skipComment(in);
                                         if (endOfInput(in)) break;

@@ -274,7 +274,7 @@ int main(int argc, unused char* argv[]) {
   while (true) {
     cout << numUnfreed() << " " << numAllocs << " " << "wart> ";
     Cell* form = read(cs);
-    if (eof(cin)) break;
+    if (cin.eof()) break;
     Cell* result = eval(form);
     write(result, cout); cout << endl;
     rmref(result);
