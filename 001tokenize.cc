@@ -58,12 +58,6 @@ struct Token {
                                       skip(in);
                                   }
 
-                                  bool eof(istream& in) {
-                                    char c = in.peek(); // set eof bit
-                                    if (c == -1) return true;
-                                    return in.eof();
-                                  }
-
                                   // slurp functions read a token when you're sure to be at it
                                   void slurpChar(istream& in, ostream& out) {
                                     out << (char)in.get();

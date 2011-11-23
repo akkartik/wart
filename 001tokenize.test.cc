@@ -1,13 +1,13 @@
 void test_tokenize_handles_empty_input() {
   CodeStream c(stream(""));
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_always_starts_a_line_with_indent() {
   CodeStream c(stream("34"));
   checkEq(nextToken(c), Token::indent(0));
   checkEq(nextToken(c), "34");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_handles_multiple_atoms() {
@@ -15,7 +15,7 @@ void test_tokenize_handles_multiple_atoms() {
   checkEq(nextToken(c), Token::indent(0));
   checkEq(nextToken(c), "34");
   checkEq(nextToken(c), "abc");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_handles_string_literal() {
@@ -23,7 +23,7 @@ void test_tokenize_handles_string_literal() {
   checkEq(nextToken(c), Token::indent(0));
   checkEq(nextToken(c), "34");
   checkEq(nextToken(c), "\"abc\"");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_handles_multiple_lines() {
@@ -32,7 +32,7 @@ void test_tokenize_handles_multiple_lines() {
   checkEq(nextToken(c), "34");
   checkEq(nextToken(c), Token::indent(0));
   checkEq(nextToken(c), "\"abc\"");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_handles_string_with_space() {
@@ -41,7 +41,7 @@ void test_tokenize_handles_string_with_space() {
   checkEq(nextToken(c), "34");
   checkEq(nextToken(c), Token::indent(0));
   checkEq(nextToken(c), "\"abc def\"");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_handles_string_with_escape() {
@@ -50,7 +50,7 @@ void test_tokenize_handles_string_with_escape() {
   checkEq(nextToken(c), "34");
   checkEq(nextToken(c), Token::indent(0));
   checkEq(nextToken(c), "\"abc \\\"quote def\"");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_handles_quote_comma() {
@@ -59,7 +59,7 @@ void test_tokenize_handles_quote_comma() {
   checkEq(nextToken(c), "'");
   checkEq(nextToken(c), ",");
   checkEq(nextToken(c), "35");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_handles_quote_comma_paren() {
@@ -69,7 +69,7 @@ void test_tokenize_handles_quote_comma_paren() {
   checkEq(nextToken(c), "'");
   checkEq(nextToken(c), ",");
   checkEq(nextToken(c), ")");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_doesnt_break_comma_right_after_ssyntax_char() {
@@ -77,7 +77,7 @@ void test_tokenize_doesnt_break_comma_right_after_ssyntax_char() {
   checkEq(nextToken(c), Token::indent(0));
   checkEq(nextToken(c), "'");
   checkEq(nextToken(c), "a:,b");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_handles_splice_operators() {
@@ -91,7 +91,7 @@ void test_tokenize_handles_splice_operators() {
   checkEq(nextToken(c), ",");
   checkEq(nextToken(c), "@");
   checkEq(nextToken(c), "b");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_handles_comment() {
@@ -107,7 +107,7 @@ void test_tokenize_ends_comment_at_newline() {
   CodeStream c(stream(";abc def ghi\nabc"));
   checkEq(nextToken(c), Token::indent(0));
   checkEq(nextToken(c), "abc");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_suppresses_comments() {
@@ -118,7 +118,7 @@ void test_tokenize_suppresses_comments() {
   checkEq(nextToken(c), "def");
   checkEq(nextToken(c), Token::indent(0));
   checkEq(nextToken(c), "ghi");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_suppresses_comments2() {
@@ -134,7 +134,7 @@ void test_tokenize_suppresses_comments2() {
   checkEq(nextToken(c), "ghi");
   checkEq(nextToken(c), Token::indent(0));
   checkEq(nextToken(c), "jkl");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_suppresses_trailing_whitespace() {
@@ -145,7 +145,7 @@ void test_tokenize_suppresses_trailing_whitespace() {
   checkEq(nextToken(c), "b");
   checkEq(nextToken(c), Token::indent(0));
   checkEq(nextToken(c), "c");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_suppresses_repeated_newline() {
@@ -154,7 +154,7 @@ void test_tokenize_suppresses_repeated_newline() {
   checkEq(nextToken(c), "34");
   checkEq(nextToken(c), Token::indent(0));
   checkEq(nextToken(c), "\"abc \\\"quote def\"");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_handles_indent_outdent() {
@@ -167,7 +167,7 @@ void test_tokenize_handles_indent_outdent() {
   checkEq(nextToken(c), "abc");
   checkEq(nextToken(c), Token::indent(2));
   checkEq(nextToken(c), "def");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_suppresses_whitespace_lines() {
@@ -178,7 +178,7 @@ void test_tokenize_suppresses_whitespace_lines() {
   checkEq(nextToken(c), "ghi");
   checkEq(nextToken(c), Token::indent(2));
   checkEq(nextToken(c), "def");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_suppresses_whitespace_lines2() {
@@ -189,7 +189,7 @@ void test_tokenize_suppresses_whitespace_lines2() {
   checkEq(nextToken(c), "ghi");
   checkEq(nextToken(c), Token::indent(2));
   checkEq(nextToken(c), "def");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }
 
 void test_tokenize_handles_sexpr() {
@@ -215,5 +215,5 @@ void test_tokenize_handles_sexpr() {
   checkEq(nextToken(c), "abc");
   checkEq(nextToken(c), Token::indent(0));
   checkEq(nextToken(c), "def");
-  check(eof(c.fd));
+//?   check(c.fd.eof());
 }

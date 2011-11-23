@@ -1,14 +1,14 @@
 void test_parse_handles_atom() {
   CodeStream c(stream("34"));
   checkEq(nextAstNode(c), Token::of("34"));
-  check(eof(c.fd));
+  check(c.fd.eof());
 }
 
 void test_parse_handles_atoms() {
   CodeStream c(stream("34\n\"a b c\""));
   checkEq(nextAstNode(c), Token::of("34"));
   checkEq(nextAstNode(c), Token::of("\"a b c\""));
-  check(eof(c.fd));
+  check(c.fd.eof());
 }
 
 void test_parse_handles_forms() {
@@ -21,7 +21,7 @@ void test_parse_handles_forms() {
   checkEq(*p, Token::of("\"a b c\"")); ++p;
   checkEq(*p, Token::of(")")); ++p;
   check(p == n.elems.end());
-  check(eof(c.fd));
+  check(c.fd.eof());
 }
 
 void test_parse_handles_nested_forms() {
@@ -43,7 +43,7 @@ void test_parse_handles_nested_forms() {
   checkEq(*p, Token::of("\"a b c\"")); ++p;
   checkEq(*p, Token::of(")")); ++p;
   check(p == n.elems.end());
-  check(eof(c.fd));
+  check(c.fd.eof());
 }
 
 void test_parse_handles_nested_forms_with_comments() {
@@ -65,7 +65,7 @@ void test_parse_handles_nested_forms_with_comments() {
 
   checkEq(*p, Token::of(")")); ++p;
   check(p == n.elems.end());
-  check(eof(c.fd));
+  check(c.fd.eof());
 }
 
 void test_parse_handles_quotes() {
@@ -114,7 +114,7 @@ void test_parse_handles_quotes() {
 
   checkEq(*p, Token::of(")")); ++p;
   check(p == n.elems.end());
-  check(eof(c.fd));
+  check(c.fd.eof());
 }
 
 void test_parse_handles_splice_operators() {
@@ -140,5 +140,5 @@ void test_parse_handles_splice_operators() {
     check(q == ast2.end());
   checkEq(*p, Token::of(")")); ++p;
   check(p == n.elems.end());
-  check(eof(c.fd));
+  check(c.fd.eof());
 }

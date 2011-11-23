@@ -3,13 +3,13 @@
 void test_build_handles_nil() {
   CodeStream cs(stream("()"));
   checkEq(nextRawCell(cs), nil);
-  check(eof(cs.fd));
+  check(cs.fd.eof());
 }
 
 void test_build_handles_nil2() {
   CodeStream cs(stream("nil"));
   checkEq(nextRawCell(cs), nil);
-  check(eof(cs.fd));
+  check(cs.fd.eof());
 }
 
 void test_build_handles_number() {
@@ -18,7 +18,7 @@ void test_build_handles_number() {
   checkEq(c, newNum(34));
   checkEq(c->nrefs, 1);
   rmref(c);
-  check(eof(cs.fd));
+  check(cs.fd.eof());
 }
 
 void test_build_handles_sym() {
@@ -27,7 +27,7 @@ void test_build_handles_sym() {
   checkEq(c, newSym("a"));
   checkEq(c->nrefs, 1);
   rmref(c);
-  check(eof(cs.fd));
+  check(cs.fd.eof());
 }
 
 void test_build_doesnt_mix_syms_and_strings() {
@@ -43,7 +43,7 @@ void test_build_handles_quoted_sym() {
   checkEq(cdr(c), newSym("a"));
   checkEq(cdr(c)->nrefs, 2);
   rmref(c);
-  check(eof(cs.fd));
+  check(cs.fd.eof());
 }
 
 void test_build_handles_nested_quote() {
@@ -54,7 +54,7 @@ void test_build_handles_nested_quote() {
   checkEq(cdr(cdr(c)), newSym("a"));
   checkEq(cdr(cdr(c))->nrefs, 2);
   rmref(c);
-  check(eof(cs.fd));
+  check(cs.fd.eof());
 }
 
 void test_build_handles_multiple_atoms() {
@@ -69,7 +69,7 @@ void test_build_handles_multiple_atoms() {
   checkEq(c->nrefs, 1);
   checkEq(cdr(c), nil);
 
-  check(eof(cs.fd));
+  check(cs.fd.eof());
 }
 
 void test_build_handles_form() {
@@ -86,7 +86,7 @@ void test_build_handles_form() {
 
   checkEq(cdr(c), nil);
   rmref(origc);
-  check(eof(cs.fd));
+  check(cs.fd.eof());
 }
 
 void test_build_handles_dot() {
@@ -101,7 +101,7 @@ void test_build_handles_dot() {
   checkEq(c->nrefs, 2);
 
   rmref(origc);
-  check(eof(cs.fd));
+  check(cs.fd.eof());
 }
 
 void test_build_handles_nested_form() {
@@ -130,7 +130,7 @@ void test_build_handles_nested_form() {
   checkEq(cdr(c), nil);
 
   rmref(origc);
-  check(eof(cs.fd));
+  check(cs.fd.eof());
 }
 
 void test_build_handles_strings() {
@@ -162,7 +162,7 @@ void test_build_handles_strings() {
   checkEq(cdr(c), nil);
 
   rmref(origc);
-  check(eof(cs.fd));
+  check(cs.fd.eof());
 }
 
 void test_build_handles_syms() {
@@ -197,7 +197,7 @@ void test_build_handles_syms() {
   checkEq(cdr(c), nil);
 
   rmref(origc);
-  check(eof(cs.fd));
+  check(cs.fd.eof());
 }
 
 void test_build_handles_quotes() {
@@ -258,5 +258,5 @@ void test_build_handles_quotes() {
   checkEq(cdr(c), nil);
 
   rmref(origc);
-  check(eof(cs.fd));
+  check(cs.fd.eof());
 }
