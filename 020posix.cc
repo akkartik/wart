@@ -34,7 +34,7 @@ COMPILE_PRIM_FUNC(make-socket, primFunc_socket, "($host $port)",
   return mkref(newNum(sockfd));
 )
 
-COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($host $port)",
+COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($port)",
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0) perror("socket() failed");
   int dummy;
