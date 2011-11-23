@@ -2,7 +2,7 @@
 
 make --silent || exit 1
 
-if rlwrap ls >&/dev/null
+if command which rlwrap >/dev/null
 then
   rlwrap -C wart ./wart_bin $*
 else
