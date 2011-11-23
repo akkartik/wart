@@ -55,3 +55,22 @@ COMPILE_PRIM_FUNC(close, primFunc_close, "($fd)",
   close(toNum(lookup("$fd")));
   return nil;
 )
+
+
+
+#include<signal.h>
+
+struct sigaction originalSignalHandler;
+void interrupt(int s) {
+  eval(newCons(lookup("on-interrupt"), nil));
+  originalSignalHandler.sa_handler(s);
+}
+
+void catchCtrlC() {
+  struct sigaction curr;
+  curr.sa_handler = interrupt;
+  sigemptyset(&curr.sa_mask);
+  curr.sa_flags = 0;
+  sigaction(SIGINT, NULL, &originalSignalHandler);
+  sigaction(SIGINT, &curr, NULL);
+}

@@ -258,12 +258,6 @@ void init() {
   setupPrimFuncs();
 }
 
-#include<signal.h>
-
-void interrupt(int) {
-  eval(newCons(lookup("on-interrupt"), nil));
-}
-
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
     runTests();
@@ -274,7 +268,7 @@ int main(int argc, unused char* argv[]) {
   loadFiles(".wart");
 
   interactive = true; // trigger eval on empty lines
-  signal(SIGINT, interrupt);
+  catchCtrlC();
 
   CodeStream cs(cin);
   while (true) {
