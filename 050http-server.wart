@@ -25,7 +25,4 @@ def http-server(port)
             prn url
 
 def serverw(port)
-  = socket make-server-socket.port
-  = client-socket socket-accept.socket
-  readfoo.client-socket
-  close.socket
+  make-server-socket.port

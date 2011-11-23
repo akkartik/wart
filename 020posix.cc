@@ -82,6 +82,18 @@ COMPILE_PRIM_FUNC(serverc, primFunc_foo, "($port)",
   return nil;
 )
 
+COMPILE_PRIM_FUNC(serverc2, primFunc_serverc2, "($port)",
+  int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+  if (sockfd < 0) perror("socket() failed");
+  int dummy;
+  PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
+  sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
+  s.sin_port = htons(toNum(lookup("$port")));
+  PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
+  close(sockfd);
+  return nil;
+)
+
 
 
 #include<signal.h>
