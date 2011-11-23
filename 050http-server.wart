@@ -23,3 +23,9 @@ def http-server(port)
             prn "Content-type: text/plain"
             prn.
             prn url
+
+def serverw(port)
+  = socket make-server-socket.port
+  = client-socket socket-accept.socket
+  readfoo.client-socket
+  close.socket

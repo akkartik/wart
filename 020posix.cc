@@ -56,6 +56,32 @@ COMPILE_PRIM_FUNC(close, primFunc_close, "($fd)",
   return nil;
 )
 
+COMPILE_PRIM_FUNC(readfoo, primFunc_readc, "($infd)",
+  char buf[BUFSIZ];
+  read(toNum(lookup("$infd")), buf, BUFSIZ-1);
+  return mkref(newString(buf));
+)
+
+COMPILE_PRIM_FUNC(serverc, primFunc_foo, "($port)",
+  int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+  if (sockfd < 0) perror("socket() failed");
+  int dummy;
+  PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
+  sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
+  s.sin_port = htons(toNum(lookup("$port")));
+  PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
+  PERR(listen(sockfd, 5));
+
+  sockaddr_in t;  socklen_t n = sizeof(sockaddr_in);
+  int clientsockfd = accept(sockfd, (sockaddr*)&t, &n);
+
+  char buf[BUFSIZ];
+  read(clientsockfd, buf, BUFSIZ-1);
+
+  close(sockfd);
+  return nil;
+)
+
 
 
 #include<signal.h>
