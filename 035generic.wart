@@ -17,7 +17,8 @@ let $mac mac
 
 mac def(name params . body) :case (iso :case car.body)
   `(let $old ,name
-     (def! ,name ,params
-       if ,cadr.body
-         (do ,@body)
-         ($old ,@params)))
+     (def! ,name $params
+       let ,params $params
+         if ,cadr.body
+           (do ,@body)
+           ($old @$params)))
