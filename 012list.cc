@@ -28,7 +28,7 @@ COMPILE_PRIM_FUNC(list_splice, primFunc_list_splice, "('$list $start $end $val)"
   return mkref(val);
 )
 
-COMPILE_PRIM_FUNC(list_get, primFunc_list_get, "($list $index $end)",
+COMPILE_PRIM_FUNC(list_range, primFunc_list_range, "($list $index $end)",
   Cell* list = lookup("$list");
   int index = toNum(lookup("$index"));
   for (int i = 0; i < index; ++i)

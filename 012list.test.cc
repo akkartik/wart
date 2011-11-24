@@ -1,5 +1,5 @@
-void test_list_get_takes_range() {
-  Cell* expr = read(stream("list_get '(3 4 5) 0 2"));
+void test_list_range() {
+  Cell* expr = read(stream("list_range '(3 4 5) 0 2"));
   Cell* result = eval(expr);
   checkEq(car(result), newNum(3));
   checkEq(car(cdr(result)), newNum(4));

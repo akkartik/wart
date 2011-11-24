@@ -4,22 +4,22 @@ def bounce-index(x l)
     x
 
 defcall list(l idx . end)
-  (list_get l (if
-                no.idx
-                  0
-                (< idx 0)
-                  (+ len.l idx)
-                :else
-                  idx)
-              (if
-                no.end
-                  nil
-                (no car.end)
-                  len.l
-                (< car.end 0)
-                  (+ len.l car.end)
-                :else
-                  car.end))
+  (list_range l (if
+                  no.idx
+                    0
+                  (< idx 0)
+                    (+ len.l idx)
+                  :else
+                    idx)
+                (if
+                  no.end
+                    nil
+                  (no car.end)
+                    len.l
+                  (< car.end 0)
+                    (+ len.l car.end)
+                  :else
+                    car.end))
 
 defset list((l idx . end) val)
   `(withs ($idx (if
