@@ -65,7 +65,7 @@ mac for(var start test update . body)
        ,update)
 
 mac each(var expr . body)
-  `(for $i ,expr $i (zap cdr $i)
+  `(for $i (as list ,expr) $i (zap cdr $i)
       let ,var car.$i
         ,@body)
 

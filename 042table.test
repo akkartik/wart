@@ -14,3 +14,9 @@
             (= h.3 4)
             h.3)
  :should be 4)
+
+(test "each works on tables"
+ :valueof (ret ans 0
+            (each (k v) (table 1 2 3 4)
+              ++.ans))
+ :should be 2)
