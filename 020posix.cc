@@ -46,11 +46,11 @@ COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($port)",
   return mkref(newNum(sockfd));
 )
 
-sockaddr_in s;
+sockaddr_in t;
 socklen_t n;
 int foo1(int fd) {
   n = sizeof(sockaddr_in);
-  return accept(fd, (sockaddr*)&s, &n);
+  return accept(fd, (sockaddr*)&t, &n);
 }
 
 char buf[BUFSIZ];
@@ -66,7 +66,7 @@ COMPILE_PRIM_FUNC(serverc0, primFunc_serverc0, "($port)",
 
 //?   int clientsockfd = foo1(sockfd);
   socklen_t n = sizeof(sockaddr_in);
-  int clientsockfd = accept(sockfd, (sockaddr*)&s, &n);
+  int clientsockfd = accept(sockfd, (sockaddr*)&t, &n);
 
   read(clientsockfd, buf, BUFSIZ-1);
 
