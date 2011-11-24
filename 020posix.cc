@@ -46,20 +46,28 @@ COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($port)",
   return mkref(newNum(sockfd));
 )
 
-COMPILE_PRIM_FUNC(socket-accept, primFunc_socket_accept, "($fd)",
+long foo1(long fd) {
   sockaddr_in s;  socklen_t n = sizeof(sockaddr_in);
-  return mkref(newNum(accept(toNum(lookup("$fd")), (sockaddr*)&s, &n)));
+  return accept(fd, (sockaddr*)&s, &n);
+}
+
+COMPILE_PRIM_FUNC(socket-accept, primFunc_socket_accept, "($fd)",
+  return mkref(newNum(foo1(toNum(lookup("$fd")))));
+)
+
+char buf[BUFSIZ];
+void foo2(long fd) {
+  read(fd, buf, BUFSIZ-1);
+}
+
+COMPILE_PRIM_FUNC(readfoo, primFunc_readc, "($infd)",
+  foo2(toNum(lookup("$infd")));
+  return mkref(newString(buf));
 )
 
 COMPILE_PRIM_FUNC(close, primFunc_close, "($fd)",
   close(toNum(lookup("$fd")));
   return nil;
-)
-
-COMPILE_PRIM_FUNC(readfoo, primFunc_readc, "($infd)",
-  char buf[BUFSIZ];
-  read(toNum(lookup("$infd")), buf, BUFSIZ-1);
-  return mkref(newString(buf));
 )
 
 COMPILE_PRIM_FUNC(serverc, primFunc_foo, "($port)",
@@ -72,11 +80,9 @@ COMPILE_PRIM_FUNC(serverc, primFunc_foo, "($port)",
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
   PERR(listen(sockfd, 5));
 
-  sockaddr_in t;  socklen_t n = sizeof(sockaddr_in);
-  int clientsockfd = accept(sockfd, (sockaddr*)&t, &n);
+  int clientsockfd = foo1(sockfd);
 
-  char buf[BUFSIZ];
-  read(clientsockfd, buf, BUFSIZ-1);
+  foo2(clientsockfd);
 
   close(clientsockfd);
   close(sockfd);
