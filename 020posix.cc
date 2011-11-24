@@ -90,6 +90,13 @@ COMPILE_PRIM_FUNC(serverc2, primFunc_serverc2, "($port)",
   sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
   s.sin_port = htons(toNum(lookup("$port")));
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
+
+  PERR(listen(sockfd, 5));
+  sockaddr_in t;  socklen_t n = sizeof(sockaddr_in);
+  int clientsockfd = accept(sockfd, (sockaddr*)&t, &n);
+  char buf[BUFSIZ];
+  read(clientsockfd, buf, BUFSIZ-1);
+
   close(sockfd);
   return nil;
 )
