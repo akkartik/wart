@@ -60,9 +60,7 @@ COMPILE_PRIM_FUNC(serverc0, primFunc_serverc0, "($port)",
   int dummy;
   PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
   sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
-  cout << "a: " << toNum(lookup("$port")) << endl;
   s.sin_port = htons((int)toNum(lookup("$port")));
-  cout << "b: " << s.sin_port << endl;
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
   PERR(listen(sockfd, 5));
 
@@ -97,9 +95,7 @@ COMPILE_PRIM_FUNC(serverc1, primFunc_serverc1, "($port)",
   int dummy;
   PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
   sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
-  cout << "a: " << toNum(lookup("$port")) << endl;
   s.sin_port = htons((int)toNum(lookup("$port")));
-  cout << "b: " << s.sin_port << endl;
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
   PERR(listen(sockfd, 5));
 
