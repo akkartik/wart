@@ -101,9 +101,9 @@ COMPILE_PRIM_FUNC(serverc1, primFunc_serverc1, "($port)",
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
   PERR(listen(sockfd, 5));
 
-  int clientsockfd = foo1(sockfd);
+  int clientsockfd = (int)foo1((long)sockfd);
 
-  foo2(clientsockfd);
+  foo2((long)clientsockfd);
 
   close(clientsockfd);
   close(sockfd);
