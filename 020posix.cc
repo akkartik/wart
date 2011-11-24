@@ -62,10 +62,11 @@ COMPILE_PRIM_FUNC(serverc0, primFunc_serverc0, "($port)",
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
   PERR(listen(sockfd, 5));
 
-  sockaddr_in t;  socklen_t n = sizeof(sockaddr_in);
-  int clientsockfd = accept(sockfd, (sockaddr*)&t, &n);
+  long clientsockfd = foo1(sockfd);
+//?   sockaddr_in t;  socklen_t n = sizeof(sockaddr_in);
+//?   int clientsockfd = accept(sockfd, (sockaddr*)&t, &n);
 
-  read(clientsockfd, buf, BUFSIZ-1);
+  read((int)clientsockfd, buf, BUFSIZ-1);
 
   close(clientsockfd);
   close(sockfd);
