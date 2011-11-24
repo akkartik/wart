@@ -83,10 +83,11 @@ list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterato
 }
 
 AstNode nextAstNode(CodeStream& c) {
-  if (c.fd.eof()) ERR << "empty input\n" << DIE;
+  if (c.fd.eof()) return AstNode::of(Token::of("nil"));
   list<Token> tokens = nextExpr(c);
   list<AstNode> result;
   parseNext(tokens.begin(), tokens.end(), result);
-  if (result.size() != 1) ERR << "parse error\n" << DIE;
+  if (result.size() > 1) ERR << "parse error\n" << DIE;
+  if (result.empty()) return AstNode::of(Token::of("nil"));
   return result.front();
 }

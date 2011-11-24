@@ -52,7 +52,6 @@ Cell* buildCell(AstNode n) {
 }
 
 Cell* nextRawCell(CodeStream c) {
-  c.fd.peek();
   if (c.fd.eof()) return nil;
   return buildCell(nextAstNode(c));
 }

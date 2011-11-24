@@ -1,3 +1,16 @@
+void test_parse_handles_empty_stream() {
+  CodeStream c(stream(""));
+  checkEq(nextAstNode(c), Token::of("nil"));
+  check(c.fd.eof());
+}
+
+void test_parse_handles_trailing_comment() {
+  CodeStream c(stream("34 ; abc"));
+  checkEq(nextAstNode(c), Token::of("34"));
+  checkEq(nextAstNode(c), Token::of("nil"));
+  check(c.fd.eof());
+}
+
 void test_parse_handles_atom() {
   CodeStream c(stream("34"));
   checkEq(nextAstNode(c), Token::of("34"));
