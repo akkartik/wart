@@ -10,3 +10,6 @@ def sym args
 def keyword?(s)
   (and sym?.s
        (iso ":" str.s.0))
+
+def sym(s . rest) :case (and !rest keyword?.s)
+  as symbol (str.s 1 nil)

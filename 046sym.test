@@ -7,7 +7,7 @@
  :should be 'abc)
 
 (test "sym works with multiple args"
- :valueof (str:sym "abc" 42 :def)
+ :valueof (str:sym "abc" 42 :def) ; keyword retains colon
  :should be "abc42:def")
 
 (test "keyword? works"
@@ -17,3 +17,7 @@
 (test "keyword? works - 2"
  :valueof (keyword? :abc)
  :should ~be nil)
+
+(test "sym converts keywords"
+ :valueof (sym :abc)
+ :should be 'abc) ; keyword loses colon
