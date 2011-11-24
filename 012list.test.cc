@@ -1,3 +1,13 @@
+void test_list_get_takes_range() {
+  Cell* expr = read(stream("list_get '(3 4 5) 0 2"));
+  Cell* result = eval(expr);
+  checkEq(car(result), newNum(3));
+  checkEq(car(cdr(result)), newNum(4));
+  checkEq(cdr(cdr(result)), nil);
+  rmref(result);
+  rmref(expr);
+}
+
 void test_list_splice_replaces_index() {
   newDynamicScope("a", newCons(newNum(3), newCons(newNum(4), nil)));
   Cell* expr = read(stream("list_splice a 1 2 '(5)"));

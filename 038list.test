@@ -19,6 +19,10 @@
  :should be 3)
 
 (test "lists can take ranges"
+ :valueof (let l '(1 2 3 4 5 6) (l 3 5))
+ :should be '(4 5))
+
+(test "lists can take ranges - 2"
  :valueof (let l '(1 2 3 4 5 6) (l 3 -1))
  :should be '(4 5))
 

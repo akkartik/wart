@@ -18,6 +18,10 @@
  :valueof ("abcd" 1 3)
  :should be "bc")
 
+(test "strings can take slices - 2"
+ :valueof ("abcd" 1 -1)
+ :should be "bc")
+
 (test "strings can be assigned to"
  :valueof (ret s "abc"
             (= s.1 "z"))
