@@ -1,13 +1,3 @@
-def range-bounce(l idx)
-  (if (< idx 0)
-    (+ len.l idx)
-    idx)
-
-def range-start(l idx)
-  if !idx
-    0
-    (range-bounce l idx)
-
 defcall list(l idx . ends)
   withs (idx (range-start l idx)
          end (if
@@ -93,3 +83,17 @@ def lastcons(l)
   aif cdr.l
     lastcons.it
     l
+
+
+
+;; Internals
+
+def range-bounce(l idx)
+  (if (< idx 0)
+    (+ len.l idx)
+    idx)
+
+def range-start(l idx)
+  if !idx
+    0
+    (range-bounce l idx)
