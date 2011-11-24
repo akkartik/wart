@@ -18,3 +18,14 @@ COMPILE_PRIM_FUNC(table_get, primFunc_table_get, "($table $key)",
   Cell* key = lookup("$key");
   return mkref(get(table, key));
 )
+
+COMPILE_PRIM_FUNC(table_to_list, primFunc_table_to_list, "($table)",
+  CellMap table = toTable(lookup("$table"))->table;
+  Cell* result = newCell();
+  Cell* curr = result;
+  for (CellMap::iterator p = table.begin(); p != table.end(); ++p) {
+    addCons(curr, newCons((Cell*)p->first, newCons((Cell*)p->second, nil)));
+    curr=cdr(curr);
+  }
+  return dropPtr(result);
+)

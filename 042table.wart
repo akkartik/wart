@@ -4,8 +4,17 @@ defcall table(h k default)
 defset table((h k) v)
   `(table_set ,h ,k ,v)
 
+defcoerce table list
+  table_to_list
+
 let $table table
   def! table args
     ret h ($table)
       each (k v) pair.args
         (= h.k v)
+
+def keys(t)
+  map car (as list t)
+
+def vals(t)
+  map cadr (as list t)
