@@ -47,8 +47,9 @@ COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($port)",
 )
 
 sockaddr_in s;
+socklen_t n;
 int foo1(int fd) {
-  socklen_t n = sizeof(sockaddr_in);
+  n = sizeof(sockaddr_in);
   return accept(fd, (sockaddr*)&s, &n);
 }
 
