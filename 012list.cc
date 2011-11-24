@@ -33,8 +33,6 @@ COMPILE_PRIM_FUNC(list_range, primFunc_list_range, "($list $index $end)",
   int index = toNum(lookup("$index"));
   for (int i = 0; i < index; ++i)
     list=cdr(list);
-  if (lookup("$end") == nil)
-    return mkref(car(list));
 
   int end = toNum(lookup("$end"));
   Cell* pResult = newCell();
