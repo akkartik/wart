@@ -9,3 +9,11 @@
 (test "sym works with multiple args"
  :valueof (sym "abc" 42 'def)
  :should be 'abc42def)
+
+(test "keyword? works"
+ :valueof (keyword? 'abc)
+ :should be nil)
+
+(test "keyword? works - 2"
+ :valueof (keyword? :abc)
+ :should ~be nil)

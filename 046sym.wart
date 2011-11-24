@@ -6,3 +6,7 @@ defcoerce symbol string
 
 def sym args
   (as symbol (str @args))
+
+def keyword?(s)
+  (and sym?.s
+       (iso ":" str.s.0))
