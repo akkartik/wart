@@ -76,12 +76,8 @@ COMPILE_PRIM_FUNC(socket-accept, primFunc_socket_accept, "($fd)",
   return mkref(newNum(foo1(toNum(lookup("$fd")))));
 )
 
-void foo2(long fd) {
-  read((int)fd, buf, BUFSIZ-1);
-}
-
 COMPILE_PRIM_FUNC(readfoo, primFunc_readc, "($infd)",
-  foo2(toNum(lookup("$infd")));
+  read((int)toNum(lookup("$infd")), buf, BUFSIZ-1);
   return mkref(newString(buf));
 )
 
@@ -102,7 +98,7 @@ COMPILE_PRIM_FUNC(serverc1, primFunc_serverc1, "($port)",
 
   long clientsockfd = foo1((long)sockfd);
 
-  foo2(clientsockfd);
+  read((int)clientsockfd, buf, BUFSIZ-1);
 
   close(clientsockfd);
   close(sockfd);
