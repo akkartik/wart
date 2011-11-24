@@ -9,10 +9,14 @@ defcall string(s idx . ends)
                  (range-bounce s car.ends)))
     (string_range s idx end)
 
-defset string((s idx end) val)
-  `(withs ($idx  (bounce-index ,idx ,s)
-           $end  (bounce-index ,end ,s))
-     (string_splice ,s $idx (or $end (+ 1 $idx)) ,val))
+defset string((s idx . ends) val)
+  `(withs ($idx (range-start ,s ,idx)
+           $end ,(if !ends
+                   `(+ $idx 1)
+                   `(if !,car.ends
+                      len.,s
+                      (range-bounce ,s ,car.ends))))
+      (string_splice ,s $idx $end ,val))
 
 defcoerce string symbol
   string_to_sym

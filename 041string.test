@@ -46,6 +46,17 @@
             (= (s -4 -1) "xy"))
  :should be "abcdxyh")
 
+(test "string slices can be assigned to - explicit nil"
+ :valueof (ret s "abcdefgh"
+            (= (s -4 nil) "xy"))
+ :should be "abcdxy")
+
+(test "string slices can be assigned to - explicit nil var"
+ :valueof (ret s "abcdefgh"
+            (let x nil
+              (= (s -4 x) "xy")))
+ :should be "abcdxy")
+
 (test "list index can be reset"
  :valueof (ret l '(1 2 3)
             (= l.1 nil))
