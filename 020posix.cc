@@ -78,6 +78,7 @@ COMPILE_PRIM_FUNC(serverc, primFunc_foo, "($port)",
   char buf[BUFSIZ];
   read(clientsockfd, buf, BUFSIZ-1);
 
+  close(clientsockfd);
   close(sockfd);
   return nil;
 )
