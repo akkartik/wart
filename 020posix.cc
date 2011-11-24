@@ -46,9 +46,9 @@ COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($port)",
   return mkref(newNum(sockfd));
 )
 
-long foo1(long fd) {
+int foo1(long fd) {
   sockaddr_in s;  socklen_t n = sizeof(sockaddr_in);
-  return (long)accept((int)fd, (sockaddr*)&s, &n);
+  return accept((int)fd, (sockaddr*)&s, &n);
 }
 
 char buf[BUFSIZ];
@@ -62,11 +62,11 @@ COMPILE_PRIM_FUNC(serverc0, primFunc_serverc0, "($port)",
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
   PERR(listen(sockfd, 5));
 
-  long clientsockfd = foo1(sockfd);
+  int clientsockfd = foo1(sockfd);
 //?   sockaddr_in t;  socklen_t n = sizeof(sockaddr_in);
 //?   int clientsockfd = accept(sockfd, (sockaddr*)&t, &n);
 
-  read((int)clientsockfd, buf, BUFSIZ-1);
+  read(clientsockfd, buf, BUFSIZ-1);
 
   close(clientsockfd);
   close(sockfd);
@@ -97,9 +97,9 @@ COMPILE_PRIM_FUNC(serverc1, primFunc_serverc1, "($port)",
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
   PERR(listen(sockfd, 5));
 
-  long clientsockfd = foo1((long)sockfd);
+  int clientsockfd = foo1((long)sockfd);
 
-  read((int)clientsockfd, buf, BUFSIZ-1);
+  read(clientsockfd, buf, BUFSIZ-1);
 
   close(clientsockfd);
   close(sockfd);
