@@ -22,22 +22,22 @@
  :valueof ("abcd" 1 -1)
  :should be "bc")
 
-(test "strings can be assigned to"
+(test "string indices can be assigned to"
  :valueof (ret s "abc"
             (= s.1 "z"))
  :should be "azc")
 
-(test "strings can be assigned to"
+(test "string indices can be assigned to - 2"
  :valueof (ret s "abc"
             (= s.-1 "z"))
  :should be "abz")
 
-(test "string ranges can be spliced"
+(test "string slices can be assigned to"
  :valueof (ret s "abcdefgh"
             (= (s 1 5) "xy"))
  :should be "axyfgh")
 
-(test "string ranges can be spliced - 2"
+(test "string slices can be assigned to - 2"
  :valueof (ret s "abcdefgh"
             (= (s -4 -1) "xy"))
  :should be "abcdxyh")
