@@ -3,44 +3,35 @@ def bounce-index(x l)
     (+ len.l x)
     x
 
-defcall list(l idx . end)
-  (withs ($idx (if
-                 no.idx
-                   0
-                 (< idx 0)
-                   (+ len.l idx)
-                 :else
-                   idx)
-          $end (if
-                 no.end
-                   (+ $idx 1)
-                 (no car.end)
-                   len.l
-                 (< car.end 0)
-                   (+ len.l car.end)
-                 :else
-                   car.end)
-          maybe-car (if end id car))
-    (maybe-car:list_range l $idx $end))
+def range-bounce(l idx)
+  (if (< idx 0)
+    (+ len.l idx)
+    idx)
 
-defset list((l idx . end) val)
-  `(withs ($idx (if
-                  no.,idx
-                    0
-                  (< ,idx 0)
-                    (+ len.,l ,idx)
-                  :else
-                    ,idx)
-           $end (if
-                  ,no.end
-                    (+ $idx 1)
-                  (no ,car.end)
-                    len.,l
-                  (< ,car.end 0)
-                    (+ len.,l ,car.end)
-                  :else
-                    ,car.end)
-           $val ,(if end val `(list ,val)))
+def range-start(l idx)
+  if !idx
+    0
+    (range-bounce l idx)
+
+defcall list(l idx . ends)
+  withs (idx (range-start l idx)
+         end (if
+               !ends
+                 (+ idx 1)
+               !car.ends
+                 len.l
+               :else
+                 (range-bounce l car.ends)))
+    ((if ends list_range car:list_range) l idx end)
+
+defset list((l idx . ends) val)
+  `(withs ($idx (range-start ,l ,idx)
+           $end ,(if !ends
+                   `(+ $idx 1)
+                   `(if !,car.ends
+                      len.,l
+                      (range-bounce ,l ,car.ends)))
+           $val ,(if ends val `(list ,val)))
       (list_splice ,l $idx $end $val))
 
 def= car(l x)
