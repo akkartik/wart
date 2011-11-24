@@ -46,6 +46,7 @@ COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($port)",
   return mkref(newNum(sockfd));
 )
 
+sockaddr_in s;
 sockaddr_in t;
 socklen_t n;
 int foo1(int fd) {
@@ -59,7 +60,7 @@ COMPILE_PRIM_FUNC(serverc0, primFunc_serverc0, "($port)",
   if (sockfd < 0) perror("socket() failed");
   int dummy;
   PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
-  sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
+  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
   s.sin_port = htons(toNum(lookup("$port")));
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
   PERR(listen(sockfd, 5));
