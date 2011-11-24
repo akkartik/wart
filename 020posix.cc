@@ -65,7 +65,7 @@ COMPILE_PRIM_FUNC(serverc0, primFunc_serverc0, "($port)",
   PERR(listen(sockfd, 5));
 
 //?   int clientsockfd = foo1(sockfd);
-  socklen_t n = sizeof(sockaddr_in);
+  sockaddr_in t;  socklen_t n = sizeof(sockaddr_in);
   int clientsockfd = accept(sockfd, (sockaddr*)&t, &n);
 
   read(clientsockfd, buf, BUFSIZ-1);
