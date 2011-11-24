@@ -22,10 +22,3 @@
 (mac w/stdout(fd . body)
   `(between (dyn_bind stdout outfd.,fd) :and (do dyn_unbind.stdout close.,fd)
      ,@body))
-
-def str args
-  (w/outstring
-    (each arg args pr.arg))
-
-def sym args
-  (as symbol (str @args))
