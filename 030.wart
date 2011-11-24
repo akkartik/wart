@@ -53,3 +53,6 @@ let $iso iso ; ignore later refinements
 
 = cadr car:cdr
 = cddr cdr:cdr
+
+def id(_)
+  _
