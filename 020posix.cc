@@ -46,8 +46,9 @@ COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($port)",
   return mkref(newNum(sockfd));
 )
 
+sockaddr_in s;
 int foo1(int fd) {
-  sockaddr_in s;  socklen_t n = sizeof(sockaddr_in);
+  socklen_t n = sizeof(sockaddr_in);
   return accept(fd, (sockaddr*)&s, &n);
 }
 
