@@ -25,4 +25,26 @@ def http-server(port)
             prn url
 
 def serverw(port)
-  make-server-socket.port
+  = s make-server-socket.port
+;?   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+;?   if (sockfd < 0) perror("socket() failed");
+;?   int dummy;
+;?   PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
+;?   sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
+;?   s.sin_port = htons(port);
+;?   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
+;?   PERR(listen(sockfd, 5));
+
+  = c socket-accept.s
+;?   sockaddr_in s;  socklen_t n = sizeof(sockaddr_in);
+;?   int clientsockfd = accept(sockfd, (sockaddr*)&s, &n));
+
+  readfoo.c
+;?   char buf[1024];
+;?   read(clientsockfd, buf, 1023);
+
+  close.c
+;?   close(clientsockfd);
+
+  close.s
+;?   close(sockfd);
