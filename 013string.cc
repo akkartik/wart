@@ -19,7 +19,7 @@ COMPILE_PRIM_FUNC(string_splice, primFunc_string_splice, "($string $start $end $
   return mkref(val);
 )
 
-COMPILE_PRIM_FUNC(string_get, primFunc_string_get, "($string $index $end)",
+COMPILE_PRIM_FUNC(string_range, primFunc_string_get, "($string $index $end)",
   Cell* str = lookup("$string");
   if (!isString(str)) {
     WARN << "not a string: " << str << endl;
@@ -30,7 +30,7 @@ COMPILE_PRIM_FUNC(string_get, primFunc_string_get, "($string $index $end)",
   if (index > ((string*)str->car)->length()-1)
     return nil;
 
-  size_t end = (lookup("$end") != nil) ? toNum(lookup("$end")) : index+1;
+  size_t end = toNum(lookup("$end"));
   if (end > ((string*)str->car)->length()) {
     WARN << "no such end-index in string: " << str << " " << end << endl;
     return nil;

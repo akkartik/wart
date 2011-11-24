@@ -22,6 +22,10 @@
  :valueof ("abcd" 1 -1)
  :should be "bc")
 
+(test "strings can take slices - explicit nil"
+ :valueof ("abcd" 1 nil)
+ :should be "bcd")
+
 (test "string indices can be assigned to"
  :valueof (ret s "abc"
             (= s.1 "z"))
@@ -41,6 +45,11 @@
  :valueof (ret s "abcdefgh"
             (= (s -4 -1) "xy"))
  :should be "abcdxyh")
+
+(test "list index can be reset"
+ :valueof (ret l '(1 2 3)
+            (= l.1 nil))
+ :should be '(1 nil 3))
 
 (test "each works on literal strings"
  :valueof (ret ans nil

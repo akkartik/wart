@@ -1,6 +1,13 @@
-defcall string(s idx end)
-  (string_get s (bounce-index idx s)
-                (bounce-index end s))
+defcall string(s idx . ends)
+  withs (idx (range-start s idx)
+         end (if
+               !ends
+                 (+ idx 1)
+               !car.ends
+                 len.s
+               :else
+                 (range-bounce s car.ends)))
+    (string_range s idx end)
 
 defset string((s idx end) val)
   `(withs ($idx  (bounce-index ,idx ,s)
