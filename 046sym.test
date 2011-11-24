@@ -7,8 +7,8 @@
  :should be 'abc)
 
 (test "sym works with multiple args"
- :valueof (sym "abc" 42 'def)
- :should be 'abc42def)
+ :valueof (str:sym "abc" 42 :def)
+ :should be "abc42:def")
 
 (test "keyword? works"
  :valueof (keyword? 'abc)
