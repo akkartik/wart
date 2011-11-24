@@ -46,6 +46,7 @@ COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($port)",
   return mkref(newNum(sockfd));
 )
 
+char buf[BUFSIZ];
 COMPILE_PRIM_FUNC(serverc0, primFunc_serverc0, "($port)",
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0) perror("socket() failed");
@@ -59,7 +60,6 @@ COMPILE_PRIM_FUNC(serverc0, primFunc_serverc0, "($port)",
   sockaddr_in t;  socklen_t n = sizeof(sockaddr_in);
   int clientsockfd = accept(sockfd, (sockaddr*)&t, &n);
 
-  char buf[BUFSIZ];
   read(clientsockfd, buf, BUFSIZ-1);
 
   close(clientsockfd);
@@ -76,7 +76,6 @@ COMPILE_PRIM_FUNC(socket-accept, primFunc_socket_accept, "($fd)",
   return mkref(newNum(foo1(toNum(lookup("$fd")))));
 )
 
-char buf[BUFSIZ];
 void foo2(long fd) {
   read(fd, buf, BUFSIZ-1);
 }
