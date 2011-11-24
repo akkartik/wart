@@ -29,7 +29,7 @@ COMPILE_PRIM_FUNC(make-socket, primFunc_socket, "($host $port)",
   hostent *host = gethostbyname(toString(lookup("$host")).c_str());
   sockaddr_in s;  s.sin_family = AF_INET;
   bcopy((char*)host->h_addr, (char*)s.sin_addr.s_addr, host->h_length);
-  s.sin_port = htons(toNum(lookup("$port")));
+  s.sin_port = htonl(toNum(lookup("$port")));
   PERR(connect(sockfd, (sockaddr*)&s, sizeof(s)));
   return mkref(newNum(sockfd));
 )
@@ -40,7 +40,7 @@ COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($port)",
   int dummy;
   PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
   sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
-  s.sin_port = htons(toNum(lookup("$port")));
+  s.sin_port = htonl(toNum(lookup("$port")));
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
   PERR(listen(sockfd, 5));
   return mkref(newNum(sockfd));
@@ -60,7 +60,9 @@ COMPILE_PRIM_FUNC(serverc0, primFunc_serverc0, "($port)",
   int dummy;
   PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
   sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
-  s.sin_port = htons((int)toNum(lookup("$port")));
+  cout << "a: " << toNum(lookup("$port")) << endl;
+  s.sin_port = htonl(toNum(lookup("$port")));
+  cout << "b: " << s.sin_port << endl;
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
   PERR(listen(sockfd, 5));
 
@@ -95,7 +97,9 @@ COMPILE_PRIM_FUNC(serverc1, primFunc_serverc1, "($port)",
   int dummy;
   PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
   sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
-  s.sin_port = htons((int)toNum(lookup("$port")));
+  cout << "a: " << toNum(lookup("$port")) << endl;
+  s.sin_port = htonl(toNum(lookup("$port")));
+  cout << "b: " << s.sin_port << endl;
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
   PERR(listen(sockfd, 5));
 
