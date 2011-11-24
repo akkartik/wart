@@ -69,7 +69,7 @@ COMPILE_PRIM_FUNC(serverc0, primFunc_serverc0, "($port)",
 
 long foo1(long fd) {
   sockaddr_in s;  socklen_t n = sizeof(sockaddr_in);
-  return accept(fd, (sockaddr*)&s, &n);
+  return (long)accept((int)fd, (sockaddr*)&s, &n);
 }
 
 COMPILE_PRIM_FUNC(socket-accept, primFunc_socket_accept, "($fd)",
@@ -77,7 +77,7 @@ COMPILE_PRIM_FUNC(socket-accept, primFunc_socket_accept, "($fd)",
 )
 
 void foo2(long fd) {
-  read(fd, buf, BUFSIZ-1);
+  read((int)fd, buf, BUFSIZ-1);
 }
 
 COMPILE_PRIM_FUNC(readfoo, primFunc_readc, "($infd)",
@@ -100,9 +100,9 @@ COMPILE_PRIM_FUNC(serverc1, primFunc_serverc1, "($port)",
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
   PERR(listen(sockfd, 5));
 
-  int clientsockfd = (int)foo1((long)sockfd);
+  long clientsockfd = foo1((long)sockfd);
 
-  foo2((long)clientsockfd);
+  foo2(clientsockfd);
 
   close(clientsockfd);
   close(sockfd);
