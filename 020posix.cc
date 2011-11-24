@@ -46,6 +46,11 @@ COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($port)",
   return mkref(newNum(sockfd));
 )
 
+long foo1(long fd) {
+  sockaddr_in s;  socklen_t n = sizeof(sockaddr_in);
+  return (long)accept((int)fd, (sockaddr*)&s, &n);
+}
+
 char buf[BUFSIZ];
 COMPILE_PRIM_FUNC(serverc0, primFunc_serverc0, "($port)",
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -66,11 +71,6 @@ COMPILE_PRIM_FUNC(serverc0, primFunc_serverc0, "($port)",
   close(sockfd);
   return nil;
 )
-
-long foo1(long fd) {
-  sockaddr_in s;  socklen_t n = sizeof(sockaddr_in);
-  return (long)accept((int)fd, (sockaddr*)&s, &n);
-}
 
 COMPILE_PRIM_FUNC(socket-accept, primFunc_socket_accept, "($fd)",
   return mkref(newNum(foo1(toNum(lookup("$fd")))));
