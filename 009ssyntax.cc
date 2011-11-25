@@ -37,8 +37,8 @@ Cell* transformComplement(string var) {
 Cell* transform_ssyntax(Cell* input) {
   if (isSym(input)) {
     string var = toString(input);
-    // avoid detecting floats as ssyntax. Hacky, not unicode-aware.
-    if (var.find_first_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") == string::npos)
+    // avoid detecting floats as ssyntax.
+    if (var.find_first_not_of("0123456789.:!~&") == string::npos)
       ;
     else if (var[0] == L'!')
       input = transformNot(var);
