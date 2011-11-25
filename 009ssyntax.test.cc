@@ -88,3 +88,13 @@ void test_complement_is_unary() {
   checkEq(cdr(cdr(cons)), nil);
   rmref(cons);
 }
+
+void test_compose_before_call() {
+  Cell* cons = read(stream("a:b.c"));
+  checkEq(car(car(cons)), newSym("compose"));
+  checkEq(car(cdr(car(cons))), newSym("a"));
+  checkEq(car(cdr(cdr(car(cons)))), newSym("b"));
+  checkEq(car(cdr(cons)), newSym("c"));
+  checkEq(cdr(cdr(cons)), nil);
+  rmref(cons);
+}

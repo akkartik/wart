@@ -42,10 +42,10 @@ Cell* transform_ssyntax(Cell* input) {
       ;
     else if (var[0] == L'!')
       input = transformNot(var);
-    else if (var[0] != L':' && var.find(L':') != string::npos)
-      input = transformCompose(var);
     else if (var.find(L'.') != string::npos || var.find(L'!') < var.length()-1)
       input = transformCall(var);
+    else if (var[0] != L':' && var.find(L':') != string::npos)
+      input = transformCompose(var);
     else if (var.find(L'&') != string::npos)
       input = transformAndf(var);
     else if (var[0] == L'~')
