@@ -54,13 +54,13 @@ int foo1(int fd) {
 }
 
 char buf[BUFSIZ];
-COMPILE_PRIM_FUNC(serverc0, primFunc_serverc0, "($port)",
+void socket0(long port) {
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0) perror("socket() failed");
   int dummy;
   PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
   sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
-  s.sin_port = htons((int)toNum(lookup("$port")));
+  s.sin_port = htons((int)port);
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
   PERR(listen(sockfd, 5));
 
@@ -72,6 +72,10 @@ COMPILE_PRIM_FUNC(serverc0, primFunc_serverc0, "($port)",
 
   close(clientsockfd);
   close(sockfd);
+}
+
+COMPILE_PRIM_FUNC(serverc0, primFunc_serverc0, "($port)",
+  socket0(toNum(lookup("$port")));
   return nil;
 )
 
@@ -89,13 +93,13 @@ COMPILE_PRIM_FUNC(close, primFunc_close, "($fd)",
   return nil;
 )
 
-COMPILE_PRIM_FUNC(serverc1, primFunc_serverc1, "($port)",
+void socket1(long port) {
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0) perror("socket() failed");
   int dummy;
   PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
   sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
-  s.sin_port = htons((int)toNum(lookup("$port")));
+  s.sin_port = htons((int)port);
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
   PERR(listen(sockfd, 5));
 
@@ -105,6 +109,10 @@ COMPILE_PRIM_FUNC(serverc1, primFunc_serverc1, "($port)",
 
   close(clientsockfd);
   close(sockfd);
+}
+
+COMPILE_PRIM_FUNC(serverc1, primFunc_serverc1, "($port)",
+  socket1(toNum(lookup("$port")));
   return nil;
 )
 
