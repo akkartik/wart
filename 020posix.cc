@@ -48,19 +48,19 @@ COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($port)",
 
 sockaddr_in t;
 socklen_t n;
-int foo1(int fd) {
+int foo1(sockaddr_in t, int fd) {
   n = sizeof(sockaddr_in);
   return accept(fd, (sockaddr*)&t, &n);
 }
 
 char buf[BUFSIZ];
-void socket0(long port) {
+Cell* primFunc_serverc0() { // $port
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0) perror("socket() failed");
   int dummy;
   PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
   sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
-  s.sin_port = htons((int)port);
+  s.sin_port = htons((int)toNum(lookup("$port")));
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
   PERR(listen(sockfd, 5));
 
@@ -72,15 +72,12 @@ void socket0(long port) {
 
   close(clientsockfd);
   close(sockfd);
+  return nil;
 }
 
-COMPILE_PRIM_FUNC(serverc0, primFunc_serverc0, "($port)",
-  socket0(toNum(lookup("$port")));
-  return nil;
-)
-
 COMPILE_PRIM_FUNC(socket-accept, primFunc_socket_accept, "($fd)",
-  return mkref(newNum(foo1(toNum(lookup("$fd")))));
+    sockaddr_in t;
+  return mkref(newNum(foo1(t, toNum(lookup("$fd")))));
 )
 
 COMPILE_PRIM_FUNC(readfoo, primFunc_readc, "($infd)",
@@ -93,28 +90,26 @@ COMPILE_PRIM_FUNC(close, primFunc_close, "($fd)",
   return nil;
 )
 
-void socket1(long port) {
+Cell* primFunc_serverc1() { // $port
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0) perror("socket() failed");
   int dummy;
   PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
   sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
+  long port = toNum(lookup("$port"));
   s.sin_port = htons((int)port);
   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
   PERR(listen(sockfd, 5));
 
-  int clientsockfd = foo1(sockfd);
+  sockaddr_in t;
+  int clientsockfd = foo1(t, sockfd);
 
   read(clientsockfd, buf, BUFSIZ-1);
 
   close(clientsockfd);
   close(sockfd);
-}
-
-COMPILE_PRIM_FUNC(serverc1, primFunc_serverc1, "($port)",
-  socket1(toNum(lookup("$port")));
   return nil;
-)
+}
 
 
 
