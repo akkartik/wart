@@ -1,9 +1,5 @@
 //// cell: core lisp data structure with ref-counted garbage collection
 
-const int NRECENT = 12;
-Cell* recentAllocs[NRECENT] = {NULL};
-int recentAllocsIdx = 0;
-
 unsigned long numAllocs = 0;
 
 struct Cell {
@@ -21,8 +17,6 @@ struct Cell {
   void init() {
     car=cdr=nil, type=CONS, nrefs=0;
     ++numAllocs;
-    recentAllocs[recentAllocsIdx] = this;
-    recentAllocsIdx = (recentAllocsIdx+1)%NRECENT;
   }
   void clear() { car=cdr=NULL, type=CONS, nrefs=0; }
 };
