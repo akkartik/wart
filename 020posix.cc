@@ -60,12 +60,6 @@ COMPILE_PRIM_FUNC(close, primFunc_close, "($fd)",
   return nil;
 )
 
-COMPILE_PRIM_FUNC(readfoo, primFunc_readc, "($infd)",
-  char buf[BUFSIZ];
-  read(toNum(lookup("$infd")), buf, BUFSIZ-1);
-  return mkref(newString(buf));
-)
-
 
 
 #include<signal.h>
