@@ -55,11 +55,6 @@ COMPILE_PRIM_FUNC(socket-accept, primFunc_socket_accept, "($fd)",
   return mkref(newNum(accept(toNum(lookup("$fd")), (sockaddr*)&t, &n)));
 )
 
-COMPILE_PRIM_FUNC(close, primFunc_close, "($fd)",
-  close(toNum(lookup("$fd")));
-  return nil;
-)
-
 
 
 #include<signal.h>

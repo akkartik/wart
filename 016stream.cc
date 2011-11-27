@@ -133,3 +133,8 @@ COMPILE_PRIM_FUNC(infd, primFunc_infd, "($fd)",
 COMPILE_PRIM_FUNC(outfd, primFunc_outfd, "($fd)",
   return mkref(newOstream(new iostream(new FdStreamBuf(toNum(lookup("$fd")))))); // leak
 )
+
+COMPILE_PRIM_FUNC(close, primFunc_close, "($fd)",
+  close(toNum(lookup("$fd")));
+  return nil;
+)
