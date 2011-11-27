@@ -4,9 +4,10 @@ mac w/server-socket(socket port . body)
        ,@body)
 
 mac accepting(client-socket socket/from . body)
-  `(let ,client-socket socket-accept.,socket
-     before close_socket.,client-socket
-       ,@body) ; body must close client-socket
+  `(repeat :forever
+     let ,client-socket socket-accept.,socket
+       before close_socket.,client-socket
+         ,@body) ; body must close client-socket
 
 def parse-request(client-socket)
   making stdin infd:socket_fd.client-socket
@@ -15,7 +16,7 @@ def parse-request(client-socket)
 
 def http-server(port)
   w/server-socket socket (or port 4040)
-;?     preforking 6 ; handler threads
+    preforking 6 ; handler threads
       accepting client-socket :from socket
         let url parse-request.client-socket
           making stdout infd:socket_fd.client-socket
