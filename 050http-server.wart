@@ -4,8 +4,7 @@ mac w/server-socket(socket port . body)
        ,@body)
 
 mac accepting(client-socket socket/from . body)
-  `(repeat :forever
-     let ,client-socket socket-accept.,socket
+  `(let ,client-socket socket-accept.,socket
        ,@body) ; body must close client-socket
 
 def parse-request(client-socket)
@@ -15,7 +14,7 @@ def parse-request(client-socket)
 
 def http-server(port)
   w/server-socket socket (or port 4040)
-    preforking 6 ; handler threads
+;?     preforking 6 ; handler threads
       accepting client-socket :from socket
         let url parse-request.client-socket
           w/stdout client-socket
@@ -23,28 +22,3 @@ def http-server(port)
             prn "Content-type: text/plain"
             prn.
             prn url
-
-def serverw(port)
-  = s make-server-socket.port
-;?   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-;?   if (sockfd < 0) perror("socket() failed");
-;?   int dummy;
-;?   PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
-;?   sockaddr_in s;  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
-;?   s.sin_port = htons(port);
-;?   PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
-;?   PERR(listen(sockfd, 5));
-
-  = c socket-accept.s
-;?   sockaddr_in s;  socklen_t n = sizeof(sockaddr_in);
-;?   int clientsockfd = accept(sockfd, (sockaddr*)&s, &n));
-
-  readfoo.c
-;?   char buf[1024];
-;?   read(clientsockfd, buf, 1023);
-
-  close.c
-;?   close(clientsockfd);
-
-  close.s
-;?   close(sockfd);

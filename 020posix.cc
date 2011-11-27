@@ -52,9 +52,6 @@ COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($port)",
 COMPILE_PRIM_FUNC(socket-accept, primFunc_socket_accept, "($fd)",
   socklen_t n = sizeof(sockaddr_in);
   bzero(&t, sizeof(sockaddr_in));
-  for (char* c = (char*)&t; c < (char*)&t+sizeof(sockaddr_in); ++c)
-    cerr << (((unsigned int)*c)&0xff) << " ";
-  cerr << endl;
   return mkref(newNum(accept(toNum(lookup("$fd")), (sockaddr*)&t, &n)));
 )
 
@@ -67,32 +64,6 @@ COMPILE_PRIM_FUNC(readfoo, primFunc_readc, "($infd)",
   char buf[BUFSIZ];
   read(toNum(lookup("$infd")), buf, BUFSIZ-1);
   return mkref(newString(buf));
-)
-
-COMPILE_PRIM_FUNC(serverc, primFunc_foo, "($port)",
-  int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  if (sockfd < 0) perror("socket() failed");
-  int dummy;
-  PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
-  bzero(&s, sizeof(sockaddr_in));
-  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
-  s.sin_port = htons(toNum(lookup("$port")));
-  PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
-  PERR(listen(sockfd, 5));
-
-  socklen_t n = sizeof(sockaddr_in);
-  bzero(&t, sizeof(sockaddr_in));
-  for (char* c = (char*)&t; c < (char*)&t+sizeof(sockaddr_in); ++c)
-    cerr << (((unsigned int)*c)&0xff) << " ";
-  cerr << endl;
-  int clientsockfd = accept(sockfd, (sockaddr*)&t, &n);
-
-  char buf[BUFSIZ];
-  read(clientsockfd, buf, BUFSIZ-1);
-
-  close(clientsockfd);
-  close(sockfd);
-  return nil;
 )
 
 

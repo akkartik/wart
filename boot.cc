@@ -93,7 +93,7 @@ struct PrimFuncMetadata {
 };
 
 const PrimFuncMetadata primFuncs[] = {
-  #include "prim_func_list2"
+  #include "prim_func_list"
 };
 
 void setupPrimFuncs() {
