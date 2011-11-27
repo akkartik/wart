@@ -36,6 +36,9 @@ using std::ofstream;
 
 bool runningTests = false;
 int numFailures = 0;
+bool inTest = false;
+int errorCount = 0;
+int warningCount = 0;
 
 
 
@@ -53,8 +56,11 @@ ostream& operator<<(unused ostream& os, unused Die die) {
 }
 Die DIE;
 
-#define WARN cerr << __FILE__ << ":" << __LINE__ << " "
-#define ERR cerr << "fatal: " << __FILE__ << ":" << __LINE__ << " "
+             // ?: to avoid dangling-else warnings
+#define WARN inTest ? ++warningCount,cout : \
+             cerr << __FILE__ << ":" << __LINE__ << " "
+#define ERR inTest ? ++errorCount,cerr : \
+            cerr << "fatal: " << __FILE__ << ":" << __LINE__ << " "
 
 
 
@@ -193,6 +199,9 @@ long numUnfreed() {
 }
 
 void checkState() {
+  inTest = false;
+  if (warningCount != 0) WARN << warningCount << "warnings encountered";
+  if (errorCount != 0) WARN << errorCount << "errors encountered";
   teardownStreams();
   teardownPrimFuncs();
   teardownLiteralTables();
@@ -233,7 +242,7 @@ void init();
 void runTests() {
   runningTests = true; // never reset
   for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
-    init();
+    init();   inTest=true;
     (*tests[i])();
     checkState();
   }
@@ -256,6 +265,7 @@ void init() {
   setupLexicalScope();
   setupStreams();
   setupPrimFuncs();
+  errorCount = warningCount = 0;
 }
 
 int main(int argc, unused char* argv[]) {

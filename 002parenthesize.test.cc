@@ -509,3 +509,18 @@ void test_parenthesize_passes_through_when_indented_by_one_space() {
   check(p == tokens.end());
   check(c.fd.eof());
 }
+
+void test_parenthesize_passes_through_unbalanced_open_paren() {
+  CodeStream c(stream("("));
+  list<Token> tokens = nextExpr(c);
+  checkEq(tokens.size(), 1);
+  checkEq(tokens.front(), "(");
+  check(c.fd.eof());
+}
+
+void test_parenthesize_errors_on_unbalanced_closed_paren() {
+  CodeStream c(stream(")"));
+  list<Token> tokens = nextExpr(c);
+  checkEq(errorCount, 1);   errorCount=0;
+  check(c.fd.eof());
+}
