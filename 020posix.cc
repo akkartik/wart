@@ -23,36 +23,68 @@ COMPILE_PRIM_FUNC(sleep, primFunc_sleep, "($n)",
 
 #define PERR(call...) if (call < 0) perror(#call)
 
-sockaddr_in s, t;
+struct Socket {
+  int fd;
+  sockaddr_in addr;
+};
+
+Cell* newSocket(Socket* s) {
+  return newCons(newSym("type"), newCons(newSym("socket"),
+            newCons(newNum((long)s), nil)));
+}
+
+Socket* toSocket(Cell* s) {
+  if (!isCons(s) || car(s) != newSym("type") || car(cdr(s)) != newSym("socket"))
+    ERR << "not a socket: " << s << endl << DIE;
+  return (Socket*)toNum(car(cdr(cdr(s))));
+}
+
+COMPILE_PRIM_FUNC(socket_fd, primFunc_socket_fd, "($sock)",
+  return mkref(newNum(toSocket(lookup("$sock"))->fd));
+)
+
 COMPILE_PRIM_FUNC(make-socket, primFunc_socket, "($host $port)",
-  int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  if (sockfd < 0) perror("socket() failed");
+  Socket* sock = new Socket();
+  sock->fd = socket(AF_INET, SOCK_STREAM, 0);
+  if (sock->fd < 0) perror("socket() failed");
   hostent *host = gethostbyname(toString(lookup("$host")).c_str());
-  bzero(&s, sizeof(sockaddr_in));
-  s.sin_family = AF_INET;
-  bcopy((char*)host->h_addr, (char*)s.sin_addr.s_addr, host->h_length);
-  s.sin_port = htons(toNum(lookup("$port")));
-  PERR(connect(sockfd, (sockaddr*)&s, sizeof(s)));
-  return mkref(newNum(sockfd));
+  bzero(&sock->addr, sizeof(sock->addr));
+  sock->addr.sin_family = AF_INET;
+  bcopy((char*)host->h_addr, (char*)sock->addr.sin_addr.s_addr, host->h_length);
+  sock->addr.sin_port = htons(toNum(lookup("$port")));
+  PERR(connect(sock->fd, (sockaddr*)&sock->addr, sizeof(sock->addr)));
+  return mkref(newSocket(sock));
 )
 
 COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($port)",
-  int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-  if (sockfd < 0) perror("socket() failed");
+  Socket* sock = new Socket();
+  sock->fd = socket(AF_INET, SOCK_STREAM, 0);
+  if (sock->fd < 0) perror("sock() failed");
   int dummy;
-  PERR(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
-  bzero(&s, sizeof(sockaddr_in));
-  s.sin_family = AF_INET;   s.sin_addr.s_addr = INADDR_ANY;
-  s.sin_port = htons(toNum(lookup("$port")));
-  PERR(bind(sockfd, (sockaddr*)&s, sizeof(s)));
-  PERR(listen(sockfd, 5));
-  return mkref(newNum(sockfd));
+  PERR(setsockopt(sock->fd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
+  bzero(&sock->addr, sizeof(sock->addr));
+  sock->addr.sin_family = AF_INET;   sock->addr.sin_addr.s_addr = INADDR_ANY;
+  sock->addr.sin_port = htons(toNum(lookup("$port")));
+  PERR(bind(sock->fd, (sockaddr*)&sock->addr, sizeof(sock->addr)));
+  PERR(listen(sock->fd, 5));
+  return mkref(newSocket(sock));
 )
 
-COMPILE_PRIM_FUNC(socket-accept, primFunc_socket_accept, "($fd)",
-  socklen_t n = sizeof(sockaddr_in);
-  bzero(&t, sizeof(sockaddr_in));
-  return mkref(newNum(accept(toNum(lookup("$fd")), (sockaddr*)&t, &n)));
+COMPILE_PRIM_FUNC(socket-accept, primFunc_socket_accept, "($sock)",
+  Socket* sock = toSocket(lookup("$sock"));
+  Socket* clientsock = new Socket();  socklen_t n = sizeof(clientsock->addr);
+  bzero(&clientsock->addr, n);
+  clientsock->fd = accept(sock->fd, (sockaddr*)&clientsock->addr, &n);
+  if (clientsock->fd < 0) perror("bind");
+  return mkref(newSocket(clientsock));
+)
+
+COMPILE_PRIM_FUNC(close_socket, primFunc_close_socket, "($sock)",
+  Socket* sock = toSocket(lookup("$sock"));
+  close(sock->fd);
+  delete sock;
+  setCar(cdr(cdr(lookup("$sock"))), nil);
+  return nil;
 )
 
 
