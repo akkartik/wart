@@ -34,6 +34,9 @@ using std::ostringstream;
 using std::ifstream;
 using std::ofstream;
 
+bool runningTests = false;
+int numFailures = 0;
+
 
 
 // generate traces for debugging
@@ -55,11 +58,6 @@ Die DIE;
 
 
 
-bool runningTests = false;
-int numFailures = 0;
-bool interactive = false;
-int printDepth = 0;
-
 // interpreter decls
 
 stringstream& stream(string s) {
@@ -71,8 +69,10 @@ stringstream& stream(string s) {
 struct Cell;
 extern Cell* nil;
 ostream& operator<<(ostream&, Cell*);
+int printDepth = 0; // for truncating when printing
 struct CodeStream;
 Cell* read(CodeStream& c);
+bool interactive = false; // eval on multiple newlines
 Cell* eval(Cell*);
 
 
