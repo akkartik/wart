@@ -85,8 +85,11 @@ list<Token> nextExpr(CodeStream& c) {
 
       if (*q == "(")
         explicitParenStack.push(q->indentLevel);
-      if (*q == ")")
+      if (*q == ")") {
+        if (explicitParenStack.empty())
+          ERR << "Unbalanced )" << endl << DIE;
         explicitParenStack.pop();
+      }
 
       if (*q == "(" && (parenNotAtStartOfLine(q, line.begin()) || argParenCount))
         ++argParenCount; // no more paren-insertion until it closes
