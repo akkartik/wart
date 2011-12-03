@@ -29,8 +29,7 @@ struct Socket {
 };
 
 Cell* newSocket(Socket* s) {
-  return newCons(newSym("type"), newCons(newSym("socket"),
-            newCons(newNum((long)s), nil)));
+  return newType("socket", newNum((long)s));
 }
 
 Socket* toSocket(Cell* s) {

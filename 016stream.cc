@@ -1,11 +1,9 @@
 Cell* newIstream(istream* x) {
-  return newCons(newSym("type"), newCons(newSym("stream"),
-            newCons(newNum((long)x), nil)));
+  return newType("stream", newNum((long)x));
 }
 
 Cell* newOstream(ostream* x) {
-  return newCons(newSym("type"), newCons(newSym("stream"),
-            newCons(newNum((long)x), nil)));
+  return newType("stream", newNum((long)x));
 }
 
 istream& toIstream(Cell* x) {
