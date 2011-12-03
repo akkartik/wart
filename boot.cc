@@ -198,7 +198,7 @@ long numUnfreed() {
 
 void checkState() {
   inTest = false;
-  if (errorCount != 0) RAISE << errorCount << "errors encountered";
+  if (errorCount != 0) RAISE << errorCount << " errors encountered";
   teardownStreams();
   teardownPrimFuncs();
   teardownLiteralTables();
