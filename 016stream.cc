@@ -9,13 +9,13 @@ Cell* newOstream(ostream* x) {
 }
 
 istream& toIstream(Cell* x) {
-  if (!isCons(x) || car(x) != newSym("type") || car(cdr(x)) != newSym("stream"))
+  if (type(x) != newSym("stream"))
     RAISE << "not a stream: " << x << endl << DIE;
   return *(istream*)toNum(car(cdr(cdr(x))));
 }
 
 ostream& toOstream(Cell* x) {
-  if (!isCons(x) || car(x) != newSym("type") || car(cdr(x)) != newSym("stream"))
+  if (type(x) != newSym("stream"))
     RAISE << "not a stream: " << x << endl << DIE;
   return *(ostream*)toNum(car(cdr(cdr(x))));
 }
