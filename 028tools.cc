@@ -38,3 +38,11 @@ COMPILE_PRIM_FUNC(quit, primFunc_quit, "()",
   exit(0);
   return nil;
 )
+
+COMPILE_PRIM_FUNC(globals, primFunc_globals, "()",
+  Cell* ans = newTable();
+  for (unordered_map<Cell*, stack<Cell*> >::iterator p = dynamics.begin(); p != dynamics.end(); ++p)
+    if (!p->second.empty())
+      set(ans, p->first, p->second.top());
+  return mkref(ans);
+)
