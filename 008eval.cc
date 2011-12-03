@@ -276,12 +276,6 @@ Cell* processUnquotes(Cell* x, int depth) {
                                             newCons(body(expr), currLexicalScopes.top())));
                                   }
 
-                                  Cell* implicitlyEval(Cell* x) {
-                                    Cell* result = eval(x);
-                                    rmref(x);
-                                    return result;
-                                  }
-
                                   Cell* functionify(Cell* obj) {
                                     if (obj == nil) return obj;
                                     Cell* coerceExpr = newCons(newSym("coerce-quoted"), newCons(obj, newCons(newSym("function"), nil)));
@@ -289,6 +283,12 @@ Cell* processUnquotes(Cell* x, int depth) {
                                     Cell* ans = eval(coerceExpr);
                                     rmref(coerceExpr);
                                     return ans;
+                                  }
+
+                                  Cell* implicitlyEval(Cell* x) {
+                                    Cell* result = eval(x);
+                                    rmref(x);
+                                    return result;
                                   }
 
 Cell* eval(Cell* expr) {
