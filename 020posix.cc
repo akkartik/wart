@@ -35,7 +35,7 @@ Cell* newSocket(Socket* s) {
 
 Socket* toSocket(Cell* s) {
   if (!isCons(s) || car(s) != newSym("type") || car(cdr(s)) != newSym("socket"))
-    ERR << "not a socket: " << s << endl << DIE;
+    RAISE << "not a socket: " << s << endl << DIE;
   return (Socket*)toNum(car(cdr(cdr(s))));
 }
 

@@ -24,7 +24,7 @@ bool isNum(Cell* x) {
 
 long toNum(Cell* x) {
   if (!isNum(x)) {
-    WARN << "not a number: " << x << endl;
+    RAISE << "not a number: " << x << endl;
     return 0;
   }
   return (long)x->car;
@@ -72,7 +72,7 @@ bool isString(Cell* x) {
 
 string toString(Cell* x) {
   if (!isString(x) && !isSym(x)) {
-    WARN << "can't convert to string: " << x << endl;
+    RAISE << "can't convert to string: " << x << endl;
     return "";
   }
   return *(string*)x->car;
@@ -91,14 +91,14 @@ unordered_set<Cell*> initialSyms;
 void teardownLiteralTables() {
   for (unordered_map<long, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
     if (p->second->nrefs > 1)
-      WARN << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
+      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
     if (p->second->nrefs > 0)
       rmref(p->second);
   }
   for (StringMap<Cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
     if (initialSyms.find(p->second) != initialSyms.end()) continue;
     if (p->second->nrefs > 1)
-      WARN << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
+      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
     if (p->second->nrefs > 0)
       rmref(p->second);
   }
@@ -119,7 +119,7 @@ bool isPrimFunc(Cell* x) {
 
 PrimFunc toPrimFunc(Cell* x) {
   if (!isPrimFunc(x))
-    ERR << "Not a compiled function" << endl << DIE;
+    RAISE << "Not a compiled function" << endl << DIE;
   return (PrimFunc)x->car;
 }
 
@@ -143,7 +143,7 @@ Table* toTable(Cell* x) {
 
                                   void unsafeSet(Cell* t, Cell* key, Cell* val, bool deleteNils) {
                                     if (!isTable(t)) {
-                                      WARN << "set on a non-table: " << t << endl;
+                                      RAISE << "set on a non-table: " << t << endl;
                                       return;
                                     }
                                     Table& table = *(Table*)(t->car);
@@ -165,7 +165,7 @@ void set(Cell* t, Cell* k, Cell* val) {
 
                                   Cell* unsafeGet(Cell* t, Cell* key) {
                                     if (!isTable(t)) {
-                                      WARN << "get on a non-table" << endl;
+                                      RAISE << "get on a non-table" << endl;
                                       return nil;
                                     }
                                     Table& table = *(Table*)(t->car);
@@ -203,7 +203,7 @@ Cell* type(Cell* x) {
       result = newSym("list");
     break;
   default:
-    ERR << "Undefined type: " << x->type << endl << DIE;
+    RAISE << "Undefined type: " << x->type << endl << DIE;
   }
   return result;
 }

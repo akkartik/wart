@@ -50,7 +50,7 @@ Cell* freelist = NULL;
 
 void growHeap() {
   currHeap = currHeap->next = new Heap();
-  if (!currHeap) ERR << "Out of memory" << endl << DIE;
+  if (!currHeap) RAISE << "Out of memory" << endl << DIE;
   currCell = 0;
 }
 
@@ -116,7 +116,7 @@ Cell* mkref(Cell* c) {
 
 void rmref(Cell* c) {
   if (!c)
-    ERR << " a cell was prematurely garbage-collected." << endl << DIE;
+    RAISE << " a cell was prematurely garbage-collected." << endl << DIE;
   if (c == nil) return;
   dbg << endl << "rmref: " << (void*)c << ": " << c->nrefs << " " << c->type << endl;
 
@@ -124,7 +124,7 @@ void rmref(Cell* c) {
   if (c->nrefs > 0) return;
 
   if (isAtom(c) && c->type != STRING && !runningTests)
-    WARN << "deleted atom: " << (void*)c << endl;
+    RAISE << "deleted atom: " << (void*)c << endl;
 
   switch (c->type) {
   case NUM:
@@ -141,7 +141,7 @@ void rmref(Cell* c) {
   case PRIM_FUNC:
     break; // compiled functions don't need freeing
   default:
-    ERR << "Can't rmref type " << c->type << endl << DIE;
+    RAISE << "Can't rmref type " << c->type << endl << DIE;
   }
 
   dbg << "  freeing " << (void*)c << endl;
@@ -157,7 +157,7 @@ void rmref(Cell* c) {
 
 Cell* car(Cell* x) {
   if (x->type != CONS) {
-    WARN << "car of non-cons: " << x << endl;
+    RAISE << "car of non-cons: " << x << endl;
     return nil;
   }
   return x->car;
@@ -169,7 +169,7 @@ Cell* cdr(Cell* x) {
 
 void setCar(Cell* x, Cell* y) {
   if (x == nil) {
-    WARN << "setCar on nil" << endl;
+    RAISE << "setCar on nil" << endl;
     return;
   }
   mkref(y);
@@ -180,7 +180,7 @@ void setCar(Cell* x, Cell* y) {
 
 void setCdr(Cell* x, Cell* y) {
   if (x == nil) {
-    WARN << "setCdr on nil" << endl;
+    RAISE << "setCdr on nil" << endl;
     return;
   }
   mkref(y);
@@ -213,7 +213,7 @@ Cell* nthCdr(Cell* x, long n) {
   Cell* curr = x;
   for (long idx = n; idx > 0; --idx) {
     if (!isCons(curr))
-      WARN << "list is too short: " << x << " " << n << endl;
+      RAISE << "list is too short: " << x << " " << n << endl;
     curr=cdr(curr);
   }
   return curr;

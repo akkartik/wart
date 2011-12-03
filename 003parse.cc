@@ -51,7 +51,7 @@ ostream& operator<<(ostream& os, AstNode x) {
 list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterator end, list<AstNode>& out) {
   if (curr == end) return curr;
 
-  if (*curr == ")") ERR << "Unbalanced )" << endl << DIE;
+  if (*curr == ")") RAISE << "Unbalanced )" << endl << DIE;
 
   if (*curr != "(" && !isQuoteOrUnquote(*curr)) {
     out.push_back(AstNode::of(*curr));
@@ -69,7 +69,7 @@ list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterato
     ++curr;
     while (curr != end && *curr != ")")
       curr = parseNext(curr, end, subform);
-    if (curr == end) ERR << "Unbalanced (" << endl << DIE;
+    if (curr == end) RAISE << "Unbalanced (" << endl << DIE;
     subform.push_back(*curr);
     ++curr;
   }
@@ -87,7 +87,7 @@ AstNode nextAstNode(CodeStream& c) {
   list<Token> tokens = nextExpr(c);
   list<AstNode> result;
   parseNext(tokens.begin(), tokens.end(), result);
-  if (result.size() > 1) ERR << "parse error\n" << DIE;
+  if (result.size() > 1) RAISE << "parse error\n" << DIE;
   if (result.empty()) return AstNode::of(Token::of("nil"));
   return result.front();
 }

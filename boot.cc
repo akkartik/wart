@@ -38,7 +38,6 @@ bool runningTests = false;
 int numFailures = 0;
 bool inTest = false;
 int errorCount = 0;
-int warningCount = 0;
 
 
 
@@ -52,15 +51,14 @@ int debug = 0;
 
 struct Die {};
 ostream& operator<<(unused ostream& os, unused Die die) {
+  os << "dying";
   exit(1);
 }
 Die DIE;
 
-             // ?: to avoid dangling-else warnings
-#define WARN inTest ? ++warningCount,cout : \
-             cerr << __FILE__ << ":" << __LINE__ << " "
-#define ERR inTest ? ++errorCount,cerr : \
-            cerr << "fatal: " << __FILE__ << ":" << __LINE__ << " "
+                     // ?: to avoid dangling-else warnings
+#define RAISE inTest ? ++errorCount,cout \
+                     : cerr << __FILE__ << ":" << __LINE__ << " "
 
 
 
@@ -200,14 +198,13 @@ long numUnfreed() {
 
 void checkState() {
   inTest = false;
-  if (warningCount != 0) WARN << warningCount << "warnings encountered";
-  if (errorCount != 0) WARN << errorCount << "errors encountered";
+  if (errorCount != 0) RAISE << errorCount << "errors encountered";
   teardownStreams();
   teardownPrimFuncs();
   teardownLiteralTables();
 
   if (numUnfreed() > 0) {
-    WARN << "Memory leak!\n";
+    RAISE << "Memory leak!\n";
     dumpUnfreed();
   }
 
@@ -265,7 +262,7 @@ void init() {
   setupLexicalScope();
   setupStreams();
   setupPrimFuncs();
-  errorCount = warningCount = 0;
+  errorCount = 0;
 }
 
 int main(int argc, unused char* argv[]) {

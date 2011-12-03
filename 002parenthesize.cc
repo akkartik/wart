@@ -87,7 +87,7 @@ list<Token> nextExpr(CodeStream& c) {
         explicitParenStack.push(q->indentLevel);
       if (*q == ")") {
         if (explicitParenStack.empty())
-          ERR << "Unbalanced )" << endl << DIE;
+          RAISE << "Unbalanced )" << endl << DIE;
         explicitParenStack.pop();
       }
 

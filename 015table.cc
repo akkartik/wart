@@ -9,7 +9,7 @@ COMPILE_PRIM_FUNC(table_set, primFunc_table_set, "($table $key $val)",
   if (isTable(table))
     set(table, key, val);
   else
-    WARN << "can't set in a non-table: " << table << endl;
+    RAISE << "can't set in a non-table: " << table << endl;
   return mkref(val);
 )
 
