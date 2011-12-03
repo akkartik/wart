@@ -270,7 +270,7 @@ Cell* processUnquotes(Cell* x, int depth) {
                                       && (isPrimFunc(car(x)) || car(x) == newSym("evald-fn") || car(x) == newSym("evald-mfn"));
                                   }
 
-                                  Cell* evalLambda(Cell* expr) {
+                                  Cell* newFunc(Cell* expr) {
                                     return newCons(newSym("evald-"+toString(car(expr))),
                                         newCons(sig(expr),
                                             newCons(body(expr), currLexicalScopes.top())));
@@ -315,7 +315,7 @@ Cell* eval(Cell* expr) {
 
   if (car(expr) == newSym("fn") || car(expr) == newSym("mfn"))
     // attach current lexical scope
-    return mkref(evalLambda(expr));
+    return mkref(newFunc(expr));
   else if (isFunc(expr))
     // lexical scope is already attached
     return mkref(expr);
