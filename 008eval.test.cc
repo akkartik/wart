@@ -567,9 +567,9 @@ void test_eval_handles_closure() {
   endLexicalScope();
   checkEq(newLexicalScope->nrefs, 1);
   checkEq(car(result), newSym("evald-fn"));
-  checkEq(car(cdr(result)), nil);
-  checkEq(car(car(cdr(cdr(result)))), newNum(34));
-  checkEq(cdr(cdr(cdr(result))), newLexicalScope);
+  checkEq(sig(result), nil);
+  checkEq(car(calleeBody(result)), newNum(34));
+  checkEq(calleeEnv(result), newLexicalScope);
   rmref(result);
   checkEq(newLexicalScope->nrefs, 0);
   rmref(expr);
