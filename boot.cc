@@ -103,8 +103,10 @@ const PrimFuncMetadata primFuncs[] = {
 void setupPrimFuncs() {
   for (unsigned int i=0; i < sizeof(primFuncs)/sizeof(primFuncs[0]); ++i)
     newDynamicScope(primFuncs[i].name,
-        newCons(newPrimFunc(primFuncs[i].impl),
-            newCons(nextRawCell(stream(primFuncs[i].params)), nil)));
+        newType("function",
+            newCons(nextRawCell(stream(primFuncs[i].params)),
+                newCons(newPrimFunc(primFuncs[i].impl),
+                    nil))));
 }
 
 void teardownPrimFuncs() {

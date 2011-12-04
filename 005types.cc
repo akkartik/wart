@@ -195,9 +195,7 @@ Cell* type(Cell* x) {
     result = newSym("function"); break;
   case CONS:
     if (x == nil) break;
-    if (car(x) == newSym("fn") || car(x) == newSym("evald-fn"))
-      result = newSym("function");
-    else if (car(x) == newSym("type"))
+    if (car(x) == newSym("type") && cdr(cdr(x)) != nil) // 1 arg = request to compute type
       result = car(cdr(x));
     else
       result = newSym("list");

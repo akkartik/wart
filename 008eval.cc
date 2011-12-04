@@ -20,6 +20,7 @@
                                     return isSym(x) && toString(x)[0] == L':';
                                   }
 
+                                  // fn = (fn params . body)
                                   Cell* sig(Cell* fn) {
                                     return car(cdr(fn));
                                   }
@@ -28,12 +29,17 @@
                                     return cdr(cdr(fn));
                                   }
 
+                                  // callee = (type function|macro (sig body . env))
+                                  Cell* calleeSig(Cell* callee) {
+                                        return car(car(cdr(cdr(callee))));
+                                  }
+
                                   Cell* calleeBody(Cell* callee) {
-                                    return car(cdr(cdr(callee)));
+                                    return car(cdr(car(cdr(cdr(callee)))));
                                   }
 
                                   Cell* calleeEnv(Cell* callee) {
-                                    return cdr(cdr(cdr(callee)));
+                                    return cdr(cdr(car(cdr(cdr(callee)))));
                                   }
 
                                   Cell* callArgs(Cell* call) {
@@ -266,12 +272,14 @@ Cell* processUnquotes(Cell* x, int depth) {
 
 
                                   bool isFunc(Cell* x) {
-                                    return isCons(x)
-                                      && (isPrimFunc(car(x)) || car(x) == newSym("evald-fn") || car(x) == newSym("evald-mfn"));
+                                    if (!isCons(x)) return false;
+                                    if (isPrimFunc(car(x))) return true;
+                                    string label = toString(type(x));
+                                    return label == "function" || label == "macro";
                                   }
 
-                                  Cell* newFunc(Cell* expr) {
-                                    return newCons(newSym("evald-"+toString(car(expr))),
+                                  Cell* newFunc(string type, Cell* expr) {
+                                    return newType(type,
                                         newCons(sig(expr),
                                             newCons(body(expr), currLexicalScopes.top())));
                                   }
@@ -313,9 +321,10 @@ Cell* eval(Cell* expr) {
   if (isBackQuoted(expr))
     return processUnquotes(cdr(expr), 1); // already mkref'd
 
-  if (car(expr) == newSym("fn") || car(expr) == newSym("mfn"))
-    // attach current lexical scope
-    return mkref(newFunc(expr));
+  if (car(expr) == newSym("fn"))
+    return mkref(newFunc("function", expr));
+  else if (car(expr) == newSym("mfn"))
+    return mkref(newFunc("macro", expr));
   else if (isFunc(expr))
     // lexical scope is already attached
     return mkref(expr);
@@ -328,20 +337,20 @@ Cell* eval(Cell* expr) {
     RAISE << "not a function call: " << expr << endl << DIE;
 
   // eval all its args in the current lexical scope
-  Cell* realArgs = reorderKeywordArgs(sig(fn), callArgs(expr));
-  Cell* evaldArgs = evalArgs(sig(fn), realArgs);
+  Cell* realArgs = reorderKeywordArgs(calleeSig(fn), callArgs(expr));
+  Cell* evaldArgs = evalArgs(calleeSig(fn), realArgs);
 
   // swap in the function's lexical environment
-  if (!isPrimFunc(car(fn)))
+  if (!isPrimFunc(calleeBody(fn)))
     newDynamicScope(CURR_LEXICAL_SCOPE, calleeEnv(fn));
   // now bind its params to args in the new environment
   newLexicalScope();
-  bindParams(sig(fn), evaldArgs);
+  bindParams(calleeSig(fn), evaldArgs);
 
   // eval all forms in body, save result of final form
   Cell* result = nil;
-  if (isPrimFunc(car(fn)))
-    result = toPrimFunc(car(fn))(); // all primFuncs must mkref result
+  if (isPrimFunc(calleeBody(fn)))
+    result = toPrimFunc(calleeBody(fn))(); // all primFuncs must mkref result
   else
     for (Cell* form = calleeBody(fn); form != nil; form = cdr(form)) {
       rmref(result);
@@ -349,11 +358,11 @@ Cell* eval(Cell* expr) {
     }
 
   endLexicalScope();
-  if (!isPrimFunc(car(fn)))
+  if (!isPrimFunc(calleeBody(fn)))
     endDynamicScope(CURR_LEXICAL_SCOPE);
 
   // macros implicitly eval their result in the caller's scope
-  if (car(fn) == newSym("evald-mfn"))
+  if (type(fn) == newSym("macro"))
     result = implicitlyEval(result);
 
   rmref(evaldArgs);
