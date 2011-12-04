@@ -209,3 +209,7 @@ Cell* type(Cell* x) {
 Cell* newType(string type, Cell* rep) {
   return newCons(newSym("type"), newCons(newSym(type), newCons(rep, nil)));
 }
+
+Cell* rep(Cell* x) {
+  return car(cdr(cdr(x)));
+}

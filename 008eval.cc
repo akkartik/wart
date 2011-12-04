@@ -31,15 +31,15 @@
 
                                   // callee = (type function|macro {sig, body, env, ..})
                                   Cell* calleeSig(Cell* callee) {
-                                    return get(car(cdr(cdr(callee))), newSym("sig"));
+                                    return get(rep(callee), newSym("sig"));
                                   }
 
                                   Cell* calleeBody(Cell* callee) {
-                                    return get(car(cdr(cdr(callee))), newSym("body"));
+                                    return get(rep(callee), newSym("body"));
                                   }
 
                                   Cell* calleeEnv(Cell* callee) {
-                                    return get(car(cdr(cdr(callee))), newSym("env"));
+                                    return get(rep(callee), newSym("env"));
                                   }
 
                                   Cell* callArgs(Cell* call) {
