@@ -55,6 +55,7 @@ COMPILE_PRIM_FUNC(bound?, primFunc_isBound, "($var)",
   return mkref(var);
 )
 
+// type can't take 2 args; calls would look like type constructors
 COMPILE_PRIM_FUNC(type, primFunc_type, "($x)",
   return mkref(type(lookup("$x")));
 )
