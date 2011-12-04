@@ -101,12 +101,13 @@ const PrimFuncMetadata primFuncs[] = {
 };
 
 void setupPrimFuncs() {
-  for (unsigned int i=0; i < sizeof(primFuncs)/sizeof(primFuncs[0]); ++i)
+  for (unsigned int i=0; i < sizeof(primFuncs)/sizeof(primFuncs[0]); ++i) {
+    Cell* f = newTable();
+    unsafeSet(f, newSym("sig"), nextRawCell(stream(primFuncs[i].params)), false);
+    unsafeSet(f, newSym("body"), newPrimFunc(primFuncs[i].impl), false);
     newDynamicScope(primFuncs[i].name,
-        newType("function",
-            newCons(nextRawCell(stream(primFuncs[i].params)),
-                newCons(newPrimFunc(primFuncs[i].impl),
-                    nil))));
+        newType("function", f));
+  }
 }
 
 void teardownPrimFuncs() {

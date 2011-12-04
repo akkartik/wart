@@ -29,17 +29,17 @@
                                     return cdr(cdr(fn));
                                   }
 
-                                  // callee = (type function|macro (sig body . env))
+                                  // callee = (type function|macro {sig, body, env, ..})
                                   Cell* calleeSig(Cell* callee) {
-                                        return car(car(cdr(cdr(callee))));
+                                    return get(car(cdr(cdr(callee))), newSym("sig"));
                                   }
 
                                   Cell* calleeBody(Cell* callee) {
-                                    return car(cdr(car(cdr(cdr(callee)))));
+                                    return get(car(cdr(cdr(callee))), newSym("body"));
                                   }
 
                                   Cell* calleeEnv(Cell* callee) {
-                                    return cdr(cdr(car(cdr(cdr(callee)))));
+                                    return get(car(cdr(cdr(callee))), newSym("env"));
                                   }
 
                                   Cell* callArgs(Cell* call) {
@@ -279,9 +279,11 @@ Cell* processUnquotes(Cell* x, int depth) {
                                   }
 
                                   Cell* newFunc(string type, Cell* expr) {
-                                    return newType(type,
-                                        newCons(sig(expr),
-                                            newCons(body(expr), currLexicalScopes.top())));
+                                    Cell* f = newTable();
+                                    unsafeSet(f, newSym("sig"), sig(expr), false);
+                                    unsafeSet(f, newSym("body"), body(expr), false);
+                                    unsafeSet(f, newSym("env"), currLexicalScopes.top(), false);
+                                    return newType(type, f);
                                   }
 
                                   Cell* functionify(Cell* obj) {
