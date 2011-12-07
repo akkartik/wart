@@ -29,7 +29,7 @@ def coerce-quoted'(x dest-type)
     x
     iflet coercer (table_get (table_get coercions* dest-type) type.x)
       coercer.x
-      prn "Can't coerce " type.x " " x " to " dest-type
+      (prn "Can't coerce " type.x " " x " to " dest-type)
 
 mac defcoerce(src dest f)
   `(do
