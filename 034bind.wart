@@ -6,7 +6,7 @@ def pair(l)
       (list:list car.l)
     :else
       (cons (list car.l cadr.l)
-            pair cddr.l))
+            (pair cddr.l)))
 
 mac with(params . body)
   `((fn ,(map car pair.params)
