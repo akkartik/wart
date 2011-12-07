@@ -1,6 +1,6 @@
 let $if if
   mac! if args
-    $if (~cdr args)
+    $if !cdr.args
       car.args
       `(,$if ,car.args
          ,cadr.args
@@ -35,5 +35,5 @@ let $iso iso
 
 def copy(x)
   if cons?.x
-    (cons (copy car.x) (copy cdr.x))
+    (cons copy:car.x copy:cdr.x)
     x
