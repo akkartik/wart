@@ -184,6 +184,12 @@ Cell* newType(string type, Cell* rep) {
   return newCons(newSym("type"), newCons(newSym(type), newCons(rep, nil)));
 }
 
+// (type _) is request to compute type of something
+// (type _ _) is a type expression and evals to itself
+bool isTypeExpr(Cell* x) {
+  return car(x) == newSym("type") && cdr(cdr(x)) != nil;
+}
+
 Cell* rep(Cell* x) {
   return car(cdr(cdr(x)));
 }
@@ -202,7 +208,7 @@ Cell* type(Cell* x) {
   case PRIM_FUNC:
     return newSym("function");
   case CONS:
-    if (car(x) == newSym("type") && cdr(cdr(x)) != nil) // 1 arg = request to compute type
+    if (isTypeExpr(x))
       return car(cdr(x));
     return newSym("list");
   default:
