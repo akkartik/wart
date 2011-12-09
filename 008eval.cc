@@ -317,6 +317,9 @@ Cell* eval(Cell* expr) {
   if (isAtom(expr))
     return mkref(expr);
 
+  if (isTypeExpr(expr))
+    return mkref(expr);
+
   if (isQuoted(expr))
     return mkref(cdr(expr));
 
