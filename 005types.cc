@@ -181,29 +181,26 @@ Cell* get(Cell* t, Cell* k) {
 
 
 Cell* type(Cell* x) {
-  Cell* result = nil;
+  if (x == nil) return nil;
   switch(x->type) {
   case NUM:
-    result = newSym("number"); break;
+    return newSym("number");
   case SYM:
-    result = newSym("symbol"); break;
+    return newSym("symbol");
   case STRING:
-    result = newSym("string"); break;
+    return newSym("string");
   case TABLE:
-    result = newSym("table"); break;
+    return newSym("table");
   case PRIM_FUNC:
-    result = newSym("function"); break;
+    return newSym("function");
   case CONS:
-    if (x == nil) break;
     if (car(x) == newSym("type") && cdr(cdr(x)) != nil) // 1 arg = request to compute type
-      result = car(cdr(x));
-    else
-      result = newSym("list");
-    break;
+      return car(cdr(x));
+    return newSym("list");
   default:
     RAISE << "Undefined type: " << x->type << endl << DIE;
+    return nil; // never reached
   }
-  return result;
 }
 
 Cell* newType(string type, Cell* rep) {
