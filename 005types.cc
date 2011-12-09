@@ -180,6 +180,14 @@ Cell* get(Cell* t, Cell* k) {
 
 
 
+Cell* newType(string type, Cell* rep) {
+  return newCons(newSym("type"), newCons(newSym(type), newCons(rep, nil)));
+}
+
+Cell* rep(Cell* x) {
+  return car(cdr(cdr(x)));
+}
+
 Cell* type(Cell* x) {
   if (x == nil) return nil;
   switch(x->type) {
@@ -201,12 +209,4 @@ Cell* type(Cell* x) {
     RAISE << "Undefined type: " << x->type << endl << DIE;
     return nil; // never reached
   }
-}
-
-Cell* newType(string type, Cell* rep) {
-  return newCons(newSym("type"), newCons(newSym(type), newCons(rep, nil)));
-}
-
-Cell* rep(Cell* x) {
-  return car(cdr(cdr(x)));
 }
