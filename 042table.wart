@@ -18,3 +18,10 @@ def keys(t)
 
 def vals(t)
   map cadr (as list t)
+
+def iso(x y) :case (isa x table)
+  (and (isa y table)
+       (iso len:keys.x len:keys.y)
+       (all (fn((k v))
+              (iso y.k v))
+            (as list x)))

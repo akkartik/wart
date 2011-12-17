@@ -20,3 +20,11 @@
             (each (k v) (table 1 2 3 4)
               ++.ans))
  :should be 2)
+
+(test "iso works on tables"
+ :valueof (iso (table) (table))
+ :should ~be nil)
+
+(test "iso works on tables - 2"
+ :valueof (iso (table 'a 1 'b 2) (table 'b 2 'a 1))
+ :should ~be nil)
