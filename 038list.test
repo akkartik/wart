@@ -94,3 +94,11 @@
 (test "keep works"
  :valueof (keep odd? '(11 12 13))
  :should be '(11 13))
+
+(test "none works"
+ :valueof (none odd? '(1 2 3))
+ :should be nil)
+
+(test "none works - 2"
+ :valueof (none odd? '(2 4 6))
+ :should ~be nil)

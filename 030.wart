@@ -29,8 +29,8 @@ mac! mac(name params . body)
   `(mac! ,name ,params ,@body)
 
 mac alias(new old) ; include later refinements
-  `(def ,new args
-     (,old @args))
+  `(mac ,new $args
+     `(,,old ,@$args))
 
 def compose(f g)
   mfn 'args
