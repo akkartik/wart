@@ -1,5 +1,17 @@
 //// insert explicit parens based on indentation
 
+                                  bool endOfInput(istream& in) {
+                                    if (in.eof()) return true;
+                                    if (!interactive) return false;
+                                    // in interactive mode two <Enter>s are like eof
+                                    bool ans = false;
+                                    char c = in.get();
+                                    if (c == '\n' && !in.eof() && in.peek() == '\n')
+                                      ans = true;
+                                    in.putback(c);
+                                    return ans;
+                                  }
+
 list<Token> nextLine(CodeStream& c) {
   list<Token> result;
   if (endOfInput(c.fd)) return result;
@@ -113,9 +125,6 @@ list<Token> nextExpr(CodeStream& c) {
       }
 
     if (implicitParenStack.empty() && explicitParenStack.empty() && argParenCount == 0)
-      break;
-
-    if (endOfInput(c.fd))
       break;
   }
 

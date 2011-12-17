@@ -105,17 +105,6 @@ struct Token {
                                     }
                                   }
 
-                                  bool endOfInput(istream& in) {
-                                    if (in.eof()) return true;
-                                    if (!interactive) return false;
-                                    bool ans = false;
-                                    char c = in.get();
-                                    if (c == '\n' && !in.eof() && in.peek() == '\n')
-                                      ans = true;
-                                    in.putback(c);
-                                    return ans;
-                                  }
-
                                   void reset(istream& in) {
                                     in.get(); in.get();
                                   }
@@ -124,10 +113,8 @@ struct Token {
                                     int indent = 0;
                                     char c;
                                     while (in >> c) {
-                                      if (c == ';') {
+                                      if (c == ';')
                                         skipComment(in);
-                                        if (endOfInput(in)) break;
-                                      }
 
                                       else if (!isspace(c)) {
                                         in.putback(c);

@@ -1,0 +1,12 @@
+wart> ^D
+
+wart> 1<Enter>
+<Enter>
+wart> ^D
+
+wart> def foo()<Enter>
+  34<Enter>
+<Enter>
+
+Add a comment at the end of one of the .wart files
+$ wart test
