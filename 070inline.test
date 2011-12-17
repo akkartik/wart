@@ -1,0 +1,3 @@
+(test "replace with body"
+ :valueof (inline '(foo) (table 'foo (table 'body '(34))))
+ :should be '(do 34))

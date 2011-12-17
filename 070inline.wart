@@ -1,0 +1,3 @@
+def inline(call env)
+  iflet f (env car.call)
+    (cons 'do f!body)
