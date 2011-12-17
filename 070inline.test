@@ -1,3 +1,7 @@
 (test "replace with body"
  :valueof (inline '(foo) (table 'foo (table 'body '(34))))
  :should be '(do 34))
+
+(test "with args"
+ :valueof (inline '(foo 3 4) (table 'foo (table 'sig '(a b) 'body '((+ a b)))))
+ :should be '(do (+ 3 4)))
