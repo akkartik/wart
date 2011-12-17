@@ -16,7 +16,7 @@ defset string((s idx . ends) val)
                    `(if !,car.ends
                       len.,s
                       (range-bounce ,s ,car.ends))))
-      (string_splice ,s $idx $end ,val))
+      (string_splice ,s $idx $end (or ,val "")))
 
 defcoerce string symbol
   string_to_sym

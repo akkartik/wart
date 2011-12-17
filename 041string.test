@@ -57,10 +57,10 @@
               (= (s -4 x) "xy")))
  :should be "abcdxy")
 
-(test "list index can be reset"
- :valueof (ret l '(1 2 3)
+(test "string index can be reset"
+ :valueof (ret l "abc"
             (= l.1 nil))
- :should be '(1 nil 3))
+ :should be "ac")
 
 (test "each works on literal strings"
  :valueof (ret ans nil
