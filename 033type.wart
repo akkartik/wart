@@ -38,7 +38,7 @@ mac defcoerce(src dest f)
      (table_set (table_get coercions* ',dest) ',src ,f))
 
 defcoerce nil list
-  (fn(_) _)
+  id
 
 ; arbitrary types in function position
 mac defcall(type params . body)
