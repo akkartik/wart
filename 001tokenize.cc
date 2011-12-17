@@ -144,6 +144,7 @@ Token nextToken(istream& in, int& currIndent) {
     case ')':
     case '\'':
     case '`':
+    case '@':
       slurpChar(in, out); break;
 
     case ',':
@@ -151,9 +152,6 @@ Token nextToken(istream& in, int& currIndent) {
       if (in.peek() == '@')
         slurpChar(in, out);
       break;
-
-    case '@':
-      slurpChar(in, out); break;
 
     default:
       slurpWord(in, out); break;
