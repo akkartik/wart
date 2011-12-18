@@ -72,7 +72,6 @@ Cell* newCell() {
     result = freelist;
     freelist = freelist->cdr;
     result->init();
-    dbg << endl << "newCell r: " << (void*)result << " " << result->type << endl;
     return result;
   }
 
@@ -82,7 +81,6 @@ Cell* newCell() {
   result = &currHeap->cells[currCell];
   ++currCell;
   result->init();
-  dbg << endl << "newCell a: " << (void*)result << " " << result->type << endl;
   return result;
 }
 
@@ -109,7 +107,6 @@ struct Table {
 
 Cell* mkref(Cell* c) {
   if (c == nil) return nil;
-  dbg << "mkref: " << (void*)c << " " << c->nrefs << endl;
   ++c->nrefs;
   return c;
 }
@@ -118,7 +115,6 @@ void rmref(Cell* c) {
   if (!c)
     RAISE << " a cell was prematurely garbage-collected." << endl << DIE;
   if (c == nil) return;
-  dbg << endl << "rmref: " << (void*)c << ": " << c->nrefs << " " << c->type << endl;
 
   --c->nrefs;
   if (c->nrefs > 0) return;
@@ -131,12 +127,10 @@ void rmref(Cell* c) {
     break; // numbers don't need freeing
   case STRING:
   case SYM:
-    dbg << "  delete: " << *(string*)c->car << endl;
     delete (string*)c->car; break;
   case CONS:
     rmref(c->car); break;
   case TABLE:
-    dbg << "  delete table" << endl;
     delete (Table*)c->car; break;
   case PRIM_FUNC:
     break; // compiled functions don't need freeing
@@ -144,7 +138,6 @@ void rmref(Cell* c) {
     RAISE << "Can't rmref type " << c->type << endl << DIE;
   }
 
-  dbg << "  freeing " << (void*)c << endl;
   rmref(c->cdr);
 
   c->clear();

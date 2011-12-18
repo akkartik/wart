@@ -2,15 +2,12 @@
 
                                   unordered_map<long, Cell*> numLiterals;
                                   Cell* intern(long x) {
-                                    if (numLiterals[x]) {
-                                      dbg << endl << "reuse: " << x << " " << (void*)numLiterals[x] << endl;
+                                    if (numLiterals[x])
                                       return numLiterals[x];
-                                    }
                                     numLiterals[x] = newCell();
                                     numLiterals[x]->car = (Cell*)x;
                                     numLiterals[x]->type = NUM;
                                     mkref(numLiterals[x]);
-                                    dbg << endl << "new: " << x << " " << (void*)numLiterals[x] << endl;
                                     return numLiterals[x];
                                   }
 
@@ -37,12 +34,9 @@ long toNum(Cell* x) {
 
                                   StringMap<Cell*> stringLiterals;
                                   Cell* intern(string x) {
-                                    if (stringLiterals[x]) {
-                                      dbg << endl << "reuse: " << x << " " << (void*)stringLiterals[x] << endl;
+                                    if (stringLiterals[x])
                                       return stringLiterals[x];
-                                    }
                                     stringLiterals[x] = newCell();
-                                    dbg << endl << "new: " << x << " " << stringLiterals[x] << endl;
                                     stringLiterals[x]->car = (Cell*)new string(x); // not aligned like cells; can fragment memory
                                     mkref(stringLiterals[x]);
                                     return stringLiterals[x];
@@ -59,7 +53,6 @@ bool isSym(Cell* x) {
 }
 
 Cell* newString(string x) {
-  dbg << endl << "new string: " << x << endl;
   Cell* result = newCell();
   result->car = (Cell*)new string(x);
   result->type = STRING;
