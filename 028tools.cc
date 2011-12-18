@@ -31,7 +31,7 @@ COMPILE_PRIM_FUNC(time, primFunc_time, "'($expr)",
   clock_t start = clock();
   Cell* result = eval(lookup("$expr"));
   cerr << clock()-start << "/" << CLOCKS_PER_SEC << endl;
-  return result;
+  return result; // already mkref'd
 )
 
 COMPILE_PRIM_FUNC(quit, primFunc_quit, "()",

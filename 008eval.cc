@@ -154,7 +154,7 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
                                       setCdr(curr, newLimb);
                                       rmref(newLimb);
                                     }
-                                    return dropPtr(pResult); // mkref's
+                                    return dropPtr(pResult);
                                   }
 
                                   Cell* evalArgs(Cell*, Cell*);
