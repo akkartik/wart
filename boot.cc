@@ -73,7 +73,6 @@ stringstream& stream(string s) {
 struct Cell;
 extern Cell* nil;
 ostream& operator<<(ostream&, Cell*);
-int printDepth = 0; // for truncating when printing
 struct CodeStream;
 Cell* read(CodeStream& c);
 bool interactive = false; // eval on multiple newlines
@@ -185,7 +184,6 @@ void dumpUnfreed() {
       if (initialSyms.find(x) != initialSyms.end()) continue;
       if (numRefsRemaining[x] > 1) continue;
       cerr << "unfreed: " << (void*)x << " " << x << endl;
-      printDepth=0;
     }
 }
 
@@ -286,7 +284,7 @@ int main(int argc, unused char* argv[]) {
     Cell* form = read(cs);
     if (cin.eof()) break;
     Cell* result = eval(form);
-    write(result, cout); cout << endl;
+    cout << result << endl;
     rmref(result);
     rmref(form);
     reset(cin);

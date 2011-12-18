@@ -10,15 +10,12 @@
 ostream& operator<<(ostream& os, Cell* c) {
   if (c == NULL) return os << "NULLNULLNULL";
   if (c == nil) return os << "nil";
-  if (++printDepth > 512) return os << "...";
   switch(c->type) {
   case CONS:
     if (car(c) == newSym("'") || car(c) == newSym("`") || car(c) == newSym(",") || car(c) == newSym(",@") || car(c) == newSym("@"))
       return os << car(c) << cdr(c);
     os << "(" << car(c);
     for (Cell* curr = cdr(c); curr != nil; curr = cdr(curr)) {
-      if (++printDepth > 512)
-        return os << "...";
       if (isCons(curr))
         os << " " << car(curr);
       else
@@ -43,15 +40,9 @@ ostream& operator<<(ostream& os, Cell* c) {
   }
 }
 
-void write(Cell* x, ostream& out) {
-  out << x;
-  printDepth=0;
-}
-
 void print(Cell* x, ostream& out) {
   if (isString(x)) out << toString(x);
   else out << x;
-  printDepth=0;
 }
 
 
@@ -67,7 +58,7 @@ COMPILE_PRIM_FUNC(pr, primFunc_pr, "($x)",
 COMPILE_PRIM_FUNC(write, primFunc_write, "($x)",
   Cell* x = lookup("$x");
   ostream& out = toOstream(STDOUT);
-  write(x, out);
+  out << x;
   out.flush();
   return mkref(x);
 )
