@@ -53,3 +53,12 @@ void test_setCdr_is_idempotent() {
   check(cdr(x));
   rmref(cons);
 }
+
+void test_set_deletes_nonexistent_key() {
+  debug = 1;
+  Cell* t = newTable();
+  Cell* k = newCons(newNum(375), nil);
+  set(t, k, nil);
+  rmref(k);
+  rmref(t);
+}

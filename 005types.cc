@@ -143,6 +143,7 @@ Table* toTable(Cell* x) {
                                     if (table[key])
                                       rmref(table[key]);
                                     if (deleteNils && val == nil) {
+                                      if (!table[key]) return;
                                       rmref(key);
                                       table[key] = NULL;
                                       return;
