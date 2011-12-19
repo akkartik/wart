@@ -142,15 +142,16 @@ Table* toTable(Cell* x) {
                                     Table& table = *(Table*)(t->car);
                                     if (table[key])
                                       rmref(table[key]);
-                                    if (deleteNils && val == nil) {
-                                      if (!table[key]) return;
-                                      rmref(key);
+                                    if (val == nil && deleteNils) {
+                                      if (table[key])
+                                        rmref(key);
                                       table[key] = NULL;
-                                      return;
                                     }
-                                    if (!table[key]) mkref(key);
-                                    mkref(val);
-                                    table[key] = val;
+                                    else {
+                                      if (!table[key])
+                                        mkref(key);
+                                      table[key] = mkref(val);
+                                    }
                                   }
 
 void set(Cell* t, Cell* k, Cell* val) {
