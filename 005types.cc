@@ -139,19 +139,22 @@ Table* toTable(Cell* x) {
                                       RAISE << "set on a non-table: " << t << endl;
                                       return;
                                     }
+
                                     Table& table = *(Table*)(t->car);
-                                    if (table[key])
-                                      rmref(table[key]);
                                     if (val == nil && deleteNils) {
-                                      if (table[key])
+                                      if (table[key]) {
+                                        rmref(table[key]);
+                                        table[key] = NULL;
                                         rmref(key);
-                                      table[key] = NULL;
+                                      }
+                                      return;
                                     }
-                                    else {
-                                      if (!table[key])
-                                        mkref(key);
-                                      table[key] = mkref(val);
-                                    }
+
+                                    if (val == table[key]) return;
+
+                                    if (!table[key]) mkref(key);
+                                    else rmref(table[key]);
+                                    table[key] = mkref(val);
                                   }
 
 void set(Cell* t, Cell* k, Cell* val) {
