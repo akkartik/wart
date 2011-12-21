@@ -10,6 +10,12 @@
  :valueof (inline '((foo 3 4)) (table 'foo (table 'sig '(a b) 'body '((+ a b)))))
  :should be '((+ 3 4)))
 
+(test "inline - flattens"
+ :valueof (let env (table 'foo (table 'sig '(a b) 'body '((bar a b) (bar a b)))
+                          'bar (table 'sig '(x y) 'body '((+ y x))))
+            (inline '((foo 3 4) (bar 3 4)) env))
+ :should be '((bar 3 4) (bar 3 4) (+ 4 3)))
+
 (test "inline - multiple levels"
  :valueof (let env (table 'foo (table 'sig '(a b) 'body '((bar a b)))
                           'bar (table 'sig '(x y) 'body '((+ y x))))
