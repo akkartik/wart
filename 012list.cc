@@ -41,3 +41,32 @@ COMPILE_PRIM_FUNC(list_range, primFunc_list_range, "($list $index $end)",
     addCons(curr, car(list));
   return dropPtr(pResult);
 )
+
+                                  struct CellLt :public std::binary_function<Cell*, Cell*, bool> {
+                                    Cell* comparer;
+                                    CellLt(Cell* f) :comparer(f) {}
+                                    bool operator()(Cell* a, Cell* b) {
+                                      Cell* expr = newCons(comparer, newCons(a, newCons(b, nil)));
+                                      Cell* result = eval(expr);
+                                      bool ans = (result != nil);
+                                      rmref(result);
+                                      rmref(expr);
+                                      return ans;
+                                    }
+                                  };
+
+#include<algorithm>
+COMPILE_PRIM_FUNC(sort, primFunc_sort, "($f $list)",
+  vector<Cell*> container;
+  for (Cell* list = lookup("$list"); list != nil; list=cdr(list))
+    container.push_back(car(list));
+
+  std::stable_sort(container.begin(), container.end(), CellLt(lookup("$f")));
+
+  Cell* pNewList = newCell();
+  vector<Cell*>::iterator p;
+  Cell* curr = pNewList;
+  for (p=container.begin(); p != container.end(); ++p, curr=cdr(curr))
+    addCons(curr, *p);
+  return dropPtr(pNewList);
+)

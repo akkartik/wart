@@ -135,3 +135,14 @@ void test_list_splice_returns_elem_if_single() {
   rmref(expr);
   endDynamicScope("a");
 }
+
+void test_list_sort() {
+  Cell* expr = read(stream("(sort (fn(a b) (< len.a len.b)) '(\"abc\" \"d\" \"ef\"))"));
+  Cell* result = eval(expr);
+  checkEq(toString(car(result)), "d");
+  checkEq(toString(car(cdr(result))), "ef");
+  checkEq(toString(car(cdr(cdr(result)))), "abc");
+  checkEq(cdr(cdr(cdr(result))), nil);
+  rmref(result);
+  rmref(expr);
+}
