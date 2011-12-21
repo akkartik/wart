@@ -55,7 +55,6 @@ COMPILE_PRIM_FUNC(list_range, primFunc_list_range, "($list $index $end)",
                                     }
                                   };
 
-#include<algorithm>
 COMPILE_PRIM_FUNC(sort, primFunc_sort, "($f $list)",
   vector<Cell*> container;
   for (Cell* list = lookup("$list"); list != nil; list=cdr(list))

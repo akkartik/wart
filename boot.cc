@@ -12,7 +12,7 @@ using std::stack;
 using std::tr1::unordered_map;
 #include<tr1/unordered_set>
 using std::tr1::unordered_set;
-#include<exception>
+#include<algorithm>
 
 #include<string>
 using std::string;
