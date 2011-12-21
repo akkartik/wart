@@ -5,3 +5,9 @@
 (test "with args"
  :valueof (inline '(foo 3 4) (table 'foo (table 'sig '(a b) 'body '((+ a b)))))
  :should be '(do (+ 3 4)))
+
+(test "multiple levels"
+ :valueof (let env (table 'foo (table 'sig '(a b) 'body '((bar a b)))
+                          'bar (table 'sig '(x y) 'body '((+ y x))))
+            (inline (inline '(foo 3 4) env) env))
+ :should be '(do (do (+ 4 3))))

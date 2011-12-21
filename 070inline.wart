@@ -9,3 +9,8 @@ def replace(expr bindings)
     (or bindings.expr expr)
     (cons (replace car.expr bindings)
           (replace cdr.expr bindings))
+
+def inline((ff . args) env) :case (iso ff 'do)
+  (cons 'do
+         (collect:each form args
+           yield (inline form env)))
