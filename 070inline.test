@@ -3,21 +3,21 @@
  :should be '((baz 3 4)))
 
 (test "inline - replace with body"
- :valueof (inline '((foo)) (table 'foo (table 'body '(34))))
+ :valueof (inline '((foo)) (table 'foo (tag 'function (table 'body '(34)))))
  :should be '(34))
 
 (test "inline - with args"
- :valueof (inline '((foo 3 4)) (table 'foo (table 'sig '(a b) 'body '((+ a b)))))
+ :valueof (inline '((foo 3 4)) (table 'foo (tag 'function (table 'sig '(a b) 'body '((+ a b))))))
  :should be '((+ 3 4)))
 
 (test "inline - flattens"
- :valueof (let env (table 'foo (table 'sig '(a b) 'body '((bar a b) (bar a b)))
-                          'bar (table 'sig '(x y) 'body '((+ y x))))
+ :valueof (let env (table 'foo (tag 'function (table 'sig '(a b) 'body '((bar a b) (bar a b))))
+                          'bar (tag 'function (table 'sig '(x y) 'body '((+ y x)))))
             (inline '((foo 3 4) (bar 3 4)) env))
  :should be '((bar 3 4) (bar 3 4) (+ 4 3)))
 
 (test "inline - multiple levels"
- :valueof (let env (table 'foo (table 'sig '(a b) 'body '((bar a b)))
-                          'bar (table 'sig '(x y) 'body '((+ y x))))
+ :valueof (let env (table 'foo (tag 'function (table 'sig '(a b) 'body '((bar a b))))
+                          'bar (tag 'function (table 'sig '(x y) 'body '((+ y x)))))
             (inline (inline '((foo 3 4)) env) env))
  :should be '((+ 4 3)))
