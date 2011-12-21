@@ -1,3 +1,7 @@
+(test "inline - pass through unknown calls"
+ :valueof (inline '((baz 3 4)) :env (table))
+ :should be '((baz 3 4)))
+
 (test "inline - replace with body"
  :valueof (inline '((foo)) (table 'foo (table 'body '(34))))
  :should be '(34))
