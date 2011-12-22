@@ -84,3 +84,17 @@ mac repeat(n . body)
 
 mac repeat(n . body) :case (iso n :forever)
   `(while 1 ,@body)
+
+
+
+def andf fs
+  (fn args
+    (let sub (afn(fs)
+               (if
+                  !fs
+                    1
+                  ~cdr.fs
+                    (car.fs @args)
+                  :else
+                    (and (car.fs @args) (self cdr.fs))))
+      (sub fs)))
