@@ -6,7 +6,9 @@ def inline(calls env)
 def inline-form((ff . args) env)
   iflet f ((andf ~compiled-fn? rep) env.ff)
     ; XXX: multiple-eval
-    (replace f!body :bindings (as table (zip f!sig args)))
+    if (and f!sig (~cons? f!sig))
+      (replace f!body (table f!sig (cons 'list args)))
+      (replace f!body :bindings (as table (zip f!sig args)))
     (list (cons ff args))
 
 def replace(expr bindings)

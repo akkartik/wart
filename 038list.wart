@@ -60,14 +60,9 @@ alias any some
 alias none ~some
 
 def zip(a b)
-  (if
-    (or !a !b)
-      nil
-    (or !cons?.a !cons?.b)
-      (list:list a b)
-    :else
+  if (and a b)
     (cons (list car.a car.b)
-          (zip cdr.a cdr.b)))
+          (zip cdr.a cdr.b))
 
 def zip-flat(a b)
   if (and a b)
