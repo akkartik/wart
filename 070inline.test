@@ -26,3 +26,8 @@
 (test "inline - pass through compiled functions"
  :valueof (inline '((cons 3 4)) :env globals.)
  :should be '((cons 3 4)))
+
+; assumes we haven't redefined cons
+(test "inline - handles rest params"
+ :valueof (inline '((foo 3 4)) :env (table 'foo (tag 'function (table 'sig 'params 'body '(params)))))
+ :should be '((3 4)))
