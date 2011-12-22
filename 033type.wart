@@ -10,6 +10,9 @@ def table?(_)
   (isa _ table)
 def fn?(_)
   (isa _ function)
+def compiled-fn?(_)
+  (and (fn? _)
+       (~cons? rep._!body))
 
 
 
