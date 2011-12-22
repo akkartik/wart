@@ -4,7 +4,7 @@ def inline(calls env)
       yield form
 
 def inline-form((ff . args) env)
-  iflet f (rep env.ff)
+  iflet f ((andf ~compiled-fn? rep) env.ff)
     ; XXX: multiple-eval
     (replace f!body :bindings (as table (zip f!sig args)))
     (list (cons ff args))

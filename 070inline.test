@@ -21,3 +21,8 @@
                           'bar (tag 'function (table 'sig '(x y) 'body '((+ y x)))))
             (inline (inline '((foo 3 4)) env) env))
  :should be '((+ 4 3)))
+
+; assumes we haven't redefined cons
+(test "inline - pass through compiled functions"
+ :valueof (inline '((cons 3 4)) :env globals.)
+ :should be '((cons 3 4)))
