@@ -27,10 +27,10 @@
  :valueof (inline '((cons 3 4)) :env globals.)
  :should be '((cons 3 4)))
 
-(test "inline - handles rest params"
+(test "inline - handles varargs params"
  :valueof (inline '((foo 3 4)) :env (table 'foo (tag 'function (table 'sig 'params 'body '(params)))))
  :should be '((list 3 4)))
 
-(test "inline - handles rest params - 2"
+(test "inline - handles varargs params - 2"
  :valueof (inline '((foo 3 4)) :env (table 'foo (tag 'function (table 'sig 'params 'body '(let (x y) params (list x y))))))
  :should be '(let (x y) (list 3 4) (list x y)))
