@@ -12,6 +12,8 @@ def inline-form((ff . args) env)
 
 ;; internals
 
+= quote (car:car (cons ' 'a))
+
 ; XXX: multiple-eval
 def gen-bindings(params args acc)
   (if
@@ -19,6 +21,10 @@ def gen-bindings(params args acc)
       acc
     ~cons?.params ; rest param
       (cons (list params (cons 'list args))
+            acc)
+    (and (iso car.params quote)
+         (~cons? cdr.params)) ; quoted rest param
+      (cons (list cdr.params (cons 'list args))
             acc)
     (~cons? car.params)
       (cons (list car.params car.args)

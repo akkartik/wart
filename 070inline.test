@@ -39,6 +39,10 @@
  :valueof (inline '((foo a b)) :env (table 'foo (tag 'function (table 'sig 'params 'body '((let (x y) params (list x y)))))))
  :should be '((let (x y) (list a b) (list x y))))
 
+(test "inline - handles quoted varargs params"
+ :valueof (inline '((foo a b)) :env (table 'foo (tag 'function (table 'sig (cons quote 'params) 'body '((let (x y) params (list x y)))))))
+ :should be '((let (x y) (list a b) (list x y))))
+
 (test "inline - handles rest params"
  :valueof (inline '((foo 3 4)) :env (table 'foo (tag 'function (table 'sig '(a . b) 'body '((boo a b))))))
  :should be '((boo 3 (list 4))))
