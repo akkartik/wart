@@ -5,7 +5,7 @@ def inline(calls env)
 
 def inline-form((ff . args) env)
   iflet f ((andf ~compiled-fn? rep) env.ff)
-    (replace f!body (as table (gen-bindings f!sig args)))
+    (apply-bindings f!body (as table (gen-bindings f!sig args)))
     (list (cons ff args))
 
 
@@ -27,8 +27,8 @@ def gen-bindings(params args acc)
       (gen-bindings car.params car.args
                (gen-bindings cdr.params cdr.args acc)))
 
-def replace(expr bindings)
+def apply-bindings(expr bindings)
   if !cons?.expr
     (or bindings.expr expr)
-    (cons (replace car.expr bindings)
-          (replace cdr.expr bindings))
+    (cons (apply-bindings car.expr bindings)
+          (apply-bindings cdr.expr bindings))
