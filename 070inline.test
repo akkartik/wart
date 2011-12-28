@@ -54,3 +54,9 @@
 (test "inline - handles destructured params"
  :valueof (inline '((foo (3 4) 5)) :env (table 'foo (tag 'function (table 'sig '((a b) . c) 'body '((boo a b c))))))
  :should be '((boo 3 4 (list 5))))
+
+(test "inline - handles lexical bindings"
+ :valueof (inline (inline '((foo 3)) :env (table 'foo (tag 'function (table 'sig '(x) 'body '((bar x))
+                                                                            'env (table 'bar (tag 'function (table 'sig '(a) 'body '(a))))))))
+                  :env (table))
+ :should be '(3))
