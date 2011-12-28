@@ -7,22 +7,22 @@
  :should be '((baz 3 4)))
 
 (test "inline - replace with body"
- :valueof (inline '((foo)) (table 'foo (tag 'function (table 'body '(34)))))
+ :valueof (inline '((foo)) (table 'foo (fn() 34)))
  :should be '(34))
 
 (test "inline - with args"
- :valueof (inline '((foo 3 4)) (table 'foo (tag 'function (table 'sig '(a b) 'body '((+ a b))))))
+ :valueof (inline '((foo 3 4)) (table 'foo (fn(a b) (+ a b))))
  :should be '((+ 3 4)))
 
 (test "inline - flattens"
- :valueof (let env (table 'foo (tag 'function (table 'sig '(a b) 'body '((bar a b) (bar a b))))
-                          'bar (tag 'function (table 'sig '(x y) 'body '((+ y x)))))
+ :valueof (let env (table 'foo (fn(a b) (bar a b) (bar a b))
+                          'bar (fn(x y) (+ y x)))
             (inline '((foo 3 4) (bar 3 4)) env))
  :should be '((bar 3 4) (bar 3 4) (+ 4 3)))
 
 (test "inline - multiple levels"
- :valueof (let env (table 'foo (tag 'function (table 'sig '(a b) 'body '((bar a b))))
-                          'bar (tag 'function (table 'sig '(x y) 'body '((+ y x)))))
+ :valueof (let env (table 'foo (fn(a b) (bar a b))
+                          'bar (fn(x y) (+ y x)))
             (inline '((foo 3 4)) env))
  :should be '((+ 4 3)))
 
@@ -32,30 +32,29 @@
  :should be '((cons 3 4)))
 
 (test "inline - handles varargs params"
- :valueof (inline '((foo 3 4)) :env (table 'foo (tag 'function (table 'sig 'params 'body '(params)))))
+ :valueof (inline '((foo 3 4)) :env (table 'foo (fn params params)))
  :should be '((list 3 4)))
 
 (test "inline - handles varargs params - 2"
- :valueof (inline '((foo 3 4)) :env (table 'foo (tag 'function (table 'sig 'params 'body '((let (x y) params (list x y)))))))
+ :valueof (inline '((foo 3 4)) :env (table 'foo (fn params (let (x y) params (list x y)))))
  :should be '((let (x y) (list 3 4) (list x y))))
 
 (test "inline - handles varargs params - 3"
- :valueof (inline '((foo a b)) :env (table 'foo (tag 'function (table 'sig 'params 'body '((let (x y) params (list x y)))))))
+ :valueof (inline '((foo a b)) :env (table 'foo (fn params (let (x y) params (list x y)))))
  :should be '((let (x y) (list a b) (list x y))))
 
 (test "inline - handles quoted varargs params"
- :valueof (inline '((foo a b)) :env (table 'foo (tag 'function (table 'sig (cons quote 'params) 'body '((let (x y) params (list x y)))))))
+ :valueof (inline '((foo a b)) :env (table 'foo (fn 'params (let (x y) params (list x y)))))
  :should be '((let (x y) (list a b) (list x y))))
 
 (test "inline - handles rest params"
- :valueof (inline '((foo 3 4)) :env (table 'foo (tag 'function (table 'sig '(a . b) 'body '((boo a b))))))
+ :valueof (inline '((foo 3 4)) :env (table 'foo (fn(a . b) (boo a b))))
  :should be '((boo 3 (list 4))))
 
 (test "inline - handles destructured params"
- :valueof (inline '((foo (3 4) 5)) :env (table 'foo (tag 'function (table 'sig '((a b) . c) 'body '((boo a b c))))))
+ :valueof (inline '((foo (3 4) 5)) :env (table 'foo (fn((a b) . c) (boo a b c))))
  :should be '((boo 3 4 (list 5))))
 
 (test "inline - handles lexical bindings"
- :valueof (inline '((foo 3)) :env (table 'foo (tag 'function (table 'sig '(x) 'body '((bar x))
-                                                                    'env (table 'bar (tag 'function (table 'sig '(a) 'body '(a))))))))
+ :valueof (inline '((foo 3)) :env (table 'foo (let bar (fn(a) a) (fn(x) (bar x)))))
  :should be '(3))
