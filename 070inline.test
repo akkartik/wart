@@ -1,3 +1,7 @@
+(test "inline - pass through atoms"
+ :valueof (inline '(34) :env (table))
+ :should be '(34))
+
 (test "inline - pass through unknown calls"
  :valueof (inline '((baz 3 4)) :env (table))
  :should be '((baz 3 4)))

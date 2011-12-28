@@ -1,7 +1,9 @@
 def inline(calls env)
   collect:each call calls
-    each form (inline-form call env)
-      yield form
+    if cons?.call
+      each form (inline-form call env)
+        yield form
+      yield call
 
 def inline-form((ff . args) env)
   iflet f ((andf ~compiled-fn? rep) env.ff)
