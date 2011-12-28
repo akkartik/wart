@@ -77,7 +77,7 @@ COMPILE_PRIM_FUNC(iso, primFunc_iso, "($x $y)",
 
 
 
-// list? will not be true of user-defined (type 'foo ...) but cons? will.
+// list? will not be true of (type _ _) expressions, but cons? will.
 COMPILE_PRIM_FUNC(cons?, primFunc_isCons, "($x)",
   Cell* x = lookup("$x");
   if (!isCons(x)) return nil;
