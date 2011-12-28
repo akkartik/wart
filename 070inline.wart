@@ -14,8 +14,6 @@ def inline-form((ff . args) env)
 
 ;; internals
 
-= quote (car:car (cons ' 'a))
-
 ; XXX: multiple-eval
 def gen-bindings(params args acc)
   (if
