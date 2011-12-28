@@ -5,14 +5,14 @@ def inline(calls env)
         yield form
       yield call
 
+
+
+;; internals
+
 def inline-form((ff . args) env)
   iflet f ((andf ~compiled-fn? rep) env.ff)
     (apply-bindings f!body (as table (gen-bindings f!sig args)))
     (list (cons ff args))
-
-
-
-;; internals
 
 ; XXX: multiple-eval
 def gen-bindings(params args acc)
