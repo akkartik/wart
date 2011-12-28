@@ -23,7 +23,7 @@
 (test "inline - multiple levels"
  :valueof (let env (table 'foo (tag 'function (table 'sig '(a b) 'body '((bar a b))))
                           'bar (tag 'function (table 'sig '(x y) 'body '((+ y x)))))
-            (inline (inline '((foo 3 4)) env) env))
+            (inline '((foo 3 4)) env))
  :should be '((+ 4 3)))
 
 ; assumes we haven't redefined cons
@@ -56,7 +56,6 @@
  :should be '((boo 3 4 (list 5))))
 
 (test "inline - handles lexical bindings"
- :valueof (inline (inline '((foo 3)) :env (table 'foo (tag 'function (table 'sig '(x) 'body '((bar x))
-                                                                            'env (table 'bar (tag 'function (table 'sig '(a) 'body '(a))))))))
-                  :env (table))
+ :valueof (inline '((foo 3)) :env (table 'foo (tag 'function (table 'sig '(x) 'body '((bar x))
+                                                                    'env (table 'bar (tag 'function (table 'sig '(a) 'body '(a))))))))
  :should be '(3))
