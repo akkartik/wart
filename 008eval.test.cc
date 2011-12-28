@@ -254,8 +254,8 @@ void test_string_evals_to_itself() {
   rmref(expr);
 }
 
-void test_type_expr_evals_to_itself() {
-  Cell* expr = read(stream("type foo 4"));
+void test_object_expr_evals_to_itself() {
+  Cell* expr = read(stream("object foo 4"));
   Cell* result = eval(expr);
   checkEq(result, expr);
   rmref(result);

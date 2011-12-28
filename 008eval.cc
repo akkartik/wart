@@ -283,7 +283,7 @@ Cell* processUnquotes(Cell* x, int depth) {
                                     unsafeSet(f, newSym("sig"), sig(expr), false);
                                     unsafeSet(f, newSym("body"), body(expr), false);
                                     unsafeSet(f, newSym("env"), currLexicalScopes.top(), false);
-                                    return newType(type, f);
+                                    return newObject(type, f);
                                   }
 
                                   Cell* functionify(Cell* obj) {
@@ -317,7 +317,7 @@ Cell* eval(Cell* expr) {
   if (isAtom(expr))
     return mkref(expr);
 
-  if (isTypeExpr(expr))
+  if (isObject(expr))
     return mkref(expr);
 
   if (isQuoted(expr))

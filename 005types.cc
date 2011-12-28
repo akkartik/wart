@@ -178,14 +178,12 @@ Cell* get(Cell* t, Cell* k) {
 
 
 
-Cell* newType(string type, Cell* rep) {
-  return newCons(newSym("type"), newCons(newSym(type), newCons(rep, nil)));
+Cell* newObject(string type, Cell* rep) {
+  return newCons(newSym("object"), newCons(newSym(type), newCons(rep, nil)));
 }
 
-// (type _) is request to compute type of something
-// (type _ _) is a type expression and evals to itself
-bool isTypeExpr(Cell* x) {
-  return car(x) == newSym("type") && cdr(cdr(x)) != nil;
+bool isObject(Cell* x) {
+  return car(x) == newSym("object");
 }
 
 Cell* rep(Cell* x) {
@@ -206,7 +204,7 @@ Cell* type(Cell* x) {
   case PRIM_FUNC:
     return newSym("function");
   case CONS:
-    if (isTypeExpr(x))
+    if (isObject(x))
       return car(cdr(x));
     return newSym("list");
   default:

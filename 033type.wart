@@ -17,10 +17,10 @@ def compiled-fn?(_)
 
 
 def tag(type val)
-  (list 'type type val)
+  (list 'object type val)
 
 def rep(x)
-  if (~iso 'type car.x)
+  if (~iso 'object car.x)
     x
     car:cddr.x
 
