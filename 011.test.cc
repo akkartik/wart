@@ -106,3 +106,12 @@ void test_bound_works() {
   rmref(result1);
   rmref(call);
 }
+
+void test_iso_nil() {
+  Cell* call = read(stream("iso nil nil"));
+  Cell* result = eval(call);
+  check(result);
+  check(result != nil);
+  rmref(result);
+  rmref(call);
+}
