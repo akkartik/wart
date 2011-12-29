@@ -1,18 +1,20 @@
 def inline(calls env)
   collect:each call calls
-    if cons?.call
-      each form (inline-form call env)
-        yield form
-      yield call
+    (if
+      (or !call !cons?.call)
+        yield call
+      (~fn?:env car.call)
+        yield call
+      (compiled-fn?:env car.call)
+        yield call
+      :else
+        let f (rep:env car.call)
+          each x (apply-bindings f!body (as table (gen-bindings f!sig cdr.call)))
+            yield x)
 
 
 
 ;; internals
-
-def inline-form((ff . args) env)
-  iflet f ((andf ~compiled-fn? rep) env.ff)
-    (apply-bindings f!body (as table (gen-bindings f!sig args)))
-    (list (cons ff args))
 
 ; XXX: multiple-eval
 def gen-bindings(params args acc)
