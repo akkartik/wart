@@ -14,6 +14,10 @@
  :valueof (let l '(list 1 2 3) l.3)
  :should be 3)
 
+(test "compose works with lists"
+ :valueof (let l '(1 (34 3) 2) (car:l 1))
+ :should be 34)
+
 (test "lists can take negative indices"
  :valueof (let l '(1 2 3) l.-1)
  :should be 3)

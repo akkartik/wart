@@ -54,3 +54,13 @@ mac defcall(type params . body)
 
 mac as(type expr)
   `(coerce ,expr ,type)
+
+defcoerce function macro
+  id
+
+defcoerce macro function
+  id
+
+def! compose(f g)
+  mfn 'args
+    `(,(as function f) (,(as function g) ,@args))
