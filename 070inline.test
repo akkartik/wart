@@ -18,7 +18,7 @@
  :valueof (let env (table 'foo (fn(a b) (bar a b) (bar a b))
                           'bar (fn(x y) (+ y x)))
             (inline '((foo 3 4) (bar 3 4)) env))
- :should be '((bar 3 4) (bar 3 4) (+ 4 3)))
+ :should be '((+ 4 3) (+ 4 3) (+ 4 3)))
 
 (test "inline - multiple levels"
  :valueof (let env (table 'foo (fn(a b) (bar a b))
