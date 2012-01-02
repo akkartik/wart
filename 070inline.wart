@@ -9,7 +9,8 @@ def inline(calls env)
         yield call
       :else
         let f (rep:env car.call)
-          each x (apply-bindings f!body (as table (gen-bindings f!sig cdr.call)))
+          each x (inline (apply-bindings f!body (as table (gen-bindings f!sig cdr.call)))
+                         env)
             yield x)
 
 
