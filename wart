@@ -1,12 +1,5 @@
 #!/usr/bin/env zsh
 
-C=10
-if git diff --quiet
-then
-  echo `git whatchanged -p -$C |grep "^[+ -][^+-]" |perl -pwe 's/(.).*/$1/' |uniq |grep "+" |wc -l` hunks added in last $C commits
-else
-  echo `{git diff HEAD; git whatchanged -p -$(($C-1))} |grep "^[+ -][^+-]" |perl -pwe 's/(.).*/$1/' |uniq |grep "+" |wc -l` hunks added in last $C commits
-fi
 make --silent || exit 1
 
 if command which rlwrap >/dev/null
