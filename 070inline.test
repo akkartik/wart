@@ -69,4 +69,4 @@
  :valueof (inline '((foo 3)) :env (table 'foo (with (bar (fn(a) (baz a))
                                                      baz cons)
                                                 (fn(x) (bar x)))))
- :should be '(baz 3))
+ :should be '((baz 3)))
