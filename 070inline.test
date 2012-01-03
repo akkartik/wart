@@ -48,12 +48,12 @@
  :should be '((let (x y) (list a b) (list x y))))
 
 (test "inline - handles rest params"
- :valueof (inline '((foo 3 4)) :env (table 'foo (fn(a . b) (boo a b))))
- :should be '((boo 3 (list 4))))
+ :valueof (inline '((foo 3 4)) :env (table 'foo (fn(a . b) (bar a b))))
+ :should be '((bar 3 (list 4))))
 
 (test "inline - handles destructured params"
- :valueof (inline '((foo (3 4) 5)) :env (table 'foo (fn((a b) . c) (boo a b c))))
- :should be '((boo 3 4 (list 5))))
+ :valueof (inline '((foo (3 4) 5)) :env (table 'foo (fn((a b) . c) (bar a b c))))
+ :should be '((bar 3 4 (list 5))))
 
 (test "inline - handles lexical bindings"
  :valueof (inline '((foo 3)) :env (table 'foo (let bar (fn(a) a) (fn(x) (bar x)))))
