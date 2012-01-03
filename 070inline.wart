@@ -3,6 +3,8 @@ def inline(calls env)
     (if
       (or !call !cons?.call)
         yield call
+      (compiled-fn? car.call)
+        yield call
       (fn? car.call)
         let f (rep car.call)
           each x (inline (apply-bindings f!body (cons (as table (gen-bindings f!sig cdr.call)) f!env))
