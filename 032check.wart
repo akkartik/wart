@@ -33,11 +33,6 @@ let $iso iso
           (iso car.a car.b)
           (iso cdr.a cdr.b)
 
-def copy(x)
-  if cons?.x
-    (cons copy:car.x copy:cdr.x)
-    x
-
 (def only(f)
   (fn args
     (if f (f @args))))

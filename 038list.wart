@@ -31,6 +31,11 @@ def empty?(l)
 def blank?(l)
   (or nil?.l empty?.l)
 
+def copy(x)
+  if cons?.x
+    (cons copy:car.x copy:cdr.x)
+    x
+
 def rem(f seq)
   if seq
     if (f car.seq)
