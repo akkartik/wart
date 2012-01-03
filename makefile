@@ -1,6 +1,4 @@
-C=10
 wart_bin: file_list transform_list prim_func_list test_list test_file_list
-	@echo `git whatchanged -p -$C |grep "^[+ -][^+-]" |perl -pwe 's/(.).*/$$1/' |uniq |grep "+" |wc -l` hunks added in last $C commits
 	g++ -g -Wall -Wextra boot.cc -o wart_bin
 	@echo
 
