@@ -6,16 +6,16 @@ def inline(calls env)
       (fn? car.call)
         let f (rep car.call)
           each x (inline (apply-bindings f!body (cons (as table (gen-bindings f!sig cdr.call)) f!env))
-                         env)
+                         (if f!env (cons f!env env) env))
             yield x
-      (~fn?:env car.call)
+      (~fn?:lookup-binding car.call env)
         yield call
-      (compiled-fn?:env car.call)
+      (compiled-fn?:lookup-binding car.call env)
         yield call
       :else
-        let f (rep:env car.call)
+        let f (rep:lookup-binding car.call env)
           each x (inline (apply-bindings f!body (cons (as table (gen-bindings f!sig cdr.call)) f!env))
-                         env)
+                         (if f!env (cons f!env env) env))
             yield x)
 
 

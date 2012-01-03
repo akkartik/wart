@@ -58,3 +58,9 @@
 (test "inline - handles lexical bindings"
  :valueof (inline '((foo 3)) :env (table 'foo (let bar (fn(a) a) (fn(x) (bar x)))))
  :should be '(3))
+
+(test "inline - handles lexical bindings"
+ :valueof (inline '((foo 3)) :env (table 'foo (with (bar (fn(a) (baz a))
+                                                     baz (fn(a) a))
+                                                (fn(x) (bar x)))))
+ :should be '(3))
