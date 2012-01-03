@@ -3,13 +3,18 @@ def inline(calls env)
     (if
       (or !call !cons?.call)
         yield call
+      (fn? car.call)
+        let f (rep car.call)
+          each x (inline (apply-bindings f!body (cons (as table (gen-bindings f!sig cdr.call)) f!env))
+                         env)
+            yield x
       (~fn?:env car.call)
         yield call
       (compiled-fn?:env car.call)
         yield call
       :else
         let f (rep:env car.call)
-          each x (inline (apply-bindings f!body (as table (gen-bindings f!sig cdr.call)))
+          each x (inline (apply-bindings f!body (cons (as table (gen-bindings f!sig cdr.call)) f!env))
                          env)
             yield x)
 
@@ -38,6 +43,16 @@ def gen-bindings(params args acc)
 
 def apply-bindings(expr bindings)
   if !cons?.expr
-    (or bindings.expr expr)
+    (or (lookup-binding expr bindings) expr)
     (cons (apply-bindings car.expr bindings)
           (apply-bindings cdr.expr bindings))
+
+def lookup-binding(sym bindings)
+  (if
+    !bindings
+      nil
+    !cons?.bindings
+      bindings.sym
+    :else
+      (or (lookup-binding sym car.bindings)
+          (lookup-binding sym cdr.bindings)))
