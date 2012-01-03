@@ -70,3 +70,9 @@
                                                      baz cons)
                                                 (fn(x) (bar x)))))
  :should be '((baz 3)))
+
+(test "inline - handles bindings to macros"
+ :valueof (inline '((foo 3)) :env (table 'foo (with (bar (fn(a) (baz a))
+                                                     baz (mfn(a) a))
+                                                (fn(x) (bar x)))))
+ :should be '(3))

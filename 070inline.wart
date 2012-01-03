@@ -10,7 +10,7 @@ def inline(calls env)
           each x (inline (apply-bindings f!body (cons (as table (gen-bindings f!sig cdr.call)) f!env))
                          (if f!env (cons f!env env) env))
             yield x
-      (~fn?:lookup-binding car.call env)
+      (and (~fn?:lookup-binding car.call env) (~mac?:lookup-binding car.call env))
         yield call
       (compiled-fn?:lookup-binding car.call env)
         yield call
