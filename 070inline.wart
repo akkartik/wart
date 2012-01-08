@@ -1,25 +1,17 @@
 def inline(calls env)
   collect:each call calls
-    (if
-      (or !call !cons?.call)
-        yield call
-      (compiled-fn? car.call)
-        yield call
-      (fn? car.call)
-        let f (rep car.call)
-          each x (inline (apply-bindings f!body (cons (as table (gen-bindings f!sig cdr.call)) f!env))
-                         (if f!env (cons f!env env) env))
-            yield x
-      (and (~fn?:lookup-binding car.call env)
-           (~mac?:lookup-binding car.call env))
-        yield call
-      (compiled-fn?:lookup-binding car.call env)
-        yield call
-      :else
-        let f (rep:lookup-binding car.call env)
-          each x (inline (apply-bindings f!body (cons (as table (gen-bindings f!sig cdr.call)) f!env))
-                         (if f!env (cons f!env env) env))
-            yield x)
+    if (or !call !cons?.call)
+      yield call
+      let f (if (sym? car.call)
+              (or (lookup-binding car.call env) car.call)
+              car.call)
+        if (or (and ~fn?.f ~mac?.f)
+               compiled-fn?.f)
+          yield call
+          let f rep.f
+            each x (inline (apply-bindings f!body (cons (as table (gen-bindings f!sig cdr.call)) f!env))
+                           (if f!env (cons f!env env) env))
+              yield x
 
 
 
