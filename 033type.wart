@@ -66,3 +66,12 @@ defcoerce macro function
 def! compose(f g)
   mfn 'args
     `(,(as function f) (,(as function g) ,@args))
+
+def sig(f)
+  rep.f!sig
+
+def body(f)
+  rep.f!body
+
+def env(f)
+  rep.f!env

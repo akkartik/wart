@@ -1,17 +1,16 @@
-def inline(calls env)
+def inline(calls bindings)
   collect:each call calls
     if (or !call !cons?.call)
       yield call
       let f (if (sym? car.call)
-              (or (lookup-binding car.call env) car.call)
+              (or (lookup-binding car.call bindings) car.call)
               car.call)
         if (or (and ~fn?.f ~mac?.f)
                compiled-fn?.f)
           yield call
-          let f rep.f
-            each x (inline (apply-bindings f!body (cons (as table (gen-bindings f!sig cdr.call)) f!env))
-                           (if f!env (cons f!env env) env))
-              yield x
+          each x (inline (apply-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
+                         (if env.f (cons env.f bindings) bindings))
+            yield x
 
 
 
