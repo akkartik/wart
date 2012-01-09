@@ -2,9 +2,9 @@ def inline(calls bindings)
   collect:each call calls
     if (or !call !cons?.call)
       yield call
-      let f (if (sym? car.call)
-              (or (lookup-binding car.call bindings) car.call)
-              car.call)
+      let f (or (if (sym? car.call)
+                  (lookup-binding car.call bindings))
+                car.call)
         if (or ~callable?.f compiled-fn?.f)
           yield call
           each x (inline (apply-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
