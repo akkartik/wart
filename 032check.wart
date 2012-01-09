@@ -36,3 +36,9 @@ let $iso iso
 def only(f)
   (fn args
     (if f (f @args)))
+
+mac check(x test else)
+  `(let $x ,x
+     if (,test $x)
+      $x
+      ,else)
