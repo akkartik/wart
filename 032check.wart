@@ -33,6 +33,6 @@ let $iso iso
           (iso car.a car.b)
           (iso cdr.a cdr.b)
 
-(def only(f)
+def only(f)
   (fn args
-    (if f (f @args))))
+    (if f (f @args)))
