@@ -1,4 +1,3 @@
-; (mac! foo(x) `(+ 1 ,x))) (let x 3 (foo x)) => 4
 = mac! (mfn '(name params . body)
   `(= ,name (mfn ',params
                     ,@body)))
