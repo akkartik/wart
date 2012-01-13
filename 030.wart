@@ -53,6 +53,7 @@ let $iso iso ; ignore later refinements
 = cadr car:cdr
 = cddr cdr:cdr
 = quote (car:car (cons ' 'a))
+def quote?(_) (iso _ quote)
 
 def id(_)
   _

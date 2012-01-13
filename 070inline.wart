@@ -15,7 +15,6 @@ def inline(calls bindings)
 
 ;; internals
 
-; XXX: multiple-eval
 def gen-bindings(params args acc)
   (if
     !params ; base case
@@ -23,8 +22,7 @@ def gen-bindings(params args acc)
     ~cons?.params ; rest param
       (cons (list params (cons 'list args))
             acc)
-    (and (iso car.params quote)
-         (~cons? cdr.params)) ; quoted rest param
+    (and quote?:car.params ~cons?:cdr.params) ; quoted rest param
       (cons (list cdr.params (cons 'list args))
             acc)
     (~cons? car.params)
