@@ -5,11 +5,15 @@ def inline(calls bindings)
       let f (or (if (sym? car.call)
                   (lookup-binding car.call bindings))
                 car.call)
-        if (or ~callable?.f compiled-fn?.f)
-          yield call
-          each x (inline (apply-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
-                         (if env.f (cons env.f bindings) bindings))
-            yield x
+        (if
+          (or ~callable?.f compiled-fn?.f)
+            yield call
+          fn?.f
+            each x (inline (apply-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
+                           (if env.f (cons env.f bindings) bindings))
+              yield x
+          :else
+            yield call)
 
 
 
