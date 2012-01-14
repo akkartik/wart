@@ -36,6 +36,16 @@ def copy(x)
     (cons copy:car.x copy:cdr.x)
     x
 
+def single?(x)
+  (and cons?.x !cdr.x)
+
+def join args
+  if args
+    if car.args
+      (cons car:car.args
+            (join cdr:car.args @cdr.args))
+      (join @cdr.args)
+
 def rem(f seq)
   if seq
     if (f car.seq)
