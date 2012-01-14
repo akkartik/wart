@@ -42,3 +42,9 @@ COMPILE_PRIM_FUNC(string_range, primFunc_string_get, "($string $index $end)",
 COMPILE_PRIM_FUNC(string_to_sym, primFunc_string_to_sym, "($s)",
   return mkref(newSym(toString(lookup("$s"))));
 )
+
+COMPILE_PRIM_FUNC(string<, primFunc_string_lesser, "($x $y)",
+  Cell* x = lookup("$x");
+  Cell* y = lookup("$y");
+  return toString(x) < toString(y) ? mkref(newNum(1)) : nil;
+)

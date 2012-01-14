@@ -36,3 +36,6 @@ defcoerce string list
   (fn(_)
     (collect:each c _
       yield.c))
+
+def <(a b) :case str?.a
+  (string< a b)
