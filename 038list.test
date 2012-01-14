@@ -110,3 +110,11 @@
 (test "none works - 2"
  :valueof (none odd? '(2 4 6))
  :should ~be nil)
+
+(test "flatten works"
+ :valueof (flatten '(a b (c d e)))
+ :should be '(a b c d e))
+
+(test "flatten works - 2"
+ :valueof (flatten '(a b (c d e) . f))
+ :should be '(a b c d e f))

@@ -97,6 +97,14 @@ def lastcons(l)
     lastcons.it
     l
 
+def flatten(l acc)
+  (if
+    !l
+      acc
+    ~cons?.l
+      (cons l acc)
+      (flatten car.l (flatten cdr.l acc)))
+
 
 
 ;; Internals
