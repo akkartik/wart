@@ -12,6 +12,10 @@ def inline(calls bindings)
             each x (inline (apply-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
                            (if env.f (cons env.f bindings) bindings))
               yield x
+          inlinable-mac?.f
+            each x (inline (apply-comma-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
+                           (if env.f (cons env.f bindings) bindings))
+              yield x
           :else
             yield call)
 
@@ -56,3 +60,44 @@ def inlinable-mac?(f)
   and mac?.f
       (~cdr body.f) ; no support for multiple exprs for now
       (and cons?:body.f cons?:car:body.f (iso backquote car:car:body.f)) ; begins with quasiquote
+      ; can't unquote lexical bindings for now
+      (contains? (map str unquoted-syms:body.f)
+                 (map str flatten:sig.f))
+
+; sub and l sorted lists of syms
+def contains?(sub l)
+  (if
+    (or !l !sub)
+      1
+    (< car.sub car.l)
+      nil
+    (iso car.sub car.l)
+      (contains? cdr.sub cdr.l)
+    :else
+      (contains? sub cdr.l))
+
+def unquoted-syms(expr)
+  if cons?.expr
+    if (or (comma? car.expr) (comma-splice? car.expr))
+      (list cdr.expr)
+      (join (unquoted-syms car.expr)
+            (unquoted-syms cdr.expr))
+
+def apply-comma-bindings(expr bindings)
+  (if
+    !cons?.expr
+      expr
+    backquote?:car.expr
+      (apply-comma-bindings cdr.expr bindings)
+    comma?:car.expr
+      (or (lookup-binding cdr.expr bindings)
+          quit.)
+    (and cons?:car.expr comma-splice?:car:car.expr)
+      let l (lookup-binding cdr:car.expr bindings)
+        if !l quit.
+        if (~iso 'list car.l) quit.
+        (join cdr.l
+              (apply-comma-bindings cdr.expr bindings))
+    :else
+      (cons (apply-comma-bindings car.expr bindings)
+            (apply-comma-bindings cdr.expr bindings)))
