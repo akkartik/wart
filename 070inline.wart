@@ -12,10 +12,6 @@ def inline(calls bindings)
             each x (inline (apply-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
                            (if env.f (cons env.f bindings) bindings))
               yield x
-          inlinable-mac?.f
-            each x (inline (apply-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
-                           (if env.f (cons env.f bindings) bindings))
-              yield unqq.x
           :else
             yield call)
 
@@ -60,31 +56,3 @@ def inlinable-mac?(f)
   and mac?.f
       (~cdr body.f) ; no support for multiple exprs for now
       (and cons?:body.f cons?:car:body.f (iso backquote car:car:body.f)) ; begins with quasiquote
-
-alias unqq strip-backquote:strip-commas:strip-comma-splice
-
-alias strip-backquote cadr
-
-def strip-commas(x)
-  (if
-    ~cons?.x
-      x
-    (iso comma car.x)
-      cadr.x
-    :else
-      (cons (strip-commas car.x)
-            (strip-commas cdr.x)))
-
-def strip-comma-splice(x)
-  (if
-    ~cons?.x
-      x
-    (and cons?:car.x (iso comma-splice car:car.x))
-      if cdr:car.x
-        (cons cadr:car.x
-              (strip-comma-splice (cons (cons comma-splice cddr:car.x)
-                                        cdr.x)))
-        (strip-comma-splice cdr.x)
-    :else
-      (cons (strip-comma-splice car.x)
-            (strip-comma-splice cdr.x)))

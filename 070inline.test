@@ -82,15 +82,3 @@
                                                 baz do)
                                            (fn(x) (bar x)))))
  :should be '(3))
-
-(test "strip-comma-splice - non-conses"
- :valueof (strip-comma-splice 3)
- :should be 3)
-
-(test "strip-comma-splice - comma-splice"
- :valueof (strip-comma-splice '(a b ,@(3 4)))
- :should be '(a b 3 4))
-
-(test "strip-comma-splice - comma-splice of list"
- :valueof (strip-comma-splice '(a b ,@(list 3 4)))
- :should be '(a b 3 4))
