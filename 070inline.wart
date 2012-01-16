@@ -2,8 +2,11 @@ def inline(calls bindings)
   collect:each call calls
     if (or !call !cons?.call)
       yield call
-      let f (or (if (sym? car.call)
-                  (lookup-binding car.call bindings))
+      let f (or (if
+                  (sym? car.call)
+                    (lookup-binding car.call bindings)
+                  (and cons?:car.call (iso 'fn car:car.call))
+                    (eval car.call))
                 car.call)
         (if
           (or ~callable?.f compiled-fn?.f)

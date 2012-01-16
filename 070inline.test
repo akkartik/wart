@@ -71,6 +71,10 @@
                                            (fn(x) (bar x)))))
  :should be '((baz 3)))
 
+(test "inline - handles fn exprs"
+ :valueof (inline '(((fn(a b) (+ a b)) 3 4)) (table))
+ :should be '((+ 3 4)))
+
 (test "inline - can't handle macros without backquotes"
  :valueof (inline '((foo 3)) (table 'foo (with (bar (fn(a) (baz a))
                                                 baz (mfn(a) a))
@@ -81,7 +85,7 @@
  :valueof (inline '((foo 3)) (table 'foo (with (bar (fn(a) (baz a))
                                                 baz do)
                                            (fn(x) (bar x)))))
- :should be '(((fn() 3))))
+ :should be '(3))
 
 (test "unquoted-syms"
  :valueof (unquoted-syms '(a b (c e) (f ((,g) ,h)) ,@i ,j))
