@@ -55,6 +55,10 @@
  :valueof (inline '((foo (3 4) 5)) (table 'foo (fn((a b) . c) (bar a b c))))
  :should be '((bar 3 4 (list 5))))
 
+(test "inline - handles quoted params"
+ :valueof (inline '((foo 3)) (table 'foo (fn'(x) (+ x 1))))
+ :should be '((+ 3 1)))
+
 (test "inline - handles lexical bindings"
  :valueof (inline '((foo 3)) (table 'foo (let bar (fn(a) a) (fn(x) (bar x)))))
  :should be '(3))

@@ -27,14 +27,13 @@ def inline(calls bindings)
 ;; internals
 
 def gen-bindings(params args acc)
+  if (and cons?.params quote?:car.params)
+    (zap cdr params) ; inline never distinguishes quoted params
   (if
     !params ; base case
       acc
     ~cons?.params ; rest param
       (cons (list params (cons 'list args))
-            acc)
-    (and quote?:car.params ~cons?:cdr.params) ; quoted rest param
-      (cons (list cdr.params (cons 'list args))
             acc)
     (~cons? car.params)
       (cons (list car.params car.args)
