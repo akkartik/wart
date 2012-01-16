@@ -35,7 +35,7 @@ def gen-bindings(params args acc)
     ~cons?.params ; rest param
       (cons (list params (cons 'list args))
             acc)
-    (~cons? car.params)
+    ~cons?:car.params
       (cons (list car.params car.args)
             (gen-bindings cdr.params cdr.args acc))
     :else ; destructured param
@@ -45,7 +45,8 @@ def gen-bindings(params args acc)
 def apply-bindings(expr bindings)
   (if
     !cons?.expr
-      (or (lookup-binding expr bindings) expr)
+      (or (lookup-binding expr bindings)
+          expr)
     backquote?:car.expr
       (apply-comma-bindings cdr.expr bindings)
     :else
