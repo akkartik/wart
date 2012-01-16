@@ -15,8 +15,8 @@ def inline(calls bindings)
             each x (inline (apply-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
                            (if env.f (cons env.f bindings) bindings))
               yield x
-          inlinable-mac?.f
-            each x (inline (apply-comma-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
+          mac?.f
+            each x (inline (apply-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
                            (if env.f (cons env.f bindings) bindings))
               yield x
           :else
@@ -43,10 +43,14 @@ def gen-bindings(params args acc)
                (gen-bindings cdr.params cdr.args acc)))
 
 def apply-bindings(expr bindings)
-  if !cons?.expr
-    (or (lookup-binding expr bindings) expr)
-    (cons (apply-bindings car.expr bindings)
-          (apply-bindings cdr.expr bindings))
+  (if
+    !cons?.expr
+      (or (lookup-binding expr bindings) expr)
+    backquote?:car.expr
+      (apply-comma-bindings cdr.expr bindings)
+    :else
+      (cons (apply-bindings car.expr bindings)
+            (apply-bindings cdr.expr bindings)))
 
 def lookup-binding(sym bindings)
   (if
@@ -58,39 +62,10 @@ def lookup-binding(sym bindings)
       (or (lookup-binding sym car.bindings)
           (lookup-binding sym cdr.bindings)))
 
-def inlinable-mac?(f)
-  and mac?.f
-      (~cdr body.f) ; no support for multiple exprs for now
-      (and cons?:body.f cons?:car:body.f (iso backquote car:car:body.f)) ; begins with quasiquote
-      ; can't unquote lexical bindings for now
-      (contains? (map str unquoted-syms:body.f)
-                 (map str flatten:sig.f))
-
-; sub and l sorted lists of syms
-def contains?(sub l)
-  (if
-    (or !l !sub)
-      1
-    (< car.sub car.l)
-      nil
-    (iso car.sub car.l)
-      (contains? cdr.sub cdr.l)
-    :else
-      (contains? sub cdr.l))
-
-def unquoted-syms(expr)
-  if cons?.expr
-    if (or (comma? car.expr) (comma-splice? car.expr))
-      (list cdr.expr)
-      (join (unquoted-syms car.expr)
-            (unquoted-syms cdr.expr))
-
 def apply-comma-bindings(expr bindings)
   (if
     !cons?.expr
       expr
-    backquote?:car.expr
-      (apply-comma-bindings cdr.expr bindings)
     comma?:car.expr
       (or (lookup-binding cdr.expr bindings)
           (die "macro with free var: " cdr.expr))

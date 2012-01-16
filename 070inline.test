@@ -79,11 +79,11 @@
  :valueof (inline '(((fn(a b) (+ a b)) 3 4)) (table))
  :should be '((+ 3 4)))
 
-(test "inline - can't handle macros without backquotes"
+(test "inline - handles macros"
  :valueof (inline '((foo 3)) (table 'foo (with (bar (fn(a) (baz a))
                                                 baz (mfn(a) a))
                                            (fn(x) (bar x)))))
- :should be '((baz 3)))
+ :should be '(3))
 
 (test "inline - handles bindings to macros"
  :valueof (inline '((foo 3)) (table 'foo (with (bar (fn(a) (baz a))
@@ -91,6 +91,10 @@
                                            (fn(x) (bar x)))))
  :should be '(3))
 
-(test "unquoted-syms"
- :valueof (unquoted-syms '(a b (c e) (f ((,g) ,h)) ,@i ,j))
- :should be '(g h i j))
+(test "inline - handles compound macro bodies"
+ :valueof (inline '((foo 3)) (table 'foo (mfn'(x) (prn "a") `(+ ,x 1))))
+ :should be '((prn "a") (+ 3 1)))
+
+(test "inline - handles compound macro bodies - 2"
+ :valueof (inline '((foo 3)) (table 'foo (mfn'(x) (let y 4 `(+ ,x y)))))
+ :should be '((let y 4 (+ 3 y))))
