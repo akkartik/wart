@@ -64,3 +64,7 @@ def backquote?(_) (iso _ backquote)
 def comma?(_) (iso _ comma)
 = comma-splice (car:cadr '`(,@1))
 def comma-splice?(_) (iso _ comma-splice)
+
+def die args
+  prn @args
+  quit.

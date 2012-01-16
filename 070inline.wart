@@ -91,11 +91,11 @@ def apply-comma-bindings(expr bindings)
       (apply-comma-bindings cdr.expr bindings)
     comma?:car.expr
       (or (lookup-binding cdr.expr bindings)
-          quit.)
+          (die "macro with free var: " cdr.expr))
     (and cons?:car.expr comma-splice?:car:car.expr)
       let l (lookup-binding cdr:car.expr bindings)
-        if !l quit.
-        if (~iso 'list car.l) quit.
+        if !l (die "macro with free var: " cdr:car.expr)
+        if (~iso 'list car.l) (die car:car.expr " must be a list for now")
         (join cdr.l
               (apply-comma-bindings cdr.expr bindings))
     :else
