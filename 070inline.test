@@ -85,6 +85,10 @@
                                            (fn(x) (bar x)))))
  :should be '(3))
 
+(test "inline - handles quotes"
+ :valueof (inline '((foo 3)) (table 'foo (fn(a) (list 'a a))))
+ :should be '((list 'a 3)))
+
 (test "inline - handles bindings to macros"
  :valueof (inline '((foo 3)) (table 'foo (with (bar (fn(a) (baz a))
                                                 baz do)

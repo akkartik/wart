@@ -39,6 +39,8 @@ def apply-bindings(expr bindings)
     !cons?.expr
       (or (lookup-binding expr bindings)
           expr)
+    quote?:car.expr
+      expr
     backquote?:car.expr
       (apply-comma-bindings cdr.expr bindings)
     :else
