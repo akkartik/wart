@@ -70,7 +70,7 @@ def apply-comma-bindings(expr bindings)
     comma?:car.expr
       (or (lookup-binding cdr.expr bindings)
           (die "macro with free var: " cdr.expr))
-    (and cons?:car.expr comma-splice?:car:car.expr)
+    (match car.expr (cons comma-splice '_))
       let l (lookup-binding cdr:car.expr bindings)
         if !l (die "macro with free var: " cdr:car.expr)
         if (~iso 'list car.l) (die car:car.expr " must be a list for now")
