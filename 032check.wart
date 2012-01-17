@@ -25,6 +25,13 @@ mac and args
 alias nil? not
 alias no not
 
+def match(a b)
+  (or (iso a b)
+      (iso b '_)
+      (and cons?.a cons?.b
+           (match car.a car.b)
+           (match cdr.a cdr.b)))
+
 let $iso iso
   def! iso(a b)
     or ($iso a b)

@@ -159,3 +159,41 @@
 (test "iso handles user-defined types"
  :valueof (iso '(type foo 3) '(type foo 3))
  :should ~be nil)
+
+
+
+(test "match - atom positive"
+ :valueof (match 3 3)
+ :should ~be nil)
+
+(test "match - atom negative"
+ :valueof (match 3 4)
+ :should be nil)
+
+(test "match - list positive"
+ :valueof (match '(1 (2 3)) '(1 (2 3)))
+ :should ~be nil)
+
+(test "match - list negative"
+ :valueof (match '(2 (2 3)) '(1 (2 3)))
+ :should be nil)
+
+(test "match treats _ as atom wildcard"
+ :valueof (match 3 '_)
+ :should ~be nil)
+
+(test "match - _ positive"
+ :valueof (match '(1 (2 3 4)) '(1 (_ 3 4)))
+ :should ~be nil)
+
+(test "match - _ negative"
+ :valueof (match '(2 (2 3 4)) '(1 (_ 3 4)))
+ :should be nil)
+
+(test "match - _ matches lists"
+ :valueof (match '(3) '_)
+ :should ~be nil)
+
+(test "match - _ matches lists when dotted"
+ :valueof (match '(1 2 3) '(1 . _))
+ :should ~be nil)
