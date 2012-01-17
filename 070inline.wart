@@ -8,19 +8,11 @@ def inline(calls bindings)
                   (and cons?:car.call (iso 'fn car:car.call))
                     (eval car.call))
                 car.call)
-        (if
-          (or ~callable?.f compiled-fn?.f)
-            yield call
-          fn?.f
-            each x (inline (apply-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
-                           (if env.f (cons env.f bindings) bindings))
-              yield x
-          mac?.f
-            each x (inline (apply-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
-                           (if env.f (cons env.f bindings) bindings))
-              yield x
-          :else
-            yield call)
+        if (or ~callable?.f compiled-fn?.f)
+          yield call
+          each x (inline (apply-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
+                         (if env.f (cons env.f bindings) bindings))
+            yield x
 
 
 
