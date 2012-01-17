@@ -60,10 +60,10 @@ def id(_)
 def quote?(_) (iso _ quote)
 = backquote (car '`(1))
 def backquote?(_) (iso _ backquote)
-= comma (car:cadr '`(,1))
-def comma?(_) (iso _ comma)
-= comma-splice (car:cadr '`(,@1))
-def comma-splice?(_) (iso _ comma-splice)
+= unquote (car:cadr '`(,1))
+def unquote?(_) (iso _ unquote)
+= unquote-splice (car:cadr '`(,@1))
+def unquote-splice?(_) (iso _ unquote-splice)
 
 def die args
   prn @args
