@@ -27,7 +27,7 @@ alias no not
 
 def match(a b)
   (or (iso a b)
-      (iso b '_)
+      (iso str.b.0 "_")
       (and cons?.a cons?.b
            (match car.a car.b)
            (match cdr.a cdr.b)))

@@ -197,3 +197,7 @@
 (test "match - _ matches lists when dotted"
  :valueof (match '(1 2 3) '(1 . _))
  :should ~be nil)
+
+(test "match treats any sym beginning with _ as wildcard"
+ :valueof (match '(1 2 3) '(1 . _x))
+ :should ~be nil)
