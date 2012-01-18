@@ -339,7 +339,8 @@ Cell* eval(Cell* expr) {
   if (!isFunc(fn))
     fn = functionify(fn);
   if (!isFunc(fn))
-    RAISE << "not a function call: " << expr << endl << DIE;
+    RAISE << "not a call: " << expr << endl
+        << "- Should it not be a call? Perhaps the expression is indented too much." << endl << DIE;
 
   // eval all its args in the current lexical scope
   Cell* realArgs = reorderKeywordArgs(calleeSig(fn), callArgs(expr));

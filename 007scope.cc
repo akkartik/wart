@@ -110,14 +110,11 @@ Cell* lookup(Cell* sym) {
   if (result) return result;
   result = lookupDynamicBinding(sym);
   if (result) return result;
-  RAISE << "No binding for " << toString(sym);
+  RAISE << "No binding for " << toString(sym) << endl;
 
-  // hackily add a hint if we printed a warning
-  if (inTest) return nil;
-  static bool extra = true;
-  if (extra) cerr << " (if a paren opens in the middle of a line, paren-insertion is disabled until it closes)";
-  extra = false;
-  cerr << endl;
+  if (inTest) return nil; // don't die
+  cerr << "- Did you not want a symbol lookup? Perhaps the expression is indented too much." << endl;
+  cerr << "- Was it defined using indentation? When wart encounters a paren in the middle of a line, it stops inserting parens until it closes." << endl << DIE;
   return nil;
 }
 
