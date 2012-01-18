@@ -26,9 +26,9 @@
             (inline '((foo 3 4)) env))
  :should be '((+ 4 3)))
 
-; assumes we haven't redefined cons
 (test "inline - pass through compiled functions"
- :valueof (inline '((cons 3 4)) globals.)
+ :valueof (and compiled-fn?.cons
+               (inline '((cons 3 4)) globals.))
  :should be '((cons 3 4)))
 
 (test "inline - handles varargs params"
