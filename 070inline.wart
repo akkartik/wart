@@ -5,7 +5,7 @@ def inline(calls bindings)
       let f (or (if
                   (sym? car.call)
                     (lookup-binding car.call bindings)
-                  (match car.call '(fn . _))
+                  (match '(fn . _) car.call)
                     (eval car.call))
                 car.call)
         if (or ~callable?.f compiled-fn?.f)
@@ -64,10 +64,10 @@ def apply-comma-bindings(expr bindings)
     unquote?:car.expr
       (or (lookup-binding cdr.expr bindings)
           (die "macro with free var: " cdr.expr))
-    (match car.expr (cons unquote-splice '_))
+    (match (cons unquote-splice '_) car.expr)
       let l (lookup-binding cdr:car.expr bindings)
         if !l (die "macro with free var: " cdr:car.expr)
-        if (~match l '(list . _)) (die cdr:car.expr " must be a list for now")
+        if (~match '(list . _) l) (die cdr:car.expr " must be a list for now")
         (join cdr.l
               (apply-comma-bindings cdr.expr bindings))
     :else

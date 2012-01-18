@@ -179,25 +179,25 @@
  :should be nil)
 
 (test "match treats _ as atom wildcard"
- :valueof (match 3 '_)
+ :valueof (match '_ 3)
  :should ~be nil)
 
 (test "match - _ positive"
- :valueof (match '(1 (2 3 4)) '(1 (_ 3 4)))
+ :valueof (match '(1 (_ 3 4)) '(1 (2 3 4)))
  :should ~be nil)
 
 (test "match - _ negative"
- :valueof (match '(2 (2 3 4)) '(1 (_ 3 4)))
+ :valueof (match '(2 (_ 3 4)) '(1 (2 3 4)))
  :should be nil)
 
 (test "match - _ matches lists"
- :valueof (match '(3) '_)
+ :valueof (match '_ '(3))
  :should ~be nil)
 
 (test "match - _ matches lists when dotted"
- :valueof (match '(1 2 3) '(1 . _))
+ :valueof (match '(1 . _) '(1 2 3))
  :should ~be nil)
 
 (test "match treats any sym beginning with _ as wildcard"
- :valueof (match '(1 2 3) '(1 . _x))
+ :valueof (match '(1 . _x) '(1 2 3))
  :should ~be nil)
