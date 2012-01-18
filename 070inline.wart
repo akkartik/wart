@@ -5,7 +5,7 @@ def inline(calls bindings)
       let f (or (if
                   (sym? car.call)
                     (lookup-binding car.call bindings)
-                  (and cons?:car.call (iso 'fn car:car.call))
+                  (match car.call '(fn . _))
                     (eval car.call))
                 car.call)
         if (or ~callable?.f compiled-fn?.f)
