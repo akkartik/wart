@@ -16,7 +16,7 @@ def inline(calls bindings)
 
 
 
-;; internals
+;; Internals
 
 def gen-bindings(params args acc)
   if (and cons?.params quote?:car.params)
