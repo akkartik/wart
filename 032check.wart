@@ -1,4 +1,3 @@
-= compiled-if if
 let $if if
   mac! if args
     $if !cdr.args
