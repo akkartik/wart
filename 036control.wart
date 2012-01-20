@@ -98,3 +98,9 @@ def andf fs
                   :else
                     (and (car.fs @args) (self cdr.fs))))
       (sub fs)))
+
+
+
+; pattern matching
+mac if args :case nil ;(iso 'let car:car.args) ;(match car.args '(let . _))
+  34

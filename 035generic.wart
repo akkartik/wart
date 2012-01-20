@@ -7,11 +7,11 @@ def construct-macro-call(args)
 
 let $mac mac
   mac! mac(name params . body)
-    if (~iso :case car.body)
+    compiled-if (~iso :case car.body)
       `(,$mac ,name ,params ,@body)
       `(let $super ,name
          (mac! ,name ,params
-           if ,cadr.body
+           compiled-if ,cadr.body
              (do ,@cddr.body)
              ,(construct-macro-call (cons '$super params)))) ; call super with params
 
