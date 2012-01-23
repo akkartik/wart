@@ -106,3 +106,7 @@
 (test "inline - handles unquote-splice"
  :valueof (inline '((foo 3)) (table 'foo (mfn 'body `(list ,@body))))
  :should be '((list 3)))
+
+(test "inline - handles unquote-splice on cdr"
+ :valueof (inline '((foo 3 4)) (table 'foo (mfn 'body `(list ,@cdr.body))))
+ :should be '((list 4)))
