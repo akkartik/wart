@@ -17,19 +17,3 @@
  :valueof (matching (a (_x _y)) (list 'a '(3 4))
             (list x y))
  :should be '(3 4))
-
-(test "pattern matching inside if"
- :valueof (if
-            nil
-              34
-            (let (A _b _c) '(A 3 4))
-              (+ b c)
-            :else
-              b)
- :should be 7)
-
-(test "if doesn't pattern match in else branch"
- :valueof (if nil
-            34
-            (let a 7 a))
- :should be 7)

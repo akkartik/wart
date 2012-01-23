@@ -11,11 +11,9 @@ let $mac mac
       `(,$mac ,name ,params ,@body)
       `(let $super ,name
          (mac! ,name ,params
-           (dyn_bind ,name $super)
-           ret $ans (if ,cadr.body
-                      (do ,@cddr.body)
-                      ,(construct-macro-call (cons '$super params))) ; call super with params
-             (dyn_unbind ,name)))
+           if ,cadr.body
+             (do ,@cddr.body)
+             ,(construct-macro-call (cons '$super params)))) ; call super with params
 
 mac def(name params . body) :case (iso :case car.body)
   `(let $old ,name

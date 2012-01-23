@@ -10,8 +10,3 @@ def foogen(s . rest) :case (and !rest sym?.s)
 (test "def :case can handle rest params - 2"
  :valueof foogen!a
  :should be 'a)
-
-(test "mac :case avoids infinite loops"
- :valueof (mac if args :case (or nil nil)
-            34)
- :should ~be nil) ; return successfully
