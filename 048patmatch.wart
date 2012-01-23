@@ -3,12 +3,6 @@ mac matching(vars vals . body)
      let ,strip_underscores.vars ,vals
       ,@body)
 
-mac if args :case (match '(let . _) car.args)
-  `(if (match ',cadr:car.args ,@cddr:car.args)
-     (matching ,@cdr:car.args
-       ,cadr.args)
-     ,@cddr.args)
-
 
 
 ;; Internals
