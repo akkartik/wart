@@ -27,3 +27,9 @@
             :else
               b)
  :should be 7)
+
+(test "if doesn't pattern match in else branch"
+ :valueof (if nil
+            34
+            (let a 7 a))
+ :should be 7)
