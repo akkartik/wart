@@ -118,3 +118,7 @@
 (test "inline - handles unquote-splice of expr - 2"
  :valueof (inline '((foo 3 4 5)) (table 'foo (mfn 'body `(list ,@cddr.body))))
  :should be '((list 5)))
+
+(test "inline - inlines multi-branch if"
+ :valueof (inline '((if 3 4)) (table 'if if))
+ :should be `((,compiled-if 3 4 (if))))

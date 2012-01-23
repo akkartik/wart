@@ -9,7 +9,7 @@ def inline(calls bindings)
                     (eval car.call))
                 car.call)
         if (or ~callable?.f compiled-fn?.f)
-          yield call
+          yield compiled-rules.call
           each x (inline (apply-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
                          (if env.f (cons env.f bindings) bindings))
             yield x
@@ -69,3 +69,40 @@ def apply-comma-bindings(expr bindings)
     :else
       (cons (apply-comma-bindings car.expr bindings)
             (apply-comma-bindings cdr.expr bindings)))
+
+def compiled-rules(call)
+  (if
+    (iso compiled-if car.call)
+      (let x (simplify cadr.call)
+        (if
+          (iso x cadr.call)
+            call
+          !x
+            wrap:inline:list cadr:cddr.call
+          :else
+            wrap:inline:list car:cddr.call))
+    :else
+      call)
+
+def simplify(expr)
+  (if
+    (match '(not _) expr)
+      let x simplify:cadr.expr
+        (if
+          (iso x cadr.expr)
+            x
+          !x
+            1
+          :else
+            nil)
+    (match '(car (list _ . _)) expr)
+      cadr:cadr.expr
+    (match '(cdr (list _ . _)) expr)
+      `(list ,@cddr:cadr.expr)
+    :else
+      expr)
+
+(def wrap(x)
+  (if single?.x
+    car.x
+    (cons 'do x)))
