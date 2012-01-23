@@ -103,6 +103,10 @@
  :valueof (inline '((foo 3)) (table 'foo (mfn'(x) (let y 4 `(+ ,x y)))))
  :should be '((let y 4 (+ 3 y))))
 
+(test "inline - handles unquote of expr"
+ :valueof (inline '((foo 3 4)) (table 'foo (mfn 'body `(list ,car.body))))
+ :should be '((list 3)))
+
 (test "inline - handles unquote-splice"
  :valueof (inline '((foo 3)) (table 'foo (mfn 'body `(list ,@body))))
  :should be '((list 3)))

@@ -62,8 +62,7 @@ def apply-comma-bindings(expr bindings)
     !cons?.expr
       expr
     unquote?:car.expr
-      (or (lookup-binding cdr.expr bindings)
-          (die "macro with free var: " cdr.expr))
+      (eval:apply-bindings cdr.expr bindings)
     (match (cons unquote-splice '_) car.expr)
       (join (eval:apply-bindings cdr:car.expr bindings)
             (apply-comma-bindings cdr.expr bindings))
