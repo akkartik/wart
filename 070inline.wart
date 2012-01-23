@@ -64,19 +64,9 @@ def apply-comma-bindings(expr bindings)
     unquote?:car.expr
       (or (lookup-binding cdr.expr bindings)
           (die "macro with free var: " cdr.expr))
-    (match (cons unquote-splice '(_ _)) car.expr)
-       matching (_ _f _var) car.expr
-         let l (lookup-binding var bindings)
-           if !l (die "macro with free var: " cadr:cdr:car.expr)
-           if (~iso 'list car.l) (die cdr:car.expr " must be a list for now")
-           (join (eval `(,f ,l)) ; ignores env in bindings
-                 (apply-comma-bindings cdr.expr bindings))
     (match (cons unquote-splice '_) car.expr)
-      let l (lookup-binding cdr:car.expr bindings)
-        if !l (die "macro with free var: " cdr:car.expr)
-        if (~match '(list . _) l) (die cdr:car.expr " must be a list for now")
-        (join cdr.l
-              (apply-comma-bindings cdr.expr bindings))
+      (join (eval (apply-bindings cdr:car.expr bindings))
+            (apply-comma-bindings cdr.expr bindings))
     :else
       (cons (apply-comma-bindings car.expr bindings)
             (apply-comma-bindings cdr.expr bindings)))
