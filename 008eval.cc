@@ -38,6 +38,11 @@
                                     return get(rep(callee), newSym("body"));
                                   }
 
+                                  Cell* calleeImpl(Cell* callee) {
+                                    Cell* impl = get(rep(callee), newSym("optimized-body"));
+                                    return (impl != nil) ? impl : calleeBody(callee);
+                                  }
+
                                   Cell* calleeEnv(Cell* callee) {
                                     return get(rep(callee), newSym("env"));
                                   }
@@ -358,7 +363,7 @@ Cell* eval(Cell* expr) {
   if (isPrimFunc(calleeBody(fn)))
     result = toPrimFunc(calleeBody(fn))(); // all primFuncs must mkref result
   else
-    for (Cell* form = calleeBody(fn); form != nil; form = cdr(form)) {
+    for (Cell* form = calleeImpl(fn); form != nil; form = cdr(form)) {
       rmref(result);
       result = eval(car(form));
     }
