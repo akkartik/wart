@@ -107,10 +107,10 @@
  :valueof (inline '((foo 3)) (table 'foo (mfn 'body `(list ,@body))))
  :should be '((list 3)))
 
-(test "inline - handles unquote-splice on cdr"
+(test "inline - handles unquote-splice of expr - 1"
  :valueof (inline '((foo 3 4)) (table 'foo (mfn 'body `(list ,@cdr.body))))
  :should be '((list 4)))
 
-(test "inline - handles unquote-splice on cddr"
+(test "inline - handles unquote-splice of expr - 2"
  :valueof (inline '((foo 3 4 5)) (table 'foo (mfn 'body `(list ,@cddr.body))))
  :should be '((list 5)))
