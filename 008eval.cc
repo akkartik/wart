@@ -155,6 +155,7 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
                                         addCons(curr, arg);
                                         continue;
                                       }
+                                      RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
                                       Cell* newLimb = unsplice(arg);
                                       setCdr(curr, newLimb);
                                       rmref(newLimb);
@@ -167,6 +168,8 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
                                     Cell* result = unsplice(car(args));
                                     if (result == nil)
                                       return evalArgs(params, cdr(args));
+                                    if (isCons(params) ? isQuoted(car(params)) : isQuoted(params))
+                                      RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
                                     Cell* curr = result;
                                     for (; cdr(curr) != nil; curr=cdr(curr))
                                       params=cdr(params); // don't eval spliced args again, even if param is unquoted
