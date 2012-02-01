@@ -17,11 +17,10 @@ mac or args
 mac and args
   if !args
     1
-    if car.args
-      if !cdr.args
-        car.args
-        `(if ,car.args
-           and ,@cdr.args)
+    if !cdr.args
+      car.args
+      `(if ,car.args
+         and ,@cdr.args)
 
 alias nil? not
 alias no not
