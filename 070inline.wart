@@ -1,4 +1,7 @@
 def inline(calls bindings)
+  (strip-listq:inline-sub calls bindings)
+
+def inline-sub(calls bindings)
   collect:each call calls
     if (or !call !cons?.call)
       yield call
@@ -10,8 +13,8 @@ def inline(calls bindings)
                 car.call)
         if (or ~callable?.f compiled-fn?.f)
           yield compiled-rules.call
-          each x (inline (apply-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
-                         (if env.f (cons env.f bindings) bindings))
+          each x (inline-sub (apply-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
+                             (if env.f (cons env.f bindings) bindings))
             yield x
 
 
@@ -25,7 +28,7 @@ def gen-bindings(params args acc)
     !params ; base case
       acc
     ~cons?.params ; rest param
-      (cons (list params (cons 'list args))
+      (cons (list params (cons 'listq args))
             acc)
     ~cons?:car.params
       (cons (list car.params car.args)
@@ -78,9 +81,9 @@ def compiled-rules(call)
           (iso x cadr.call)
             call
           !x
-            wrap:inline:list cadr:cddr.call
+            wrap:inline-sub:list cadr:cddr.call
           :else
-            wrap:inline:list car:cddr.call))
+            wrap:inline-sub:list car:cddr.call))
     :else
       call)
 
@@ -95,10 +98,10 @@ def simplify(expr)
             1
           :else
             nil)
-    (match '(car (list _ . _)) expr)
+    (match '(car (listq _ . _)) expr)
       cadr:cadr.expr
-    (match '(cdr (list _ . _)) expr)
-      `(list ,@cddr:cadr.expr)
+    (match '(cdr (listq _ . _)) expr)
+      `(listq ,@cddr:cadr.expr)
     :else
       expr)
 
@@ -106,3 +109,16 @@ def wrap(x)
   if single?.x
     car.x
     (cons 'do x)
+
+def listq 'args
+  args
+
+def strip-listq(tree)
+  (if
+    (iso 'listq tree)
+      'list
+    ~cons?.tree
+      tree
+    :else
+      (cons strip-listq:car.tree
+            strip-listq:cdr.tree))

@@ -122,3 +122,7 @@
 (test "inline - inlines multi-branch if"
  :valueof (inline '((if 3 4)) (table 'if if))
  :should be `((,compiled-if 3 4 (if))))
+
+(test "inline - inlines multi-branch if with free vars"
+ :valueof (inline '((if a b)) (table 'if if))
+ :should be `((,compiled-if a b (if))))
