@@ -67,10 +67,18 @@ def reduce(f xs)
     (f @xs)
 
 def all(f xs)
-  (and @(map f xs))
+  (if
+    !xs
+      1
+    (f car.xs)
+      (all f cdr.xs))
 
 def some(f xs)
-  (or @(map f xs))
+  if xs
+    if (f car.xs)
+      1
+      (some f cdr.xs)
+
 alias any some
 alias none ~some
 
