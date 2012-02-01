@@ -102,7 +102,7 @@ def simplify(expr)
     :else
       expr)
 
-(def wrap(x)
-  (if single?.x
+def wrap(x)
+  if single?.x
     car.x
-    (cons 'do x)))
+    (cons 'do x)
