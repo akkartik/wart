@@ -37,7 +37,7 @@ using std::ofstream;
 bool runningTests = false;
 int numFailures = 0;
 bool inTest = false;
-int errorCount = 0;
+int raiseCount = 0;
 
 
 
@@ -57,7 +57,7 @@ ostream& operator<<(unused ostream& os, unused Die die) {
 Die DIE;
 
                      // ?: to avoid dangling-else warnings
-#define RAISE inTest ? ++errorCount,cout \
+#define RAISE inTest ? ++raiseCount,cout \
                      : cerr << __FILE__ << ":" << __LINE__ << " "
 
 
@@ -198,7 +198,7 @@ long numUnfreed() {
 
 void checkState() {
   inTest = false;
-  if (errorCount != 0) RAISE << errorCount << " errors encountered";
+  if (raiseCount != 0) RAISE << raiseCount << " errors encountered";
   teardownStreams();
   teardownPrimFuncs();
   teardownLiteralTables();
@@ -262,7 +262,7 @@ void init() {
   setupLexicalScope();
   setupStreams();
   setupPrimFuncs();
-  errorCount = 0;
+  raiseCount = 0;
 }
 
 int main(int argc, unused char* argv[]) {

@@ -120,8 +120,7 @@ void test_evalArgs_handles_spliced_arg_for_quoted_vararg_param() {
   rmref(params);
   endDynamicScope("b");
   endDynamicScope("a");
-  checkEq(errorCount, 1); // raised warning
-  errorCount = 0;
+  checkEq(raiseCount, 1);   raiseCount = 0;
 }
 
 void test_evalArgs_handles_spliced_arg() {

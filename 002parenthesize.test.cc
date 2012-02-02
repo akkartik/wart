@@ -521,6 +521,6 @@ void test_parenthesize_passes_through_unbalanced_open_paren() {
 void test_parenthesize_errors_on_unbalanced_closed_paren() {
   CodeStream c(stream(")"));
   list<Token> tokens = nextExpr(c);
-  checkEq(errorCount, 1);   errorCount=0;
+  checkEq(raiseCount, 1);   raiseCount=0;
   check(c.fd.eof());
 }
