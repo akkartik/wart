@@ -103,6 +103,10 @@
  :valueof (keep odd? '(11 12 13))
  :should be '(11 13))
 
+(test "all works with lists"
+ :valueof (all cons? '((1) 2))
+ :should be nil)
+
 (test "none works"
  :valueof (none odd? '(1 2 3))
  :should be nil)
