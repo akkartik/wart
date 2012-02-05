@@ -1,14 +1,55 @@
-Feedback: wart@akkartik.com
+  If I look at any small part of it, I can see what is going on -- I don’t
+  need to refer to other parts to understand what something is doing.
 
-This thoroughly unit-tested interpreter takes wart off Common Lisp and makes
-it a lisp-1 with syntactically significant whitespace, fexprs and
-case-sensitive symbols.
+  If I look at any large part in overview, I can see what is going on -- I
+  don’t need to know all the details to get it.
 
-Still in progress. Factorial is a thousand times slower than in arc.
+  Every level of detail is as locally coherent and as well thought-out as any
+  other level.
 
-You'll need gcc.
+      -- Richard Gabriel, The Quality Without A Name
+         (http://dreamsongs.com/Files/PatternsOfSoftware.pdf, pg 42))
 
-To run:
+Wart is a small, *super* readable, thoroughly unit-tested lisp.
+Wart returns to the roots of lisp: no constraints, maximum flexibility, extreme late-binding.
+Wart is not a platform. It exposes no interface, releases no version numbers.
+Anything can change at any time. If you use it, write lots of tests. Or God help you.
+Everything is open to question -- but you'll have to pry macros out of my cold dead hands.
+
+Wart is intended above all to be read.
+If you write programs using it, put them in this directory. Don't hide it away
+somewhere in your path.
+Feel free to make changes to the language. You know your needs best.
+
+Wart will eventually be 'fast enough'. Right now it's 3-5 orders of magnitude too slow.
+It will always be small. 10-20kLoC should provide a useable foundation for 'real' apps.
+
+---
+
+Code sample:
+
+  def fact(n)
+    if (iso n 0)
+      1
+      (* n (fact (- n 1)))
+
+  ; Alternatively
+  def fact(n)
+    (* n (fact (- n 1)))
+  def fact(n) :case (iso n 0)
+    1
+
+The implementation uniformly uses stepwise refinement (aka monkeypatching) to
+separate concerns. All language primitives can be extended (or even redefined).
+In a small codebase it's easy to find every place that say 'if' has been extended.
+
+Key features: first-class macros (fexprs), pervasive python-style keyword args,
+and it can deduce parens from indentation (but lisp-with-all-parens will always
+work).
+
+You'll need linux and gcc.
+
+To run it:
   $ wart
   wart>
 
@@ -18,6 +59,9 @@ Hit ctrl-d to quit.
 To run tests:
   $ wart test
   $ # success
+
+It started out as a common lisp implementation, which may be an easier read if
+you aren't fluent with C: http://github.com/akkartik/wart/tree/sbcl
 
 ---
 
@@ -33,13 +77,72 @@ above isn't a function call. And parens are required in:
   (do
     something)
 
-Conventional, fully-parenthesized expressions should always work with any
-reasonable indentation.
+Conventional, fully-parenthesized expressions should always work:
   (def foo() 34)
   (def foo()
     34)
-
-One special-case: multi-line top-level lists should wrap by exactly one extra
+One exception: multi-line top-level lists should wrap by exactly one extra
 space to avoid grouping subsequent lines:
   (one really long
    lisp data list)
+
+--- Garbage collection
+
+Wart frees up unused memory using reference-counting
+(http://en.wikipedia.org/wiki/Reference_counting). Every Cell tracks the
+number of incoming pointers to it using a field called nrefs.
+
+Wart must increment/decrement nrefs when saving a Cell inside another: in the
+car or cdr, or inside a Table. Never assign to car or cdr or a Table key by
+hand. Use an existing primitive: setCar, setCdr, set. They're thoroughly
+tested.
+
+Tests thoroughly audit nrefs using checkState, in order to detect errors as
+soon as possible.
+
+eval takes pains to increment the nrefs of *exactly* one Cell (the return
+value) across all paths. Nested calls to eval decrement nrefs of the result
+unless they return it. Structure other functions returning Cells the same way.
+
+To implement operations in C, use the COMPILE_PRIM_FUNC macro.
+COMPILE_PRIM_FUNC, like eval, is responsible for ensuring that the nrefs of
+exactly one Cell is incremented across all paths.
+
+If you hack on wart's cc files and forget to decrement nrefs you have a memory
+leak. If you forget to increment nrefs you have something worse: a prematurely
+garbage-collected cell that may now be used for something else entirely. Old
+pointers to it can no longer rely on what it contains; they may clobber or try
+to interpret arbitrary data as a string or a Table. All bets are off. Wart
+tries to loudly detect this insidious class of error as immediately as
+possible. Every time a Cell is freed it resets its pointers to NULL; when it's
+reused its pointers are initialized to nil. If wart ever complains that it ran
+across NULL, it means I or you forgot to decrement nrefs somewhere. All bets
+are off.
+
+--- Generated _lists
+
+To run its tests wart needs a list of tests to run. It constructs such a list
+on the fly during compilation. Several other places use the same trick. The
+set of files to compile is auto-generated, as is the list of compiled
+primitives wart knows about. You can add new COMPILE_PRIM_FUNC operators, or
+entirely new code in files new or old, and they'll be automatically included
+the next time you run wart.
+
+--- Credits
+
+Wart was inspired by Arc, a lisp dialect by Paul Graham and Robert T Morris:
+  http://www.paulgraham.com/arc.html
+
+Discussions on the Arc Forum generated all the ideas here:
+  http://arclanguage.org/news
+
+Story arc (pun intended):
+  "The wart atop the mountain": http://arclanguage.org/item?id=12814
+  Generic functions: http://arclanguage.org/item?id=11779, http://arclanguage.org/item?id=13790
+  Python-style keyword args: http://arclanguage.org/item?id=12657
+  Why wart has no modules: http://arclanguage.org/item?id=12777
+  Why wart has just one kind of equality: http://arclanguage.org/item?id=13690
+  In praise of late binding: http://arclanguage.org/item?id=15655
+  Libraries suck: http://www.arclanguage.org/item?id=13283
+
+Feedback: wart@akkartik.com
