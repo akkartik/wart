@@ -8,5 +8,7 @@ wart> def foo()<Enter>
   34<Enter>
 <Enter>
 
-Add a comment at the end of one of the .wart files
+Manually load a .wart file at the repl.
+
+Add a comment at the end of one of the .wart files.
 $ wart test

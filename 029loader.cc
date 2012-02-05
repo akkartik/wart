@@ -3,11 +3,13 @@
 void loadFile(const char* filename) {
   ifstream f(filename);
   CodeStream c(f);
+  bool old_interactive = interactive; interactive = false;
   while (!c.fd.eof()) {
     Cell* cell = read(c);
     rmref(eval(cell));
     rmref(cell);
   }
+  interactive = old_interactive;
 }
 
                                   vector<char*> sortedFiles(const char* dirname, const char* ext) {
