@@ -8,7 +8,7 @@
   other level.
 
       -- Richard Gabriel, The Quality Without A Name
-         (http://dreamsongs.com/Files/PatternsOfSoftware.pdf, pg 42))
+         (http://dreamsongs.com/Files/PatternsOfSoftware.pdf, page 42)
 
 Wart is a small, *super* readable, thoroughly unit-tested lisp.
 Wart returns to the roots of lisp: no constraints, maximum flexibility, extreme late-binding.
