@@ -41,6 +41,10 @@ Code sample:
 
 The implementation uniformly uses stepwise refinement (aka monkeypatching) to
 separate concerns. All language primitives can be extended (or even redefined).
+
+  def len(x) :case (isa len queue)
+    (queue-length x)
+
 In a small codebase it's easy to find every place that say 'if' has been extended.
 
 Key features: first-class macros (fexprs), pervasive python-style keyword args,
