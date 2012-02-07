@@ -39,7 +39,7 @@ Code sample:
   def fact(n) :case (iso n 0)
     1
 
-The implementation uniformly uses stepwise refinement (aka monkeypatching) to
+The implementation uniformly uses stepwise refinement (aka monkey-patching) to
 separate concerns. All language primitives can be extended (or even redefined).
 
   def len(x) :case (isa len queue)
