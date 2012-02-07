@@ -39,9 +39,9 @@ Code sample:
   def fact(n) :case (iso n 0)
     1
 
-All functions are generic and can be extended at any time. The implementation
-uniformly adds features to language primitives by extending them in this
-manner.
+All functions are generic and can be extended or overridden at any time. The
+implementation uniformly adds features to language primitives by extending
+them in this manner.
 
   def len(x) :case (isa len queue)
     (queue-length x)
