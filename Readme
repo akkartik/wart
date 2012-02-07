@@ -68,9 +68,9 @@ if you aren't fluent with C: http://github.com/akkartik/wart/tree/sbcl
 --- Directory organization
 
 Wart loads all files that start with a digit and have a '.cc' or '.wart' or
-'.test' extension. Files are loaded in order. To create a new app just save
-your code into a new file or files and give them the appropriate digit prefix
-to influence load order.
+'.test' extension. Files are loaded in [ascii] order. To create a new app,
+just save your code into a new file or files and give them the appropriate
+digit prefix to influence load order.
 
 By convention code in a '.cc' or '.wart' file stores its unit tests in the
 corresponding '.test.cc' or '.test' file respectively. If you don't understand
@@ -79,12 +79,16 @@ what a name means, locate and read its tests.
 --- Paren-insertion based on indentation
 
 Wart is indentation sensitive. Multi-token lines without leading parens are
-implicitly grouped with later indented lines.
-
+implicitly grouped with later indented lines:
   if (> n 0)
     * n (- n 1)
   => (if (> n 0)
        (* n (- n 1))
+
+No indented lines after? They're grouped in isolation:
+  a b
+  c d
+  => (a b) (c d)
 
 Lines with a single token are never wrapped in parens:
   def foo()
