@@ -118,11 +118,11 @@ Putting these rules together, parens are not required around 'if' in:
   => (if (iso 1 (% x 2)) 'odd)
      (:else 'even)
 
-By convention I try to leave out parens for control flow operators like def
-and if and while, and keep parens around expressions. But there are exceptions
+By convention I try to leave out parens for control flow operators like 'def'
+and 'if' and 'while', and keep parens elsewhere. But there are exceptions
 where parens are required, like with 'if' sometimes like above, and with 'do'
 blocks:
-  (do
+  (do                 ; parens required because line has a single token
     something
     something else)
   => (do something (something else))
@@ -132,7 +132,8 @@ Arglists are special:
       d e f) ; this line's indentation doesn't matter
     34
   => (def foo(a b c d e f) 34)
-Parens in the middle of a line disable paren-insertion until they are closed.
+Parens opening in the middle of a line disable paren-insertion until they are
+closed.
 
 There are lots more scenarios in parenthesize.test.cc if you want to practice.
 
@@ -141,9 +142,10 @@ Conventional, fully-parenthesized expressions should always work:
   (def foo()
     34)
 One exception: multi-line top-level lists should wrap by exactly one extra
-space to avoid grouping subsequent lines:
-  (one really long
-   lisp data list)
+space beyond the paren to avoid grouping subsequent lines:
+  '(one really long
+    lisp data list)
+  => (one really long lisp data list)
 
 Tabs count as 2 spaces. Don't mix tabs and spaces.
 
