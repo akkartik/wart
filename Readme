@@ -39,15 +39,16 @@ Code sample:
   def fact(n) :case (iso n 0)
     1
 
-The implementation uniformly uses stepwise refinement (aka monkey-patching) to
-separate concerns. All language primitives can be extended (or even redefined).
+All functions are generic and can be extended at any time. The implementation
+uniformly adds features to language primitives by extending them in this
+manner.
 
   def len(x) :case (isa len queue)
     (queue-length x)
 
-Other features: first-class macros (fexprs), pervasive python-style keyword
-args, and it can deduce parens from indentation (but traditional
-lisp-with-parens will always work).
+Other features: first-class macros (fexprs) that are also open to extension,
+pervasive python-style keyword args, and it can deduce parens from indentation
+(but traditional lisp-with-parens will always work).
 
 You'll need linux and gcc.
 
