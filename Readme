@@ -65,19 +65,61 @@ To run tests:
 Wart started out as a common lisp implementation, which may be an easier read
 if you aren't fluent with C: http://github.com/akkartik/wart/tree/sbcl
 
----
+--- Paren-insertion based on indentation
 
-Wart is indentation sensitive:
+Wart is indentation sensitive. Multi-token lines without leading parens are
+implicitly grouped with later indented lines.
+
+  if (> n 0)
+    * n (- n 1)
+  => (if (> n 0)
+       (* n (- n 1))
+
+Lines with a single token are never wrapped in parens:
   def foo()
-    34
+    x
+  => (def foo() x)    ; x is returned as a value, never called
 
-Tabs count as 2 spaces. Don't mix tabs and spaces.
+Lines with a leading paren are never wrapped in parens:
+  def foo(x)
+    (prn x) x
+  => (def foo(x) (prn x) x)
 
-Multi-token lines without leading parens are implicitly grouped with later
-indented lines. Lines with a single token are always left alone. So the '34'
-above isn't a function call. And parens are required in:
+Putting these rules together, parens are not required around 'if' in:
+  if (iso 1 (% x 2))
+    'odd
+    'even
+..but they are required in:
+  (if                 ; parens required because line has a single token
+    (iso 1 (% x 2))   ; parens required to avoid grouping with next line
+      'odd
+    :else             ; optional; more clear
+      'even)
+..and furthermore, this is wrong:
+  if (iso 1 (% x 2)
+    'odd
+  :else
+    'even
+  => (if (iso 1 (% x 2)) 'odd)
+     (:else 'even)
+
+By convention I try to leave out parens for control flow operators like def
+and if and while, and keep parens around expressions. But there are exceptions
+where parens are required, like with 'if' sometimes like above, and with 'do'
+blocks:
   (do
-    something)
+    something
+    something else)
+  => (do something (something else))
+
+Arglists are special:
+  def foo(a b c
+      d e f) ; this line's indentation doesn't matter
+    34
+  => (def foo(a b c d e f) 34)
+Parens in the middle of a line disable paren-insertion until they are closed.
+
+There are lots more scenarios in parenthesize.test.cc if you want to practice.
 
 Conventional, fully-parenthesized expressions should always work:
   (def foo() 34)
@@ -87,6 +129,8 @@ One exception: multi-line top-level lists should wrap by exactly one extra
 space to avoid grouping subsequent lines:
   (one really long
    lisp data list)
+
+Tabs count as 2 spaces. Don't mix tabs and spaces.
 
 --- Garbage collection
 
