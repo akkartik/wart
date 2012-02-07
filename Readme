@@ -115,8 +115,7 @@ Putting these rules together, parens are not required around 'if' in:
     'odd
   :else
     'even
-  => (if (iso 1 (% x 2)) 'odd)
-     (:else 'even)
+  => (if (iso 1 (% x 2)) 'odd) :else 'even
 
 By convention I try to leave out parens for control flow operators like 'def'
 and 'if' and 'while', and keep parens elsewhere. But there are exceptions
