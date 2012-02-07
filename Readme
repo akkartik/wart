@@ -108,9 +108,9 @@ Putting these rules together, parens are not required around 'if' in:
   (if                 ; parens required because line has a single token
     (iso 1 (% x 2))   ; parens required to avoid grouping with next line
       'odd
-    :else             ; optional; more clear
+    :else             ; optional, more clear
       'even)
-..and furthermore, this is wrong:
+..and, furthermore, this is wrong:
   if (iso 1 (% x 2)
     'odd
   :else
