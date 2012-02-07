@@ -17,7 +17,7 @@ Anything can change at any time. If you use it, write lots of tests. Or God help
 Everything is open to question -- but you'll have to pry macros out of my cold dead hands.
 
 Wart is intended above all to be read.
-If you write programs using it, put them in this directory. Don't hide it away
+If you write programs using it, put them in this directory. Don't hide wart away
 somewhere in your path.
 Feel free to make changes to the language. You know your needs best.
 
