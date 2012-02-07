@@ -1,8 +1,8 @@
-  If I look at any small part of it, I can see what is going on -- I don’t
+  If I look at any small part of it, I can see what is going on -- I don't
   need to refer to other parts to understand what something is doing.
 
   If I look at any large part in overview, I can see what is going on -- I
-  don’t need to know all the details to get it.
+  don't need to know all the details to get it.
 
   Every level of detail is as locally coherent and as well thought-out as any
   other level.
@@ -45,11 +45,9 @@ separate concerns. All language primitives can be extended (or even redefined).
   def len(x) :case (isa len queue)
     (queue-length x)
 
-In a small codebase it's easy to find every place that say 'if' has been extended.
-
-Key features: first-class macros (fexprs), pervasive python-style keyword args,
-and it can deduce parens from indentation (but lisp-with-all-parens will always
-work).
+Other key features: first-class macros (fexprs), pervasive python-style
+keyword args, and it can deduce parens from indentation (but
+lisp-with-all-parens will always work).
 
 You'll need linux and gcc.
 
@@ -64,8 +62,8 @@ To run tests:
   $ wart test
   $ # success
 
-It started out as a common lisp implementation, which may be an easier read if
-you aren't fluent with C: http://github.com/akkartik/wart/tree/sbcl
+Wart started out as a common lisp implementation, which may be an easier read
+if you aren't fluent with C: http://github.com/akkartik/wart/tree/sbcl
 
 ---
 
