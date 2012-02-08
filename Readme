@@ -149,6 +149,25 @@ space beyond the paren to avoid grouping subsequent lines:
 
 Tabs count as 2 spaces. Don't mix tabs and spaces.
 
+--- Simple syntax
+
+Wart uses a few simple syntax rules to reduce parens further:
+
+  a.b ; => (a b) as long as a and b aren't all digits; 2.4 is just a number
+  a.  ; => (a)
+  a!b ; => (a 'b)
+  !a  ; => (not a)
+
+  f:g ; => (compose f g)
+  f&g ; => (andf f g)
+  ~f  ; => (complement f)
+
+The prededence rules for these operators are intended to be as intuitive as
+possible, and it's easy to see what they expand to at the prompt:
+
+  wart> 'a.b!c
+  ((a b) 'c)
+
 --- Garbage collection
 
 Wart frees up unused memory using reference-counting
