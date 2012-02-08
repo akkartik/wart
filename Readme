@@ -74,8 +74,8 @@ just save your code into a new file or files and give them the appropriate
 digit prefix to influence load order.
 
 By convention code in a '.cc' or '.wart' file stores its unit tests in the
-corresponding '.test.cc' or '.test' file respectively. If you don't understand
-what a name means, locate and read its tests.
+corresponding '.test.cc' or '.test' file respectively. To understand a strange
+name, find its tests.
 
 --- Paren-insertion based on indentation
 
