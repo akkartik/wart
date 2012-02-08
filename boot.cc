@@ -135,14 +135,7 @@ Cell* read(CodeStream& c) {
 
 
 
-// post-test teardown
-
-void resetState() {
-  numLiterals.clear();
-  stringLiterals.clear();
-  resetHeap();
-  dynamics.clear(); // leaks memory for strings and tables
-}
+// check for leaks in tests
 
                                   void markAllCells(Cell* x, unordered_map<Cell*, long>& mark) {
                                     if (x == nil) return;
@@ -207,8 +200,6 @@ void checkState() {
     RAISE << "Memory leak!\n";
     dumpUnfreed();
   }
-
-  resetState();
 }
 
 
@@ -258,6 +249,11 @@ void runTests() {
 
 
 void init() {
+  numLiterals.clear();
+  stringLiterals.clear();
+  dynamics.clear(); // leaks memory for strings and tables
+  resetHeap();
+
   setupNil();
   setupLexicalScope();
   setupStreams();
