@@ -133,6 +133,19 @@ Cell* read(CodeStream& c) {
   return mkref(transform(nextRawCell(c)));
 }
 
+void init() {
+  numLiterals.clear();
+  stringLiterals.clear();
+  dynamics.clear(); // leaks memory for strings and tables
+  resetHeap();
+
+  setupNil();
+  setupLexicalScope();
+  setupStreams();
+  setupPrimFuncs();
+  raiseCount = 0;
+}
+
 
 
 // check for leaks in tests
@@ -247,19 +260,6 @@ void runTests() {
 }
 
 
-
-void init() {
-  numLiterals.clear();
-  stringLiterals.clear();
-  dynamics.clear(); // leaks memory for strings and tables
-  resetHeap();
-
-  setupNil();
-  setupLexicalScope();
-  setupStreams();
-  setupPrimFuncs();
-  raiseCount = 0;
-}
 
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
