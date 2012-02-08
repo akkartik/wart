@@ -202,9 +202,7 @@ long numUnfreed() {
   return n;
 }
 
-void checkState() {
-  inTest = false;
-  if (raiseCount != 0) RAISE << raiseCount << " errors encountered";
+void checkForLeaks() {
   teardownStreams();
   teardownPrimFuncs();
   teardownLiteralTables();
@@ -239,13 +237,13 @@ const testfunc tests[] = {
   #include "test_list"
 };
 
-void init();
 void runTests() {
-  runningTests = true; // never reset
+  runningTests = inTest = true; // never reset
   for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
-    init();   inTest=true;
+    init();
     (*tests[i])();
-    checkState();
+    if (raiseCount != 0) cerr << raiseCount << " errors encountered" << endl;
+    checkForLeaks();
   }
 
   init();
