@@ -79,7 +79,7 @@ what a name means, locate and read its tests.
 
 --- Paren-insertion based on indentation
 
-Wart is indentation sensitive. Multi-token lines without leading parens are
+Wart is indentation sensitive. Multi-word lines without leading parens are
 implicitly grouped with later indented lines:
   if (> n 0)
     * n (- n 1)
@@ -91,7 +91,7 @@ No indented lines after? They're grouped in isolation:
   c d
   => (a b) (c d)
 
-Lines with a single token are never wrapped in parens:
+Lines with a single word are never wrapped in parens:
   def foo()
     x
   => (def foo() x)    ; x is returned as a value, never called
@@ -106,7 +106,7 @@ Putting these rules together, parens are not required around 'if' in:
     'odd
     'even
 ..but they are required in:
-  (if                 ; parens required because line has a single token
+  (if                 ; parens required because line has a single word
     (iso 1 (% x 2))   ; parens required to avoid grouping with next line
       'odd
     :else             ; optional, more clear
@@ -122,7 +122,7 @@ By convention I try to leave out parens for control flow operators like 'def'
 and 'if' and 'while', and keep parens elsewhere. But there are exceptions
 where parens are required, like with 'if' sometimes like above, and with 'do'
 blocks:
-  (do                 ; parens required because line has a single token
+  (do                 ; parens required because line has a single word
     something
     something else)
   => (do something (something else))
