@@ -79,8 +79,8 @@ name, find its tests.
 
 --- Keyword args
 
-You can change the order of arguments to a function, or make their meaning
-more obvious, by adding keywords. Keywords begin with a colon and are always
+You can change the order of arguments to a function -- or make their meaning
+more obvious -- by adding keywords. Keywords begin with a colon and are always
 optional. Wart will first scan the keywords in a call, then bind the remaining
 arguments in order.
 
@@ -94,6 +94,13 @@ arguments in order.
   (3 1)
   wart> (foo :b 1 :a 3)
   (3 1)
+
+Keywords that don't match function params are passed through as arguments:
+
+  wart> (foo :c 1 2)
+  (:c 1)                                ; the third arg gets dropped
+
+[Keyword symbols starting with a colon always evaluate to themselves.]
 
 --- Paren-insertion based on indentation
 
