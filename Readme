@@ -77,6 +77,24 @@ By convention code in a '.cc' or '.wart' file stores its unit tests in the
 corresponding '.test.cc' or '.test' file respectively. To understand a strange
 name, find its tests.
 
+--- Keyword args
+
+You can change the order of arguments to a function, or make their meaning
+more obvious, by adding keywords. Keywords begin with a colon and are always
+optional. Wart will first scan the keywords in a call, then bind the remaining
+arguments in order.
+
+  wart> (def foo(a b)
+          (list a b))
+  wart> (foo 1 3)
+  (1 3)
+  wart> (foo :b 1 3)
+  (3 1)
+  wart> (foo 1 :a 3)
+  (3 1)
+  wart> (foo :b 1 :a 3)
+  (3 1)
+
 --- Paren-insertion based on indentation
 
 Wart is indentation sensitive. Multi-word lines without leading parens are
