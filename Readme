@@ -159,11 +159,15 @@ Conventional, fully-parenthesized expressions should always work:
   (def foo() 34)
   (def foo()
     34)
-One exception: multi-line top-level lists should wrap by exactly one extra
-space to avoid grouping subsequent lines:
+One exception: To wrap args to multiple lines, indent them by exactly one
+extra space:
   (list 1 2 3
    4 5 6)
   => (1 2 3 4 5 6)
+
+  (list 1 2 3
+        4 5 6)
+  => (1 2 3 (4 5 6)) ; probably not what you want
 
 Tabs count as 2 spaces. Don't mix tabs and spaces.
 
