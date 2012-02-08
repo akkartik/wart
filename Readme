@@ -160,10 +160,10 @@ Conventional, fully-parenthesized expressions should always work:
   (def foo()
     34)
 One exception: multi-line top-level lists should wrap by exactly one extra
-space beyond the paren to avoid grouping subsequent lines:
-  '(one really long
-    lisp data list)
-  => (one really long lisp data list)
+space to avoid grouping subsequent lines:
+  (list 1 2 3
+   4 5 6)
+  => (1 2 3 4 5 6)
 
 Tabs count as 2 spaces. Don't mix tabs and spaces.
 

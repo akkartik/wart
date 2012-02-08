@@ -510,6 +510,24 @@ void test_parenthesize_passes_through_when_indented_by_one_space() {
   check(c.fd.eof());
 }
 
+void test_parenthesize_passes_through_when_indented_by_one_space2() {
+  CodeStream c(stream("    '(a b c\n     d e\n     f g)"));
+  list<Token> tokens = nextExpr(c);
+  list<Token>::iterator p = tokens.begin();
+  checkEq(*p, "'"); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, "c"); ++p;
+  checkEq(*p, "d"); ++p;
+  checkEq(*p, "e"); ++p;
+  checkEq(*p, "f"); ++p;
+  checkEq(*p, "g"); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == tokens.end());
+  check(c.fd.eof());
+}
+
 void test_parenthesize_passes_through_unbalanced_open_paren() {
   CodeStream c(stream("("));
   list<Token> tokens = nextExpr(c);

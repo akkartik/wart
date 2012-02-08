@@ -52,7 +52,7 @@ list<Token> nextLine(CodeStream& c) {
 
                                   bool parenNotAtStartOfLine(list<Token>::iterator q, list<Token>::iterator begin) {
                                     while (begin->isIndent()) begin++;
-                                    if (*begin == "`") begin++;
+                                    if (isQuoteOrUnquote(*begin)) begin++;
                                     if (q == begin) return false;
                                     return (*q == "(");
                                   }
