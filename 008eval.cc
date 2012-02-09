@@ -296,9 +296,9 @@ Cell* processUnquotes(Cell* x, int depth) {
 
                                   Cell* newFunc(string type, Cell* expr) {
                                     Cell* f = newTable();
-                                    unsafeSet(f, newSym("sig"), sig(expr), false);
-                                    unsafeSet(f, newSym("body"), body(expr), false);
-                                    unsafeSet(f, newSym("env"), currLexicalScopes.top(), false);
+                                    set(f, newSym("sig"), sig(expr));
+                                    set(f, newSym("body"), body(expr));
+                                    set(f, newSym("env"), currLexicalScopes.top());
                                     return newObject(type, f);
                                   }
 
