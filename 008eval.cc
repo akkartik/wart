@@ -373,7 +373,8 @@ Cell* eval(Cell* expr) {
         << "- Should it not be a call? Perhaps the expression is indented too much." << endl << DIE;
 
   // eval all its args in the current lexical scope
-  Cell* orderedArgs = reorderKeywordArgs(calleeSig(fn), callArgs(expr));
+  Cell* splicedArgs = spliceArgs(callArgs(expr));
+  Cell* orderedArgs = reorderKeywordArgs(calleeSig(fn), splicedArgs);
   Cell* evaldArgs = evalArgs(calleeSig(fn), orderedArgs);
 
   // swap in the function's lexical environment
@@ -403,6 +404,7 @@ Cell* eval(Cell* expr) {
 
   rmref(evaldArgs);
   rmref(orderedArgs);
+  rmref(splicedArgs);
   rmref(fn);
   return result; // already mkref'd
 }
