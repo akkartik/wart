@@ -4,10 +4,6 @@
                                     return isCons(cell) && car(cell) == newSym("'");
                                   }
 
-                                  bool isAlreadyEvald(Cell* cell) {
-                                    return isCons(cell) && car(cell) == newSym("''");
-                                  }
-
                                   bool isBackQuoted(Cell* cell) {
                                     return isCons(cell) && car(cell) == newSym("`");
                                   }
@@ -71,7 +67,7 @@ Cell* spliceArgs(Cell* args) {
         if (isColonSym(car(curr2)))
           addCons(tip, car(curr2));
         else
-          addCons(tip, newCons(newSym("''"), car(curr2)));
+          addCons(tip, newCons(newSym("'"), car(curr2)));
       rmref(x);
     }
     else {
@@ -320,7 +316,7 @@ Cell* eval(Cell* expr) {
   if (isObject(expr))
     return mkref(expr);
 
-  if (isQuoted(expr) || isAlreadyEvald(expr))
+  if (isQuoted(expr))
     return mkref(cdr(expr));
 
   if (isBackQuoted(expr))
