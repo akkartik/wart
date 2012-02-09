@@ -20,6 +20,9 @@ let $table table ; ignore later refinements
 def! table args
   (as table pair.args)
 
+def copy(x) :case (isa x table)
+  (as table (as list x))
+
 def keys(t)
   map car (as list t)
 
