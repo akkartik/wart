@@ -208,8 +208,7 @@ possible, and it's easy to see what they expand to at the prompt:
 
 --- Garbage collection
 
-Wart frees up unused memory using reference-counting
-(http://en.wikipedia.org/wiki/Reference_counting). Every Cell tracks the
+Wart frees up unused memory using reference counting. Every Cell tracks the
 number of incoming pointers to it using a field called nrefs.
 
 Wart must increment/decrement nrefs when saving a Cell inside another: in the
