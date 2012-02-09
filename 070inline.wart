@@ -81,9 +81,9 @@ def compiled-rules(call)
           (iso x cadr.call)
             call
           !x
-            wrap:inline-sub:list cadr:cddr.call
+            doify:inline-sub:list cadr:cddr.call
           :else
-            wrap:inline-sub:list car:cddr.call))
+            doify:inline-sub:list car:cddr.call))
     :else
       call)
 
@@ -105,7 +105,7 @@ def simplify(expr)
     :else
       expr)
 
-def wrap(x)
+def doify(x)
   if single?.x
     car.x
     (cons 'do x)
