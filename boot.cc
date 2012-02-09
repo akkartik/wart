@@ -163,6 +163,7 @@ void init() {
                                     case TABLE: {
                                       Table* t = (Table*)x->car;
                                       for (CellMap::iterator p = t->table.begin(); p != t->table.end(); ++p) {
+                                        if (!p->second) continue;
                                         markAllCells((Cell*)p->first, mark);
                                         markAllCells(p->second, mark);
                                       }

@@ -24,6 +24,7 @@ COMPILE_PRIM_FUNC(table_to_list, primFunc_table_to_list, "($table)",
   Cell* result = newCell();
   Cell* curr = result;
   for (CellMap::iterator p = table.begin(); p != table.end(); ++p) {
+    if (!p->second) continue;
     addCons(curr, newCons((Cell*)p->first, newCons((Cell*)p->second, nil)));
     curr=cdr(curr);
   }
