@@ -155,8 +155,7 @@ Putting these rules together, parens are not required around 'if' in:
 
 By convention I try to leave out parens for control flow operators like 'def'
 and 'if' and 'while', and keep parens elsewhere. But there are exceptions
-where parens are required, like with 'if' sometimes like above, and with 'do'
-blocks:
+where parens are required. Like with 'if' above, and with 'do' blocks:
   (do                 ; parens required because line has a single word
     something
     something else)
