@@ -326,6 +326,14 @@ void test_eval_handles_quoted_atoms() {
   rmref(expr);
 }
 
+void test_eval_treats_already_evaluated_like_quote() {
+  Cell* expr = newCons(newSym("''"), newSym("a"));
+  Cell* result = eval(expr);
+  checkEq(result, newSym("a"));
+  rmref(result);
+  rmref(expr);
+}
+
 void test_eval_handles_quoted_lists() {
   Cell* expr = read(stream("'(a b)"));
   Cell* result = eval(expr);

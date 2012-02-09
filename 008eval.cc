@@ -4,6 +4,10 @@
                                     return isCons(cell) && car(cell) == newSym("'");
                                   }
 
+                                  bool isAlreadyEvald(Cell* cell) {
+                                    return isCons(cell) && car(cell) == newSym("''");
+                                  }
+
                                   bool isBackQuoted(Cell* cell) {
                                     return isCons(cell) && car(cell) == newSym("`");
                                   }
@@ -346,7 +350,7 @@ Cell* eval(Cell* expr) {
   if (isObject(expr))
     return mkref(expr);
 
-  if (isQuoted(expr))
+  if (isQuoted(expr) || isAlreadyEvald(expr))
     return mkref(cdr(expr));
 
   if (isBackQuoted(expr))
