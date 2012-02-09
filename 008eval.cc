@@ -53,6 +53,28 @@
 
 
 
+                                  Cell* unsplice(Cell* arg) {
+                                    return eval(cdr(arg));
+                                  }
+
+// eval @exprs and inline them into args, tagging them with ''
+Cell* spliceArgs(Cell* args) {
+  Cell *pResult = newCell(), *tip = pResult;
+  for (Cell* curr = args; curr != nil; curr=cdr(curr)) {
+    if (isSplice(car(curr))) {
+      Cell* x = unsplice(car(curr));
+      for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
+        addCons(tip, newCons(newSym("''"), car(curr2)));
+      rmref(x);
+    }
+    else {
+      addCons(tip, car(curr));
+      tip=cdr(tip);
+    }
+  }
+  return dropPtr(pResult);
+}
+
                                   Cell* stripQuote(Cell* cell) {
                                     return isQuoted(cell) ? cdr(cell) : cell;
                                   }
@@ -143,10 +165,6 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
 }
 
 
-
-                                  Cell* unsplice(Cell* arg) {
-                                    return eval(cdr(arg));
-                                  }
 
                                   Cell* unspliceAll(Cell* args) {
                                     Cell* pResult = newCell();
