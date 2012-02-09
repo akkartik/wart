@@ -30,6 +30,23 @@ void test_spliceArgs_works_with_nil() {
   endDynamicScope("a");
 }
 
+void test_spliceArgs_works_with_keywords() {
+  newDynamicScope("a", newNum(3));
+  newDynamicScope("b", newCons(newNum(4), newCons(newSym(":x"), nil)));
+  Cell* args = read(stream("(a @b a)"));
+  Cell* splicedArgs = spliceArgs(args);
+  checkEq(car(splicedArgs), newSym("a"));
+  checkEq(car(car(cdr(splicedArgs))), newSym("''"));
+  checkEq(cdr(car(cdr(splicedArgs))), newNum(4));
+  checkEq(car(cdr(cdr(splicedArgs))), newSym(":x"));
+  checkEq(car(cdr(cdr(cdr(splicedArgs)))), newSym("a"));
+  checkEq(cdr(cdr(cdr(cdr(splicedArgs)))), nil);
+  rmref(splicedArgs);
+  rmref(args);
+  endDynamicScope("b");
+  endDynamicScope("a");
+}
+
 void test_evalArgs_handles_unquoted_param() {
   newDynamicScope("a", newNum(3));
   Cell* params = read(stream("(x)"));
@@ -879,6 +896,22 @@ void test_eval_handles_body_keyword_synonym() {
   checkEq(car(result), newNum(1));
   checkEq(car(cdr(result)), newNum(3));
   checkEq(cdr(cdr(result)), nil);
+  rmref(result);
+  rmref(call);
+  rmref(f);
+  rmref(fn);
+  endDynamicScope("f");
+}
+
+void test_eval_handles_keyword_args_inside_splice() {
+  Cell* fn = read(stream("(fn (a b) b)"));
+  Cell* f = eval(fn);
+  newDynamicScope("f", f);
+  Cell* call = read(stream("(f @'(3 :a 4))"));
+  debug = 1;
+  Cell* result = eval(call);
+  debug = 0;
+  checkEq(result, newNum(3));
   rmref(result);
   rmref(call);
   rmref(f);

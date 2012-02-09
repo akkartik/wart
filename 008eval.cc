@@ -68,7 +68,10 @@ Cell* spliceArgs(Cell* args) {
     if (isSplice(car(curr))) {
       Cell* x = unsplice(car(curr));
       for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
-        addCons(tip, newCons(newSym("''"), car(curr2)));
+        if (isColonSym(car(curr2)))
+          addCons(tip, car(curr2));
+        else
+          addCons(tip, newCons(newSym("''"), car(curr2)));
       rmref(x);
     }
     else {
