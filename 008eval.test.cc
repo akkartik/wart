@@ -4,9 +4,9 @@ void test_spliceArgs_works() {
   Cell* args = read(stream("(a @b a)"));
   Cell* splicedArgs = spliceArgs(args);
   checkEq(car(splicedArgs), newSym("a"));
-  checkEq(car(car(cdr(splicedArgs))), newSym("'"));
+  checkEq(car(car(cdr(splicedArgs))), newSym("''"));
   checkEq(cdr(car(cdr(splicedArgs))), newNum(4));
-  checkEq(car(car(cdr(cdr(splicedArgs)))), newSym("'"));
+  checkEq(car(car(cdr(cdr(splicedArgs)))), newSym("''"));
   checkEq(cdr(car(cdr(cdr(splicedArgs)))), newNum(5));
   checkEq(car(cdr(cdr(cdr(splicedArgs)))), newSym("a"));
   checkEq(cdr(cdr(cdr(cdr(splicedArgs)))), nil);
@@ -36,7 +36,7 @@ void test_spliceArgs_works_with_keywords() {
   Cell* args = read(stream("(a @b a)"));
   Cell* splicedArgs = spliceArgs(args);
   checkEq(car(splicedArgs), newSym("a"));
-  checkEq(car(car(cdr(splicedArgs))), newSym("'"));
+  checkEq(car(car(cdr(splicedArgs))), newSym("''"));
   checkEq(cdr(car(cdr(splicedArgs))), newNum(4));
   checkEq(car(cdr(cdr(splicedArgs))), newSym(":x"));
   checkEq(car(cdr(cdr(cdr(splicedArgs)))), newSym("a"));
@@ -73,10 +73,10 @@ void test_evalArgs_handles_quoted_param() {
   endDynamicScope("a");
 }
 
-void test_evalArgs_handles_quoted_arg() {
+void test_evalArgs_handles_alreadyEvald_arg() {
   newDynamicScope("a", newNum(3));
   Cell* params = read(stream("(x)"));
-  Cell* args = read(stream("('a)"));
+  Cell* args = newCons(newCons(newSym("''"), newSym("a")), nil);
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newSym("a"));
   checkEq(cdr(evaldArgs), nil);
@@ -285,6 +285,14 @@ void test_eval_handles_quoted_atoms() {
   expr = read(s);
   result = eval(expr);
   checkEq(result, newNum(34));
+  rmref(result);
+  rmref(expr);
+}
+
+void test_eval_treats_already_evaluated_like_quote() {
+  Cell* expr = newCons(newSym("''"), newSym("a"));
+  Cell* result = eval(expr);
+  checkEq(result, newSym("a"));
   rmref(result);
   rmref(expr);
 }

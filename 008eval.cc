@@ -4,6 +4,10 @@
                                     return isCons(cell) && car(cell) == newSym("'");
                                   }
 
+                                  bool isAlreadyEvald(Cell* cell) {
+                                    return isCons(cell) && car(cell) == newSym("''");
+                                  }
+
                                   bool isBackQuoted(Cell* cell) {
                                     return isCons(cell) && car(cell) == newSym("`");
                                   }
@@ -67,7 +71,7 @@ Cell* spliceArgs(Cell* args) {
         if (isColonSym(car(curr2)))
           addCons(tip, car(curr2));
         else
-          addCons(tip, newCons(newSym("'"), car(curr2)));
+          addCons(tip, newCons(newSym("''"), car(curr2)));
       rmref(x);
     }
     else {
@@ -169,15 +173,31 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
 
 
 
+                                  Cell* stripAlreadyEval(Cell* args) {
+                                    Cell *pResult = newCell();
+                                    for (Cell *from=args, *to=pResult; from != nil; from=cdr(from), to=cdr(to)) {
+                                      if (isAlreadyEvald(car(from)))
+                                        addCons(to, cdr(car(from)));
+                                      else
+                                        addCons(to, car(from));
+                                    }
+                                    return dropPtr(pResult);
+                                  }
+
 Cell* evalArgs(Cell* params, Cell* args) {
   if (args == nil) return nil;
+
   if (isQuoted(params))
-    return mkref(args);
+    return stripAlreadyEval(args);
 
   Cell* result = newCell();
   setCdr(result, evalArgs(cdr(params), cdr(args)));
   rmref(cdr(result));
-  if (!isCons(params) || !isQuoted(car(params))) {
+
+  if (isAlreadyEvald(car(args))) {
+    setCar(result, cdr(car(args)));
+  }
+  else if (!isCons(params) || !isQuoted(car(params))) {
     setCar(result, eval(car(args)));
     rmref(car(result));
   }
@@ -316,7 +336,7 @@ Cell* eval(Cell* expr) {
   if (isObject(expr))
     return mkref(expr);
 
-  if (isQuoted(expr))
+  if (isQuoted(expr) || isAlreadyEvald(expr))
     return mkref(cdr(expr));
 
   if (isBackQuoted(expr))
