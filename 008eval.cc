@@ -351,8 +351,8 @@ Cell* eval(Cell* expr) {
         << "- Should it not be a call? Perhaps the expression is indented too much." << endl << DIE;
 
   // eval all its args in the current lexical scope
-  Cell* realArgs = reorderKeywordArgs(calleeSig(fn), callArgs(expr));
-  Cell* evaldArgs = evalArgs(calleeSig(fn), realArgs);
+  Cell* orderedArgs = reorderKeywordArgs(calleeSig(fn), callArgs(expr));
+  Cell* evaldArgs = evalArgs(calleeSig(fn), orderedArgs);
 
   // swap in the function's lexical environment
   if (!isPrimFunc(calleeBody(fn)))
@@ -380,7 +380,7 @@ Cell* eval(Cell* expr) {
     result = implicitlyEval(result);
 
   rmref(evaldArgs);
-  rmref(realArgs);
+  rmref(orderedArgs);
   rmref(fn);
   return result; // already mkref'd
 }
