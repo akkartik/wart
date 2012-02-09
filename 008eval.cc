@@ -168,40 +168,10 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
   Cell* nonKeywordArgs = extractKeywordArgs(params, args, keywordArgs);
   Cell* result = argsInParamOrder(params, nonKeywordArgs, keywordArgs);
   rmref(nonKeywordArgs);
-  return result;
+  return result; // already mkref'd
 }
 
 
-
-                                  Cell* unspliceAll(Cell* args) {
-                                    Cell* pResult = newCell();
-                                    for (Cell *curr=pResult, *arg=car(args); args != nil; args=cdr(args), arg=car(args), curr=last(curr)) {
-                                      if (!isSplice(arg)) {
-                                        addCons(curr, arg);
-                                        continue;
-                                      }
-                                      RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
-                                      Cell* newLimb = unsplice(arg);
-                                      setCdr(curr, newLimb);
-                                      rmref(newLimb);
-                                    }
-                                    return dropPtr(pResult);
-                                  }
-
-                                  Cell* evalArgs(Cell*, Cell*);
-                                  Cell* spliceFirst(Cell* params, Cell* args) {
-                                    Cell* result = unsplice(car(args));
-                                    if (result == nil)
-                                      return evalArgs(params, cdr(args));
-                                    if (isCons(params) ? isQuoted(car(params)) : isQuoted(params))
-                                      RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
-                                    Cell* curr = result;
-                                    for (; cdr(curr) != nil; curr=cdr(curr))
-                                      params=cdr(params); // don't eval spliced args again, even if param is unquoted
-                                    setCdr(curr, evalArgs(cdr(params), cdr(args)));
-                                    rmref(cdr(curr));
-                                    return result; // already mkref'd
-                                  }
 
 Cell* evalArgs(Cell* params, Cell* args) {
   if (args == nil) return nil;
