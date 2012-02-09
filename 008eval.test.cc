@@ -133,73 +133,6 @@ void test_evalArgs_handles_quoted_rest_param() {
   endDynamicScope("a");
 }
 
-void test_evalArgs_handles_spliced_arg_for_vararg_param() {
-  newDynamicScope("a", newNum(3));
-  newDynamicScope("b", newCons(newNum(4), newCons(newNum(5), nil)));
-  Cell* params = read(stream("x"));
-  Cell* args = read(stream("(a @b)"));
-  Cell* evaldArgs = evalArgs(params, args);
-  checkEq(car(evaldArgs), newNum(3));
-  checkEq(car(cdr(evaldArgs)), newNum(4));
-  checkEq(car(cdr(cdr(evaldArgs))), newNum(5));
-  checkEq(cdr(cdr(cdr(evaldArgs))), nil);
-  rmref(evaldArgs);
-  rmref(args);
-  rmref(params);
-  endDynamicScope("b");
-  endDynamicScope("a");
-}
-
-void test_evalArgs_handles_spliced_arg_for_quoted_vararg_param() {
-  newDynamicScope("a", newNum(3));
-  newDynamicScope("b", newCons(newNum(4), newCons(newNum(5), nil)));
-  Cell* params = read(stream("'x"));
-  Cell* args = read(stream("(a @b)"));
-  Cell* evaldArgs = evalArgs(params, args);
-  checkEq(car(evaldArgs), newSym("a"));
-  checkEq(car(cdr(evaldArgs)), newNum(4));
-  checkEq(car(cdr(cdr(evaldArgs))), newNum(5));
-  checkEq(cdr(cdr(cdr(evaldArgs))), nil);
-  rmref(evaldArgs);
-  rmref(args);
-  rmref(params);
-  endDynamicScope("b");
-  endDynamicScope("a");
-  checkEq(raiseCount, 1);   raiseCount = 0;
-}
-
-void test_evalArgs_handles_spliced_arg() {
-  newDynamicScope("a", newNum(3));
-  newDynamicScope("b", newCons(newNum(4), newCons(newNum(5), nil)));
-  Cell* params = read(stream("(x y 'z)"));
-  Cell* args = read(stream("(a @b)"));
-  Cell* evaldArgs = evalArgs(params, args);
-  checkEq(car(evaldArgs), newNum(3));
-  checkEq(car(cdr(evaldArgs)), newNum(4));
-  checkEq(car(cdr(cdr(evaldArgs))), newNum(5));
-  checkEq(cdr(cdr(cdr(evaldArgs))), nil);
-  rmref(evaldArgs);
-  rmref(args);
-  rmref(params);
-  endDynamicScope("b");
-  endDynamicScope("a");
-}
-
-void test_evalArgs_skips_spliced_args_of_nil() {
-  newDynamicScope("a", nil);
-  newDynamicScope("b", newNum(4));
-  Cell* params = read(stream("x 'y"));
-  Cell* args = read(stream("(@a b)"));
-  Cell* evaldArgs = evalArgs(params, args);
-  checkEq(car(evaldArgs), newNum(4));
-  checkEq(cdr(evaldArgs), nil);
-  rmref(evaldArgs);
-  rmref(args);
-  rmref(params);
-  endDynamicScope("b");
-  endDynamicScope("a");
-}
-
 
 
 void test_bindParams_handles_vararg() {

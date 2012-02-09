@@ -203,10 +203,7 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
 Cell* evalArgs(Cell* params, Cell* args) {
   if (args == nil) return nil;
   if (isQuoted(params))
-    return unspliceAll(args); // already mkref'd
-
-  if (isSplice(car(args)))
-    return spliceFirst(params, args); // already mkref'd
+    return mkref(args);
 
   Cell* result = newCell();
   setCdr(result, evalArgs(cdr(params), cdr(args)));
