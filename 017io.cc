@@ -55,6 +55,11 @@ COMPILE_PRIM_FUNC(pr, primFunc_pr, "($x)",
   return mkref(x);
 )
 
+COMPILE_PRIM_FUNC(dbg, primFunc_dbg, "($x)",
+  dbg << lookup("$x") << endl;
+  return nil;
+)
+
 COMPILE_PRIM_FUNC(write, primFunc_write, "($x)",
   Cell* x = lookup("$x");
   ostream& out = toOstream(STDOUT);
