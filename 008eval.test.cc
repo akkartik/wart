@@ -934,9 +934,7 @@ void test_eval_handles_keyword_args_inside_splice() {
   Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read(stream("(f @'(3 :a 4))"));
-  debug = 1;
   Cell* result = eval(call);
-  debug = 0;
   checkEq(result, newNum(3));
   rmref(result);
   rmref(call);
