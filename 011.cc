@@ -60,6 +60,10 @@ COMPILE_PRIM_FUNC(type, primFunc_type, "($x)",
   return mkref(type(lookup("$x")));
 )
 
+COMPILE_PRIM_FUNC(coerce-quoted, primFunc_coerce_quoted, "'($x $dest-type)",
+  return coerceQuoted(lookup("$x"), lookup("$dest-type"), lookup("coercions*")); // already mkref'd
+)
+
 COMPILE_PRIM_FUNC(iso, primFunc_iso, "($x $y)",
   Cell* x = lookup("$x");
   Cell* y = lookup("$y");

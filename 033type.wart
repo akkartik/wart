@@ -31,12 +31,6 @@ def rep(x)
 def coerce(x 'dest-type)
   eval `(coerce-quoted ,x ,dest-type)
 = coercions* (table)
-def coerce-quoted'(x dest-type)
-  if (iso dest-type type.x)
-    x
-    iflet coercer (table_get (table_get coercions* dest-type) type.x)
-      coercer.x
-      (prn "Can't coerce " type.x " " x " to " dest-type)
 
 mac defcoerce(src dest f)
   `(do

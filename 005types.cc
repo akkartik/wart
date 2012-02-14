@@ -212,3 +212,25 @@ Cell* type(Cell* x) {
     return nil; // never reached
   }
 }
+
+// mkrefs its result
+Cell* coerceQuoted(Cell* x, Cell* destType, Cell* coercions) {
+  Cell* typ = type(x); // leak
+  if (typ == destType)
+    return mkref(x);
+
+  if (coercions == nil) RAISE << "coercions* not initialized yet\n";
+  if (!isTable(coercions)) RAISE << "coercions* not a table\n";
+  Cell* tmp = get(coercions, destType);
+  if (tmp == nil) RAISE << "coercions* for " << destType << " not initialized\n";
+  if (!isTable(coercions)) RAISE << "coercions* for " << destType << " not a table\n";
+  Cell* coercer = get(tmp, typ);
+  if (coercer == nil) {
+    RAISE << "can't coerce " << typ << " " << x << " to " << destType << endl;
+    return nil;
+  }
+  Cell* expr = newCons(coercer, newCons(newCons(newSym("'"), x), nil));
+  Cell* result = eval(expr);
+  rmref(expr);
+  return result; // already mkref'd
+}

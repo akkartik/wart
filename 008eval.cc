@@ -305,15 +305,6 @@ Cell* processUnquotes(Cell* x, int depth) {
                                     return newObject(type, f);
                                   }
 
-                                  Cell* functionify(Cell* obj) {
-                                    if (obj == nil) return obj;
-                                    Cell* coerceExpr = newCons(newSym("coerce-quoted"), newCons(obj, newCons(newSym("function"), nil)));
-                                    rmref(obj);
-                                    Cell* ans = eval(coerceExpr);
-                                    rmref(coerceExpr);
-                                    return ans;
-                                  }
-
                                   Cell* implicitlyEval(Cell* x) {
                                     Cell* result = eval(x);
                                     rmref(x);
@@ -355,8 +346,8 @@ Cell* eval(Cell* expr) {
 
   // expr is a function call
   Cell* fn = eval(car(expr));
-  if (!isFunc(fn))
-    fn = functionify(fn);
+  if (fn != nil && !isFunc(fn))
+    fn = coerceQuoted(fn, newSym("function"), lookup("coercions*"));
   if (!isFunc(fn))
     RAISE << "not a call: " << expr << endl
         << "- Should it not be a call? Perhaps the expression is indented too much." << endl << DIE;
