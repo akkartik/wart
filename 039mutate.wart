@@ -33,4 +33,4 @@ mac making(var val . body)
      ,@body)
 
 mac coerce!(var type)
-  `(= ,var (coerce ,var ,type))
+  `(= ,var (coerce ,var ',type))

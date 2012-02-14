@@ -3,7 +3,7 @@
  :should be 5)
 
 (test "lists coerce to function"
- :valueof (type:coerce '(1 2 3) function)
+ :valueof (type:coerce '(1 2 3) 'function)
  :should be 'function)
 
 (test "lists work in function position"

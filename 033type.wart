@@ -1,17 +1,17 @@
 def sym?(_)
-  (isa _ symbol)
+  (isa _ 'symbol)
 def list?(_)
-  (isa _ list)
+  (isa _ 'list)
 def num?(_)
-  (isa _ number)
+  (isa _ 'number)
 def str?(_)
-  (isa _ string)
+  (isa _ 'string)
 def table?(_)
-  (isa _ table)
+  (isa _ 'table)
 def fn?(_)
-  (isa _ function)
+  (isa _ 'function)
 def mac?(_)
-  (isa _ macro)
+  (isa _ 'macro)
 def callable?(_)
   (or fn?._ mac?._)
 def compiled-fn?(_)
@@ -28,7 +28,7 @@ def rep(x)
     x
     car:cddr.x
 
-def coerce(x 'dest-type)
+def coerce(x dest-type)
   eval `(coerce-quoted ,x ,dest-type)
 = coercions* (table)
 
@@ -51,7 +51,7 @@ mac defcall(type params . body)
 
 
 mac as(type expr)
-  `(coerce ,expr ,type)
+  `(coerce ,expr ',type)
 
 defcoerce function macro
   id
