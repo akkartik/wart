@@ -157,8 +157,16 @@ Table* toTable(Cell* x) {
                                     table[key] = mkref(val);
                                   }
 
+void unsafeSet(Cell* t, string k, Cell* val, bool deleteNils) {
+  unsafeSet(t, newSym(k), val, deleteNils);
+}
+
 void set(Cell* t, Cell* k, Cell* val) {
   unsafeSet(t, k, val, true);
+}
+
+void set(Cell* t, string k, Cell* val) {
+  unsafeSet(t, newSym(k), val, true);
 }
 
                                   Cell* unsafeGet(Cell* t, Cell* key) {
@@ -174,6 +182,10 @@ Cell* get(Cell* t, Cell* k) {
   Cell* result = unsafeGet(t, k);
   if (!result) return nil;
   return result;
+}
+
+Cell* get(Cell* t, string k) {
+  return get(t, newSym(k));
 }
 
 

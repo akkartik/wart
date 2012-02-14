@@ -120,3 +120,39 @@ COMPILE_PRIM_FUNC(len, primFunc_len, "($x)",
     ++ans;
   return mkref(newNum(ans));
 )
+
+
+
+Cell* unquotify(Cell* x) {
+  if (!isCons(x)) return x;
+  if (isQuoted(x)) return unquotify(cdr(x));
+  return newCons(unquotify(car(x)), unquotify(cdr(x)));
+}
+
+Cell* wrap(Cell* f) {
+  Cell* result = newObject("function", newTable());
+  set(rep(result), "body", get(rep(f), "body"));
+  set(rep(result), "env", get(rep(f), "env"));
+  set(rep(result), "sig", unquotify(get(rep(f), "sig")));
+  return result;
+}
+
+COMPILE_PRIM_FUNC(wrap, primFunc_wrap, "($f)",
+  return mkref(wrap(lookup("$f")));
+)
+
+Cell* quotify(Cell* x) {
+  return newCons(newSym("'"), unquotify(x));
+}
+
+Cell* unwrap(Cell* f) {
+  Cell* result = newObject("function", newTable());
+  set(rep(result), "body", get(rep(f), "body"));
+  set(rep(result), "env", get(rep(f), "env"));
+  set(rep(result), "sig", quotify(get(rep(f), "sig")));
+  return result;
+}
+
+COMPILE_PRIM_FUNC(unwrap, primFunc_unwrap, "($f)",
+  return mkref(unwrap(lookup("$f")));
+)
