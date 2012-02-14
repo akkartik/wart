@@ -1,6 +1,6 @@
-= mac! (mfn '(name params . body)
-  `(= ,name (mfn ',params
-                    ,@body)))
+= mac! (vau (name params . body)
+  (eval `(= ,name (vau ',params
+                    (eval ((fn() ,@body)))))))
 
 mac! def!(name params . body)
   `(= ,name (fn ,params ,@body))

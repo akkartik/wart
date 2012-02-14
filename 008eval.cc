@@ -307,7 +307,7 @@ Cell* processUnquotes(Cell* x, int depth) {
                                     if (!isCons(x)) return false;
                                     if (isPrimFunc(car(x))) return true;
                                     string label = toString(type(x));
-                                    return label == "function" || label == "macro";
+                                    return label == "function" || label == "macro" || label == "vau";
                                   }
 
                                   Cell* newFunc(string type, Cell* expr) {
@@ -316,6 +316,14 @@ Cell* processUnquotes(Cell* x, int depth) {
                                     set(f, newSym("body"), body(expr));
                                     set(f, newSym("env"), currLexicalScopes.top());
                                     return newObject(type, f);
+                                  }
+
+                                  Cell* newVau(Cell* expr) {
+                                    Cell* f = newTable();
+                                    set(f, newSym("sig"), newCons(newSym("'"), sig(expr)));
+                                    set(f, newSym("body"), body(expr));
+                                    set(f, newSym("env"), currLexicalScopes.top());
+                                    return newObject("vau", f);
                                   }
 
                                   Cell* implicitlyEval(Cell* x, Cell* env) {
@@ -355,6 +363,8 @@ Cell* eval(Cell* expr, Cell* env) {
     return mkref(newFunc("function", expr));
   else if (car(expr) == newSym("mfn"))
     return mkref(newFunc("macro", expr));
+  else if (car(expr) == newSym("vau"))
+    return mkref(newVau(expr));
   else if (isFunc(expr))
     // lexical scope is already attached
     return mkref(expr);
@@ -373,7 +383,7 @@ Cell* eval(Cell* expr, Cell* env) {
   Cell* evaldArgs = evalArgs(calleeSig(fn), orderedArgs, env);
 
   // swap in the function's lexical environment
-  if (!isPrimFunc(calleeBody(fn)))
+  if (!isPrimFunc(calleeBody(fn)) && type(fn) != newSym("vau"))
     newDynamicScope(CURR_LEXICAL_SCOPE, calleeEnv(fn));
   // now bind its params to args in the new environment
   newLexicalScope();
@@ -390,7 +400,7 @@ Cell* eval(Cell* expr, Cell* env) {
     }
 
   endLexicalScope();
-  if (!isPrimFunc(calleeBody(fn)))
+  if (!isPrimFunc(calleeBody(fn)) && type(fn) != newSym("vau"))
     endDynamicScope(CURR_LEXICAL_SCOPE);
 
   // macros implicitly eval their result in the caller's scope
