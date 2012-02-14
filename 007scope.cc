@@ -72,11 +72,20 @@ void endLexicalScope() {
   endDynamicScope(CURR_LEXICAL_SCOPE);
 }
 
-void addLexicalBinding(Cell* sym, Cell* val) {
-  if (unsafeGet(currLexicalScopes.top(), sym))
+void addLexicalBinding(Cell* sym, Cell* val, Cell* scope) {
+  if (unsafeGet(scope, sym))
     RAISE << "Can't rebind within a lexical scope" << endl << DIE;
-  unsafeSet(currLexicalScopes.top(), sym, val, false);
+  unsafeSet(scope, sym, val, false);
 }
+
+void addLexicalBinding(Cell* sym, Cell* val) {
+  addLexicalBinding(sym, val, currLexicalScopes.top());
+}
+
+void addLexicalBinding(string var, Cell* val, Cell* scope) {
+  addLexicalBinding(newSym(var), val, scope);
+}
+
 void addLexicalBinding(string var, Cell* val) {
   addLexicalBinding(newSym(var), val);
 }
@@ -105,8 +114,8 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
   return NULL;
 }
 
-Cell* lookup(Cell* sym) {
-  Cell* result = lookupLexicalBinding(sym, currLexicalScopes.top());
+Cell* lookup(Cell* sym, Cell* scope) {
+  Cell* result = lookupLexicalBinding(sym, scope);
   if (result) return result;
   result = lookupDynamicBinding(sym);
   if (result) return result;
@@ -116,6 +125,10 @@ Cell* lookup(Cell* sym) {
   cerr << "- Did you not want a symbol lookup? Perhaps the expression is indented too much." << endl;
   cerr << "- Was it defined using indentation? When wart encounters a paren in the middle of a line, it stops inserting parens until it closes." << endl << DIE;
   return nil;
+}
+
+Cell* lookup(Cell* sym) {
+  return lookup(sym, currLexicalScopes.top());
 }
 
 Cell* lookup(string s) {

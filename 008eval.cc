@@ -57,19 +57,19 @@
 
 
 
-                                  Cell* unsplice(Cell* arg) {
-                                    return eval(cdr(arg));
+                                  Cell* unsplice(Cell* arg, Cell* env) {
+                                    return eval(cdr(arg), env);
                                   }
 
 // eval @exprs and inline them into args, tagging them with ''
-Cell* spliceArgs(Cell* args, Cell* fn) {
+Cell* spliceArgs(Cell* args, Cell* fn, Cell* env) {
   Cell *pResult = newCell(), *tip = pResult;
   for (Cell* curr = args; curr != nil; curr=cdr(curr)) {
     if (isSplice(car(curr))) {
       if (type(fn) == newSym("macro"))
         RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
 
-      Cell* x = unsplice(car(curr));
+      Cell* x = unsplice(car(curr), env);
       for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
         if (isColonSym(car(curr2)))
           addCons(tip, car(curr2));
@@ -83,6 +83,10 @@ Cell* spliceArgs(Cell* args, Cell* fn) {
     }
   }
   return dropPtr(pResult);
+}
+
+Cell* spliceArgs(Cell* args, Cell* fn) {
+  return spliceArgs(args, fn, currLexicalScopes.top());
 }
 
                                   Cell* stripQuote(Cell* cell) {
@@ -187,27 +191,31 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
                                     return dropPtr(pResult);
                                   }
 
-Cell* evalArgs(Cell* params, Cell* args) {
+Cell* evalArgs(Cell* params, Cell* args, Cell* env) {
   if (args == nil) return nil;
 
   if (isQuoted(params))
     return stripAlreadyEval(args);
 
   Cell* result = newCell();
-  setCdr(result, evalArgs(cdr(params), cdr(args)));
+  setCdr(result, evalArgs(cdr(params), cdr(args), env));
   rmref(cdr(result));
 
   if (isAlreadyEvald(car(args))) {
     setCar(result, cdr(car(args)));
   }
   else if (!isCons(params) || !isQuoted(car(params))) {
-    setCar(result, eval(car(args)));
+    setCar(result, eval(car(args), env));
     rmref(car(result));
   }
   else {
     setCar(result, car(args));
   }
   return mkref(result);
+}
+
+Cell* evalArgs(Cell* params, Cell* args) {
+  return evalArgs(params, args, currLexicalScopes.top());
 }
 
 
@@ -256,23 +264,23 @@ void bindParams(Cell* params, Cell* args) {
                                     return stripUnquote(cdr(x));
                                   }
 
-Cell* processUnquotes(Cell* x, int depth) {
+Cell* processUnquotes(Cell* x, int depth, Cell* env) {
   if (!isCons(x)) return mkref(x);
 
   if (unquoteDepth(x) == depth)
-    return eval(stripUnquote(x));
+    return eval(stripUnquote(x), env);
   else if (car(x) == newSym(","))
     return mkref(x);
 
   if (isBackQuoted(x)) {
-    Cell* result = newCons(car(x), processUnquotes(cdr(x), depth+1));
+    Cell* result = newCons(car(x), processUnquotes(cdr(x), depth+1, env));
     rmref(cdr(result));
     return mkref(result);
   }
 
   if (depth == 1 && isUnquoteSplice(car(x))) {
-    Cell* result = eval(cdr(car(x)));
-    Cell* splice = processUnquotes(cdr(x), depth);
+    Cell* result = eval(cdr(car(x)), env);
+    Cell* splice = processUnquotes(cdr(x), depth, env);
     if (result == nil) return splice;
     // always splice in a copy
     Cell* resultcopy = copyList(result);
@@ -282,10 +290,15 @@ Cell* processUnquotes(Cell* x, int depth) {
     return mkref(resultcopy);
   }
 
-  Cell* result = newCons(processUnquotes(car(x), depth), processUnquotes(cdr(x), depth));
+  Cell* result = newCons(processUnquotes(car(x), depth, env),
+                         processUnquotes(cdr(x), depth, env));
   rmref(car(result));
   rmref(cdr(result));
   return mkref(result);
+}
+
+Cell* processUnquotes(Cell* x, int depth) {
+  return processUnquotes(x, depth, currLexicalScopes.top());
 }
 
 
@@ -305,13 +318,15 @@ Cell* processUnquotes(Cell* x, int depth) {
                                     return newObject(type, f);
                                   }
 
-                                  Cell* implicitlyEval(Cell* x) {
-                                    Cell* result = eval(x);
+                                  Cell* implicitlyEval(Cell* x, Cell* env) {
+                                    Cell* result = eval(x, env);
                                     rmref(x);
                                     return result;
                                   }
 
-Cell* eval(Cell* expr) {
+// HACK: explicitly reads from passed-in env, but implicitly creates bindings
+// to currLexicalScope. Carefully make sure it's popped off.
+Cell* eval(Cell* expr, Cell* env) {
   if (!expr)
     RAISE << "eval: cell should never be NUL" << endl << DIE;
 
@@ -322,7 +337,7 @@ Cell* eval(Cell* expr) {
     return mkref(expr);
 
   if (isSym(expr))
-    return mkref(lookup(expr));
+    return mkref(lookup(expr, env));
 
   if (isAtom(expr))
     return mkref(expr);
@@ -334,7 +349,7 @@ Cell* eval(Cell* expr) {
     return mkref(cdr(expr));
 
   if (isBackQuoted(expr))
-    return processUnquotes(cdr(expr), 1); // already mkref'd
+    return processUnquotes(cdr(expr), 1, env); // already mkref'd
 
   if (car(expr) == newSym("fn"))
     return mkref(newFunc("function", expr));
@@ -345,7 +360,7 @@ Cell* eval(Cell* expr) {
     return mkref(expr);
 
   // expr is a function call
-  Cell* fn = eval(car(expr));
+  Cell* fn = eval(car(expr), env);
   if (fn != nil && !isFunc(fn))
     fn = coerceQuoted(fn, newSym("function"), lookup("coercions*"));
   if (!isFunc(fn))
@@ -353,9 +368,9 @@ Cell* eval(Cell* expr) {
         << "- Should it not be a call? Perhaps the expression is indented too much." << endl << DIE;
 
   // eval all its args in the current lexical scope
-  Cell* splicedArgs = spliceArgs(callArgs(expr), fn);
+  Cell* splicedArgs = spliceArgs(callArgs(expr), fn, env);
   Cell* orderedArgs = reorderKeywordArgs(calleeSig(fn), splicedArgs);
-  Cell* evaldArgs = evalArgs(calleeSig(fn), orderedArgs);
+  Cell* evaldArgs = evalArgs(calleeSig(fn), orderedArgs, env);
 
   // swap in the function's lexical environment
   if (!isPrimFunc(calleeBody(fn)))
@@ -371,7 +386,7 @@ Cell* eval(Cell* expr) {
   else
     for (Cell* form = calleeImpl(fn); form != nil; form = cdr(form)) {
       rmref(result);
-      result = eval(car(form));
+      result = eval(car(form)); // use fn's env
     }
 
   endLexicalScope();
@@ -380,11 +395,15 @@ Cell* eval(Cell* expr) {
 
   // macros implicitly eval their result in the caller's scope
   if (type(fn) == newSym("macro"))
-    result = implicitlyEval(result);
+    result = implicitlyEval(result, env);
 
   rmref(evaldArgs);
   rmref(orderedArgs);
   rmref(splicedArgs);
   rmref(fn);
   return result; // already mkref'd
+}
+
+Cell* eval(Cell* expr) {
+  return eval(expr, currLexicalScopes.top());
 }

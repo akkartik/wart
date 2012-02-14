@@ -77,6 +77,7 @@ struct CodeStream;
 Cell* read(CodeStream& c);
 bool interactive = false; // eval on multiple newlines
 Cell* eval(Cell*);
+Cell* eval(Cell*, Cell*);
 
 
 
