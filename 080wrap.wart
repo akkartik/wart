@@ -1,0 +1,37 @@
+;; http://web.cs.wpi.edu/~jshutt/kernel.html
+
+def wrap(f)
+  ret newf copy.f
+    zap unquotify rep.newf!sig
+
+def unwrap(f)
+  ret newf copy.f
+    zap quotify rep.newf!sig
+
+
+
+;; Internals
+
+def unquotify(sig)
+  (if
+    !sig
+      nil
+    ~cons?.sig
+      sig
+    quote?:car.sig
+      cdr.sig
+    :else
+      (cons unquotify:car.sig
+            unquotify:cdr.sig))
+
+def quotify(sig)
+  (if
+    !sig
+      nil
+    ~cons?.sig
+      (cons quote sig)
+    quote?:car.sig
+      sig
+    :else
+      (cons quotify:car.sig
+            quotify:cdr.sig))
