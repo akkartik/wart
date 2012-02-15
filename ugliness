@@ -1,2 +1,6 @@
+concepts I'd like to do without in eval:
+  mfn
+  already-eval ('')
+
 can't use coerce in eval
 can't use splice in macro calls
