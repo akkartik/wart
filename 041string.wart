@@ -21,12 +21,12 @@ defset string((s idx . ends) val)
 defcoerce string symbol
   string_to_sym
 
-def empty?(s) :case str?.s
+def empty?(s) :case string?.s
   (iso "" s)
 
 let $each each
   mac! each(var s . body)
-    `(if str?.,s
+    `(if string?.,s
        forlen $i ,s
          let ,var (,s $i)
            ,@body
@@ -37,5 +37,5 @@ defcoerce string list
     (collect:each c _
       yield.c))
 
-def <(a b) :case str?.a
+def <(a b) :case string?.a
   (string< a b)

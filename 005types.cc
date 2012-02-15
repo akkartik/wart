@@ -6,7 +6,7 @@
                                       return numLiterals[x];
                                     numLiterals[x] = newCell();
                                     numLiterals[x]->car = (Cell*)x;
-                                    numLiterals[x]->type = NUM;
+                                    numLiterals[x]->type = NUMBER;
                                     mkref(numLiterals[x]);
                                     return numLiterals[x];
                                   }
@@ -16,7 +16,7 @@ Cell* newNum(long x) {
 }
 
 bool isNum(Cell* x) {
-  return x->type == NUM;
+  return x->type == NUMBER;
 }
 
 long toNum(Cell* x) {
@@ -44,12 +44,12 @@ long toNum(Cell* x) {
 
 Cell* newSym(string x) {
   Cell* result = intern(x);
-  result->type = SYM;
+  result->type = SYMBOL;
   return result;
 }
 
 bool isSym(Cell* x) {
-  return x->type == SYM;
+  return x->type == SYMBOL;
 }
 
 Cell* newString(string x) {
@@ -205,9 +205,9 @@ Cell* rep(Cell* x) {
 Cell* type(Cell* x) {
   if (x == nil) return nil;
   switch(x->type) {
-  case NUM:
+  case NUMBER:
     return newSym("number");
-  case SYM:
+  case SYMBOL:
     return newSym("symbol");
   case STRING:
     return newSym("string");

@@ -155,9 +155,9 @@ void init() {
                                     if (x == nil) return;
                                     ++mark[x];
                                     switch (x->type) {
-                                    case NUM:
+                                    case NUMBER:
                                     case STRING:
-                                    case SYM:
+                                    case SYMBOL:
                                       break;
                                     case CONS:
                                       markAllCells(car(x), mark); break;

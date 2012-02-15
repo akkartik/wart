@@ -20,9 +20,7 @@ void test_rmref_frees_space() {
 }
 
 void test_rmref_handles_nums() {
-  Cell* c = newCell();
-  c->type = NUM;
-  c->car = (Cell*)34;
+  Cell* c = newNum(34);
   rmref(c);
   check(!c->car);
   checkEq(freelist, c);

@@ -22,9 +22,9 @@ ostream& operator<<(ostream& os, Cell* c) {
         os << " . " << curr;
     }
     return os << ")";
-  case NUM:
+  case NUMBER:
     return os << toNum(c);
-  case SYM:
+  case SYMBOL:
     return os << toString(c);
   case STRING:
     return os << "\"" << toString(c) << "\"";
