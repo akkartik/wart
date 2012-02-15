@@ -201,15 +201,13 @@ Cell* evalArgs(Cell* params, Cell* args, Cell* env) {
   setCdr(result, evalArgs(cdr(params), cdr(args), env));
   rmref(cdr(result));
 
-  if (isAlreadyEvald(car(args))) {
+  if (isAlreadyEvald(car(args)))
     setCar(result, cdr(car(args)));
-  }
-  else if (!isCons(params) || !isQuoted(car(params))) {
+  else if (isCons(params) && isQuoted(car(params)))
+    setCar(result, car(args));
+  else {
     setCar(result, eval(car(args), env));
     rmref(car(result));
-  }
-  else {
-    setCar(result, car(args));
   }
   return mkref(result);
 }
