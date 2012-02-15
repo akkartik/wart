@@ -382,12 +382,16 @@ Cell* eval(Cell* expr, Cell* env) {
   Cell* orderedArgs = reorderKeywordArgs(calleeSig(fn), splicedArgs);
   Cell* evaldArgs = evalArgs(calleeSig(fn), orderedArgs, env);
 
+  Cell* callerEnv = currLexicalScopes.top();
+
   // swap in the function's lexical environment
-  if (!isPrimFunc(calleeBody(fn)) && type(fn) != newSym("vau"))
+  if (!isPrimFunc(calleeBody(fn)))
     newDynamicScope(CURR_LEXICAL_SCOPE, calleeEnv(fn));
   // now bind its params to args in the new environment
   newLexicalScope();
   bindParams(calleeSig(fn), evaldArgs);
+  if (type(fn) == newSym("vau"))
+    addLexicalBinding("caller-env", callerEnv);
 
   // eval all forms in body, save result of final form
   Cell* result = nil;
@@ -400,7 +404,7 @@ Cell* eval(Cell* expr, Cell* env) {
     }
 
   endLexicalScope();
-  if (!isPrimFunc(calleeBody(fn)) && type(fn) != newSym("vau"))
+  if (!isPrimFunc(calleeBody(fn)))
     endDynamicScope(CURR_LEXICAL_SCOPE);
 
   // macros implicitly eval their result in the caller's scope

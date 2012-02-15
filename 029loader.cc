@@ -1,6 +1,7 @@
 #include<dirent.h>
 
 void loadFile(const char* filename) {
+  cerr << filename << endl;
   ifstream f(filename);
   CodeStream c(f);
   bool old_interactive = interactive; interactive = false;

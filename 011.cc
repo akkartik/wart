@@ -4,8 +4,12 @@
 // use $vars to avoid shadowing
 // they never call each other; needn't generate gensyms for $vars
 
-COMPILE_PRIM_FUNC(eval, primFunc_eval, "($x)",
-  return eval(lookup("$x"));
+COMPILE_PRIM_FUNC(eval, primFunc_eval, "($x $env)",
+  Cell* env = lookup("$env");
+  if (env == nil)
+    return eval(lookup("$x"));
+  else
+    return eval(lookup("$x"), nil);
 )
 
 COMPILE_PRIM_FUNC(if, primFunc_if, "($cond '$then '$else)",
