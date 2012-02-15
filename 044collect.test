@@ -1,3 +1,0 @@
-(test "collect/yield works"
- :valueof (collect:for i 1 (< i 4) ++.i yield.i)
- :should be '(1 2 3))

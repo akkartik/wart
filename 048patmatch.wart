@@ -1,17 +1,0 @@
-mac matching(vars vals . body)
-  `(if (match ',vars ,vals)
-     let ,strip_underscores.vars ,vals
-      ,@body)
-
-
-
-;; Internals
-
-def strip_underscores(vars)
-  (if
-    cons?.vars
-      (cons strip_underscores:car.vars strip_underscores:cdr.vars)
-    (iso str.vars.0 "_")
-      (sym (str.vars 1 nil))
-    :else
-      vars)
