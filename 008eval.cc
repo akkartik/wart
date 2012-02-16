@@ -325,6 +325,7 @@ Cell* processUnquotes(Cell* x, int depth) {
 // HACK: explicitly reads from passed-in env, but implicitly creates bindings
 // to currLexicalScope. Carefully make sure it's popped off.
 Cell* eval(Cell* expr, Cell* env) {
+  cerr << expr << endl;
   if (!expr)
     RAISE << "eval: cell should never be NUL" << endl << DIE;
 
@@ -349,7 +350,11 @@ Cell* eval(Cell* expr, Cell* env) {
   if (car(expr) == newSym("mu"))
     return mkref(newFunc("mu", expr));
 
+  if (car(expr) == newSym("lookup"))
+    return mkref(lookup(car(cdr(expr)), env));
+
   Cell* fn = eval(car(expr), env);
+  cerr << car(expr) << " => " << fn << endl;
   if (!isFunc(fn))
     RAISE << "not a call: " << expr << endl
         << "- Should it not be a call? Perhaps the expression is indented too much." << endl << DIE;
@@ -362,6 +367,7 @@ Cell* eval(Cell* expr, Cell* env) {
   for (Cell* form = calleeImpl(fn); form != nil; form = cdr(form)) {
     rmref(result);
     result = eval(car(form)); // use fn's env
+    cerr << car(form) << " => " << result << endl;
   }
 
   endLexicalScope();
