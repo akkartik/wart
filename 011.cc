@@ -10,3 +10,15 @@ COMPILE_PRIM_FUNC(eval, primFunc_eval, "($x $scope)",
   else
     return eval(lookup("$x"), scope);
 )
+
+COMPILE_PRIM_FUNC(cons, primFunc_cons, "($x $y)",
+  return mkref(newCons(lookup("$x"), lookup("$y")));
+)
+
+COMPILE_PRIM_FUNC(car, primFunc_car, "($l)",
+  return mkref(car(lookup("$l")));
+)
+
+COMPILE_PRIM_FUNC(cdr, primFunc_cdr, "($l)",
+  return mkref(cdr(lookup("$l")));
+)

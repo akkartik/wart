@@ -62,13 +62,10 @@
                                   }
 
 // eval @exprs and inline them into args, tagging them with ''
-Cell* spliceArgs(Cell* args, Cell* fn, Cell* scope) {
+Cell* spliceArgs(Cell* args, Cell* scope) {
   Cell *pResult = newCell(), *tip = pResult;
   for (Cell* curr = args; curr != nil; curr=cdr(curr)) {
     if (isSplice(car(curr))) {
-      if (type(fn) == newSym("macro"))
-        RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
-
       Cell* x = unsplice(car(curr), scope);
       for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
         if (isColonSym(car(curr2)))
@@ -85,8 +82,8 @@ Cell* spliceArgs(Cell* args, Cell* fn, Cell* scope) {
   return dropPtr(pResult);
 }
 
-Cell* spliceArgs(Cell* args, Cell* fn) {
-  return spliceArgs(args, fn, currLexicalScopes.top());
+Cell* spliceArgs(Cell* args) {
+  return spliceArgs(args, currLexicalScopes.top());
 }
 
                                   Cell* stripQuote(Cell* cell) {
@@ -304,8 +301,7 @@ Cell* processUnquotes(Cell* x, int depth) {
                                   bool isFunc(Cell* x) {
                                     if (!isCons(x)) return false;
                                     if (isPrimFunc(car(x))) return true;
-                                    string label = toString(type(x));
-                                    return label == "function" || label == "macro" || label == "mu";
+                                    return toString(type(x)) == "function";
                                   }
 
                                   Cell* newFunc(string type, Cell* expr) {
@@ -349,27 +345,50 @@ Cell* eval(Cell* expr, Cell* scope) {
   if (isBackQuoted(expr))
     return processUnquotes(cdr(expr), 1, scope); // already mkref'd
 
-  if (car(expr) == newSym("mu"))
-    return mkref(newFunc("mu", expr));
+  if (car(expr) == newSym("fn"))
+    return mkref(newFunc("function", expr));
+  else if (isFunc(expr))
+    // lexical scope is already attached
+    return mkref(expr);
 
+  // expr is a function call
   Cell* fn = eval(car(expr), scope);
+  if (fn != nil && !isFunc(fn))
+    fn = coerceQuoted(fn, newSym("function"), lookup("coercions*"));
   if (!isFunc(fn))
     RAISE << "not a call: " << expr << endl
         << "- Should it not be a call? Perhaps the expression is indented too much." << endl << DIE;
 
+  // eval all its args in the current lexical scope
+  Cell* splicedArgs = spliceArgs(callArgs(expr), scope);
+  Cell* orderedArgs = reorderKeywordArgs(calleeSig(fn), splicedArgs);
+  Cell* evaldArgs = evalArgs(calleeSig(fn), orderedArgs, scope);
+
+  // swap in the function's lexical environment
+  if (!isPrimFunc(calleeBody(fn)))
+    newDynamicScope(CURR_LEXICAL_SCOPE, calleeEnv(fn));
+  // now bind its params to args in the new environment
   newLexicalScope();
-  bindParams(calleeSig(fn), callArgs(expr));
+  bindParams(calleeSig(fn), evaldArgs);
   addLexicalBinding("caller-scope", scope);
 
   // eval all forms in body, save result of final form
   Cell* result = nil;
-  for (Cell* form = calleeImpl(fn); form != nil; form = cdr(form)) {
-    rmref(result);
-    result = eval(car(form)); // use fn's env
-  }
+  if (isPrimFunc(calleeBody(fn)))
+    result = toPrimFunc(calleeBody(fn))(); // all primFuncs must mkref result
+  else
+    for (Cell* form = calleeImpl(fn); form != nil; form = cdr(form)) {
+      rmref(result);
+      result = eval(car(form)); // use fn's env
+    }
 
   endLexicalScope();
+  if (!isPrimFunc(calleeBody(fn)))
+    endDynamicScope(CURR_LEXICAL_SCOPE);
 
+  rmref(evaldArgs);
+  rmref(orderedArgs);
+  rmref(splicedArgs);
   rmref(fn);
   return result; // already mkref'd
 }
