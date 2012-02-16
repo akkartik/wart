@@ -1,0 +1,11 @@
+= mac! (fn '(name params . body)
+  (eval `(= ,name (fn ',params
+                    (eval ((fn() ,@body)))))))
+
+mac! do body
+  `((fn() ,@body))
+
+pr (do 3 4)
+pr ((fn(x) ((fn() x))) 3)
+pr ((fn(x) (do x)) 3)
+quit.
