@@ -361,6 +361,7 @@ Cell* eval(Cell* expr, Cell* scope) {
 
   newLexicalScope();
   bindParams(calleeSig(fn), callArgs(expr));
+  addLexicalBinding("caller-scope", scope);
 
   // eval all forms in body, save result of final form
   Cell* result = nil;
