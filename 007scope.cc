@@ -75,7 +75,7 @@ void endLexicalScope() {
 void addLexicalBinding(Cell* sym, Cell* val, Cell* scope) {
   if (unsafeGet(scope, sym))
     RAISE << "Can't rebind within a lexical scope" << endl << DIE;
-  unsafeSet(scope, sym, val, false);
+  unsafeSet(scope, sym, val, false); // deleting nil might expose a shadowed binding
 }
 
 void addLexicalBinding(Cell* sym, Cell* val) {
