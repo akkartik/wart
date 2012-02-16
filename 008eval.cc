@@ -304,11 +304,11 @@ Cell* processUnquotes(Cell* x, int depth) {
                                     return toString(type(x)) == "function";
                                   }
 
-                                  Cell* newFunc(string type, Cell* expr) {
+                                  Cell* newFunc(string type, Cell* expr, Cell* scope) {
                                     Cell* f = newTable();
                                     set(f, newSym("sig"), sig(expr));
                                     set(f, newSym("body"), body(expr));
-                                    set(f, newSym("env"), currLexicalScopes.top());
+                                    set(f, newSym("env"), scope);
                                     return newObject(type, f);
                                   }
 
@@ -321,6 +321,7 @@ Cell* processUnquotes(Cell* x, int depth) {
 // HACK: explicitly reads from passed-in scope, but implicitly creates bindings
 // to currLexicalScope. Carefully make sure it's popped off.
 Cell* eval(Cell* expr, Cell* scope) {
+  cerr << expr << " || " << scope << endl;
   if (!expr)
     RAISE << "eval: cell should never be NUL" << endl << DIE;
 
@@ -346,7 +347,7 @@ Cell* eval(Cell* expr, Cell* scope) {
     return processUnquotes(cdr(expr), 1, scope); // already mkref'd
 
   if (car(expr) == newSym("fn"))
-    return mkref(newFunc("function", expr));
+    return mkref(newFunc("function", expr, scope));
   else if (isFunc(expr))
     // lexical scope is already attached
     return mkref(expr);
