@@ -342,9 +342,6 @@ Cell* eval(Cell* expr, Cell* env) {
   if (isColonSym(expr))
     return mkref(expr);
 
-  if (isSym(expr))
-    return mkref(lookup(expr, env));
-
   if (isAtom(expr))
     return mkref(expr);
 
@@ -357,63 +354,7 @@ Cell* eval(Cell* expr, Cell* env) {
   if (isBackQuoted(expr))
     return processUnquotes(cdr(expr), 1, env); // already mkref'd
 
-  if (car(expr) == newSym("fn"))
-    return mkref(newFunc("function", expr));
-  else if (car(expr) == newSym("mfn"))
-    return mkref(newFunc("macro", expr));
-  else if (car(expr) == newSym("vau"))
-    return mkref(newVau(expr));
-  else if (isFunc(expr))
-    // lexical scope is already attached
-    return mkref(expr);
-
-  // expr is a function call
-  Cell* fn = eval(car(expr), env);
-  if (fn != nil && !isFunc(fn))
-    fn = coerceQuoted(fn, newSym("function"), lookup("coercions*"));
-  if (!isFunc(fn))
-    RAISE << "not a call: " << expr << endl
-        << "- Should it not be a call? Perhaps the expression is indented too much." << endl << DIE;
-
-  // eval all its args in the current lexical scope
-  Cell* splicedArgs = spliceArgs(callArgs(expr), fn, env);
-  Cell* orderedArgs = reorderKeywordArgs(calleeSig(fn), splicedArgs);
-  Cell* evaldArgs = evalArgs(calleeSig(fn), orderedArgs, env);
-
-  Cell* callerEnv = currLexicalScopes.top();
-
-  // swap in the function's lexical environment
-  if (!isPrimFunc(calleeBody(fn)))
-    newDynamicScope(CURR_LEXICAL_SCOPE, calleeEnv(fn));
-  // now bind its params to args in the new environment
-  newLexicalScope();
-  bindParams(calleeSig(fn), evaldArgs);
-  if (type(fn) == newSym("vau"))
-    addLexicalBinding("caller-env", callerEnv);
-
-  // eval all forms in body, save result of final form
-  Cell* result = nil;
-  if (isPrimFunc(calleeBody(fn)))
-    result = toPrimFunc(calleeBody(fn))(); // all primFuncs must mkref result
-  else
-    for (Cell* form = calleeImpl(fn); form != nil; form = cdr(form)) {
-      rmref(result);
-      result = eval(car(form)); // use fn's env
-    }
-
-  endLexicalScope();
-  if (!isPrimFunc(calleeBody(fn)))
-    endDynamicScope(CURR_LEXICAL_SCOPE);
-
-  // macros implicitly eval their result in the caller's scope
-  if (type(fn) == newSym("macro"))
-    result = implicitlyEval(result, env);
-
-  rmref(evaldArgs);
-  rmref(orderedArgs);
-  rmref(splicedArgs);
-  rmref(fn);
-  return result; // already mkref'd
+  return mkref(expr);
 }
 
 Cell* eval(Cell* expr) {
