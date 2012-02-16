@@ -57,19 +57,19 @@
 
 
 
-                                  Cell* unsplice(Cell* arg, Cell* env) {
-                                    return eval(cdr(arg), env);
+                                  Cell* unsplice(Cell* arg, Cell* scope) {
+                                    return eval(cdr(arg), scope);
                                   }
 
 // eval @exprs and inline them into args, tagging them with ''
-Cell* spliceArgs(Cell* args, Cell* fn, Cell* env) {
+Cell* spliceArgs(Cell* args, Cell* fn, Cell* scope) {
   Cell *pResult = newCell(), *tip = pResult;
   for (Cell* curr = args; curr != nil; curr=cdr(curr)) {
     if (isSplice(car(curr))) {
       if (type(fn) == newSym("macro"))
         RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
 
-      Cell* x = unsplice(car(curr), env);
+      Cell* x = unsplice(car(curr), scope);
       for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
         if (isColonSym(car(curr2)))
           addCons(tip, car(curr2));
@@ -191,14 +191,14 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
                                     return dropPtr(pResult);
                                   }
 
-Cell* evalArgs(Cell* params, Cell* args, Cell* env) {
+Cell* evalArgs(Cell* params, Cell* args, Cell* scope) {
   if (args == nil) return nil;
 
   if (isQuoted(params))
     return stripAlreadyEval(args);
 
   Cell* result = newCell();
-  setCdr(result, evalArgs(cdr(params), cdr(args), env));
+  setCdr(result, evalArgs(cdr(params), cdr(args), scope));
   rmref(cdr(result));
 
   if (isAlreadyEvald(car(args)))
@@ -206,7 +206,7 @@ Cell* evalArgs(Cell* params, Cell* args, Cell* env) {
   else if (isCons(params) && isQuoted(car(params)))
     setCar(result, car(args));
   else {
-    setCar(result, eval(car(args), env));
+    setCar(result, eval(car(args), scope));
     rmref(car(result));
   }
   return mkref(result);
@@ -262,23 +262,23 @@ void bindParams(Cell* params, Cell* args) {
                                     return stripUnquote(cdr(x));
                                   }
 
-Cell* processUnquotes(Cell* x, int depth, Cell* env) {
+Cell* processUnquotes(Cell* x, int depth, Cell* scope) {
   if (!isCons(x)) return mkref(x);
 
   if (unquoteDepth(x) == depth)
-    return eval(stripUnquote(x), env);
+    return eval(stripUnquote(x), scope);
   else if (car(x) == newSym(","))
     return mkref(x);
 
   if (isBackQuoted(x)) {
-    Cell* result = newCons(car(x), processUnquotes(cdr(x), depth+1, env));
+    Cell* result = newCons(car(x), processUnquotes(cdr(x), depth+1, scope));
     rmref(cdr(result));
     return mkref(result);
   }
 
   if (depth == 1 && isUnquoteSplice(car(x))) {
-    Cell* result = eval(cdr(car(x)), env);
-    Cell* splice = processUnquotes(cdr(x), depth, env);
+    Cell* result = eval(cdr(car(x)), scope);
+    Cell* splice = processUnquotes(cdr(x), depth, scope);
     if (result == nil) return splice;
     // always splice in a copy
     Cell* resultcopy = copyList(result);
@@ -288,8 +288,8 @@ Cell* processUnquotes(Cell* x, int depth, Cell* env) {
     return mkref(resultcopy);
   }
 
-  Cell* result = newCons(processUnquotes(car(x), depth, env),
-                         processUnquotes(cdr(x), depth, env));
+  Cell* result = newCons(processUnquotes(car(x), depth, scope),
+                         processUnquotes(cdr(x), depth, scope));
   rmref(car(result));
   rmref(cdr(result));
   return mkref(result);
@@ -316,15 +316,15 @@ Cell* processUnquotes(Cell* x, int depth) {
                                     return newObject(type, f);
                                   }
 
-                                  Cell* implicitlyEval(Cell* x, Cell* env) {
-                                    Cell* result = eval(x, env);
+                                  Cell* implicitlyEval(Cell* x, Cell* scope) {
+                                    Cell* result = eval(x, scope);
                                     rmref(x);
                                     return result;
                                   }
 
-// HACK: explicitly reads from passed-in env, but implicitly creates bindings
+// HACK: explicitly reads from passed-in scope, but implicitly creates bindings
 // to currLexicalScope. Carefully make sure it's popped off.
-Cell* eval(Cell* expr, Cell* env) {
+Cell* eval(Cell* expr, Cell* scope) {
   cerr << expr << endl;
   if (!expr)
     RAISE << "eval: cell should never be NUL" << endl << DIE;
@@ -345,15 +345,15 @@ Cell* eval(Cell* expr, Cell* env) {
     return mkref(cdr(expr));
 
   if (isBackQuoted(expr))
-    return processUnquotes(cdr(expr), 1, env); // already mkref'd
+    return processUnquotes(cdr(expr), 1, scope); // already mkref'd
 
   if (car(expr) == newSym("mu"))
     return mkref(newFunc("mu", expr));
 
   if (car(expr) == newSym("lookup"))
-    return mkref(lookup(car(cdr(expr)), env));
+    return mkref(lookup(car(cdr(expr)), scope));
 
-  Cell* fn = eval(car(expr), env);
+  Cell* fn = eval(car(expr), scope);
   cerr << car(expr) << " => " << fn << endl;
   if (!isFunc(fn))
     RAISE << "not a call: " << expr << endl
