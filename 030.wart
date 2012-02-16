@@ -1,3 +1,9 @@
-= do (fn 'body (eval `((fn() ,@body))))
-((fn(x) (do x)) 3)
+= mac! (mu '(name params . body)
+  (eval `(= ,name (mu ',params
+                    (eval ((fn() ,@body)))))))
+
+mac! do body
+  `((fn() ,@body))
+
+pr ((fn(x) (do x)) 3)
 quit.
