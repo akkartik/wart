@@ -335,6 +335,9 @@ Cell* eval(Cell* expr, Cell* scope) {
   if (isColonSym(expr))
     return mkref(expr);
 
+  if (isSym(expr))
+    return mkref(lookup(expr, scope));
+
   if (isAtom(expr))
     return mkref(expr);
 
@@ -349,9 +352,6 @@ Cell* eval(Cell* expr, Cell* scope) {
 
   if (car(expr) == newSym("mu"))
     return mkref(newFunc("mu", expr));
-
-  if (car(expr) == newSym("lookup"))
-    return mkref(lookup(car(cdr(expr)), scope));
 
   Cell* fn = eval(car(expr), scope);
   cerr << car(expr) << " => " << fn << endl;
