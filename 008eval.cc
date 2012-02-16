@@ -305,7 +305,7 @@ Cell* processUnquotes(Cell* x, int depth) {
                                     if (!isCons(x)) return false;
                                     if (isPrimFunc(car(x))) return true;
                                     string label = toString(type(x));
-                                    return label == "function" || label == "macro" || label == "vau";
+                                    return label == "function" || label == "macro" || label == "mu";
                                   }
 
                                   Cell* newFunc(string type, Cell* expr) {
@@ -314,14 +314,6 @@ Cell* processUnquotes(Cell* x, int depth) {
                                     set(f, newSym("body"), body(expr));
                                     set(f, newSym("env"), currLexicalScopes.top());
                                     return newObject(type, f);
-                                  }
-
-                                  Cell* newVau(Cell* expr) {
-                                    Cell* f = newTable();
-                                    set(f, newSym("sig"), newCons(newSym("'"), sig(expr)));
-                                    set(f, newSym("body"), body(expr));
-                                    set(f, newSym("env"), currLexicalScopes.top());
-                                    return newObject("vau", f);
                                   }
 
                                   Cell* implicitlyEval(Cell* x, Cell* env) {
@@ -354,7 +346,28 @@ Cell* eval(Cell* expr, Cell* env) {
   if (isBackQuoted(expr))
     return processUnquotes(cdr(expr), 1, env); // already mkref'd
 
-  return mkref(expr);
+  if (car(expr) == newSym("mu"))
+    return mkref(newFunc("mu", expr));
+
+  Cell* fn = eval(car(expr), env);
+  if (!isFunc(fn))
+    RAISE << "not a call: " << expr << endl
+        << "- Should it not be a call? Perhaps the expression is indented too much." << endl << DIE;
+
+  newLexicalScope();
+  bindParams(calleeSig(fn), callArgs(expr));
+
+  // eval all forms in body, save result of final form
+  Cell* result = nil;
+  for (Cell* form = calleeImpl(fn); form != nil; form = cdr(form)) {
+    rmref(result);
+    result = eval(car(form)); // use fn's env
+  }
+
+  endLexicalScope();
+
+  rmref(fn);
+  return result; // already mkref'd
 }
 
 Cell* eval(Cell* expr) {
