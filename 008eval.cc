@@ -325,7 +325,6 @@ Cell* processUnquotes(Cell* x, int depth) {
 // HACK: explicitly reads from passed-in scope, but implicitly creates bindings
 // to currLexicalScope. Carefully make sure it's popped off.
 Cell* eval(Cell* expr, Cell* scope) {
-  cerr << expr << endl;
   if (!expr)
     RAISE << "eval: cell should never be NUL" << endl << DIE;
 
@@ -354,7 +353,6 @@ Cell* eval(Cell* expr, Cell* scope) {
     return mkref(newFunc("mu", expr));
 
   Cell* fn = eval(car(expr), scope);
-  cerr << car(expr) << " => " << fn << endl;
   if (!isFunc(fn))
     RAISE << "not a call: " << expr << endl
         << "- Should it not be a call? Perhaps the expression is indented too much." << endl << DIE;
@@ -368,7 +366,6 @@ Cell* eval(Cell* expr, Cell* scope) {
   for (Cell* form = calleeImpl(fn); form != nil; form = cdr(form)) {
     rmref(result);
     result = eval(car(form)); // use fn's env
-    cerr << car(form) << " => " << result << endl;
   }
 
   endLexicalScope();
