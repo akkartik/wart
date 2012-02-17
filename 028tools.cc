@@ -21,6 +21,10 @@ COMPILE_PRIM_FUNC(mem_usage, primFunc_mem_usage, "()",
   return mkref(newNum(numUnfreed()));
 )
 
+COMPILE_PRIM_FUNC(nrefs, primFunc_nrefs, "($x)",
+  return mkref(newNum(lookup("$x")->nrefs));
+)
+
 COMPILE_PRIM_FUNC(date, primFunc_date, "()",
   time_t t = time(NULL);
   cerr << asctime(localtime(&t));
