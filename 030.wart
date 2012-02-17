@@ -2,8 +2,69 @@
   (eval `(= ,name (fn ',params
                     (eval ((fn() ,@body)))))))
 
+mac! def!(name params . body)
+  `(= ,name (fn ,params ,@body))
+
 mac! do body
   `((fn() ,@body))
 
-pr ((fn(x) (do x)) 3)
-quit.
+def! prn args
+  (if args
+    (do
+      pr car.args
+      prn @cdr.args
+      car.args)
+    (pr "
+"))
+
+mac! def(name params . body)
+  if bound?.name
+    (prn "redef: " name)
+  `(def! ,name ,params ,@body)
+
+mac! mac(name params . body)
+  if bound?.name
+    (prn "redef: " name)
+  `(mac! ,name ,params ,@body)
+
+mac alias(new old) ; include later refinements
+  `(mac ,new $args
+     `(,,old ,@$args))
+
+def compose(f g)
+  fn 'args
+    eval `(,f (,g ,@args))
+
+def complement(f)
+  (compose not f)
+
+mac let(var val . body)
+  `((fn(,var) ,@body) ,val)
+
+def list args
+  if args
+    (cons car.args
+          (list @cdr.args))
+
+let $iso iso ; ignore later refinements
+  def isa(x t)
+    ($iso t type.x)
+
+= cadr car:cdr
+= cddr cdr:cdr
+
+def id(_)
+  _
+
+= quote (car:car (cons ' 'a))
+def quote?(_) (iso _ quote)
+= backquote (car '`(1))
+def backquote?(_) (iso _ backquote)
+= unquote (car:cadr '`(,1))
+def unquote?(_) (iso _ unquote)
+= unquote-splice (car:cadr '`(,@1))
+def unquote-splice?(_) (iso _ unquote-splice)
+
+def die args
+  prn @args
+  quit.

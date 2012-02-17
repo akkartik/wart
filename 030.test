@@ -1,0 +1,36 @@
+(mac! foo(x) `(+ 1 ,x))
+(test "mac!"
+ :valueof (let x 3 (foo x))
+ :should be 4)
+
+(test "do returns last expr"
+ :valueof (do 3 4)
+ :should be 4)
+
+(test "do evals all exprs"
+ :valueof ((fn(a) (do (= a (+ a 1))
+                      (= a (+ a 1))))
+              2)
+ :should be 4)
+
+(test "compose works"
+ :valueof ((compose (fn(_) (+ _ 1)) (fn(a b) (+ a b))) 3 4)
+ :should be 8)
+
+(test "compose works - 2"
+ :valueof ((compose not cons?) '(1 2))
+ :should be nil)
+
+(test "compose works with macros"
+ :valueof ((compose foo foo) 1)
+ :should be 3)
+
+
+
+(test "let works"
+ :valueof (let x 3 (+ x 1))
+ :should be 4)
+
+(test "let destructures"
+ :valueof (let (a . b) (cons 3 4) (+ a b))
+ :should be 7)

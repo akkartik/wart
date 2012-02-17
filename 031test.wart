@@ -1,0 +1,10 @@
+def test(msg pred/should expr/valueof expected)
+  if (pred expr expected)
+    (pr ".")
+    (register_failed_test msg expr)
+
+def pending-test'(msg expr/valueof pred/should expected)
+  prn.
+  (prn "pending: " msg)
+
+alias be iso
