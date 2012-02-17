@@ -248,6 +248,7 @@ void runTests() {
     checkForLeaks();
   }
 
+  inTest = false;
   init();
   loadFiles(".wart"); // after GC tests
   loadFiles(".test");
