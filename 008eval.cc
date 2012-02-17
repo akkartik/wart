@@ -366,19 +366,18 @@ Cell* eval(Cell* expr, Cell* scope) {
   // now bind its params to args in the new environment
   newLexicalScope();
   bindParams(calleeSig(fn), evaldArgs);
+  if (!isPrimFunc(calleeBody(fn)))
+    addLexicalBinding("caller-scope", scope);
 
   // eval all forms in body, save result of final form
   Cell* result = nil;
-  if (isPrimFunc(calleeBody(fn))) {
+  if (isPrimFunc(calleeBody(fn)))
     result = toPrimFunc(calleeBody(fn))(); // all primFuncs must mkref result
-  }
-  else {
-    addLexicalBinding("caller-scope", scope);
+  else
     for (Cell* form = calleeImpl(fn); form != nil; form = cdr(form)) {
       rmref(result);
       result = eval(car(form)); // use fn's env
     }
-  }
 
   endLexicalScope();
   if (!isPrimFunc(calleeBody(fn)))
