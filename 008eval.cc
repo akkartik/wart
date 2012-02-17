@@ -4,10 +4,6 @@
                                     return isCons(cell) && car(cell) == newSym("'");
                                   }
 
-                                  bool isAlreadyEvald(Cell* cell) {
-                                    return isCons(cell) && car(cell) == newSym("''");
-                                  }
-
                                   bool isBackQuoted(Cell* cell) {
                                     return isCons(cell) && car(cell) == newSym("`");
                                   }
@@ -61,17 +57,13 @@
                                     return eval(cdr(arg), scope);
                                   }
 
-// eval @exprs and inline them into args, tagging them with ''
 Cell* spliceArgs(Cell* args, Cell* scope) {
   Cell *pResult = newCell(), *tip = pResult;
   for (Cell* curr = args; curr != nil; curr=cdr(curr)) {
     if (isSplice(car(curr))) {
       Cell* x = unsplice(car(curr), scope);
       for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
-        if (isColonSym(car(curr2)))
-          addCons(tip, car(curr2));
-        else
-          addCons(tip, newCons(newSym("''"), car(curr2)));
+        addCons(tip, car(curr2));
       rmref(x);
     }
     else {
@@ -84,6 +76,21 @@ Cell* spliceArgs(Cell* args, Cell* scope) {
 
 Cell* spliceArgs(Cell* args) {
   return spliceArgs(args, currLexicalScopes.top());
+}
+
+bool containsSplice(Cell* args) {
+  for (Cell* curr = args; curr != nil; curr=cdr(curr))
+    if (isSplice(car(curr)))
+      return true;
+  return false;
+}
+
+Cell* processSplice(Cell* fn, Cell* args, Cell* scope) {
+  Cell* tmp = newCons(fn, spliceArgs(args, scope));
+  rmref(cdr(tmp));
+  Cell* ans = eval(tmp, scope);
+  rmref(tmp);
+  return ans;
 }
 
                                   Cell* stripQuote(Cell* cell) {
@@ -177,30 +184,16 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
 
 
 
-                                  Cell* stripAlreadyEval(Cell* args) {
-                                    Cell *pResult = newCell();
-                                    for (Cell *from=args, *to=pResult; from != nil; from=cdr(from), to=cdr(to)) {
-                                      if (isAlreadyEvald(car(from)))
-                                        addCons(to, cdr(car(from)));
-                                      else
-                                        addCons(to, car(from));
-                                    }
-                                    return dropPtr(pResult);
-                                  }
-
 Cell* evalArgs(Cell* params, Cell* args, Cell* scope) {
   if (args == nil) return nil;
 
-  if (isQuoted(params))
-    return stripAlreadyEval(args);
+  if (isQuoted(params)) return mkref(args);
 
   Cell* result = newCell();
   setCdr(result, evalArgs(cdr(params), cdr(args), scope));
   rmref(cdr(result));
 
-  if (isAlreadyEvald(car(args)))
-    setCar(result, cdr(car(args)));
-  else if (isCons(params) && isQuoted(car(params)))
+  if (isCons(params) && isQuoted(car(params)))
     setCar(result, car(args));
   else {
     setCar(result, eval(car(args), scope));
@@ -333,7 +326,7 @@ Cell* eval(Cell* expr, Cell* scope) {
   if (isObject(expr))
     return mkref(expr);
 
-  if (isQuoted(expr) || isAlreadyEvald(expr))
+  if (isQuoted(expr))
     return mkref(cdr(expr));
 
   if (isBackQuoted(expr))
@@ -346,7 +339,6 @@ Cell* eval(Cell* expr, Cell* scope) {
     return mkref(expr);
 
   newDynamicScope(CURR_LEXICAL_SCOPE, scope);
-  dbg << expr << " || " << scope << endl;
   // expr is a function call
   Cell* fn0 = eval(car(expr), scope);
   Cell* fn = fn0;
@@ -358,9 +350,16 @@ Cell* eval(Cell* expr, Cell* scope) {
     RAISE << "not a call: " << expr << endl
         << "- Should it not be a call? Perhaps the expression is indented too much." << endl << DIE;
 
+  Cell* args = callArgs(expr);
+  if (containsSplice(args)) {
+    Cell* result = processSplice(fn, args, scope);
+    rmref(fn);
+    rmref(fn0);
+    return result; // already mkref'd
+  }
+
   // eval all its args in the current lexical scope
-  Cell* splicedArgs = spliceArgs(callArgs(expr), scope);
-  Cell* orderedArgs = reorderKeywordArgs(calleeSig(fn), splicedArgs);
+  Cell* orderedArgs = reorderKeywordArgs(calleeSig(fn), args);
   Cell* evaldArgs = evalArgs(calleeSig(fn), orderedArgs, scope);
 
   // swap in the function's lexical environment
@@ -388,7 +387,6 @@ Cell* eval(Cell* expr, Cell* scope) {
 
   rmref(evaldArgs);
   rmref(orderedArgs);
-  rmref(splicedArgs);
   rmref(fn);
   rmref(fn0);
   endDynamicScope(CURR_LEXICAL_SCOPE);
