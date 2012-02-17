@@ -1,0 +1,36 @@
+mac zap(f x)
+  `(= ,x (,f ,x))
+
+; infinite nil generator
+= nils '(nil)   cdr.nils nils
+
+mac wipe places
+  `(= ,@(zip-flat places nils))
+
+mac push(x xs)
+  `(= ,xs (cons ,x ,xs))
+
+mac pop(xs)
+  `(do1 car.,xs
+     (zap cdr ,xs))
+
+mac or=(var val)
+  `(unless ,var
+     (= ,var ,val))
+
+mac shift args ; multiple-eval to maintain places
+  `(= ,@(zip-flat args cdr.args))
+
+mac rotate args
+  `(let $tmp ,car.args
+     shift ,@args $tmp)
+
+mac swap(x y)
+  `(rotate ,x ,y)
+
+mac making(var val . body)
+  `(between (dyn_bind ,var ,val) :and (dyn_unbind ,var)
+     ,@body)
+
+mac coerce!(var type)
+  `(= ,var (coerce ,var ',type))

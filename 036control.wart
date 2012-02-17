@@ -1,0 +1,100 @@
+mac do1 body
+  `(ret $ret ,car.body
+     ,@cdr.body)
+
+mac between(before after/and . body)
+  `(do1
+     (do ,before ,@body)
+     ,after)
+
+mac before(cleanup . body)
+  `(do1
+     (do ,@body)
+     ,cleanup)
+
+mac when(cond . body)
+  `(if ,cond
+     (do ,@body))
+
+mac unless(cond . body)
+  `(if !,cond
+     (do ,@body))
+
+mac iflet(var expr . branches)
+  if !branches
+    expr
+    `(let $tmp ,expr
+       if $tmp
+         (let ,var $tmp
+           ,car.branches)
+         ,(if cdr.branches
+            `(iflet ,var ,@cdr.branches)))
+
+mac aif(expr . branches)
+  `(iflet it ,expr ,@branches)
+
+mac whenlet(var test . body)
+  `(iflet ,var ,test
+      (do ,@body))
+
+mac awhen(test . body)
+  `(whenlet it ,test
+      ,@body)
+
+
+
+mac while(test . body)
+  `(when ,test
+     ,@body
+     while ,test
+       ,@body)
+
+mac whilet(var test . body)
+  `(let ,var nil
+     while (= ,var ,test)
+       ,@body)
+
+mac awhile(test . body)
+  `(whilet it ,test
+     ,@body)
+
+mac for(var start test update . body)
+  `(let ,var ,start
+     while ,test
+       ,@body
+       ,update)
+
+mac each(var expr . body)
+  `(for $i (as list ,expr) $i (zap cdr $i)
+      let ,var car.$i
+        ,@body)
+
+mac on(var expr . body)
+  `(for ($i index) (list ,expr 0) $i (do (zap cdr $i) ++.index)
+     let ,var car.$i
+      ,@body)
+
+mac forlen(var expr . body)
+  `(for ,var 0 (< ,var len.,expr) ++.,var
+     ,@body)
+
+mac repeat(n . body)
+  `(for $i 0 (< $i ,n) ++.$i
+     ,@body)
+
+mac repeat(n . body) :case (iso n :forever)
+  `(while 1 ,@body)
+
+
+
+def andf fs
+  (fn args
+    (let sub (afn(fs)
+               (if
+                  !fs
+                    1
+                  ~cdr.fs
+                    (car.fs @args)
+                  :else
+                    (and (car.fs @args) (self cdr.fs))))
+      (sub fs)))

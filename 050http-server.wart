@@ -1,0 +1,26 @@
+mac w/server-socket(socket port . body)
+  `(let ,socket make-server-socket.,port
+     before close_socket.,socket
+       ,@body)
+
+mac accepting(client-socket socket/from . body)
+  `(repeat :forever
+     let ,client-socket socket-accept.,socket
+       before close_socket.,client-socket
+         ,@body) ; body must close client-socket
+
+def parse-request(client-socket)
+  making stdin infd:socket_fd.client-socket
+    let (verb url) read.
+      url
+
+def http-server(port)
+  w/server-socket socket (or port 4040)
+    preforking 6 ; handler threads
+      accepting client-socket :from socket
+        let url parse-request.client-socket
+          making stdout infd:socket_fd.client-socket
+            prn "HTTP/1.0 200 OK"
+            prn "Content-type: text/plain"
+            prn.
+            prn url

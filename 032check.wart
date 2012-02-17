@@ -1,0 +1,51 @@
+= compiled-if if
+let $if if
+  mac! if args
+    $if !cdr.args
+      car.args
+      `(,$if ,car.args
+         ,cadr.args
+         (if ,@cddr.args))
+
+mac or args
+  if args
+    `(let $x ,car.args
+       if $x
+         $x
+         or ,@cdr.args)
+
+mac and args
+  if !args
+    1
+    if !cdr.args
+      car.args
+      `(if ,car.args
+         and ,@cdr.args)
+
+alias nil? not
+alias no not
+
+def match(a b)
+  (or (iso a b)
+      (iso str.a.0 "_")
+      (and cons?.a cons?.b
+           (match car.a car.b)
+           (match cdr.a cdr.b)))
+
+let $iso iso
+  def! iso(a b)
+    or ($iso a b)
+      and (cons? a)
+          (cons? b)
+          (iso car.a car.b)
+          (iso cdr.a cdr.b)
+
+def only(f)
+  (fn args
+    (if f (f @args)))
+
+mac check(x test else)
+  `(let $x ,x
+     if (,test $x)
+      $x
+      ,else)

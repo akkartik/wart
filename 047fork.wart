@@ -1,0 +1,14 @@
+let $fork fork
+  mac! fork body
+    `(when (zero? ,$fork.)
+       ,@body
+       quit.)
+
+mac preforking(n . body)
+  `(do
+      repeat ,n
+        (fork ,@body)
+      repeat :forever
+        (wait_for_child)
+        (prn "restart")
+        (fork ,@body))

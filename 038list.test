@@ -1,0 +1,124 @@
+(test "len works on lists"
+ :valueof (len '(1 2 3 4 5))
+ :should be 5)
+
+(test "lists coerce to function"
+ :valueof (type:coerce '(1 2 3) 'function)
+ :should be 'function)
+
+(test "lists work in function position"
+ :valueof ((list 1 2 3) 1)
+ :should be 2)
+
+(test "lists work in function position - 2"
+ :valueof (let l '(list 1 2 3) l.3)
+ :should be 3)
+
+(test "compose works with lists"
+ :valueof (let l '(1 (34 3) 2) (car:l 1))
+ :should be 34)
+
+(test "lists can take negative indices"
+ :valueof (let l '(1 2 3) l.-1)
+ :should be 3)
+
+(test "lists can take slices"
+ :valueof (let l '(1 2 3 4 5 6) (l 3 5))
+ :should be '(4 5))
+
+(test "lists can take slices - 2"
+ :valueof (let l '(1 2 3 4 5 6) (l 3 -1))
+ :should be '(4 5))
+
+(test "lists can take slices - explicit nil"
+ :valueof (let l '(1 2 3 4 5 6) (l 3 nil))
+ :should be '(4 5 6))
+
+(test "lists can be assigned to"
+ :valueof (ret l '(1 2 3)
+            (= l.1 4))
+ :should be '(1 4 3))
+
+(test "list slices can be assigned to"
+ :valueof (ret l '(1 2 3 4 5 6 7)
+            (= (l 1 3) '(16 17 18)))
+ :should be '(1 16 17 18 4 5 6 7))
+
+(test "list slices can be assigned to - 2"
+ :valueof (ret l '(1 2 3 4 5 6 7)
+            (= (l -4 -1) '(29 37)))
+ :should be '(1 2 3 29 37 7))
+
+(test "list slices can be assigned to - explicit nil"
+ :valueof (ret l '(1 2 3 4 5 6 7)
+            (= (l -4 nil) '(29 37)))
+ :should be '(1 2 3 29 37))
+
+(test "list slices can be assigned to - explicit nil var"
+ :valueof (ret l '(1 2 3 4 5 6 7)
+            (let x nil
+              (= (l -4 x) '(29 37))))
+ :should be '(1 2 3 29 37))
+
+(test "list index can be reset"
+ :valueof (ret l '(1 2 3)
+            (= l.1 nil))
+ :should be '(1 nil 3))
+
+(test "list slices can be deleted"
+ :valueof (ret l '(1 2 3 4 5 6 7)
+            (= (l 1 5) nil))
+ :should be '(1 6 7))
+
+(test "list slices can be deleted - 2"
+ :valueof (ret l '(1 2 3 4 5 6 7)
+            (= (l -4 -1) nil))
+ :should be '(1 2 3 7))
+
+(test "list slice assignment can delete at start of list (by rebinding the var)"
+ :valueof (ret l '(1 2 3 4)
+            (= (l 0 2) nil))
+ :should be '(3 4))
+
+(test "nested lists can be assigned to"
+ :valueof (ret l '(1 (2 3))
+            (= ((l 1) 0) 3))
+ :should be '(1 (3 3)))
+
+(test "elems of other types can be assigned to"
+ :valueof (let l (tag 'footype '(1 2 3))
+            (= rep.l.0 3)
+            rep.l)
+ :should be '(3 2 3))
+
+(test "join works"
+ :valueof (join '(1 2 3) nil '(4 5) nil nil '(6 (7 8)))
+ :should be '(1 2 3 4 5 6 (7 8)))
+
+(test "rem works"
+ :valueof (rem no '(1 2 nil 4 nil))
+ :should be '(1 2 4))
+
+(test "keep works"
+ :valueof (keep odd? '(11 12 13))
+ :should be '(11 13))
+
+(test "all works with lists"
+ :valueof (all cons? '((1) 2))
+ :should be nil)
+
+(test "none works"
+ :valueof (none odd? '(1 2 3))
+ :should be nil)
+
+(test "none works - 2"
+ :valueof (none odd? '(2 4 6))
+ :should ~be nil)
+
+(test "flatten works"
+ :valueof (flatten '(a b (c d e)))
+ :should be '(a b c d e))
+
+(test "flatten works - 2"
+ :valueof (flatten '(a b (c d e) . f))
+ :should be '(a b c d e f))

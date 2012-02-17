@@ -1,0 +1,23 @@
+(test "str works with multiple args"
+ :valueof (str 'a 43)
+ :should be "a43")
+
+(test "sym works with one arg"
+ :valueof (sym "abc")
+ :should be 'abc)
+
+(test "sym works with multiple args"
+ :valueof (str:sym "abc" 42 :def) ; keyword retains colon
+ :should be "abc42:def")
+
+(test "keyword? works"
+ :valueof (keyword? 'abc)
+ :should be nil)
+
+(test "keyword? works - 2"
+ :valueof (keyword? :abc)
+ :should ~be nil)
+
+(test "sym converts keywords"
+ :valueof (sym :abc)
+ :should be 'abc) ; keyword loses colon

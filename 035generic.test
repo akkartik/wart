@@ -1,0 +1,12 @@
+def foogen args
+  args
+def foogen(s . rest) :case (and !rest sym?.s)
+  s
+
+(test "def :case can handle rest params"
+ :valueof foogen.3
+ :should be '(3))
+
+(test "def :case can handle rest params - 2"
+ :valueof foogen!a
+ :should be 'a)
