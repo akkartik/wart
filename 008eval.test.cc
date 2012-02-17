@@ -453,7 +453,7 @@ void test_eval_handles_splice2() {
 }
 
 void test_eval_handles_splice3() {
-  Cell* fn = read(stream("(fn (x 'y) (cons x y))"));
+  Cell* fn = read(stream("(fn (x y) (cons x y))"));
   Cell* def = eval(fn);
   newDynamicScope("f", def);
   newDynamicScope("a", newNum(3));
@@ -464,6 +464,54 @@ void test_eval_handles_splice3() {
   Cell* result = eval(call);
   check(isCons(result));
   checkEq(car(result), newSym("a"));
+  checkEq(cdr(result), newSym("b"));
+  rmref(result);
+  rmref(call);
+  endDynamicScope("args");
+  rmref(argval);
+  endDynamicScope("b");
+  endDynamicScope("a");
+  endDynamicScope("f");
+  rmref(def);
+  rmref(fn);
+}
+
+void test_eval_handles_splice4() {
+  Cell* fn = read(stream("(fn ('x y) (cons x y))"));
+  Cell* def = eval(fn);
+  newDynamicScope("f", def);
+  newDynamicScope("a", newNum(3));
+  newDynamicScope("b", newNum(4));
+  Cell* argval = read(stream("(b)"));
+  newDynamicScope("args", argval);
+  Cell* call = read(stream("(f a @args)"));
+  Cell* result = eval(call);
+  check(isCons(result));
+  checkEq(car(result), newSym("a"));
+  checkEq(cdr(result), newSym("b"));
+  rmref(result);
+  rmref(call);
+  endDynamicScope("args");
+  rmref(argval);
+  endDynamicScope("b");
+  endDynamicScope("a");
+  endDynamicScope("f");
+  rmref(def);
+  rmref(fn);
+}
+
+void test_eval_handles_splice5() {
+  Cell* fn = read(stream("(fn (x y) (cons x y))"));
+  Cell* def = eval(fn);
+  newDynamicScope("f", def);
+  newDynamicScope("a", newNum(3));
+  newDynamicScope("b", newNum(4));
+  Cell* argval = read(stream("(b)"));
+  newDynamicScope("args", argval);
+  Cell* call = read(stream("(f a @args)"));
+  Cell* result = eval(call);
+  check(isCons(result));
+  checkEq(car(result), newNum(3));
   checkEq(cdr(result), newSym("b"));
   rmref(result);
   rmref(call);

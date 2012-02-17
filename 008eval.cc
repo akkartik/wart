@@ -74,10 +74,6 @@ Cell* spliceArgs(Cell* args, Cell* scope) {
   return dropPtr(pResult);
 }
 
-Cell* spliceArgs(Cell* args) {
-  return spliceArgs(args, currLexicalScopes.top());
-}
-
 bool containsSplice(Cell* args) {
   for (Cell* curr = args; curr != nil; curr=cdr(curr))
     if (isSplice(car(curr)))
