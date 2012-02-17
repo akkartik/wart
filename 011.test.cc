@@ -1,13 +1,11 @@
 void test_eval_handles_eval() {
   newDynamicScope("a", newNum(34));
   newDynamicScope("x", newSym("a"));
-  newDynamicScope("caller-scope", nil);
   Cell* call = read(stream("(eval x)"));
   Cell* result = eval(call);
   checkEq(result, newNum(34));
   rmref(result);
   rmref(call);
-  endDynamicScope("caller-scope");
   endDynamicScope("x");
   endDynamicScope("a");
 }

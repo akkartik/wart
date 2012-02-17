@@ -5,10 +5,9 @@
 
 COMPILE_PRIM_FUNC(eval, primFunc_eval, "($x $scope)",
   Cell* scope = lookup("$scope");
-  if (scope == nil)
-    return eval(lookup("$x"), lookup("caller-scope"));
-  else
-    return eval(lookup("$x"), scope);
+  if (scope == nil && scopeContainingBinding(newSym("caller-scope"), currLexicalScopes.top()))
+    scope = lookup("caller-scope");
+  return eval(lookup("$x"), scope);
 )
 
 COMPILE_PRIM_FUNC(if, primFunc_if, "($cond '$then '$else)",
