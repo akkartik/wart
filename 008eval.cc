@@ -368,6 +368,8 @@ Cell* eval(Cell* expr, Cell* scope) {
   // swap in the function's lexical environment
   if (type(fn) == newSym("fn"))
     newDynamicScope(CURR_LEXICAL_SCOPE, calleeEnv(fn));
+  else if (calleeEnv(fn) != nil)
+    newLexicalScope(calleeEnv(fn));
   // now bind its params to args in the new environment
   newLexicalScope();
   bindParams(calleeSig(fn), evaldArgs);
@@ -386,6 +388,8 @@ Cell* eval(Cell* expr, Cell* scope) {
   endLexicalScope();
   if (type(fn) == newSym("fn"))
     endDynamicScope(CURR_LEXICAL_SCOPE);
+  else if (calleeEnv(fn) != nil)
+    endLexicalScope();
 
   rmref(evaldArgs);
   rmref(orderedArgs);
