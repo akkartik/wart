@@ -370,7 +370,6 @@ Cell* eval(Cell* expr, Cell* scope) {
   // eval all forms in body, save result of final form
   Cell* result = nil;
   if (isPrimFunc(calleeBody(fn))) {
-    if (scope != nil) addLexicalBinding("caller-scope", get(scope, "caller-scope"));
     result = toPrimFunc(calleeBody(fn))(); // all primFuncs must mkref result
   }
   else {
