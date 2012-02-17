@@ -372,17 +372,20 @@ Cell* eval(Cell* expr, Cell* scope) {
   // now bind its params to args in the new environment
   newLexicalScope();
   bindParams(calleeSig(fn), evaldArgs);
-  addLexicalBinding("caller-scope", scope);
 
   // eval all forms in body, save result of final form
   Cell* result = nil;
-  if (isPrimFunc(calleeBody(fn)))
+  if (isPrimFunc(calleeBody(fn))) {
+    if (scope != nil) addLexicalBinding("caller-scope", get(scope, "caller-scope"));
     result = toPrimFunc(calleeBody(fn))(); // all primFuncs must mkref result
-  else
+  }
+  else {
+    addLexicalBinding("caller-scope", scope);
     for (Cell* form = calleeImpl(fn); form != nil; form = cdr(form)) {
       rmref(result);
       result = eval(car(form)); // use fn's env
     }
+  }
 
   endLexicalScope();
   if (!isPrimFunc(calleeBody(fn)))
