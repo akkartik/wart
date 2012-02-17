@@ -10,6 +10,13 @@
  :valueof ((list 1 2 3) 1)
  :should be 2)
 
+(test "lists in function position don't leak memory"
+ :valueof (withs (l '(1 2 3)
+                  n0 nrefs.l)
+            l.1 ; do the lookup
+            (- nrefs.l n0))
+ :should be 0)
+
 (test "lists work in function position - 2"
  :valueof (let l '(list 1 2 3) l.3)
  :should be 3)

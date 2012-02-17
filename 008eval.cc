@@ -348,9 +348,12 @@ Cell* eval(Cell* expr, Cell* scope) {
   newDynamicScope(CURR_LEXICAL_SCOPE, scope);
   dbg << expr << " || " << scope << endl;
   // expr is a function call
-  Cell* fn = eval(car(expr), scope);
-  if (fn != nil && !isFunc(fn))
-    fn = coerceQuoted(fn, newSym("function"), lookup("coercions*"));
+  Cell* fn0 = eval(car(expr), scope);
+  Cell* fn = fn0;
+  if (fn0 != nil && !isFunc(fn0))
+    fn = coerceQuoted(fn0, newSym("function"), lookup("coercions*"));
+  else
+    fn = mkref(fn0);
   if (!isFunc(fn))
     RAISE << "not a call: " << expr << endl
         << "- Should it not be a call? Perhaps the expression is indented too much." << endl << DIE;
@@ -387,6 +390,7 @@ Cell* eval(Cell* expr, Cell* scope) {
   rmref(orderedArgs);
   rmref(splicedArgs);
   rmref(fn);
+  rmref(fn0);
   endDynamicScope(CURR_LEXICAL_SCOPE);
   return result; // already mkref'd
 }
