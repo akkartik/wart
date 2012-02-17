@@ -65,11 +65,6 @@ void newLexicalScope() {
   newDynamicScope(CURR_LEXICAL_SCOPE, newScope);
 }
 
-void newLexicalScope(Cell* newScope) {
-  setCdr(newScope, currLexicalScopes.top());
-  newDynamicScope(CURR_LEXICAL_SCOPE, newScope);
-}
-
 void endLexicalScope() {
   Cell* currScope = currLexicalScopes.top();
   if (currScope == nil)

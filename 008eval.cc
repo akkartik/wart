@@ -298,19 +298,18 @@ Cell* processUnquotes(Cell* x, int depth) {
 
 
 
-                                  bool isCallable(Cell* x) {
+                                  bool isFunc(Cell* x) {
                                     if (!isCons(x)) return false;
                                     if (isPrimFunc(car(x))) return true;
-                                    string fnType = toString(type(x));
-                                    return fnType == "fn" || fnType == "mu";
+                                    return toString(type(x)) == "function";
                                   }
 
-                                  Cell* newCallable(Cell* expr, Cell* scope) {
+                                  Cell* newFunc(string type, Cell* expr, Cell* scope) {
                                     Cell* f = newTable();
                                     set(f, newSym("sig"), sig(expr));
                                     set(f, newSym("body"), body(expr));
                                     set(f, newSym("env"), scope);
-                                    return newObject(car(expr), f);
+                                    return newObject(type, f);
                                   }
 
                                   Cell* implicitlyEval(Cell* x, Cell* scope) {
@@ -322,6 +321,7 @@ Cell* processUnquotes(Cell* x, int depth) {
 // HACK: explicitly reads from passed-in scope, but implicitly creates bindings
 // to currLexicalScope. Carefully make sure it's popped off.
 Cell* eval(Cell* expr, Cell* scope) {
+  cerr << expr << " || " << scope << endl;
   if (!expr)
     RAISE << "eval: cell should never be NUL" << endl << DIE;
 
@@ -346,17 +346,17 @@ Cell* eval(Cell* expr, Cell* scope) {
   if (isBackQuoted(expr))
     return processUnquotes(cdr(expr), 1, scope); // already mkref'd
 
-  if (car(expr) == newSym("fn") || car(expr) == newSym("mu"))
-    return mkref(newCallable(expr, scope));
-  else if (isCallable(expr))
+  if (car(expr) == newSym("fn"))
+    return mkref(newFunc("function", expr, scope));
+  else if (isFunc(expr))
     // lexical scope is already attached
     return mkref(expr);
 
   // expr is a function call
   Cell* fn = eval(car(expr), scope);
-  if (fn != nil && !isCallable(fn))
-    fn = coerceQuoted(fn, newSym("fn"), lookup("coercions*"));
-  if (!isCallable(fn))
+  if (fn != nil && !isFunc(fn))
+    fn = coerceQuoted(fn, newSym("function"), lookup("coercions*"));
+  if (!isFunc(fn))
     RAISE << "not a call: " << expr << endl
         << "- Should it not be a call? Perhaps the expression is indented too much." << endl << DIE;
 
@@ -366,10 +366,8 @@ Cell* eval(Cell* expr, Cell* scope) {
   Cell* evaldArgs = evalArgs(calleeSig(fn), orderedArgs, scope);
 
   // swap in the function's lexical environment
-  if (type(fn) == newSym("fn"))
+  if (!isPrimFunc(calleeBody(fn)))
     newDynamicScope(CURR_LEXICAL_SCOPE, calleeEnv(fn));
-  else if (calleeEnv(fn) != nil)
-    newLexicalScope(calleeEnv(fn));
   // now bind its params to args in the new environment
   newLexicalScope();
   bindParams(calleeSig(fn), evaldArgs);
@@ -386,10 +384,8 @@ Cell* eval(Cell* expr, Cell* scope) {
     }
 
   endLexicalScope();
-  if (type(fn) == newSym("fn"))
+  if (!isPrimFunc(calleeBody(fn)))
     endDynamicScope(CURR_LEXICAL_SCOPE);
-  else if (calleeEnv(fn) != nil)
-    endLexicalScope();
 
   rmref(evaldArgs);
   rmref(orderedArgs);

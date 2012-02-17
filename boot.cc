@@ -105,7 +105,7 @@ void setupPrimFuncs() {
     Cell* f = newTable();
     unsafeSet(f, newSym("sig"), nextRawCell(stream(primFuncs[i].params)), false);
     unsafeSet(f, newSym("body"), newPrimFunc(primFuncs[i].impl), false);
-    newDynamicScope(primFuncs[i].name, newObject("mu", f));
+    newDynamicScope(primFuncs[i].name, newObject("function", f));
   }
 }
 

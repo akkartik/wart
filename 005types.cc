@@ -190,12 +190,8 @@ Cell* get(Cell* t, string k) {
 
 
 
-Cell* newObject(Cell* type, Cell* rep) {
-  return newCons(newSym("object"), newCons(type, newCons(rep, nil)));
-}
-
 Cell* newObject(string type, Cell* rep) {
-  return newObject(newSym(type), rep);
+  return newCons(newSym("object"), newCons(newSym(type), newCons(rep, nil)));
 }
 
 bool isObject(Cell* x) {
