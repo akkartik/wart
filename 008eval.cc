@@ -306,9 +306,11 @@ Cell* processUnquotes(Cell* x, int depth) {
 
                                   Cell* newFunc(string type, Cell* expr, Cell* scope) {
                                     Cell* f = newTable();
+                                    cerr << "fn: " << expr << endl;
                                     set(f, newSym("sig"), sig(expr));
                                     set(f, newSym("body"), body(expr));
                                     set(f, newSym("env"), scope);
+                                    cerr << "fn scope: " << scope << endl;
                                     return newObject(type, f);
                                   }
 
@@ -321,7 +323,6 @@ Cell* processUnquotes(Cell* x, int depth) {
 // HACK: explicitly reads from passed-in scope, but implicitly creates bindings
 // to currLexicalScope. Carefully make sure it's popped off.
 Cell* eval(Cell* expr, Cell* scope) {
-  cerr << expr << " || " << scope << endl;
   if (!expr)
     RAISE << "eval: cell should never be NUL" << endl << DIE;
 

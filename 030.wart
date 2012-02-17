@@ -1,3 +1,6 @@
+= foo (fn '(x) (eval `(+ 1 ,x)))
+(pr foo.42)
+
 = do (fn 'body (eval `((fn() ,@body))))
 ((fn(x) (do x)) 3)
 quit.

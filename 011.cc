@@ -5,8 +5,12 @@
 
 COMPILE_PRIM_FUNC(eval, primFunc_eval, "($x $scope)",
   Cell* scope = lookup("$scope");
+  cerr << "eval: " << lookup("$x") << endl;
+  cerr << "eval scope: " << scope << endl;
+  cerr << "eval caller-scope: " << lookup("caller-scope") << endl;
+  cerr << "eval caller-scope~2: " << get(lookup("caller-scope"), newSym("caller-scope")) << endl;
   if (scope == nil)
-    return eval(lookup("$x"), lookup("caller-scope"));
+    return eval(lookup("$x"), get(lookup("caller-scope"), newSym("caller-scope")));
   else
     return eval(lookup("$x"), scope);
 )
