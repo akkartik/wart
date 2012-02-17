@@ -312,12 +312,6 @@ Cell* processUnquotes(Cell* x, int depth) {
                                     return newObject(type, f);
                                   }
 
-                                  Cell* implicitlyEval(Cell* x, Cell* scope) {
-                                    Cell* result = eval(x, scope);
-                                    rmref(x);
-                                    return result;
-                                  }
-
 // HACK: explicitly reads from passed-in scope, but implicitly creates bindings
 // to currLexicalScope. Carefully make sure it's popped off.
 Cell* eval(Cell* expr, Cell* scope) {
