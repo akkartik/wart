@@ -1,0 +1,12 @@
+= compiled-if if
+let $if if
+  mac! if args
+    $if !cdr.args
+      car.args
+      `(,$if ,car.args
+         ,cadr.args
+         (if ,@cddr.args))
+
+pr (if nil 4 nil 6 7)
+prn 111
+quit.
