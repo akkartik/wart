@@ -351,6 +351,8 @@ Cell* eval(Cell* expr, Cell* scope) {
     // lexical scope is already attached
     return mkref(expr);
 
+  newDynamicScope(CURR_LEXICAL_SCOPE, scope);
+  dbg << expr << " || " << scope << endl;
   // expr is a function call
   Cell* fn = eval(car(expr), scope);
   if (fn != nil && !isFunc(fn))
@@ -393,6 +395,7 @@ Cell* eval(Cell* expr, Cell* scope) {
   rmref(orderedArgs);
   rmref(splicedArgs);
   rmref(fn);
+  endDynamicScope(CURR_LEXICAL_SCOPE);
   return result; // already mkref'd
 }
 
