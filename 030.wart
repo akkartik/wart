@@ -1,6 +1,9 @@
-= foo (fn '(x) (eval `(+ 1 ,x)))
-(pr foo.42)
+= mac! (fn '(name params . body)
+  (eval `(= ,name (fn ',params
+                    (eval ((fn() ,@body)))))))
 
-= do (fn 'body (eval `((fn() ,@body))))
-((fn(x) (do x)) 3)
+mac! do body
+  `((fn() ,@body))
+
+pr ((fn(x) (do x)) 3)
 quit.

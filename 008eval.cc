@@ -306,11 +306,9 @@ Cell* processUnquotes(Cell* x, int depth) {
 
                                   Cell* newFunc(string type, Cell* expr, Cell* scope) {
                                     Cell* f = newTable();
-                                    cerr << "fn: " << expr << endl;
                                     set(f, newSym("sig"), sig(expr));
                                     set(f, newSym("body"), body(expr));
                                     set(f, newSym("env"), scope);
-                                    cerr << "fn scope: " << scope << endl;
                                     return newObject(type, f);
                                   }
 

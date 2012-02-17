@@ -6,7 +6,6 @@ void loadFile(const char* filename) {
   bool old_interactive = interactive; interactive = false;
   while (!c.fd.eof()) {
     Cell* cell = read(c);
-    cerr << "read: " << cell << endl;
     rmref(eval(cell));
     rmref(cell);
   }
