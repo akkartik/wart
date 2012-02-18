@@ -1,6 +1,8 @@
 = mac! (fn '(name params . body)
   (eval `(= ,name (fn ',params
-                    (eval ((fn() ,@body)))))))
+                    (eval ((fn() ,@body))
+                          caller-scope)))
+        caller-scope))
 
 mac! def!(name params . body)
   `(= ,name (fn ,params ,@body))
@@ -33,7 +35,7 @@ mac alias(new old) ; include later refinements
 
 def compose(f g)
   fn 'args
-    eval `(,f (,g ,@args))
+    eval `(,f (,g ,@args)) caller-scope
 
 def complement(f)
   (compose not f)

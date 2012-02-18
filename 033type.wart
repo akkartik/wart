@@ -61,7 +61,7 @@ defcoerce macro function
 
 def! compose(f g)
   fn 'args
-    eval `(,(as function f) (,(as function g) ,@args))
+    eval `(,(as function f) (,(as function g) ,@args)) caller-scope
 
 def sig(f)
   rep.f!sig

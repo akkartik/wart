@@ -335,9 +335,6 @@ Cell* eval(Cell* expr, Cell* scope) {
   if (isBackQuoted(expr))
     return processUnquotes(cdr(expr), 1, scope); // already mkref'd
 
-  if (car(expr) == newSym("currLexicalScope"))
-    return mkref(scope);
-
   if (car(expr) == newSym("fn"))
     return mkref(newFunc("function", expr, scope));
   else if (isFunc(expr))

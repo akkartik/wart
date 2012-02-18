@@ -5,8 +5,7 @@
 
 COMPILE_PRIM_FUNC(eval, primFunc_eval, "($x $scope)",
   Cell* scope = lookup("$scope");
-  if (scope == nil && scopeContainingBinding(newSym("caller-scope"), currLexicalScopes.top()))
-    scope = lookup("caller-scope");
+  if (scope == nil) scope = currLexicalScopes.top();
   return eval(lookup("$x"), scope);
 )
 
