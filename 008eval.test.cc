@@ -6,8 +6,10 @@ void test_spliceArgs_works() {
   Cell* fn = eval(f);
   Cell* splicedArgs = spliceArgs(args, fn);
   checkEq(car(splicedArgs), newSym("a"));
-  checkEq(car(cdr(splicedArgs)), newNum(4));
-  checkEq(car(cdr(cdr(splicedArgs))), newNum(5));
+  checkEq(car(car(cdr(splicedArgs))), newSym("''"));
+  checkEq(cdr(car(cdr(splicedArgs))), newNum(4));
+  checkEq(car(car(cdr(cdr(splicedArgs)))), newSym("''"));
+  checkEq(cdr(car(cdr(cdr(splicedArgs)))), newNum(5));
   checkEq(car(cdr(cdr(cdr(splicedArgs)))), newSym("a"));
   checkEq(cdr(cdr(cdr(cdr(splicedArgs)))), nil);
   rmref(splicedArgs);
@@ -44,7 +46,8 @@ void test_spliceArgs_works_with_keywords() {
   Cell* fn = eval(f);
   Cell* splicedArgs = spliceArgs(args, fn);
   checkEq(car(splicedArgs), newSym("a"));
-  checkEq(car(cdr(splicedArgs)), newNum(4));
+  checkEq(car(car(cdr(splicedArgs))), newSym("''"));
+  checkEq(cdr(car(cdr(splicedArgs))), newNum(4));
   checkEq(car(cdr(cdr(splicedArgs))), newSym(":x"));
   checkEq(car(cdr(cdr(cdr(splicedArgs)))), newSym("a"));
   checkEq(cdr(cdr(cdr(cdr(splicedArgs)))), nil);
@@ -73,6 +76,19 @@ void test_evalArgs_handles_quoted_param() {
   newDynamicScope("a", newNum(3));
   Cell* params = read(stream("('x)"));
   Cell* args = read(stream("(a)"));
+  Cell* evaldArgs = evalArgs(params, args);
+  checkEq(car(evaldArgs), newSym("a"));
+  checkEq(cdr(evaldArgs), nil);
+  rmref(evaldArgs);
+  rmref(args);
+  rmref(params);
+  endDynamicScope("a");
+}
+
+void test_evalArgs_handles_alreadyEvald_arg() {
+  newDynamicScope("a", newNum(3));
+  Cell* params = read(stream("(x)"));
+  Cell* args = newCons(newCons(newSym("''"), newSym("a")), nil);
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newSym("a"));
   checkEq(cdr(evaldArgs), nil);
@@ -281,6 +297,14 @@ void test_eval_handles_quoted_atoms() {
   expr = read(s);
   result = eval(expr);
   checkEq(result, newNum(34));
+  rmref(result);
+  rmref(expr);
+}
+
+void test_eval_treats_already_evaluated_like_quote() {
+  Cell* expr = newCons(newSym("''"), newSym("a"));
+  Cell* result = eval(expr);
+  checkEq(result, newSym("a"));
   rmref(result);
   rmref(expr);
 }
@@ -512,6 +536,30 @@ void test_eval_handles_splice5() {
   Cell* result = eval(call);
   check(isCons(result));
   checkEq(car(result), newNum(3));
+  checkEq(cdr(result), newSym("b"));
+  rmref(result);
+  rmref(call);
+  endDynamicScope("args");
+  rmref(argval);
+  endDynamicScope("b");
+  endDynamicScope("a");
+  endDynamicScope("f");
+  rmref(def);
+  rmref(fn);
+}
+
+void test_eval_handles_splice6() {
+  Cell* fn = read(stream("(fn (x 'y) (cons x y))"));
+  Cell* def = eval(fn);
+  newDynamicScope("f", def);
+  newDynamicScope("a", newNum(3));
+  newDynamicScope("b", newNum(4));
+  Cell* argval = read(stream("(a b)"));
+  newDynamicScope("args", argval);
+  Cell* call = read(stream("(f @args)"));
+  Cell* result = eval(call);
+  check(isCons(result));
+  checkEq(car(result), newSym("a"));
   checkEq(cdr(result), newSym("b"));
   rmref(result);
   rmref(call);
@@ -954,7 +1002,6 @@ void test_eval_handles_keyword_args_inside_splice() {
 }
 
 void test_reorderKeywordArgs_keeps_nil_rest_args() {
-  exit(0);
   checkEq(reorderKeywordArgs(newSym("a"), nil), nil);
   Cell* params = newCons(newSym("'"), newSym("a"));
   checkEq(reorderKeywordArgs(params, nil), nil);
