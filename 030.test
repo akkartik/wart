@@ -1,5 +1,5 @@
 (mac! foo(x) `(+ 1 ,x))
-(test "mac!"
+(test "mac! works"
  :valueof (let x 3 (foo x))
  :should be 4)
 
