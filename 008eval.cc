@@ -329,7 +329,7 @@ Cell* eval(Cell* expr, Cell* scope) {
   if (isObject(expr))
     return mkref(expr);
 
-  if (isQuoted(expr) || isAlreadyEvald(expr))
+  if (isQuoted(expr))
     return mkref(cdr(expr));
 
   if (isBackQuoted(expr))
