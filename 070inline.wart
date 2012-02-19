@@ -105,10 +105,14 @@ def simplify(expr)
     (match '(cdr (listq _ . _)) expr)
       `(listq ,@cddr:cadr.expr)
     ; (eval '_) => _
-    (and (iso 'eval car.expr)
-         (cons? cadr.expr)
-         (quote? car:cadr.expr))
-      (simplify cdr:cadr.expr)
+    (match '(eval _) expr)
+      let expr2 simplify:cadr.expr
+        if (and cons?.expr2 quote?:car.expr2)
+          (simplify cdr.expr2)
+          `(eval ,expr2)
+    (and single?.expr
+         (match '(fn nil _) car.expr))
+      (simplify (car.expr 2))
     :else
       expr)
 
