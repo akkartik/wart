@@ -3,9 +3,10 @@
 // these have access to caller scope
 // params start with $ by convention to avoid shadowing
 
-COMPILE_PRIM_FUNC(eval, primFunc_eval, "($x $scope)",
+COMPILE_PRIM_FUNC(eval, primFunc_eval, "($x . $scope)",
   Cell* scope = lookup("$scope");
   if (scope == nil) scope = currLexicalScopes.top();
+  else scope = car(scope);
   return eval(lookup("$x"), scope);
 )
 

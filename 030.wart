@@ -1,8 +1,3 @@
-= foo (fn '(x) (eval '(= x 34) caller-scope))
-foo.
-pr x
-quit.
-
 = mac! (fn '(name params . body)
   (eval `(= ,name (fn ',params
                     (eval ((fn() ,@body))

@@ -10,6 +10,19 @@ void test_eval_handles_eval() {
   endDynamicScope("a");
 }
 
+void test_eval_handles_nil_scope() {
+  newLexicalScope();
+  addLexicalBinding("x", newNum(34));
+  addLexicalBinding("caller-scope", nil);
+  Cell* call = read(stream("eval 'x caller-scope"));
+  Cell* result = eval(call);
+  checkEq(result, nil);
+  checkEq(raiseCount, 1);   raiseCount=0;
+  rmref(result);
+  rmref(call);
+  endLexicalScope();
+}
+
 void test_if_sees_args_in_then_and_else() {
   Cell* fn = read(stream("(fn(x) (if 34 x))"));
   Cell* f = eval(fn);
