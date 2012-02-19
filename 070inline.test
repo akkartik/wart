@@ -83,7 +83,7 @@
  :valueof (inline '((foo 3)) (table 'foo (with (bar (fn(a) (baz a))
                                                 baz (fn(a) (eval a caller-scope)))
                                            (fn(x) (bar x)))))
- :should be '(3))
+ :should be '((eval 3)))
 
 (test "inline - handles quotes"
  :valueof (inline '((foo 3)) (table 'foo (fn(a) (list 'a a))))
@@ -105,7 +105,7 @@
  :valueof (inline '((foo 3)) (table 'foo (fn'(x)
                                            (let y 4
                                              (eval `(+ ,x y) caller-scope)))))
- :should be '((let y 4 (+ 3 y))))
+ :should be '((let y 4 (eval '(+ 3 y) caller-scope))))
 
 (test "inline - handles unquote of expr"
  :valueof (inline '((foo 3 4)) (table 'foo (fn 'body
