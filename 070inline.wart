@@ -45,7 +45,7 @@ def apply-bindings(expr bindings)
     quote?:car.expr
       expr
     backquote?:car.expr
-      (apply-comma-bindings cdr.expr bindings)
+      (cons quote (apply-comma-bindings cdr.expr bindings))
     :else
       (cons (apply-bindings car.expr bindings)
             (apply-bindings cdr.expr bindings)))
@@ -84,8 +84,10 @@ def compiled-rules(call)
             doify:inline-sub:list cadr:cddr.call
           :else
             doify:inline-sub:list car:cddr.call))
+    (match '(eval _ caller-scope) call)
+      (simplify `(eval ,cadr.call))
     :else
-      call)
+      simplify.call)
 
 def simplify(expr)
   (if
@@ -102,6 +104,11 @@ def simplify(expr)
       cadr:cadr.expr
     (match '(cdr (listq _ . _)) expr)
       `(listq ,@cddr:cadr.expr)
+    ; (eval '_) => _
+    (and (iso 'eval car.expr)
+         (cons? cadr.expr)
+         (quote? car:cadr.expr))
+      (simplify cdr:cadr.expr)
     :else
       expr)
 
