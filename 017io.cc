@@ -2,7 +2,7 @@
                                     os << "{";
                                     for (CellMap::iterator p = t->table.begin(); p != t->table.end(); ++p) {
                                       if (p->second)
-                                        os << (Cell*)p->first << ": " << p->second << ", ";
+                                        os << (Cell*)p->first << ", ";
                                     }
                                     return os << "}";
                                   }
