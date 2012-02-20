@@ -4,7 +4,7 @@ void test_spliceArgs_works() {
   Cell* args = read(stream("(a @b a)"));
   Cell* f = read(stream("fn nil 3"));
   Cell* fn = eval(f);
-  Cell* splicedArgs = spliceArgs(args, fn);
+  Cell* splicedArgs = spliceArgs(args, nil, fn);
   checkEq(car(splicedArgs), newSym("a"));
   checkEq(car(car(cdr(splicedArgs))), newSym("''"));
   checkEq(cdr(car(cdr(splicedArgs))), newNum(4));
@@ -26,7 +26,7 @@ void test_spliceArgs_works_with_nil() {
   Cell* args = read(stream("(a @b a)"));
   Cell* f = read(stream("fn nil 3"));
   Cell* fn = eval(f);
-  Cell* splicedArgs = spliceArgs(args, fn);
+  Cell* splicedArgs = spliceArgs(args, nil, fn);
   checkEq(car(splicedArgs), newSym("a"));
   checkEq(car(cdr(splicedArgs)), newSym("a"));
   checkEq(cdr(cdr(splicedArgs)), nil);
@@ -44,7 +44,7 @@ void test_spliceArgs_works_with_keywords() {
   Cell* args = read(stream("(a @b a)"));
   Cell* f = read(stream("fn nil 3"));
   Cell* fn = eval(f);
-  Cell* splicedArgs = spliceArgs(args, fn);
+  Cell* splicedArgs = spliceArgs(args, nil, fn);
   checkEq(car(splicedArgs), newSym("a"));
   checkEq(car(car(cdr(splicedArgs))), newSym("''"));
   checkEq(cdr(car(cdr(splicedArgs))), newNum(4));

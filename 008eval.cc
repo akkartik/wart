@@ -62,10 +62,12 @@
                                   }
 
 // eval @exprs and inline them into args, tagging them with ''
-Cell* spliceArgs(Cell* args, Cell* scope) {
+Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
   Cell *pResult = newCell(), *tip = pResult;
   for (Cell* curr = args; curr != nil; curr=cdr(curr)) {
     if (isSplice(car(curr))) {
+      if (isQuoted(calleeSig(fn)))
+        RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
       Cell* x = unsplice(car(curr), scope);
       for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
         if (isColonSym(car(curr2)))
@@ -354,7 +356,7 @@ Cell* eval(Cell* expr, Cell* scope) {
         << "- Should it not be a call? Perhaps the expression is indented too much." << endl << DIE;
 
   // eval all its args in the current lexical scope
-  Cell* splicedArgs = spliceArgs(callArgs(expr), scope);
+  Cell* splicedArgs = spliceArgs(callArgs(expr), scope, fn);
   Cell* orderedArgs = reorderKeywordArgs(calleeSig(fn), splicedArgs);
   Cell* evaldArgs = evalArgs(calleeSig(fn), orderedArgs, scope);
 
