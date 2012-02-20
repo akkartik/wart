@@ -38,7 +38,6 @@ def gen-bindings(params args acc)
                (gen-bindings cdr.params cdr.args acc)))
 
 def apply-bindings(expr bindings)
-  prn expr " " bindings
   (if
     !cons?.expr
       (or (lookup-binding expr bindings)
@@ -91,7 +90,6 @@ def compiled-rules(call)
       simplify.call)
 
 def simplify(expr)
-  prn expr
   (if
     (match '(not _) expr)
       let x simplify:cadr.expr
@@ -135,10 +133,3 @@ def strip-listq(tree)
     :else
       (cons strip-listq:car.tree
             strip-listq:cdr.tree))
-
-prn (inline '((foo 3)) (table 'foo (fn'(x)
-                                     (eval ((fn() (let y 4
-                                                    `(+ ,x ,y)) caller-scope))))
-                              'let (fn'(var val . body)
-                                     (eval `((fn(,var) ,@body) ,val) caller-scope))))
-quit.
