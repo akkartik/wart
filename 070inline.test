@@ -107,6 +107,12 @@
                                              (eval `(+ ,x y) caller-scope)))))
  :should be '((let y 4 (eval '(+ 3 y) caller-scope))))
 
+(test "inline - handles compound macro bodies - 2"
+ :valueof (inline '((foo 3)) (table 'foo (fn'(x)
+                                           (eval (let y 4
+                                                   `(+ ,x ,y)) caller-scope))))
+ :should be '((let y 4 (eval '(let y 4 (+ 3 ,y) caller-scope)))))
+
 (test "inline - handles unquote of expr"
  :valueof (inline '((foo 3 4)) (table 'foo (fn 'body
                                              (eval `(list ,car.body) caller-scope))))
