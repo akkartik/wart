@@ -75,6 +75,8 @@ def apply-comma-bindings(expr bindings)
 
 def compiled-rules(call)
   (if
+    ~cons?.call
+      simplify.call
     (iso compiled-if car.call)
       (let x (simplify cadr.call)
         (if
@@ -92,7 +94,7 @@ def compiled-rules(call)
 def simplify(expr)
   (if
     (match '(not _) expr)
-      let x simplify:cadr.expr
+      let x compiled-rules:cadr.expr
         (if
           (iso x cadr.expr)
             x
@@ -106,13 +108,13 @@ def simplify(expr)
       `(listq ,@cddr:cadr.expr)
     ; (eval '_) => _
     (match '(eval _) expr)
-      let expr2 simplify:cadr.expr
+      let expr2 compiled-rules:cadr.expr
         if (and cons?.expr2 quote?:car.expr2)
-          (simplify cdr.expr2)
+          (compiled-rules cdr.expr2)
           `(eval ,expr2)
     (and single?.expr
          (match '(fn nil _) car.expr))
-      (simplify (car.expr 2))
+      (compiled-rules (car.expr 2))
     :else
       expr)
 
