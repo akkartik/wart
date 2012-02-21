@@ -571,6 +571,28 @@ void test_eval_handles_splice6() {
   rmref(fn);
 }
 
+void test_eval_splice_on_macros_warns() {
+  Cell* expr = read(stream("(fn '(x y) (eval `(cons ,x ,y) caller-scope))"));
+  Cell* fn = eval(expr);
+  newDynamicScope("f", fn);
+  newDynamicScope("a", newNum(3));
+  newDynamicScope("b", newNum(4));
+  Cell* argval = read(stream("(a b)"));
+  newDynamicScope("args", argval);
+  Cell* call = read(stream("(f @args)"));
+  Cell* result = eval(call);
+  checkEq(raiseCount, 1);   raiseCount=0;
+  rmref(result);
+  rmref(call);
+  endDynamicScope("args");
+  rmref(argval);
+  endDynamicScope("b");
+  endDynamicScope("a");
+  endDynamicScope("f");
+  rmref(fn);
+  rmref(expr);
+}
+
 void test_eval_doesnt_modify_fn() {
   Cell* fn = read(stream("(fn(x) (eval x))"));
   Cell* f = eval(fn);
