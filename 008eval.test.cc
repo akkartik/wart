@@ -59,6 +59,13 @@ void test_spliceArgs_works_with_keywords() {
   endDynamicScope("a");
 }
 
+void test_reorderKeywordArgs_keeps_nil_rest_args() {
+  checkEq(reorderKeywordArgs(newSym("a"), nil), nil);
+  Cell* params = newCons(newSym("'"), newSym("a"));
+  checkEq(reorderKeywordArgs(params, nil), nil);
+  rmref(params);
+}
+
 void test_evalArgs_handles_unquoted_param() {
   newDynamicScope("a", newNum(3));
   Cell* params = read(stream("(x)"));
@@ -991,11 +998,4 @@ void test_eval_handles_keyword_args_inside_splice() {
   rmref(f);
   rmref(fn);
   endDynamicScope("f");
-}
-
-void test_reorderKeywordArgs_keeps_nil_rest_args() {
-  checkEq(reorderKeywordArgs(newSym("a"), nil), nil);
-  Cell* params = newCons(newSym("'"), newSym("a"));
-  checkEq(reorderKeywordArgs(params, nil), nil);
-  rmref(params);
 }
