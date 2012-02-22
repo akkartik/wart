@@ -83,35 +83,35 @@ Cell* eval(Cell*, Cell*);
 
 // pre-compiled primitives
 
-#define COMPILE_PRIM_FUNC(op, name, params, body) \
-  Cell* name() { body } /* we extract op and params into prim_func_list */
+#define COMPILE_FN(op, name, params, body) \
+  Cell* name() { body } /* we extract op and params into compiled_fn_list */
 
-typedef Cell* (*PrimFunc)();
+typedef Cell* (*CompiledFn)();
 
 #include "file_list" // rest of the interpreter
 
-struct PrimFuncMetadata {
+struct CompiledFnMetadata {
   string name;
   string params;
-  PrimFunc impl;
+  CompiledFn impl;
 };
 
-const PrimFuncMetadata primFuncs[] = {
-  #include "prim_func_list"
+const CompiledFnMetadata compiledFns[] = {
+  #include "compiled_fn_list"
 };
 
-void setupPrimFuncs() {
-  for (unsigned int i=0; i < sizeof(primFuncs)/sizeof(primFuncs[0]); ++i) {
+void setupCompiledFns() {
+  for (unsigned int i=0; i < sizeof(compiledFns)/sizeof(compiledFns[0]); ++i) {
     Cell* f = newTable();
-    unsafeSet(f, newSym("sig"), nextRawCell(stream(primFuncs[i].params)), false);
-    unsafeSet(f, newSym("body"), newPrimFunc(primFuncs[i].impl), false);
-    newDynamicScope(primFuncs[i].name, newObject("function", f));
+    unsafeSet(f, newSym("sig"), nextRawCell(stream(compiledFns[i].params)), false);
+    unsafeSet(f, newSym("body"), newCompiledFn(compiledFns[i].impl), false);
+    newDynamicScope(compiledFns[i].name, newObject("function", f));
   }
 }
 
-void teardownPrimFuncs() {
-  for (unsigned int i=0; i < sizeof(primFuncs)/sizeof(primFuncs[0]); ++i)
-    endDynamicScope(primFuncs[i].name);
+void teardownCompiledFns() {
+  for (unsigned int i=0; i < sizeof(compiledFns)/sizeof(compiledFns[0]); ++i)
+    endDynamicScope(compiledFns[i].name);
 }
 
 
@@ -143,7 +143,7 @@ void init() {
   setupNil();
   setupLexicalScope();
   setupStreams();
-  setupPrimFuncs();
+  setupCompiledFns();
   raiseCount = 0;
 }
 
@@ -170,7 +170,7 @@ void init() {
                                       }
                                       break;
                                     }
-                                    case PRIM_FUNC:
+                                    case COMPILED_FN:
                                       break;
                                     default:
                                       cerr << "Can't mark type " << x->type << endl << DIE;
@@ -206,7 +206,7 @@ long numUnfreed() {
 
 void checkForLeaks() {
   teardownStreams();
-  teardownPrimFuncs();
+  teardownCompiledFns();
   teardownLiteralTables();
 
   if (numUnfreed() > 0) {

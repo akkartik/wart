@@ -7,7 +7,7 @@ Cell* transformDollarVars(Cell* input, Table& map) {
     return map[input];
   }
 
-  if (!isCons(input)) return input; // no tables or primFuncs in static code
+  if (!isCons(input)) return input; // no tables or compiledFns in static code
   setCar(input, transformDollarVars(car(input), map));
   setCdr(input, transformDollarVars(cdr(input), map));
   return input;

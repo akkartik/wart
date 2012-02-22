@@ -38,37 +38,37 @@ void teardownStreams() {
 
 
 
-COMPILE_PRIM_FUNC(infile, primFunc_infile, "($name)",
+COMPILE_FN(infile, compiledFn_infile, "($name)",
   return mkref(newIstream(new ifstream(toString(lookup("$name")).c_str(), std::ios::binary)));
 )
 
-COMPILE_PRIM_FUNC(close_infile, primFunc_close_infile, "($stream)",
+COMPILE_FN(close_infile, compiledFn_close_infile, "($stream)",
   ifstream* f = (ifstream*)toNum(car(cdr(cdr(lookup("$stream")))));
   f->close();
   delete f;
   return nil;
 )
 
-COMPILE_PRIM_FUNC(outfile, primFunc_outfile, "($name)",
+COMPILE_FN(outfile, compiledFn_outfile, "($name)",
   return mkref(newOstream(new ofstream(toString(lookup("$name")).c_str(), std::ios::binary)));
 )
 
-COMPILE_PRIM_FUNC(close_outfile, primFunc_close_outfile, "($stream)",
+COMPILE_FN(close_outfile, compiledFn_close_outfile, "($stream)",
   ofstream* f = (ofstream*)toNum(car(cdr(cdr(lookup("$stream")))));
   f->close();
   delete f;
   return nil;
 )
 
-COMPILE_PRIM_FUNC(instring, primFunc_instring, "($s)",
+COMPILE_FN(instring, compiledFn_instring, "($s)",
   return mkref(newIstream(new stringstream(toString(lookup("$s")))));
 )
 
-COMPILE_PRIM_FUNC(outstring, primFunc_outstring, "()",
+COMPILE_FN(outstring, compiledFn_outstring, "()",
   return mkref(newOstream(new ostringstream()));
 )
 
-COMPILE_PRIM_FUNC(outstring_buffer, primFunc_outstring_buffer, "($stream)",
+COMPILE_FN(outstring_buffer, compiledFn_outstring_buffer, "($stream)",
   ostringstream* s = (ostringstream*)toNum(car(cdr(cdr(lookup("$stream")))));
   return mkref(newString(s->str()));
 )
@@ -77,11 +77,11 @@ COMPILE_PRIM_FUNC(outstring_buffer, primFunc_outstring_buffer, "($stream)",
 
 #include<fcntl.h>
 
-COMPILE_PRIM_FUNC(input_fd, primFunc_input_fd, "($name)",
+COMPILE_FN(input_fd, compiledFn_input_fd, "($name)",
   return mkref(newNum(open(toString(lookup("$name")).c_str(), O_RDONLY)));
 )
 
-COMPILE_PRIM_FUNC(output_fd, primFunc_output_fd, "($name)",
+COMPILE_FN(output_fd, compiledFn_output_fd, "($name)",
   return mkref(newNum(open(toString(lookup("$name")).c_str(), O_WRONLY)));
 )
 
@@ -128,15 +128,15 @@ public:
    }
 };
 
-COMPILE_PRIM_FUNC(infd, primFunc_infd, "($fd)",
+COMPILE_FN(infd, compiledFn_infd, "($fd)",
   return mkref(newIstream(new iostream(new FdStreamBuf(toNum(lookup("$fd")))))); // leak
 )
 
-COMPILE_PRIM_FUNC(outfd, primFunc_outfd, "($fd)",
+COMPILE_FN(outfd, compiledFn_outfd, "($fd)",
   return mkref(newOstream(new iostream(new FdStreamBuf(toNum(lookup("$fd")))))); // leak
 )
 
-COMPILE_PRIM_FUNC(close, primFunc_close, "($fd)",
+COMPILE_FN(close, compiledFn_close, "($fd)",
   close(toNum(lookup("$fd")));
   return nil;
 )

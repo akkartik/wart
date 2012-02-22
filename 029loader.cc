@@ -36,7 +36,7 @@ void loadFiles(const char* ext) {
 
 
 
-COMPILE_PRIM_FUNC(load, primFunc_load, "($f)",
+COMPILE_FN(load, compiledFn_load, "($f)",
   loadFile(toString(lookup("$f")).c_str());
   return nil;
 )

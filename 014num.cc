@@ -1,23 +1,23 @@
-COMPILE_PRIM_FUNC(+, primFunc_add, "($x $y)",
+COMPILE_FN(+, compiledFn_add, "($x $y)",
   return mkref(newNum(toNum(lookup("$x")) + toNum(lookup("$y"))));
 )
 
-COMPILE_PRIM_FUNC(-, primFunc_subtract, "($x $y)",
+COMPILE_FN(-, compiledFn_subtract, "($x $y)",
   return mkref(newNum(toNum(lookup("$x")) - toNum(lookup("$y"))));
 )
 
-COMPILE_PRIM_FUNC(*, primFunc_multiply, "($x $y)",
+COMPILE_FN(*, compiledFn_multiply, "($x $y)",
   return mkref(newNum(toNum(lookup("$x")) * toNum(lookup("$y"))));
 )
 
-COMPILE_PRIM_FUNC(/, primFunc_divide, "($x $y)",
+COMPILE_FN(/, compiledFn_divide, "($x $y)",
   return mkref(newNum(toNum(lookup("$x")) / toNum(lookup("$y"))));
 )
 
-COMPILE_PRIM_FUNC(%, primFunc_modulo, "($x $y)",
+COMPILE_FN(%, compiledFn_modulo, "($x $y)",
   return mkref(newNum(toNum(lookup("$x")) % toNum(lookup("$y"))));
 )
 
-COMPILE_PRIM_FUNC(<, primFunc_lesser, "($x $y)",
+COMPILE_FN(<, compiledFn_lesser, "($x $y)",
   return toNum(lookup("$x")) < toNum(lookup("$y")) ? mkref(lookup("$x")) : nil;
 )

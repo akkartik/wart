@@ -1,4 +1,4 @@
-wart_bin: file_list transform_list prim_func_list test_list test_file_list
+wart_bin: file_list transform_list compiled_fn_list test_list test_file_list
 	g++ -g -Wall -Wextra boot.cc -o wart_bin
 	@echo
 
@@ -8,8 +8,8 @@ file_list: *.cc
 test_file_list: *.cc
 	@ls *.cc |grep test.cc |perl -pwe 's/.*/#include "$$&"/' > test_file_list
 
-prim_func_list: *.cc
-	@grep -h "^COMPILE_PRIM_FUNC" *.cc |perl -pwe 's/.*COMPILE_PRIM_FUNC\(([^,]*), ([^,]*), ([^,]*),$$/{ "$$1", $$3, $$2 },/' > prim_func_list
+compiled_fn_list: *.cc
+	@grep -h "^COMPILE_FN" *.cc |perl -pwe 's/.*COMPILE_FN\(([^,]*), ([^,]*), ([^,]*),$$/{ "$$1", $$3, $$2 },/' > compiled_fn_list
 
 test_list: *.test.cc
 	@grep -h "^[[:space:]]*void test_" *.test.cc |perl -pwe 's/^\s*void (.*)\(\) {$$/$$1,/' > test_list

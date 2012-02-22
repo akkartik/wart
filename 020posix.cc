@@ -1,19 +1,19 @@
-COMPILE_PRIM_FUNC(system, primFunc_system, "($command)",
+COMPILE_FN(system, compiledFn_system, "($command)",
   return mkref(newNum(system(toString(lookup("$command")).c_str())));
 )
 
-COMPILE_PRIM_FUNC(fork, primFunc_fork, "()",
+COMPILE_FN(fork, compiledFn_fork, "()",
   return mkref(newNum(fork()));
 )
 
 #include<sys/wait.h>
 
-COMPILE_PRIM_FUNC(wait_for_child, primFunc_wait_for_child, "()",
+COMPILE_FN(wait_for_child, compiledFn_wait_for_child, "()",
   wait(NULL);
   return nil;
 )
 
-COMPILE_PRIM_FUNC(sleep, primFunc_sleep, "($n)",
+COMPILE_FN(sleep, compiledFn_sleep, "($n)",
   sleep(toNum(lookup("$n")));
   return nil;
 )
@@ -38,11 +38,11 @@ Socket* toSocket(Cell* s) {
   return (Socket*)toNum(car(cdr(cdr(s))));
 }
 
-COMPILE_PRIM_FUNC(socket_fd, primFunc_socket_fd, "($sock)",
+COMPILE_FN(socket_fd, compiledFn_socket_fd, "($sock)",
   return mkref(newNum(toSocket(lookup("$sock"))->fd));
 )
 
-COMPILE_PRIM_FUNC(make-socket, primFunc_socket, "($host $port)",
+COMPILE_FN(make-socket, compiledFn_socket, "($host $port)",
   Socket* sock = new Socket();
   sock->fd = socket(AF_INET, SOCK_STREAM, 0);
   if (sock->fd < 0) perror("socket() failed");
@@ -55,7 +55,7 @@ COMPILE_PRIM_FUNC(make-socket, primFunc_socket, "($host $port)",
   return mkref(newSocket(sock));
 )
 
-COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($port)",
+COMPILE_FN(make-server-socket, compiledFn_server_socket, "($port)",
   Socket* sock = new Socket();
   sock->fd = socket(AF_INET, SOCK_STREAM, 0);
   if (sock->fd < 0) perror("sock() failed");
@@ -69,7 +69,7 @@ COMPILE_PRIM_FUNC(make-server-socket, primFunc_server_socket, "($port)",
   return mkref(newSocket(sock));
 )
 
-COMPILE_PRIM_FUNC(socket-accept, primFunc_socket_accept, "($sock)",
+COMPILE_FN(socket-accept, compiledFn_socket_accept, "($sock)",
   Socket* sock = toSocket(lookup("$sock"));
   Socket* clientsock = new Socket();  socklen_t n = sizeof(clientsock->addr);
   bzero(&clientsock->addr, n);
@@ -78,7 +78,7 @@ COMPILE_PRIM_FUNC(socket-accept, primFunc_socket_accept, "($sock)",
   return mkref(newSocket(clientsock));
 )
 
-COMPILE_PRIM_FUNC(close_socket, primFunc_close_socket, "($sock)",
+COMPILE_FN(close_socket, compiledFn_close_socket, "($sock)",
   Socket* sock = toSocket(lookup("$sock"));
   close(sock->fd);
   delete sock;

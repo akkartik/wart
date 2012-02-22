@@ -54,10 +54,11 @@ mac as(type expr)
   `(coerce ,expr ',type)
 
 defcoerce function macro
-  id
+  (fn(_)
+    (tag 'macro _))
 
 defcoerce macro function
-  id
+  rep
 
 def! compose(f g)
   fn 'args

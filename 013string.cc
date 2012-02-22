@@ -1,4 +1,4 @@
-COMPILE_PRIM_FUNC(string_splice, primFunc_string_splice, "($string $start $end $val)",
+COMPILE_FN(string_splice, compiledFn_string_splice, "($string $start $end $val)",
   Cell* str = lookup("$string");
   if (!isString(str)) {
     RAISE << "can't set non-string: " << str << endl;
@@ -19,7 +19,7 @@ COMPILE_PRIM_FUNC(string_splice, primFunc_string_splice, "($string $start $end $
   return mkref(val);
 )
 
-COMPILE_PRIM_FUNC(string_range, primFunc_string_get, "($string $index $end)",
+COMPILE_FN(string_range, compiledFn_string_get, "($string $index $end)",
   Cell* str = lookup("$string");
   if (!isString(str)) {
     RAISE << "not a string: " << str << endl;
@@ -39,11 +39,11 @@ COMPILE_PRIM_FUNC(string_range, primFunc_string_get, "($string $index $end)",
   return mkref(newString(toString(str).substr(index, end-index)));
 )
 
-COMPILE_PRIM_FUNC(string_to_sym, primFunc_string_to_sym, "($s)",
+COMPILE_FN(string_to_sym, compiledFn_string_to_sym, "($s)",
   return mkref(newSym(toString(lookup("$s"))));
 )
 
-COMPILE_PRIM_FUNC(string<, primFunc_string_lesser, "($x $y)",
+COMPILE_FN(string<, compiledFn_string_lesser, "($x $y)",
   Cell* x = lookup("$x");
   Cell* y = lookup("$y");
   return toString(x) < toString(y) ? mkref(newNum(1)) : nil;

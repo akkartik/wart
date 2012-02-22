@@ -11,7 +11,7 @@ struct Cell {
     #define SYMBOL 2
     #define STRING 3
     #define TABLE 4
-    #define PRIM_FUNC 5
+    #define COMPILED_FN 5
   long nrefs;
   Cell() :car(NULL), cdr(NULL), type(CONS), nrefs(0) {}
   void init() {
@@ -31,7 +31,7 @@ bool isCons(Cell* x) {
 }
 
 bool isAtom(Cell* x) {
-  return x == nil || x->type == NUMBER || x->type == STRING || x->type == SYMBOL || x->type == PRIM_FUNC;
+  return x == nil || x->type == NUMBER || x->type == STRING || x->type == SYMBOL || x->type == COMPILED_FN;
 }
 
 
@@ -132,7 +132,7 @@ void rmref(Cell* c) {
     rmref(c->car); break;
   case TABLE:
     delete (Table*)c->car; break;
-  case PRIM_FUNC:
+  case COMPILED_FN:
     break; // compiled functions don't need freeing
   default:
     RAISE << "Can't rmref type " << c->type << endl << DIE;

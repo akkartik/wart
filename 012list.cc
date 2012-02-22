@@ -1,4 +1,4 @@
-COMPILE_PRIM_FUNC(list_splice, primFunc_list_splice, "('$list $start $end $val)",
+COMPILE_FN(list_splice, compiledFn_list_splice, "('$list $start $end $val)",
   Cell* binding = lookup("$list");
   Cell* list = eval(binding);
   long start = toNum(lookup("$start"));
@@ -28,7 +28,7 @@ COMPILE_PRIM_FUNC(list_splice, primFunc_list_splice, "('$list $start $end $val)"
   return mkref(val);
 )
 
-COMPILE_PRIM_FUNC(list_range, primFunc_list_range, "($list $index $end)",
+COMPILE_FN(list_range, compiledFn_list_range, "($list $index $end)",
   Cell* list = lookup("$list");
   int index = toNum(lookup("$index"));
   for (int i = 0; i < index; ++i)
@@ -55,7 +55,7 @@ COMPILE_PRIM_FUNC(list_range, primFunc_list_range, "($list $index $end)",
                                     }
                                   };
 
-COMPILE_PRIM_FUNC(sort, primFunc_sort, "($f $list)",
+COMPILE_FN(sort, compiledFn_sort, "($f $list)",
   vector<Cell*> container;
   for (Cell* list = lookup("$list"); list != nil; list=cdr(list))
     container.push_back(car(list));

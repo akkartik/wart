@@ -3,22 +3,22 @@
 // these have access to caller scope
 // params start with $ by convention to avoid shadowing
 
-COMPILE_PRIM_FUNC(eval, primFunc_eval, "($x . $scope)",
+COMPILE_FN(eval, compiledFn_eval, "($x . $scope)",
   Cell* scope = lookup("$scope");
   if (scope == nil) scope = currLexicalScopes.top();
   else scope = car(scope);
   return eval(lookup("$x"), scope);
 )
 
-COMPILE_PRIM_FUNC(if, primFunc_if, "($cond '$then '$else)",
+COMPILE_FN(if, compiledFn_if, "($cond '$then '$else)",
   return lookup("$cond") != nil ? eval(lookup("$then")) : eval(lookup("$else"));
 )
 
-COMPILE_PRIM_FUNC(not, primFunc_not, "($x)",
+COMPILE_FN(not, compiledFn_not, "($x)",
   return lookup("$x") == nil ? mkref(newNum(1)) : nil;
 )
 
-COMPILE_PRIM_FUNC(uniq, primFunc_uniq, "($x)",
+COMPILE_FN(uniq, compiledFn_uniq, "($x)",
   return mkref(genSym(lookup("$x")));
 )
 
@@ -32,24 +32,24 @@ COMPILE_PRIM_FUNC(uniq, primFunc_uniq, "($x)",
                                       unsafeSet(scope, var, val, false);
                                   }
 
-COMPILE_PRIM_FUNC(=, primFunc_assign, "('$var $val)",
+COMPILE_FN(=, compiledFn_assign, "('$var $val)",
   Cell* var = lookup("$var");
   Cell* val = lookup("$val");
   assign(var, val);
   return mkref(val);
 )
 
-COMPILE_PRIM_FUNC(dyn_bind, primFunc_dyn_bind, "('$var $val)",
+COMPILE_FN(dyn_bind, compiledFn_dyn_bind, "('$var $val)",
   newDynamicScope(lookup("$var"), lookup("$val"));
   return nil;
 )
 
-COMPILE_PRIM_FUNC(dyn_unbind, primFunc_dyn_unbind, "('$var)",
+COMPILE_FN(dyn_unbind, compiledFn_dyn_unbind, "('$var)",
   endDynamicScope(lookup("$var"));
   return nil;
 )
 
-COMPILE_PRIM_FUNC(bound?, primFunc_isBound, "($var)",
+COMPILE_FN(bound?, compiledFn_isBound, "($var)",
   Cell* var = lookup("$var");
   if (var == nil) return mkref(newNum(1));
   if (!scopeContainingBinding(var, currLexicalScopes.top()))
@@ -58,15 +58,15 @@ COMPILE_PRIM_FUNC(bound?, primFunc_isBound, "($var)",
 )
 
 // type can't take 2 args; calls would look like type constructors
-COMPILE_PRIM_FUNC(type, primFunc_type, "($x)",
+COMPILE_FN(type, compiledFn_type, "($x)",
   return mkref(type(lookup("$x")));
 )
 
-COMPILE_PRIM_FUNC(coerce-quoted, primFunc_coerce_quoted, "'($x $dest-type)",
+COMPILE_FN(coerce-quoted, compiledFn_coerce_quoted, "'($x $dest-type)",
   return coerceQuoted(lookup("$x"), lookup("$dest-type"), lookup("coercions*")); // already mkref'd
 )
 
-COMPILE_PRIM_FUNC(iso, primFunc_iso, "($x $y)",
+COMPILE_FN(iso, compiledFn_iso, "($x $y)",
   Cell* x = lookup("$x");
   Cell* y = lookup("$y");
   Cell* result = nil;
@@ -84,35 +84,35 @@ COMPILE_PRIM_FUNC(iso, primFunc_iso, "($x $y)",
 
 
 // list? will not be true of (type _ _) expressions, but cons? will.
-COMPILE_PRIM_FUNC(cons?, primFunc_isCons, "($x)",
+COMPILE_FN(cons?, compiledFn_isCons, "($x)",
   Cell* x = lookup("$x");
   if (!isCons(x)) return nil;
   return mkref(x);
 )
 
-COMPILE_PRIM_FUNC(cons, primFunc_cons, "($x $y)",
+COMPILE_FN(cons, compiledFn_cons, "($x $y)",
   return mkref(newCons(lookup("$x"), lookup("$y")));
 )
 
-COMPILE_PRIM_FUNC(car, primFunc_car, "($l)",
+COMPILE_FN(car, compiledFn_car, "($l)",
   return mkref(car(lookup("$l")));
 )
 
-COMPILE_PRIM_FUNC(cdr, primFunc_cdr, "($l)",
+COMPILE_FN(cdr, compiledFn_cdr, "($l)",
   return mkref(cdr(lookup("$l")));
 )
 
-COMPILE_PRIM_FUNC(set_car, primFunc_set_car, "($cons $val)",
+COMPILE_FN(set_car, compiledFn_set_car, "($cons $val)",
   setCar(lookup("$cons"), lookup("$val"));
   return mkref(lookup("$val"));
 )
 
-COMPILE_PRIM_FUNC(set_cdr, primFunc_set_cdr, "($cons $val)",
+COMPILE_FN(set_cdr, compiledFn_set_cdr, "($cons $val)",
   setCdr(lookup("$cons"), lookup("$val"));
   return mkref(lookup("$val"));
 )
 
-COMPILE_PRIM_FUNC(len, primFunc_len, "($x)",
+COMPILE_FN(len, compiledFn_len, "($x)",
   Cell* x = lookup("$x");
   if (isString(x))
     return mkref(newNum(toString(x).length()));

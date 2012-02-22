@@ -33,7 +33,7 @@ ostream& operator<<(ostream& os, Cell* c) {
     if (cdr(c) != nil)
       os << "->" << cdr(c);
     return os;
-  case PRIM_FUNC:
+  case COMPILED_FN:
     return os << "#compiled";
   default:
     return os << "Can't print type " << c->type << endl << DIE;
@@ -47,7 +47,7 @@ void print(Cell* x, ostream& out) {
 
 
 
-COMPILE_PRIM_FUNC(pr, primFunc_pr, "($x)",
+COMPILE_FN(pr, compiledFn_pr, "($x)",
   Cell* x = lookup("$x");
   ostream& out = toOstream(STDOUT);
   print(x, out);
@@ -55,12 +55,12 @@ COMPILE_PRIM_FUNC(pr, primFunc_pr, "($x)",
   return mkref(x);
 )
 
-COMPILE_PRIM_FUNC(dbg, primFunc_dbg, "($x)",
+COMPILE_FN(dbg, compiledFn_dbg, "($x)",
   dbg << lookup("$x") << endl;
   return nil;
 )
 
-COMPILE_PRIM_FUNC(write, primFunc_write, "($x)",
+COMPILE_FN(write, compiledFn_write, "($x)",
   Cell* x = lookup("$x");
   ostream& out = toOstream(STDOUT);
   out << x;
@@ -68,7 +68,7 @@ COMPILE_PRIM_FUNC(write, primFunc_write, "($x)",
   return mkref(x);
 )
 
-COMPILE_PRIM_FUNC(err, primFunc_err, "($x)",
+COMPILE_FN(err, compiledFn_err, "($x)",
   Cell* x = lookup("$x");
   ostream& out = toOstream(STDERR);
   print(x, out);
@@ -81,13 +81,13 @@ COMPILE_PRIM_FUNC(err, primFunc_err, "($x)",
                                     return read(c);
                                   }
 
-COMPILE_PRIM_FUNC(read, primFunc_read, "('$eof)",
+COMPILE_FN(read, compiledFn_read, "('$eof)",
   if (toIstream(STDIN).eof())
     return mkref(lookup("$eof"));
   return mkref(read(toIstream(STDIN)));
 )
 
-COMPILE_PRIM_FUNC(read-byte, primFunc_read_byte, "('$eof)",
+COMPILE_FN(read-byte, compiledFn_read_byte, "('$eof)",
   istream& f = toIstream(STDIN);
   if (f.eof())
     return mkref(lookup("$eof"));

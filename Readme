@@ -223,9 +223,9 @@ eval takes pains to increment the nrefs of *exactly* one Cell (the return
 value) across all paths. Nested calls to eval decrement nrefs of the result
 unless they return it. Structure other functions returning Cells the same way.
 
-To implement operations in C, use the COMPILE_PRIM_FUNC macro.
-COMPILE_PRIM_FUNC, like eval, is responsible for ensuring that the nrefs of
-exactly one Cell is incremented across all paths.
+To implement operations in C, use the COMPILE_FN macro. COMPILE_FN, like eval,
+is responsible for ensuring that the nrefs of exactly one Cell is incremented
+across all paths.
 
 If you hack on wart's cc files and forget to decrement nrefs you have a memory
 leak. If you forget to increment nrefs you have something worse: a prematurely
@@ -243,9 +243,9 @@ are off until it is fixed.
 To run its tests wart needs a list of tests to run. It constructs such a list
 on the fly during compilation. Several other places use the same trick. The
 set of files to compile is auto-generated, as is the list of compiled
-primitives wart knows about. You can add new COMPILE_PRIM_FUNC operators, or
-entirely new code in files new or old, and they'll be automatically included
-the next time you run wart.
+primitives wart knows about. You can add new CompiledFns, or entirely new code
+in files new or old, and they'll be automatically included the next time you
+run wart.
 
 --- Credits
 

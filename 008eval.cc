@@ -298,7 +298,7 @@ Cell* processUnquotes(Cell* x, int depth) {
 
                                   bool isFunc(Cell* x) {
                                     if (!isCons(x)) return false;
-                                    if (isPrimFunc(car(x))) return true;
+                                    if (isCompiledFn(car(x))) return true;
                                     return toString(type(x)) == "function";
                                   }
 
@@ -361,18 +361,18 @@ Cell* eval(Cell* expr, Cell* scope) {
   Cell* evaldArgs = evalArgs(calleeSig(fn), orderedArgs, scope);
 
   // swap in the function's lexical environment
-  if (!isPrimFunc(calleeBody(fn)))
+  if (!isCompiledFn(calleeBody(fn)))
     newDynamicScope(CURR_LEXICAL_SCOPE, calleeEnv(fn));
   // now bind its params to args in the new environment
   newLexicalScope();
   bindParams(calleeSig(fn), evaldArgs);
-  if (!isPrimFunc(calleeBody(fn)))
+  if (!isCompiledFn(calleeBody(fn)))
     addLexicalBinding("caller-scope", scope);
 
   // eval all forms in body, save result of final form
   Cell* result = nil;
-  if (isPrimFunc(calleeBody(fn)))
-    result = toPrimFunc(calleeBody(fn))(); // all primFuncs must mkref result
+  if (isCompiledFn(calleeBody(fn)))
+    result = toCompiledFn(calleeBody(fn))(); // all compiledFns must mkref result
   else
     for (Cell* form = calleeImpl(fn); form != nil; form = cdr(form)) {
       rmref(result);
@@ -380,7 +380,7 @@ Cell* eval(Cell* expr, Cell* scope) {
     }
 
   endLexicalScope();
-  if (!isPrimFunc(calleeBody(fn)))
+  if (!isCompiledFn(calleeBody(fn)))
     endDynamicScope(CURR_LEXICAL_SCOPE);
 
   rmref(evaldArgs);

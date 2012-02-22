@@ -99,21 +99,21 @@ void teardownLiteralTables() {
 
 
 
-Cell* newPrimFunc(PrimFunc f) {
+Cell* newCompiledFn(CompiledFn f) {
   Cell* result = newCell();
-  result->type = PRIM_FUNC;
+  result->type = COMPILED_FN;
   result->car = (Cell*)f;
   return result;
 }
 
-bool isPrimFunc(Cell* x) {
-  return x->type == PRIM_FUNC;
+bool isCompiledFn(Cell* x) {
+  return x->type == COMPILED_FN;
 }
 
-PrimFunc toPrimFunc(Cell* x) {
-  if (!isPrimFunc(x))
+CompiledFn toCompiledFn(Cell* x) {
+  if (!isCompiledFn(x))
     RAISE << "Not a compiled function" << endl << DIE;
-  return (PrimFunc)x->car;
+  return (CompiledFn)x->car;
 }
 
 
@@ -213,7 +213,7 @@ Cell* type(Cell* x) {
     return newSym("string");
   case TABLE:
     return newSym("table");
-  case PRIM_FUNC:
+  case COMPILED_FN:
     return newSym("function");
   case CONS:
     if (isObject(x))
