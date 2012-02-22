@@ -234,8 +234,8 @@ void checkForLeaks() {
 
 #include "test_file_list"
 
-typedef void (*testfunc)(void);
-const testfunc tests[] = {
+typedef void (*TestFn)(void);
+const TestFn tests[] = {
   #include "test_list"
 };
 

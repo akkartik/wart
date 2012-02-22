@@ -296,13 +296,13 @@ Cell* processUnquotes(Cell* x, int depth) {
 
 
 
-                                  bool isFunc(Cell* x) {
+                                  bool isFn(Cell* x) {
                                     if (!isCons(x)) return false;
                                     if (isCompiledFn(car(x))) return true;
                                     return toString(type(x)) == "function";
                                   }
 
-                                  Cell* newFunc(string type, Cell* expr, Cell* scope) {
+                                  Cell* newFn(string type, Cell* expr, Cell* scope) {
                                     Cell* f = newTable();
                                     set(f, newSym("sig"), sig(expr));
                                     set(f, newSym("body"), body(expr));
@@ -338,8 +338,8 @@ Cell* eval(Cell* expr, Cell* scope) {
     return processUnquotes(cdr(expr), 1, scope); // already mkref'd
 
   if (car(expr) == newSym("fn"))
-    return mkref(newFunc("function", expr, scope));
-  else if (isFunc(expr))
+    return mkref(newFn("function", expr, scope));
+  else if (isFn(expr))
     // lexical scope is already attached
     return mkref(expr);
 
@@ -347,11 +347,11 @@ Cell* eval(Cell* expr, Cell* scope) {
   // expr is a function call
   Cell* fn0 = eval(car(expr), scope);
   Cell* fn = fn0;
-  if (fn0 != nil && !isFunc(fn0))
+  if (fn0 != nil && !isFn(fn0))
     fn = coerceQuoted(fn0, newSym("function"), lookup("coercions*"));
   else
     fn = mkref(fn0);
-  if (!isFunc(fn))
+  if (!isFn(fn))
     RAISE << "not a call: " << expr << endl
         << "- Should it not be a call? Perhaps the expression is indented too much." << endl << DIE;
 
