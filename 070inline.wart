@@ -77,7 +77,7 @@ def compiled-rules(call)
   (if
     ~cons?.call
       simplify.call
-    (iso compiled-if car.call)
+    (iso compiled!if car.call)
       (let x (simplify cadr.call)
         (if
           (iso x cadr.call)

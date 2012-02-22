@@ -101,17 +101,22 @@ const CompiledFnMetadata compiledFns[] = {
 };
 
 void setupCompiledFns() {
+  newDynamicScope("compiled", newTable());
   for (unsigned int i=0; i < sizeof(compiledFns)/sizeof(compiledFns[0]); ++i) {
     Cell* f = newTable();
     unsafeSet(f, newSym("sig"), nextRawCell(stream(compiledFns[i].params)), false);
     unsafeSet(f, newSym("body"), newCompiledFn(compiledFns[i].impl), false);
-    newDynamicScope(compiledFns[i].name, newObject("function", f));
+    Cell* obj = newObject("function", f);
+    newDynamicScope(compiledFns[i].name, obj);
+    // save to a second, immutable place
+    set(lookup("compiled"), compiledFns[i].name, obj);
   }
 }
 
 void teardownCompiledFns() {
   for (unsigned int i=0; i < sizeof(compiledFns)/sizeof(compiledFns[0]); ++i)
     endDynamicScope(compiledFns[i].name);
+  endDynamicScope("compiled");
 }
 
 

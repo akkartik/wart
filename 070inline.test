@@ -135,8 +135,8 @@
 
 (test "inline - simplifies two-branch if"
  :valueof (inline '((if 3 4)) (table 'if if))
- :should be `((,compiled-if 3 4 (if))))
+ :should be `((,compiled!if 3 4 (if))))
 
 (test "inline - simplifies two-branch if with free vars"
  :valueof (inline '((if a b)) (table 'if if))
- :should be `((,compiled-if a b (if))))
+ :should be `((,compiled!if a b (if))))
