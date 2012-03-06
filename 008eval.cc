@@ -33,7 +33,7 @@
                                     return cdr(cdr(fn));
                                   }
 
-                                  // callee = (type function|macro {sig, body, env, ..})
+                                  // callee = (object function {sig, body, env, ..})
                                   Cell* calleeSig(Cell* callee) {
                                     return get(rep(callee), newSym("sig"));
                                   }
