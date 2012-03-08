@@ -10,3 +10,7 @@ prn.
 (test "to-with-expr handles destructured params"
  :valueof (to-with-expr '(foo (list 3 4)) (table 'foo (fn((x y)) (bar x y))))
  :should be '(with () (with ((x y) (list 3 4)) (bar x y))))
+
+(test "to-with-expr handles varargs params"
+ :valueof (to-with-expr '(foo 3 4) (table 'foo (fn args (bar args))))
+ :should be '(with () (with (args (list 3 4)) (bar args))))

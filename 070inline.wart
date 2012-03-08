@@ -19,4 +19,6 @@ def caller-scope?(x)
 ;; Internals
 
 def gen-bindings(params args acc)
-  (zip params args)
+  if ~cons?.params
+    (list (list params (cons 'list args)))
+    (zip params args)
