@@ -1,3 +1,11 @@
+(test "inline-defs works"
+ :valueof (inline-defs '(foo a b) (table 'foo (fn(x y) (bar x y))))
+ :should be `(,(fn(x y) (bar x y)) a b))
+
+"inline-defs handles quoted params"
+"inline-defs handles do"
+"inline-defs handles fn"
+
 (test "inline - pass through atoms"
  :valueof (inline '(34) (table))
  :should be '(34))

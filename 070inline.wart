@@ -1,3 +1,15 @@
+; (inline (fn(a b) (foo a b)) globals.) => (fn(a b) (compiled!+ a b))
+
+def inline(f bindings)
+  (hoist-bindings:make-bindings:inline-defs f bindings)
+
+def inline-defs(f bindings)
+  (or bindings.f
+      (if ~cons?.f
+        f
+        (cons (inline-defs car.f bindings)
+              (inline-defs cdr.f bindings))))
+
 def inline(calls bindings)
   (strip-listq:inline-sub calls bindings)
 
