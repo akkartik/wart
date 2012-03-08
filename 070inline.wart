@@ -18,7 +18,12 @@ def caller-scope?(x)
 
 ;; Internals
 
-def gen-bindings(params args acc)
-  if ~cons?.params
-    (list (list params (cons 'list args)))
-    (zip params args)
+def gen-bindings(params args)
+  (if
+    !params
+      nil
+    ~cons?.params
+      (list (list params (cons 'list args)))
+    :else
+      (cons (list car.params car.args)
+            (gen-bindings cdr.params cdr.args)))

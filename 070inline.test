@@ -14,3 +14,7 @@ prn.
 (test "to-with-expr handles varargs params"
  :valueof (to-with-expr '(foo 3 4) (table 'foo (fn args (bar args))))
  :should be '(with () (with (args (list 3 4)) (bar args))))
+
+(test "to-with-expr handles rest params"
+ :valueof (to-with-expr '(foo 3 4) (table 'foo (fn (x . rest) (bar rest))))
+ :should be '(with () (with (x 3 rest (list 4)) (bar rest))))
