@@ -11,7 +11,7 @@ def inline-sub(calls bindings)
                   (match '(fn . _) car.call)
                     (eval car.call))
                 car.call)
-        if (or ~callable?.f compiled-fn?.f)
+        if (or ~fn?.f compiled-fn?.f)
           yield compiled-rules.call
           each x (inline-sub (apply-bindings body.f (cons (as table (gen-bindings sig.f cdr.call)) env.f))
                              (if env.f (cons env.f bindings) bindings))
