@@ -1,7 +1,8 @@
 def to-with-expr(call bindings)
   (let f (lookup-or-eval car.call bindings)
-    `(with ,(join @(zip sig.f cdr.call))
-        ,@body.f))
+    `(with ,(join @(rem caller-scope? (as list env.f)))
+       (with ,(join @(gen-bindings sig.f cdr.call))
+          ,@body.f)))
 
 def lookup-or-eval(f bindings)
   (or (if sym?.f
@@ -9,6 +10,9 @@ def lookup-or-eval(f bindings)
       (if (match '(fn . _) f)
         eval.f)
       f)
+
+def caller-scope?(x)
+  (match '(caller-scope . _) x)
 
 def inline(calls bindings)
   (strip-listq:inline-sub calls bindings)
