@@ -22,7 +22,8 @@ def gen-bindings(params args)
   (if
     !params
       nil
-    ~cons?.params
+    (or ~cons?.params ; rest
+        (and cons?.args cons?:car.args splice?:car:car.args)) ; splice
       (list (list params (cons 'list args)))
     :else
       (cons (list car.params car.args)

@@ -18,3 +18,19 @@ prn.
 (test "to-with-expr handles rest params"
  :valueof (to-with-expr '(foo 3 4) (table 'foo (fn (x . rest) (bar rest))))
  :should be '(with () (with (x 3 rest (list 4)) (bar rest))))
+
+(test "to-with-expr handles spliced args for rest param"
+ :valueof (to-with-expr '(foo @(list 3 4)) (table 'foo (fn args (bar args))))
+ :should be '(with () (with (args (list @(list 3 4))) (bar args))))
+
+(test "to-with-expr handles spliced args"
+ :valueof (to-with-expr '(foo @(list 3 4)) (table 'foo (fn (x y) (bar x y))))
+ :should be '(with () (with ((x y) (list @(list 3 4))) (bar x y))))
+
+(test "to-with-expr handles partially spliced args"
+ :valueof (to-with-expr '(foo 3 @(list 4)) (table 'foo (fn (x y) (bar x y))))
+ :should be '(with () (with (x 3 (y) (list @(list 4))) (bar x y))))
+
+(test "to-with-expr handles partially spliced args - 2"
+ :valueof (to-with-expr '(foo 3 @(list 4) 5) (table 'foo (fn (x y z) (bar x y z))))
+ :should be '(with () (with (x 3 (y z) (list @(list 4) 5)) (bar x y z))))

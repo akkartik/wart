@@ -66,6 +66,8 @@ def backquote?(_) (iso _ backquote)
 def unquote?(_) (iso _ unquote)
 = unquote-splice (car:cadr '`(,@1))
 def unquote-splice?(_) (iso _ unquote-splice)
+= splice (car '@1)
+def splice?(_) (iso _ splice)
 
 def die args
   prn @args
