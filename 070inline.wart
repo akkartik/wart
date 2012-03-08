@@ -1,7 +1,7 @@
 def to-with-expr(call bindings)
   (let f (lookup-or-eval car.call bindings)
     `(with ,(join @(rem caller-scope? (as list env.f)))
-       (with ,(join @(gen-bindings sig.f cdr.call))
+       (with (,sig.f ,(cons 'list cdr.call))
           ,@body.f)))
 
 def lookup-or-eval(f bindings)
@@ -13,18 +13,3 @@ def lookup-or-eval(f bindings)
 
 def caller-scope?(x)
   (match '(caller-scope . _) x)
-
-
-
-;; Internals
-
-def gen-bindings(params args)
-  (if
-    !params
-      nil
-    (or ~cons?.params ; rest
-        (and cons?.args cons?:car.args splice?:car:car.args)) ; splice
-      (list (list params (cons 'list args)))
-    :else
-      (cons (list car.params car.args)
-            (gen-bindings cdr.params cdr.args)))
