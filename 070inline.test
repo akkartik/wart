@@ -1,3 +1,4 @@
+prn.
 (test "to-with-expr works"
  :valueof (to-with-expr '(foo a b) (table 'foo (fn(x y) (bar x y))))
  :should be '(with () (with (x a y b) (bar x y))))

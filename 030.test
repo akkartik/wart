@@ -1,3 +1,4 @@
+prn.
 (mac! foo(x) `(+ 1 ,x))
 (test "mac! works"
  :valueof (let x 3 (foo x))
