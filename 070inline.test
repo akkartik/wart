@@ -6,3 +6,7 @@ prn.
 (test "to-with-expr handles environment"
  :valueof (to-with-expr '(foo a b) (table 'foo (let z 3 (fn(x y) (bar x y z)))))
  :should be '(with (z 3) (with (x a y b) (bar x y z))))
+
+(test "to-with-expr handles destructured params"
+ :valueof (to-with-expr '(foo (list 3 4)) (table 'foo (fn((x y)) (bar x y))))
+ :should be '(with () (with ((x y) (list 3 4)) (bar x y))))

@@ -19,17 +19,4 @@ def caller-scope?(x)
 ;; Internals
 
 def gen-bindings(params args acc)
-  if (and cons?.params quote?:car.params)
-    (zap cdr params) ; inline never distinguishes quoted params
-  (if
-    !params ; base case
-      acc
-    ~cons?.params ; rest param
-      (cons (list params (cons 'listq args))
-            acc)
-    ~cons?:car.params
-      (cons (list car.params car.args)
-            (gen-bindings cdr.params cdr.args acc))
-    :else ; destructured param
-      (gen-bindings car.params car.args
-               (gen-bindings cdr.params cdr.args acc)))
+  (zip params args)
