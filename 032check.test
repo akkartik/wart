@@ -204,3 +204,43 @@
 (test "match treats any sym beginning with _ as wildcard"
  :valueof (match '(1 . _x) '(1 2 3))
  :should ~be nil)
+
+ 
+
+(test "caselet works"
+ :valueof (caselet x 'b
+            'a
+              1
+            'b
+              2
+              3)
+ :should be 2)
+
+(test "case works"
+ :valueof (with (x 1 y 2 z 3 w 2)
+            (case w
+              x
+                34
+              y
+                35
+              z
+                36))
+ :should be 35)
+
+(test "case uses predicate"
+ :valueof (let x 3
+            (case x
+              odd?
+                34
+              even?
+                36))
+ :should be 34)
+
+(test "case recognizes keyword :else"
+ :valueof (let x 3
+            (case x
+              even?
+                34
+              :else
+                35))
+ :should be 35)
