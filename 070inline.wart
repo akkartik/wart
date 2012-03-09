@@ -1,15 +1,15 @@
 def to-with-expr(call bindings)
-  (let f (lookup-or-eval car.call bindings)
+  (iflet f (lookup-or-eval car.call bindings)
     `(with ,(join @(rem caller-scope? (as list env.f)))
        (with (,sig.f ,(cons 'list cdr.call))
-          ,@body.f)))
+         ,@body.f))
+    call)
 
 def lookup-or-eval(f bindings)
   (or (if sym?.f
         bindings.f)
       (if (match '(fn . _) f)
-        eval.f)
-      f)
+        eval.f))
 
 def caller-scope?(x)
   (match '(caller-scope . _) x)
