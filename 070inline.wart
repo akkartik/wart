@@ -2,7 +2,8 @@ def to-with-expr(call bindings)
   (iflet f (lookup-or-eval car.call bindings)
     `(with ,(join @(rem caller-scope? (as list env.f)))
        (with (,sig.f ,(cons 'list cdr.call))
-         ,@body.f))
+         ,@(collect:each expr body.f
+             (yield:to-with-expr expr bindings))))
     call)
 
 def lookup-or-eval(f bindings)

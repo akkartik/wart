@@ -11,3 +11,15 @@ prn.
 (test "to-with-expr passes through unknown calls"
  :valueof (to-with-expr '(foo 1 2) (table))
  :should be '(foo 1 2))
+
+(test "to-with-expr handles nested calls"
+ :valueof (to-with-expr '(foo 1 2)
+                        (table 'foo (fn(a b)
+                                      (bar a b))
+                               'bar (fn(c d)
+                                      (baz c d))))
+ :should be '(with ()
+               (with ((a b) (list 1 2))
+                 (with ()
+                   (with ((c d) (list a b))
+                     (baz c d))))))
