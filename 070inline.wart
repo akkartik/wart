@@ -1,17 +1,18 @@
 def to-with-expr(call bindings done)
-  (iflet f (and (~pos car.call done) ; skip recursive calls
-                (lookup-or-eval car.call bindings))
+  iflet f (and (~pos car.call done) ; skip recursive calls
+               (lookup-or-eval car.call bindings))
     `(with ,(join @(rem caller-scope? (as list env.f)))
-       (with (,sig.f ,(cons 'list cdr.call))
+       with (,sig.f ,(cons 'list cdr.call))
          ,@(collect:each expr body.f
-             (yield:to-with-expr expr bindings (cons car.call done)))))
-    call)
+             (yield:to-with-expr expr bindings (cons car.call done))))
+    call
 
 def lookup-or-eval(f bindings)
-  (or (if sym?.f
-        bindings.f)
-      (if (match '(fn . _) f)
-        eval.f))
+  (if
+    sym?.f
+      bindings.f
+    (match '(fn . _) f)
+      eval.f)
 
 def caller-scope?(x)
   (match '(caller-scope . _) x)
