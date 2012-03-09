@@ -15,7 +15,9 @@ prn.
  :should be 4)
 
 (test "compose works"
- :valueof ((compose (fn(_) (+ _ 1)) (fn(a b) (+ a b))) 3 4)
+ :valueof ((compose (fn(_) (+ _ 1))
+                    (fn(a b) (+ a b)))
+              3 4)
  :should be 8)
 
 (test "compose works - 2"
