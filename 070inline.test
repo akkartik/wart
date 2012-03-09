@@ -23,3 +23,11 @@ prn.
                  (with ()
                    (with ((c d) (list a b))
                      (baz c d))))))
+
+(test "to-with-expr skips recursive calls"
+ :valueof (to-with-expr '(foo 1 2)
+                        (table 'foo (fn(a b)
+                                      (foo a b))))
+ :should be '(with ()
+               (with ((a b) (list 1 2))
+                 (foo a b))))
