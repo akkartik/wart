@@ -231,18 +231,21 @@ Cell* evalArgs(Cell* params, Cell* args) {
 
 void bindParams(Cell* params, Cell* args) {
   if (params == nil) return;
+  Cell* orderedArgs = reorderKeywordArgs(params, args);
 
   if (isQuoted(params)) {
-    bindParams(cdr(params), args);
+    bindParams(cdr(params), orderedArgs);
+    rmref(orderedArgs);
     return;
   }
 
   if (isSym(params))
-    bindParamAliases(params, args);
+    bindParamAliases(params, orderedArgs);
   else
-    bindParams(car(params), car(args));
+    bindParams(car(params), car(orderedArgs));
 
-  bindParams(cdr(params), cdr(args));
+  bindParams(cdr(params), cdr(orderedArgs));
+  rmref(orderedArgs);
 }
 
 
@@ -359,6 +362,7 @@ Cell* eval(Cell* expr, Cell* scope) {
 
   // eval all its args in the current lexical scope
   Cell* splicedArgs = spliceArgs(callArgs(expr), scope, fn);
+  // keyword args can change what we eval
   Cell* orderedArgs = reorderKeywordArgs(calleeSig(fn), splicedArgs);
   Cell* evaldArgs = evalArgs(calleeSig(fn), orderedArgs, scope);
 

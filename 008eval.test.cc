@@ -1032,3 +1032,17 @@ void test_eval_handles_keyword_args_inside_splice() {
   rmref(fn);
   endDynamicScope("f");
 }
+
+void test_eval_handles_keyword_args_inside_destructured_params() {
+  Cell* fn = read(stream("(fn ((a b)) b)"));
+  Cell* f = eval(fn);
+  newDynamicScope("f", f);
+  Cell* call = read(stream("(f '(3 :a 4))"));
+  Cell* result = eval(call);
+  checkEq(result, newNum(3));
+  rmref(result);
+  rmref(call);
+  rmref(f);
+  rmref(fn);
+  endDynamicScope("f");
+}
