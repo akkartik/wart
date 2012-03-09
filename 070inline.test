@@ -31,3 +31,12 @@ prn.
  :should be '(with ()
                (with ((a b) (list 1 2))
                  (foo a b))))
+
+(test "to-with-expr skips macro calls"
+ :valueof (to-with-expr '(foo x y)
+                        (table 'foo (fn'(a b)
+                                      (eval `(+ ,a ,b) caller-scope))))
+ :should be '(with ()
+               ((fn'(a b)
+                  (eval `(+ ,a ,b) caller-scope))
+                x y)))
