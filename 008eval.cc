@@ -139,7 +139,7 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
                                         keywordArgs[currArg] = car(args);
                                       }
                                     }
-                                    if (args != nil && !isCons(args)) // improper list
+                                    if (!isCons(args)) // improper list
                                       setCdr(curr, args);
                                     return dropPtr(pNonKeywordArgs);
                                   }
