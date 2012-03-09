@@ -19,6 +19,16 @@ defset list((l idx . ends) val)
            $val ,(if ends val `(list ,val)))
       (list_splice ,l $idx $end $val))
 
+def pos(x xs n)
+  or= n 0
+  if xs
+    if (iso x car.xs)
+      n
+      (pos x cdr.xs (+ n 1))
+
+def predicate(x) :case (isa x 'list)
+  (fn(_) (pos _ x))
+
 def= car(l x)
   (set_car l x)
 

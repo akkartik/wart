@@ -98,6 +98,30 @@
             rep.l)
  :should be '(3 2 3))
 
+(test "pos works"
+ :valueof (pos 2 '(1 2 3))
+ :should ~be nil)
+
+(test "pos works - 2"
+ :valueof (pos 4 '(1 2 3))
+ :should be nil)
+
+(test "pos works - 3"
+ :valueof (pos nil '(1 2 3))
+ :should be nil)
+
+(test "pos works - 4"
+ :valueof (pos nil '(1 nil 2 3))
+ :should ~be nil)
+
+(test "predicate works with a list"
+ :valueof ((predicate '(1 2 3)) 3)
+ :should ~be nil)
+
+(test "predicate works with a list - 2"
+ :valueof ((predicate '(1 2 3)) 4)
+ :should be nil)
+
 (test "join works"
  :valueof (join '(1 2 3) nil '(4 5) nil nil '(6 (7 8)))
  :should be '(1 2 3 4 5 6 (7 8)))
