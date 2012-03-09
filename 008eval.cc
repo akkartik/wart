@@ -124,7 +124,7 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
                                   // extract keyword args into the CellMap provided; return non-keyword args
                                   Cell* extractKeywordArgs(Cell* params, Cell* args, CellMap& keywordArgs) {
                                     Cell *pNonKeywordArgs = newCell(), *curr = pNonKeywordArgs;
-                                    for (; args != nil; args=cdr(args)) {
+                                    for (; isCons(args); args=cdr(args)) {
                                       Cell* currArg = keywordArg(car(args), params);
                                       if (currArg == newSym("__wartRestKeywordArg")) {
                                         setCdr(curr, cdr(args));
@@ -139,6 +139,8 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
                                         keywordArgs[currArg] = car(args);
                                       }
                                     }
+                                    if (args != nil && !isCons(args)) // improper list
+                                      setCdr(curr, args);
                                     return dropPtr(pNonKeywordArgs);
                                   }
 

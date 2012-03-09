@@ -66,6 +66,17 @@ void test_reorderKeywordArgs_keeps_nil_rest_args() {
   rmref(params);
 }
 
+void test_reorderKeywordArgs_handles_improper_lists() {
+  Cell* params = newCons(newSym("a"), newSym("b"));
+  Cell* args = newCons(newNum(3), newNum(4));
+  Cell* orderedArgs = reorderKeywordArgs(params, args);
+  checkEq(car(orderedArgs), car(args));
+  checkEq(cdr(orderedArgs), cdr(args));
+  rmref(orderedArgs);
+  rmref(args);
+  rmref(params);
+}
+
 void test_evalArgs_handles_unquoted_param() {
   newDynamicScope("a", newNum(3));
   Cell* params = read(stream("(x)"));
