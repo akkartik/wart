@@ -40,3 +40,14 @@ prn.
                ((fn'(a b)
                   (eval `(+ ,a ,b) caller-scope))
                 x y)))
+
+(test "to-with-expr handles functions in env"
+ :valueof (to-with-expr '(foo x y)
+                        (table 'foo (let bar (fn(a b) (+ a b))
+                                      (fn(c d)
+                                        (bar c d)))))
+ :should be `(with (bar ,(fn(a b) (+ a b)))
+               (with ((c d) (list x y))
+                 (with ()
+                   (with ((a b) (list c d))
+                     (+ a b))))))

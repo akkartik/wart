@@ -123,6 +123,11 @@ def flatten(l acc)
       (cons l acc)
       (flatten car.l (flatten cdr.l acc)))
 
+def reduce-if(f a b)
+  if a
+    (f a b)
+    b
+
 
 
 ;; Internals
