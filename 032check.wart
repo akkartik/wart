@@ -49,6 +49,11 @@ mac check(x test else)
       $x
       ,else)
 
+def maybe(f a b/to)
+  if a
+    (f a b)
+    b
+
 mac in(x . choices)
   `(let $x ,x
      (or ,@(map (fn(_) `(iso $x ,_))
