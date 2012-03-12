@@ -44,3 +44,11 @@ def contains-quote?(expr)
 def scope->with-bindings(s)
   (join @(rem (fn(x) (match '(caller-scope . _) x))
               (as list s)))
+
+def with-bindings->scope(bindings)
+  ret ans (eval `(with ,bindings curr-scope.) caller-scope)
+    wipe ans!caller-scope
+    wipe cdr.ans
+
+def curr-scope()
+  caller-scope

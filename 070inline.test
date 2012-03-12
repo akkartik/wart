@@ -65,3 +65,7 @@ prn.
                  (with ()
                    (with ((a b) (list c d))
                      (+ a b))))))
+
+(test "scope->with-bindings and with-bindings->scope are converses"
+ :valueof (with-bindings->scope (scope->with-bindings (table 'x 34)))
+ :should be (table 'x 34))
