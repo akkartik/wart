@@ -7,9 +7,11 @@ def to-with-expr(call bindings done)
             (quote? car:sig.f)
               `(with (,cdr:sig.f ',cdr.call)
                  ,@(collect:each expr body.f
-                     (yield:to-with-expr expr
-                                         (maybe cons env.f :to bindings)
-                                         (cons car.call done))))
+                     (if (iso car.expr 'eval)
+                       (yield:strip-caller-scope expr)
+                       (yield:to-with-expr expr
+                                           (maybe cons env.f :to bindings)
+                                           (cons car.call done)))))
             (contains-quote sig.f)
               `((fn ,sig.f ,@body.f) ,@cdr.call)
             :else
@@ -18,8 +20,6 @@ def to-with-expr(call bindings done)
                      (yield:to-with-expr expr
                                          (maybe cons env.f :to bindings)
                                          (cons car.call done))))))
-    (iso car.call 'eval)
-      strip-caller-scope.call
     :else
       call
 

@@ -40,6 +40,14 @@ prn.
                (with ((a b) '(x y))
                   (eval `(+ ,a ,b)))))
 
+(test "to-with-expr leaves alone caller-scope outside macros"
+ :valueof (to-with-expr '(foo 1 2)
+                        (table 'foo (fn(a b)
+                                      (eval a caller-scope))))
+ :should be '(with ()
+               (with ((a b) (list 1 2))
+                 (eval a caller-scope))))
+
 (test "to-with-expr handles functions in env"
  :valueof (to-with-expr '(foo x y)
                         (table 'foo (let bar (fn(a b) (+ a b))
