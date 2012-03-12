@@ -21,6 +21,12 @@ def to-with-expr(call bindings done)
                                        (cons car.call done))))))
     call)
 
+def inline-macro-eval(expr bindings)
+  if (~match '(with _ (eval . _)) expr)
+    expr
+    `(,expr.0 ,expr.1 ,(apply-bindings expr.2.1 ; eval arg
+                                       (cons with-bindings->scope:expr.1 bindings)))
+
 
 
 ;; Internals
@@ -52,3 +58,26 @@ def with-bindings->scope(bindings)
 
 def curr-scope()
   caller-scope
+
+def apply-bindings(expr bindings)
+  (if
+    !cons?.expr
+      (or (lookup-or-eval expr bindings)
+          expr)
+    quote?:car.expr
+      expr
+    backquote?:car.expr
+      (apply-comma-bindings cdr.expr bindings)
+    :else
+      (cons (apply-bindings car.expr bindings)
+            (apply-bindings cdr.expr bindings)))
+
+def apply-comma-bindings(expr bindings)
+  (if
+    !cons?.expr
+      expr
+    unquote?:car.expr
+      (apply-bindings cdr.expr bindings)
+    :else
+      (cons (apply-comma-bindings car.expr bindings)
+            (apply-comma-bindings cdr.expr bindings)))

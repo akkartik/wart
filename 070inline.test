@@ -66,6 +66,12 @@ prn.
                    (with ((a b) (list c d))
                      (+ a b))))))
 
+(test "inline-macro-eval works"
+ :valueof (inline-macro-eval '(with ((a b) '(x y))
+                                (eval `(+ ,a ,b))))
+ :should be '(with ((a b) '(x y))
+               (+ x y)))
+
 (test "scope->with-bindings and with-bindings->scope are converses"
  :valueof (with-bindings->scope (scope->with-bindings (table 'x 34)))
  :should be (table 'x 34))
