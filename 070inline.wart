@@ -62,25 +62,13 @@ def with-bindings->scope(bindings)
 def curr-scope()
   caller-scope
 
-def apply-bindings(expr bindings)
-  (if
-    !cons?.expr
-      (or (lookup-or-eval expr bindings)
-          expr)
-    quote?:car.expr
-      expr
-    backquote?:car.expr
-      (cons quote (apply-comma-bindings cdr.expr bindings))
-    :else
-      (cons (apply-bindings car.expr bindings)
-            (apply-bindings cdr.expr bindings)))
-
 def apply-comma-bindings(expr bindings)
   (if
     !cons?.expr
       expr
     unquote?:car.expr
-      (apply-bindings cdr.expr bindings)
+      (or (try-eval cdr.expr bindings)
+          expr) ; failure = expr still has commas
     :else
       (cons (apply-comma-bindings car.expr bindings)
             (apply-comma-bindings cdr.expr bindings)))
