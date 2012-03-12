@@ -1,27 +1,25 @@
 def to-with-expr(call bindings done)
-  iflet f
-    (and (~pos car.call done) ; skip recursive calls
-         (lookup-or-eval car.call bindings))
-      `(with ,(join @(rem caller-scope? (as list env.f)))
-         ,(if
-            (quote? car:sig.f)
-              `(with (,cdr:sig.f ',cdr.call)
-                 ,@(collect:each expr body.f
-                     (if (iso car.expr 'eval)
-                       (yield:strip-caller-scope expr)
-                       (yield:to-with-expr expr
-                                           (maybe cons env.f :to bindings)
-                                           (cons car.call done)))))
-            (contains-quote sig.f)
-              `((fn ,sig.f ,@body.f) ,@cdr.call)
-            :else
-              `(with (,sig.f ,(cons 'list cdr.call))
-                 ,@(collect:each expr body.f
+  (iflet f (and (~pos car.call done) ; skip recursive calls
+                (lookup-or-eval car.call bindings))
+    `(with ,(join @(rem caller-scope? (as list env.f)))
+       ,(if
+          (quote? car:sig.f)
+            `(with (,cdr:sig.f ',cdr.call)
+               ,@(collect:each expr body.f
+                   (if (iso car.expr 'eval)
+                     (yield:strip-caller-scope expr)
                      (yield:to-with-expr expr
                                          (maybe cons env.f :to bindings)
-                                         (cons car.call done))))))
-    :else
-      call
+                                         (cons car.call done)))))
+          (contains-quote sig.f)
+            `((fn ,sig.f ,@body.f) ,@cdr.call)
+          :else
+            `(with (,sig.f ,(cons 'list cdr.call))
+               ,@(collect:each expr body.f
+                   (yield:to-with-expr expr
+                                       (maybe cons env.f :to bindings)
+                                       (cons car.call done))))))
+    call)
 
 
 
