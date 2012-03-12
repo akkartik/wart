@@ -104,6 +104,12 @@ prn.
  :should be '(with (args '(x y))
                (+ x y 3)))
 
+(test "inline-macro-eval works with nested backquotes"
+ :valueof (inline-macro-eval '(with ((a b) '(x y))
+                                (eval `(+ ,a ,(if 3 `(+ 3 ,b))))))
+ :should be '(with ((a b) '(x y))
+               (+ x (+ 3 y))))
+
 (test "scope->with-bindings and with-bindings->scope are converses"
  :valueof (with-bindings->scope (scope->with-bindings (table 'x 34)))
  :should be (table 'x 34))
