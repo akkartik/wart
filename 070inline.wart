@@ -38,8 +38,8 @@ def lookup-or-eval(f bindings)
 def contains-quote(expr)
   if ~cons?.expr
     quote?.expr
-    (or (quote? car.expr)
-        (quote? cdr.expr))
+    (or (contains-quote car.expr)
+        (contains-quote cdr.expr))
 
 def caller-scope?(x)
   (match '(caller-scope . _) x)

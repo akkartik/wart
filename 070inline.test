@@ -32,6 +32,13 @@ prn.
                (with ((a b) (list 1 2))
                  (foo a b))))
 
+(test "to-with-expr skips selectively quoted params"
+ :valueof (to-with-expr '(foo x y)
+                        (table 'foo (fn('a 'b)
+                                      `(+ ,a ,b))))
+ :should be '(with ()
+               ((fn('a 'b) `(+ ,a ,b)) x y)))
+
 (test "to-with-expr handles macro calls"
  :valueof (to-with-expr '(foo x y)
                         (table 'foo (fn'(a b)
