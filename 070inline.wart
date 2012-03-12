@@ -7,7 +7,7 @@ def to-with-expr(call bindings done)
             `(with (,cdr:sig.f ',cdr.call)
                ,@(collect:each expr body.f
                    (if (iso car.expr 'eval)
-                     (yield:strip-caller-scope expr)
+                     (yield `(,expr.0 ,expr.1)) ; strip caller-scope
                      (yield:to-with-expr expr
                                          (maybe cons env.f :to bindings)
                                          (cons car.call done)))))
@@ -43,13 +43,3 @@ def contains-quote(expr)
 
 def caller-scope?(x)
   (match '(caller-scope . _) x)
-
-def strip-caller-scope(call)
-  (if
-    ~cons?.call
-      call
-    (iso 'caller-scope car.call)
-      (strip-caller-scope cdr.call)
-    :else
-      (cons (strip-caller-scope car.call)
-            (strip-caller-scope cdr.call)))
