@@ -9,7 +9,7 @@ def to-with-expr(call bindings done)
                    (if (iso car.expr 'eval)
                      (yield `(,expr.0 ,expr.1)) ; strip caller-scope
                      (yield:to-with-expr expr
-                                         (maybe cons env.f :to bindings)
+                                         (maybe chain-scope env.f :to bindings)
                                          (cons car.call done)))))
           (contains-quote? sig.f)
             `((fn ,sig.f ,@body.f) ,@cdr.call)
@@ -17,7 +17,7 @@ def to-with-expr(call bindings done)
             `(with (,sig.f ,(cons 'list cdr.call))
                ,@(collect:each expr body.f
                    (yield:to-with-expr expr
-                                       (maybe cons env.f :to bindings)
+                                       (maybe chain-scope env.f :to bindings)
                                        (cons car.call done))))))
     call)
 
@@ -29,7 +29,7 @@ def inline-macro-eval(expr bindings)
                                      (~backquote? car:x.1))
                          x
                          (apply-comma-bindings cdr:x.1 ; strip backquote
-                              (cons with-bindings->scope:expr.1 bindings)))))
+                              (maybe chain-scope with-bindings->scope:expr.1 :to bindings)))))
 
 
 
@@ -38,10 +38,9 @@ def inline-macro-eval(expr bindings)
 def lookup-or-eval(f bindings)
   (if
     sym?.f
-      (if cons?.bindings
-        (or (car.bindings f)
+      if bindings
+        (or bindings.f
             (lookup-or-eval f cdr.bindings))
-        bindings.f)
     (match '(fn . _) f)
       eval.f)
 
@@ -85,3 +84,10 @@ def apply-comma-bindings(expr bindings)
     :else
       (cons (apply-comma-bindings car.expr bindings)
             (apply-comma-bindings cdr.expr bindings)))
+
+def chain-scope(a b)
+  ret ans copy.a
+    let curr ans
+      while cdr.curr
+        zap cdr curr
+      = cdr.curr b
