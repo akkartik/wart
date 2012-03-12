@@ -28,7 +28,7 @@ def inline-macro-eval(expr bindings)
                        (yield:if (or (~match '(eval . _) x)
                                      (~backquote? car:x.1))
                          x
-                         (apply-bindings x.1
+                         (apply-comma-bindings cdr:x.1 ; strip backquote
                               (cons with-bindings->scope:expr.1 bindings)))))
 
 
@@ -71,7 +71,7 @@ def apply-bindings(expr bindings)
     quote?:car.expr
       expr
     backquote?:car.expr
-      (apply-comma-bindings cdr.expr bindings)
+      (cons quote (apply-comma-bindings cdr.expr bindings))
     :else
       (cons (apply-bindings car.expr bindings)
             (apply-bindings cdr.expr bindings)))
