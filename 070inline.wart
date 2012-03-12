@@ -1,7 +1,7 @@
 def to-with-expr(call bindings done)
   (iflet f (and (~pos car.call done) ; skip recursive calls
                 (lookup-or-eval car.call bindings))
-    `(with ,(join @(rem caller-scope? (as list env.f)))
+    `(with ,(scope->with-bindings env.f)
        ,(if
           (quote? car:sig.f)
             `(with (,cdr:sig.f ',cdr.call)
@@ -41,5 +41,6 @@ def contains-quote?(expr)
     (or (contains-quote? car.expr)
         (contains-quote? cdr.expr))
 
-def caller-scope?(x)
-  (match '(caller-scope . _) x)
+def scope->with-bindings(s)
+  (join @(rem (fn(x) (match '(caller-scope . _) x))
+              (as list s)))
