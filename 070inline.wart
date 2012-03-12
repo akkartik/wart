@@ -1,15 +1,27 @@
 def to-with-expr(call bindings done)
-  iflet f (and (~pos car.call done) ; skip recursive calls
-               (lookup-or-eval car.call bindings))
-    `(with ,(join @(rem caller-scope? (as list env.f)))
-       ,(if (contains-quote sig.f)
-          `((fn ,sig.f ,@body.f) ,@cdr.call)
-          `(with (,sig.f ,(cons 'list cdr.call))
-             ,@(collect:each expr body.f
-                 (yield:to-with-expr expr
-                                     (maybe cons env.f :to bindings)
-                                     (cons car.call done))))))
-    call
+  iflet f
+    (and (~pos car.call done) ; skip recursive calls
+         (lookup-or-eval car.call bindings))
+      `(with ,(join @(rem caller-scope? (as list env.f)))
+         ,(if
+            (quote? car:sig.f)
+              `(with (,cdr:sig.f ',cdr.call)
+                 ,@(collect:each expr body.f
+                     (yield:to-with-expr expr
+                                         (maybe cons env.f :to bindings)
+                                         (cons car.call done))))
+            (contains-quote sig.f)
+              `((fn ,sig.f ,@body.f) ,@cdr.call)
+            :else
+              `(with (,sig.f ,(cons 'list cdr.call))
+                 ,@(collect:each expr body.f
+                     (yield:to-with-expr expr
+                                         (maybe cons env.f :to bindings)
+                                         (cons car.call done))))))
+    (iso car.call 'eval)
+      strip-caller-scope.call
+    :else
+      call
 
 
 
@@ -33,3 +45,13 @@ def contains-quote(expr)
 
 def caller-scope?(x)
   (match '(caller-scope . _) x)
+
+def strip-caller-scope(call)
+  (if
+    ~cons?.call
+      call
+    (iso 'caller-scope car.call)
+      (strip-caller-scope cdr.call)
+    :else
+      (cons (strip-caller-scope car.call)
+            (strip-caller-scope cdr.call)))

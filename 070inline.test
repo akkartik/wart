@@ -32,14 +32,13 @@ prn.
                (with ((a b) (list 1 2))
                  (foo a b))))
 
-(test "to-with-expr skips macro calls"
+(test "to-with-expr handles macro calls"
  :valueof (to-with-expr '(foo x y)
                         (table 'foo (fn'(a b)
                                       (eval `(+ ,a ,b) caller-scope))))
  :should be '(with ()
-               ((fn'(a b)
-                  (eval `(+ ,a ,b) caller-scope))
-                x y)))
+               (with ((a b) '(x y))
+                  (eval `(+ ,a ,b)))))
 
 (test "to-with-expr handles functions in env"
  :valueof (to-with-expr '(foo x y)
