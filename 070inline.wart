@@ -28,8 +28,10 @@ def inline-macro-eval(expr bindings)
                        (yield:if (or (~match '(eval . _) x)
                                      (~backquote? car:x.1))
                          x
-                         (apply-comma-bindings cdr:x.1 ; strip backquote
-                              (maybe chain-scope with-bindings->scope:expr.1 :to bindings)))))
+                         (check (apply-comma-bindings cdr:x.1 ; strip backquote
+                                    (maybe chain-scope with-bindings->scope:expr.1 :to bindings))
+                                ~has-comma-bindings
+                                x))))
 
 
 
@@ -78,6 +80,20 @@ def apply-comma-bindings(expr bindings)
     :else
       (cons (apply-comma-bindings car.expr bindings)
             (apply-comma-bindings cdr.expr bindings)))
+
+def has-comma-bindings(expr)
+  (if
+    !cons?.expr
+      nil
+    unquote?:car.expr
+      expr
+    (match (cons unquote-splice '_) car.expr)
+      car.expr
+    backquote?:car.expr
+      nil
+    :else
+      (or has-comma-bindings:car.expr
+          has-comma-bindings:cdr.expr))
 
 def chain-scope(a b)
   ret ans copy.a

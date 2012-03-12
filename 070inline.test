@@ -86,6 +86,12 @@ prn.
  :should be '(with ((a b) '(x y))
                (eval (cons '+ a b))))
 
+(test "inline-macro-eval gives up with unbound vars"
+ :valueof (inline-macro-eval '(with ((a b) '(x y))
+                                (eval `(+ ,c ,b))))
+ :should be '(with ((a b) '(x y))
+               (eval `(+ ,c ,b))))
+
 (test "inline-macro-eval works with comma expressions without side effects"
  :valueof (inline-macro-eval '(with ((a b) '(x y))
                                 (eval `(+ ,a ,(if 3 b)))))
