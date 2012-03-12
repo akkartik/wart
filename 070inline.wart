@@ -11,7 +11,7 @@ def to-with-expr(call bindings done)
                      (yield:to-with-expr expr
                                          (maybe cons env.f :to bindings)
                                          (cons car.call done)))))
-          (contains-quote sig.f)
+          (contains-quote? sig.f)
             `((fn ,sig.f ,@body.f) ,@cdr.call)
           :else
             `(with (,sig.f ,(cons 'list cdr.call))
@@ -35,11 +35,11 @@ def lookup-or-eval(f bindings)
     (match '(fn . _) f)
       eval.f)
 
-def contains-quote(expr)
+def contains-quote?(expr)
   if ~cons?.expr
     quote?.expr
-    (or (contains-quote car.expr)
-        (contains-quote cdr.expr))
+    (or (contains-quote? car.expr)
+        (contains-quote? cdr.expr))
 
 def caller-scope?(x)
   (match '(caller-scope . _) x)
