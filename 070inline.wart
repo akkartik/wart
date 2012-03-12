@@ -25,13 +25,12 @@ def inline-macro-eval(expr bindings)
   if (~match '(with . _) expr)
     expr
     `(with ,expr.1 ,@(collect:each x (expr 2 nil)
-                       (yield:if (or (~match '(eval . _) x)
-                                     (~backquote? car:x.1))
-                         x
-                         (check (apply-comma-bindings cdr:x.1 ; strip backquote
-                                    (maybe chain-scope with-bindings->scope:expr.1 :to bindings))
-                                ~has-comma-bindings
-                                x))))
+                       (yield:or (if (and (match '(eval . _) x)
+                                          (backquote?:car x.1))
+                                   (check (apply-comma-bindings cdr:x.1 ; strip backquote
+                                              (maybe chain-scope with-bindings->scope:expr.1 :to bindings))
+                                          ~has-comma-bindings))
+                                 x)))
 
 
 
