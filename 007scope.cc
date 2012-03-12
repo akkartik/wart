@@ -121,7 +121,7 @@ Cell* lookup(Cell* sym, Cell* scope) {
   if (result) return result;
   RAISE << "No binding for " << toString(sym) << endl;
 
-  if (inTest) return nil; // don't die
+  if (pretendRaise) return nil; // don't die
   cerr << "- Did you not want a symbol lookup? Perhaps the expression is indented too much." << endl;
   cerr << "- Was it defined using indentation? When wart encounters a paren in the middle of a line, it stops inserting parens until it closes." << endl << DIE;
   return nil;

@@ -36,7 +36,7 @@ using std::ofstream;
 
 bool runningTests = false;
 int numFailures = 0;
-bool inTest = false;
+bool pretendRaise = false;
 int raiseCount = 0;
 
 
@@ -57,8 +57,8 @@ ostream& operator<<(unused ostream& os, unused Die die) {
 Die DIE;
 
                      // ?: to avoid dangling-else warnings
-#define RAISE inTest ? ++raiseCount,cout \
-                     : cerr << __FILE__ << ":" << __LINE__ << " "
+#define RAISE pretendRaise ? ++raiseCount,cout \
+                           : cerr << __FILE__ << ":" << __LINE__ << " "
 
 
 
@@ -245,7 +245,8 @@ const TestFn tests[] = {
 };
 
 void runTests() {
-  runningTests = inTest = true; // never reset
+  runningTests = true;
+  pretendRaise = true;
   for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
     init();
     (*tests[i])();
@@ -253,7 +254,7 @@ void runTests() {
     checkForLeaks();
   }
 
-  inTest = false;
+  pretendRaise = false;
   init();
   loadFiles(".wart"); // after GC tests
   loadFiles(".test");
