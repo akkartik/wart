@@ -22,10 +22,13 @@ def to-with-expr(call bindings done)
     call)
 
 def inline-macro-eval(expr bindings)
-  if (~match '(with _ (eval . _)) expr)
+  if (~match '(with . _) expr)
     expr
-    `(,expr.0 ,expr.1 ,(apply-bindings expr.2.1 ; eval arg
-                                       (cons with-bindings->scope:expr.1 bindings)))
+    `(with ,expr.1 ,@(collect:each x (expr 2 nil)
+                       (yield:if (~match '(eval . _) x)
+                         x
+                         (apply-bindings x.1
+                              (cons with-bindings->scope:expr.1 bindings)))))
 
 
 
