@@ -25,7 +25,8 @@ def inline-macro-eval(expr bindings)
   if (~match '(with . _) expr)
     expr
     `(with ,expr.1 ,@(collect:each x (expr 2 nil)
-                       (yield:if (~match '(eval . _) x)
+                       (yield:if (or (~match '(eval . _) x)
+                                     (~backquote? car:x.1))
                          x
                          (apply-bindings x.1
                               (cons with-bindings->scope:expr.1 bindings)))))

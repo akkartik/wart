@@ -80,6 +80,12 @@ prn.
                (prn a)
                (+ x y)))
 
+(test "inline-macro-eval skips explicit list construction"
+ :valueof (inline-macro-eval '(with ((a b) '(x y))
+                                (eval (cons '+ a b))))
+ :should be '(with ((a b) '(x y))
+               (eval (cons '+ a b))))
+
 (test "scope->with-bindings and with-bindings->scope are converses"
  :valueof (with-bindings->scope (scope->with-bindings (table 'x 34)))
  :should be (table 'x 34))
