@@ -10,6 +10,19 @@ COMPILE_FN(eval, compiledFn_eval, "($x . $scope)",
   return eval(lookup("$x"), scope);
 )
 
+COMPILE_FN(try-eval, compiledFn_try_eval, "($x . $scope)",
+  bool oldPretendRaise = pretendRaise;
+  pretendRaise = true;
+    Cell* ans = compiledFn_eval();
+  pretendRaise = oldPretendRaise;
+
+  if (raiseCount == 0) return ans;
+  // error
+  raiseCount = 0;
+  rmref(ans);
+  return nil;
+)
+
 COMPILE_FN(if, compiledFn_if, "($cond '$then '$else)",
   return lookup("$cond") != nil ? eval(lookup("$then")) : eval(lookup("$else"));
 )
