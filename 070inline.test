@@ -92,6 +92,12 @@ prn.
  :should be '(with ((a b) '(x y))
                (+ x y)))
 
+(test "inline-macro-eval works with comma-splice expressions without side effects"
+ :valueof (inline-macro-eval '(with (args '(x y))
+                                (eval `(+ ,@args 3))))
+ :should be '(with (args '(x y))
+               (+ x y 3)))
+
 (test "scope->with-bindings and with-bindings->scope are converses"
  :valueof (with-bindings->scope (scope->with-bindings (table 'x 34)))
  :should be (table 'x 34))

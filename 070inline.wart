@@ -62,6 +62,7 @@ def with-bindings->scope(bindings)
 def curr-scope()
   caller-scope
 
+; unquoted exprs shouldn't have side effects
 def apply-comma-bindings(expr bindings)
   (if
     !cons?.expr
@@ -69,6 +70,11 @@ def apply-comma-bindings(expr bindings)
     unquote?:car.expr
       (or (try-eval cdr.expr bindings)
           expr) ; failure = expr still has commas
+    (match (cons unquote-splice '_) car.expr)
+      (iflet splice (try-eval cdr:car.expr bindings)
+        (join splice
+              (apply-comma-bindings cdr.expr bindings))
+        expr)
     :else
       (cons (apply-comma-bindings car.expr bindings)
             (apply-comma-bindings cdr.expr bindings)))
