@@ -35,3 +35,7 @@ def iso(x y) :case (isa x 'table)
        (all (fn((k v))
               (iso y.k v))
             (as list x)))
+
+mac w/table(var . body)
+  `(ret ,var (table)
+     ,@body)
