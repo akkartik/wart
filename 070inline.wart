@@ -32,6 +32,10 @@ def inline-macro-eval(expr bindings)
                                           ~has-comma-bindings))
                                  x)))
 
+def coalesce-bindings(expr)
+  let (bindings body) (collect-bindings-body expr)
+    `(with ,bindings ,@body)
+
 
 
 ;; Internals
@@ -100,3 +104,18 @@ def chain-scope(a b)
       while cdr.curr
         zap cdr curr
       = cdr.curr b
+
+def collect-bindings-body(expr)
+  (if
+    (match '(with . _) expr)
+      let (bindings body) (collect-bindings-body (cons 'do (expr 2 nil)))
+        (list (join expr.1 bindings) body)
+    (match '(do . _) expr)
+      let (bindings body) '(nil nil)
+        each form cdr.expr
+          let (bn bd) collect-bindings-body.form
+            = bindings (join bindings bn)
+            = body (join body bd)
+        (list bindings body)
+    :else
+      (list nil list.expr))

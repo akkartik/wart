@@ -113,3 +113,15 @@ prn.
 (test "scope->with-bindings and with-bindings->scope are converses"
  :valueof (with-bindings->scope (scope->with-bindings (table 'x 34)))
  :should be (table 'x 34))
+
+(test "coalesce-bindings works"
+ :valueof (coalesce-bindings '(with (a 3) (with (b 4) (+ a b) (- a b))))
+ :should be '(with (a 3 b 4) (+ a b) (- a b)))
+
+(test "coalesce-bindings works - 2"
+ :valueof (coalesce-bindings '(with (a 3) (something or other) (with (b 4) (+ a b) (- a b))))
+ :should be '(with (a 3 b 4) (something or other) (+ a b) (- a b)))
+
+(test "coalesce-bindings works - 3"
+ :valueof (coalesce-bindings '(do a b (do c d) (do e f) (do g) h i j))
+ :should be '(with nil a b c d e f g h i j))
