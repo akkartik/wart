@@ -1,10 +1,10 @@
 def to-with-expr(call bindings done)
   (iflet f (and (~pos car.call done) ; skip recursive calls
                 (lookup-or-eval car.call bindings))
-    `(with ,(scope->with-bindings env.f)
+    `(withs ,(scope->with-bindings env.f)
        ,(if
           (quote?:car sig.f)
-            `(with (,cdr:sig.f ',cdr.call)
+            `(withs (,cdr:sig.f ',cdr.call)
                ,@(collect:each expr body.f
                    (if (iso car.expr 'eval)
                      (yield `(,expr.0 ,expr.1)) ; strip caller-scope
@@ -14,7 +14,7 @@ def to-with-expr(call bindings done)
           (contains-quote? sig.f)
             `((fn ,sig.f ,@body.f) ,@cdr.call)
           :else
-            `(with (,sig.f ,(cons 'list cdr.call))
+            `(withs (,sig.f ,(cons 'list cdr.call))
                ,@(collect:each expr body.f
                    (yield:to-with-expr expr
                                        (maybe chain-scope env.f :to bindings)
@@ -22,19 +22,19 @@ def to-with-expr(call bindings done)
     call)
 
 def inline-macro-eval(expr bindings)
-  if (~match '(with . _) expr)
+  if (~match '(withs . _) expr)
     expr
-    `(with ,expr.1 ,@(collect:each x (expr 2 nil)
-                       (yield:or (if (and (match '(eval . _) x)
-                                          (backquote?:car x.1))
-                                   (check (apply-comma-bindings cdr:x.1 ; strip backquote
-                                              (maybe chain-scope with-bindings->scope:expr.1 :to bindings))
-                                          ~has-comma-bindings))
-                                 x)))
+    `(withs ,expr.1 ,@(collect:each x (expr 2 nil)
+                        (yield:or (if (and (match '(eval . _) x)
+                                           (backquote?:car x.1))
+                                    (check (apply-comma-bindings cdr:x.1 ; strip backquote
+                                               (maybe chain-scope with-bindings->scope:expr.1 :to bindings))
+                                           ~has-comma-bindings))
+                                  x)))
 
 def coalesce-bindings(expr)
   let (bindings body) (collect-bindings-body expr)
-    `(with ,bindings ,@body)
+    `(withs ,bindings ,@body)
 
 
 
@@ -60,9 +60,13 @@ def scope->with-bindings(s)
               (as list s)))
 
 def with-bindings->scope(bindings)
-  ret ans (eval `(with ,bindings curr-scope.) caller-scope)
-    wipe ans!caller-scope
-    wipe cdr.ans
+  w/table ans
+    for curr (eval `(withs ,bindings curr-scope.) caller-scope)
+             cdr.curr ; HACK: ignore the scope with the 'bindings' binding
+             (zap cdr curr)
+      each k keys.curr
+        if (~iso 'caller-scope k)
+          or= ans.k curr.k
 
 def curr-scope()
   caller-scope
@@ -107,7 +111,7 @@ def chain-scope(a b)
 
 def collect-bindings-body(expr)
   (if
-    (match '(with . _) expr)
+    (match '(withs . _) expr)
       let (bindings body) (collect-bindings-body (cons 'do (expr 2 nil)))
         (list (join expr.1 bindings) body)
     (match '(do . _) expr)

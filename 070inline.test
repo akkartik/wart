@@ -4,8 +4,8 @@ prn.
                         (table 'foo (let x 34
                                       (fn(a b (c d) e . f)
                                         (list a b c d e f)))))
- :should be '(with (x 34)
-               (with ((a b (c d) e . f) (list 1 :a 2 (list 3 4) @(list 5 6) 7))
+ :should be '(withs (x 34)
+               (withs ((a b (c d) e . f) (list 1 :a 2 (list 3 4) @(list 5 6) 7))
                  (list a b c d e f))))
 
 (test "to-with-expr passes through unknown calls"
@@ -18,41 +18,41 @@ prn.
                                       (bar a b))
                                'bar (fn(c d)
                                       (baz c d))))
- :should be '(with ()
-               (with ((a b) (list 1 2))
-                 (with ()
-                   (with ((c d) (list a b))
+ :should be '(withs ()
+               (withs ((a b) (list 1 2))
+                 (withs ()
+                   (withs ((c d) (list a b))
                      (baz c d))))))
 
 (test "to-with-expr skips recursive calls"
  :valueof (to-with-expr '(foo 1 2)
                         (table 'foo (fn(a b)
                                       (foo a b))))
- :should be '(with ()
-               (with ((a b) (list 1 2))
+ :should be '(withs ()
+               (withs ((a b) (list 1 2))
                  (foo a b))))
 
 (test "to-with-expr skips selectively quoted params"
  :valueof (to-with-expr '(foo x y)
                         (table 'foo (fn('a 'b)
                                       `(+ ,a ,b))))
- :should be '(with ()
+ :should be '(withs ()
                ((fn('a 'b) `(+ ,a ,b)) x y)))
 
 (test "to-with-expr handles macro calls"
  :valueof (to-with-expr '(foo x y)
                         (table 'foo (fn'(a b)
                                       (eval `(+ ,a ,b) caller-scope))))
- :should be '(with ()
-               (with ((a b) '(x y))
+ :should be '(withs ()
+               (withs ((a b) '(x y))
                   (eval `(+ ,a ,b)))))
 
 (test "to-with-expr leaves alone caller-scope outside macros"
  :valueof (to-with-expr '(foo 1 2)
                         (table 'foo (fn(a b)
                                       (eval a caller-scope))))
- :should be '(with ()
-               (with ((a b) (list 1 2))
+ :should be '(withs ()
+               (withs ((a b) (list 1 2))
                  (eval a caller-scope))))
 
 (test "to-with-expr handles functions in env"
@@ -60,54 +60,54 @@ prn.
                         (table 'foo (let bar (fn(a b) (+ a b))
                                       (fn(c d)
                                         (bar c d)))))
- :should be `(with (bar ,(fn(a b) (+ a b)))
-               (with ((c d) (list x y))
-                 (with ()
-                   (with ((a b) (list c d))
+ :should be `(withs (bar ,(fn(a b) (+ a b)))
+               (withs ((c d) (list x y))
+                 (withs ()
+                   (withs ((a b) (list c d))
                      (+ a b))))))
 
 (test "inline-macro-eval works"
- :valueof (inline-macro-eval '(with ((a b) '(x y))
+ :valueof (inline-macro-eval '(withs ((a b) '(x y))
                                 (eval `(+ ,a ,b))))
- :should be '(with ((a b) '(x y))
+ :should be '(withs ((a b) '(x y))
                (+ x y)))
 
-(test "inline-macro-eval works with intermezzo code"
- :valueof (inline-macro-eval '(with ((a b) '(x y))
+(test "inline-macro-eval works withs intermezzo code"
+ :valueof (inline-macro-eval '(withs ((a b) '(x y))
                                 (prn a)
                                 (eval `(+ ,a ,b))))
- :should be '(with ((a b) '(x y))
+ :should be '(withs ((a b) '(x y))
                (prn a)
                (+ x y)))
 
 (test "inline-macro-eval skips explicit list construction"
- :valueof (inline-macro-eval '(with ((a b) '(x y))
+ :valueof (inline-macro-eval '(withs ((a b) '(x y))
                                 (eval (cons '+ a b))))
- :should be '(with ((a b) '(x y))
+ :should be '(withs ((a b) '(x y))
                (eval (cons '+ a b))))
 
 (test "inline-macro-eval gives up with unbound vars"
- :valueof (inline-macro-eval '(with ((a b) '(x y))
+ :valueof (inline-macro-eval '(withs ((a b) '(x y))
                                 (eval `(+ ,c ,b))))
- :should be '(with ((a b) '(x y))
+ :should be '(withs ((a b) '(x y))
                (eval `(+ ,c ,b))))
 
 (test "inline-macro-eval works with comma expressions without side effects"
- :valueof (inline-macro-eval '(with ((a b) '(x y))
+ :valueof (inline-macro-eval '(withs ((a b) '(x y))
                                 (eval `(+ ,a ,(if 3 b)))))
- :should be '(with ((a b) '(x y))
+ :should be '(withs ((a b) '(x y))
                (+ x y)))
 
 (test "inline-macro-eval works with comma-splice expressions without side effects"
- :valueof (inline-macro-eval '(with (args '(x y))
+ :valueof (inline-macro-eval '(withs (args '(x y))
                                 (eval `(+ ,@args 3))))
- :should be '(with (args '(x y))
+ :should be '(withs (args '(x y))
                (+ x y 3)))
 
 (test "inline-macro-eval works with nested backquotes"
- :valueof (inline-macro-eval '(with ((a b) '(x y))
+ :valueof (inline-macro-eval '(withs ((a b) '(x y))
                                 (eval `(+ ,a ,(if 3 `(+ 3 ,b))))))
- :should be '(with ((a b) '(x y))
+ :should be '(withs ((a b) '(x y))
                (+ x (+ 3 y))))
 
 (test "scope->with-bindings and with-bindings->scope are converses"
@@ -115,13 +115,13 @@ prn.
  :should be (table 'x 34))
 
 (test "coalesce-bindings works"
- :valueof (coalesce-bindings '(with (a 3) (with (b 4) (+ a b) (- a b))))
- :should be '(with (a 3 b 4) (+ a b) (- a b)))
+ :valueof (coalesce-bindings '(withs (a 3) (withs (b 4) (+ a b) (- a b))))
+ :should be '(withs (a 3 b 4) (+ a b) (- a b)))
 
 (test "coalesce-bindings works - 2"
- :valueof (coalesce-bindings '(with (a 3) (something or other) (with (b 4) (+ a b) (- a b))))
- :should be '(with (a 3 b 4) (something or other) (+ a b) (- a b)))
+ :valueof (coalesce-bindings '(withs (a 3) (something or other) (withs (b 4) (+ a b) (- a b))))
+ :should be '(withs (a 3 b 4) (something or other) (+ a b) (- a b)))
 
 (test "coalesce-bindings works - 3"
  :valueof (coalesce-bindings '(do a b (do c d) (do e f) (do g) h i j))
- :should be '(with nil a b c d e f g h i j))
+ :should be '(withs nil a b c d e f g h i j))
