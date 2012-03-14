@@ -1,7 +1,3 @@
-(test "str works with multiple args"
- :valueof (str 'a 43)
- :should be "a43")
-
 (test "sym works with one arg"
  :valueof (sym "abc")
  :should be 'abc)

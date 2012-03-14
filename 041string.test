@@ -74,3 +74,7 @@
               (each c s
                 (push c ans))))
  :should be '("c" "b" "a"))
+
+(test "str works with multiple args"
+ :valueof (str 'a 43)
+ :should be "a43")
