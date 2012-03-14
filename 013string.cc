@@ -40,7 +40,9 @@ COMPILE_FN(string_range, compiledFn_string_get, "($string $index $end)",
 )
 
 COMPILE_FN(string_to_sym, compiledFn_string_to_sym, "($s)",
-  return mkref(newSym(toString(lookup("$s"))));
+  string s = toString(lookup("$s"));
+  if (s == "") return nil;
+  return mkref(newSym(s));
 )
 
 COMPILE_FN(string<, compiledFn_string_lesser, "($x $y)",
