@@ -32,6 +32,40 @@ def inline-macro-eval(expr bindings)
                                            ~has-comma-bindings))
                                   x)))
 
+def mangle-binding(expr var new)
+  (if
+    (iso var expr)
+      new
+    ~cons?.expr
+      expr
+    (~match '(withs . _) expr)
+      (cons (mangle-binding car.expr var new)
+            (mangle-binding cdr.expr var new))
+    :else ; (withs . _)
+      `(withs ,(mangle-binding-in-bindings expr.1 var new)
+         ,@(mangle-binding-in-body expr var new)))
+
+def mangle-binding-in-bindings(bindings var new)
+  if bindings
+    (list bindings.0
+          (mangle-binding bindings.1 var new)
+          @(mangle-binding-in-bindings cddr.bindings var new))
+
+def mangle-binding-in-body(with-expr var new)
+  if (~match '(withs . _) with-expr)
+    'fail
+    if (creates-binding with-expr.1 var)
+      cddr.with-expr
+      (mangle-binding cddr.with-expr var new)
+
+def creates-binding(bindings var)
+  if bindings
+    (or (iso bindings var)
+        (and cons?.bindings
+             (pos var flatten:bindings.1))
+        (creates-binding cddr.bindings var))
+
+; Assumes there are no conflicting bindings
 def coalesce-bindings(expr)
   let (bindings body) (collect-bindings-body expr)
     `(withs ,bindings ,@body)

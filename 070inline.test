@@ -125,3 +125,19 @@ prn.
 (test "coalesce-bindings works - 3"
  :valueof (coalesce-bindings '(do a b (do c d) (do e f) (do g) h i j))
  :should be '(withs nil a b c d e f g h i j))
+
+(test "mangle-binding renames symbols"
+ :valueof (mangle-binding '(= a 2) 'a 'a_2)
+ :should be '(= a_2 2))
+
+(test "mangle-binding processes lists of forms"
+ :valueof (mangle-binding '((= a 2) (cons a b)) 'a 'a_2)
+ :should be '((= a_2 2) (cons a_2 b)))
+
+(test "mangle-binding recurses into subforms"
+ :valueof (mangle-binding '(withs (x 1 y 2) (= a 2) (cons a b)) 'a 'a_2)
+ :should be '(withs (x 1 y 2) (= a_2 2) (cons a_2 b)))
+
+(test "mangle-binding doesn't touch subforms that create shadowing bindings"
+ :valueof (mangle-binding '(withs (a (+ a 1) y 2) (= a 2) (cons a b)) 'a 'a_2)
+ :should be '(withs (a (+ a_2 1) y 2) (= a 2) (cons a b)))
