@@ -191,7 +191,7 @@ Tabs count as 2 spaces. Don't mix tabs and spaces.
 
 Wart uses a few simple syntax rules to reduce parens further:
 
-  a.b ; => (a b) as long as a and b aren't all digits; 2.4 is just a number
+  a.b ; => (a b) unless a and b are all digits; 2.4 will eventually be a number
   a.  ; => (a)
   a!b ; => (a 'b)
   !a  ; => (not a)
@@ -223,9 +223,9 @@ eval takes pains to increment the nrefs of *exactly* one Cell (the return
 value) across all paths. Nested calls to eval decrement nrefs of the result
 unless they return it. Structure other functions returning Cells the same way.
 
-To implement operations in C, use the COMPILE_FN macro. COMPILE_FN, like eval,
-is responsible for ensuring that the nrefs of exactly one Cell is incremented
-across all paths.
+To implement operations in C, use the COMPILE_FN macro. Each operation, like
+eval, is responsible for ensuring that the nrefs of exactly one Cell is
+incremented across all paths.
 
 If you hack on wart's cc files and forget to decrement nrefs you have a memory
 leak. If you forget to increment nrefs you have something worse: a prematurely
@@ -249,7 +249,7 @@ run wart.
 
 --- Credits
 
-Wart was inspired by Arc, a lisp dialect by Paul Graham and Robert T Morris:
+Wart was inspired by Arc, a lisp dialect by Paul Graham and Robert Morris:
   http://www.paulgraham.com/arc.html
 
 Discussions on the Arc Forum generated all the ideas here:
