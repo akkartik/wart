@@ -8,16 +8,16 @@ def pair(l)
       (cons (list car.l cadr.l)
             (pair cddr.l)))
 
-mac with(params . body)
-  `((fn ,(map car pair.params)
+mac with(bindings . body)
+  `((fn ,(map car pair.bindings)
      ,@body)
-    ,@(map cadr pair.params))
+    ,@(map cadr pair.bindings))
 
-mac withs(params . body)
-  if !params
+mac withs(bindings . body)
+  if !bindings
     `(do ,@body)
-    `(let ,car.params ,cadr.params
-       (withs ,cddr.params ,@body))
+    `(let ,car.bindings ,cadr.bindings
+       (withs ,cddr.bindings ,@body))
 
 
 
