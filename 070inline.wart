@@ -43,14 +43,14 @@ def inline-macro-eval(expr bindings)
                                   x)))
 
 ; bindings are alternating var-exp pairs
+; conflicts is a table from syms to their new names
 ; search for a conflict in just vars, and replace throughout later pairs
-; TODO: must also return new vars
 def rename-vars-in-bindings(conflicts bindings)
   (if
     ~cons?.bindings
       nil
-    (pos car.bindings conflicts)
-      let new uniq:car.bindings
+    (conflicts car.bindings)
+      let new (conflicts car.bindings)
         (list new cadr.bindings
               @(rename-vars-in-bindings conflicts
                                         (replace car.bindings new cddr.bindings)))
