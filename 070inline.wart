@@ -1,3 +1,13 @@
+; inline all function bodies into with-exprs:
+;   (def foo(a b) (prn a) (+ a b))
+;   (foo x y)
+;   => (withs ((a b) (list x y))
+;        (prn a)
+;        (+ a b))
+;
+; Parts of with-exprs:
+;   (withs bindings body)
+; Parts of bindings: var exp
 def to-with-expr(call bindings done)
   (iflet f (and (~pos car.call done) ; skip recursive calls
                 (lookup-or-eval car.call bindings))
