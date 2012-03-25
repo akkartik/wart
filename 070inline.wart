@@ -42,6 +42,37 @@ def inline-macro-eval(expr bindings)
                                            ~has-comma-bindings))
                                   x)))
 
+; bindings are alternating var-exp pairs
+; search for a conflict in just vars, and replace throughout later pairs
+; TODO: must also return new vars
+def rename-vars-in-bindings(conflicts bindings)
+  (if
+    ~cons?.bindings
+      nil
+    (pos car.bindings conflicts)
+      let new uniq:car.bindings
+        (list new cadr.bindings
+              @(rename-vars-in-bindings conflicts
+                                        (replace car.bindings new cddr.bindings)))
+    ~cons?:car.bindings
+      (list car.bindings cadr.bindings ; no rename in exp
+            @(rename-vars-in-bindings conflicts cddr.bindings))
+    :else
+      'todo)
+
+def replace(old new expr)
+  (if
+    (iso old expr)
+      new
+    ~cons?.expr
+      expr
+    quote?:car.expr
+      expr
+    ; TODO: what about backquoted exprs?
+    :else
+      (cons (replace old new car.expr)
+            (replace old new cdr.expr)))
+
 def mangle-binding(expr var new)
   (if
     (iso var expr)

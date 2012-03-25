@@ -141,3 +141,26 @@ prn.
 (test "mangle-binding doesn't touch subforms that create shadowing bindings"
  :valueof (mangle-binding '(withs (a (+ a 1) y 2) (= a 2) (cons a b)) 'a 'a_2)
  :should be '(withs (a (+ a_2 1) y 2) (= a 2) (cons a b)))
+
+(test "rename-vars-in-bindings works"
+ :valueof (let ans (rename-vars-in-bindings '(x) '(x 1 y 2))
+            (list (iso 'x car.ans) cdr.ans))
+ :should be '(nil (1 y 2)))
+
+(test "rename-vars-in-bindings ignores expressions"
+ :valueof (rename-vars-in-bindings '(x) '(a x b y))
+ :should be '(a x b y))
+
+(test "rename-vars-in-bindings replaces later expressions"
+ :valueof (withs (in '(a x x (+ a 1) b x)
+                  out (rename-vars-in-bindings '(x) in))
+            (list (iso in out)
+                  (match '(a x _ (+ a 1) b _) out)))
+ :should be '(nil 1))
+
+(test "rename-vars-in-bindings replaces later expressions - 2"
+ :valueof (withs (in '(x (+ x 1) y x)
+                  out (rename-vars-in-bindings '(x) in))
+            (list (iso in out)
+                  (match '(_ (+ x 1) y _) out)))
+ :should be '(nil 1))
