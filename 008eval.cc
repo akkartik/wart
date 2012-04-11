@@ -358,7 +358,8 @@ Cell* eval(Cell* expr, Cell* scope) {
     fn = mkref(fn0);
   if (!isFn(fn))
     RAISE << "not a call: " << expr << endl
-        << "- Should it not be a call? Perhaps the expression is indented too much." << endl << DIE;
+        << "  Perhaps the line is indented too much." << endl
+        << "  Or you need to split it in two." << endl << DIE;
 
   // eval all its args in the current lexical scope
   Cell* splicedArgs = spliceArgs(callArgs(expr), scope, fn);
