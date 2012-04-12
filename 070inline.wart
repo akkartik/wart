@@ -168,6 +168,29 @@ def collect-bindings-body(expr)
     :else
       (list nil list.expr))
 
+def new-vars(conflicts)
+  collect:each var conflicts
+    yield (new-var var conflicts)
+
+def new-var(var conflicts)
+  if (~pos var conflicts)
+    var
+    with (root var-root.var
+          i   0)
+      while (pos (foofoo root i) conflicts)
+        ++.i
+      (foofoo root i)
+
+def var-root(var)
+  let name (rev:as list str.var)
+    while (and name (or digit?:car.name
+                        (iso "_" car.name)))
+      (zap cdr name)
+    (as string rev.name)
+
+def foofoo(name idx)
+  (sym name "_" idx)
+
 ; bindings are alternating var-exp pairs
 ; conflicts is a table from syms to their new names
 ; search for a conflict in just vars, and replace throughout later pairs
