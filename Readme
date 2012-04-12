@@ -69,7 +69,7 @@ if you aren't fluent with C: http://github.com/akkartik/wart/tree/sbcl
 --- Directory organization
 
 Wart loads all files that start with a digit and have a '.cc' or '.wart' or
-'.test' extension. Files are loaded in [ascii] order. To create a new app,
+'.test' extension. Files are loaded in ascii order. To create a new app,
 just save your code into a new file or files and give them the appropriate
 digit prefix to influence load order.
 
@@ -100,7 +100,7 @@ Keywords that don't match function params are passed through as arguments:
   wart> (foo :c 1 2)
   (:c 1)                                ; the third arg gets dropped
 
-[Keyword symbols starting with a colon always evaluate to themselves.]
+(Keyword symbols starting with a colon always evaluate to themselves.)
 
 This is useful primarily because you can pass keywords through layers of
 functions:
