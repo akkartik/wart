@@ -191,17 +191,17 @@ You'll also want to suppress grouping in two situations:
 
 a) When wrapping long lists to a new line, you must indent by exactly one
 space:
-  (func 1 2 3
-   4 5 6)             ; single space to avoid grouping this line
+  (foo a b c
+   d e f)             ; single space to avoid grouping this line
 =>
-  (func 1 2 3 4 5 6)
+  (foo a b c d e f)
 
 The parens are required in this situation:
-  func 1 2 3
-   4 5 6
+  foo a b c
+   d e f
 =>
-  (func 1 2 3
-   (4 5 6))           ; probably not what you want
+  (foo a b c
+   (d e f))           ; probably not what you want
 
 Indenting by one space looks better if you use keyword args:
   (test "add works"
