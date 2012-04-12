@@ -19,21 +19,21 @@ let $% %
     (reduce $% xs)
 
 let $< <
-  def! > xs
-    (all (fn((x y)) ($< y x))
-         pairwise.xs)
-
   def! < xs
     (all (fn((x y)) ($< x y))
          pairwise.xs)
 
-  def >= xs
-    (none (fn((x y)) ($< x y))
-          pairwise.xs)
+def! > xs
+  (all (fn((x y)) (< y x))
+       pairwise.xs)
 
-  def <= xs
-    (none (fn((x y)) ($< y x))
-          pairwise.xs)
+def <= xs
+  (none (fn((x y)) (< y x))
+        pairwise.xs)
+
+def >= xs
+  (none (fn((x y)) (< x y))
+        pairwise.xs)
 
 mac ++(n)
   `(= ,n (+ ,n 1))

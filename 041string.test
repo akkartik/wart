@@ -78,3 +78,51 @@
 (test "str works with multiple args"
  :valueof (str 'a 43)
  :should be "a43")
+
+(test "< works on strings"
+ :valueof (< "a" "b")
+ :should ~be nil)
+
+(test "< works on strings - 2"
+ :valueof (< "b" "a")
+ :should be nil)
+
+(test "< works on strings - 3"
+ :valueof (< "a" "a")
+ :should be nil)
+
+(test "> works on strings"
+ :valueof (> "a" "b")
+ :should be nil)
+
+(test "> works on strings - 2"
+ :valueof (> "b" "a")
+ :should ~be nil)
+
+(test "> works on strings - 4"
+ :valueof (> "a" "a")
+ :should be nil)
+
+(test "<= works on strings"
+ :valueof (<= "a" "b")
+ :should ~be nil)
+
+(test "<= works on strings - 2"
+ :valueof (<= "b" "a")
+ :should be nil)
+
+(test "<= works on strings - 3"
+ :valueof (<= "a" "a")
+ :should ~be nil)
+
+(test ">= works on strings"
+ :valueof (>= "a" "b")
+ :should be nil)
+
+(test ">= works on strings - 2"
+ :valueof (>= "b" "a")
+ :should ~be nil)
+
+(test ">= works on strings - 4"
+ :valueof (>= "a" "a")
+ :should ~be nil)
