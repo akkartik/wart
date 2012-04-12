@@ -26,7 +26,10 @@ alias no not
 
 def match(a b)
   (or (iso a b)
-      (iso str.a.0 "_")
+      (and sym?.a
+           (iso str.a.0 "_"))
+      (and sym?.a sym?.b
+           (iso sym-root.a sym-root.b))
       (and cons?.a cons?.b
            (match car.a car.b)
            (match cdr.a cdr.b)))
@@ -82,3 +85,10 @@ mac case(expr . branches)
 
 mac acase(expr . branches)
   `(caselet it ,expr ,@branches)
+
+; ignore the uniq part of a sym
+def sym-root(x)
+  let name (rev:as list str.x)
+    while (and name digit?:car.name)
+      (zap cdr name)
+    (sym @rev.name)

@@ -205,6 +205,10 @@
  :valueof (match '(1 . _x) '(1 2 3))
  :should ~be nil)
 
+(test "match treats any sym ending in digits as just its root"
+ :valueof (match 'a 'a3)
+ :should ~be nil)
+
  
 
 (test "caselet works"
@@ -244,3 +248,7 @@
               :else
                 35))
  :should be 35)
+
+(test "sym-root works"
+ :valueof (sym-root 'a3)
+ :should be 'a)
