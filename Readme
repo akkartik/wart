@@ -162,41 +162,64 @@ Putting these rules together, parens are not required around 'if' in:
   (if (iso 1 (% x 2))
     'odd)
   :else
-  'even
+  'even               ; wrong
 
-By convention I try to leave out parens for control flow operators like 'def'
-and 'if' and 'while', and keep parens elsewhere. But there are exceptions
-where parens are required. Like with 'if' above, and with 'do' blocks:
-  (do                 ; parens required because line has a single word
-    something
-    something else)
-  => (do something (something else))
-
-Arglists are special:
-  def foo(a b c
-      d e f) ; this line's indentation doesn't matter
-    34
-  => (def foo(a b c d e f) 34)
-Parens opening in the middle of a line disable paren-insertion until they are
-closed.
-
-There are lots more scenarios in parenthesize.test.cc if you want to practice.
-
-Conventional, fully-parenthesized expressions should always work:
+Conventional, fully-parenthesized expressions almost always work:
   (def foo() 34)
   (def foo()
     34)
-One exception: To wrap args to multiple lines, indent them by exactly one
-extra space:
-  (list 1 2 3
-   4 5 6)
-  => (1 2 3 4 5 6)
 
-  (list 1 2 3
-        4 5 6)
-  => (1 2 3 (4 5 6)) ; probably not what you want
+But you can't indent 'if' like in Common Lisp or Scheme:
+  (if expr1 body1
+      expr2 body2
+            else)
+=>
+  (if expr1
+        body1
+      (expr2 body2)
+        else)         ; eek!
+
+Also, when wrapping long lists to a new line, you must indent by exactly one
+space:
+  (func 1 2 3
+   4 5 6)             ; single space to avoid grouping this line
+=>
+  (func 1 2 3 4 5 6)
+
+The parens are required in this situation:
+  func 1 2 3
+   4 5 6
+=>
+  (func 1 2 3
+   (4 5 6))           ; probably not what you want
+
+Indenting by one space looks better if you use keyword args:
+  (test "add works"
+   :valueof (+ 2 2)
+   :should be 4)
+That kinda reads like a stanza or a paragraph.
 
 Tabs count as 2 spaces. Don't mix tabs and spaces.
+
+Wrapping param lists always works:
+  def foo(a b c
+      d e f)          ; this line's indentation doesn't matter
+    34
+=>
+  (def foo(a b c d e f)
+    34)
+Parens opening in the middle of a line disable paren-insertion until they are
+closed.
+
+I try to leave out parens for control flow operators like 'def' and 'if' and
+'while', and keep parens elsewhere. But sometimes it's not possible:
+  (do                 ; parens required because line has a single word
+    ...)
+
+There are lots more scenarios in parenthesize.test.cc if you want to practice.
+But they all stem from the one rule and 2 exceptions above: paren-insertion is
+suppressed by open paren in middle of line, or by wrapping lines indented by
+just one space.
 
 --- Simple syntax
 
