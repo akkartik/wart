@@ -164,7 +164,15 @@ Putting these rules together, parens are not required around 'if' in:
   :else
   'even               ; wrong
 
-Conventional, fully-parenthesized expressions almost always work:
+--- But I hate significant whitespace
+
+I'm not trying to minimize parens typed; I'm trying to make lisp code more
+readable to non-lispers. Wart's codebase tastefully removes parens from just
+control-flow operators (def/mac/if/while/..), leaving them alone everywhere
+else. When in doubt, insert parens.
+
+If you don't like this approach, you can almost always just explicitly insert
+all parens:
   (def foo() 34)
   (def foo()
     34)
@@ -179,7 +187,9 @@ But you can't indent 'if' like in Common Lisp or Scheme:
       (expr2 body2)
         else)         ; eek!
 
-Also, when wrapping long lists to a new line, you must indent by exactly one
+You'll also want to suppress grouping in two situations:
+
+a) When wrapping long lists to a new line, you must indent by exactly one
 space:
   (func 1 2 3
    4 5 6)             ; single space to avoid grouping this line
@@ -197,11 +207,12 @@ Indenting by one space looks better if you use keyword args:
   (test "add works"
    :valueof (+ 2 2)
    :should be 4)
-That kinda reads like a stanza or a paragraph.
+That kinda reads like a stanza or a paragraph. Long expressions should use
+keyword args anyway.
 
-Tabs count as 2 spaces. Don't mix tabs and spaces.
+(Tabs count as 2 spaces. Don't mix tabs and spaces.)
 
-Wrapping param lists always works:
+b) Wrapping param lists always works as long as its not on its own line:
   def foo(a b c
       d e f)          ; this line's indentation doesn't matter
     34
@@ -211,15 +222,8 @@ Wrapping param lists always works:
 Parens opening in the middle of a line disable paren-insertion until they are
 closed.
 
-I try to leave out parens for control flow operators like 'def' and 'if' and
-'while', and keep parens elsewhere. But sometimes it's not possible:
-  (do                 ; parens required because line has a single word
-    ...)
-
-There are lots more scenarios in parenthesize.test.cc if you want to practice.
-But they all stem from the one rule and 2 exceptions above: paren-insertion is
-suppressed by open paren in middle of line, or by wrapping lines indented by
-just one space.
+These 2 exceptions add (very slightly) to the writer's burden, but I think
+they never make reading harder.
 
 --- Simple syntax
 
