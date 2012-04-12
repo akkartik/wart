@@ -44,5 +44,12 @@ defcoerce string list
     (collect:each c _
       yield.c))
 
+defcoerce list string
+  (fn(_)
+    (str @_))
+
+defcoerce nil string
+  (fn() "")
+
 def <(a b) :case string?.a
   (string< a b)

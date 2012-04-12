@@ -79,6 +79,14 @@
  :valueof (str 'a 43)
  :should be "a43")
 
+(test "string coerces to list"
+ :valueof (as list "abc")
+ :should be '("a" "b" "c"))
+
+(test "list coerces to string"
+ :valueof (as string '("a" "b" "c"))
+ :should be "abc")
+
 (test "< works on strings"
  :valueof (< "a" "b")
  :should ~be nil)
