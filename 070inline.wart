@@ -175,11 +175,7 @@ def new-vars(conflicts)
 def new-var(var conflicts)
   if (~pos var conflicts)
     var
-    with (root var-root.var
-          i   0)
-      while (pos (foofoo root i) conflicts)
-        ++.i
-      (foofoo root i)
+    (uniq var-root.var)
 
 def var-root(var)
   let name (rev:as list str.var)
@@ -187,9 +183,6 @@ def var-root(var)
                         (iso "_" car.name)))
       (zap cdr name)
     (as string rev.name)
-
-def foofoo(name idx)
-  (sym name "_" idx)
 
 ; bindings are alternating var-exp pairs
 ; conflicts is a table from syms to their new names

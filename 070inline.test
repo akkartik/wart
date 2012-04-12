@@ -163,11 +163,3 @@ prn.
  :valueof (rename-vars-in-bindings (table 'x 'x2 'y 'y2)
                                    '(x (+ x 1) y x))
  :should be '(x2 (+ x 1) y2 x2))
-
-(test "new-vars updates conflicts"
- :valueof (new-vars '(a b c))
- :should be '(a_0 b_0 c_0))
-
-(test "new-vars increments the suffix until available"
- :valueof (new-vars '(a b c a_0))
- :should be '(a_1 b_0 c_0 a_2))
