@@ -1,5 +1,5 @@
 mac matching(vars vals . body)
-  `(if (match ',vars ,vals)
+  `(if (is-match ',vars ,vals)
      let ,strip_underscores.vars ,vals
       ,@body)
 

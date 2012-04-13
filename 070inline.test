@@ -168,5 +168,5 @@ prn.
  :valueof (withs (got (new-vars '(a b c))
                   expected  (table 'a 'a_ 'b 'b_ 'c 'c_))
             (list (iso expected got)
-                  (~~match expected got)))
+                  (~~is-match expected got)))
  :should be '(nil 1))

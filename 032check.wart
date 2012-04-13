@@ -24,7 +24,7 @@ mac and args
 alias nil? not
 alias no not
 
-def match(a b bindings)
+def is-match(a b bindings)
   or= bindings (table)
   (or (iso a b)
       (iso a '_)                            ; _ matches anything
@@ -48,8 +48,11 @@ def match(a b bindings)
                   (or= bindings.a b)
                   (iso bindings.a b))))
       (and cons?.a cons?.b
-           (match car.a car.b bindings)
-           (match cdr.a cdr.b bindings)))
+           (is-match car.a car.b bindings)
+           (is-match cdr.a cdr.b bindings)))
+
+def match(a b)    ; reverse order of args for tests
+  (is-match b a)
 
 let $iso iso
   def! iso(a b)

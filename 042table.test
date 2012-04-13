@@ -29,8 +29,8 @@
  :valueof (iso (table 'a 1 'b 2) (table 'b 2 'a 1))
  :should ~be nil)
 
-(test "match works on table values"
- :valueof (match (table 'a 'x_) (table 'a 'x3))
+(test "is-match works on table values"
+ :valueof (is-match (table 'a 'x_) (table 'a 'x3))
  :should ~be nil)
 
 (test "lists coerce to tables"

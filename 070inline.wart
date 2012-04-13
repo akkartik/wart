@@ -32,10 +32,10 @@ def to-with-expr(call bindings done)
     call)
 
 def inline-macro-eval(expr bindings)
-  if (~match '(withs . _) expr)
+  if (~is-match '(withs . _) expr)
     expr
     `(withs ,expr.1 ,@(collect:each x withs-body.expr
-                        (yield:or (if (and (match '(eval . _) x)
+                        (yield:or (if (and (is-match '(eval . _) x)
                                            (backquote?:car x.1))
                                     (check (apply-comma-bindings cdr:x.1 ; strip backquote
                                                (maybe chain-scope with-bindings->scope:expr.1 :to bindings))
@@ -48,7 +48,7 @@ def mangle-binding(expr var new)
       new
     ~cons?.expr
       expr
-    (~match '(withs . _) expr)
+    (~is-match '(withs . _) expr)
       (cons (mangle-binding car.expr var new)
             (mangle-binding cdr.expr var new))
     :else ; (withs . _)
@@ -62,7 +62,7 @@ def mangle-binding-in-bindings(bindings var new)
           @(mangle-binding-in-bindings cddr.bindings var new))
 
 def mangle-binding-in-body(with-expr var new)
-  if (~match '(withs . _) with-expr)
+  if (~is-match '(withs . _) with-expr)
     'fail
     if (creates-binding with-expr.1 var)
       cddr.with-expr
@@ -90,7 +90,7 @@ def lookup-or-eval(f bindings)
       if bindings
         (or bindings.f
             (lookup-or-eval f cdr.bindings))
-    (match '(fn . _) f)
+    (is-match '(fn . _) f)
       eval.f)
 
 def contains-quote?(expr)
@@ -100,7 +100,7 @@ def contains-quote?(expr)
         (contains-quote? cdr.expr))
 
 def scope->with-bindings(s)
-  (join @(rem (fn(x) (match '(caller-scope . _) x))
+  (join @(rem (fn(x) (is-match '(caller-scope . _) x))
               (as list s)))
 
 def with-bindings->scope(bindings)
@@ -123,7 +123,7 @@ def apply-comma-bindings(expr bindings)
     unquote?:car.expr
       (or (try-eval cdr.expr bindings)
           expr) ; failure = expr still has commas
-    (match (cons unquote-splice '_) car.expr)
+    (is-match (cons unquote-splice '_) car.expr)
       (iflet splice (try-eval cdr:car.expr bindings)
         (join splice
               (apply-comma-bindings cdr.expr bindings))
@@ -138,7 +138,7 @@ def has-comma-bindings(expr)
       nil
     unquote?:car.expr
       expr
-    (match (cons unquote-splice '_) car.expr)
+    (is-match (cons unquote-splice '_) car.expr)
       car.expr
     backquote?:car.expr
       nil
@@ -155,10 +155,10 @@ def chain-scope(a b)
 
 def collect-bindings-body(expr)
   (if
-    (match '(withs . _) expr)
+    (is-match '(withs . _) expr)
       let (bindings body) (collect-bindings-body `(do ,@withs-body.expr))
         (list (join expr.1 bindings) body)
-    (match '(do . _) expr)
+    (is-match '(do . _) expr)
       let (bindings body) '(nil nil)
         each form cdr.expr
           let (bn bd) collect-bindings-body.form
