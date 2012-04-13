@@ -227,7 +227,7 @@ Cell* type(Cell* x) {
 
 // mkrefs its result
 Cell* coerceQuoted(Cell* x, Cell* destType, Cell* coercions) {
-  Cell* typ = type(x); // leak
+  Cell* typ = type(x);
   if (typ == destType)
     return mkref(x);
 

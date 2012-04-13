@@ -104,6 +104,7 @@ void setupCompiledFns() {
   newDynamicScope("compiled", newTable());
   for (unsigned int i=0; i < sizeof(compiledFns)/sizeof(compiledFns[0]); ++i) {
     Cell* f = newTable();
+    unsafeSet(f, newSym("name"), newSym(compiledFns[i].name), false);
     unsafeSet(f, newSym("sig"), nextRawCell(stream(compiledFns[i].params)), false);
     unsafeSet(f, newSym("body"), newCompiledFn(compiledFns[i].impl), false);
     Cell* obj = newObject("function", f);

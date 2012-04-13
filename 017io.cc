@@ -1,7 +1,9 @@
                                   ostream& operator<<(ostream& os, Table* t) {
+                                    static Cell* const NAME = newSym("name");
                                     os << "{";
+                                    if (t->table[NAME]) os << t->table[NAME] << ": ";
                                     for (CellMap::iterator p = t->table.begin(); p != t->table.end(); ++p) {
-                                      if (p->second)
+                                      if (p->second && p->first != NAME)
                                         os << (Cell*)p->first << ", ";
                                     }
                                     return os << "}";
