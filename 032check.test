@@ -205,6 +205,14 @@
  :valueof (match '(1 . _x) '(1 2 3))
  :should ~be nil)
 
+(test "match manages _sym identity"
+ :valueof (match '(1 _x _x) '(1 2 3))
+ :should be nil)
+
+(test "match manages _sym identity - 2"
+ :valueof (match '(1 _x _x) '(1 2 2))
+ :should ~be nil)
+
 (test "match treats any sym ending in digits as just its root"
  :valueof (match 'a 'a3)
  :should ~be nil)
