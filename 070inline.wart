@@ -34,7 +34,7 @@ def to-with-expr(call bindings done)
 def inline-macro-eval(expr bindings)
   if (~match '(withs . _) expr)
     expr
-    `(withs ,expr.1 ,@(collect:each x (expr 2 nil)
+    `(withs ,expr.1 ,@(collect:each x withs-body.expr
                         (yield:or (if (and (match '(eval . _) x)
                                            (backquote?:car x.1))
                                     (check (apply-comma-bindings cdr:x.1 ; strip backquote
@@ -156,7 +156,7 @@ def chain-scope(a b)
 def collect-bindings-body(expr)
   (if
     (match '(withs . _) expr)
-      let (bindings body) (collect-bindings-body (cons 'do (expr 2 nil)))
+      let (bindings body) (collect-bindings-body `(do ,@withs-body.expr))
         (list (join expr.1 bindings) body)
     (match '(do . _) expr)
       let (bindings body) '(nil nil)
@@ -203,3 +203,6 @@ def new-vars(conflicts)
   w/table h
     each var conflicts
       = h.var (uniq sym-root.var)
+
+def withs-body(with-expr)
+  (with-expr 2 nil)
