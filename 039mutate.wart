@@ -15,8 +15,8 @@ mac pop(xs)
      (zap cdr ,xs))
 
 mac or=(var val)
-  `(unless ,var
-     (= ,var ,val))
+  `(or ,var
+       (= ,var ,val))
 
 mac shift args ; multiple-eval to maintain places
   `(= ,@(zip-flat args cdr.args))
