@@ -10,10 +10,14 @@
             (or= x ++.x))
  :should be 3)
 
-(test "or= returns old value on failure"
+(test "or= returns assigned value"
  :valueof (let x nil
-            (or= x 3)
-            (or= x ++.x))
+            (or= x 4))
+ :should be 4)
+
+(test "or= returns old value on failure"
+ :valueof (let x 3
+            (or= x 4))
  :should be 3)
 
 (test "shift works"
