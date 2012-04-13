@@ -173,11 +173,6 @@ def new-vars(conflicts)
     each var conflicts
       = h.var (uniq sym-root.var)
 
-def new-var(var conflicts)
-  if (~pos var conflicts)
-    var
-    (uniq sym-root.var)
-
 ; bindings are alternating var-exp pairs
 ; conflicts is a table from syms to their new names
 ; search for a conflict in just vars, and replace throughout later pairs
