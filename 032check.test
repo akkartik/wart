@@ -221,6 +221,18 @@
  :valueof (match 'a_ 'a)
  :should be nil)
 
+(test "match manages $var_sym identity"
+ :valueof (match '(a_x a_x) '(a3 a3))
+ :should ~be nil)
+
+(test "match manages $var_sym identity - 2"
+ :valueof (match '(a_x a_x) '(a2 a3))
+ :should be nil)
+
+(test "match manages $var_sym identity - 3"
+ :valueof (match '(a_x a_x) '(a a3))
+ :should be nil)
+
  
 
 (test "caselet works"

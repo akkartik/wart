@@ -32,11 +32,21 @@ def match(a b bindings)
            (iso str.a.0 "_")
            (or= bindings.a b)
            (iso bindings.a b))
-      (and sym?.a                           ; x_ matches any $x
+      (and sym?.a sym?.b                    ; p_ matches any $p (but not p)
            (iso str.a.-1 "_")
            (let acore (str.a 0 -1)
-             (and (~iso acore str.b)        ; (but not x itself)
+             (and (~iso acore str.b)
                   (iso sym.acore sym-root.b))))
+      (and sym?.a sym?.b                    ; (p_x p_x) matches two of any $p
+           (digit? str.b.-1)
+           (withs (sa   str.a
+                   ai   (pos "_" (as list sa))
+                   acore  (if ai (sa 0 ai)))
+             (and ai
+                  (~iso acore str.b)
+                  (iso sym.acore sym-root.b)
+                  (or= bindings.a b)
+                  (iso bindings.a b))))
       (and cons?.a cons?.b
            (match car.a car.b bindings)
            (match cdr.a cdr.b bindings)))
