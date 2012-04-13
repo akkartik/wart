@@ -168,11 +168,6 @@ def collect-bindings-body(expr)
     :else
       (list nil list.expr))
 
-def new-vars(conflicts)
-  w/table h
-    each var conflicts
-      = h.var (uniq sym-root.var)
-
 ; bindings are alternating var-exp pairs
 ; conflicts is a table from syms to their new names
 ; search for a conflict in just vars, and replace throughout later pairs
@@ -203,3 +198,8 @@ def replace(old new expr)
     :else
       (cons (replace old new car.expr)
             (replace old new cdr.expr)))
+
+def new-vars(conflicts)
+  w/table h
+    each var conflicts
+      = h.var (uniq sym-root.var)
