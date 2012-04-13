@@ -163,3 +163,10 @@ prn.
  :valueof (rename-vars-in-bindings (table 'x 'x2 'y 'y2)
                                    '(x (+ x 1) y x))
  :should be '(x2 (+ x 1) y2 x2))
+
+(test "new-vars updates conflicts with gensyms"
+ :valueof (withs (got (new-vars '(a b c))
+                  expected  (list 'a 'b 'c))
+            (list (iso expected got)
+                  (~~match expected got)))
+ :should be '(nil 1))
