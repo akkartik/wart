@@ -169,8 +169,9 @@ def collect-bindings-body(expr)
       (list nil list.expr))
 
 def new-vars(conflicts)
-  collect:each var conflicts
-    yield (new-var var conflicts)
+  w/table h
+    each var conflicts
+      = h.var (uniq sym-root.var)
 
 def new-var(var conflicts)
   if (~pos var conflicts)

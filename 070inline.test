@@ -166,7 +166,7 @@ prn.
 
 (test "new-vars updates conflicts with gensyms"
  :valueof (withs (got (new-vars '(a b c))
-                  expected  (list 'a 'b 'c))
+                  expected  (table 'a 'a 'b 'b 'c 'c))
             (list (iso expected got)
                   (~~match expected got)))
  :should be '(nil 1))
