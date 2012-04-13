@@ -164,15 +164,14 @@ Putting these rules together, parens are not required around 'if' in:
   :else
   'even               ; wrong
 
---- But I hate significant whitespace
+--- "But I hate significant whitespace!"
 
 I'm not trying to minimize parens typed; I'm trying to make lisp code more
 readable to non-lispers. Wart's codebase tastefully removes parens from just
 control-flow operators (def/mac/if/while/..), leaving them alone everywhere
-else. When in doubt, insert parens.
+else. When in doubt, I insert parens.
 
-If you don't like this approach, you can almost always just explicitly insert
-all parens:
+If you don't like this approach, just use parens everywhere:
   (def foo() 34)
   (def foo()
     34)
@@ -184,8 +183,8 @@ But you can't indent 'if' like in Common Lisp or Scheme:
 =>
   (if expr1
         body1
-      (expr2 body2)
-        else)         ; eek!
+      (expr2 body2)   ; eek!
+        else)
 
 You'll also want to suppress grouping in two situations:
 
