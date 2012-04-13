@@ -213,9 +213,13 @@
  :valueof (match '(1 _x _x) '(1 2 2))
  :should ~be nil)
 
-(test "match treats any sym ending in digits as just its root"
- :valueof (match 'a 'a3)
+(test "match matches $vars with their root"
+ :valueof (match 'a_ 'a3)
  :should ~be nil)
+
+(test "match matches $vars with their root - 2"
+ :valueof (match 'a_ 'a)
+ :should be nil)
 
  
 

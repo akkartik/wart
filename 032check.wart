@@ -27,13 +27,16 @@ alias no not
 def match(a b bindings)
   or= bindings (table)
   (or (iso a b)
-      (iso a '_)
-      (and sym?.a
+      (iso a '_)                            ; _ matches anything
+      (and sym?.a                           ; (_x _x) matches two of anything
            (iso str.a.0 "_")
            (or= bindings.a b)
            (iso bindings.a b))
-      (and sym?.a sym?.b
-           (iso a sym-root.b))
+      (and sym?.a                           ; x_ matches any $x
+           (iso str.a.-1 "_")
+           (let acore (str.a 0 -1)
+             (and (~iso acore str.b)        ; (but not x itself)
+                  (iso sym.acore sym-root.b))))
       (and cons?.a cons?.b
            (match car.a car.b bindings)
            (match cdr.a cdr.b bindings)))
