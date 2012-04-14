@@ -66,6 +66,8 @@ prn.
                    (withs ((a b) (list c d))
                      (+ a b))))))
 
+
+
 (test "inline-macro-eval works"
  :valueof (inline-macro-eval '(withs ((a b) '(x y))
                                 (eval `(+ ,a ,b))))
@@ -110,66 +112,7 @@ prn.
  :should be '(withs ((a b) '(x y))
                (+ x (+ 3 y))))
 
-(test "scope->with-bindings and with-bindings->scope are converses"
- :valueof (with-bindings->scope (scope->with-bindings (table 'x 34)))
- :should be (table 'x 34))
-
-(test "coalesce-bindings works"
- :valueof (coalesce-bindings '(withs (a 3) (withs (b 4) (+ a b) (- a b))))
- :should be '(withs (a 3 b 4) (+ a b) (- a b)))
-
-(test "coalesce-bindings works - 2"
- :valueof (coalesce-bindings '(withs (a 3) (something or other) (withs (b 4) (+ a b) (- a b))))
- :should be '(withs (a 3 b 4) (something or other) (+ a b) (- a b)))
-
-(test "coalesce-bindings works - 3"
- :valueof (coalesce-bindings '(do a b (do c d) (do e f) (do g) h i j))
- :should be '(withs nil a b c d e f g h i j))
-
-(test "mangle-binding renames symbols"
- :valueof (mangle-binding '(= a 2) 'a 'a_2)
- :should be '(= a_2 2))
-
-(test "mangle-binding processes lists of forms"
- :valueof (mangle-binding '((= a 2) (cons a b)) 'a 'a_2)
- :should be '((= a_2 2) (cons a_2 b)))
-
-(test "mangle-binding recurses into subforms"
- :valueof (mangle-binding '(withs (x 1 y 2) (= a 2) (cons a b)) 'a 'a_2)
- :should be '(withs (x 1 y 2) (= a_2 2) (cons a_2 b)))
-
-(test "mangle-binding doesn't touch subforms that create shadowing bindings"
- :valueof (mangle-binding '(withs (a (+ a 1) y 2) (= a 2) (cons a b)) 'a 'a_2)
- :should be '(withs (a (+ a_2 1) y 2) (= a 2) (cons a b)))
-
-(test "rename-vars-in-bindings works"
- :valueof (rename-vars-in-bindings (table 'x 'x2) '(x 1 y 2))
- :should be '(x2 1 y 2))
-
-(test "rename-vars-in-bindings ignores expressions"
- :valueof (rename-vars-in-bindings (table 'x 'x2) '(a x b y))
- :should be '(a x b y))
-
-(test "rename-vars-in-bindings replaces later expressions"
- :valueof (rename-vars-in-bindings (table 'x 'x2)
-                                   '(a x x (+ a 1) b x))
- :should be '(a x x2 (+ a 1) b x2))
-
-(test "rename-vars-in-bindings replaces later expressions - 2"
- :valueof (rename-vars-in-bindings (table 'x 'x2) '(x (+ x 1) y x))
- :should be '(x2 (+ x 1) y x2))
-
-(test "rename-vars-in-bindings renames multiple vars"
- :valueof (rename-vars-in-bindings (table 'x 'x2 'y 'y2)
-                                   '(x (+ x 1) y x))
- :should be '(x2 (+ x 1) y2 x2))
-
-(test "new-vars updates conflicts with gensyms"
- :valueof (withs (got (new-vars '(a b c))
-                  expected  (table 'a 'a_ 'b 'b_ 'c 'c_))
-            (list (iso expected got)
-                  (~~is-match expected got)))
- :should be '(nil 1))
+
 
 (test "mangle-names leaves untouched by default"
  :valueof (mangle-names '(withs (a 3) (+ a 3)))
@@ -219,3 +162,38 @@ prn.
                   (withs (a_y 4)
                     (a_y d e))
                   (a_x f g)))
+
+
+
+(test "rename-vars-in-bindings works"
+ :valueof (rename-vars-in-bindings (table 'x 'x2) '(x 1 y 2))
+ :should be '(x2 1 y 2))
+
+(test "rename-vars-in-bindings ignores expressions"
+ :valueof (rename-vars-in-bindings (table 'x 'x2) '(a x b y))
+ :should be '(a x b y))
+
+(test "rename-vars-in-bindings replaces later expressions"
+ :valueof (rename-vars-in-bindings (table 'x 'x2)
+                                   '(a x x (+ a 1) b x))
+ :should be '(a x x2 (+ a 1) b x2))
+
+(test "rename-vars-in-bindings replaces later expressions - 2"
+ :valueof (rename-vars-in-bindings (table 'x 'x2) '(x (+ x 1) y x))
+ :should be '(x2 (+ x 1) y x2))
+
+(test "rename-vars-in-bindings renames multiple vars"
+ :valueof (rename-vars-in-bindings (table 'x 'x2 'y 'y2)
+                                   '(x (+ x 1) y x))
+ :should be '(x2 (+ x 1) y2 x2))
+
+(test "scope->with-bindings and with-bindings->scope are converses"
+ :valueof (with-bindings->scope (scope->with-bindings (table 'x 34)))
+ :should be (table 'x 34))
+
+(test "new-vars updates conflicts with gensyms"
+ :valueof (withs (got (new-vars '(a b c))
+                  expected  (table 'a 'a_ 'b 'b_ 'c 'c_))
+            (list (iso expected got)
+                  (~~is-match expected got)))
+ :should be '(nil 1))

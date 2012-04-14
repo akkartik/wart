@@ -42,78 +42,32 @@ def inline-macro-eval(expr bindings)
                                            ~has-comma-bindings))
                                   x)))
 
-def mangle-binding(expr var new)
-  (if
-    (iso var expr)
-      new
-    ~cons?.expr
-      expr
-    (~is-match '(withs . _) expr)
-      (cons (mangle-binding car.expr var new)
-            (mangle-binding cdr.expr var new))
-    :else ; (withs . _)
-      `(withs ,(mangle-binding-in-bindings expr.1 var new)
-         ,@(mangle-binding-in-body expr var new)))
-
-def mangle-binding-in-bindings(bindings var new)
-  if bindings
-    (list bindings.0
-          (mangle-binding bindings.1 var new)
-          @(mangle-binding-in-bindings cddr.bindings var new))
-
-def mangle-binding-in-body(with-expr var new)
+; mangle-names '(withs (a 1) (withs (a 2) (+ a 3))) '()
+  ; => rename-vars '(withs (a 1) (withs (a 2) (+ a 3))) {} '(a)
+  ; => rename-vars-in-body '((withs (a 2) (+ a 3))) {} '(a)
+  ; => mangle-all '((withs (a 2) (+ a 3))) '(a)
+  ; => mangle-names '(withs (a 2) (+ a 3)) '(a)
+  ; => rename-vars '(withs (a 2) (+ a 3)) {a: a2} '(a a2)
+    ; => rename-vars-in-body "
+      ; => mangle-all '((+ a 3)) '(a a2)
+        ; => mangle-names '(+ a 3) '(a a2)
+        ; <= '(+ a 3)
+      ; => replace-all '(+ a 3) {a: a2}
+      ; <= '(+ a2 3)
+    ; <= '(+ a2 3)
+  ; <= '(withs (a2 2) (+ a2 3))
+; <= '(withs (a 1) (withs (a2 2) (+ a2 3)))
+def mangle-names(with-expr vars)
   if (~is-match '(withs . _) with-expr)
-    'fail
-    if (creates-binding with-expr.1 var)
-      cddr.with-expr
-      (mangle-binding cddr.with-expr var new)
-
-def creates-binding(bindings var)
-  if bindings
-    (or (iso bindings var)
-        (and cons?.bindings
-             (pos var flatten:bindings.1))
-        (creates-binding cddr.bindings var))
-
-; Assumes there are no conflicting bindings
-def coalesce-bindings(expr)
-  let (bindings body) (collect-bindings-body expr)
-    `(withs ,bindings ,@body)
+    with-expr
+    withs (new-bindings   (flatten:map car pair:with-expr.1)
+           conflicting-vars   (intersection vars new-bindings)
+           conflicts  new-vars.conflicting-vars)
+      (rename-vars with-expr conflicts (join vars new-bindings))
 
 
 
 ;; Internals
-
-def lookup-or-eval(f bindings)
-  (if
-    sym?.f
-      if bindings
-        (or bindings.f
-            (lookup-or-eval f cdr.bindings))
-    (is-match '(fn . _) f)
-      eval.f)
-
-def contains-quote?(expr)
-  if ~cons?.expr
-    quote?.expr
-    (or (contains-quote? car.expr)
-        (contains-quote? cdr.expr))
-
-def scope->with-bindings(s)
-  (join @(rem (fn(x) (is-match '(caller-scope . _) x))
-              (as list s)))
-
-def with-bindings->scope(bindings)
-  w/table ans
-    for curr (eval `(withs ,bindings curr-scope.) caller-scope)
-             cdr.curr ; HACK: ignore the scope with the 'bindings' binding
-             (zap cdr curr)
-      each k keys.curr
-        if (~iso 'caller-scope k)
-          or= ans.k curr.k
-
-def curr-scope()
-  caller-scope
 
 ; unquoted exprs shouldn't have side effects
 def apply-comma-bindings(expr bindings)
@@ -146,27 +100,11 @@ def has-comma-bindings(expr)
       (or has-comma-bindings:car.expr
           has-comma-bindings:cdr.expr))
 
-def chain-scope(a b)
-  ret ans copy.a
-    let curr ans
-      while cdr.curr
-        zap cdr curr
-      = cdr.curr b
-
-def collect-bindings-body(expr)
-  (if
-    (is-match '(withs . _) expr)
-      let (bindings body) (collect-bindings-body `(do ,@withs-body.expr))
-        (list (join expr.1 bindings) body)
-    (is-match '(do . _) expr)
-      let (bindings body) '(nil nil)
-        each form cdr.expr
-          let (bn bd) collect-bindings-body.form
-            = bindings (join bindings bn)
-            = body (join body bd)
-        (list bindings body)
-    :else
-      (list nil list.expr))
+def rename-vars(expr conflicts vars)
+  if (~is-match '(withs . _) expr)
+    (replace-all conflicts expr)
+    `(withs ,(rename-vars-in-bindings conflicts expr.1)
+       ,@(rename-vars-in-body withs-body.expr conflicts vars))
 
 ; bindings are alternating var-exp pairs
 ; conflicts is a table from syms to their new names
@@ -186,6 +124,51 @@ def rename-vars-in-bindings(conflicts bindings)
     :else
       'todo)
 
+def rename-vars-in-body(body conflicts vars)
+  (replace-all conflicts (mangle-all body vars))
+
+def mangle-all(body vars)
+  collect:each form body
+    yield (mangle-names form vars)
+
+def lookup-or-eval(f bindings)
+  (if
+    sym?.f
+      if bindings
+        (or bindings.f
+            (lookup-or-eval f cdr.bindings))
+    (is-match '(fn . _) f)
+      eval.f)
+
+def contains-quote?(expr)
+  if ~cons?.expr
+    quote?.expr
+    (or (contains-quote? car.expr)
+        (contains-quote? cdr.expr))
+
+def scope->with-bindings(s)
+  (join @(rem (fn(x) (is-match '(caller-scope . _) x))
+              (as list s)))
+
+def with-bindings->scope(bindings)
+  w/table ans
+    for curr (eval `(withs ,bindings curr-scope.) caller-scope)
+             cdr.curr ; HACK: ignore the scope with the 'bindings' binding
+             (zap cdr curr)
+      each k keys.curr
+        if (~iso 'caller-scope k)
+          or= ans.k curr.k
+
+def curr-scope()
+  caller-scope
+
+def chain-scope(a b)
+  ret ans copy.a
+    let curr ans
+      while cdr.curr
+        zap cdr curr
+      = cdr.curr b
+
 def replace(old new expr)
   (if
     (iso old expr)
@@ -199,6 +182,11 @@ def replace(old new expr)
       (cons (replace old new car.expr)
             (replace old new cdr.expr)))
 
+def replace-all(conflicts expr)
+  each (k v) conflicts
+    = expr (replace k v expr)
+  expr
+
 def new-vars(conflicts)
   w/table h
     each var conflicts
@@ -207,48 +195,7 @@ def new-vars(conflicts)
 def withs-body(with-expr)
   (with-expr 2 nil)
 
-; mangle-names '(withs (a 1) (withs (a 2) (+ a 3))) '()
-  ; => rename-vars '(withs (a 1) (withs (a 2) (+ a 3))) {} '(a)
-  ; => rename-vars-in-body '((withs (a 2) (+ a 3))) {} '(a)
-  ; => mangle-all '((withs (a 2) (+ a 3))) '(a)
-  ; => mangle-names '(withs (a 2) (+ a 3)) '(a)
-  ; => rename-vars '(withs (a 2) (+ a 3)) {a: a2} '(a a2)
-    ; => rename-vars-in-body "
-      ; => mangle-all '((+ a 3)) '(a a2)
-        ; => mangle-names '(+ a 3) '(a a2)
-        ; <= '(+ a 3)
-      ; => replace-all '(+ a 3) {a: a2}
-      ; <= '(+ a2 3)
-    ; <= '(+ a2 3)
-  ; <= '(withs (a2 2) (+ a2 3))
-; <= '(withs (a 1) (withs (a2 2) (+ a2 3)))
-def mangle-names(with-expr vars)
-  if (~is-match '(withs . _) with-expr)
-    with-expr
-    withs (new-bindings   (flatten:map car pair:with-expr.1)
-           conflicting-vars   (intersection vars new-bindings)
-           conflicts  new-vars.conflicting-vars)
-      (rename-vars with-expr conflicts (join vars new-bindings))
-
-def rename-vars(expr conflicts vars)
-  if (~is-match '(withs . _) expr)
-    (replace-all conflicts expr)
-    `(withs ,(rename-vars-in-bindings conflicts expr.1)
-       ,@(rename-vars-in-body withs-body.expr conflicts vars))
-
-def rename-vars-in-body(body conflicts vars)
-  (replace-all conflicts (mangle-all body vars))
-
-def mangle-all(body vars)
-  collect:each form body
-    yield (mangle-names form vars)
-
 def intersection(a b)
   collect:each x a
     if (pos x b)
       yield x
-
-def replace-all(conflicts expr)
-  each (k v) conflicts
-    = expr (replace k v expr)
-  expr
