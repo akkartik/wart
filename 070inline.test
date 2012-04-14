@@ -170,3 +170,52 @@ prn.
             (list (iso expected got)
                   (~~is-match expected got)))
  :should be '(nil 1))
+
+(test "mangle-names leaves untouched by default"
+ :valueof (mangle-names '(withs (a 3) (+ a 3)))
+ :should be '(withs (a 3) (+ a 3)))
+
+(test "mangle-names handles incoming exprs"
+ :valueof (mangle-names '(withs (a (+ a 1)) (+ a 3)) '(a))
+ :should match '(withs (a_x (+ a 1)) (+ a_x 3)))
+
+(test "mangle-names handles multiple exprs in body"
+ :valueof (mangle-names '(withs (a (+ a 1)) (+ a 2) (+ a 3)) '(a))
+ :should match '(withs (a_x (+ a 1)) (+ a_x 2) (+ a_x 3)))
+
+(test "mangle-names updates nested with exprs"
+ :valueof (mangle-names '(withs (a 3) (withs (b 39) (+ a b))) '(a))
+ :should match '(withs (a_x 3) (withs (b 39) (+ a_x b))))
+
+(test "mangle-names updates exprs in nested bindings"
+ :valueof (mangle-names '(withs (a 3) (withs (b (+ a 2)) (+ a b))) '(a))
+ :should match '(withs (a_x 3) (withs (b (+ a_x 2)) (+ a_x b))))
+
+(test "mangle-names creates new nested conflicts"
+ :valueof (mangle-names '(withs (a 3) (withs (a (+ a 2)) (+ a b))) '(a))
+ :should match '(withs (a_x 3) (withs (a_y (+ a_x 2)) (+ a_y b))))
+
+(test "mangle-names handles exprs after nested exprs"
+ :valueof (mangle-names '(withs (a 3)
+                           (a b c)
+                           (withs (a 4)
+                             (a d e))
+                           (a f g)))
+ :should match '(withs (a 3)
+                  (a b c)
+                  (withs (a_x 4)
+                    (a_x d e))
+                  (a f g)))
+
+(test "mangle-names watches conflict list"
+ :valueof (mangle-names '(withs (a 3)
+                           (a b c)
+                           (withs (a 4)
+                             (a d e))
+                           (a f g))
+                        '(a))
+ :should match '(withs (a_x 3)
+                  (a_x b c)
+                  (withs (a_y 4)
+                    (a_y d e))
+                  (a_x f g)))

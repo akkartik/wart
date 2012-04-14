@@ -206,3 +206,49 @@ def new-vars(conflicts)
 
 def withs-body(with-expr)
   (with-expr 2 nil)
+
+; mangle-names '(withs (a 1) (withs (a 2) (+ a 3))) '()
+  ; => rename-vars '(withs (a 1) (withs (a 2) (+ a 3))) {} '(a)
+  ; => rename-vars-in-body '((withs (a 2) (+ a 3))) {} '(a)
+  ; => mangle-all '((withs (a 2) (+ a 3))) '(a)
+  ; => mangle-names '(withs (a 2) (+ a 3)) '(a)
+  ; => rename-vars '(withs (a 2) (+ a 3)) {a: a2} '(a a2)
+    ; => rename-vars-in-body "
+      ; => mangle-all '((+ a 3)) '(a a2)
+        ; => mangle-names '(+ a 3) '(a a2)
+        ; <= '(+ a 3)
+      ; => replace-all '(+ a 3) {a: a2}
+      ; <= '(+ a2 3)
+    ; <= '(+ a2 3)
+  ; <= '(withs (a2 2) (+ a2 3))
+; <= '(withs (a 1) (withs (a2 2) (+ a2 3)))
+def mangle-names(with-expr vars)
+  if (~is-match '(withs . _) with-expr)
+    with-expr
+    withs (new-bindings   (flatten:map car pair:with-expr.1)
+           conflicting-vars   (intersection vars new-bindings)
+           conflicts  new-vars.conflicting-vars)
+      (rename-vars with-expr conflicts (join vars new-bindings))
+
+def rename-vars(expr conflicts vars)
+  if (~is-match '(withs . _) expr)
+    (replace-all conflicts expr)
+    `(withs ,(rename-vars-in-bindings conflicts expr.1)
+       ,@(rename-vars-in-body withs-body.expr conflicts vars))
+
+def rename-vars-in-body(body conflicts vars)
+  (replace-all conflicts (mangle-all body vars))
+
+def mangle-all(body vars)
+  collect:each form body
+    yield (mangle-names form vars)
+
+def intersection(a b)
+  collect:each x a
+    if (pos x b)
+      yield x
+
+def replace-all(conflicts expr)
+  each (k v) conflicts
+    = expr (replace k v expr)
+  expr
