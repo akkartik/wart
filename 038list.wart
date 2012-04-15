@@ -121,6 +121,9 @@ def lastcons(l)
     lastcons.it
     l
 
+def last(l)
+  car:lastcons.l
+
 def flatten(l acc)
   (if
     !l

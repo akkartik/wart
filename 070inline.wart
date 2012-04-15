@@ -36,15 +36,18 @@ def to-with-expr(call bindings done)
 ; assumes macros are converted to the very specific structure
 ;   (mac-withs (_ '_) ... (eval _ caller-scope))
 def inline-macro-eval(expr bindings)
-  if (~is-match '(mac-withs . _) expr)
-    expr
-    `(withs ,expr.1 ,@(collect:each x withs-body.expr
-                        (yield:or (if (and (is-match '(eval . _) x)
-                                           (backquote?:car x.1))
-                                    (check (apply-comma-bindings cdr:x.1 ; strip backquote
-                                               (maybe chain-scope with-bindings->scope:expr.1 :to bindings))
-                                           ~has-comma-bindings))
-                                  x)))
+  (if
+    (normal-macro? expr)
+      `(withs ,(macro-unquote-bindings expr.1)
+              ,@(collect:each x withs-body.expr
+                  (yield:or (if (and (is-match '(eval . _) x)
+                                     (backquote?:car x.1))
+                              (check (apply-comma-bindings cdr:x.1 ; strip backquote
+                                         (maybe chain-scope with-bindings->scope:expr.1 :to bindings))
+                                     ~has-comma-bindings))
+                            x)))
+    :else
+      expr)
 
 ; mangle-names '(withs (a 1) (withs (a 2) (+ a 3))) '()
   ; => rename-vars '(withs (a 1) (withs (a 2) (+ a 3))) {} '(a)
@@ -72,6 +75,15 @@ def mangle-names(with-expr vars)
 
 
 ;; Internals
+
+def normal-macro?(expr)
+  and (is-match '(mac-withs . _) expr)
+      (is-match '(eval _) last:withs-body.expr)
+
+def macro-unquote-bindings(bindings)
+  if (and pair?.bindings
+          quote?:car:bindings.1)
+    `(,bindings.0 ,(cons 'list cdr:bindings.1))
 
 ; unquoted exprs shouldn't have side effects
 def apply-comma-bindings(expr bindings)

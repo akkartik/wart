@@ -72,25 +72,25 @@ prn.
 (test "inline-macro-eval works"
  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
                                 (eval `(+ ,a ,b))))
- :should be '(withs ((a b) '(x y))
+ :should be '(withs ((a b) (list x y))
                (+ x y)))
 
 (test "inline-macro-eval works with comma expressions without side effects"
  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
                                 (eval `(+ ,a ,(if 3 b)))))
- :should be '(withs ((a b) '(x y))
+ :should be '(withs ((a b) (list x y))
                (+ x y)))
 
 (test "inline-macro-eval works with comma-splice expressions without side effects"
  :valueof (inline-macro-eval '(mac-withs (args '(x y))
                                 (eval `(+ ,@args 3))))
- :should be '(withs (args '(x y))
+ :should be '(withs (args (list x y))
                (+ x y 3)))
 
 (test "inline-macro-eval works with nested backquotes"
  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
                                 (eval `(+ ,a ,(if 3 `(+ 3 ,b))))))
- :should be '(withs ((a b) '(x y))
+ :should be '(withs ((a b) (list x y))
                (+ x (+ 3 y))))
 
 
