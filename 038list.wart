@@ -47,7 +47,13 @@ def copy(x)
     x
 
 def single?(x)
-  (and cons?.x !cdr.x)
+  (and cons?.x ~cdr.x)
+
+def pair?(x)
+  (and cons?.x
+       cdr.x
+       cons?:cdr.x
+       ~cdr:cdr.x)
 
 def join args
   if args

@@ -122,6 +122,42 @@
  :valueof ((predicate '(1 2 3)) 4)
  :should be nil)
 
+(test "single? - 1"
+ :valueof (single? nil)
+ :should be nil)
+
+(test "single? - 2"
+ :valueof (single? '(1))
+ :should ~be nil)
+
+(test "single? - 3"
+ :valueof (single? '(1 2))
+ :should be nil)
+
+(test "single? - 4"
+ :valueof (single? '(1 . 2))
+ :should be nil)
+
+(test "pair? - 1"
+ :valueof (pair? nil)
+ :should be nil)
+
+(test "pair? - 2"
+ :valueof (pair? '(1))
+ :should be nil)
+
+(test "pair? - 3"
+ :valueof (pair? '(1 2))
+ :should ~be nil)
+
+(test "pair? - 4"
+ :valueof (pair? '(1 . 2))
+ :should be nil)
+
+(test "pair? - 5"
+ :valueof (pair? '(1 2 3))
+ :should be nil)
+
 (test "join works"
  :valueof (join '(1 2 3) nil '(4 5) nil nil '(6 (7 8)))
  :should be '(1 2 3 4 5 6 (7 8)))
