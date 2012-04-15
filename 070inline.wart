@@ -41,7 +41,7 @@ def inline-macro-eval(expr bindings)
       (let new-bindings (maybe chain-scope with-bindings->scope:expr.1 :to bindings)
         `(withs ,expr.1 ,@(map (fn(_) (inline-macro-eval _ new-bindings))
                                withs-body.expr)))
-    (normal-macro? expr)
+    (is-match '(mac-withs . _) expr)
       (check `(withs ,(macro-unquote-bindings expr.1)
                      ,@(collect:each x withs-body.expr
                          (yield:or (if (and (is-match '(eval . _) x)
@@ -52,8 +52,6 @@ def inline-macro-eval(expr bindings)
                                    x)))
              ~contains-eval
              `(withs ,@cdr.expr))
-    (is-match '(mac-withs . _) expr)
-      `(withs ,@cdr.expr)
     :else
       expr)
 
@@ -83,11 +81,6 @@ def mangle-names(with-expr vars)
 
 
 ;; Internals
-
-def normal-macro?(expr)
-  and (is-match '(mac-withs . _) expr)
-      (is-match '(eval _) last:withs-body.expr)
-      (backquote?:car cadr:last:withs-body.expr)
 
 def macro-unquote-bindings(bindings)
   if (and pair?.bindings
