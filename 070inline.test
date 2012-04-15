@@ -75,26 +75,6 @@ prn.
  :should be '(withs ((a b) '(x y))
                (+ x y)))
 
-(test "inline-macro-eval works withs intermezzo code"
- :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
-                                (prn a)
-                                (eval `(+ ,a ,b))))
- :should be '(withs ((a b) '(x y))
-               (prn a)
-               (+ x y)))
-
-(test "inline-macro-eval skips explicit list construction"
- :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
-                                (eval (cons '+ a b))))
- :should be '(withs ((a b) '(x y))
-               (eval (cons '+ a b))))
-
-(test "inline-macro-eval gives up with unbound vars"
- :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
-                                (eval `(+ ,c ,b))))
- :should be '(withs ((a b) '(x y))
-               (eval `(+ ,c ,b))))
-
 (test "inline-macro-eval works with comma expressions without side effects"
  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
                                 (eval `(+ ,a ,(if 3 b)))))
