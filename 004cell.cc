@@ -212,12 +212,6 @@ Cell* nthCdr(Cell* x, long n) {
   return curr;
 }
 
-Cell* last(Cell* x) {
-  while(cdr(x) != nil)
-    x = cdr(x);
-  return x;
-}
-
 void append(Cell* x, Cell* y) {
   while(cdr(x) != nil)
     x = cdr(x);
