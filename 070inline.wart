@@ -50,6 +50,8 @@ def inline-macro-eval(expr bindings)
                                          (maybe chain-scope with-bindings->scope:expr.1 :to bindings))
                                      ~has-comma-bindings))
                             x)))
+    (is-match '(mac-withs . _) expr)
+      `(withs ,@cdr.expr)
     :else
       expr)
 
@@ -83,6 +85,7 @@ def mangle-names(with-expr vars)
 def normal-macro?(expr)
   and (is-match '(mac-withs . _) expr)
       (is-match '(eval _) last:withs-body.expr)
+      (backquote?:car cadr:last:withs-body.expr)
 
 def macro-unquote-bindings(bindings)
   if (and pair?.bindings
