@@ -8,13 +8,15 @@
 ; Parts of with-exprs:
 ;   (withs bindings body)
 ; Parts of bindings: var exp
+;
+; Macros are specially tagged with 'mac-withs.
 def to-with-expr(call bindings done)
   (iflet f (and (~pos car.call done) ; skip recursive calls
                 (lookup-or-eval car.call bindings))
     `(withs ,(scope->with-bindings env.f)
        ,(if
           (quote?:car sig.f)
-            `(withs (,cdr:sig.f ',cdr.call)
+            `(mac-withs (,cdr:sig.f ',cdr.call)
                ,@(collect:each expr body.f
                    (if (iso car.expr 'eval)
                      (yield `(,expr.0 ,expr.1)) ; strip caller-scope
@@ -31,8 +33,10 @@ def to-with-expr(call bindings done)
                                        (cons car.call done))))))
     call)
 
+; assumes macros are converted to the very specific structure
+;   (mac-withs (_ '_) ... (eval _ caller-scope))
 def inline-macro-eval(expr bindings)
-  if (~is-match '(withs . _) expr)
+  if (~is-match '(mac-withs . _) expr)
     expr
     `(withs ,expr.1 ,@(collect:each x withs-body.expr
                         (yield:or (if (and (is-match '(eval . _) x)
