@@ -112,3 +112,13 @@ def sym-root(x)
     while (and name digit?:car.name)
       (zap cdr name)
     (sym @rev.name)
+
+mac aand args
+  (if
+    !args
+      1
+    ~cdr.args
+      car.args
+    :else
+      `(let it ,(car args)
+         (and it (aand ,@(cdr args)))))
