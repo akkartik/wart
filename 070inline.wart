@@ -37,6 +37,9 @@ def to-with-expr(call bindings done)
 ;   (mac-withs (_ '_) ... (eval _ caller-scope))
 def inline-macro-eval(expr bindings)
   (if
+    (is-match '(withs . _) expr)
+      `(withs ,expr.1 ,@(map (fn(_) (inline-macro-eval _ bindings))
+                             withs-body.expr))
     (normal-macro? expr)
       `(withs ,(macro-unquote-bindings expr.1)
               ,@(collect:each x withs-body.expr
