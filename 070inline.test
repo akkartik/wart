@@ -83,6 +83,14 @@ prn.
                (withs ((a b) (list x y))
                  (+ x y))))
 
+(test "inline-macro-eval reaches into with exprs - 2"
+ :valueof (inline-macro-eval '(withs (z 3)
+                                (mac-withs ((a b) '(x y))
+                                  (eval `(+ ,a ,b ,z)))))
+ :should be '(withs (z 3)
+               (withs ((a b) (list x y))
+                 (+ x y 3))))
+
 (test "inline-macro-eval works with comma expressions without side effects"
  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
                                 (eval `(+ ,a ,(if 3 b)))))
