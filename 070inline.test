@@ -91,6 +91,22 @@ prn.
                (withs ((a b) (list x y))
                  (+ x y 3))))
 
+(test "inline-macro-eval works with intermezzo code"
+ :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
+                                (prn a)
+                                (eval `(+ ,a ,b))))
+ :should be '(withs ((a b) (list x y))
+               (prn 'x)
+               (+ x y)))
+
+(test "inline-macro-eval works with intermezzo code - 2"
+ :valueof (inline-macro-eval '(mac-withs ((a b) '((+ x 1) y))
+                                (prn a)
+                                (eval `(+ ,a ,b))))
+ :should be '(withs ((a b) (list (+ x 1) y))
+               (prn '(+ x 1))
+               (+ (+ x 1) y)))
+
 (test "inline-macro-eval skips explicit list construction"
  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
                                 (eval (cons '+ a b))))

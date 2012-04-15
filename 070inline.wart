@@ -48,7 +48,8 @@ def inline-macro-eval(expr bindings)
                                             (backquote?:car x.1))
                                      (check (apply-comma-bindings cdr:x.1 ; strip backquote
                                                 (maybe chain-scope with-bindings->scope:expr.1 :to bindings))
-                                            ~has-comma-bindings))
+                                            ~has-comma-bindings)
+                                     (replace-all quotify-vals:with-bindings->scope:expr.1 x)) ; quote just immediate params
                                    x)))
              ~contains-eval
              `(withs ,@cdr.expr))
@@ -117,6 +118,11 @@ def has-comma-bindings(expr)
     :else
       (or has-comma-bindings:car.expr
           has-comma-bindings:cdr.expr))
+
+def quotify-vals(tab)
+  each (k v) tab
+    = tab.k (cons quote v)
+  tab
 
 def contains-eval(expr)
   (if
