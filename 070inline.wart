@@ -1,3 +1,6 @@
+def inline(call bindings)
+  (inline-macro-eval:to-with-expr call bindings)
+
 ; inline all function bodies into with-exprs:
 ;   (def foo(a b) (prn a) (+ a b))
 ;   (foo x y)
