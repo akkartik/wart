@@ -18,10 +18,6 @@
  :valueof (if nil 4 5)
  :should be 5)
 
-(test "if handles 3 args"
- :valueof (if nil 4 5)
- :should be 5)
-
 (test "if handles 4 args"
  :valueof (if nil 4 5 6)
  :should be 6)
