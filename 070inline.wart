@@ -42,14 +42,16 @@ def inline-macro-eval(expr bindings)
         `(withs ,expr.1 ,@(map (fn(_) (inline-macro-eval _ new-bindings))
                                withs-body.expr)))
     (normal-macro? expr)
-      `(withs ,(macro-unquote-bindings expr.1)
-              ,@(collect:each x withs-body.expr
-                  (yield:or (if (and (is-match '(eval . _) x)
-                                     (backquote?:car x.1))
-                              (check (apply-comma-bindings cdr:x.1 ; strip backquote
-                                         (maybe chain-scope with-bindings->scope:expr.1 :to bindings))
-                                     ~has-comma-bindings))
-                            x)))
+      (check `(withs ,(macro-unquote-bindings expr.1)
+                     ,@(collect:each x withs-body.expr
+                         (yield:or (if (and (is-match '(eval . _) x)
+                                            (backquote?:car x.1))
+                                     (check (apply-comma-bindings cdr:x.1 ; strip backquote
+                                                (maybe chain-scope with-bindings->scope:expr.1 :to bindings))
+                                            ~has-comma-bindings))
+                                   x)))
+             ~contains-eval
+             `(withs ,@cdr.expr))
     (is-match '(mac-withs . _) expr)
       `(withs ,@cdr.expr)
     :else
@@ -122,6 +124,16 @@ def has-comma-bindings(expr)
     :else
       (or has-comma-bindings:car.expr
           has-comma-bindings:cdr.expr))
+
+def contains-eval(expr)
+  (if
+    (iso expr 'eval)
+      expr
+    ~cons?.expr
+      nil
+    :else ; cons?.expr
+      (or contains-eval:car.expr
+          contains-eval:cdr.expr))
 
 def rename-vars(expr conflicts vars)
   if (~is-match '(withs . _) expr)
