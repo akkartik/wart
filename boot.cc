@@ -296,6 +296,5 @@ int main(int argc, unused char* argv[]) {
 }
 
 // style:
-//  wide unicode strings everywhere
 //  minimal function prototypes
 //  immutable objects; copy everywhere; no pointers except Cell*
