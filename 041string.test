@@ -95,6 +95,10 @@
  :valueof (as string '("a" "b" "c"))
  :should be "abc")
 
+(test "join works on strings"
+ :valueof (join "a" 'b nil)
+ :should be "ab")
+
 (test "< works on strings"
  :valueof (< "a" "b")
  :should ~be nil)
