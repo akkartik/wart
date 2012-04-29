@@ -79,6 +79,10 @@
  :valueof (str 'a 43)
  :should be "a43")
 
+(test "str works with nil"
+ :valueof str.nil
+ :should be "")
+
 (test "string coerces to list"
  :valueof (as list "abc")
  :should be '("a" "b" "c"))
