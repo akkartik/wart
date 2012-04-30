@@ -6,8 +6,11 @@ defcall list(l idx . ends)
                !car.ends
                  len.l
                :else
-                 (range-bounce l car.ends)))
-    ((if ends list_range car:list_range) l idx end)
+                 (range-bounce l car.ends))
+         slice  (list_range l idx end))
+    if ends
+      slice
+      car.slice
 
 defset list((l idx . ends) val)
   `(withs ($idx (range-start ,l ,idx)
