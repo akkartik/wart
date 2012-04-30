@@ -130,6 +130,7 @@ def flatten(l acc)
       acc
     ~cons?.l
       (cons l acc)
+    :else
       (flatten car.l (flatten cdr.l acc)))
 
 
@@ -137,9 +138,9 @@ def flatten(l acc)
 ;; Internals
 
 def range-bounce(l idx)
-  (if (< idx 0)
+  if (< idx 0)
     (+ len.l idx)
-    idx)
+    idx
 
 def range-start(l idx)
   if !idx
