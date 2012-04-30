@@ -1,12 +1,12 @@
 defcall list(l idx . ends)
-  withs (idx (range-start l idx)
-         end (if
-               !ends
-                 (+ idx 1)
-               !car.ends
-                 len.l
-               :else
-                 (range-bounce l car.ends))
+  withs (idx    (range-start l idx)
+         end    (if
+                  !ends
+                    (+ idx 1)
+                  !car.ends
+                    len.l
+                  :else
+                    (range-bounce l car.ends))
          slice  (list_range l idx end))
     if ends
       slice
