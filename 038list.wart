@@ -29,7 +29,7 @@ def pos(x xs n)
       n
       (pos x cdr.xs (+ n 1))
 
-def predicate(x) :case (isa x 'list)
+def predicate(x) :case (isa x list)
   (fn(_) (pos _ x))
 
 def= car(l x)

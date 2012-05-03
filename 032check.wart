@@ -84,7 +84,7 @@ mac in(x . choices)
 
 def predicate(x)
   (if
-    (isa x 'function)
+    (isa x function)
       x
     (iso x :else)
       (fn() 1)

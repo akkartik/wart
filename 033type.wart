@@ -1,15 +1,15 @@
 def sym?(_)
-  (isa _ 'symbol)
+  (isa _ symbol)
 def list?(_)
-  (isa _ 'list)
+  (isa _ list)
 def num?(_)
-  (isa _ 'number)
+  (isa _ number)
 def string?(_)
-  (isa _ 'string)
+  (isa _ string)
 def table?(_)
-  (isa _ 'table)
+  (isa _ table)
 def fn?(_)
-  (isa _ 'function)
+  (isa _ function)
 def compiled-fn?(_)
   (and (fn? _)
        (~cons? rep._!body))
@@ -24,7 +24,7 @@ def rep(x)
     x
     car:cddr.x
 
-def coerce(x dest-type)
+def coerce(x 'dest-type)
   eval `(coerce-quoted ,x ,dest-type)
 = coercions* (table)
 
@@ -47,7 +47,7 @@ mac defcall(type params . body)
 
 
 mac as(type expr)
-  `(coerce ,expr ',type)
+  `(coerce ,expr ,type)
 
 def! compose(f g)
   fn 'args
