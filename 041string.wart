@@ -30,7 +30,7 @@ def str args
 defcoerce symbol string
   str
 
-def join args :case (isa car.args string)
+def join args :case string?:car.args
   (str @args)
 
 def empty?(s) :case string?.s

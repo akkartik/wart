@@ -20,7 +20,7 @@ let $table table ; ignore later refinements
 def! table args
   (as table pair.args)
 
-def copy(x) :case (isa x table)
+def copy(x) :case table?.x
   (as table (as list x))
 
 def keys(t)
@@ -29,15 +29,15 @@ def keys(t)
 def vals(t)
   map cadr (as list t)
 
-def iso(x y) :case (isa x table)
-  (and (isa y table)
+def iso(x y) :case table?.x
+  (and table?.y
        (iso len:keys.x len:keys.y)
        (all (fn((k v))
               (iso v y.k))
             (as list x)))
 
-def is-match(x y) :case (isa x table)
-  (and (isa y table)
+def is-match(x y) :case table?.x
+  (and table?.y
        (iso len:keys.x len:keys.y)
        (all (fn((k v))
               (is-match v y.k))
