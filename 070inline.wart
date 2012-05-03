@@ -189,12 +189,13 @@ def scope->with-bindings(s)
 
 def with-bindings->scope(bindings)
   w/table ans
-    for curr (eval `(withs ,bindings curr-scope.) caller-scope)
-             cdr.curr ; HACK: ignore the scope with the 'bindings' binding
-             (zap cdr curr)
-      each k keys.curr
-        if (~iso 'caller-scope k)
-          or= ans.k curr.k
+    aif (try-eval `(withs ,bindings curr-scope.) caller-scope)
+      for curr it
+               cdr.curr ; HACK: ignore the scope with the 'bindings' binding
+               (zap cdr curr)
+        each k keys.curr
+          if (~iso 'caller-scope k)
+            or= ans.k curr.k
 
 def curr-scope()
   caller-scope

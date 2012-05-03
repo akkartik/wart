@@ -8,6 +8,14 @@ prn.
  :valueof (inline '(foo 3 4) (table 'foo (fn'(x y) (eval `(+ ,x ,y) caller-scope))))
  :should be '(withs () (withs ((x y) (list 3 4)) (+ 3 4))))
 
+(test "inline works on functions with unbound syms"
+ :valueof (inline '(foo a b) (table 'foo (fn(x y) (+ x y))))
+ :should be '(withs () (withs ((x y) (list a b)) (+ x y))))
+
+(test "inline works on macros with unbound syms"
+ :valueof (inline '(foo a b) (table 'foo (fn'(x y) (eval `(+ ,x ,y) caller-scope))))
+ :should be '(withs () (withs ((x y) (list a b)) (+ a b))))
+
 
 
 (test "to-with-expr works"
