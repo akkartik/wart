@@ -8,10 +8,11 @@ struct Cell {
   int type;
     #define CONS 0
     #define INTEGER 1
-    #define SYMBOL 2
-    #define STRING 3
-    #define TABLE 4
-    #define COMPILED_FN 5
+    #define FLOAT 2
+    #define SYMBOL 3
+    #define STRING 4
+    #define TABLE 5
+    #define COMPILED_FN 6
   int nrefs;
   Cell() :car(NULL), cdr(NULL), type(CONS), nrefs(0) {}
   void init() {
@@ -31,7 +32,7 @@ bool isCons(Cell* x) {
 }
 
 bool isAtom(Cell* x) {
-  return x == nil || x->type == INTEGER || x->type == STRING || x->type == SYMBOL || x->type == COMPILED_FN;
+  return x == nil || x->type == INTEGER || x->type == FLOAT || x->type == STRING || x->type == SYMBOL || x->type == COMPILED_FN;
 }
 
 
@@ -124,6 +125,7 @@ void rmref(Cell* c) {
 
   switch (c->type) {
   case INTEGER:
+  case FLOAT:
     break; // numbers don't need freeing
   case STRING:
   case SYMBOL:
