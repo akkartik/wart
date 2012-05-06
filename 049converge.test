@@ -1,0 +1,7 @@
+def newton-raphson-sqrt-of-2(x)
+  (/ (+ x (/ 2.0 x)) 2)
+
+(test "converge works"
+ :valueof (let x (converge newton-raphson-sqrt-of-2 1.0)
+            (* x x))
+ :should be 2.0)

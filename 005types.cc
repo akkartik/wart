@@ -45,7 +45,7 @@ float toFloat(Cell* x) {
 }
 
 bool equalFloats(float x, float y) {
-  return fabs(x-y) < 1e-7;
+  return fabs(x-y) < 1e-6;
 }
 
 
