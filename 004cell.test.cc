@@ -34,6 +34,8 @@ void test_nthCdr() {
   rmref(x);
 }
 
+// We rely on Cell size being a power of 2 to avoid fragmentation (modulo
+// strings).
 void test_num_types_take_up_same_space_as_Cell() {
   checkEq(sizeof(int), sizeof(Cell*));
   checkEq(sizeof(long), sizeof(Cell*));
