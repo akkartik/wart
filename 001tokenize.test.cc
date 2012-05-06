@@ -9,10 +9,11 @@ void test_tokenize_always_starts_a_line_with_indent() {
 }
 
 void test_tokenize_handles_multiple_atoms() {
-  CodeStream c(stream("34 abc"));
+  CodeStream c(stream("34 abc 3.4"));
   checkEq(nextToken(c), Token::indent(0));
   checkEq(nextToken(c), "34");
   checkEq(nextToken(c), "abc");
+  checkEq(nextToken(c), "3.4");
 }
 
 void test_tokenize_handles_string_literal() {

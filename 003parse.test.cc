@@ -18,9 +18,10 @@ void test_parse_handles_atom() {
 }
 
 void test_parse_handles_atoms() {
-  CodeStream c(stream("34\n\"a b c\""));
+  CodeStream c(stream("34\n\"a b c\"\n3.4"));
   checkEq(nextAstNode(c), Token::of("34"));
   checkEq(nextAstNode(c), Token::of("\"a b c\""));
+  checkEq(nextAstNode(c), Token::of("3.4"));
   check(c.fd.eof());
 }
 
