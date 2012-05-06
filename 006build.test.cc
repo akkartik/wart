@@ -12,7 +12,7 @@ void test_build_handles_nil2() {
   check(cs.fd.eof());
 }
 
-void test_build_handles_number() {
+void test_build_handles_integer() {
   CodeStream cs(stream("34"));
   Cell* c = nextRawCell(cs);
   checkEq(c, newNum(34));
