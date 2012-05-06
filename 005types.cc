@@ -1,18 +1,14 @@
 //// primitive datatypes
 
                                   unordered_map<long, Cell*> numLiterals;
-                                  Cell* intern(long x) {
-                                    if (numLiterals[x])
-                                      return numLiterals[x];
-                                    numLiterals[x] = newCell();
-                                    numLiterals[x]->car = (Cell*)x;
-                                    numLiterals[x]->type = NUMBER;
-                                    mkref(numLiterals[x]);
-                                    return numLiterals[x];
-                                  }
 
 Cell* newNum(long x) {
-  return intern(x);
+  if (numLiterals[x])
+    return numLiterals[x];
+  numLiterals[x] = newCell();
+  numLiterals[x]->car = (Cell*)x;
+  numLiterals[x]->type = NUMBER;
+  return mkref(numLiterals[x]);
 }
 
 bool isNum(Cell* x) {
@@ -33,19 +29,14 @@ long toNum(Cell* x) {
                                   struct StringMap :public unordered_map<string, Data>{};
 
                                   StringMap<Cell*> symLiterals;
-                                  Cell* intern(string x) {
-                                    if (symLiterals[x])
-                                      return symLiterals[x];
-                                    symLiterals[x] = newCell();
-                                    symLiterals[x]->car = (Cell*)new string(x); // not aligned like cells; can fragment memory
-                                    mkref(symLiterals[x]);
-                                    return symLiterals[x];
-                                  }
 
 Cell* newSym(string x) {
-  Cell* result = intern(x);
-  result->type = SYMBOL;
-  return result;
+  if (symLiterals[x])
+    return symLiterals[x];
+  symLiterals[x] = newCell();
+  symLiterals[x]->car = (Cell*)new string(x); // not aligned like cells; can fragment memory
+  symLiterals[x]->type = SYMBOL;
+  return mkref(symLiterals[x]);
 }
 
 bool isSym(Cell* x) {
