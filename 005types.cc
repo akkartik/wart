@@ -15,7 +15,7 @@ bool isNum(Cell* x) {
   return x->type == NUMBER;
 }
 
-int toNum(Cell* x) {
+int toInt(Cell* x) {
   if (!isNum(x)) {
     RAISE << "not a number: " << x << endl;
     return 0;

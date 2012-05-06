@@ -5,8 +5,8 @@ COMPILE_FN(string_splice, compiledFn_string_splice, "($string $start $end $val)"
     return nil;
   }
 
-  size_t start = toNum(lookup("$start"));
-  size_t end = toNum(lookup("$end"));
+  size_t start = toInt(lookup("$start"));
+  size_t end = toInt(lookup("$end"));
   if (start > ((string*)str->car)->length()) { // append works
     RAISE << "string too short: " << str << " " << start << endl;
     return nil;
@@ -26,11 +26,11 @@ COMPILE_FN(string_range, compiledFn_string_get, "($string $index $end)",
     return nil;
   }
 
-  size_t index = toNum(lookup("$index"));
+  size_t index = toInt(lookup("$index"));
   if (index > ((string*)str->car)->length()-1)
     return nil;
 
-  size_t end = toNum(lookup("$end"));
+  size_t end = toInt(lookup("$end"));
   if (end > ((string*)str->car)->length()) {
     RAISE << "no such end-index in string: " << str << " " << end << endl;
     return nil;

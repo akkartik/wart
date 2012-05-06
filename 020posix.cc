@@ -14,7 +14,7 @@ COMPILE_FN(wait_for_child, compiledFn_wait_for_child, "()",
 )
 
 COMPILE_FN(sleep, compiledFn_sleep, "($n)",
-  sleep(toNum(lookup("$n")));
+  sleep(toInt(lookup("$n")));
   return nil;
 )
 
@@ -35,7 +35,7 @@ Cell* newSocket(Socket* s) {
 Socket* toSocket(Cell* s) {
   if (type(s) != newSym("socket"))
     RAISE << "not a socket: " << s << endl << DIE;
-  return (Socket*)toNum(car(cdr(cdr(s))));
+  return (Socket*)toInt(car(cdr(cdr(s))));
 }
 
 COMPILE_FN(socket_fd, compiledFn_socket_fd, "($sock)",
@@ -50,7 +50,7 @@ COMPILE_FN(make-socket, compiledFn_socket, "($host $port)",
   bzero(&sock->addr, sizeof(sock->addr));
   sock->addr.sin_family = AF_INET;
   bcopy((char*)host->h_addr, (char*)sock->addr.sin_addr.s_addr, host->h_length);
-  sock->addr.sin_port = htons(toNum(lookup("$port")));
+  sock->addr.sin_port = htons(toInt(lookup("$port")));
   PERR(connect(sock->fd, (sockaddr*)&sock->addr, sizeof(sock->addr)));
   return mkref(newSocket(sock));
 )
@@ -63,7 +63,7 @@ COMPILE_FN(make-server-socket, compiledFn_server_socket, "($port)",
   PERR(setsockopt(sock->fd, SOL_SOCKET, SO_REUSEADDR, &dummy, sizeof(dummy)));
   bzero(&sock->addr, sizeof(sock->addr));
   sock->addr.sin_family = AF_INET;   sock->addr.sin_addr.s_addr = INADDR_ANY;
-  sock->addr.sin_port = htons(toNum(lookup("$port")));
+  sock->addr.sin_port = htons(toInt(lookup("$port")));
   PERR(bind(sock->fd, (sockaddr*)&sock->addr, sizeof(sock->addr)));
   PERR(listen(sock->fd, 5));
   return mkref(newSocket(sock));

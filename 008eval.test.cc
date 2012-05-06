@@ -430,7 +430,7 @@ void test_eval_handles_quoted_destructured_params() {
   Cell* call = read(stream("((fn ('(a b)) b) (1 2))"));
   Cell* result = eval(call);
   check(isNum(result));
-  checkEq(toNum(result), 2);
+  checkEq(toInt(result), 2);
   rmref(result);
   rmref(call);
 }
@@ -440,10 +440,10 @@ void test_eval_handles_rest_params() {
   Cell* result = eval(call);
   check(isCons(result));
   check(isNum(car(result)));
-  checkEq(toNum(car(result)), 3);
+  checkEq(toInt(car(result)), 3);
   check(isNum(car(cdr(result))));
-  checkEq(toNum(car(cdr(result))), 4);
-  checkEq(toNum(car(cdr(cdr(result)))), 5);
+  checkEq(toInt(car(cdr(result))), 4);
+  checkEq(toInt(car(cdr(cdr(result)))), 5);
   checkEq(cdr(cdr(cdr(result))), nil);
   rmref(result);
   rmref(call);
@@ -880,7 +880,7 @@ void test_eval_evals_args() {
   Cell* call = read(stream("((fn (f) (f)) (fn () 34))"));
   Cell* result = eval(call);
   check(isNum(result));
-  checkEq(toNum(result), 34);
+  checkEq(toInt(result), 34);
   rmref(result);
   rmref(call);
 }
@@ -889,7 +889,7 @@ void test_eval_doesnt_leak_body_evals() {
   Cell* call = read(stream("((fn (f) (f) (f)) (fn () 34))"));
   Cell* result = eval(call);
   check(isNum(result));
-  checkEq(toNum(result), 34);
+  checkEq(toInt(result), 34);
   rmref(result);
   rmref(call);
 }
@@ -898,7 +898,7 @@ void test_eval_handles_destructured_params() {
   Cell* call = read(stream("((fn ((a b)) b) '(1 2))"));
   Cell* result = eval(call);
   check(isNum(result));
-  checkEq(toNum(result), 2);
+  checkEq(toInt(result), 2);
   rmref(result);
   rmref(call);
 }

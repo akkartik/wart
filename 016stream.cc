@@ -9,13 +9,13 @@ Cell* newOstream(ostream* x) {
 istream& toIstream(Cell* x) {
   if (type(x) != newSym("stream"))
     RAISE << "not a stream: " << x << endl << DIE;
-  return *(istream*)toNum(car(cdr(cdr(x))));
+  return *(istream*)toInt(car(cdr(cdr(x))));
 }
 
 ostream& toOstream(Cell* x) {
   if (type(x) != newSym("stream"))
     RAISE << "not a stream: " << x << endl << DIE;
-  return *(ostream*)toNum(car(cdr(cdr(x))));
+  return *(ostream*)toInt(car(cdr(cdr(x))));
 }
 
 
@@ -43,7 +43,7 @@ COMPILE_FN(infile, compiledFn_infile, "($name)",
 )
 
 COMPILE_FN(close_infile, compiledFn_close_infile, "($stream)",
-  ifstream* f = (ifstream*)toNum(car(cdr(cdr(lookup("$stream")))));
+  ifstream* f = (ifstream*)toInt(car(cdr(cdr(lookup("$stream")))));
   f->close();
   delete f;
   return nil;
@@ -54,7 +54,7 @@ COMPILE_FN(outfile, compiledFn_outfile, "($name)",
 )
 
 COMPILE_FN(close_outfile, compiledFn_close_outfile, "($stream)",
-  ofstream* f = (ofstream*)toNum(car(cdr(cdr(lookup("$stream")))));
+  ofstream* f = (ofstream*)toInt(car(cdr(cdr(lookup("$stream")))));
   f->close();
   delete f;
   return nil;
@@ -69,7 +69,7 @@ COMPILE_FN(outstring, compiledFn_outstring, "()",
 )
 
 COMPILE_FN(outstring_buffer, compiledFn_outstring_buffer, "($stream)",
-  ostringstream* s = (ostringstream*)toNum(car(cdr(cdr(lookup("$stream")))));
+  ostringstream* s = (ostringstream*)toInt(car(cdr(cdr(lookup("$stream")))));
   return mkref(newString(s->str()));
 )
 
@@ -129,14 +129,14 @@ public:
 };
 
 COMPILE_FN(infd, compiledFn_infd, "($fd)",
-  return mkref(newIstream(new iostream(new FdStreamBuf(toNum(lookup("$fd")))))); // leak
+  return mkref(newIstream(new iostream(new FdStreamBuf(toInt(lookup("$fd")))))); // leak
 )
 
 COMPILE_FN(outfd, compiledFn_outfd, "($fd)",
-  return mkref(newOstream(new iostream(new FdStreamBuf(toNum(lookup("$fd")))))); // leak
+  return mkref(newOstream(new iostream(new FdStreamBuf(toInt(lookup("$fd")))))); // leak
 )
 
 COMPILE_FN(close, compiledFn_close, "($fd)",
-  close(toNum(lookup("$fd")));
+  close(toInt(lookup("$fd")));
   return nil;
 )

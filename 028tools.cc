@@ -5,7 +5,7 @@ COMPILE_FN(addr, compiledFn_addr, "($x)",
 )
 
 COMPILE_FN(debug, compiledFn_debug, "($x)",
-  debug = toNum(lookup("$x"));
+  debug = toInt(lookup("$x"));
   return nil;
 )
 
