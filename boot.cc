@@ -157,7 +157,7 @@ void init() {
 
 // check for leaks in tests
 
-                                  void markAllCells(Cell* x, unordered_map<Cell*, long>& mark) {
+                                  void markAllCells(Cell* x, unordered_map<Cell*, int>& mark) {
                                     if (x == nil) return;
                                     ++mark[x];
                                     switch (x->type) {
@@ -185,7 +185,7 @@ void init() {
                                   }
 
 void dumpUnfreed() {
-  unordered_map<Cell*, long> numRefsRemaining;
+  unordered_map<Cell*, int> numRefsRemaining;
   for (Heap* h = firstHeap; h; h=h->next)
     for (Cell* x = &h->cells[0]; x < &h->cells[HEAPCELLS]; ++x)
       if (x->car)
@@ -200,8 +200,8 @@ void dumpUnfreed() {
     }
 }
 
-long numUnfreed() {
-  long n = 0;
+int numUnfreed() {
+  int n = 0;
   for (Heap* h = firstHeap; h != currHeap; h=h->next)
     n += HEAPCELLS;
   n += currCell-initialSyms.size();

@@ -1,7 +1,7 @@
 //// Bindings for underlying functions.
 
 COMPILE_FN(addr, compiledFn_addr, "($x)",
-  return mkref(newNum((long)lookup("$x")));
+  return mkref(newNum((int)lookup("$x")));
 )
 
 COMPILE_FN(debug, compiledFn_debug, "($x)",
@@ -17,7 +17,7 @@ COMPILE_FN(register_failed_test, compiledFn_incTests, "($msg $expr)",
 )
 
 COMPILE_FN(mem_usage, compiledFn_mem_usage, "()",
-  long numUnfreed();
+  int numUnfreed();
   return mkref(newNum(numUnfreed()));
 )
 

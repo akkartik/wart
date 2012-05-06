@@ -14,7 +14,7 @@ Cell* buildCell(AstNode n) {
 
   if (n.isAtom()) {
     char* end;
-    long v = strtol(n.atom.token.c_str(), &end, 0);
+    int v = strtol(n.atom.token.c_str(), &end, 0);
     if (*end == '\0')
       return newNum(v);
 

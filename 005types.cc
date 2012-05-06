@@ -1,8 +1,8 @@
 //// primitive datatypes
 
-                                  unordered_map<long, Cell*> numLiterals;
+                                  unordered_map<int, Cell*> numLiterals;
 
-Cell* newNum(long x) {
+Cell* newNum(int x) {
   if (numLiterals[x])
     return numLiterals[x];
   numLiterals[x] = newCell();
@@ -15,12 +15,12 @@ bool isNum(Cell* x) {
   return x->type == NUMBER;
 }
 
-long toNum(Cell* x) {
+int toNum(Cell* x) {
   if (!isNum(x)) {
     RAISE << "not a number: " << x << endl;
     return 0;
   }
-  return (long)x->car;
+  return (int)x->car;
 }
 
 
@@ -63,7 +63,7 @@ string toString(Cell* x) {
 }
 
 Cell* genSym(Cell* x) {
-  static long counter = 0;
+  static int counter = 0;
   ostringstream os;
   os << (x == nil ? "sym" : toString(x)) << ++counter;
   return newSym(os.str());
@@ -73,9 +73,9 @@ Cell* genSym(Cell* x) {
 
 unordered_set<Cell*> initialSyms;
 void teardownLiteralTables() {
-  for (unordered_map<long, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
+  for (unordered_map<int, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
     if (p->second->nrefs > 1)
-      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
+      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (int)p->second->car << " " << p->second->nrefs << endl;
     if (p->second->nrefs > 0)
       rmref(p->second);
   }

@@ -1,7 +1,7 @@
 COMPILE_FN(list_splice, compiledFn_list_splice, "('$list $start $end $val)",
   Cell* binding = lookup("$list");
   Cell* list = eval(binding);
-  long start = toNum(lookup("$start"));
+  int start = toNum(lookup("$start"));
   Cell* prePtr = nthCdr(list, start-1);
   Cell* startPtr = nthCdr(list, start);
   Cell* endPtr = nthCdr(list, toNum(lookup("$end")));

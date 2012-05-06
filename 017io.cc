@@ -95,5 +95,5 @@ COMPILE_FN(read-byte, compiledFn_read_byte, "('$eof)",
     return mkref(lookup("$eof"));
   char c;
   f.read(&c, 1);
-  return mkref(newNum((long)c));
+  return mkref(newNum((int)c));
 )
