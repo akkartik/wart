@@ -33,6 +33,10 @@ mac alias(new old) ; include later refinements
   `(mac ,new $args
      `(,,old ,@$args))
 
+mac freezing(name . body) ; ignore later refinements
+  `(let ,name ,name
+     ,@body)
+
 def compose(f g)
   fn 'args
     eval `(,f (,g ,@args)) caller-scope
@@ -48,9 +52,9 @@ def list args
     (cons car.args
           (list @cdr.args))
 
-let $iso iso ; ignore later refinements
+freezing iso
   def isa(x 't)
-    ($iso t type.x)
+    (iso t type.x)
 
 = cadr car:cdr
 = cddr cdr:cdr
