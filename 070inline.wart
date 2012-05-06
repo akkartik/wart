@@ -1,3 +1,7 @@
+def inline!(sym bindings)
+  = rep.sym!optimized-body (map (fn(_) (inline _ bindings))
+                                body.sym)
+
 def inline(call bindings)
   (inline-macro-eval:to-with-expr call bindings)
 
@@ -237,3 +241,5 @@ def intersection(a b)
   collect:each x a
     if (pos x b)
       yield x
+
+inline! if
