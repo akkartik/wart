@@ -1,14 +1,14 @@
 //// primitive datatypes
 
-                                  unordered_map<int, Cell*> numLiterals;
+                                  unordered_map<int, Cell*> intLiterals;
 
 Cell* newNum(int x) {
-  if (numLiterals[x])
-    return numLiterals[x];
-  numLiterals[x] = newCell();
-  numLiterals[x]->car = (Cell*)x;
-  numLiterals[x]->type = NUMBER;
-  return mkref(numLiterals[x]);
+  if (intLiterals[x])
+    return intLiterals[x];
+  intLiterals[x] = newCell();
+  intLiterals[x]->car = (Cell*)x;
+  intLiterals[x]->type = NUMBER;
+  return mkref(intLiterals[x]);
 }
 
 bool isNum(Cell* x) {
@@ -73,7 +73,7 @@ Cell* genSym(Cell* x) {
 
 unordered_set<Cell*> initialSyms;
 void teardownLiteralTables() {
-  for (unordered_map<int, Cell*>::iterator p = numLiterals.begin(); p != numLiterals.end(); ++p) {
+  for (unordered_map<int, Cell*>::iterator p = intLiterals.begin(); p != intLiterals.end(); ++p) {
     if (p->second->nrefs > 1)
       RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (int)p->second->car << " " << p->second->nrefs << endl;
     if (p->second->nrefs > 0)
