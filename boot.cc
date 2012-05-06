@@ -142,7 +142,7 @@ Cell* read(CodeStream& c) {
 
 void init() {
   numLiterals.clear();
-  stringLiterals.clear();
+  symLiterals.clear();
   dynamics.clear(); // leaks memory for strings and tables
   resetHeap();
 

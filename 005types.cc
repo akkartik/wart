@@ -32,14 +32,14 @@ long toNum(Cell* x) {
                                   template<class Data>
                                   struct StringMap :public unordered_map<string, Data>{};
 
-                                  StringMap<Cell*> stringLiterals;
+                                  StringMap<Cell*> symLiterals;
                                   Cell* intern(string x) {
-                                    if (stringLiterals[x])
-                                      return stringLiterals[x];
-                                    stringLiterals[x] = newCell();
-                                    stringLiterals[x]->car = (Cell*)new string(x); // not aligned like cells; can fragment memory
-                                    mkref(stringLiterals[x]);
-                                    return stringLiterals[x];
+                                    if (symLiterals[x])
+                                      return symLiterals[x];
+                                    symLiterals[x] = newCell();
+                                    symLiterals[x]->car = (Cell*)new string(x); // not aligned like cells; can fragment memory
+                                    mkref(symLiterals[x]);
+                                    return symLiterals[x];
                                   }
 
 Cell* newSym(string x) {
@@ -88,7 +88,7 @@ void teardownLiteralTables() {
     if (p->second->nrefs > 0)
       rmref(p->second);
   }
-  for (StringMap<Cell*>::iterator p = stringLiterals.begin(); p != stringLiterals.end(); ++p) {
+  for (StringMap<Cell*>::iterator p = symLiterals.begin(); p != symLiterals.end(); ++p) {
     if (initialSyms.find(p->second) != initialSyms.end()) continue;
     if (p->second->nrefs > 1)
       RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
