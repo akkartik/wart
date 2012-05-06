@@ -43,7 +43,7 @@ bool isSym(Cell* x) {
   return x->type == SYMBOL;
 }
 
-Cell* newString(string x) {
+Cell* newString(string x) { // don't intern strings
   Cell* result = newCell();
   result->car = (Cell*)new string(x);
   result->type = STRING;
