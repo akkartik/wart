@@ -128,3 +128,12 @@ void test_iso_nil() {
   rmref(result);
   rmref(call);
 }
+
+void test_iso_handles_floats() {
+  Cell* call = read(stream("iso (/ 3.0 2) 1.5"));
+  Cell* result = eval(call);
+  check(result);
+  check(result != nil);
+  rmref(result);
+  rmref(call);
+}

@@ -87,6 +87,8 @@ COMPILE_FN(iso, compiledFn_iso, "($x $y)",
     result = newNum(1);
   else if (x == y)
     result = x;
+  else if (x->type == FLOAT || y->type == FLOAT)
+    result = (equalFloats(toFloat(x), toFloat(y)) ? x : nil);
   else if (isString(x) && isString(y) && toString(x) == toString(y))
     result = x;
   else
