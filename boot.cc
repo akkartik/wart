@@ -162,8 +162,8 @@ void init() {
                                     ++mark[x];
                                     switch (x->type) {
                                     case NUMBER:
-                                    case STRING:
                                     case SYMBOL:
+                                    case STRING:
                                       break;
                                     case CONS:
                                       markAllCells(car(x), mark); break;
