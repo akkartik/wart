@@ -30,6 +30,15 @@ void test_build_handles_sym() {
   check(cs.fd.eof());
 }
 
+void test_build_handles_string() {
+  CodeStream cs(stream("\"a\""));
+  Cell* c = nextRawCell(cs);
+  checkEq(toString(c), "a");
+  checkEq(c->nrefs, 0); // strings aren't interned
+  rmref(c);
+  check(cs.fd.eof());
+}
+
 void test_build_doesnt_mix_syms_and_strings() {
   Cell* s = newString("a");
   check(s != newSym("a"));
