@@ -18,6 +18,10 @@ Cell* buildCell(AstNode n) {
     if (*end == '\0')
       return newNum(v);
 
+    float f = strtof(n.atom.token.c_str(), &end);
+    if (*end == '\0')
+      return newNum(f);
+
     if (n.atom.token.c_str()[0] == '"')
       return newString(n.atom.token.substr(1, n.atom.token.length()-2));
 

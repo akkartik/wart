@@ -2,6 +2,7 @@
 #include<cstring>
 #include<cstdlib>
 #include<time.h>
+#include<math.h>
 #include<vector>
 using std::vector;
 #include<list>
@@ -162,6 +163,7 @@ void init() {
                                     ++mark[x];
                                     switch (x->type) {
                                     case INTEGER:
+                                    case FLOAT:
                                     case SYMBOL:
                                     case STRING:
                                       break;

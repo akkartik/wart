@@ -11,16 +11,41 @@ Cell* newNum(int x) {
   return mkref(intLiterals[x]);
 }
 
+Cell* newNum(float x) { // don't intern floats
+  Cell* result = newCell();
+  result->car = *(Cell**)&x;
+  result->type = FLOAT;
+  return result;
+}
+
+Cell* newNum(double x) {
+  return newNum((float)x);
+}
+
 bool isNum(Cell* x) {
-  return x->type == INTEGER;
+  return x->type == INTEGER || x->type == FLOAT;
 }
 
 int toInt(Cell* x) {
-  if (!isNum(x)) {
-    RAISE << "not a number: " << x << endl;
-    return 0;
-  }
-  return (int)x->car;
+  if (x->type == INTEGER)
+    return (int)x->car;
+  if (x->type == FLOAT)
+    return (int)*((float*)&x->car);
+  RAISE << "not a number: " << x << endl;
+  return 0;
+}
+
+float toFloat(Cell* x) {
+  if (x->type == INTEGER)
+    return (int)x->car;
+  if (x->type == FLOAT)
+    return *(float*)&x->car;
+  RAISE << "not a number: " << x << endl;
+  return 0;
+}
+
+bool equalFloats(float x, float y) {
+  return fabs(x-y) < 1e-7;
 }
 
 
@@ -197,6 +222,7 @@ Cell* type(Cell* x) {
   if (x == nil) return nil;
   switch(x->type) {
   case INTEGER:
+  case FLOAT:
     return newSym("number");
   case SYMBOL:
     return newSym("symbol");

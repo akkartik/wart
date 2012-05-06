@@ -31,7 +31,8 @@ void test_dot_is_call() {
 
 void test_dot_skips_floats() {
   Cell* val = read(stream("2.4"));
-  checkEq(val, newSym("2.4")); // fix when we support floats
+  check(isNum(val));
+  check(equalFloats(toFloat(val), 2.4));
   rmref(val);
 }
 

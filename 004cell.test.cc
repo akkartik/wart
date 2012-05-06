@@ -38,4 +38,5 @@ void test_num_types_take_up_same_space_as_Cell() {
   checkEq(sizeof(int), sizeof(Cell*));
   checkEq(sizeof(long), sizeof(Cell*));
   checkEq(sizeof(float), sizeof(Cell*));
+  checkEq(sizeof(size_t), sizeof(Cell*));
 }

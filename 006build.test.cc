@@ -21,6 +21,16 @@ void test_build_handles_integer() {
   check(cs.fd.eof());
 }
 
+void test_build_handles_float() {
+  CodeStream cs(stream("3.4"));
+  Cell* c = nextRawCell(cs);
+  check(isNum(c));
+  check(equalFloats(toFloat(c), 3.4));
+  checkEq(c->nrefs, 0); // floats aren't interned
+  rmref(c);
+  check(cs.fd.eof());
+}
+
 void test_build_handles_sym() {
   CodeStream cs(stream("a"));
   Cell* c = nextRawCell(cs);

@@ -26,6 +26,8 @@ ostream& operator<<(ostream& os, Cell* c) {
     return os << ")";
   case INTEGER:
     return os << toInt(c);
+  case FLOAT:
+    return os << toFloat(c);
   case SYMBOL:
     return os << toString(c);
   case STRING:
