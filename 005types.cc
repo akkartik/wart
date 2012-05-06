@@ -7,12 +7,12 @@ Cell* newNum(int x) {
     return intLiterals[x];
   intLiterals[x] = newCell();
   intLiterals[x]->car = (Cell*)x;
-  intLiterals[x]->type = NUMBER;
+  intLiterals[x]->type = INTEGER;
   return mkref(intLiterals[x]);
 }
 
 bool isNum(Cell* x) {
-  return x->type == NUMBER;
+  return x->type == INTEGER;
 }
 
 int toInt(Cell* x) {
@@ -196,7 +196,7 @@ Cell* rep(Cell* x) {
 Cell* type(Cell* x) {
   if (x == nil) return nil;
   switch(x->type) {
-  case NUMBER:
+  case INTEGER:
     return newSym("number");
   case SYMBOL:
     return newSym("symbol");

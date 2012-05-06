@@ -161,7 +161,7 @@ void init() {
                                     if (x == nil) return;
                                     ++mark[x];
                                     switch (x->type) {
-                                    case NUMBER:
+                                    case INTEGER:
                                     case SYMBOL:
                                     case STRING:
                                       break;

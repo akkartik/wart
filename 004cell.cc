@@ -7,7 +7,7 @@ struct Cell {
   Cell* cdr;
   int type;
     #define CONS 0
-    #define NUMBER 1
+    #define INTEGER 1
     #define SYMBOL 2
     #define STRING 3
     #define TABLE 4
@@ -31,7 +31,7 @@ bool isCons(Cell* x) {
 }
 
 bool isAtom(Cell* x) {
-  return x == nil || x->type == NUMBER || x->type == STRING || x->type == SYMBOL || x->type == COMPILED_FN;
+  return x == nil || x->type == INTEGER || x->type == STRING || x->type == SYMBOL || x->type == COMPILED_FN;
 }
 
 
@@ -123,7 +123,7 @@ void rmref(Cell* c) {
     RAISE << "deleted atom: " << (void*)c << endl;
 
   switch (c->type) {
-  case NUMBER:
+  case INTEGER:
     break; // numbers don't need freeing
   case STRING:
   case SYMBOL:
