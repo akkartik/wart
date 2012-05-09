@@ -13,3 +13,21 @@ void test_add_works_for_floats() {
   rmref(result);
   rmref(call);
 }
+
+void test_division_always_returns_floats() {
+  Cell* call = read(stream("/ 4 2"));
+  Cell* result = eval(call);
+  checkEq(result->type, FLOAT);
+  checkEq(toFloat(result), 2.0);
+  rmref(result);
+  rmref(call);
+}
+
+void test_integer_drops_decimals() {
+  Cell* call = read(stream("int -2.7"));
+  Cell* result = eval(call);
+  checkEq(result->type, INTEGER);
+  checkEq(toInt(result), -2.0);
+  rmref(result);
+  rmref(call);
+}
