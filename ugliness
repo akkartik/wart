@@ -1,5 +1,7 @@
 can't use coerce in eval
 
+spliceArgs assumes only macros quote the entire param list
+
 names to avoid because wart uses them internally:
   anything ending in a digit - $vars expand to digit suffixes
   anything containing _ - match may misinterpret it

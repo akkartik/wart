@@ -61,7 +61,7 @@
                                     return eval(cdr(arg), scope);
                                   }
 
-// eval @exprs and inline them into args, tagging them with ''
+// eval @exprs and inline them into args, tagging them with '' (already eval'd)
 Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
   Cell *pResult = newCell(), *tip = pResult;
   for (Cell* curr = args; curr != nil; curr=cdr(curr)) {

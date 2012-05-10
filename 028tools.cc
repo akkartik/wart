@@ -31,7 +31,7 @@ COMPILE_FN(date, compiledFn_date, "()",
   return nil;
 )
 
-COMPILE_FN(time, compiledFn_time, "'($expr)",
+COMPILE_FN(time, compiledFn_time, "('$expr)",
   clock_t start = clock();
   Cell* result = eval(lookup("$expr"));
   cerr << clock()-start << "/" << CLOCKS_PER_SEC << endl;
