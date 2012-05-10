@@ -15,8 +15,13 @@ Cell* buildCell(AstNode n) {
   if (n.isAtom()) {
     char* end;
     int v = strtol(n.atom.token.c_str(), &end, 0);
-    if (*end == '\0')
+    if (*end == '\0' && errno == 0)
       return newNum(v);
+
+    if (errno != 0) {
+      errno = 0;
+      RAISE << "dropping precision for bignum " << n.atom.token << endl;
+    }
 
     float f = strtof(n.atom.token.c_str(), &end);
     if (*end == '\0')

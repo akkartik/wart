@@ -1,6 +1,7 @@
 #include<cstdio>
 #include<cstring>
 #include<cstdlib>
+#include<errno.h>
 #include<time.h>
 #include<math.h>
 #include<vector>
