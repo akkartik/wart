@@ -1,5 +1,6 @@
 can't use coerce in eval
 
+can't call macros with @args
 spliceArgs assumes only macros quote the entire param list
 
 names to avoid because wart uses them internally:
