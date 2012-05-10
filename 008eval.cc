@@ -209,10 +209,6 @@ Cell* evalArgs(Cell* params, Cell* args, Cell* scope) {
   return mkref(result);
 }
 
-Cell* evalArgs(Cell* params, Cell* args) {
-  return evalArgs(params, args, currLexicalScopes.top());
-}
-
 
 
                                   // split param sym at '/' and bind all resulting syms to val

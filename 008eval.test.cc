@@ -77,6 +77,12 @@ void test_reorderKeywordArgs_handles_improper_lists() {
   rmref(params);
 }
 
+
+
+                                  Cell* evalArgs(Cell* params, Cell* args) {
+                                    return evalArgs(params, args, currLexicalScopes.top());
+                                  }
+
 void test_evalArgs_handles_unquoted_param() {
   newDynamicScope("a", newNum(3));
   Cell* params = read(stream("(x)"));
