@@ -1,14 +1,18 @@
 //// primitive datatypes
 
-                                  unordered_map<int, Cell*> intLiterals;
+                                  unordered_map<long, Cell*> intLiterals;
 
-Cell* newNum(int x) {
+Cell* newNum(long x) {
   if (intLiterals[x])
     return intLiterals[x];
   intLiterals[x] = newCell();
   intLiterals[x]->car = (Cell*)x;
   intLiterals[x]->type = INTEGER;
   return mkref(intLiterals[x]);
+}
+
+Cell* newNum(int x) {
+  return newNum((long)x);
 }
 
 Cell* newNum(float x) { // don't intern floats
@@ -26,18 +30,19 @@ bool isNum(Cell* x) {
   return x->type == INTEGER || x->type == FLOAT;
 }
 
-int toInt(Cell* x) {
+long toInt(Cell* x) {
+  // ignore endianness; Cells are never persisted.
   if (x->type == INTEGER)
-    return (int)x->car;
+    return (long)x->car;
   if (x->type == FLOAT)
-    return (int)*((float*)&x->car);
+    return (long)*((float*)&x->car);
   RAISE << "not a number: " << x << endl;
   return 0;
 }
 
 float toFloat(Cell* x) {
   if (x->type == INTEGER)
-    return (int)x->car;
+    return (long)x->car;
   if (x->type == FLOAT)
     return *(float*)&x->car;
   RAISE << "not a number: " << x << endl;
@@ -88,7 +93,7 @@ string toString(Cell* x) {
 }
 
 Cell* genSym(Cell* x) {
-  static int counter = 0;
+  static long counter = 0;
   ostringstream os;
   os << (x == nil ? "sym" : toString(x)) << ++counter;
   return newSym(os.str());
@@ -98,9 +103,9 @@ Cell* genSym(Cell* x) {
 
 unordered_set<Cell*> initialSyms;
 void teardownLiteralTables() {
-  for (unordered_map<int, Cell*>::iterator p = intLiterals.begin(); p != intLiterals.end(); ++p) {
+  for (unordered_map<long, Cell*>::iterator p = intLiterals.begin(); p != intLiterals.end(); ++p) {
     if (p->second->nrefs > 1)
-      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (int)p->second->car << " " << p->second->nrefs << endl;
+      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
     if (p->second->nrefs > 0)
       rmref(p->second);
   }

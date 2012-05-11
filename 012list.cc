@@ -1,7 +1,7 @@
 COMPILE_FN(list_splice, compiledFn_list_splice, "('$list $start $end $val)",
   Cell* binding = lookup("$list");
   Cell* list = eval(binding);
-  int start = toInt(lookup("$start"));
+  long start = toInt(lookup("$start"));
   Cell* prePtr = nthCdr(list, start-1);
   Cell* startPtr = nthCdr(list, start);
   Cell* endPtr = nthCdr(list, toInt(lookup("$end")));
@@ -30,14 +30,14 @@ COMPILE_FN(list_splice, compiledFn_list_splice, "('$list $start $end $val)",
 
 COMPILE_FN(list_range, compiledFn_list_range, "($list $index $end)",
   Cell* list = lookup("$list");
-  int index = toInt(lookup("$index"));
-  for (int i = 0; i < index; ++i)
+  long index = toInt(lookup("$index"));
+  for (long i = 0; i < index; ++i)
     list=cdr(list);
 
-  int end = toInt(lookup("$end"));
+  long end = toInt(lookup("$end"));
   Cell* pResult = newCell();
   Cell* curr = pResult;
-  for (int i = index; i < end && list != nil; ++i, list=cdr(list), curr=cdr(curr))
+  for (long i = index; i < end && list != nil; ++i, list=cdr(list), curr=cdr(curr))
     addCons(curr, car(list));
   return dropPtr(pResult);
 )

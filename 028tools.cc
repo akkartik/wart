@@ -1,7 +1,7 @@
 //// Bindings for underlying functions.
 
 COMPILE_FN(addr, compiledFn_addr, "($x)",
-  return mkref(newNum((int)lookup("$x")));
+  return mkref(newNum((long)lookup("$x")));
 )
 
 COMPILE_FN(debug, compiledFn_debug, "($x)",

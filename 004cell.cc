@@ -1,10 +1,12 @@
 //// cell: core lisp data structure with ref-counted garbage collection
 
-unsigned int numAllocs = 0;
+unsigned long numAllocs = 0;
 
 struct Cell {
-  Cell* car;
+  Cell* car; // aliased to long or float
   Cell* cdr;
+
+  // ints save space on 64-bit platforms
   int type;
     #define CONS 0
     #define INTEGER 1
@@ -14,6 +16,7 @@ struct Cell {
     #define TABLE 5
     #define COMPILED_FN 6
   int nrefs;
+
   Cell() :car(NULL), cdr(NULL), type(CONS), nrefs(0) {}
   void init() {
     car=cdr=nil, type=CONS, nrefs=0;
@@ -46,7 +49,7 @@ struct Heap {
 
 Heap* firstHeap = new Heap();
 Heap* currHeap = firstHeap;
-int currCell = 0;
+long currCell = 0;
 Cell* freelist = NULL;
 
 void growHeap() {
@@ -204,9 +207,9 @@ bool equalList(Cell* a, Cell* b) {
       && equalList(cdr(a), cdr(b));
 }
 
-Cell* nthCdr(Cell* x, int n) {
+Cell* nthCdr(Cell* x, long n) {
   Cell* curr = x;
-  for (int idx = n; idx > 0; --idx) {
+  for (long idx = n; idx > 0; --idx) {
     if (!isCons(curr))
       RAISE << "list is too short: " << x << " " << n << endl;
     curr=cdr(curr);

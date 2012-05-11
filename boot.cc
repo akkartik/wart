@@ -203,8 +203,8 @@ void dumpUnfreed() {
     }
 }
 
-int numUnfreed() {
-  int n = 0;
+long numUnfreed() {
+  long n = 0;
   for (Heap* h = firstHeap; h != currHeap; h=h->next)
     n += HEAPCELLS;
   n += currCell-initialSyms.size();

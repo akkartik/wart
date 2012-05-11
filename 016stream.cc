@@ -1,9 +1,9 @@
 Cell* newIstream(istream* x) {
-  return newObject("stream", newNum((int)x));
+  return newObject("stream", newNum((long)x));
 }
 
 Cell* newOstream(ostream* x) {
-  return newObject("stream", newNum((int)x));
+  return newObject("stream", newNum((long)x));
 }
 
 istream& toIstream(Cell* x) {
