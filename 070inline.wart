@@ -242,5 +242,3 @@ def intersection(a b)
   collect:each x a
     if (pos x b)
       yield x
-
-inline! if
