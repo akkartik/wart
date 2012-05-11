@@ -32,7 +32,7 @@ void test_build_handles_float() {
 }
 
 void test_build_creates_floats_on_overflow() {
-  CodeStream cs(stream("10000000000"));
+  CodeStream cs(stream("100000000000000000000"));
   Cell* c = nextRawCell(cs);
   checkEq(raiseCount, 1); raiseCount=0; // overflow warning
   checkEq(c->type, FLOAT);
