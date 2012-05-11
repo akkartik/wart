@@ -1,5 +1,5 @@
 can't call macros with @args
-spliceArgs assumes only macros quote the entire param list
+spliceArgs and inline assume that only macros quote the entire param list
 
 names to avoid because wart uses them internally:
   anything ending in a digit - $vars expand to digit suffixes
