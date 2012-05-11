@@ -37,15 +37,15 @@ using std::ifstream;
 using std::ofstream;
 
 bool runningTests = false;
-int numFailures = 0;
+long numFailures = 0;
 bool pretendRaise = false;
-int raiseCount = 0;
+long raiseCount = 0;
 
 
 
 // generate traces for debugging
 
-int debug = 0;
+long debug = 0;
 #define dbg if(debug == 1) cerr
 #define dbg2 if(debug == 2) cerr
 
@@ -104,7 +104,7 @@ const CompiledFnMetadata compiledFns[] = {
 
 void setupCompiledFns() {
   newDynamicScope("compiled", newTable());
-  for (unsigned int i=0; i < sizeof(compiledFns)/sizeof(compiledFns[0]); ++i) {
+  for (unsigned long i=0; i < sizeof(compiledFns)/sizeof(compiledFns[0]); ++i) {
     Cell* f = newTable();
     unsafeSet(f, newSym("name"), newSym(compiledFns[i].name), false);
     unsafeSet(f, newSym("sig"), nextRawCell(stream(compiledFns[i].params)), false);
@@ -117,7 +117,7 @@ void setupCompiledFns() {
 }
 
 void teardownCompiledFns() {
-  for (unsigned int i=0; i < sizeof(compiledFns)/sizeof(compiledFns[0]); ++i)
+  for (unsigned long i=0; i < sizeof(compiledFns)/sizeof(compiledFns[0]); ++i)
     endDynamicScope(compiledFns[i].name);
   endDynamicScope("compiled");
 }
@@ -132,7 +132,7 @@ const transformer transforms[] = {
 };
 
 Cell* transform(Cell* cell) {
-  for (unsigned int i=0; i < sizeof(transforms)/sizeof(transforms[0]); ++i)
+  for (unsigned long i=0; i < sizeof(transforms)/sizeof(transforms[0]); ++i)
     cell = (*transforms[i])(cell);
   return cell;
 }
@@ -251,7 +251,7 @@ const TestFn tests[] = {
 void runTests() {
   runningTests = true;
   pretendRaise = true;
-  for (unsigned int i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
+  for (unsigned long i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
     init();
     (*tests[i])();
     if (raiseCount != 0) cerr << raiseCount << " errors encountered" << endl;
@@ -301,3 +301,5 @@ int main(int argc, unused char* argv[]) {
 // style:
 //  minimal function prototypes
 //  immutable objects; copy everywhere; no pointers except Cell*
+//  long is the default integer type (it's always as large as a pointer)
+//  use int for Cell nrefs (to save space), and for system libs

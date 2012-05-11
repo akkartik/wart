@@ -130,9 +130,9 @@ COMPILE_FN(set_cdr, compiledFn_set_cdr, "($cons $val)",
 COMPILE_FN(len, compiledFn_len, "($x)",
   Cell* x = lookup("$x");
   if (isString(x))
-    return mkref(newNum((int)toString(x).length()));
+    return mkref(newNum((long)toString(x).length()));
 
-  int ans = 0;
+  long ans = 0;
   for (; x != nil; x=cdr(x))
     ++ans;
   return mkref(newNum(ans));

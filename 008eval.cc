@@ -246,7 +246,7 @@ void bindParams(Cell* params, Cell* args) {
 
 
 
-                                  int unquoteDepth(Cell* x) {
+                                  long unquoteDepth(Cell* x) {
                                     if (!isCons(x) || car(x) != newSym(","))
                                       return 0;
                                     return unquoteDepth(cdr(x))+1;
@@ -258,7 +258,7 @@ void bindParams(Cell* params, Cell* args) {
                                     return stripUnquote(cdr(x));
                                   }
 
-Cell* processUnquotes(Cell* x, int depth, Cell* scope) {
+Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
   if (!isCons(x)) return mkref(x);
 
   if (unquoteDepth(x) == depth)
@@ -291,7 +291,7 @@ Cell* processUnquotes(Cell* x, int depth, Cell* scope) {
   return mkref(result);
 }
 
-Cell* processUnquotes(Cell* x, int depth) {
+Cell* processUnquotes(Cell* x, long depth) {
   return processUnquotes(x, depth, currLexicalScopes.top());
 }
 

@@ -36,8 +36,8 @@ list<Token> nextLine(CodeStream& c) {
                                     return x == "'" || x == "`" || x == "," || x == ",@" || x == "@";
                                   }
 
-                                  int numWordsInLine(list<Token> line) {
-                                    int numWords = 0;
+                                  long numWordsInLine(list<Token> line) {
+                                    long numWords = 0;
                                     for (list<Token>::iterator p = line.begin(); p != line.end(); ++p)
                                       if (!p->isIndent() && !isParen(*p)
                                           && !isQuoteOrUnquote(*p))
@@ -57,9 +57,9 @@ list<Token> nextLine(CodeStream& c) {
                                     return (*q == "(");
                                   }
 
-                                  Token nthTokenInLine(list<Token> line, int n) {
+                                  Token nthTokenInLine(list<Token> line, long n) {
                                     list<Token>::iterator p = line.begin();
-                                    for (int i = 0; i < n; ++i)
+                                    for (long i = 0; i < n; ++i)
                                       ++p;
                                     return *p;
                                   }
@@ -71,17 +71,17 @@ list<Token> nextLine(CodeStream& c) {
                                         || (isQuoteOrUnquote(firstToken) && secondToken == "(");
                                   }
 
-                                  bool continuationLine(int currLineIndent, stack<int> parenStack) {
+                                  bool continuationLine(long currLineIndent, stack<long> parenStack) {
                                     return !parenStack.empty() && currLineIndent == parenStack.top()+1;
                                   }
 
 list<Token> nextExpr(CodeStream& c) {
   list<Token> result;
-  stack<int> explicitParenStack; // parens in the original
-  stack<int> implicitParenStack; // parens we inserted
-  int argParenCount=0; // depth of unprocessed parens not at start of line
+  stack<long> explicitParenStack; // parens in the original
+  stack<long> implicitParenStack; // parens we inserted
+  long argParenCount=0; // depth of unprocessed parens not at start of line
   for (list<Token> line = nextLine(c); !line.empty(); line=nextLine(c)) {
-    int thisLineIndent=line.front().indentLevel, nextLineIndent=line.back().indentLevel;
+    long thisLineIndent=line.front().indentLevel, nextLineIndent=line.back().indentLevel;
 
     bool insertedParenThisLine = false;
     if (!argParenCount && numWordsInLine(line) > 1 && !alreadyGrouped(line) && !continuationLine(thisLineIndent, explicitParenStack)) {
@@ -128,7 +128,7 @@ list<Token> nextExpr(CodeStream& c) {
       break;
   }
 
-  for (unsigned int i=0; i < implicitParenStack.size(); ++i)
+  for (unsigned long i=0; i < implicitParenStack.size(); ++i)
     result.push_back(Token::of(")"));
   return result;
 }

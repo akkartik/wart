@@ -3,9 +3,9 @@
 // line contains 1 indent and zero or more regular tokens
 struct Token {
   string token;
-  int indentLevel; // all tokens on a line share its indentLevel
+  long indentLevel; // all tokens on a line share its indentLevel
 
-  Token(const string x, const int l)
+  Token(const string x, const long l)
     :token(x), indentLevel(l) {}
   Token(const Token& rhs)
     :token(rhs.token), indentLevel(rhs.indentLevel) {}
@@ -19,11 +19,11 @@ struct Token {
   static Token of(string s) {
     return of(s, 0);
   }
-  static Token of(string s, int indent) {
+  static Token of(string s, long indent) {
     Token result(s, indent);
     return result;
   }
-  static Token indent(int indent) {
+  static Token indent(long indent) {
     Token result("", indent);
     return result;
   }
@@ -109,8 +109,8 @@ struct Token {
                                     in.get(); in.get();
                                   }
 
-                                  int indent(istream& in) {
-                                    int indent = 0;
+                                  long indent(istream& in) {
+                                    long indent = 0;
                                     char c;
                                     while (in >> c) {
                                       if (c == ';')
@@ -128,7 +128,7 @@ struct Token {
                                     return indent;
                                   }
 
-Token nextToken(istream& in, int& currIndent) {
+Token nextToken(istream& in, long& currIndent) {
   if (currIndent == -1) // initial
     return Token::indent(currIndent=indent(in));
   skipWhitespace(in);
@@ -161,7 +161,7 @@ Token nextToken(istream& in, int& currIndent) {
 
 struct CodeStream {
   istream& fd;
-  int currIndent;
+  long currIndent;
 
   CodeStream(istream& in) :fd(in), currIndent(-1) {
     fd >> std::noskipws;

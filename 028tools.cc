@@ -17,7 +17,7 @@ COMPILE_FN(register_failed_test, compiledFn_incTests, "($msg $expr)",
 )
 
 COMPILE_FN(mem_usage, compiledFn_mem_usage, "()",
-  int numUnfreed();
+  long numUnfreed();
   return mkref(newNum(numUnfreed()));
 )
 

@@ -11,7 +11,7 @@ Cell* newNum(long x) {
   return mkref(intLiterals[x]);
 }
 
-Cell* newNum(int x) {
+Cell* newNum(int x) { // just for integer literals
   return newNum((long)x);
 }
 
