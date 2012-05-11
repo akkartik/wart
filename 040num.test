@@ -57,3 +57,7 @@
 (test ">= works"
  :valueof (>= 3 1 2)
  :should be nil)
+
+(test "floats compare to within a tolerance"
+ :valueof (>= 2 2.0000001)
+ :should ~be nil)
