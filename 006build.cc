@@ -13,15 +13,14 @@ Cell* buildCell(AstNode n) {
   }
 
   if (n.isAtom()) {
+    errno = 0;
     char* end;
     long v = strtol(n.atom.token.c_str(), &end, 0);
     if (*end == '\0' && errno == 0)
       return newNum(v);
 
-    if (errno != 0) {
-      errno = 0;
+    if (errno == ERANGE || errno == EOVERFLOW)
       RAISE << "dropping precision for bignum " << n.atom.token << endl;
-    }
 
     float f = strtof(n.atom.token.c_str(), &end);
     if (*end == '\0')
