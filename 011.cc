@@ -70,6 +70,17 @@ COMPILE_FN(bound?, compiledFn_isBound, "($var)",
   return mkref(var);
 )
 
+COMPILE_FN(make-unbound, compiledFn_make_unbound, "($var)",
+  Cell* var = lookup("$var");
+  stack<Cell*>& bindings = dynamics[var]; // unbind just in dynamic scopes
+  while (!bindings.empty()) {
+    rmref(var);
+    rmref(bindings.top());
+    bindings.pop();
+  }
+  return nil;
+)
+
 // type can't take 2 args; calls would look like type constructors
 COMPILE_FN(type, compiledFn_type, "($x)",
   return mkref(type(lookup("$x")));
