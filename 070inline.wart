@@ -18,28 +18,32 @@ def inline(call bindings)
 ;
 ; Macros are specially tagged with 'mac-withs.
 def to-with-expr(call bindings done)
-  (iflet f (and (~pos car.call done) ; skip recursive calls
-                (~iso 'withs car.call)
-                (lookup-or-eval car.call bindings))
-    `(withs ,(scope->with-bindings env.f)
-       ,(if
-          (quote?:car sig.f)
-            `(mac-withs (,cdr:sig.f ',cdr.call)
-               ,@(collect:each expr body.f
-                   (if (iso car.expr 'eval)
-                     (yield `(,expr.0 ,expr.1)) ; strip caller-scope
+  if (iso 'withs car.call)
+    `(withs ,call.1
+       ,@(collect:each expr withs-body.call
+           (yield:to-with-expr expr
+                               (maybe chain-scope with-bindings->scope:call.1 :to bindings))))
+    (iflet f (and (~pos car.call done) ; skip recursive calls
+                  (check (lookup-or-eval car.call bindings) ~compiled-fn?))
+      `(withs ,(scope->with-bindings env.f)
+         ,(if
+            (quote?:car sig.f)
+              `(mac-withs (,cdr:sig.f ',cdr.call)
+                 ,@(collect:each expr body.f
+                     (if (iso car.expr 'eval)
+                       (yield `(,expr.0 ,expr.1)) ; strip caller-scope
+                       (yield:to-with-expr expr
+                                           (maybe chain-scope env.f :to bindings)
+                                           (cons car.call done)))))
+            (contains-quote? sig.f)
+              `((fn ,sig.f ,@body.f) ,@cdr.call)
+            :else
+              `(withs (,sig.f ,(cons 'list cdr.call))
+                 ,@(collect:each expr body.f
                      (yield:to-with-expr expr
                                          (maybe chain-scope env.f :to bindings)
-                                         (cons car.call done)))))
-          (contains-quote? sig.f)
-            `((fn ,sig.f ,@body.f) ,@cdr.call)
-          :else
-            `(withs (,sig.f ,(cons 'list cdr.call))
-               ,@(collect:each expr body.f
-                   (yield:to-with-expr expr
-                                       (maybe chain-scope env.f :to bindings)
-                                       (cons car.call done))))))
-    call)
+                                         (cons car.call done))))))
+      call)
 
 ; assumes macros are converted to the very specific structure
 ;   (mac-withs (_ '_) ... (eval _ caller-scope))

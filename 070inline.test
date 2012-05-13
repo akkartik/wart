@@ -90,6 +90,13 @@ let expr '(withs (a x b y) (cons a b))
    :valueof (to-with-expr expr globals.)
    :should equal expr)
 
+make-unbound!x
+make-unbound!y
+(test "to-with-expr inlines within with-exprs"
+ :valueof (to-with-expr '(withs (a x b y) (foo a b))
+                        (table 'foo (fn(c d) (bar c d))))
+ :should be '(withs (a x b y) (withs () (withs ((c d) (list a b)) (bar c d)))))
+
 
 
 (test "inline-macro-eval works"
