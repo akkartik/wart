@@ -85,9 +85,10 @@ prn.
                    (withs ((a b) (list c d))
                      (+ a b))))))
 
-(test "to-with-expr is idempotent"
- :valueof (to-with-expr '(withs (a x b y) (cons a b)) globals.)
- :should be '(withs (a x b y) (cons a b)))
+let expr '(withs (a x b y) (cons a b))
+  (test "to-with-expr is idempotent"
+   :valueof (to-with-expr expr globals.)
+   :should equal expr)
 
 
 

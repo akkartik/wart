@@ -8,3 +8,4 @@ def pending-test'(msg expr/valueof pred/should expected)
   (prn "pending: " msg)
 
 alias be iso
+alias equal iso
