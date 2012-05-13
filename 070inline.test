@@ -92,10 +92,6 @@ let expr '(withs (a x b y) (cons a b))
 
 make-unbound!x
 make-unbound!y
-(test "generating scopes works with unbound variables"
- :valueof (with-bindings->scope '(a x b y))
- :should be (table 'a 'x 'b 'y))
-
 (test "to-with-expr inlines within with-exprs"
  :valueof (to-with-expr '(withs (a x b y) (foo a b))
                         (table 'foo (fn(c d) (bar c d))))
