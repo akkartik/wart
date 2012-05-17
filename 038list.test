@@ -160,6 +160,16 @@
  :valueof (pair? '(1 2 3))
  :should be nil)
 
+
+
+(test "zip works"
+ :valueof (zip '(1 2) '(3 4 5))
+ :should be '((1 3) (2 4)))
+
+(test "zipmax works"
+ :valueof (zipmax '(1 2) '(3 4 5))
+ :should be '((1 3) (2 4) (nil 5)))
+
 (test "flatten works"
  :valueof (flatten '(a b (c d e)))
  :should be '(a b c d e))
