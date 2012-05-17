@@ -61,3 +61,15 @@
 (test "floats compare to within a tolerance"
  :valueof (>= 2 2.0000001)
  :should ~be nil)
+
+(test "sum works with zero args"
+ :valueof (sum nil)
+ :should be 0)
+
+(test "sum works with one arg"
+ :valueof (sum '(2))
+ :should be 2)
+
+(test "sum works with multiple args"
+ :valueof (sum '(1 2 3))
+ :should be 6)

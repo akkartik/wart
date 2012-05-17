@@ -1,6 +1,6 @@
 let $+ +
   def! + xs
-    (reduce $+ xs)
+    (reduce $+ xs 0)
 
 let $- -
   def! - xs
@@ -8,7 +8,7 @@ let $- -
 
 let $* *
   def! * xs
-    (reduce $* xs)
+    (reduce $* xs 1)
 
 let $/ /
   def! / xs
@@ -53,3 +53,9 @@ def even?(n)
   (divides n 2)
 
 = odd? ~even?
+
+def sum(xs)
+  (+ @xs)
+
+def product(xs)
+  (* @xs)
