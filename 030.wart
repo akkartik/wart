@@ -57,6 +57,7 @@ let $iso iso ; ignore later refinements
 
 def id(_)
   _
+alias present? id
 
 = quote (car:car (cons ' 'a))
 def quote?(_) (iso _ quote)

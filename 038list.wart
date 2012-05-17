@@ -74,10 +74,15 @@ def rem(f seq)
 def keep(f seq)
   (rem ~f seq)
 
-def map(f xs)
-  if xs
-    (cons (f car.xs)
-          (map f cdr.xs))
+def map(f . seqs)
+  if (all present? seqs)
+    (cons (f @(map car seqs))
+          (map f @(map cdr seqs)))
+
+def map(f seq . rest) :case no.rest
+  if seq
+    (cons (f car.seq)
+          (map f cdr.seq))
 
 def reduce(f xs)
   if cddr.xs
