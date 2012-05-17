@@ -170,6 +170,10 @@
  :valueof (keep odd? '(11 12 13))
  :should be '(11 13))
 
+(test "map works"
+ :valueof (map ++ '(1 2 3))
+ :should be '(2 3 4))
+
 (test "all works with lists"
  :valueof (all cons? '((1) 2))
  :should be nil)
