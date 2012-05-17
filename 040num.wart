@@ -43,6 +43,12 @@ def >= xs
   (none (fn((x y)) (< x y))
         pairwise.xs)
 
+def min args
+  (best < args)
+
+def max args
+  (best > args)
+
 
 
 def zero?(n)

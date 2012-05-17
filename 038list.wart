@@ -158,6 +158,13 @@ def reduce(f xs init) ; f is a binary op
 def pairwise(xs)
   (zip xs cdr.xs)
 
+def best(f seq)
+  if seq
+    ret winner car.seq
+      each elem cdr.seq
+        if (f elem winner)
+          = winner elem
+
 
 
 ;; Internals

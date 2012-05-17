@@ -58,6 +58,10 @@
  :valueof (>= 3 1 2)
  :should be nil)
 
+(test "max works"
+ :valueof (max 0 5 7 9 3 4 21 15)
+ :should be 21)
+
 (test "floats compare to within a tolerance"
  :valueof (>= 2 2.0000001)
  :should ~be nil)
