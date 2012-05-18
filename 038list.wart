@@ -106,27 +106,23 @@ def join args
             (join cdr:car.args @cdr.args))
       (join @cdr.args)
 
+def keep(f seq)
+  if seq
+    if f:car.seq
+      (cons car.seq (keep f cdr.seq))
+      (keep f cdr.seq)
+
 def rem(f seq)
+  (keep complement:predicate.f seq)
+
+def some(f seq)
   if seq
     if (f car.seq)
-      (rem f cdr.seq)
-      (cons car.seq (rem f cdr.seq))
-
-def keep(f seq)
-  (rem ~f seq)
-
-def all(f xs)
-  (if
-    !xs
       1
-    (f car.xs)
-      (all f cdr.xs))
+      (some f cdr.seq)
 
-def some(f xs)
-  if xs
-    if (f car.xs)
-      1
-      (some f cdr.xs)
+def all(f seq)
+  (~some ~f seq)
 
 alias any some
 alias none ~some
