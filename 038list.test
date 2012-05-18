@@ -200,6 +200,10 @@
  :valueof (rem nil '(1 2 nil 4 nil))
  :should be '(1 2 4))
 
+(test "skip nil works"
+ :valueof (skip nil '(1 2 nil 4))
+ :should be '(1 2 4))
+
 (test "all works with lists"
  :valueof (all cons? '((1) 2))
  :should be nil)

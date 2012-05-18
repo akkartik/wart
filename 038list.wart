@@ -114,6 +114,7 @@ def keep(f seq)
 
 def rem(f seq)
   (keep complement:predicate.f seq)
+alias skip rem
 
 def some(f seq)
   if seq
