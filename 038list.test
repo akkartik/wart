@@ -116,6 +116,14 @@
  :valueof (pos nil '(1 nil 2 3))
  :should ~be nil)
 
+(test "rpos works"
+ :valueof (rpos 3 '(0 1 2 3))
+ :should be 3)
+
+(test "rpos works - 2"
+ :valueof (rpos 3 '(0 1 2))
+ :should be nil)
+
 (test "predicate works with a list"
  :valueof ((predicate '(1 2 3)) 3)
  :should ~be nil)

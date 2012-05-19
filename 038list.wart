@@ -29,6 +29,10 @@ def pos(x xs n)
       n
       (pos x cdr.xs (+ n 1))
 
+def rpos(x xs n)
+  aif (pos x rev.xs n)
+    (- len.xs 1 it)
+
 def predicate(x) :case list?.x
   (fn(_) (pos _ x))
 
