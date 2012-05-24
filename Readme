@@ -43,7 +43,7 @@ All functions are generic and can be extended or overridden at any time. The
 implementation uniformly adds features to language primitives by extending
 them in this manner.
 
-  def len(x) :case (isa len queue)
+  def len(x) :case (isa x queue)
     (queue-length x)
 
 Other features: first-class macros (fexprs) that are also open to extension,
