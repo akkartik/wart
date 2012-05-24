@@ -237,7 +237,7 @@ they never make reading harder.
 
 Wart uses a few simple syntax rules to reduce parens further:
 
-  a.b ; => (a b) unless a and b are all digits; 2.4 will eventually be a number
+  a.b ; => (a b) unless a and b are all digits; 2.4 is a number
   a.  ; => (a)
   a!b ; => (a 'b)
   !a  ; => (not a)
