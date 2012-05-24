@@ -121,11 +121,6 @@
               (and x 36))
  :should be 36)
 
-(test "aand works"
- :valueof (let x list.3
-            (aand x (< car.it 4)))
- :should ~be nil)
-
 
 
 (test "iso handles nils"

@@ -41,6 +41,16 @@ mac awhen(test . body)
   `(whenlet it ,test
       ,@body)
 
+mac aand args
+  (if
+    !args
+      1
+    ~cdr.args
+      car.args
+    :else
+      `(aif ,car.args
+         (aand ,@cdr.args)))
+
 
 
 mac while(test . body)
