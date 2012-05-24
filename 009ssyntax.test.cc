@@ -99,3 +99,12 @@ void test_compose_before_call() {
   checkEq(cdr(cdr(cons)), nil);
   rmref(cons);
 }
+
+void test_complement_before_call() {
+  Cell* cons = read(stream("~a.b"));
+  checkEq(car(car(cons)), newSym("complement"));
+  checkEq(car(cdr(car(cons))), newSym("a"));
+  checkEq(car(cdr(cons)), newSym("b"));
+  checkEq(cdr(cdr(cons)), nil);
+  rmref(cons);
+}
