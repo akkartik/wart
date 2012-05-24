@@ -1,5 +1,13 @@
 " Copy this into your vimrc.
 
+" parens/ssyntax very subtle
+highlight Delimiter ctermfg=DarkMagenta
+" quasiquote/unquote slightly less subtle
+highlight Preproc ctermfg=Blue
+
+" quoted syms are like literal numbers or strings
+highlight link lispAtom Constant
+
 function! WartSettings()
   set filetype=lisp
   set nolisp " since we lack parens so often
