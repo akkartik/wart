@@ -112,6 +112,15 @@ functions:
   wart> (A 1 2 :c 3)
   (3 1 2)
 
+If you want to refer to a variable using a different keyword arg, use param
+aliases:
+
+  def test(msg pred/should expr/valueof expected)
+    ..
+
+Now test can refer to 'pred' and 'expr', but ':should' or ':valueof' may be
+more readable in calls to it.
+
 --- Optional parens
 
 Wart is indentation sensitive. Multi-word lines without leading parens are
