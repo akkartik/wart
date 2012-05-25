@@ -27,11 +27,13 @@ function! WartSettings()
   syntax clear lispFunc
 
   "" unquote and splice
+  " ,@a (,@b)
   syntax match Unquote /,@\|,/
   syntax cluster lispListCluster add=Unquote
   highlight link Unquote Preproc
+  " @a (@b)
   syntax match Splice /@/
-  syntax cluster lispListCluster add=Delimiter
+  syntax cluster lispListCluster add=Splice
   highlight link Splice Delimiter
 
   " quoted and keyword literals
