@@ -14,11 +14,12 @@ function! WartSettings()
 
   "" ssyntax
   set iskeyword-=:
-  " !~a.b:c!d&:e.f!.g!!h?.i
-  " ^^ ^ ^ ^ ^  ^  ^  ^  ^    highlight these like parens
-  syntax match SSyntax /[^ ]\zs[:.&!]\([^ .!]\)\@=/
-  syntax match SSyntax /\~\([^ ]\)\@=/
-  syntax match SSyntax /\<!\([^ ]\)\@=/
+  " !a !~a.b:c!d&:e.f!.g!!h?.i j. k!( l!'
+  " ^  ^^ ^ ^ ^ ^  ^  ^  ^  ^   ^   ^   ^   highlight these like parens
+  syntax match SSyntax /[^ ]\zs\./  " period after sym
+  syntax match SSyntax /!\([^ \t'.!(),@`]\)\@=/   " bang before sym
+  syntax match SSyntax /[^ ]\zs[:&]\([^ ]\)\@=/   " infix colon or ampersand
+  syntax match SSyntax /\~\([^ ]\)\@=/  " tilde before sym
   syntax cluster lispListCluster add=SSyntax
   highlight link SSyntax Delimiter
   " hack: symbols are interfering with SSyntax
