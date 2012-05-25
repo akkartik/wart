@@ -34,9 +34,12 @@ function! WartSettings()
   syntax cluster lispListCluster add=Delimiter
   highlight link Splice Delimiter
 
-  " unquote trumps quote
+  " quoted and keyword literals
+  " :a (:b -12 -5.6 :c -7e-8 "d" 'e :f) ',g :h   these are all literals except g
   syntax clear lispAtom
-  syntax match lispAtom "'[^ ,@\t()]\+" contains=lispAtomMark
+  syntax match lispAtom "'[^ \t'.!(),@`]\+" contains=lispAtomMark
+  syntax match lispAtom "\(\w\)\@<!:\w\+"
+  syntax cluster lispListCluster add=lispAtom
 endfunction
 
 autocmd BufReadPost,BufNewFile *.wart,*.test,*.wtst call WartSettings()
