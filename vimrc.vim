@@ -1,9 +1,11 @@
 " Copy this into your vimrc.
 
+highlight Comment ctermfg=Cyan cterm=bold
+highlight Constant ctermfg=Cyan cterm=none
 " parens/ssyntax very subtle
-highlight Delimiter ctermfg=DarkMagenta
+highlight Delimiter ctermfg=DarkMagenta cterm=none
 " quasiquote/unquote slightly less subtle
-highlight Preproc ctermfg=Blue
+highlight Preproc ctermfg=Blue cterm=bold
 
 " quoted syms are like literal numbers or strings
 highlight link lispAtom Constant
