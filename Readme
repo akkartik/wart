@@ -95,7 +95,7 @@ arguments in order.
   wart> (foo :b 1 :a 3)
   (3 1)
 
-Keywords that don't match function params are passed through as arguments:
+Keywords that don't match function parameters are passed through as arguments:
 
   wart> (foo :c 1 2)
   (:c 1)                                ; the third arg gets dropped
@@ -103,17 +103,16 @@ Keywords that don't match function params are passed through as arguments:
 (Keyword symbols starting with a colon always evaluate to themselves.)
 
 This is useful primarily because you can pass keywords through layers of
-functions:
+function calls:
 
-  wart> (def A args (B @args))          ; all args get spliced into a call to B
+  wart> (def A params (B @params))      ; all params get spliced into a call to B
   wart> (def B(c . d) (list c @d))      ; d gets remaining args as in scheme
   wart> (A 1 2 3)
   (1 2 3)
   wart> (A 1 2 :c 3)
   (3 1 2)
 
-If you want to refer to a variable using a different keyword arg, use param
-aliases:
+If you want to refer to a param using a different keyword, use param aliases:
 
   def test(msg pred/should expr/valueof expected)
     ..
