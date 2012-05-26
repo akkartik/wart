@@ -254,7 +254,8 @@ possible, and it's easy to see what they expand to at the prompt:
 --- Garbage collection
 
 Wart frees up unused memory using reference counting. Every Cell tracks the
-number of incoming pointers to it using a field called nrefs.
+number of incoming pointers to it using a field called nrefs. Cycles must be
+explicitly broken to be collected.
 
 Wart must increment/decrement nrefs when saving a Cell inside another: in the
 car or cdr, or inside a Table. Never assign to car or cdr or a Table key by
