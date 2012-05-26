@@ -39,10 +39,15 @@ function! WartSettings()
   highlight link Splice Delimiter
 
   " quoted and keyword literals
-  " :a (:b -12 -5.6 :c -7e-8 "d" 'e :f) ',g :h   these are all literals except g
+  " :a (:b -12 -5.6 :c -7e-8 "d" 'e :f) ',g :h    these are all literals except g
   syntax clear lispAtom
+  syntax clear lispKey
   syntax match lispAtom "'[^ \t'.!(),@`]\+" contains=lispAtomMark
-  syntax match lispAtom "\(\w\)\@<!:\w\+"
+  " :a b!:c :d?!e f:g.h i?:j.k
+  " ^    ^  ^                                     literal
+  "     ^      ^   ^ ^    ^ ^                     delimiter
+  syntax match lispAtom "\([ \t'.!~:&(),@`]\)\@<=:[^ \t'.!~:&(),@`]\+"
+  syntax match lispAtom "^:[^ \t'.!~:&(),@`]\+"
   syntax cluster lispListCluster add=lispAtom
 endfunction
 
