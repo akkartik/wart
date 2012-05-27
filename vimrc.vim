@@ -16,6 +16,7 @@ function! WartSettings()
 
   "" ssyntax
   set iskeyword-=:
+  set iskeyword-=!
   " !a !~a.b:c!d&:e.f!.g!!h?.i j. k!( l!'
   " ^  ^^ ^ ^ ^ ^  ^  ^  ^  ^   ^   ^   ^   highlight these like parens
   syntax match SSyntax /[^ ]\zs\./  " period after sym
