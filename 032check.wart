@@ -27,15 +27,14 @@ alias no not
 let $iso iso
   def! iso(a b)
     or ($iso a b)
-      and (cons? a)   ; default for objects
-          (cons? b)
+      and cons?.a cons?.b   ; default for objects
           (iso car.a car.b)
           (iso cdr.a cdr.b)
 
 def is-match(a b bindings)
   or= bindings (table)
   (or (iso a b)
-      (iso a '_)  ; matches anything
+      (iso '_ a)  ; _ matches anything
       (and cons?.a cons?.b  ; default for objects
            (is-match car.a car.b bindings)
            (is-match cdr.a cdr.b bindings)))

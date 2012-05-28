@@ -13,7 +13,7 @@ def strip_underscores(vars)
       vars
     list?.vars
       (cons strip_underscores:car.vars strip_underscores:cdr.vars)
-    (iso str.vars.0 "_")
+    (iso "_" str.vars.0)
       (sym (str.vars 1 nil))
     :else
       vars)
