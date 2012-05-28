@@ -80,7 +80,7 @@ mac each(var expr . body)
         ,@body)
 
 mac on(var expr . body)
-  `(for ($i index) (list ,expr 0) $i (do (zap cdr $i) ++.index)
+  `(for ($i index) (list ,expr 0) $i  (do (zap cdr $i) ++.index)
      let ,var car.$i
       ,@body)
 
