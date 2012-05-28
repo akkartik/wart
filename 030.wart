@@ -29,7 +29,7 @@ mac! mac(name params . body)
     (prn "redef: " name)
   `(mac! ,name ,params ,@body)
 
-mac alias(new old) ; include later refinements
+mac alias(new old)  ; include later refinements
   `(mac ,new $args
      `(,,old ,@$args))
 

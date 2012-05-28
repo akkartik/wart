@@ -23,7 +23,7 @@ def to-with-expr(call bindings done)
        ,@(collect:each expr withs-body.call
            (yield:to-with-expr expr
                                (maybe chain-scope with-bindings->scope:call.1 :to bindings))))
-    (iflet f (and (~pos car.call done) ; skip recursive calls
+    (iflet f (and (~pos car.call done)  ; skip recursive calls
                   (check (lookup-or-eval car.call bindings) ~compiled-fn?))
       `(withs ,(scope->with-bindings env.f)
          ,(if
@@ -31,7 +31,7 @@ def to-with-expr(call bindings done)
               `(mac-withs (,cdr:sig.f ',cdr.call)
                  ,@(collect:each expr body.f
                      (if (iso car.expr 'eval)
-                       (yield `(,expr.0 ,expr.1)) ; strip caller-scope
+                       (yield `(,expr.0 ,expr.1))   ; strip caller-scope
                        (yield:to-with-expr expr
                                            (maybe chain-scope env.f :to bindings)
                                            (cons car.call done)))))
@@ -58,10 +58,10 @@ def inline-macro-eval(expr bindings)
                      ,@(collect:each x withs-body.expr
                          (yield:or (if (and (is-match '(eval . _) x)
                                             (backquote?:car x.1))
-                                     (check (apply-comma-bindings cdr:x.1 ; strip backquote
+                                     (check (apply-comma-bindings cdr:x.1   ; strip backquote
                                                 (maybe chain-scope with-bindings->scope:expr.1 :to bindings))
                                             ~has-comma-bindings)
-                                     (replace-all quotify-vals:with-bindings->scope:expr.1 x)) ; quote just immediate params
+                                     (replace-all quotify-vals:with-bindings->scope:expr.1 x))  ; quote just immediate params
                                    x)))
              ~contains-eval
              `(withs ,@cdr.expr))
@@ -107,7 +107,7 @@ def apply-comma-bindings(expr bindings)
       expr
     unquote?:car.expr
       (or (try-eval cdr.expr bindings)
-          expr) ; failure = expr still has commas
+          expr)   ; failure = expr still has commas
     (is-match (cons unquote-splice '_) car.expr)
       (iflet splice (try-eval cdr:car.expr bindings)
         (join splice
@@ -142,7 +142,7 @@ def contains-eval(expr)
       expr
     ~cons?.expr
       nil
-    :else ; cons?.expr
+    :else   ; cons?.expr
       (or contains-eval:car.expr
           contains-eval:cdr.expr))
 
@@ -165,7 +165,7 @@ def rename-vars-in-bindings(conflicts bindings)
               @(rename-vars-in-bindings conflicts
                                         (replace car.bindings new cddr.bindings)))
     ~cons?:car.bindings
-      (list car.bindings cadr.bindings ; no rename in exp
+      (list car.bindings cadr.bindings  ; no rename in exp
             @(rename-vars-in-bindings conflicts cddr.bindings))
     :else
       'todo)
@@ -200,7 +200,7 @@ def with-bindings->scope(bindings)
   w/table ans
     aif (try-eval `(withs ,bindings curr-scope.) caller-scope)
       for curr it
-               cdr.curr ; HACK: ignore the scope with the 'bindings' binding
+               cdr.curr   ; HACK: ignore the scope with the 'bindings' binding
                (zap cdr curr)
         each k keys.curr
           if (~iso 'caller-scope k)

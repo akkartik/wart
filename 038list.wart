@@ -144,12 +144,12 @@ def map(f seq . rest) :case no.rest
     (cons (f car.seq)
           (map f cdr.seq))
 
-def reduce(f xs init) ; f is a binary op
+def reduce(f xs init)   ; f is a binary op
   (if
     !xs
       init
     ~cdr.xs
-      car.xs ; f on one op is the identity function
+      car.xs  ; f on one op is the identity function
     ~cddr.xs
       (f @xs)
     :else
