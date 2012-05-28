@@ -27,7 +27,7 @@ def to-with-expr(call bindings done)
                   (check (lookup-or-eval car.call bindings) ~compiled-fn?))
       `(withs ,(scope->with-bindings env.f)
          ,(if
-            (quote?:car sig.f)
+            (quoted? sig.f)
               `(mac-withs (,cdr:sig.f ',cdr.call)
                  ,@(collect:each expr body.f
                      (if (iso car.expr 'eval)
@@ -57,7 +57,7 @@ def inline-macro-eval(expr bindings)
       (check `(withs ,(macro-unquote-bindings expr.1)
                      ,@(collect:each x withs-body.expr
                          (yield:or (if (and (is-match '(eval . _) x)
-                                            (backquote?:car x.1))
+                                            (backquoted? x.1))
                                      (check (apply-comma-bindings cdr:x.1   ; strip backquote
                                                 (maybe chain-scope with-bindings->scope:expr.1 :to bindings))
                                             ~has-comma-bindings)
@@ -97,7 +97,7 @@ def mangle-names(with-expr vars)
 
 def macro-unquote-bindings(bindings)
   if (and pair?.bindings
-          quote?:car:bindings.1)
+          quoted?:bindings.1)
     `(,bindings.0 ,(cons 'list cdr:bindings.1))
 
 ; unquoted exprs shouldn't have side effects
@@ -105,7 +105,7 @@ def apply-comma-bindings(expr bindings)
   (if
     !list?.expr
       expr
-    unquote?:car.expr
+    unquoted?.expr
       (or (try-eval cdr.expr bindings)
           expr)   ; failure = expr still has commas
     (is-match (cons unquote-splice '_) car.expr)
@@ -121,11 +121,11 @@ def has-comma-bindings(expr)
   (if
     !list?.expr
       nil
-    unquote?:car.expr
+    unquoted?.expr
       expr
     (is-match (cons unquote-splice '_) car.expr)
       car.expr
-    backquote?:car.expr
+    backquoted?.expr
       nil
     :else
       (or has-comma-bindings:car.expr
@@ -222,7 +222,7 @@ def replace(old new expr)
       new
     ~list?.expr
       expr
-    quote?:car.expr
+    quoted?.expr
       expr
     ; TODO: what about backquoted exprs?
     :else

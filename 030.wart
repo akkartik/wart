@@ -61,14 +61,19 @@ alias present? id
 
 = quote (car:car (cons ' 'a))
 def quote?(_) (iso _ quote)
+def quoted?(_) (quote? car._)
 = backquote (car '`(1))
 def backquote?(_) (iso _ backquote)
+def backquoted?(_) (backquote? car._)
 = unquote (car:cadr '`(,1))
 def unquote?(_) (iso _ unquote)
+def unquoted?(_) (unquote? car._)
 = unquote-splice (car:cadr '`(,@1))
 def unquote-splice?(_) (iso _ unquote-splice)
+def unquote-spliced?(_) (unquote-splice? car._)
 = splice (car '@1)
 def splice?(_) (iso _ splice)
+def spliced?(_) (splice? car._)
 
 def die args
   prn @args
