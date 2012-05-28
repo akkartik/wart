@@ -189,11 +189,11 @@
  :valueof (is-match '(2 (_ 3 4)) '(1 (2 3 4)))
  :should be nil)
 
-(test "is-match - _ is-matches lists"
+(test "is-match - _ matches lists"
  :valueof (is-match '_ '(3))
  :should ~be nil)
 
-(test "is-match - _ is-matches lists when dotted"
+(test "is-match - _ matches lists when dotted"
  :valueof (is-match '(1 . _) '(1 2 3))
  :should ~be nil)
 
@@ -209,11 +209,11 @@
  :valueof (is-match '(1 _x _x) '(1 2 2))
  :should ~be nil)
 
-(test "is-match is-matches $vars with their root"
+(test "is-match matches $vars with their root"
  :valueof (is-match 'a_ 'a3)
  :should ~be nil)
 
-(test "is-match is-matches $vars with their root - 2"
+(test "is-match matches $vars with their root - 2"
  :valueof (is-match 'a_ 'a)
  :should be nil)
 
