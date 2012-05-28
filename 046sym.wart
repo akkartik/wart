@@ -8,34 +8,28 @@ def keyword?(s)
 def sym(s . rest) :case (and !rest keyword?.s)
   as symbol (str.s 1 nil)
 
-; (_x _x) matches two of anything
-def is-match(a b bindings) :case (and sym?.a (iso str.a.0 "_"))
+def is-match(a b bindings) :case sym?.a
   or= bindings (table)
-  or= bindings.a b
-  (iso bindings.a b)
-
-; p_ matches any $p (but not p)
-def is-match(a b) :case (and sym?.a
-                             (~iso a '_)
-                             (iso str.a.-1 "_"))
-  if sym?.b
-    let acore (str.a 0 -1)
-      (and (~iso acore str.b)
-           (iso sym.acore sym-root.b))
-
-; (p_x p_x) matches two of any $p
-def is-match(a b bindings) :case (and sym?.a
-                                      (~iso a '_)
-                                      sym?.b (digit? str.b.-1))
-  or= bindings (table)
-  withs (sa   str.a
-         ai   (pos "_" (as list sa))
-         acore  (if ai (sa 0 ai)))
-    (and ai
-         (~iso acore str.b)
-         (iso sym.acore sym-root.b)
-         (or= bindings.a b)
-         (iso bindings.a b))
+  (or (iso a b)
+      (iso '_ str.a.0)
+      (and (iso "_" str.a.0)  ; (_x _x) matches two of anything
+           (or= bindings.a b)
+           (iso bindings.a b))
+      (and (iso "_" str.a.-1)   ; p_ matches any $p
+           sym?.b
+           (let acore (str.a 0 -1)
+             (and (~iso acore str.b)  ; ..but not p
+                  (iso sym.acore sym-root.b))))
+      (and sym?.b
+           (digit? str.b.-1)  ; (p_x p_x) matches two of any $p
+           (withs (sa   str.a
+                   ai   (pos "_" (as list sa))
+                   acore  (if ai (sa 0 ai)))
+             (and ai
+                  (~iso acore str.b)
+                  (iso sym.acore sym-root.b)
+                  (or= bindings.a b)
+                  (iso bindings.a b)))))
 
 ; ignore the uniq part of a $sym
 def sym-root(x)
