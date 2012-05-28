@@ -59,9 +59,6 @@ def is-match(a b bindings)
            (is-match car.a car.b bindings)
            (is-match cdr.a cdr.b bindings)))
 
-def match(a b)    ; reverse order of args for tests
-  (is-match b a)
-
 def only(f)
   (fn args
     (if f (f @args)))

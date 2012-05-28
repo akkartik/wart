@@ -9,3 +9,6 @@ def pending-test'(msg expr/valueof pred/should expected)
 
 alias be iso
 alias equal iso
+
+def match(a b)
+  (is-match b a)
