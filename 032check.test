@@ -197,6 +197,10 @@
  :valueof (is-match '(1 . _) '(1 2 3))
  :should ~be nil)
 
+(test "is-match - _ matches nil when dotted"
+ :valueof (is-match '(1 . _) '(1))
+ :should ~be nil)
+
  
 
 (test "caselet works"

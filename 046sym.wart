@@ -11,7 +11,7 @@ def sym(s . rest) :case (and !rest keyword?.s)
 def is-match(a b bindings) :case sym?.a
   or= bindings (table)
   (or (iso a b)
-      (iso '_ str.a.0)
+      (iso '_ a)
       (and (iso "_" str.a.0)  ; (_x _x) matches two of anything
            (or= bindings.a b)
            (iso bindings.a b))
