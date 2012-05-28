@@ -30,7 +30,7 @@
  :should ~be nil)
 
 (test "is-match works on table values"
- :valueof (is-match (table 'a 'x_) (table 'a 'x3))
+ :valueof (is-match (table 'a '_) (table 'a 'x))
  :should ~be nil)
 
 (test "lists coerce to tables"

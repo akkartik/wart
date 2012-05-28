@@ -35,27 +35,8 @@ let $iso iso
 def is-match(a b bindings)
   or= bindings (table)
   (or (iso a b)
-      (iso a '_)                            ; _ matches anything
-      (and sym?.a                           ; (_x _x) matches two of anything
-           (iso str.a.0 "_")
-           (or= bindings.a b)
-           (iso bindings.a b))
-      (and sym?.a sym?.b                    ; p_ matches any $p (but not p)
-           (iso str.a.-1 "_")
-           (let acore (str.a 0 -1)
-             (and (~iso acore str.b)
-                  (iso sym.acore sym-root.b))))
-      (and sym?.a sym?.b                    ; (p_x p_x) matches two of any $p
-           (digit? str.b.-1)
-           (withs (sa   str.a
-                   ai   (pos "_" (as list sa))
-                   acore  (if ai (sa 0 ai)))
-             (and ai
-                  (~iso acore str.b)
-                  (iso sym.acore sym-root.b)
-                  (or= bindings.a b)
-                  (iso bindings.a b))))
-      (and cons?.a cons?.b
+      (iso a '_)  ; matches anything
+      (and cons?.a cons?.b  ; default for objects
            (is-match car.a car.b bindings)
            (is-match cdr.a cdr.b bindings)))
 
@@ -102,10 +83,3 @@ mac case(expr . branches)
 
 mac acase(expr . branches)
   `(caselet it ,expr ,@branches)
-
-; ignore the uniq part of a sym
-def sym-root(x)
-  let name (rev:as list str.x)
-    while (and name digit?:car.name)
-      (zap cdr name)
-    (sym @rev.name)
