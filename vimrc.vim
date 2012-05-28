@@ -28,6 +28,12 @@ function! WartSettings()
   " hack: symbols are interfering with SSyntax
   syntax clear lispSymbol
   syntax clear lispFunc
+  " have to redo numbers; lispNumber depended on lispSymbol
+  " a2 b-3 c%4 d?5 should not highlight digits
+  " 34 3.5 .1 1.3e5 (34) (a 3) b.34 c!34 d:34 e&35 should
+  syntax clear lispNumber
+  syntax match Number "\([^ (\t'.!()@`:&]\)\@<![+-]*\(\.\d\+\|\d\+\(\.\d*\)\=\)\([eE][-+]\=\d\+\)\="
+  syntax cluster lispListCluster add=Number
 
   "" unquote and splice
   " ,@a (,@b)
