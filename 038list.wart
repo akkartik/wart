@@ -49,17 +49,17 @@ def blank?(l)
   (or nil?.l empty?.l)
 
 def copy(x)
-  if cons?.x
+  if cons?.x  ; piecewise copy for objects by default
     (cons copy:car.x copy:cdr.x)
     x
 
 def single?(x)
-  (and cons?.x ~cdr.x)
+  (and list?.x ~cdr.x)
 
 def pair?(x)
-  (and cons?.x
+  (and list?.x
        cdr.x
-       cons?:cdr.x
+       list?:cdr.x
        ~cdr:cdr.x)
 
 def rev(xs acc)
@@ -96,7 +96,7 @@ def flatten(l acc)
   (if
     !l
       acc
-    ~cons?.l
+    ~list?.l
       (cons l acc)
     :else
       (flatten car.l (flatten cdr.l acc)))

@@ -213,7 +213,7 @@
  :should be '(1 2 4))
 
 (test "all works with lists"
- :valueof (all cons? '((1) 2))
+ :valueof (all list? '((1) 2))
  :should be nil)
 
 (test "all does not convert to predicate"

@@ -27,7 +27,7 @@ alias no not
 let $iso iso
   def! iso(a b)
     or ($iso a b)
-      and (cons? a)
+      and (cons? a)   ; default for objects
           (cons? b)
           (iso car.a car.b)
           (iso cdr.a cdr.b)

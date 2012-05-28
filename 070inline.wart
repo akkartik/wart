@@ -103,7 +103,7 @@ def macro-unquote-bindings(bindings)
 ; unquoted exprs shouldn't have side effects
 def apply-comma-bindings(expr bindings)
   (if
-    !cons?.expr
+    !list?.expr
       expr
     unquote?:car.expr
       (or (try-eval cdr.expr bindings)
@@ -119,7 +119,7 @@ def apply-comma-bindings(expr bindings)
 
 def has-comma-bindings(expr)
   (if
-    !cons?.expr
+    !list?.expr
       nil
     unquote?:car.expr
       expr
@@ -140,9 +140,9 @@ def contains-eval(expr)
   (if
     (iso expr 'eval)
       expr
-    ~cons?.expr
+    ~list?.expr
       nil
-    :else   ; cons?.expr
+    :else   ; list?.expr
       (or contains-eval:car.expr
           contains-eval:cdr.expr))
 
@@ -157,14 +157,14 @@ def rename-vars(expr conflicts vars)
 ; search for a conflict in just vars, and replace throughout later pairs
 def rename-vars-in-bindings(conflicts bindings)
   (if
-    ~cons?.bindings
+    ~list?.bindings
       nil
     (conflicts car.bindings)
       let new (conflicts car.bindings)
         (list new cadr.bindings
               @(rename-vars-in-bindings conflicts
                                         (replace car.bindings new cddr.bindings)))
-    ~cons?:car.bindings
+    ~list?:car.bindings
       (list car.bindings cadr.bindings  ; no rename in exp
             @(rename-vars-in-bindings conflicts cddr.bindings))
     :else
@@ -187,7 +187,7 @@ def lookup-or-eval(f bindings)
       eval.f)
 
 def contains-quote?(expr)
-  if ~cons?.expr
+  if ~list?.expr
     quote?.expr
     (or (contains-quote? car.expr)
         (contains-quote? cdr.expr))
@@ -220,7 +220,7 @@ def replace(old new expr)
   (if
     (iso old expr)
       new
-    ~cons?.expr
+    ~list?.expr
       expr
     quote?:car.expr
       expr

@@ -11,7 +11,7 @@ def strip_underscores(vars)
   (if
     !vars
       vars
-    cons?.vars
+    list?.vars
       (cons strip_underscores:car.vars strip_underscores:cdr.vars)
     (iso str.vars.0 "_")
       (sym (str.vars 1 nil))
