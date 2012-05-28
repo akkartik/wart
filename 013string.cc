@@ -1,3 +1,23 @@
+COMPILE_FN(string_range, compiledFn_string_get, "($string $index $end)",
+  Cell* str = lookup("$string");
+  if (!isString(str)) {
+    RAISE << "not a string: " << str << endl;
+    return nil;
+  }
+
+  size_t index = toInt(lookup("$index"));
+  if (index > ((string*)str->car)->length()-1)
+    return nil;
+
+  size_t end = toInt(lookup("$end"));
+  if (end > ((string*)str->car)->length()) {
+    RAISE << "no such end-index in string: " << str << " " << end << endl;
+    return nil;
+  }
+
+  return mkref(newString(toString(str).substr(index, end-index)));
+)
+
 COMPILE_FN(string_splice, compiledFn_string_splice, "($string $start $end $val)",
   Cell* str = lookup("$string");
   if (!isString(str)) {
@@ -17,26 +37,6 @@ COMPILE_FN(string_splice, compiledFn_string_splice, "($string $start $end $val)"
     RAISE << "can't set string with non-string: " << val << endl;
   ((string*)str->car)->replace(start, end-start, toString(val));
   return mkref(val);
-)
-
-COMPILE_FN(string_range, compiledFn_string_get, "($string $index $end)",
-  Cell* str = lookup("$string");
-  if (!isString(str)) {
-    RAISE << "not a string: " << str << endl;
-    return nil;
-  }
-
-  size_t index = toInt(lookup("$index"));
-  if (index > ((string*)str->car)->length()-1)
-    return nil;
-
-  size_t end = toInt(lookup("$end"));
-  if (end > ((string*)str->car)->length()) {
-    RAISE << "no such end-index in string: " << str << " " << end << endl;
-    return nil;
-  }
-
-  return mkref(newString(toString(str).substr(index, end-index)));
 )
 
 COMPILE_FN(string_to_sym, compiledFn_string_to_sym, "($s)",

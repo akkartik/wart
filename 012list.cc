@@ -1,3 +1,17 @@
+COMPILE_FN(list_range, compiledFn_list_range, "($list $index $end)",
+  Cell* list = lookup("$list");
+  long index = toInt(lookup("$index"));
+  for (long i = 0; i < index; ++i)
+    list=cdr(list);
+
+  long end = toInt(lookup("$end"));
+  Cell* pResult = newCell();
+  Cell* curr = pResult;
+  for (long i = index; i < end && list != nil; ++i, list=cdr(list), curr=cdr(curr))
+    addCons(curr, car(list));
+  return dropPtr(pResult);
+)
+
 COMPILE_FN(list_splice, compiledFn_list_splice, "('$list $start $end $val)",
   Cell* binding = lookup("$list");
   Cell* list = eval(binding);
@@ -26,20 +40,6 @@ COMPILE_FN(list_splice, compiledFn_list_splice, "('$list $start $end $val)",
   if (cdr(val) == nil) val = car(val);
   rmref(list);
   return mkref(val);
-)
-
-COMPILE_FN(list_range, compiledFn_list_range, "($list $index $end)",
-  Cell* list = lookup("$list");
-  long index = toInt(lookup("$index"));
-  for (long i = 0; i < index; ++i)
-    list=cdr(list);
-
-  long end = toInt(lookup("$end"));
-  Cell* pResult = newCell();
-  Cell* curr = pResult;
-  for (long i = index; i < end && list != nil; ++i, list=cdr(list), curr=cdr(curr))
-    addCons(curr, car(list));
-  return dropPtr(pResult);
 )
 
                                   struct CellLt :public std::binary_function<Cell*, Cell*, bool> {
