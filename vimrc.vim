@@ -50,11 +50,10 @@ function! WartSettings()
   syntax clear lispAtom
   syntax clear lispKey
   syntax match lispAtom "'[^ \t'.!(),@`]\+" contains=lispAtomMark
-  " :a b!:c :d?!e f:g.h i?:j.k
+  " :a b!:c :d?!e f:g.h i?:j.k l&:m
   " ^    ^  ^                                     literal
-  "     ^      ^   ^ ^    ^ ^                     delimiter
-  syntax match lispAtom "\([ \t'.!~:&(),@`]\)\@<=:[^ \t'.!~:&(),@`]\+"
-  syntax match lispAtom "^:[^ \t'.!~:&(),@`]\+"
+  "     ^      ^   ^ ^    ^ ^   ^x                delimiter
+  syntax match lispAtom "\([^ \t'.!~(),@`]\)\@<!:[^ \t'.!~(),@`:&]\+"
   syntax cluster lispListCluster add=lispAtom
 endfunction
 
