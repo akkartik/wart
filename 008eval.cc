@@ -177,22 +177,11 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
 
 
 
-                                  Cell* stripAlreadyEval(Cell* args) {
-                                    Cell *pResult = newCell();
-                                    for (Cell *from=args, *to=pResult; from != nil; from=cdr(from), to=cdr(to)) {
-                                      if (isAlreadyEvald(car(from)))
-                                        addCons(to, cdr(car(from)));
-                                      else
-                                        addCons(to, car(from));
-                                    }
-                                    return dropPtr(pResult);
-                                  }
-
 Cell* evalArgs(Cell* params, Cell* args, Cell* scope) {
   if (args == nil) return nil;
 
   if (isQuoted(params))
-    return stripAlreadyEval(args);
+    return mkref(args);
 
   Cell* result = newCell();
   setCdr(result, evalArgs(cdr(params), cdr(args), scope));
@@ -262,7 +251,7 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
   if (!isCons(x)) return mkref(x);
 
   if (unquoteDepth(x) == depth)
-    return eval(stripUnquote(x), scope);
+    return eval(stripUnquote(x), scope, true);
   else if (car(x) == newSym(","))
     return mkref(x);
 
@@ -273,7 +262,7 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
   }
 
   if (depth == 1 && isUnquoteSplice(car(x))) {
-    Cell* result = eval(cdr(car(x)), scope);
+    Cell* result = eval(cdr(car(x)), scope, true);
     Cell* splice = processUnquotes(cdr(x), depth, scope);
     if (result == nil) return splice;
     // always splice in a copy
@@ -313,7 +302,7 @@ Cell* processUnquotes(Cell* x, long depth) {
 
 // HACK: explicitly reads from passed-in scope, but implicitly creates bindings
 // to currLexicalScope. Carefully make sure it's popped off.
-Cell* eval(Cell* expr, Cell* scope) {
+Cell* eval(Cell* expr, Cell* scope, bool dontStripAlreadyEval) {
   if (!expr)
     RAISE << "eval: cell should never be NUL" << endl << DIE;
 
@@ -324,7 +313,7 @@ Cell* eval(Cell* expr, Cell* scope) {
     return mkref(expr);
 
   if (isSym(expr))
-    return mkref(lookup(expr, scope));
+    return mkref(lookup(expr, scope, dontStripAlreadyEval));
 
   if (isAtom(expr))
     return mkref(expr);
@@ -393,6 +382,10 @@ Cell* eval(Cell* expr, Cell* scope) {
   rmref(fn0);
   endDynamicScope(CURR_LEXICAL_SCOPE);
   return result; // already mkref'd
+}
+
+Cell* eval(Cell* expr, Cell* scope) {
+  return eval(expr, scope, false);
 }
 
 Cell* eval(Cell* expr) {

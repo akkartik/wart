@@ -5,6 +5,39 @@ prn.
  :valueof (let x 3 (foo x))
  :should be 4)
 
+(mac! foo(a b) `(cons ,a ,b))
+(test "macros work with splice when eventually eval'd"
+ :valueof (foo @'(1 (2 3)))
+ :should be '(1 2 3))
+
+(test "macros work with splice when not eventually eval'd"
+ :valueof ((fn() (= @'(foo 3)) foo))
+ :should be 3)
+
+(mac! foo(a b) `(cons ,a ,b))
+(mac! bar(a b) `(foo ,a ,b))
+(test "nested macros work with splice"
+ :valueof (bar @'(1 (2 3)))
+ :should be '(1 2 3))
+
+(mac! bar args `(foo ,@args))
+(test "nested macros work with nested splice"
+ :valueof (bar @'(1 (2 3)))
+ :should be '(1 2 3))
+
+(def! bar args (foo @args))
+(mac! qux args `(bar ,@args))
+(test "nested functions and macros work with nested splice"
+ :valueof (qux @'(1 (2 3)))
+ :should be '(1 2 3))
+
+(mac! foo(a b) `(if 34 ,(if 34 `(cons ,a ,b))))
+(test "nested backquotes work with splice"
+ :valueof (foo @'(1 (2 3)))
+ :should be '(1 2 3))
+
+
+
 (test "do returns last expr"
  :valueof (do 3 4)
  :should be 4)
@@ -25,6 +58,7 @@ prn.
  :valueof ((compose not cons?) '(1 2))
  :should be nil)
 
+(mac! foo(x) `(+ 1 ,x))
 (test "compose works with macros"
  :valueof ((compose foo foo) 1)
  :should be 3)
