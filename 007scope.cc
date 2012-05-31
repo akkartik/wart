@@ -115,17 +115,17 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
 }
 
                                   bool isAlreadyEvald(Cell*);
-                                  Cell* maybeStripAlreadyEvald(bool operate, Cell* x) {
-                                    if (!operate) return x;
+                                  Cell* maybeStripAlreadyEvald(bool dontReallyStrip, Cell* x) {
+                                    if (dontReallyStrip) return x;
                                     if (isAlreadyEvald(x)) return cdr(x);
                                     return x;
                                   }
 
 Cell* lookup(Cell* sym, Cell* scope, bool keepAlreadyEval) {
   Cell* result = lookupLexicalBinding(sym, scope);
-  if (result) return maybeStripAlreadyEvald(!keepAlreadyEval, result);
+  if (result) return maybeStripAlreadyEvald(keepAlreadyEval, result);
   result = lookupDynamicBinding(sym);
-  if (result) return maybeStripAlreadyEvald(!keepAlreadyEval, result);
+  if (result) return maybeStripAlreadyEvald(keepAlreadyEval, result);
   RAISE << "No binding for " << toString(sym) << endl;
 
   if (pretendRaise) return nil; // don't die
