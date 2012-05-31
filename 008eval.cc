@@ -65,12 +65,17 @@
                                     return true;
                                   }
 
+                                  bool isMacroWithoutBackquotes(Cell* fn) {
+                                    if (!isMacro(fn)) return false;
+                                    return !contains(calleeBody(fn), newSym("`"));
+                                  }
+
 // eval @exprs and inline them into args, tagging them with '' (already eval'd)
 Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn, bool dontStripAlreadyEval) {
   Cell *pResult = newCell(), *tip = pResult;
   for (Cell* curr = args; curr != nil; curr=cdr(curr)) {
     if (isSplice(car(curr))) {
-      if (isMacro(fn))
+      if (isMacroWithoutBackquotes(fn))
         RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
       Cell* x = unsplice(car(curr), scope, dontStripAlreadyEval);
       for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
