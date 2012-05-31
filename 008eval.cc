@@ -24,15 +24,6 @@
                                     return isSym(x) && toString(x)[0] == L':';
                                   }
 
-                                  // fn = (fn params . body)
-                                  Cell* sig(Cell* fn) {
-                                    return car(cdr(fn));
-                                  }
-
-                                  Cell* body(Cell* fn) {
-                                    return cdr(cdr(fn));
-                                  }
-
                                   // callee = (object function {sig, body, env, ..})
                                   Cell* calleeSig(Cell* callee) {
                                     return get(rep(callee), newSym("sig"));
@@ -306,10 +297,11 @@ Cell* processUnquotes(Cell* x, long depth) {
                                     return toString(type(x)) == "function";
                                   }
 
+                                  // (fn params . body) => (object function {sig, body, env})
                                   Cell* newFn(string type, Cell* expr, Cell* scope) {
                                     Cell* f = newTable();
-                                    set(f, newSym("sig"), sig(expr));
-                                    set(f, newSym("body"), body(expr));
+                                    set(f, newSym("sig"), car(cdr(expr)));
+                                    set(f, newSym("body"), cdr(cdr(expr)));
                                     set(f, newSym("env"), scope);
                                     return newObject(type, f);
                                   }
