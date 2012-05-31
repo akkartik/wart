@@ -10,6 +10,11 @@ COMPILE_FN(eval, compiledFn_eval, "($x . $scope)",
   return eval(lookup("$x"), scope);
 )
 
+COMPILE_FN(mac?, compiledFn_isMacro, "($f)",
+  Cell* f = lookup("$f");
+  return isMacro(f) ? mkref(f) : nil;
+)
+
 COMPILE_FN(try-eval, compiledFn_try_eval, "($x . $scope)",
   bool oldPretendRaise = pretendRaise;
   pretendRaise = true;

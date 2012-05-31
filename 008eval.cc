@@ -52,12 +52,25 @@
                                     return eval(cdr(arg), scope, dontStripAlreadyEval);
                                   }
 
+                                  // keep sync'd with mac
+                                  bool isMacro(Cell* fn) {
+                                    if (!isObject(fn)) return false;
+                                    if (!isQuoted(calleeSig(fn))) return false;
+                                    Cell* body = calleeBody(fn);
+                                    if (cdr(body) != nil) return false;
+                                    Cell* form = car(body);
+                                    if (car(form) != newSym("eval")) return false;
+                                    if (car(cdr(cdr(form))) != newSym("caller-scope")) return false;
+                                    if (cdr(cdr(cdr(form))) != nil) return false;
+                                    return true;
+                                  }
+
 // eval @exprs and inline them into args, tagging them with '' (already eval'd)
 Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn, bool dontStripAlreadyEval) {
   Cell *pResult = newCell(), *tip = pResult;
   for (Cell* curr = args; curr != nil; curr=cdr(curr)) {
     if (isSplice(car(curr))) {
-      if (isQuoted(calleeSig(fn)))
+      if (isMacro(fn))
         RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
       Cell* x = unsplice(car(curr), scope, dontStripAlreadyEval);
       for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))

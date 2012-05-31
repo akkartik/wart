@@ -27,7 +27,7 @@ def to-with-expr(call bindings done)
                   (check (lookup-or-eval car.call bindings) ~compiled-fn?))
       `(withs ,(scope->with-bindings env.f)
          ,(if
-            (quoted? sig.f)
+            mac?.f
               `(mac-withs (,cdr:sig.f ',cdr.call)
                  ,@(collect:each expr body.f
                      (if (iso car.expr 'eval)
