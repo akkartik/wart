@@ -138,3 +138,12 @@ void test_lower_lexical_scopes_are_available() {
       endLexicalScope();
   endLexicalScope();
 }
+
+void test_containsAlreadyEvald_handles_circular_lists() {
+  unordered_set<Cell*> done;
+  Cell* x = newCons(newNum(1), nil);
+  setCdr(x, x);
+  check(!containsAlreadyEvald(x, done));
+  x->cdr = nil; // break cycle for gc
+  rmref(x);
+}
