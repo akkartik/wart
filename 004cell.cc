@@ -234,3 +234,19 @@ Cell* dropPtr(Cell* p) {
 void addCons(Cell* p, Cell* x) {
   setCdr(p, newCons(x, nil));
 }
+
+bool contains(Cell* tree, Cell* a, unordered_set<Cell*>& done) {
+  // guard against cycles
+  if (done.find(tree) != done.end()) return false;
+  done.insert(tree);
+
+  if (tree == a) return true;
+  if (!isCons(tree)) return false;
+  return contains(car(tree), a, done)
+         || contains(cdr(tree), a, done);
+}
+
+bool contains(Cell* tree, Cell* a) {
+  unordered_set<Cell*> done;
+  return contains(tree, a, done);
+}
