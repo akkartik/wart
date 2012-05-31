@@ -128,12 +128,13 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
 
                                   bool skippedAlreadyEvald = false;
                                   Cell* maybeStripAlreadyEvald(bool dontReallyStrip, Cell* x) {
-                                    unordered_set<Cell*> done;
-                                    if (containsAlreadyEvald(x, done))
-                                      skippedAlreadyEvald = true;
-
-                                    if (dontReallyStrip) return x;
-                                    if (isAlreadyEvald(x)) return cdr(x);
+                                    if (dontReallyStrip) {
+                                      unordered_set<Cell*> done;
+                                      skippedAlreadyEvald = containsAlreadyEvald(x, done);
+                                      return x;
+                                    }
+                                    if (isAlreadyEvald(x))
+                                      return cdr(x);
                                     return x;
                                   }
 

@@ -57,18 +57,18 @@
 
 
 
-                                  Cell* unsplice(Cell* arg, Cell* scope) {
-                                    return eval(cdr(arg), scope);
+                                  Cell* unsplice(Cell* arg, Cell* scope, bool dontStripAlreadyEval) {
+                                    return eval(cdr(arg), scope, dontStripAlreadyEval);
                                   }
 
 // eval @exprs and inline them into args, tagging them with '' (already eval'd)
-Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
+Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn, bool dontStripAlreadyEval) {
   Cell *pResult = newCell(), *tip = pResult;
   for (Cell* curr = args; curr != nil; curr=cdr(curr)) {
     if (isSplice(car(curr))) {
       if (isQuoted(calleeSig(fn)))
         RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
-      Cell* x = unsplice(car(curr), scope);
+      Cell* x = unsplice(car(curr), scope, dontStripAlreadyEval);
       for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
         if (isColonSym(car(curr2)))
           addCons(tip, car(curr2));
@@ -82,6 +82,10 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
     }
   }
   return dropPtr(pResult);
+}
+
+Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
+  return spliceArgs(args, scope, fn, false);
 }
 
                                   Cell* stripQuote(Cell* cell) {
@@ -177,14 +181,14 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
 
 
 
-Cell* evalArgs(Cell* params, Cell* args, Cell* scope) {
+Cell* evalArgs(Cell* params, Cell* args, Cell* scope, bool dontStripAlreadyEval) {
   if (args == nil) return nil;
 
   if (isQuoted(params))
     return mkref(args);
 
   Cell* result = newCell();
-  setCdr(result, evalArgs(cdr(params), cdr(args), scope));
+  setCdr(result, evalArgs(cdr(params), cdr(args), scope, dontStripAlreadyEval));
   rmref(cdr(result));
 
   if (isAlreadyEvald(car(args)))
@@ -192,10 +196,14 @@ Cell* evalArgs(Cell* params, Cell* args, Cell* scope) {
   else if (isCons(params) && isQuoted(car(params)))
     setCar(result, car(args));
   else {
-    setCar(result, eval(car(args), scope));
+    setCar(result, eval(car(args), scope, dontStripAlreadyEval));
     rmref(car(result));
   }
   return mkref(result);
+}
+
+Cell* evalArgs(Cell* params, Cell* args, Cell* scope) {
+  return evalArgs(params, args, scope, false);
 }
 
 
@@ -341,7 +349,7 @@ Cell* eval(Cell* expr, Cell* scope, bool dontStripAlreadyEval) {
 
   newDynamicScope(CURR_LEXICAL_SCOPE, scope);
   // expr is a function call
-  Cell* fn0 = eval(car(expr), scope);
+  Cell* fn0 = eval(car(expr), scope, dontStripAlreadyEval);
   Cell* fn = fn0;
   if (fn0 != nil && !isFn(fn0))
     fn = coerceQuoted(fn0, newSym("function"), lookup("coercions*"));
@@ -353,10 +361,10 @@ Cell* eval(Cell* expr, Cell* scope, bool dontStripAlreadyEval) {
         << "  Or you need to split it in two." << endl << DIE;
 
   // eval all its args in the current lexical scope
-  Cell* splicedArgs = spliceArgs(callArgs(expr), scope, fn);
+  Cell* splicedArgs = spliceArgs(callArgs(expr), scope, fn, dontStripAlreadyEval);
   // keyword args can change what we eval
   Cell* orderedArgs = reorderKeywordArgs(calleeSig(fn), splicedArgs);
-  Cell* evaldArgs = evalArgs(calleeSig(fn), orderedArgs, scope);
+  Cell* evaldArgs = evalArgs(calleeSig(fn), orderedArgs, scope, dontStripAlreadyEval);
 
   // swap in the function's lexical environment
   if (!isCompiledFn(calleeBody(fn)))
@@ -374,7 +382,7 @@ Cell* eval(Cell* expr, Cell* scope, bool dontStripAlreadyEval) {
   else
     for (Cell* form = calleeImpl(fn); form != nil; form = cdr(form)) {
       rmref(result);
-      result = eval(car(form)); // use fn's env
+      result = eval(car(form), currLexicalScopes.top(), dontStripAlreadyEval);
     }
 
   endLexicalScope();
