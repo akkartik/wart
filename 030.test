@@ -36,6 +36,11 @@ prn.
  :valueof (foo @'(1 (2 3)))
  :should be '(1 2 3))
 
+(mac! foo(a b) `(cons ,a ,cdr.b))
+(test "compound comma-exprs work with splice"
+ :valueof (foo @'(1 (2 3)))
+ :should be '(1 3))
+
 
 
 (test "do returns last expr"

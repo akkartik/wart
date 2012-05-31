@@ -115,9 +115,22 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
 }
 
                                   bool isAlreadyEvald(Cell*);
+
+                                  bool containsAlreadyEvald(Cell* x) {
+                                    if (!isCons(x)) return false;
+                                    if (isAlreadyEvald(x)) return true;
+                                    return containsAlreadyEvald(car(x))
+                                           || containsAlreadyEvald(cdr(x));
+                                  }
+
+                                  bool skippedAlreadyEvald = false;
                                   Cell* maybeStripAlreadyEvald(bool dontReallyStrip, Cell* x) {
-                                    if (dontReallyStrip) return x;
-                                    if (isAlreadyEvald(x)) return cdr(x);
+                                    if (dontReallyStrip) {
+                                      skippedAlreadyEvald = containsAlreadyEvald(x);
+                                      return x;
+                                    }
+                                    if (isAlreadyEvald(x))
+                                      return cdr(x);
                                     return x;
                                   }
 
