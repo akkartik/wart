@@ -708,10 +708,10 @@ void test_eval_handles_simple_fn() {
   Cell* expr = read(stream("(fn () 34)"));
   Cell* fn = eval(expr);
   checkEq(type(fn), newSym("function"));
-  checkEq(calleeSig(fn), nil);
-  check(isCons(calleeBody(fn)));
-  checkEq(car(calleeBody(fn)), newNum(34));
-  checkEq(calleeEnv(fn), nil);
+  checkEq(sig(fn), nil);
+  check(isCons(body(fn)));
+  checkEq(car(body(fn)), newNum(34));
+  checkEq(env(fn), nil);
   rmref(fn);
   rmref(expr);
 }
@@ -721,10 +721,10 @@ void test_eval_on_fn_is_idempotent() {
   Cell* fn = eval(expr);
   Cell* fn2 = eval(fn);
   checkEq(type(fn2), newSym("function"));
-  checkEq(calleeSig(fn2), nil);
-  check(isCons(calleeBody(fn2)));
-  checkEq(car(calleeBody(fn2)), newNum(34));
-  checkEq(calleeEnv(fn2), nil);
+  checkEq(sig(fn2), nil);
+  check(isCons(body(fn2)));
+  checkEq(car(body(fn2)), newNum(34));
+  checkEq(env(fn2), nil);
   rmref(fn2);
   rmref(fn);
   rmref(expr);
@@ -740,9 +740,9 @@ void test_eval_handles_closure() {
   endLexicalScope();
   checkEq(newLexicalScope->nrefs, 1);
   checkEq(type(result), newSym("function"));
-  checkEq(calleeSig(result), nil);
-  checkEq(car(calleeBody(result)), newNum(34));
-  checkEq(calleeEnv(result), newLexicalScope);
+  checkEq(sig(result), nil);
+  checkEq(car(body(result)), newNum(34));
+  checkEq(env(result), newLexicalScope);
   rmref(result);
   checkEq(newLexicalScope->nrefs, 0);
   rmref(expr);

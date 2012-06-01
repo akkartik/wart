@@ -49,7 +49,7 @@ void test_cons_works() {
 void test_assign_to_fn() {
   Cell* fn = read(stream("= foo (fn() 34)"));
   Cell* def = eval(fn);
-  Cell* scope = calleeEnv(lookup("foo"));
+  Cell* scope = env(lookup("foo"));
   checkEq(scope, nil);
   endDynamicScope("foo");
   rmref(def);

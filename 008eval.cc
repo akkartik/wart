@@ -25,20 +25,20 @@
                                   }
 
                                   // callee = (object function {sig, body, env, ..})
-                                  Cell* calleeSig(Cell* callee) {
+                                  Cell* sig(Cell* callee) {
                                     return get(rep(callee), newSym("sig"));
                                   }
 
-                                  Cell* calleeBody(Cell* callee) {
+                                  Cell* body(Cell* callee) {
                                     return get(rep(callee), newSym("body"));
                                   }
 
-                                  Cell* calleeImpl(Cell* callee) {
+                                  Cell* impl(Cell* callee) {
                                     Cell* impl = get(rep(callee), newSym("optimized-body"));
-                                    return (impl != nil) ? impl : calleeBody(callee);
+                                    return (impl != nil) ? impl : body(callee);
                                   }
 
-                                  Cell* calleeEnv(Cell* callee) {
+                                  Cell* env(Cell* callee) {
                                     return get(rep(callee), newSym("env"));
                                   }
 
@@ -55,10 +55,10 @@
                                   // keep sync'd with mac
                                   bool isMacro(Cell* fn) {
                                     if (!isObject(fn)) return false;
-                                    if (!isQuoted(calleeSig(fn))) return false;
-                                    Cell* body = calleeBody(fn);
-                                    if (cdr(body) != nil) return false;
-                                    Cell* form = car(body);
+                                    if (!isQuoted(sig(fn))) return false;
+                                    Cell* forms = body(fn);
+                                    if (cdr(forms) != nil) return false;
+                                    Cell* form = car(forms);
                                     if (car(form) != newSym("eval")) return false;
                                     if (car(cdr(cdr(form))) != newSym("caller-scope")) return false;
                                     if (cdr(cdr(cdr(form))) != nil) return false;
@@ -67,7 +67,7 @@
 
                                   bool isMacroWithoutBackquotes(Cell* fn) {
                                     if (!isMacro(fn)) return false;
-                                    return !contains(calleeBody(fn), newSym("`"));
+                                    return !contains(body(fn), newSym("`"));
                                   }
 
 // eval @exprs and inline them into args, tagging them with '' (already eval'd)
@@ -373,30 +373,30 @@ Cell* eval(Cell* expr, Cell* scope, bool dontStripAlreadyEval) {
   // eval all its args in the current lexical scope
   Cell* splicedArgs = spliceArgs(callArgs(expr), scope, fn, dontStripAlreadyEval);
   // keyword args can change what we eval
-  Cell* orderedArgs = reorderKeywordArgs(calleeSig(fn), splicedArgs);
-  Cell* evaldArgs = evalArgs(calleeSig(fn), orderedArgs, scope, dontStripAlreadyEval);
+  Cell* orderedArgs = reorderKeywordArgs(sig(fn), splicedArgs);
+  Cell* evaldArgs = evalArgs(sig(fn), orderedArgs, scope, dontStripAlreadyEval);
 
   // swap in the function's lexical environment
-  if (!isCompiledFn(calleeBody(fn)))
-    newDynamicScope(CURR_LEXICAL_SCOPE, calleeEnv(fn));
+  if (!isCompiledFn(body(fn)))
+    newDynamicScope(CURR_LEXICAL_SCOPE, env(fn));
   // now bind its params to args in the new environment
   newLexicalScope();
-  bindParams(calleeSig(fn), evaldArgs);
-  if (!isCompiledFn(calleeBody(fn)))
+  bindParams(sig(fn), evaldArgs);
+  if (!isCompiledFn(body(fn)))
     addLexicalBinding("caller-scope", scope);
 
   // eval all forms in body, save result of final form
   Cell* result = nil;
-  if (isCompiledFn(calleeBody(fn)))
-    result = toCompiledFn(calleeBody(fn))(); // all compiledFns must mkref result
+  if (isCompiledFn(body(fn)))
+    result = toCompiledFn(body(fn))(); // all compiledFns must mkref result
   else
-    for (Cell* form = calleeImpl(fn); form != nil; form = cdr(form)) {
+    for (Cell* form = impl(fn); form != nil; form = cdr(form)) {
       rmref(result);
       result = eval(car(form), currLexicalScopes.top(), dontStripAlreadyEval);
     }
 
   endLexicalScope();
-  if (!isCompiledFn(calleeBody(fn)))
+  if (!isCompiledFn(body(fn)))
     endDynamicScope(CURR_LEXICAL_SCOPE);
 
   rmref(evaldArgs);
