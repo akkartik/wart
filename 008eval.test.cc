@@ -1032,7 +1032,7 @@ void test_eval_handles_non_keyword_arg_colon_syms() {
 }
 
 void test_eval_handles_body_keyword_synonym() {
-  Cell* fn = read(stream("(fn (a . body) body)"));
+  Cell* fn = read(stream("(fn (a . body/do) body)"));
   Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read(stream("(f 2 :do 1 3)"));

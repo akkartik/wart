@@ -123,9 +123,7 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
                                     Cell* realArg = newSym(toString(arg).substr(1));
                                     for (; params != nil; params=cdr(params)) {
                                       if (!isCons(params)) {
-                                        if (realArg == params) // rest keyword arg must be last
-                                          return newSym("__wartRestKeywordArg");
-                                        if (realArg == newSym("do") && params == newSym("body"))
+                                        if (paramAliasMatch(realArg, params)) // rest keyword arg must be last
                                           return newSym("__wartRestKeywordArg");
                                       }
                                       else {
