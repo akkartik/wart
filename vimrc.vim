@@ -14,10 +14,11 @@ function! WartSettings()
   set filetype=lisp
   set nolisp " since we lack parens so often
 
-  "" ssyntax
-  set iskeyword-=: | set iskeyword-=47-58 | set iskeyword +=47-57
+  set iskeyword-=: | set iskeyword-=47-58 | set iskeyword+=47-57
   set iskeyword-=!
-  set iskeyword-=& | set iskeyword -=38
+  set iskeyword-=& | set iskeyword-=38
+
+  "" ssyntax
   " !a !~a.b:c!d&:e.f!.g!!h?.i j. k!( l!' !,k
   " ^  ^^ ^ ^ ^ ^  ^  ^  ^  ^   ^   ^   ^ ^       highlight these like parens
   syntax match SSyntax /[^ ]\zs\./  " period after sym
