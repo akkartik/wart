@@ -122,14 +122,17 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
                                     if (!isColonSym(arg)) return nil;
                                     Cell* realArg = newSym(toString(arg).substr(1));
                                     for (; params != nil; params=cdr(params)) {
-                                      if (realArg == params) // rest keyword arg must be last
-                                        return newSym("__wartRestKeywordArg");
-                                      if (realArg == newSym("do") && params == newSym("body"))
-                                        return newSym("__wartRestKeywordArg");
-                                      if (!isCons(params)) continue;
-                                      Cell* param = stripQuote(car(params));
-                                      if (paramAliasMatch(realArg, param))
-                                        return param;
+                                      if (!isCons(params)) {
+                                        if (realArg == params) // rest keyword arg must be last
+                                          return newSym("__wartRestKeywordArg");
+                                        if (realArg == newSym("do") && params == newSym("body"))
+                                          return newSym("__wartRestKeywordArg");
+                                      }
+                                      else {
+                                        Cell* param = stripQuote(car(params));
+                                        if (paramAliasMatch(realArg, param))
+                                          return param;
+                                      }
                                     }
                                     return nil;
                                   }
@@ -139,13 +142,13 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
                                     Cell *pNonKeywordArgs = newCell(), *curr = pNonKeywordArgs;
                                     for (; isCons(args); args=cdr(args)) {
                                       Cell* currArg = keywordArg(car(args), params);
-                                      if (currArg == newSym("__wartRestKeywordArg")) {
-                                        setCdr(curr, cdr(args));
-                                        break;
-                                      }
-                                      else if (currArg == nil) {
+                                      if (currArg == nil) {
                                         addCons(curr, car(args));
                                         curr=cdr(curr);
+                                      }
+                                      else if (currArg == newSym("__wartRestKeywordArg")) {
+                                        setCdr(curr, cdr(args));
+                                        break;
                                       }
                                       else {
                                         args = cdr(args); // skip keyword arg
