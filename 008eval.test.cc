@@ -1039,13 +1039,11 @@ void test_eval_handles_quoted_rest_keyword_arg() {
   Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read(stream("(f :b 1 2 3)"));
-  debug = 1;
   Cell* result = eval(call);
   checkEq(car(result), newNum(1));
   checkEq(car(cdr(result)), newNum(2));
   checkEq(car(cdr(cdr(result))), newNum(3));
   checkEq(cdr(cdr(cdr(result))), nil);
-  exit(0);
   rmref(result);
   rmref(call);
   rmref(f);
