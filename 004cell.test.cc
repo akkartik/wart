@@ -27,7 +27,7 @@ void test_rmref_handles_nums() {
 }
 
 void test_nthCdr() {
-  Cell* x = newCons(newNum(3), newCons(newNum(4), nil));
+  Cell* x = newCons(newNum(3), newCons(newNum(4)));
   checkEq(nthCdr(x, 0), x);
   checkEq(car(nthCdr(x, 1)), newNum(4));
   checkEq(nthCdr(x, 2), nil);
@@ -53,7 +53,7 @@ void test_Cell_layout_constraints() {
 
 void test_contains_handles_circular_lists() {
   unordered_set<Cell*> done;
-  Cell* x = newCons(newNum(1), nil);
+  Cell* x = newCons(newNum(1));
   setCdr(x, x);
   check(!contains(x, newSym("a"), done));
   x->cdr = nil; // break cycle for gc

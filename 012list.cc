@@ -46,7 +46,7 @@ COMPILE_FN(list_splice, compiledFn_list_splice, "('$list $start $end $val)",
                                     Cell* comparer;
                                     CellLt(Cell* f) :comparer(f) {}
                                     bool operator()(Cell* a, Cell* b) {
-                                      Cell* expr = newCons(comparer, newCons(a, newCons(b, nil)));
+                                      Cell* expr = newCons(comparer, newCons(a, newCons(b)));
                                       Cell* result = eval(expr);
                                       bool ans = (result != nil);
                                       rmref(result);

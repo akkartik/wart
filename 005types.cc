@@ -212,7 +212,7 @@ Cell* get(Cell* t, string k) {
 
 
 Cell* newObject(string type, Cell* rep) {
-  return newCons(newSym("object"), newCons(newSym(type), newCons(rep, nil)));
+  return newCons(newSym("object"), newCons(newSym(type), newCons(rep)));
 }
 
 bool isObject(Cell* x) {
@@ -263,7 +263,7 @@ Cell* coerceQuoted(Cell* x, Cell* destType, Cell* coercions) {
     RAISE << "can't coerce " << typ << " " << x << " to " << destType << endl;
     return nil;
   }
-  Cell* expr = newCons(coercer, newCons(newCons(newSym("'"), x), nil));
+  Cell* expr = newCons(coercer, newCons(newCons(newSym("'"), x)));
   Cell* result = eval(expr);
   rmref(expr);
   return result; // already mkref'd

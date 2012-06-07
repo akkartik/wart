@@ -92,7 +92,7 @@ COMPILE_FN(close_socket, compiledFn_close_socket, "($sock)",
 
 struct sigaction originalSignalHandler;
 void interrupt(int s) {
-  eval(newCons(lookup("on-interrupt"), nil));
+  eval(newCons(lookup("on-interrupt")));
   originalSignalHandler.sa_handler(s);
 }
 

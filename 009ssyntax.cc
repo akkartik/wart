@@ -13,7 +13,7 @@ Cell* transformCompose(string var) {
 Cell* transformCall(string var) {
   size_t end = var.length()-1;
   if (var.rfind(L'.') == end)
-    return newCons(newSym(var.substr(0, end)), nil);
+    return newCons(newSym(var.substr(0, end)));
 
   size_t dot = var.rfind(L'.');
   size_t bang = end > 0 ? var.rfind(L'!', end-1) : var.rfind(L'!');

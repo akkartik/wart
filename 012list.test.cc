@@ -9,7 +9,7 @@ void test_list_range() {
 }
 
 void test_list_splice_replaces_index() {
-  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4), nil)));
+  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4))));
   Cell* expr = read(stream("list_splice a 1 2 '(5)"));
   Cell* call = eval(expr);
   checkEq(car(lookup("a")), newNum(3));
@@ -20,7 +20,7 @@ void test_list_splice_replaces_index() {
 }
 
 void test_list_splice_replaces_first_index() {
-  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4), nil)));
+  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4))));
   Cell* expr = read(stream("list_splice a 0 1 '(9)"));
   Cell* call = eval(expr);
   checkEq(car(lookup("a")), newNum(9));
@@ -30,7 +30,7 @@ void test_list_splice_replaces_first_index() {
 }
 
 void test_list_splice_inserts_list_at_beginning() {
-  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4), nil)));
+  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4))));
   Cell* expr = read(stream("list_splice a 0 1 '(7 9)"));
   Cell* call = eval(expr);
   checkEq(car(lookup("a")), newNum(7));
@@ -41,7 +41,7 @@ void test_list_splice_inserts_list_at_beginning() {
 }
 
 void test_list_splice_inserts_shorter_list() {
-  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4), newCons(newNum(5), nil))));
+  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4), newCons(newNum(5)))));
   Cell* expr = read(stream("list_splice a 1 3 '(6)"));
   Cell* call = eval(expr);
   checkEq(car(lookup("a")), newNum(3));
@@ -53,7 +53,7 @@ void test_list_splice_inserts_shorter_list() {
 }
 
 void test_list_splice_inserts_longer_list() {
-  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4), newCons(newNum(5), nil))));
+  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4), newCons(newNum(5)))));
   Cell* expr = read(stream("list_splice a 1 2 '(6 7 8)"));
   Cell* call = eval(expr);
   Cell* curr = lookup("a");
@@ -69,7 +69,7 @@ void test_list_splice_inserts_longer_list() {
 }
 
 void test_list_splice_inserts_nil() {
-  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4), nil)));
+  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4))));
   Cell* expr = read(stream("list_splice a 0 1 '(nil)"));
   Cell* call = eval(expr);
   checkEq(car(lookup("a")), nil);
@@ -81,7 +81,7 @@ void test_list_splice_inserts_nil() {
 }
 
 void test_list_splice_deletes() {
-  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4), nil)));
+  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4))));
   Cell* expr = read(stream("list_splice a 1 2 nil"));
   Cell* call = eval(expr);
   checkEq(car(lookup("a")), newNum(3));
@@ -92,7 +92,7 @@ void test_list_splice_deletes() {
 }
 
 void test_list_splice_deletes_at_start() {
-  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4), nil)));
+  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4))));
   Cell* expr = read(stream("list_splice a 0 1 nil"));
   Cell* call = eval(expr);
   checkEq(car(lookup("a")), newNum(4));
@@ -103,7 +103,7 @@ void test_list_splice_deletes_at_start() {
 }
 
 void test_list_splice_deletes_entire() {
-  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4), nil)));
+  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4))));
   Cell* expr = read(stream("list_splice a 0 2 nil"));
   Cell* call = eval(expr);
   checkEq(lookup("a"), nil);
@@ -113,7 +113,7 @@ void test_list_splice_deletes_entire() {
 }
 
 void test_list_splice_returns_list_being_spliced_in() {
-  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4), newCons(newNum(5), nil))));
+  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4), newCons(newNum(5)))));
   Cell* expr = read(stream("list_splice a 1 2 '(6 7 8)"));
   Cell* result = eval(expr);
   Cell* curr = result;
@@ -127,7 +127,7 @@ void test_list_splice_returns_list_being_spliced_in() {
 }
 
 void test_list_splice_returns_elem_if_single() {
-  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4), nil)));
+  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4))));
   Cell* expr = read(stream("list_splice a 1 2 '(5)"));
   Cell* call = eval(expr);
   checkEq(call, newNum(5));

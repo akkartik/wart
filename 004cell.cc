@@ -193,6 +193,10 @@ Cell* newCons(Cell* car, Cell* cdr) {
   return ans;
 }
 
+Cell* newCons(Cell* car) {
+  return newCons(car, nil);
+}
+
 
 
 Cell* copyList(Cell* x) {
@@ -232,7 +236,7 @@ Cell* dropPtr(Cell* p) {
 }
 
 void addCons(Cell* p, Cell* x) {
-  setCdr(p, newCons(x, nil));
+  setCdr(p, newCons(x));
 }
 
 bool contains(Cell* tree, Cell* a, unordered_set<Cell*>& done) {

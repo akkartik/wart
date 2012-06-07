@@ -1,6 +1,6 @@
 void test_spliceArgs_works() {
   newDynamicScope("a", newNum(3));
-  newDynamicScope("b", newCons(newNum(4), newCons(newNum(5), nil)));
+  newDynamicScope("b", newCons(newNum(4), newCons(newNum(5))));
   Cell* args = read(stream("(a @b a)"));
   Cell* f = read(stream("fn nil 3"));
   Cell* fn = eval(f);
@@ -40,7 +40,7 @@ void test_spliceArgs_works_with_nil() {
 
 void test_spliceArgs_works_with_keywords() {
   newDynamicScope("a", newNum(3));
-  newDynamicScope("b", newCons(newNum(4), newCons(newSym(":x"), nil)));
+  newDynamicScope("b", newCons(newNum(4), newCons(newSym(":x"))));
   Cell* args = read(stream("(a @b a)"));
   Cell* f = read(stream("fn nil 3"));
   Cell* fn = eval(f);
@@ -112,7 +112,7 @@ void test_evalArgs_handles_quoted_param() {
 void test_evalArgs_handles_alreadyEvald_arg() {
   newDynamicScope("a", newNum(3));
   Cell* params = read(stream("(x)"));
-  Cell* args = newCons(newCons(newSym("''"), newSym("a")), nil);
+  Cell* args = newCons(newCons(newSym("''"), newSym("a")));
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newSym("a"));
   checkEq(cdr(evaldArgs), nil);
@@ -228,7 +228,7 @@ void test_processUnquotes_handles_unquote() {
 }
 
 void test_processUnquotes_handles_unquote_splice() {
-  newDynamicScope("a", newCons(newNum(3), nil));
+  newDynamicScope("a", newCons(newNum(3)));
   Cell* expr = read(stream("(,@a)"));
   Cell* result = processUnquotes(expr, 1);
   check(isCons(result));
@@ -240,8 +240,8 @@ void test_processUnquotes_handles_unquote_splice() {
 }
 
 void test_processUnquotes_handles_unquote_splice_and_unquote() {
-  newDynamicScope("a", newCons(newNum(3), nil));
-  newDynamicScope("b", newCons(newNum(4), nil));
+  newDynamicScope("a", newCons(newNum(3)));
+  newDynamicScope("b", newCons(newNum(4)));
   Cell* expr = read(stream("(,@a ,b)"));
   Cell* result = processUnquotes(expr, 1);
   check(isCons(result));
@@ -257,8 +257,8 @@ void test_processUnquotes_handles_unquote_splice_and_unquote() {
 }
 
 void test_processUnquotes_splices_copies_of_lists() {
-  newDynamicScope("a", newCons(newNum(3), nil));
-  newDynamicScope("b", newCons(newNum(4), nil));
+  newDynamicScope("a", newCons(newNum(3)));
+  newDynamicScope("b", newCons(newNum(4)));
   Cell* expr = read(stream("(,@a ,b)"));
   Cell* result = processUnquotes(expr, 1);
   check(isCons(result));
