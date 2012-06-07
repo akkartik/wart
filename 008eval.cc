@@ -164,7 +164,7 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
                                   Cell* argsInParamOrder(Cell* params, Cell* nonKeywordArgs, CellMap& keywordArgs) {
                                     Cell* pReconstitutedArgs = newCell();
                                     params = stripQuote(params);
-                                    for (Cell* curr = pReconstitutedArgs; params != nil; curr=cdr(curr), params=cdr(params)) {
+                                    for (Cell* curr = pReconstitutedArgs; params != nil; curr=cdr(curr), params=stripQuote(cdr(params))) {
                                       if (!isCons(params)) {
                                         setCdr(curr, keywordArgs[params] ? keywordArgs[params] : nonKeywordArgs);
                                         break;
