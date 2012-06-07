@@ -1017,6 +1017,23 @@ void test_eval_handles_rest_keyword_arg_at_end() {
   endDynamicScope("f");
 }
 
+void test_eval_handles_rest_keyword_arg_at_end2() {
+  Cell* fn = read(stream("(fn (a . b) b)"));
+  Cell* f = eval(fn);
+  newDynamicScope("f", f);
+  Cell* call = read(stream("(f :b 1 2 3)"));
+  Cell* result = eval(call);
+  checkEq(car(result), newNum(1));
+  checkEq(car(cdr(result)), newNum(2));
+  checkEq(car(cdr(cdr(result))), newNum(3));
+  checkEq(cdr(cdr(cdr(result))), nil);
+  rmref(result);
+  rmref(call);
+  rmref(f);
+  rmref(fn);
+  endDynamicScope("f");
+}
+
 void test_eval_handles_non_keyword_arg_colon_syms() {
   Cell* fn = read(stream("(fn (a b) b)"));
   Cell* f = eval(fn);

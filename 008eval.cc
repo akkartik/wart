@@ -117,14 +117,16 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
                                     return false;
                                   }
 
+                                  // returns the appropriate param if arg is a valid keyword arg
+                                  // responds to rest keyword args with (rest-param)
                                   // doesn't look inside destructured params
                                   Cell* keywordArg(Cell* arg, Cell* params) {
                                     if (!isColonSym(arg)) return nil;
                                     Cell* realArg = newSym(toString(arg).substr(1));
                                     for (; params != nil; params=cdr(params)) {
                                       if (!isCons(params)) {
-                                        if (paramAliasMatch(realArg, params)) // rest keyword arg must be last
-                                          return newSym("__wartRestKeywordArg");
+                                        if (paramAliasMatch(realArg, params))
+                                          return newCons(params);
                                       }
                                       else {
                                         Cell* param = stripQuote(car(params));
@@ -144,9 +146,10 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
                                         addCons(curr, car(args));
                                         curr=cdr(curr);
                                       }
-                                      else if (currArg == newSym("__wartRestKeywordArg")) {
-                                        setCdr(curr, cdr(args));
-                                        break;
+                                      else if (isCons(currArg)) { // rest keyword arg
+                                        keywordArgs[car(currArg)] = cdr(args); // ..must be final keyword arg
+                                        rmref(currArg);
+                                        args = nil;
                                       }
                                       else {
                                         args = cdr(args); // skip keyword arg
