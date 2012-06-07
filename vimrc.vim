@@ -14,6 +14,7 @@ function! WartSettings()
   set filetype=lisp
   set nolisp " since we lack parens so often
 
+  set iskeyword-=@ | set iskeyword-=@-@ | set iskeyword-=64-90 | set iskeyword+=65-90
   set iskeyword-=: | set iskeyword-=47-58 | set iskeyword+=47-57
   set iskeyword-=!
   set iskeyword-=& | set iskeyword-=38
