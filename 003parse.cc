@@ -37,6 +37,11 @@ struct AstNode {
   }
 };
 
+ostream& operator<<(ostream& os, Token y) {
+  if (y == "") return os << ":" << y.indentLevel;
+  else return os << y.token;
+}
+
 ostream& operator<<(ostream& os, AstNode x) {
   if (x.elems.empty()) return os << x.atom;
   bool prevWasOpen = true;
