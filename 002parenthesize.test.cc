@@ -40,6 +40,12 @@ void test_parenthesize_skips_outdent_tokens() {
   check(c.fd.eof());
 }
 
+void test_parenthesize_preserves_following_indent() {
+  CodeStream c(stream("a\n  b"));
+  nextExpr(c);
+  checkEq(c.fd.peek(), ' ');
+}
+
 void test_parenthesize_handles_fully_parenthesized_expressions_regardless_of_indent() {
   CodeStream c(stream("(a b c\n  (def gh)\n    (i j k)\n  lm\n\n\n    (no p))"));
   list<Token> tokens = nextExpr(c);
@@ -523,6 +529,26 @@ void test_parenthesize_passes_through_when_indented_by_one_space2() {
   checkEq(*p, "e"); ++p;
   checkEq(*p, "f"); ++p;
   checkEq(*p, "g"); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == tokens.end());
+  check(c.fd.eof());
+}
+
+void test_parenthesize_passes_through_when_indented_by_one_space3() {
+  CodeStream c(stream("a\n  (a b c\n   d e)"));
+  list<Token> tokens = nextExpr(c);
+  list<Token>::iterator p = tokens.begin();
+  checkEq(*p, "a"); ++p;
+  check(p == tokens.end());
+
+  tokens = nextExpr(c);
+  p = tokens.begin();
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, "c"); ++p;
+  checkEq(*p, "d"); ++p;
+  checkEq(*p, "e"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
   check(c.fd.eof());

@@ -124,8 +124,11 @@ list<Token> nextExpr(CodeStream& c) {
         implicitParenStack.pop();
       }
 
-    if (implicitParenStack.empty() && explicitParenStack.empty() && argParenCount == 0)
+    if (implicitParenStack.empty() && explicitParenStack.empty() && argParenCount == 0) {
+      for (int i = 0; i < nextLineIndent; ++i)
+        c.fd.putback(' ');
       break;
+    }
   }
 
   for (unsigned long i=0; i < implicitParenStack.size(); ++i)

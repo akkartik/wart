@@ -289,3 +289,36 @@ void test_build_handles_quotes() {
   rmref(origc);
   check(cs.fd.eof());
 }
+
+void test_build_handles_indented_wrapped_lines() {
+  CodeStream cs(stream("a\n  (a b c\n   d e)")); // d e indented by just one space
+  Cell *c0=nextRawCell(cs);
+  checkEq(c0->nrefs, 1);
+  checkEq(c0, newSym("a"));
+
+  Cell *c=nextRawCell(cs), *origc=c;
+  checkEq(c->nrefs, 0);
+  checkEq(car(c), newSym("a"));
+  checkEq(car(c)->nrefs, 2);
+  c = cdr(c);
+  checkEq(c->nrefs, 1);
+  checkEq(car(c), newSym("b"));
+  checkEq(car(c)->nrefs, 2);
+  c = cdr(c);
+  checkEq(c->nrefs, 1);
+  checkEq(car(c), newSym("c"));
+  checkEq(car(c)->nrefs, 2);
+  c = cdr(c);
+  checkEq(c->nrefs, 1);
+  checkEq(car(c), newSym("d"));
+  checkEq(car(c)->nrefs, 2);
+  c = cdr(c);
+  checkEq(c->nrefs, 1);
+  checkEq(car(c), newSym("e"));
+  checkEq(car(c)->nrefs, 2);
+  c = cdr(c);
+  checkEq(c, nil);
+  rmref(origc);
+  rmref(c0);
+  check(cs.fd.eof());
+}

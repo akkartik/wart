@@ -156,3 +156,22 @@ void test_parse_handles_splice_operators() {
   check(p == n.elems.end());
   check(c.fd.eof());
 }
+
+void test_parse_handles_indented_wrapped_lines() {
+  CodeStream c(stream("a\n  (a b c\n   d e)")); // d e indented by just one space
+  AstNode n = nextAstNode(c);
+
+  n = nextAstNode(c);
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  check(p->isAtom());
+  checkEq(p->atom.token, "("); ++p;
+  checkEq(p->atom.token, "a"); ++p;
+  checkEq(p->atom.token, "b"); ++p;
+  checkEq(p->atom.token, "c"); ++p;
+  checkEq(p->atom.token, "d"); ++p;
+  checkEq(p->atom.token, "e"); ++p;
+  checkEq(p->atom.token, ")"); ++p;
+  check(p == n.elems.end());
+  check(c.fd.eof());
+}
