@@ -1,7 +1,3 @@
-void test_tokenize_handles_empty_input() {
-  CodeStream c(stream(""));
-}
-
 void test_tokenize_always_starts_a_line_with_indent() {
   CodeStream c(stream("34"));
   checkEq(nextToken(c), Token::indent(0));
