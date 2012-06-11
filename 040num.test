@@ -38,11 +38,11 @@
  :valueof (<= 1 2 3)
  :should ~be nil)
 
-(test "<= works"
+(test "<= works - 2"
  :valueof (<= 1 1 3)
  :should ~be nil)
 
-(test "<= works"
+(test "<= works - 3"
  :valueof (<= 1 4 3)
  :should be nil)
 
@@ -50,11 +50,11 @@
  :valueof (>= 3 2 1)
  :should ~be nil)
 
-(test ">= works"
+(test ">= works - 2"
  :valueof (>= 3 1 1)
  :should ~be nil)
 
-(test ">= works"
+(test ">= works - 3"
  :valueof (>= 3 1 2)
  :should be nil)
 
