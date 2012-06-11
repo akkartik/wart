@@ -8,6 +8,12 @@
                                     return isCons(cell) && car(cell) == newSym("''");
                                   }
 
+                                  Cell* stripAlreadyEvald(Cell* cell) {
+                                    while (isAlreadyEvald(cell))
+                                      cell = cdr(cell);
+                                    return cell;
+                                  }
+
                                   bool isBackQuoted(Cell* cell) {
                                     return isCons(cell) && car(cell) == newSym("`");
                                   }
@@ -205,7 +211,7 @@ Cell* evalArgs(Cell* params, Cell* args, Cell* scope, bool dontStripAlreadyEval)
   rmref(cdr(result));
 
   if (isAlreadyEvald(car(args)))
-    setCar(result, cdr(car(args)));
+    setCar(result, stripAlreadyEvald(car(args)));
   else if (isCons(params) && isQuoted(car(params)))
     setCar(result, car(args));
   else {

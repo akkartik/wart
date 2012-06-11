@@ -122,6 +122,20 @@ void test_evalArgs_handles_alreadyEvald_arg() {
   endDynamicScope("a");
 }
 
+void test_evalArgs_handles_multiply_alreadyEvald_arg() {
+  newDynamicScope("a", newNum(3));
+  Cell* params = read(stream("(x)"));
+  Cell* args = newCons(newCons(newSym("''"),
+                  newCons(newSym("''"), newSym("a"))));
+  Cell* evaldArgs = evalArgs(params, args);
+  checkEq(car(evaldArgs), newSym("a"));
+  checkEq(cdr(evaldArgs), nil);
+  rmref(evaldArgs);
+  rmref(args);
+  rmref(params);
+  endDynamicScope("a");
+}
+
 void test_evalArgs_handles_varargs_param() {
   newDynamicScope("a", newNum(3));
   newDynamicScope("b", newNum(4));
