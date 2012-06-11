@@ -221,10 +221,6 @@ Cell* evalArgs(Cell* params, Cell* args, Cell* scope, bool dontStripAlreadyEval)
   return mkref(result);
 }
 
-Cell* evalArgs(Cell* params, Cell* args, Cell* scope) {
-  return evalArgs(params, args, scope, false);
-}
-
 
 
                                   // split param sym at '/' and bind all resulting syms to val
