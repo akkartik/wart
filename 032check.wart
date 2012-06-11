@@ -11,7 +11,7 @@ mac or args
     `(let $x ,car.args
        if $x
          $x
-         or ,@cdr.args)
+         (or ,@cdr.args))
 
 mac and args
   if !args
@@ -19,7 +19,7 @@ mac and args
     if !cdr.args
       car.args
       `(if ,car.args
-         and ,@cdr.args)
+         (and ,@cdr.args))
 
 alias nil? not
 alias no not
