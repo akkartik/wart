@@ -30,6 +30,11 @@ mac! mac(name params . body)
     (prn "redef: " name)
   `(mac! ,name ,params ,@body)
 
+(mac! foo(a b) `(cons ,a ,cdr.b))
+debug.1
+(foo @'(1 (2 3)))
+quit.
+
 mac alias(new old)  ; include later refinements
   `(mac ,new $args
      `(,,old ,@$args))

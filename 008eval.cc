@@ -15,9 +15,19 @@
                                   }
 
                                   stack<bool> keepAlreadyEvald;
+                                  stack<bool> skippedAlreadyEvald;
+                                  bool foofoo = false;
                                   Cell* maybeStripAlreadyEvald(Cell* x) {
                                     if (keepAlreadyEvald.empty()) keepAlreadyEvald.push(false);
-                                    if (!keepAlreadyEvald.top() && isAlreadyEvald(x))
+                                    if (keepAlreadyEvald.top()) {
+//?                                       if (!skippedAlreadyEvald.empty()) {
+//?                                         skippedAlreadyEvald.pop();
+//?                                         skippedAlreadyEvald.push(contains(x, newSym("''")));
+//?                                       }
+                                      foofoo = contains(x, newSym("''"));
+                                      return x;
+                                    }
+                                    if (isAlreadyEvald(x))
                                       return stripAlreadyEvald(x);
                                     return x;
                                   }
@@ -279,9 +289,17 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
 
   if (unquoteDepth(x) == depth) {
     keepAlreadyEvald.push(true);
+    skippedAlreadyEvald.push(false);
+    foofoo = false;
     Cell* result = eval(stripUnquote(x), scope);
+    bool skip = skippedAlreadyEvald.top();
+    skippedAlreadyEvald.pop();
     keepAlreadyEvald.pop();
-    return result;
+    skip = foofoo;
+    if (!skip) return result;
+    result = newCons(newSym("''"), result);
+    rmref(cdr(result));
+    return mkref(result);
   }
   else if (car(x) == newSym(","))
     return mkref(x);
@@ -294,7 +312,9 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
 
   if (depth == 1 && isUnquoteSplice(car(x))) {
     keepAlreadyEvald.push(true);
+    skippedAlreadyEvald.push(false);
     Cell* result = eval(cdr(car(x)), scope);
+    skippedAlreadyEvald.pop(); // ignore
     keepAlreadyEvald.pop();
     Cell* splice = processUnquotes(cdr(x), depth, scope);
     if (result == nil) return splice;
@@ -339,6 +359,8 @@ Cell* processUnquotes(Cell* x, long depth) {
 Cell* eval(Cell* expr, Cell* scope) {
   if (!expr)
     RAISE << "eval: cell should never be NUL" << endl << DIE;
+
+  dbg << expr << endl;
 
   if (expr == nil)
     return nil;
@@ -385,6 +407,7 @@ Cell* eval(Cell* expr, Cell* scope) {
   // keyword args can change what we eval
   Cell* orderedArgs = reorderKeywordArgs(sig(fn), splicedArgs);
   Cell* evaldArgs = evalArgs(sig(fn), orderedArgs, scope);
+  dbg << car(expr) << "/" << keepAlreadyEvald.top() << ": " << evaldArgs << endl;
 
   // swap in the function's lexical environment
   if (!isCompiledFn(body(fn)))

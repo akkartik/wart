@@ -115,8 +115,10 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
 }
 
                                   Cell* maybeStripAlreadyEvald(Cell*);
+                                  extern stack<bool> keepAlreadyEvald;
 
 Cell* lookup(Cell* sym, Cell* scope) {
+  dbg << "lookup: " << sym << "/" << keepAlreadyEvald.top() << endl;
   Cell* result = lookupLexicalBinding(sym, scope);
   if (result) return maybeStripAlreadyEvald(result);
   result = lookupDynamicBinding(sym);
