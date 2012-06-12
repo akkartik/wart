@@ -15,9 +15,7 @@
                                   }
 
                                   Cell* maybeStripAlreadyEvald(bool dontReallyStrip, Cell* x) {
-                                    if (dontReallyStrip)
-                                      return x;
-                                    if (isAlreadyEvald(x))
+                                    if (!dontReallyStrip && isAlreadyEvald(x))
                                       return stripAlreadyEvald(x);
                                     return x;
                                   }
