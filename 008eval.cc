@@ -18,7 +18,7 @@
                                     if (dontReallyStrip)
                                       return x;
                                     if (isAlreadyEvald(x))
-                                      return cdr(x);
+                                      return stripAlreadyEvald(x);
                                     return x;
                                   }
 
