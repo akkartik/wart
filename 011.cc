@@ -10,6 +10,13 @@ COMPILE_FN(eval, compiledFn_eval, "($x . $scope)",
   return eval(lookup("$x"), scope);
 )
 
+COMPILE_FN(mac-eval, compiledFn_mac_eval, "('$x $scope)",
+  Cell* x = eval(lookup("$x"), currLexicalScopes.top(), true);
+  Cell* ans = eval(x, lookup("$scope"), true);
+  rmref(x);
+  return ans;
+)
+
 COMPILE_FN(mac?, compiledFn_isMacro, "($f)",
   Cell* f = lookup("$f");
   return isMacro(f) ? mkref(f) : nil;

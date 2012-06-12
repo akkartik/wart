@@ -31,6 +31,10 @@ let $< <
     (all (fn((x y)) ($< x y))
          pairwise.xs)
 
+prn (< 3 0)
+prn (if (< 3 0) 34 35)
+quit.
+
 def > xs
   (all (fn((x y)) (< y x))
        pairwise.xs)

@@ -65,7 +65,7 @@
                                     Cell* forms = body(fn);
                                     if (cdr(forms) != nil) return false;
                                     Cell* form = car(forms);
-                                    if (car(form) != newSym("eval")) return false;
+                                    if (car(form) != newSym("mac-eval")) return false;
                                     if (car(cdr(cdr(form))) != newSym("caller-scope")) return false;
                                     if (cdr(cdr(cdr(form))) != nil) return false;
                                     return true;
