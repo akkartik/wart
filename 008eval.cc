@@ -14,12 +14,6 @@
                                     return cell;
                                   }
 
-                                  Cell* maybeStripAlreadyEvald(bool keepAlreadyEvald, Cell* x) {
-                                    if (!keepAlreadyEvald && isAlreadyEvald(x))
-                                      return stripAlreadyEvald(x);
-                                    return x;
-                                  }
-
                                   bool isBackQuoted(Cell* cell) {
                                     return isCons(cell) && car(cell) == newSym("`");
                                   }
@@ -60,8 +54,8 @@
 
 
 
-                                  Cell* unsplice(Cell* arg, Cell* scope, bool keepAlreadyEvald) {
-                                    return eval(cdr(arg), scope, keepAlreadyEvald);
+                                  Cell* unsplice(Cell* arg, Cell* scope) {
+                                    return eval(cdr(arg), scope);
                                   }
 
                                   // keep sync'd with mac
@@ -77,19 +71,14 @@
                                     return true;
                                   }
 
-                                  bool isMacroWithoutBackquotes(Cell* fn) {
-                                    if (!isMacro(fn)) return false;
-                                    return !contains(body(fn), newSym("`"));
-                                  }
-
 // eval @exprs and inline them into args, tagging them with '' (already eval'd)
-Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn, bool keepAlreadyEvald) {
+Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
   Cell *pResult = newCell(), *tip = pResult;
   for (Cell* curr = args; curr != nil; curr=cdr(curr)) {
     if (isSplice(car(curr))) {
-      if (isMacroWithoutBackquotes(fn))
+      if (isMacro(fn))
         RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
-      Cell* x = unsplice(car(curr), scope, keepAlreadyEvald);
+      Cell* x = unsplice(car(curr), scope);
       for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
         if (isColonSym(car(curr2)))
           addCons(tip, car(curr2));
@@ -103,10 +92,6 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn, bool keepAlreadyEvald) {
     }
   }
   return dropPtr(pResult);
-}
-
-Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
-  return spliceArgs(args, scope, fn, false);
 }
 
                                   Cell* stripQuote(Cell* cell) {
@@ -206,14 +191,14 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
 
 
 
-Cell* evalArgs(Cell* params, Cell* args, Cell* scope, bool keepAlreadyEvald) {
+Cell* evalArgs(Cell* params, Cell* args, Cell* scope) {
   if (args == nil) return nil;
 
   if (isQuoted(params))
     return mkref(args);
 
   Cell* result = newCell();
-  setCdr(result, evalArgs(cdr(params), cdr(args), scope, keepAlreadyEvald));
+  setCdr(result, evalArgs(cdr(params), cdr(args), scope));
   rmref(cdr(result));
 
   if (isAlreadyEvald(car(args)))
@@ -221,7 +206,7 @@ Cell* evalArgs(Cell* params, Cell* args, Cell* scope, bool keepAlreadyEvald) {
   else if (isCons(params) && isQuoted(car(params)))
     setCar(result, car(args));
   else {
-    setCar(result, eval(car(args), scope, keepAlreadyEvald));
+    setCar(result, eval(car(args), scope));
     rmref(car(result));
   }
   return mkref(result);
@@ -280,7 +265,7 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
   if (!isCons(x)) return mkref(x);
 
   if (unquoteDepth(x) == depth)
-    return eval(stripUnquote(x), scope, true);
+    return eval(stripUnquote(x), scope);
   else if (car(x) == newSym(","))
     return mkref(x);
 
@@ -291,7 +276,7 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
   }
 
   if (depth == 1 && isUnquoteSplice(car(x))) {
-    Cell* result = eval(cdr(car(x)), scope, true);
+    Cell* result = eval(cdr(car(x)), scope);
     Cell* splice = processUnquotes(cdr(x), depth, scope);
     if (result == nil) return splice;
     // always splice in a copy
@@ -332,7 +317,7 @@ Cell* processUnquotes(Cell* x, long depth) {
 
 // HACK: explicitly reads from passed-in scope, but implicitly creates bindings
 // to currLexicalScope. Carefully make sure it's popped off.
-Cell* eval(Cell* expr, Cell* scope, bool keepAlreadyEvald) {
+Cell* eval(Cell* expr, Cell* scope) {
   if (!expr)
     RAISE << "eval: cell should never be NUL" << endl << DIE;
 
@@ -343,7 +328,7 @@ Cell* eval(Cell* expr, Cell* scope, bool keepAlreadyEvald) {
     return mkref(expr);
 
   if (isSym(expr))
-    return mkref(lookup(expr, scope, keepAlreadyEvald));
+    return mkref(lookup(expr, scope));
 
   if (isAtom(expr))
     return mkref(expr);
@@ -365,7 +350,7 @@ Cell* eval(Cell* expr, Cell* scope, bool keepAlreadyEvald) {
 
   newDynamicScope(CURR_LEXICAL_SCOPE, scope);
   // expr is a function call
-  Cell* fn0 = eval(car(expr), scope, keepAlreadyEvald);
+  Cell* fn0 = eval(car(expr), scope);
   Cell* fn = fn0;
   if (fn0 != nil && !isFn(fn0))
     fn = coerceQuoted(fn0, newSym("function"), lookup("coercions*"));
@@ -377,10 +362,10 @@ Cell* eval(Cell* expr, Cell* scope, bool keepAlreadyEvald) {
         << "  Or you need to split it in two." << endl << DIE;
 
   // eval all its args in the current lexical scope
-  Cell* splicedArgs = spliceArgs(callArgs(expr), scope, fn, keepAlreadyEvald);
+  Cell* splicedArgs = spliceArgs(callArgs(expr), scope, fn);
   // keyword args can change what we eval
   Cell* orderedArgs = reorderKeywordArgs(sig(fn), splicedArgs);
-  Cell* evaldArgs = evalArgs(sig(fn), orderedArgs, scope, keepAlreadyEvald);
+  Cell* evaldArgs = evalArgs(sig(fn), orderedArgs, scope);
 
   // swap in the function's lexical environment
   if (!isCompiledFn(body(fn)))
@@ -398,7 +383,7 @@ Cell* eval(Cell* expr, Cell* scope, bool keepAlreadyEvald) {
   else
     for (Cell* form = impl(fn); form != nil; form = cdr(form)) {
       rmref(result);
-      result = eval(car(form), currLexicalScopes.top(), keepAlreadyEvald);
+      result = eval(car(form), currLexicalScopes.top());
     }
 
   endLexicalScope();
@@ -412,10 +397,6 @@ Cell* eval(Cell* expr, Cell* scope, bool keepAlreadyEvald) {
   rmref(fn0);
   endDynamicScope(CURR_LEXICAL_SCOPE);
   return result; // already mkref'd
-}
-
-Cell* eval(Cell* expr, Cell* scope) {
-  return eval(expr, scope, false);
 }
 
 Cell* eval(Cell* expr) {

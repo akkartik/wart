@@ -82,10 +82,6 @@
                 (or nil x)))
  :should be 3)
 
-(test "or works with splice"
- :valueof (or @'(nil 1))
- :should be 1)
-
 
 
 (test "and handles 0 args"
@@ -124,10 +120,6 @@
  :valueof (do (= x 35)
               (and x 36))
  :should be 36)
-
-(test "and works with splice"
- :valueof (and @'(1 2))
- :should be 2)
 
 
 

@@ -50,12 +50,3 @@ void test_Cell_layout_constraints() {
   check(sizeof(float) <= sizeof(Cell*));
   check(sizeof(size_t) <= sizeof(Cell*));
 }
-
-void test_contains_handles_circular_lists() {
-  unordered_set<Cell*> done;
-  Cell* x = newCons(newNum(1));
-  setCdr(x, x);
-  check(!contains(x, newSym("a"), done));
-  x->cdr = nil; // break cycle for gc
-  rmref(x);
-}
