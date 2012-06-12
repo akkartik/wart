@@ -114,21 +114,23 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
   return NULL;
 }
 
-                                  Cell* maybeStripAlreadyEvald(Cell*);
-                                  extern stack<bool> keepAlreadyEvald;
+                                  Cell* maybeStripAlreadyEvald(bool, Cell*);
 
-Cell* lookup(Cell* sym, Cell* scope) {
-  dbg << "lookup: " << sym << "/" << keepAlreadyEvald.top() << endl;
+Cell* lookup(Cell* sym, Cell* scope, bool keepAlreadyEval) {
   Cell* result = lookupLexicalBinding(sym, scope);
-  if (result) return maybeStripAlreadyEvald(result);
+  if (result) return maybeStripAlreadyEvald(keepAlreadyEval, result);
   result = lookupDynamicBinding(sym);
-  if (result) return maybeStripAlreadyEvald(result);
+  if (result) return maybeStripAlreadyEvald(keepAlreadyEval, result);
   RAISE << "No binding for " << toString(sym) << endl;
 
   if (pretendRaise) return nil; // don't die
   cerr << "- Did you not want a symbol lookup? Perhaps the expression is indented too much." << endl;
   cerr << "- Was it defined using indentation? When wart encounters a paren in the middle of a line, it stops inserting parens until it closes." << endl << DIE;
   return nil;
+}
+
+Cell* lookup(Cell* sym, Cell* scope) {
+  return lookup(sym, scope, false);
 }
 
 Cell* lookup(Cell* sym) {

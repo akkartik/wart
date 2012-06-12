@@ -130,7 +130,6 @@ COMPILE_FN(car, compiledFn_car, "($l)",
 )
 
 COMPILE_FN(cdr, compiledFn_cdr, "($l)",
-  dbg << "AA: " << lookup("$l") << endl;
   return mkref(cdr(lookup("$l")));
 )
 
