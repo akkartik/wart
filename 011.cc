@@ -28,8 +28,11 @@ COMPILE_FN(try-eval, compiledFn_try_eval, "($x . $scope)",
   return nil;
 )
 
-COMPILE_FN(if, compiledFn_if, "($cond '$then '$else)",
-  return lookup("$cond") != nil ? eval(lookup("$then")) : eval(lookup("$else"));
+COMPILE_FN(if, compiledFn_if, "'($cond $then $else)",
+  Cell* x = eval(lookup("$cond"));
+  Cell* result = (x != nil) ? eval(lookup("$then")) : eval(lookup("$else"));
+  rmref(x);
+  return result;
 )
 
 COMPILE_FN(not, compiledFn_not, "($x)",

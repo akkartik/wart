@@ -357,6 +357,9 @@ Cell* eval(Cell* expr, Cell* scope, bool dontStripAlreadyEval) {
   if (isBackQuoted(expr))
     return processUnquotes(cdr(expr), 1, scope); // already mkref'd
 
+  if (isAlreadyEvald(expr))
+    return mkref(dontStripAlreadyEval ? expr : stripAlreadyEvald(expr));
+
   if (car(expr) == newSym("fn"))
     return mkref(newFn("function", expr, scope));
   else if (isFn(expr))
