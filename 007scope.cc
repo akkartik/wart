@@ -115,12 +115,9 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
 }
 
                                   bool isAlreadyEvald(Cell*);
-                                  bool skippedAlreadyEvald = false;
                                   Cell* maybeStripAlreadyEvald(bool dontReallyStrip, Cell* x) {
-                                    if (dontReallyStrip) {
-                                      skippedAlreadyEvald = contains(x, newSym("''"));
+                                    if (dontReallyStrip)
                                       return x;
-                                    }
                                     if (isAlreadyEvald(x))
                                       return cdr(x);
                                     return x;

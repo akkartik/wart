@@ -273,14 +273,8 @@ void bindParams(Cell* params, Cell* args) {
 Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
   if (!isCons(x)) return mkref(x);
 
-  if (unquoteDepth(x) == depth) {
-    skippedAlreadyEvald = false;
-    Cell* result = eval(stripUnquote(x), scope, true);
-    if (!skippedAlreadyEvald) return result;
-    result = newCons(newSym("''"), result);
-    rmref(cdr(result));
-    return mkref(result);
-  }
+  if (unquoteDepth(x) == depth)
+    return eval(stripUnquote(x), scope, true);
   else if (car(x) == newSym(","))
     return mkref(x);
 
