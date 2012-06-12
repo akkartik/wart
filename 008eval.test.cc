@@ -80,7 +80,7 @@ void test_reorderKeywordArgs_handles_improper_lists() {
 
 
                                   Cell* evalArgs(Cell* params, Cell* args) {
-                                    return evalArgs(params, args, currLexicalScopes.top(), false);
+                                    return evalArgs(params, args, currLexicalScopes.top());
                                   }
 
 void test_evalArgs_handles_unquoted_param() {
