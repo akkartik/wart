@@ -121,10 +121,13 @@ def rem(f seq)
 alias skip rem
 
 def some(f seq)
-  (or @(map f seq))
+  if seq
+    if (f car.seq)
+      1
+      (some f cdr.seq)
 
 def all(f seq)
-  (and @(map f seq))
+  (~some ~f seq)
 
 alias any some
 alias none ~some

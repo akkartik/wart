@@ -10,13 +10,6 @@ COMPILE_FN(eval, compiledFn_eval, "($x . $scope)",
   return eval(lookup("$x"), scope);
 )
 
-COMPILE_FN(mac-eval, compiledFn_mac_eval, "('$x $scope)",
-  Cell* x = eval(lookup("$x"), currLexicalScopes.top(), true);
-  Cell* ans = eval(x, lookup("$scope"), true);
-  rmref(x);
-  return ans;
-)
-
 COMPILE_FN(mac?, compiledFn_isMacro, "($f)",
   Cell* f = lookup("$f");
   return isMacro(f) ? mkref(f) : nil;
@@ -35,11 +28,8 @@ COMPILE_FN(try-eval, compiledFn_try_eval, "($x . $scope)",
   return nil;
 )
 
-COMPILE_FN(if, compiledFn_if, "'($cond $then $else)",
-  Cell* x = eval(lookup("$cond"));
-  Cell* result = (x != nil) ? eval(lookup("$then")) : eval(lookup("$else"));
-  rmref(x);
-  return result;
+COMPILE_FN(if, compiledFn_if, "($cond '$then '$else)",
+  return lookup("$cond") != nil ? eval(lookup("$then")) : eval(lookup("$else"));
 )
 
 COMPILE_FN(not, compiledFn_not, "($x)",

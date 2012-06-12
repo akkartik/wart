@@ -65,7 +65,7 @@
                                     Cell* forms = body(fn);
                                     if (cdr(forms) != nil) return false;
                                     Cell* form = car(forms);
-                                    if (car(form) != newSym("mac-eval")) return false;
+                                    if (car(form) != newSym("eval")) return false;
                                     if (car(cdr(cdr(form))) != newSym("caller-scope")) return false;
                                     if (cdr(cdr(cdr(form))) != nil) return false;
                                     return true;
@@ -356,9 +356,6 @@ Cell* eval(Cell* expr, Cell* scope, bool dontStripAlreadyEval) {
 
   if (isBackQuoted(expr))
     return processUnquotes(cdr(expr), 1, scope); // already mkref'd
-
-  if (isAlreadyEvald(expr))
-    return mkref(dontStripAlreadyEval ? expr : stripAlreadyEvald(expr));
 
   if (car(expr) == newSym("fn"))
     return mkref(newFn("function", expr, scope));

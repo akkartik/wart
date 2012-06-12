@@ -34,6 +34,10 @@
  :valueof (< 1 2 3)
  :should ~be nil)
 
+(test "< works inside if"
+ :valueof (if (< 3 0) 34 35)
+ :should be 35)
+
 (test "<= works"
  :valueof (<= 1 2 3)
  :should ~be nil)
