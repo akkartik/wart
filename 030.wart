@@ -1,9 +1,9 @@
 = mac! (fn '(name params . body)
-  (eval `(= ,name (fn ',params
-                    ; remember to update isMacro when changing this
-                    (eval ((fn() ,@body))
-                          caller-scope)))
-        caller-scope))
+  (mac-eval `(= ,name (fn ',params
+                        ; remember to update isMacro when changing this
+                        (mac-eval ((fn() ,@body))
+                                  caller-scope)))
+            caller-scope))
 
 mac! def!(name params . body)
   `(= ,name (fn ,params ,@body))
