@@ -30,7 +30,7 @@ def to-with-expr(call bindings done)
             mac?.f
               `(mac-withs (,cdr:sig.f ',cdr.call)
                  ,@(collect:each expr body.f
-                     (if (iso car.expr 'eval)
+                     (if (iso car.expr 'mac-eval)
                        (yield `(,expr.0 ,expr.1))   ; strip caller-scope
                        (yield:to-with-expr expr
                                            (maybe chain-scope env.f :to bindings)
@@ -46,7 +46,7 @@ def to-with-expr(call bindings done)
       call)
 
 ; assumes macros are converted to the very specific structure
-;   (mac-withs (_ '_) ... (eval _ caller-scope))
+;   (mac-withs (_ '_) ... (mac-eval _ caller-scope))
 def inline-macro-eval(expr bindings)
   (if
     (is-match '(withs . _) expr)
@@ -56,7 +56,7 @@ def inline-macro-eval(expr bindings)
     (is-match '(mac-withs . _) expr)
       (check `(withs ,(macro-unquote-bindings expr.1)
                      ,@(collect:each x withs-body.expr
-                         (yield:or (if (and (is-match '(eval . _) x)
+                         (yield:or (if (and (is-match '(mac-eval . _) x)
                                             (backquoted? x.1))
                                      (check (apply-comma-bindings cdr:x.1   ; strip backquote
                                                 (maybe chain-scope with-bindings->scope:expr.1 :to bindings))
@@ -138,7 +138,7 @@ def quotify-vals(tab)
 
 def contains-eval(expr)
   (if
-    (iso expr 'eval)
+    (iso expr 'mac-eval)
       expr
     ~list?.expr
       nil

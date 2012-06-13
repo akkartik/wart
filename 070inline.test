@@ -5,7 +5,7 @@ prn.
  :should be '(withs () (withs ((x y) (list 3 4)) (+ x y))))
 
 (test "inline works on macros"
- :valueof (inline '(foo 3 4) (table 'foo (fn'(x y) (eval `(+ ,x ,y) caller-scope))))
+ :valueof (inline '(foo 3 4) (table 'foo (fn'(x y) (mac-eval `(+ ,x ,y) caller-scope))))
  :should be '(withs () (withs ((x y) (list 3 4)) (+ 3 4))))
 
 (test "inline works on functions with unbound syms"
@@ -13,7 +13,7 @@ prn.
  :should be '(withs () (withs ((x y) (list a b)) (+ x y))))
 
 (test "inline works on macros with unbound syms"
- :valueof (inline '(foo a b) (table 'foo (fn'(x y) (eval `(+ ,x ,y) caller-scope))))
+ :valueof (inline '(foo a b) (table 'foo (fn'(x y) (mac-eval `(+ ,x ,y) caller-scope))))
  :should be '(withs () (withs ((x y) (list a b)) (+ a b))))
 
 
@@ -61,18 +61,18 @@ prn.
 (test "to-with-expr handles macro calls"
  :valueof (to-with-expr '(foo x y)
                         (table 'foo (fn'(a b)
-                                      (eval `(+ ,a ,b) caller-scope))))
+                                      (mac-eval `(+ ,a ,b) caller-scope))))
  :should be '(withs ()
                (mac-withs ((a b) '(x y))
-                  (eval `(+ ,a ,b)))))
+                  (mac-eval `(+ ,a ,b)))))
 
 (test "to-with-expr leaves alone caller-scope outside macros"
  :valueof (to-with-expr '(foo 1 2)
                         (table 'foo (fn(a b)
-                                      (eval a caller-scope))))
+                                      (mac-eval a caller-scope))))
  :should be '(withs ()
                (withs ((a b) (list 1 2))
-                 (eval a caller-scope))))
+                 (mac-eval a caller-scope))))
 
 (test "to-with-expr handles functions in env"
  :valueof (to-with-expr '(foo x y)
@@ -101,14 +101,14 @@ make-unbound!y
 
 (test "inline-macro-eval works"
  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
-                                (eval `(+ ,a ,b))))
+                                (mac-eval `(+ ,a ,b))))
  :should be '(withs ((a b) (list x y))
                (+ x y)))
 
 (test "inline-macro-eval reaches into with exprs"
  :valueof (inline-macro-eval '(withs (z 3)
                                 (mac-withs ((a b) '(x y))
-                                  (eval `(+ ,a ,b)))))
+                                  (mac-eval `(+ ,a ,b)))))
  :should be '(withs (z 3)
                (withs ((a b) (list x y))
                  (+ x y))))
@@ -116,7 +116,7 @@ make-unbound!y
 (test "inline-macro-eval reaches into with exprs - 2"
  :valueof (inline-macro-eval '(withs (z 3)
                                 (mac-withs ((a b) '(x y))
-                                  (eval `(+ ,a ,b ,z)))))
+                                  (mac-eval `(+ ,a ,b ,z)))))
  :should be '(withs (z 3)
                (withs ((a b) (list x y))
                  (+ x y 3))))
@@ -124,7 +124,7 @@ make-unbound!y
 (test "inline-macro-eval works with intermezzo code"
  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
                                 (prn a)
-                                (eval `(+ ,a ,b))))
+                                (mac-eval `(+ ,a ,b))))
  :should be '(withs ((a b) (list x y))
                (prn 'x)
                (+ x y)))
@@ -132,38 +132,38 @@ make-unbound!y
 (test "inline-macro-eval works with intermezzo code - 2"
  :valueof (inline-macro-eval '(mac-withs ((a b) '((+ x 1) y))
                                 (prn a)
-                                (eval `(+ ,a ,b))))
+                                (mac-eval `(+ ,a ,b))))
  :should be '(withs ((a b) (list (+ x 1) y))
                (prn '(+ x 1))
                (+ (+ x 1) y)))
 
 (test "inline-macro-eval skips explicit list construction"
  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
-                                (eval (cons '+ a b))))
+                                (mac-eval (cons '+ a b))))
  :should be '(withs ((a b) '(x y))
-               (eval (cons '+ a b))))
+               (mac-eval (cons '+ a b))))
 
 (test "inline-macro-eval gives up with unbound vars"
  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
-                                (eval `(+ ,c ,b))))
+                                (mac-eval `(+ ,c ,b))))
  :should be '(withs ((a b) '(x y))
-               (eval `(+ ,c ,b))))
+               (mac-eval `(+ ,c ,b))))
 
 (test "inline-macro-eval works with comma expressions without side effects"
  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
-                                (eval `(+ ,a ,(if 3 b)))))
+                                (mac-eval `(+ ,a ,(if 3 b)))))
  :should be '(withs ((a b) (list x y))
                (+ x y)))
 
 (test "inline-macro-eval works with comma-splice expressions without side effects"
  :valueof (inline-macro-eval '(mac-withs (args '(x y))
-                                (eval `(+ ,@args 3))))
+                                (mac-eval `(+ ,@args 3))))
  :should be '(withs (args (list x y))
                (+ x y 3)))
 
 (test "inline-macro-eval works with nested backquotes"
  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
-                                (eval `(+ ,a ,(if 3 `(+ 3 ,b))))))
+                                (mac-eval `(+ ,a ,(if 3 `(+ 3 ,b))))))
  :should be '(withs ((a b) (list x y))
                (+ x (+ 3 y))))
 
