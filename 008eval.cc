@@ -289,8 +289,9 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
     Cell* result = eval(stripUnquote(x), scope, true);
     return skippedAlreadyEvald ? pushCons(newSym("''"), result) : result;
   }
-  else if (car(x) == newSym(","))
+  else if (unquoteDepth(x) > 0) {
     return mkref(x);
+  }
 
   if (isBackQuoted(x)) {
     Cell* result = newCons(car(x), processUnquotes(cdr(x), depth+1, scope));
