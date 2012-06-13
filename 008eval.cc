@@ -69,14 +69,6 @@
                                     return cell;
                                   }
 
-                                  bool skippedAlreadyEvald = false;
-                                  Cell* maybeStripAlreadyEvald(bool keepAlreadyEvald, Cell* x) {
-                                    skippedAlreadyEvald = isAlreadyEvald(x);
-                                    if (!keepAlreadyEvald && isAlreadyEvald(x))
-                                      return stripAlreadyEvald(x);
-                                    return x;
-                                  }
-
                                   // keep sync'd with mac
                                   bool isMacro(Cell* fn) {
                                     if (!isObject(fn)) return false;
@@ -283,6 +275,15 @@ void bindParams(Cell* params, Cell* args) {
                                     if (!isCons(x) || car(x) != newSym(","))
                                       return x;
                                     return stripUnquote(cdr(x));
+                                  }
+
+                                  // when inMacro did we encounter ''?
+                                  bool skippedAlreadyEvald = false;
+                                  Cell* maybeStripAlreadyEvald(bool keepAlreadyEvald, Cell* x) {
+                                    skippedAlreadyEvald = isAlreadyEvald(x);
+                                    if (!keepAlreadyEvald && isAlreadyEvald(x))
+                                      return stripAlreadyEvald(x);
+                                    return x;
                                   }
 
 Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
