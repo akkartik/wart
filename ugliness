@@ -1,3 +1,6 @@
+nested splice doesn't work yet
+http://people.csail.mit.edu/alan/ftp/quasiquote-v59.ps.gz
+
 can't always call macros with @args
 
 macros rely on a special primitive: mac-eval
