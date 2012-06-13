@@ -289,9 +289,7 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
 
   if (unquoteDepth(x) == depth) {
     skippedAlreadyEvald = false;
-    inMacro.push(true);
     Cell* result = eval(stripUnquote(x), scope);
-    inMacro.pop();
     return skippedAlreadyEvald ? pushCons(newSym("''"), result) : result;
   }
   else if (unquoteDepth(x) > 0) {
@@ -305,9 +303,7 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
   }
 
   if (depth == 1 && isUnquoteSplice(car(x))) {
-    inMacro.push(true);
     Cell* result = eval(cdr(car(x)), scope);
-    inMacro.pop();
     Cell* splice = processUnquotes(cdr(x), depth, scope);
     if (result == nil) return splice;
     // always splice in a copy
