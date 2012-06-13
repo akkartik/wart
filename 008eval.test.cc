@@ -80,7 +80,7 @@ void test_reorderKeywordArgs_handles_improper_lists() {
 
 
                                   Cell* evalArgs(Cell* params, Cell* args) {
-                                    return evalArgs(params, args, currLexicalScopes.top());
+                                    return evalArgs(params, args, currLexicalScopes.top(), false);
                                   }
 
 void test_evalArgs_handles_unquoted_param() {
@@ -113,6 +113,20 @@ void test_evalArgs_handles_alreadyEvald_arg() {
   newDynamicScope("a", newNum(3));
   Cell* params = read(stream("(x)"));
   Cell* args = newCons(newCons(newSym("''"), newSym("a")));
+  Cell* evaldArgs = evalArgs(params, args);
+  checkEq(car(evaldArgs), newSym("a"));
+  checkEq(cdr(evaldArgs), nil);
+  rmref(evaldArgs);
+  rmref(args);
+  rmref(params);
+  endDynamicScope("a");
+}
+
+void test_evalArgs_handles_multiply_alreadyEvald_arg() {
+  newDynamicScope("a", newNum(3));
+  Cell* params = read(stream("(x)"));
+  Cell* args = newCons(newCons(newSym("''"),
+                  newCons(newSym("''"), newSym("a"))));
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newSym("a"));
   checkEq(cdr(evaldArgs), nil);
@@ -589,7 +603,7 @@ void test_eval_handles_splice6() {
 }
 
 void test_eval_splice_on_macros_warns() {
-  Cell* expr = read(stream("(fn '(x y) (eval `(cons ,x ,y) caller-scope))"));
+  Cell* expr = read(stream("(fn '(x y) (eval (cons 'cons (cons x (cons y nil))) caller-scope))"));
   Cell* fn = eval(expr);
   newDynamicScope("f", fn);
   newDynamicScope("a", newNum(3));
@@ -599,6 +613,28 @@ void test_eval_splice_on_macros_warns() {
   Cell* call = read(stream("(f @args)"));
   Cell* result = eval(call);
   checkEq(raiseCount, 1);   raiseCount=0;
+  rmref(result);
+  rmref(call);
+  endDynamicScope("args");
+  rmref(argval);
+  endDynamicScope("b");
+  endDynamicScope("a");
+  endDynamicScope("f");
+  rmref(fn);
+  rmref(expr);
+}
+
+void test_eval_splice_on_macros_with_backquote() {
+  Cell* expr = read(stream("(fn '(x y) (eval `(cons ,x ,y) caller-scope))"));
+  Cell* fn = eval(expr);
+  newDynamicScope("f", fn);
+  newDynamicScope("a", newNum(3));
+  newDynamicScope("b", newNum(4));
+  Cell* argval = read(stream("(a b)"));
+  newDynamicScope("args", argval);
+  Cell* call = read(stream("(f @args)"));
+  Cell* result = eval(call);
+  checkEq(raiseCount, 0);
   rmref(result);
   rmref(call);
   endDynamicScope("args");

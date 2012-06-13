@@ -7,8 +7,6 @@ def pending-test'(msg expr/valueof pred/should expected)
   (err "
 pending: ")
   (err msg)
-  (err "
-")
 
 alias be iso
 alias equal iso
