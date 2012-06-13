@@ -281,9 +281,7 @@ void bindParams(Cell* params, Cell* args) {
                                   bool skippedAlreadyEvald = false;
                                   Cell* maybeStripAlreadyEvald(bool keepAlreadyEvald, Cell* x) {
                                     skippedAlreadyEvald = isAlreadyEvald(x);
-                                    if (!keepAlreadyEvald && isAlreadyEvald(x))
-                                      return stripAlreadyEvald(x);
-                                    return x;
+                                    return keepAlreadyEvald ? x : stripAlreadyEvald(x);
                                   }
 
 Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
