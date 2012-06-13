@@ -1,4 +1,7 @@
-can't call macros with @args
+can't always call macros with @args
+
+eval takes too many params
+  macros rely on a special primitive: mac-eval
 
 names to avoid because wart uses them internally:
   anything ending in a digit - $vars expand to digit suffixes
