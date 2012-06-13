@@ -4,27 +4,6 @@
                                     return isCons(cell) && car(cell) == newSym("'");
                                   }
 
-                                  bool isAlreadyEvald(Cell* cell) {
-                                    return isCons(cell) && car(cell) == newSym("''");
-                                  }
-
-                                  Cell* stripAlreadyEvald(Cell* cell) {
-                                    while (isAlreadyEvald(cell))
-                                      cell = cdr(cell);
-                                    return cell;
-                                  }
-
-                                  bool skippedAlreadyEvald = false;
-                                  Cell* maybeStripAlreadyEvald(bool keepAlreadyEvald, Cell* x) {
-                                    if (keepAlreadyEvald) {
-                                      skippedAlreadyEvald = isAlreadyEvald(x);
-                                      return x;
-                                    }
-                                    if (isAlreadyEvald(x))
-                                      return stripAlreadyEvald(x);
-                                    return x;
-                                  }
-
                                   bool isBackQuoted(Cell* cell) {
                                     return isCons(cell) && car(cell) == newSym("`");
                                   }
@@ -210,6 +189,27 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
 }
 
 
+
+                                  bool isAlreadyEvald(Cell* cell) {
+                                    return isCons(cell) && car(cell) == newSym("''");
+                                  }
+
+                                  Cell* stripAlreadyEvald(Cell* cell) {
+                                    while (isAlreadyEvald(cell))
+                                      cell = cdr(cell);
+                                    return cell;
+                                  }
+
+                                  bool skippedAlreadyEvald = false;
+                                  Cell* maybeStripAlreadyEvald(bool keepAlreadyEvald, Cell* x) {
+                                    if (keepAlreadyEvald) {
+                                      skippedAlreadyEvald = isAlreadyEvald(x);
+                                      return x;
+                                    }
+                                    if (isAlreadyEvald(x))
+                                      return stripAlreadyEvald(x);
+                                    return x;
+                                  }
 
 Cell* evalArgs(Cell* params, Cell* args, Cell* scope, bool keepAlreadyEvald) {
   if (args == nil) return nil;
