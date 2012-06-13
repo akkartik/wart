@@ -239,6 +239,13 @@ void addCons(Cell* p, Cell* x) {
   setCdr(p, newCons(x));
 }
 
+// push p onto l and move one refcount to new head
+Cell* pushCons(Cell* p, Cell* l) {
+  Cell* result = newCons(p, l);
+  rmref(cdr(result));
+  return mkref(result);
+}
+
 bool contains(Cell* tree, Cell* a, unordered_set<Cell*>& done) {
   // guard against cycles
   if (done.find(tree) != done.end()) return false;

@@ -287,10 +287,7 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
   if (unquoteDepth(x) == depth) {
     skippedAlreadyEvald = false;
     Cell* result = eval(stripUnquote(x), scope, true);
-    if (!skippedAlreadyEvald) return result;
-    result = newCons(newSym("''"), result);
-    rmref(cdr(result));
-    return mkref(result);
+    return skippedAlreadyEvald ? pushCons(newSym("''"), result) : result;
   }
   else if (car(x) == newSym(","))
     return mkref(x);
