@@ -55,6 +55,10 @@
                                     return inMacro.top();
                                   }
 
+                                  Cell* tagAlreadyEvald(Cell* cell) {
+                                    return newCons(newSym("''"), cell);
+                                  }
+
                                   bool isAlreadyEvald(Cell* cell) {
                                     return isCons(cell) && car(cell) == newSym("''");
                                   }
@@ -105,7 +109,7 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
         if (isColonSym(car(curr2)))
           addCons(tip, car(curr2));
         else
-          addCons(tip, newCons(newSym("''"), car(curr2)));
+          addCons(tip, tagAlreadyEvald(car(curr2)));
       rmref(x);
     }
     else {

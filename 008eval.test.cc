@@ -112,7 +112,7 @@ void test_evalArgs_handles_quoted_param() {
 void test_evalArgs_handles_alreadyEvald_arg() {
   newDynamicScope("a", newNum(3));
   Cell* params = read(stream("(x)"));
-  Cell* args = newCons(newCons(newSym("''"), newSym("a")));
+  Cell* args = newCons(tagAlreadyEvald(newSym("a")));
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newSym("a"));
   checkEq(cdr(evaldArgs), nil);
@@ -125,8 +125,7 @@ void test_evalArgs_handles_alreadyEvald_arg() {
 void test_evalArgs_handles_multiply_alreadyEvald_arg() {
   newDynamicScope("a", newNum(3));
   Cell* params = read(stream("(x)"));
-  Cell* args = newCons(newCons(newSym("''"),
-                  newCons(newSym("''"), newSym("a"))));
+  Cell* args = newCons(tagAlreadyEvald(tagAlreadyEvald(newSym("a"))));
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newSym("a"));
   checkEq(cdr(evaldArgs), nil);
