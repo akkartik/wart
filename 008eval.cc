@@ -48,6 +48,34 @@
                                     return eval(cdr(arg), scope);
                                   }
 
+                                  // supporting @ in macro calls
+                                  stack<bool> inMacro;
+                                  bool keepAlreadyEvald() {
+                                    if (inMacro.empty()) inMacro.push(false);
+                                    return inMacro.top();
+                                  }
+
+                                  bool isAlreadyEvald(Cell* cell) {
+                                    return isCons(cell) && car(cell) == newSym("''");
+                                  }
+
+                                  Cell* stripAlreadyEvald(Cell* cell) {
+                                    while (isAlreadyEvald(cell))
+                                      cell = cdr(cell);
+                                    return cell;
+                                  }
+
+                                  bool skippedAlreadyEvald = false;
+                                  Cell* maybeStripAlreadyEvald(bool keepAlreadyEvald, Cell* x) {
+                                    if (keepAlreadyEvald) {
+                                      skippedAlreadyEvald = isAlreadyEvald(x);
+                                      return x;
+                                    }
+                                    if (isAlreadyEvald(x))
+                                      return stripAlreadyEvald(x);
+                                    return x;
+                                  }
+
                                   // keep sync'd with mac
                                   bool isMacro(Cell* fn) {
                                     if (!isObject(fn)) return false;
@@ -186,27 +214,6 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
 
 
 
-                                  bool isAlreadyEvald(Cell* cell) {
-                                    return isCons(cell) && car(cell) == newSym("''");
-                                  }
-
-                                  Cell* stripAlreadyEvald(Cell* cell) {
-                                    while (isAlreadyEvald(cell))
-                                      cell = cdr(cell);
-                                    return cell;
-                                  }
-
-                                  bool skippedAlreadyEvald = false;
-                                  Cell* maybeStripAlreadyEvald(bool keepAlreadyEvald, Cell* x) {
-                                    if (keepAlreadyEvald) {
-                                      skippedAlreadyEvald = isAlreadyEvald(x);
-                                      return x;
-                                    }
-                                    if (isAlreadyEvald(x))
-                                      return stripAlreadyEvald(x);
-                                    return x;
-                                  }
-
 Cell* evalArgs(Cell* params, Cell* args, Cell* scope) {
   if (args == nil) return nil;
 
@@ -275,13 +282,6 @@ void bindParams(Cell* params, Cell* args) {
                                     if (!isCons(x) || car(x) != newSym(","))
                                       return x;
                                     return stripUnquote(cdr(x));
-                                  }
-
-                                  // supporting @ in macro calls
-                                  stack<bool> inMacro;
-                                  bool keepAlreadyEvald() {
-                                    if (inMacro.empty()) inMacro.push(false);
-                                    return inMacro.top();
                                   }
 
 Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
