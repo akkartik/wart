@@ -11,9 +11,11 @@ COMPILE_FN(eval, compiledFn_eval, "($x . $scope)",
 )
 
 COMPILE_FN(mac-eval, compiledFn_mac_eval, "('$x $scope)",
-  Cell* x = eval(lookup("$x"), currLexicalScopes.top(), true);
-  Cell* ans = eval(x, lookup("$scope"), true);
+  inMacro.push(true);
+  Cell* x = eval(lookup("$x"), currLexicalScopes.top());
+  Cell* ans = eval(x, lookup("$scope"));
   rmref(x);
+  inMacro.pop();
   return ans;
 )
 
