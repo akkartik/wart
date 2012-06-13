@@ -14,6 +14,17 @@
                                     return cell;
                                   }
 
+                                  bool skippedAlreadyEvald = false;
+                                  Cell* maybeStripAlreadyEvald(bool dontReallyStrip, Cell* x) {
+                                    if (dontReallyStrip) {
+                                      skippedAlreadyEvald = isAlreadyEvald(x);
+                                      return x;
+                                    }
+                                    if (isAlreadyEvald(x))
+                                      return stripAlreadyEvald(x);
+                                    return x;
+                                  }
+
                                   bool isBackQuoted(Cell* cell) {
                                     return isCons(cell) && car(cell) == newSym("`");
                                   }

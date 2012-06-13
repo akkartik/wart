@@ -114,17 +114,7 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
   return NULL;
 }
 
-                                  bool isAlreadyEvald(Cell*);
-                                  bool skippedAlreadyEvald = false;
-                                  Cell* maybeStripAlreadyEvald(bool dontReallyStrip, Cell* x) {
-                                    if (dontReallyStrip) {
-                                      skippedAlreadyEvald = isAlreadyEvald(x);
-                                      return x;
-                                    }
-                                    if (isAlreadyEvald(x))
-                                      return cdr(x);
-                                    return x;
-                                  }
+                                  Cell* maybeStripAlreadyEvald(bool, Cell*);
 
 Cell* lookup(Cell* sym, Cell* scope, bool keepAlreadyEval) {
   Cell* result = lookupLexicalBinding(sym, scope);
