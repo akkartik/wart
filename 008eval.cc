@@ -67,10 +67,9 @@
 
                                   bool skippedAlreadyEvald = false;
                                   Cell* maybeStripAlreadyEvald(bool keepAlreadyEvald, Cell* x) {
-                                    if (keepAlreadyEvald) {
-                                      skippedAlreadyEvald = isAlreadyEvald(x);
+                                    skippedAlreadyEvald = isAlreadyEvald(x);
+                                    if (keepAlreadyEvald)
                                       return x;
-                                    }
                                     if (isAlreadyEvald(x))
                                       return stripAlreadyEvald(x);
                                     return x;
