@@ -59,12 +59,8 @@ list<Token> nextLine(CodeStream& c) {
                                   }
 
                                   bool noParenAtStartOfLine(list<Token> line) {
-                                    for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
-                                      if (p->isIndent()) continue;
-                                      if (isQuoteOrUnquote(*p)) continue;
-                                      return *p != "(";
-                                    }
-                                    return false;
+                                    list<Token>::iterator p = firstNonQuote(line);
+                                    return p != line.end() && *p != "(";
                                   }
 
                                   bool continuationLine(long currLineIndent, stack<long> parenStack) {
