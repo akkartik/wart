@@ -56,13 +56,13 @@ list<Token> nextLine(CodeStream& c) {
                                     return q == begin;
                                   }
 
-                                  bool parenAtStartOfLine(list<Token> line) {
+                                  bool noParenAtStartOfLine(list<Token> line) {
                                     for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
                                       if (p->isIndent()) continue;
                                       if (isQuoteOrUnquote(*p)) continue;
-                                      return *p == "(";
+                                      return *p != "(";
                                     }
-                                    return true;
+                                    return false;
                                   }
 
                                   bool continuationLine(long currLineIndent, stack<long> parenStack) {
@@ -78,7 +78,7 @@ list<Token> nextExpr(CodeStream& c) {
     long thisLineIndent=line.front().indentLevel, nextLineIndent=line.back().indentLevel;
 
     bool insertedParenThisLine = false;
-    if (!argParenCount && numWordsInLine(line) > 1 && !parenAtStartOfLine(line) && !continuationLine(thisLineIndent, explicitParenStack)) {
+    if (!argParenCount && numWordsInLine(line) > 1 && noParenAtStartOfLine(line) && !continuationLine(thisLineIndent, explicitParenStack)) {
       // open paren
       add(result, Token::of("("));
       implicitParenStack.push(thisLineIndent);
