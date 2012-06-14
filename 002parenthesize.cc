@@ -57,18 +57,13 @@ list<Token> nextLine(CodeStream& c) {
                                     return (*q == "(");
                                   }
 
-                                  Token nthTokenInLine(list<Token> line, long n) {
-                                    list<Token>::iterator p = line.begin();
-                                    for (long i = 0; i < n; ++i)
-                                      ++p;
-                                    return *p;
-                                  }
-
                                   bool alreadyGrouped(list<Token> line) {
-                                    Token firstToken = nthTokenInLine(line, 1);
-                                    Token secondToken = nthTokenInLine(line, 2); // line must have 2 tokens
-                                    return firstToken == "("
-                                        || (isQuoteOrUnquote(firstToken) && secondToken == "(");
+                                    for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
+                                      if (p->isIndent()) continue;
+                                      if (isQuoteOrUnquote(*p)) continue;
+                                      return *p == "(";
+                                    }
+                                    return true;
                                   }
 
                                   bool continuationLine(long currLineIndent, stack<long> parenStack) {
