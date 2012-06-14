@@ -58,7 +58,7 @@ list<Token> nextLine(CodeStream& c) {
                                     return line.end();
                                   }
 
-                                  bool noParenAtStartOfLine(list<Token> line) {
+                                  bool noParenAtStart(list<Token> line) {
                                     list<Token>::iterator p = firstNonQuote(line);
                                     return p != line.end() && *p != "(";
                                   }
@@ -76,7 +76,7 @@ list<Token> nextExpr(CodeStream& c) {
     long thisLineIndent=line.front().indentLevel, nextLineIndent=line.back().indentLevel;
 
     bool insertedParenThisLine = false;
-    if (!argParenCount && numWordsInLine(line) > 1 && noParenAtStartOfLine(line) && !continuationLine(thisLineIndent, explicitParenStack)) {
+    if (!argParenCount && numWordsInLine(line) > 1 && noParenAtStart(line) && !continuationLine(thisLineIndent, explicitParenStack)) {
       // open paren
       add(result, Token::of("("));
       implicitParenStack.push(thisLineIndent);
