@@ -57,7 +57,7 @@ list<Token> nextLine(CodeStream& c) {
                                     return (*q == "(");
                                   }
 
-                                  bool alreadyGrouped(list<Token> line) {
+                                  bool parenAtStartOfLine(list<Token> line) {
                                     for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
                                       if (p->isIndent()) continue;
                                       if (isQuoteOrUnquote(*p)) continue;
@@ -79,7 +79,7 @@ list<Token> nextExpr(CodeStream& c) {
     long thisLineIndent=line.front().indentLevel, nextLineIndent=line.back().indentLevel;
 
     bool insertedParenThisLine = false;
-    if (!argParenCount && numWordsInLine(line) > 1 && !alreadyGrouped(line) && !continuationLine(thisLineIndent, explicitParenStack)) {
+    if (!argParenCount && numWordsInLine(line) > 1 && !parenAtStartOfLine(line) && !continuationLine(thisLineIndent, explicitParenStack)) {
       // open paren
       add(result, Token::of("("));
       implicitParenStack.push(thisLineIndent);
