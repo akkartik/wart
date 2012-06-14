@@ -50,10 +50,12 @@ list<Token> nextLine(CodeStream& c) {
                                       l.push_back(x);
                                   }
 
-                                  bool isFirstNonQuoteInLine(list<Token>::iterator q, list<Token>::iterator begin) {
-                                    while (begin->isIndent()) begin++;
-                                    if (isQuoteOrUnquote(*begin)) begin++;
-                                    return q == begin;
+                                  list<Token>::iterator firstNonQuote(list<Token>& line) {
+                                    for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
+                                      if (!p->isIndent() && !isQuoteOrUnquote(*p))
+                                        return p;
+                                    }
+                                    return line.end();
                                   }
 
                                   bool noParenAtStartOfLine(list<Token> line) {
@@ -97,7 +99,7 @@ list<Token> nextExpr(CodeStream& c) {
         explicitParenStack.pop();
       }
 
-      if (*q == "(" && (argParenCount || !isFirstNonQuoteInLine(q, line.begin())))
+      if (*q == "(" && (argParenCount || q != firstNonQuote(line)))
         ++argParenCount; // no more paren-insertion until it closes
       if (*q == ")" && argParenCount) // it closed
         --argParenCount;
