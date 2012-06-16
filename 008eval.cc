@@ -381,28 +381,27 @@ Cell* eval(Cell* expr, Cell* scope) {
   Cell* evaldArgs = evalArgs(sig(fn), orderedArgs, scope);
   dbg << car(expr) << "/" << keepAlreadyEvald() << ": " << evaldArgs << endl;
 
-  // swap in the function's lexical environment
-  if (!isCompiledFn(body(fn)))
-    newDynamicScope(CURR_LEXICAL_SCOPE, env(fn));
-  // now bind its params to args in the new environment
-  newLexicalScope();
-  bindParams(sig(fn), evaldArgs);
-  if (!isCompiledFn(body(fn)))
-    addLexicalBinding("caller-scope", scope);
-
-  // eval all forms in body, save result of final form
   Cell* result = nil;
-  if (isCompiledFn(body(fn)))
+  if (isCompiledFn(body(fn))) {
+    newLexicalScope();
+    bindParams(sig(fn), evaldArgs);
     result = toCompiledFn(body(fn))(); // all compiledFns must mkref result
-  else
+    endLexicalScope();
+  }
+  else {
+    // swap in the function's lexical environment
+    newDynamicScope(CURR_LEXICAL_SCOPE, env(fn));
+    newLexicalScope();
+    bindParams(sig(fn), evaldArgs);
+    addLexicalBinding("caller-scope", scope);
+    // eval all forms in body, save result of final form
     for (Cell* form = impl(fn); form != nil; form = cdr(form)) {
       rmref(result);
       result = eval(car(form), currLexicalScopes.top());
     }
-
-  endLexicalScope();
-  if (!isCompiledFn(body(fn)))
+    endLexicalScope();
     endDynamicScope(CURR_LEXICAL_SCOPE);
+  }
 
   rmref(evaldArgs);
   rmref(orderedArgs);
