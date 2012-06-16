@@ -52,6 +52,7 @@
                                   }
 
                                   Cell* tagAlreadyEvald(Cell* cell) {
+                                    if (isColonSym(cell)) return cell;
                                     return newCons(newSym("''"), cell);
                                   }
 
@@ -92,10 +93,7 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
         RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
       Cell* x = unsplice(car(curr), scope);
       for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
-        if (isColonSym(car(curr2)))
-          addCons(tip, car(curr2));
-        else
-          addCons(tip, tagAlreadyEvald(car(curr2)));
+        addCons(tip, tagAlreadyEvald(car(curr2)));
       rmref(x);
     }
     else {
