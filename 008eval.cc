@@ -20,26 +20,26 @@
                                     return isSym(x) && toString(x)[0] == L':';
                                   }
 
-                                  // callee = (object function {sig, body, env, ..})
+                                  // fn = (object function {sig, body, env, ..})
                                   bool isFn(Cell* x) {
                                     return isCons(x) && toString(type(x)) == "function";
                                   }
 
-                                  Cell* sig(Cell* callee) {
-                                    return get(rep(callee), newSym("sig"));
+                                  Cell* sig(Cell* fn) {
+                                    return get(rep(fn), newSym("sig"));
                                   }
 
-                                  Cell* body(Cell* callee) {
-                                    return get(rep(callee), newSym("body"));
+                                  Cell* body(Cell* fn) {
+                                    return get(rep(fn), newSym("body"));
                                   }
 
-                                  Cell* impl(Cell* callee) {
-                                    Cell* impl = get(rep(callee), newSym("optimized-body"));
-                                    return (impl != nil) ? impl : body(callee);
+                                  Cell* impl(Cell* fn) {
+                                    Cell* impl = get(rep(fn), newSym("optimized-body"));
+                                    return (impl != nil) ? impl : body(fn);
                                   }
 
-                                  Cell* env(Cell* callee) {
-                                    return get(rep(callee), newSym("env"));
+                                  Cell* env(Cell* fn) {
+                                    return get(rep(fn), newSym("env"));
                                   }
 
 
