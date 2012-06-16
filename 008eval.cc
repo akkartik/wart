@@ -38,10 +38,6 @@
                                     return get(rep(callee), newSym("env"));
                                   }
 
-                                  Cell* callArgs(Cell* call) {
-                                    return cdr(call);
-                                  }
-
 
 
                                   Cell* unsplice(Cell* arg, Cell* scope) {
@@ -339,7 +335,7 @@ Cell* processUnquotes(Cell* x, long depth) {
                                   }
 
                                   Cell* processArgs(Cell* call, Cell* scope, Cell* fn) {
-                                    Cell* splicedArgs = spliceArgs(callArgs(call), scope, fn);
+                                    Cell* splicedArgs = spliceArgs(cdr(call), scope, fn);
                                     Cell* orderedArgs = reorderKeywordArgs(sig(fn), splicedArgs);   rmref(splicedArgs);
                                     Cell* evaldArgs = evalArgs(sig(fn), orderedArgs, scope);  rmref(orderedArgs);
                                     dbg << car(call) << "/" << keepAlreadyEvald() << ": " << evaldArgs << endl;
