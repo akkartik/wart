@@ -308,10 +308,6 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
   return mkref(result);
 }
 
-Cell* processUnquotes(Cell* x, long depth) {
-  return processUnquotes(x, depth, currLexicalScopes.top());
-}
-
 
 
                                   bool isFn(Cell* x) {

@@ -228,6 +228,10 @@ void test_bindParams_binds_multiple_params() {
 
 
 
+                                  Cell* processUnquotes(Cell* x, long depth) {
+                                    return processUnquotes(x, depth, currLexicalScopes.top());
+                                  }
+
 void test_processUnquotes_handles_unquote() {
   newDynamicScope("a", newNum(3));
   Cell* expr = read(stream("(,a)"));
