@@ -361,10 +361,6 @@ Cell* eval(Cell* expr, Cell* scope) {
   if (isAlreadyEvald(expr))
     return mkref(keepAlreadyEvald() ? expr : stripAlreadyEvald(expr));
 
-  if (isFn(expr))
-    // lexical scope is already attached
-    return mkref(expr);
-
   newDynamicScope(CURR_LEXICAL_SCOPE, scope);
   // expr is a function call
   Cell* fn0 = eval(car(expr), scope);
