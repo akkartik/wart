@@ -379,7 +379,7 @@ Cell* eval(Cell* expr, Cell* scope) {
   else {
     addLexicalBinding("caller-scope", scope);
     // eval all forms in body, save result of final form
-    for (Cell* form = impl(fn); form != nil; form = cdr(form)) {
+    for (Cell* form = impl(fn); form != nil; form=cdr(form)) {
       rmref(result);
       result = eval(car(form), currLexicalScopes.top());
     }
