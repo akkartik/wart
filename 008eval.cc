@@ -92,18 +92,18 @@
 Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
   Cell *pResult = newCell(), *tip = pResult;
   for (Cell* curr = args; curr != nil; curr=cdr(curr)) {
-    if (isSplice(car(curr))) {
-      if (isMacroWithoutBackquotes(fn))
-        RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
-      Cell* x = unsplice(car(curr), scope);
-      for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
-        addCons(tip, tagAlreadyEvald(car(curr2)));
-      rmref(x);
-    }
-    else {
+    if (!isSplice(car(curr))) {
       addCons(tip, car(curr));
       tip=cdr(tip);
+      continue;
     }
+
+    if (isMacroWithoutBackquotes(fn))
+      RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
+    Cell* x = unsplice(car(curr), scope);
+    for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
+      addCons(tip, tagAlreadyEvald(car(curr2)));
+    rmref(x);
   }
   return dropPtr(pResult);
 }
