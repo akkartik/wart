@@ -192,8 +192,8 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
                                   }
 
 Cell* reorderKeywordArgs(Cell* params, Cell* args) {
-  if (!isCons(params)) return mkref(args);
-  if (isQuoted(params) && !isCons(cdr(params))) return mkref(args);
+  if (!isCons(stripQuote(params))) return mkref(args);
+
   CellMap keywordArgs;
   Cell* nonKeywordArgs = extractKeywordArgs(params, args, keywordArgs);
   Cell* result = argsInParamOrder(params, nonKeywordArgs, keywordArgs);   rmref(nonKeywordArgs);
