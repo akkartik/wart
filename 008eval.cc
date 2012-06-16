@@ -328,8 +328,7 @@ Cell* processUnquotes(Cell* x, long depth) {
 
 
                                   bool isFn(Cell* x) {
-                                    if (!isCons(x)) return false;
-                                    return toString(type(x)) == "function";
+                                    return isCons(x) && toString(type(x)) == "function";
                                   }
 
 // HACK: explicitly reads from passed-in scope, but implicitly creates bindings
