@@ -110,6 +110,8 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
   return dropPtr(pResult);
 }
 
+
+
                                   Cell* stripQuote(Cell* cell) {
                                     return isQuoted(cell) ? cdr(cell) : cell;
                                   }
