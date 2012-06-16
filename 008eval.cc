@@ -200,8 +200,7 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
   if (isQuoted(params) && !isCons(cdr(params))) return mkref(args);
   CellMap keywordArgs;
   Cell* nonKeywordArgs = extractKeywordArgs(params, args, keywordArgs);
-  Cell* result = argsInParamOrder(params, nonKeywordArgs, keywordArgs);
-  rmref(nonKeywordArgs);
+  Cell* result = argsInParamOrder(params, nonKeywordArgs, keywordArgs);   rmref(nonKeywordArgs);
   return result; // already mkref'd
 }
 
