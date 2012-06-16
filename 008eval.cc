@@ -235,10 +235,10 @@ Cell* evalArgs(Cell* params, Cell* args, Cell* scope) {
                                   }
 
 void bindParams(Cell* params, Cell* args) {
+  params = stripQuote(params);
   if (params == nil) return;
 
   Cell* orderedArgs = reorderKeywordArgs(params, args);
-  params = stripQuote(params);
   if (isSym(params)) {
     bindParamAliases(params, orderedArgs);
   }
