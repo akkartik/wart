@@ -331,6 +331,23 @@ Cell* processUnquotes(Cell* x, long depth) {
                                     return isCons(x) && toString(type(x)) == "function";
                                   }
 
+                                  Cell* toFn(Cell* x) {
+                                    if (x == nil) return x;
+                                    if (isFn(x)) return x;
+                                    Cell* result = coerceQuoted(x, newSym("function"), lookup("coercions*"));
+                                    rmref(x);
+                                    return result;
+                                  }
+
+                                  Cell* processArgs(Cell* call, Cell* scope, Cell* fn) {
+                                    Cell* splicedArgs = spliceArgs(callArgs(call), scope, fn);
+                                    Cell* orderedArgs = reorderKeywordArgs(sig(fn), splicedArgs);
+                                    Cell* evaldArgs = evalArgs(sig(fn), orderedArgs, scope);
+                                    dbg << car(call) << "/" << keepAlreadyEvald() << ": " << evaldArgs << endl;
+                                    rmref(orderedArgs);   rmref(splicedArgs);
+                                    return evaldArgs;
+                                  }
+
 // HACK: explicitly reads from passed-in scope, but implicitly creates bindings
 // to currLexicalScope. Carefully make sure it's popped off.
 Cell* eval(Cell* expr, Cell* scope) {
@@ -361,26 +378,16 @@ Cell* eval(Cell* expr, Cell* scope) {
   if (isAlreadyEvald(expr))
     return mkref(keepAlreadyEvald() ? expr : stripAlreadyEvald(expr));
 
+  // expr is a call
   newDynamicScope(CURR_LEXICAL_SCOPE, scope);
-  // expr is a function call
-  Cell* fn0 = eval(car(expr), scope);
-  Cell* fn = fn0;
-  if (fn0 != nil && !isFn(fn0))
-    fn = coerceQuoted(fn0, newSym("function"), lookup("coercions*"));
-  else
-    fn = mkref(fn0);
+  Cell* fn = toFn(eval(car(expr), scope));
   if (!isFn(fn))
     RAISE << "not a call: " << expr << endl
         << "  Perhaps the line is indented too much." << endl
         << "  Or you need to split it in two." << endl << DIE;
 
-  // eval all its args in the current lexical scope
-  Cell* splicedArgs = spliceArgs(callArgs(expr), scope, fn);
-  // keyword args can change what we eval
-  Cell* orderedArgs = reorderKeywordArgs(sig(fn), splicedArgs);
-  Cell* evaldArgs = evalArgs(sig(fn), orderedArgs, scope);
-  dbg << car(expr) << "/" << keepAlreadyEvald() << ": " << evaldArgs << endl;
-
+  // eval its args in the caller's lexical environment
+  Cell* evaldArgs = processArgs(expr, scope, fn);
   Cell* result = nil;
   if (isCompiledFn(body(fn))) {
     newLexicalScope();
@@ -404,10 +411,7 @@ Cell* eval(Cell* expr, Cell* scope) {
   }
 
   rmref(evaldArgs);
-  rmref(orderedArgs);
-  rmref(splicedArgs);
   rmref(fn);
-  rmref(fn0);
   endDynamicScope(CURR_LEXICAL_SCOPE);
   return result; // already mkref'd
 }
