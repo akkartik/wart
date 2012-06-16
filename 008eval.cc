@@ -369,19 +369,17 @@ Cell* eval(Cell* expr, Cell* scope) {
   newDynamicScope(CURR_LEXICAL_SCOPE, isCompiledFn(body(fn)) ? scope : env(fn));
   newLexicalScope();
   bindParams(sig(fn), evaldArgs);
+  addLexicalBinding("caller-scope", scope);
 
   Cell* result = nil;
-  if (isCompiledFn(body(fn))) {
+  if (isCompiledFn(body(fn)))
     result = toCompiledFn(body(fn))(); // all compiledFns must mkref result
-  }
-  else {
-    addLexicalBinding("caller-scope", scope);
+  else
     // eval all forms in body, save result of final form
     for (Cell* form = impl(fn); form != nil; form=cdr(form)) {
       rmref(result);
       result = eval(car(form), currLexicalScopes.top());
     }
-  }
 
   endLexicalScope();
   endDynamicScope(CURR_LEXICAL_SCOPE);
