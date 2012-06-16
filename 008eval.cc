@@ -238,15 +238,13 @@ void bindParams(Cell* params, Cell* args) {
   if (params == nil) return;
 
   Cell* orderedArgs = reorderKeywordArgs(params, args);
-  if (isQuoted(params)) {
-    bindParams(cdr(params), orderedArgs);
+  params = stripQuote(params);
+  if (isSym(params)) {
+    bindParamAliases(params, orderedArgs);
   }
   else {
+    bindParams(car(params), car(orderedArgs));
     bindParams(cdr(params), cdr(orderedArgs));
-    if (isSym(params))
-      bindParamAliases(params, orderedArgs);
-    else
-      bindParams(car(params), car(orderedArgs));
   }
   rmref(orderedArgs);
 }
