@@ -387,30 +387,26 @@ Cell* eval(Cell* expr, Cell* scope) {
 
   // eval its args in the caller's lexical environment
   Cell* evaldArgs = processArgs(expr, scope, fn);
+  // swap in the function's lexical environment
+  newDynamicScope(CURR_LEXICAL_SCOPE, isCompiledFn(body(fn)) ? scope : env(fn));
+  newLexicalScope();
+  bindParams(sig(fn), evaldArgs);
+
   Cell* result = nil;
   if (isCompiledFn(body(fn))) {
-    newDynamicScope(CURR_LEXICAL_SCOPE, scope);
-    newLexicalScope();
-    bindParams(sig(fn), evaldArgs);
     result = toCompiledFn(body(fn))(); // all compiledFns must mkref result
-    endLexicalScope();
-    endDynamicScope(CURR_LEXICAL_SCOPE);
   }
   else {
-    // swap in the function's lexical environment
-    newDynamicScope(CURR_LEXICAL_SCOPE, env(fn));
-    newLexicalScope();
-    bindParams(sig(fn), evaldArgs);
     addLexicalBinding("caller-scope", scope);
     // eval all forms in body, save result of final form
     for (Cell* form = impl(fn); form != nil; form = cdr(form)) {
       rmref(result);
       result = eval(car(form), currLexicalScopes.top());
     }
-    endLexicalScope();
-    endDynamicScope(CURR_LEXICAL_SCOPE);
   }
 
+  endLexicalScope();
+  endDynamicScope(CURR_LEXICAL_SCOPE);
   rmref(evaldArgs);
   rmref(fn);
   return result; // already mkref'd
