@@ -329,7 +329,6 @@ Cell* processUnquotes(Cell* x, long depth) {
 
                                   bool isFn(Cell* x) {
                                     if (!isCons(x)) return false;
-                                    if (isCompiledFn(car(x))) return true;
                                     return toString(type(x)) == "function";
                                   }
 
