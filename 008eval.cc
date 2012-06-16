@@ -379,7 +379,6 @@ Cell* eval(Cell* expr, Cell* scope) {
     return mkref(keepAlreadyEvald() ? expr : stripAlreadyEvald(expr));
 
   // expr is a call
-  newDynamicScope(CURR_LEXICAL_SCOPE, scope);
   Cell* fn = toFn(eval(car(expr), scope));
   if (!isFn(fn))
     RAISE << "not a call: " << expr << endl
@@ -390,10 +389,12 @@ Cell* eval(Cell* expr, Cell* scope) {
   Cell* evaldArgs = processArgs(expr, scope, fn);
   Cell* result = nil;
   if (isCompiledFn(body(fn))) {
+    newDynamicScope(CURR_LEXICAL_SCOPE, scope);
     newLexicalScope();
     bindParams(sig(fn), evaldArgs);
     result = toCompiledFn(body(fn))(); // all compiledFns must mkref result
     endLexicalScope();
+    endDynamicScope(CURR_LEXICAL_SCOPE);
   }
   else {
     // swap in the function's lexical environment
@@ -412,7 +413,6 @@ Cell* eval(Cell* expr, Cell* scope) {
 
   rmref(evaldArgs);
   rmref(fn);
-  endDynamicScope(CURR_LEXICAL_SCOPE);
   return result; // already mkref'd
 }
 
