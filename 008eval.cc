@@ -333,15 +333,6 @@ Cell* processUnquotes(Cell* x, long depth) {
                                     return toString(type(x)) == "function";
                                   }
 
-                                  // (fn params . body) => (object function {sig, body, env})
-                                  Cell* newFn(string type, Cell* expr, Cell* scope) {
-                                    Cell* f = newTable();
-                                    set(f, newSym("sig"), car(cdr(expr)));
-                                    set(f, newSym("body"), cdr(cdr(expr)));
-                                    set(f, newSym("env"), scope);
-                                    return newObject(type, f);
-                                  }
-
 // HACK: explicitly reads from passed-in scope, but implicitly creates bindings
 // to currLexicalScope. Carefully make sure it's popped off.
 Cell* eval(Cell* expr, Cell* scope) {
@@ -372,9 +363,7 @@ Cell* eval(Cell* expr, Cell* scope) {
   if (isAlreadyEvald(expr))
     return mkref(keepAlreadyEvald() ? expr : stripAlreadyEvald(expr));
 
-  if (car(expr) == newSym("fn"))
-    return mkref(newFn("function", expr, scope));
-  else if (isFn(expr))
+  if (isFn(expr))
     // lexical scope is already attached
     return mkref(expr);
 

@@ -37,6 +37,14 @@ COMPILE_FN(try-eval, compiledFn_try_eval, "($x . $scope)",
   return nil;
 )
 
+COMPILE_FN(fn, compiledFn_fn, "'($params . $body)",
+  Cell* f = newTable();
+  set(f, newSym("sig"), lookup("$params"));
+  set(f, newSym("body"), lookup("$body"));
+  set(f, newSym("env"), cdr(currLexicalScopes.top()));
+  return mkref(newObject("function", f));
+)
+
 COMPILE_FN(if, compiledFn_if, "($cond '$then '$else)",
   return lookup("$cond") != nil ? eval(lookup("$then")) : eval(lookup("$else"));
 )
