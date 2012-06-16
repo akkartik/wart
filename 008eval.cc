@@ -202,24 +202,19 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
 
 
 
+                                  Cell* evalArg(Cell* params, Cell* arg, Cell* scope) {
+                                    if (isAlreadyEvald(arg)) return mkref(stripAlreadyEvald(arg));
+                                    if (isCons(params) && isQuoted(car(params))) return mkref(arg);
+                                    return eval(arg, scope);
+                                  }
+
 Cell* evalArgs(Cell* params, Cell* args, Cell* scope) {
   if (args == nil) return nil;
-
-  if (isQuoted(params))
-    return mkref(args);
+  if (isQuoted(params)) return mkref(args);
 
   Cell* result = newCell();
-  setCdr(result, evalArgs(cdr(params), cdr(args), scope));
-  rmref(cdr(result));
-
-  if (isAlreadyEvald(car(args)))
-    setCar(result, stripAlreadyEvald(car(args)));
-  else if (isCons(params) && isQuoted(car(params)))
-    setCar(result, car(args));
-  else {
-    setCar(result, eval(car(args), scope));
-    rmref(car(result));
-  }
+  setCar(result, evalArg(params, car(args), scope));  rmref(car(result));
+  setCdr(result, evalArgs(cdr(params), cdr(args), scope));  rmref(cdr(result));
   return mkref(result);
 }
 
