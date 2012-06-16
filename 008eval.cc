@@ -21,6 +21,10 @@
                                   }
 
                                   // callee = (object function {sig, body, env, ..})
+                                  bool isFn(Cell* x) {
+                                    return isCons(x) && toString(type(x)) == "function";
+                                  }
+
                                   Cell* sig(Cell* callee) {
                                     return get(rep(callee), newSym("sig"));
                                   }
@@ -310,15 +314,9 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
 
 
 
-                                  bool isFn(Cell* x) {
-                                    return isCons(x) && toString(type(x)) == "function";
-                                  }
-
                                   Cell* toFn(Cell* x) {
-                                    if (x == nil) return x;
-                                    if (isFn(x)) return x;
-                                    Cell* result = coerceQuoted(x, newSym("function"), lookup("coercions*"));
-                                    rmref(x);
+                                    if (x == nil || isFn(x)) return x;
+                                    Cell* result = coerceQuoted(x, newSym("function"), lookup("coercions*"));   rmref(x);
                                     return result;
                                   }
 
