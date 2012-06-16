@@ -294,6 +294,7 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
     Cell* result = eval(cdr(car(x)), scope);
     Cell* splice = processUnquotes(cdr(x), depth, scope);
     if (result == nil) return splice;
+
     // always splice in a copy
     Cell* resultcopy = copyList(result);
     rmref(result);
