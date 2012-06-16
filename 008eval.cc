@@ -328,8 +328,6 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
                                     return evaldArgs;
                                   }
 
-// HACK: explicitly reads from passed-in scope, but implicitly creates bindings
-// to currLexicalScope. Carefully make sure it's popped off.
 Cell* eval(Cell* expr, Cell* scope) {
   if (!expr)
     RAISE << "eval: cell should never be NUL" << endl << DIE;
