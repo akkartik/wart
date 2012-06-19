@@ -1,9 +1,9 @@
-; given params, return code to construct the args
-; (mac arg1 arg2 . body) => `(,mac ,arg1 ,arg2 ,@body)
-def construct-macro-call(args)
-  if list?.args
-    `(cons ,car.args ,(construct-macro-call cdr.args))
-    args
+                                  ; given params, return code to construct the args
+                                  ; (mac arg1 arg2 . body) => `(,mac ,arg1 ,arg2 ,@body)
+                                  def construct-macro-call(args)
+                                    if list?.args
+                                      `(cons ,car.args ,(construct-macro-call cdr.args))
+                                      args
 
 let $mac mac
   mac! mac(name params . body)
