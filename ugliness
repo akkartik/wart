@@ -2,6 +2,7 @@ nested ,@ doesn't work yet: http://people.csail.mit.edu/alan/ftp/quasiquote-v59.
 
 can't always call macros with @args
 macros need a special-cased eval to support @args
+evalArgs != explicitly eval'ing a quoted param (handles @args)
 
 names to avoid because wart uses them internally:
   anything ending in a digit - $vars expand to digit suffixes
