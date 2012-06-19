@@ -6,17 +6,17 @@ Cell* transformNot(string var) {
 }
 
 Cell* transformCompose(string var) {
-  var.replace(var.rfind(L':'), 1, " ");
+  var.replace(var.rfind(':'), 1, " ");
   return nextRawCell(stream("compose "+var));
 }
 
 Cell* transformCall(string var) {
   size_t end = var.length()-1;
-  if (var.rfind(L'.') == end)
+  if (var.rfind('.') == end)
     return newCons(newSym(var.substr(0, end)));
 
-  size_t dot = var.rfind(L'.');
-  size_t bang = end > 0 ? var.rfind(L'!', end-1) : var.rfind(L'!');
+  size_t dot = var.rfind('.');
+  size_t bang = end > 0 ? var.rfind('!', end-1) : var.rfind('!');
   if (bang != string::npos && (dot == string::npos || bang > dot))
     var.replace(bang, 1, " '");
   else
@@ -25,7 +25,7 @@ Cell* transformCall(string var) {
 }
 
 Cell* transformAndf(string var) {
-  var.replace(var.rfind(L'&'), 1, " ");
+  var.replace(var.rfind('&'), 1, " ");
   return nextRawCell(stream("andf "+var));
 }
 
@@ -40,15 +40,15 @@ Cell* transform_ssyntax(Cell* input) {
     // avoid detecting floats as ssyntax.
     if (var.find_first_not_of("0123456789.:!~&") == string::npos)
       ;
-    else if (var[0] == L'!')
+    else if (var[0] == '!')
       input = transformNot(var);
-    else if (var.find(L'.') != string::npos || var.find(L'!') < var.length()-1)
+    else if (var.find('.') != string::npos || var.find('!') < var.length()-1)
       input = transformCall(var);
-    else if (var[0] != L':' && var.find(L':') != string::npos)
+    else if (var[0] != ':' && var.find(':') != string::npos)
       input = transformCompose(var);
-    else if (var.find(L'&') != string::npos)
+    else if (var.find('&') != string::npos)
       input = transformAndf(var);
-    else if (var[0] == L'~')
+    else if (var[0] == '~')
       input = transformComplement(var);
   }
 

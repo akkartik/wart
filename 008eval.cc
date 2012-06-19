@@ -17,7 +17,7 @@
                                   }
 
                                   bool isColonSym(Cell* x) {
-                                    return isSym(x) && toString(x)[0] == L':';
+                                    return isSym(x) && toString(x)[0] == ':';
                                   }
 
                                   // fn = (object function {sig, body, env, ..})
@@ -119,7 +119,7 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
                                     if (!isSym(arg)) return false;
 
                                     string name = toString(param);
-                                    if (name.find(L'/') == string::npos || name.find(L'/') == 0)
+                                    if (name.find('/') == string::npos || name.find('/') == 0)
                                       return false;
 
                                     string expected = toString(arg);
@@ -228,7 +228,7 @@ Cell* evalArgs(Cell* params, Cell* args, Cell* scope) {
                                   // split param sym at '/' and bind all resulting syms to val
                                   void bindParamAliases(Cell* param, Cell* val) {
                                     string name = toString(param);
-                                    if (name.find(L'/') == string::npos || name.find(L'/') == 0) {
+                                    if (name.find('/') == string::npos || name.find('/') == 0) {
                                       addLexicalBinding(param, val);
                                       return;
                                     }
