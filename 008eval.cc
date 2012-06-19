@@ -331,7 +331,7 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
 
 Cell* eval(Cell* expr, Cell* scope) {
   if (!expr)
-    RAISE << "eval: cell should never be NUL" << endl << DIE;
+    RAISE << "eval: cell should never be NULL" << endl << DIE;
 
   if (expr == nil)
     return nil;
