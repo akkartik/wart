@@ -130,8 +130,9 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
                                     return false;
                                   }
 
-                                  // returns the appropriate param if arg is a valid keyword arg
-                                  // responds to rest keyword args with (rest-param)
+                                  // return the appropriate param if arg is a valid keyword arg
+                                  // handle param aliases; :a => a/b
+                                  // respond to rest keyword args with (rest-param)
                                   // doesn't look inside destructured params
                                   Cell* keywordArg(Cell* arg, Cell* params) {
                                     if (!isColonSym(arg)) return nil;
