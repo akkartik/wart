@@ -60,7 +60,7 @@ def divides(nr dr)
 def even?(n)
   (divides n 2)
 
-= odd? ~even?
+alias odd? ~even?
 
 def sum(xs)
   (+ @xs)
