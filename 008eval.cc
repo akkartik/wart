@@ -136,7 +136,7 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
                                   Cell* keywordArg(Cell* arg, Cell* params) {
                                     if (!isColonSym(arg)) return nil;
                                     Cell* realArg = newSym(toString(arg).substr(1));
-                                    for (; params != nil; params=cdr(params)) {
+                                    for (params=stripQuote(params); params != nil; params=stripQuote(cdr(params))) {
                                       if (!isCons(params)) {
                                         if (paramAliasMatch(realArg, params))
                                           return newCons(params);
