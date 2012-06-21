@@ -1,4 +1,4 @@
-//// eval: lookup symbols, respect quotes, rewrite fn calls
+//// call functions with @args, 'quoted params, :keyword args, backquote exprs
 
                                   bool isQuoted(Cell* cell) {
                                     return isCons(cell) && car(cell) == newSym("'");
@@ -20,7 +20,7 @@
                                     return isSym(x) && toString(x)[0] == ':';
                                   }
 
-                                  // fn = (object function {sig, body, env, ..})
+                                  // fn = (object function {sig => .., body => .., env => ..})
                                   bool isFn(Cell* x) {
                                     return isCons(x) && toString(type(x)) == "function";
                                   }
