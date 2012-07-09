@@ -10,6 +10,7 @@ COMPILE_FN(eval, compiledFn_eval, "($x . $scope)",
   return eval(lookup("$x"), scope);
 )
 
+// eval with extra smarts for handling @args
 COMPILE_FN(mac-eval, compiledFn_mac_eval, "('$x $scope)",
   inMacro.push(true);
   Cell* x = eval(lookup("$x"), currLexicalScopes.top());
