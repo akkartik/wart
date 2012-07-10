@@ -14,10 +14,6 @@ mac pop(xs)
   `(do1 car.,xs
      (zap cdr ,xs))
 
-mac or=(var val)
-  `(or ,var
-       (= ,var ,val))
-
 mac shift args  ; multiple-eval to maintain places
   `(= ,@(zip-flat args cdr.args))
 

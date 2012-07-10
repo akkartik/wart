@@ -169,6 +169,30 @@
 
 
 
+(test "or= works"
+ :valueof (let x nil
+            (or= x 3)
+            x)
+ :should be 3)
+
+(test "or= shortcuts unnecessary evals"
+ :valueof (let x 3
+            (or= x (= x (+ x 1)))
+            x)
+ :should be 3)
+
+(test "or= returns assigned value"
+ :valueof (let x nil
+            (or= x 4))
+ :should be 4)
+
+(test "or= returns old value on failure"
+ :valueof (let x 3
+            (or= x 4))
+ :should be 3)
+
+
+
 (test "is-match - atom positive"
  :valueof (is-match 3 3)
  :should ~be nil)
