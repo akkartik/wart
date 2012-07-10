@@ -4,15 +4,15 @@
  :should ~be nil)
 
 (test "while works"
- :valueof (ret ans 0
-            (let x 3
-              (while (> x 0)
-                ++.ans
-                --.x)))
- :should be 3)
+ :valueof (ret ans nil
+            (let x 0
+              (while (< x 3)
+                (push x ans)
+                (= x (+ x 1)))))
+ :should be '(2 1 0))
 
 (test "for works"
- :valueof (ret ans 0
-            (for x 0 (< x 3) ++.x
-              ++.ans))
- :should be 3)
+ :valueof (ret ans nil
+            (for x 0 (< x 3) (= x (+ x 1))
+              (push x ans)))
+ :should be '(2 1 0))

@@ -256,18 +256,18 @@
  :should be 35)
 
 (test "case uses predicate"
- :valueof (let x 3
+ :valueof (let x '(3)
             (case x
-              odd?
+              cons?
                 34
-              even?
+              (fn(_) 1)
                 36))
  :should be 34)
 
 (test "case recognizes keyword :else"
- :valueof (let x 3
+ :valueof (let x '(3)
             (case x
-              even?
+              ~cons?
                 34
               :else
                 35))
