@@ -61,10 +61,6 @@ def id(_)
   _
 alias present? id
 
-let $iso iso ; ignore later refinements
-  def isa(x 't)
-    ($iso t type.x)
-
 = quote (car:car (cons ' 'a))
 def quote?(_) (iso _ quote)
 def quoted?(_) (quote? car._)
