@@ -131,15 +131,15 @@ alias none ~some
 
 
 
-def map(f . seqs)
-  if (all present? seqs)
-    (cons (f @(map car seqs))
-          (map f @(map cdr seqs)))
-
-def map(f seq . rest) :case no.rest
+def map(f seq)
   if seq
     (cons (f car.seq)
           (map f cdr.seq))
+
+def map(f . seqs) :case cdr.seqs
+  if (all present? seqs)
+    (cons (f @(map car seqs))
+          (map f @(map cdr seqs)))
 
 def reduce(f xs init)   ; f is a binary op
   (if
