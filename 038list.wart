@@ -131,11 +131,6 @@ alias none ~some
 
 
 
-def map(f seq)
-  if seq
-    (cons (f car.seq)
-          (map f cdr.seq))
-
 def map(f . seqs) :case cdr.seqs
   if (all present? seqs)
     (cons (f @(map car seqs))

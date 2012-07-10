@@ -244,10 +244,6 @@
  :valueof (none odd? '(2 4 6))
  :should ~be nil)
 
-(test "map works"
- :valueof (map ++ '(1 2 3))
- :should be '(2 3 4))
-
 (test "map works with multiary functions"
  :valueof (map + '(1 2 3) '(2 4 6) '(3 6 9))
  :should be '(6 12 18))

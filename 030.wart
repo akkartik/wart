@@ -49,6 +49,11 @@ def list args
     (cons car.args
           (list @cdr.args))
 
+def map(f seq)
+  if seq
+    (cons (f car.seq)
+          (map f cdr.seq))
+
 let $iso iso ; ignore later refinements
   def isa(x 't)
     ($iso t type.x)
