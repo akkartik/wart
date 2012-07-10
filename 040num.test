@@ -1,3 +1,6 @@
+prn.
+date.
+
 (test "arithmetic is varargs"
  :valueof (+ 1 2 3 (* 1 2 2))
  :should be 10)

@@ -1,4 +1,5 @@
 prn.
+date.
 
 (test "inline works on functions"
  :valueof (inline '(foo 3 4) (table 'foo (fn(x y) (+ x y))))
