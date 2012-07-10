@@ -1,3 +1,11 @@
+(test "let works"
+ :valueof (let x 3 (+ x 1))
+ :should be 4)
+
+(test "let destructures"
+ :valueof (let (a . b) (cons 3 4) (+ a b))
+ :should be 7)
+
 (test "pair works"
  :valueof (pair '(1 2 3 4 5))
  :should be '((1 2) (3 4) (5)))
