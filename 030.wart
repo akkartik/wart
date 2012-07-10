@@ -54,16 +54,16 @@ def map(f seq)
     (cons (f car.seq)
           (map f cdr.seq))
 
-let $iso iso ; ignore later refinements
-  def isa(x 't)
-    ($iso t type.x)
-
 = cadr car:cdr
 = cddr cdr:cdr
 
 def id(_)
   _
 alias present? id
+
+let $iso iso ; ignore later refinements
+  def isa(x 't)
+    ($iso t type.x)
 
 = quote (car:car (cons ' 'a))
 def quote?(_) (iso _ quote)
