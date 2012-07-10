@@ -39,6 +39,20 @@ COMPILE_FN(string_splice, compiledFn_string_splice, "($string $start $end $val)"
   return mkref(val);
 )
 
+COMPILE_FN(string_to_list, compiledFn_string_to_list, "($string)",
+  string str = toString(lookup("$string"));
+  Cell* pResult = newCell();
+  char x[2];
+  x[1] = 0;
+  Cell* curr = pResult;
+  for (size_t i = 0; i < str.size(); ++i) {
+    x[0] = str[i];
+    addCons(curr, newString(x));
+    curr=cdr(curr);
+  }
+  return dropPtr(pResult);
+)
+
 COMPILE_FN(string_to_sym, compiledFn_string_to_sym, "($s)",
   string s = toString(lookup("$s"));
   if (s == "") return nil;

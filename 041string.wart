@@ -36,18 +36,8 @@ def join args :case string?:car.args
 def empty?(s) :case string?.s
   (iso "" s)
 
-let $each each
-  mac! each(var s . body)
-    `(if string?.,s
-       forlen $i ,s
-         let ,var (,s $i)
-           ,@body
-       (,$each ,var ,s ,@body))
-
 defcoerce string list
-  (fn(_)
-    (collect:each c _
-      yield.c))
+  string_to_list
 
 defcoerce list string
   (fn(_)
