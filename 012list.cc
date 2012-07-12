@@ -35,7 +35,6 @@ COMPILE_FN(list_splice, compiledFn_list_splice, "('$list $start $end $val)",
     rmref(endPtr);
   }
 
-  if (cdr(val) == nil) val = car(val);
   rmref(list);
   return mkref(val);
 )

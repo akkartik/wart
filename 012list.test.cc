@@ -126,16 +126,6 @@ void test_list_splice_returns_list_being_spliced_in() {
   endDynamicScope("a");
 }
 
-void test_list_splice_returns_elem_if_single() {
-  newDynamicScope("a", newCons(newNum(3), newCons(newNum(4))));
-  Cell* expr = read(stream("list_splice a 1 2 '(5)"));
-  Cell* call = eval(expr);
-  checkEq(call, newNum(5));
-  rmref(call);
-  rmref(expr);
-  endDynamicScope("a");
-}
-
 void test_list_sort() {
   Cell* expr = read(stream("(sort (fn(a b) (< len.a len.b)) '(\"abc\" \"d\" \"ef\"))"));
   Cell* result = eval(expr);

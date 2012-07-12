@@ -18,9 +18,10 @@ defset list((seq idx . ends) val)
                    `(+ $idx 1)
                    `(if !,car.ends
                       len.,seq
-                      (range-bounce ,seq ,car.ends)))
-           $val ,(if ends val `(list ,val)))
-      (list_splice ,seq $idx $end $val))
+                      (range-bounce ,seq ,car.ends))))
+     ,(if ends
+        `(list_splice ,seq $idx $end ,val)
+        `(car:list_splice ,seq $idx $end list.,val)))
 
 def pos(x seq n)
   or= n 0
