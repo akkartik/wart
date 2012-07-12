@@ -142,8 +142,6 @@ def reduce(f xs init)   ; f is a binary op
       init
     ~cdr.xs
       car.xs  ; f on one op is the identity function
-    ~cddr.xs
-      (f @xs)
     :else
       (reduce f (cons (f car.xs cadr.xs)
                       cddr.xs)))
