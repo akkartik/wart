@@ -49,13 +49,13 @@ defcoerce nil string
 def <(a b) :case string?.a
   (string< a b)
 
-def digit?(x)
-  (and string?.x
-       (iso 1 len.x)
-       (<= "0" x "9"))
+def digit?(c)
+  (and string?.c
+       (iso 1 len.c)
+       (<= "0" c "9"))
 
-def letter?(x)
-  (and string?.x
-       (iso 1 len.x)
-       (or (<= "A" x "Z")
-           (<= "a" x "z")))
+def letter?(c)
+  (and string?.c
+       (iso 1 len.c)
+       (or (<= "A" c "Z")
+           (<= "a" c "z")))

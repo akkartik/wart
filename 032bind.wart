@@ -1,15 +1,15 @@
 mac let(var val . body)
   `((fn(,var) ,@body) ,val)
 
-def pair(l)
+def pair(seq)
   (if
-    !l
+    !seq
       nil
-    !cdr.l
-      (list:list car.l)
+    !cdr.seq
+      (list:list car.seq)
     :else
-      (cons (list car.l cadr.l)
-            (pair cddr.l)))
+      (cons (list car.seq cadr.seq)
+            (pair cddr.seq)))
 
 mac with(bindings . body)
   `((fn ,(map car pair.bindings)

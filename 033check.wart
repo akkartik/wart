@@ -25,8 +25,8 @@ alias nil? not
 alias no not
 
 let $iso iso ; ignore later refinements
-  def isa(x 't)
-    ($iso t type.x)
+  def isa(x 'Type)
+    ($iso Type type.x)
 
 let $iso iso
   def! iso(a b)

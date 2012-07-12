@@ -23,11 +23,11 @@ def! table args
 def copy(x) :case table?.x
   (as table (as list x))
 
-def keys(t)
-  map car (as list t)
+def keys(h)
+  map car (as list h)
 
-def vals(t)
-  map cadr (as list t)
+def vals(h)
+  map cadr (as list h)
 
 def iso(x y) :case table?.x
   (and table?.y
@@ -43,6 +43,6 @@ def is-match(x y) :case table?.x
               (is-match v y.k))
             (as list x)))
 
-mac w/table(var . body)
-  `(ret ,var (table)
+mac w/table(h . body)
+  `(ret ,h (table)
      ,@body)

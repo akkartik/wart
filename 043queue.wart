@@ -1,5 +1,5 @@
-def queue(l)
-  (tag 'queue (list l lastcons.l len.l))
+def queue(seq)
+  (tag 'queue (list seq lastcons.seq len.seq))
 
 def enq(x q)
   do1 x
@@ -16,5 +16,5 @@ def deq(q)
         (= rep.q.2 (- len 1))
       (= rep.q.0 cdr.l)
 
-def len(x) :case (isa x queue)
-  rep.x.2
+def len(q) :case (isa q queue)
+  rep.q.2

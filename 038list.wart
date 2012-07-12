@@ -1,52 +1,52 @@
-defcall list(l idx . ends)
-  withs (idx    (range-start l idx)
+defcall list(seq idx . ends)
+  withs (idx    (range-start seq idx)
          end    (if
                   !ends
                     (+ idx 1)
                   !car.ends
-                    len.l
+                    len.seq
                   :else
-                    (range-bounce l car.ends))
-         slice  (list_range l idx end))
+                    (range-bounce seq car.ends))
+         slice  (list_range seq idx end))
     if ends
       slice
       car.slice
 
-defset list((l idx . ends) val)
-  `(withs ($idx (range-start ,l ,idx)
+defset list((seq idx . ends) val)
+  `(withs ($idx (range-start ,seq ,idx)
            $end ,(if !ends
                    `(+ $idx 1)
                    `(if !,car.ends
-                      len.,l
-                      (range-bounce ,l ,car.ends)))
+                      len.,seq
+                      (range-bounce ,seq ,car.ends)))
            $val ,(if ends val `(list ,val)))
-      (list_splice ,l $idx $end $val))
+      (list_splice ,seq $idx $end $val))
 
-def pos(x xs n)
+def pos(x seq n)
   or= n 0
-  if xs
-    if (iso x car.xs)
+  if seq
+    if (iso x car.seq)
       n
-      (pos x cdr.xs (+ n 1))
+      (pos x cdr.seq (+ n 1))
 
-def rpos(x xs n)
-  aif (pos x rev.xs n)
-    (- len.xs 1 it)
+def rpos(x seq n)
+  aif (pos x rev.seq n)
+    (- len.seq 1 it)
 
 def predicate(x) :case list?.x
   (fn(_) (pos _ x))
 
-def= car(l x)
-  (set_car l x)
+def= car(seq x)
+  (set_car seq x)
 
-def= cdr(l x)
-  (set_cdr l x)
+def= cdr(seq x)
+  (set_cdr seq x)
 
-def empty?(l)
-  nil?.l
+def empty?(seq)
+  nil?.seq
 
-def blank?(l)
-  (or nil?.l empty?.l)
+def blank?(seq)
+  (or nil?.seq empty?.seq)
 
 def copy(x)
   if cons?.x  ; piecewise copy for objects by default
@@ -62,19 +62,19 @@ def pair?(x)
        list?:cdr.x
        ~cdr:cdr.x)
 
-def rev(xs acc)
-  if !xs
+def rev(seq acc)
+  if !seq
     acc
-    (rev cdr.xs
-         (cons car.xs acc))
+    (rev cdr.seq
+         (cons car.seq acc))
 
-def lastcons(l)
-  aif cdr.l
+def lastcons(seq)
+  aif cdr.seq
     lastcons.it
-    l
+    seq
 
-def last(l)
-  car:lastcons.l
+def last(seq)
+  car:lastcons.seq
 
 
 
@@ -92,14 +92,14 @@ def zip-flat(a b)
   if (and a b)
     `(,car.a ,car.b ,@(zip-flat cdr.a cdr.b))
 
-def flatten(l acc)
+def flatten(seq acc)
   (if
-    !l
+    !seq
       acc
-    ~list?.l
-      (cons l acc)
+    ~list?.seq
+      (cons seq acc)
     :else
-      (flatten car.l (flatten cdr.l acc)))
+      (flatten car.seq (flatten cdr.seq acc)))
 
 
 
@@ -136,18 +136,18 @@ def map(f . seqs) :case cdr.seqs
     (cons (f @(map car seqs))
           (map f @(map cdr seqs)))
 
-def reduce(f xs init)   ; f is a binary op
+def reduce(f seq init)  ; f is a binary op
   (if
-    !xs
+    !seq
       init
-    ~cdr.xs
-      car.xs  ; f on one op is the identity function
+    ~cdr.seq
+      car.seq   ; f on one op is the identity function
     :else
-      (reduce f (cons (f car.xs cadr.xs)
-                      cddr.xs)))
+      (reduce f (cons (f car.seq cadr.seq)
+                      cddr.seq)))
 
-def pairwise(xs)
-  (zip xs cdr.xs)
+def pairwise(seq)
+  (zip seq cdr.seq)
 
 def best(f seq)
   if seq
@@ -160,12 +160,12 @@ def best(f seq)
 
 ;; Internals
 
-def range-bounce(l idx)
+def range-bounce(seq idx)
   if (< idx 0)
-    (+ len.l idx)
+    (+ len.seq idx)
     idx
 
-def range-start(l idx)
+def range-start(seq idx)
   if !idx
     0
-    (range-bounce l idx)
+    (range-bounce seq idx)

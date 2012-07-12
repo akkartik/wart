@@ -7,19 +7,19 @@ mac zap(f x)
 mac wipe places
   `(= ,@(zip-flat places nils))
 
-mac push(x xs)
-  `(= ,xs (cons ,x ,xs))
+mac push(x seq)
+  `(= ,seq (cons ,x ,seq))
 
-mac pop(xs)
-  `(do1 car.,xs
-     (zap cdr ,xs))
+mac pop(seq)
+  `(do1 car.,seq
+     (zap cdr ,seq))
 
-mac shift args  ; multiple-eval to maintain places
-  `(= ,@(zip-flat args cdr.args))
+mac shift places  ; multiple-eval to maintain places
+  `(= ,@(zip-flat places cdr.places))
 
-mac rotate args
-  `(let $tmp ,car.args
-     shift ,@args $tmp)
+mac rotate places
+  `(let $tmp ,car.places
+     shift ,@places $tmp)
 
 mac swap(x y)
   `(rotate ,x ,y)

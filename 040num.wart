@@ -1,22 +1,22 @@
 let $+ +
-  def! + xs
-    (reduce $+ xs 0)
+  def! + args
+    (reduce $+ args 0)
 
 let $- -
-  def! - xs
-    (reduce $- xs)
+  def! - args
+    (reduce $- args)
 
 let $* *
-  def! * xs
-    (reduce $* xs 1)
+  def! * args
+    (reduce $* args 1)
 
 let $/ /
-  def! / xs
-    (reduce $/ xs)
+  def! / args
+    (reduce $/ args)
 
 let $% %
-  def! % xs
-    (reduce $% xs)
+  def! % args
+    (reduce $% args)
 
 mac ++(n)
   `(= ,n (+ ,n 1))
@@ -27,21 +27,21 @@ mac --(n)
 
 
 let $< <
-  def! < xs
+  def! < args
     (all (fn((x y)) ($< x y))
-         pairwise.xs)
+         pairwise.args)
 
-def > xs
+def > args
   (all (fn((x y)) (< y x))
-       pairwise.xs)
+       pairwise.args)
 
-def <= xs
+def <= args
   (none (fn((x y)) (< y x))
-        pairwise.xs)
+        pairwise.args)
 
-def >= xs
+def >= args
   (none (fn((x y)) (< x y))
-        pairwise.xs)
+        pairwise.args)
 
 def min args
   (best < args)
@@ -66,8 +66,8 @@ def even?(n)
 
 alias odd? ~even?
 
-def sum(xs)
-  (+ @xs)
+def sum(seq)
+  (+ @seq)
 
-def product(xs)
-  (* @xs)
+def product(seq)
+  (* @seq)
