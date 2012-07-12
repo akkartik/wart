@@ -49,6 +49,10 @@ def min args
 def max args
   (best > args)
 
+def <(scorer) :case fn?.scorer
+  (fn(x y)
+    (< scorer.x scorer.y))
+
 
 
 def zero?(n)

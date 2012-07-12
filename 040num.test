@@ -69,6 +69,10 @@ date.
  :valueof (max 0 5 7 9 3 4 21 15)
  :should be 21)
 
+(test "< works with scorer"
+ :valueof (<.str 'a 'b)
+ :should ~be nil)
+
 (test "floats compare to within a tolerance"
  :valueof (>= 2 2.0000001)
  :should ~be nil)
