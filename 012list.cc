@@ -48,7 +48,7 @@ COMPILE_FN(list_splice, compiledFn_list_splice, "('$list $start $end $val)",
                                     bool operator()(Cell* a, Cell* b) {
                                       Cell* expr = newCons(comparer, newCons(a, newCons(b)));
                                       Cell* result = eval(expr);
-                                      bool ans = (result != nil);
+                                      bool ans = (stripAlreadyEvald(result) != nil);
                                       rmref(result);
                                       rmref(expr);
                                       return ans;
