@@ -22,10 +22,8 @@ COMPILE_FN(list_splice, compiledFn_list_splice, "('$list $start $end $val)",
   Cell* val = lookup("$val");
 
   if (val == nil) {
-    if (start == 0)
-      assign(binding, endPtr);
-    else
-      setCdr(prePtr, endPtr);
+    if (start == 0) assign(binding, endPtr);
+    else setCdr(prePtr, endPtr);
   }
   else {
     setCar(startPtr, car(val));
