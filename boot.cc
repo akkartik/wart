@@ -58,7 +58,7 @@ ostream& operator<<(unused ostream& os, unused Die die) {
 }
 Die DIE;
 
-                     // ?: to avoid dangling-else warnings
+                           // ?: to avoid dangling-else warnings
 #define RAISE pretendRaise ? ++raiseCount,cout \
                            : cerr << __FILE__ << ":" << __LINE__ << " "
 
