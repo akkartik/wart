@@ -360,8 +360,7 @@ Cell* eval(Cell* expr, Cell* scope) {
   Cell* fn = toFn(eval(car(expr), scope));
   if (!isFn(fn))
     RAISE << "not a call: " << expr << endl
-        << "  Perhaps the line is indented too much." << endl
-        << "  Or you need to split it in two." << endl << DIE;
+        << "  Perhaps you need to split the line in two." << endl << DIE;
 
   // eval its args in the caller's lexical environment
   Cell* evaldArgs = processArgs(expr, scope, fn);
