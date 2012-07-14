@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-make || exit 1
+make >&2 || exit 1
 
 if command which rlwrap >/dev/null
 then
