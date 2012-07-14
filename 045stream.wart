@@ -16,9 +16,13 @@ mac w/outstring body
      outstring_buffer.stdout)
 
 mac w/stdin(fd . body)
-  `(between (dyn_bind stdin infd.,fd) :and (do dyn_unbind.stdin close.,fd)
+  `(between (dyn_bind stdin ,fd) :and (do dyn_unbind.stdin close.,fd)
      ,@body)
 
 mac w/stdout(fd . body)
-  `(between (dyn_bind stdout outfd.,fd) :and (do dyn_unbind.stdout close.,fd)
+  `(between (dyn_bind stdout ,fd) :and (do dyn_unbind.stdout close.,fd)
      ,@body)
+
+def ern args
+  (w/stdout stderr
+    (prn @args))
