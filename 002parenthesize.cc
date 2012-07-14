@@ -70,12 +70,10 @@ list<Token> nextExpr(CodeStream& c) {
   for (list<Token> line = nextLine(c); !line.empty(); line=nextLine(c)) {
     long thisLineIndent=line.front().indentLevel, nextLineIndent=line.back().indentLevel;
 
-    bool insertedParenThisLine = false;
+    // open an implicit paren if necessary
     if (explicitParenStack.empty() && numWordsInLine(line) > 1 && noParenAtStart(line)) {
-      // open paren
       add(result, Token::of("("));
       implicitParenStack.push(thisLineIndent);
-      insertedParenThisLine = true;
     }
 
     // copy line tokens
@@ -91,18 +89,11 @@ list<Token> nextExpr(CodeStream& c) {
       }
     }
 
-    if (nextLineIndent <= thisLineIndent && insertedParenThisLine) {
-      // close paren for this line
+    // close all possible implicit parens
+    while (!implicitParenStack.empty() && implicitParenStack.top() >= nextLineIndent) {
       add(result, Token::of(")"));
       implicitParenStack.pop();
     }
-
-    if (nextLineIndent < thisLineIndent)
-      while (!implicitParenStack.empty() && implicitParenStack.top() >= nextLineIndent) {
-        // close paren for a previous line
-        add(result, Token::of(")"));
-        implicitParenStack.pop();
-      }
 
     if (implicitParenStack.empty() && explicitParenStack.empty()) {
       if (!c.fd.eof())
