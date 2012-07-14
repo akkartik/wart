@@ -184,12 +184,18 @@ If you don't like this approach, just use parens everywhere:
   (def foo()
     34)
 
-Indentation-sensitivity is disabled inside parens. This is particularly useful
-if you want multiple expressions on a single line:
+Indentation-sensitivity is disabled inside parens. This rule is useful if you
+want multiple expressions on a single line:
 
   (if test1 body1     ; parens required to avoid grouping test2 and body2
       test2 body2
             else-expr)
+
+It also implies that backquoted expressions must be fully parenthesized:
+
+  mac when(cond . body)
+    `(if ,cond
+       (do ,@body))   ; parens before 'do' are required
 
 --- Simple syntax
 
