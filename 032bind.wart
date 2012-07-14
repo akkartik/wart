@@ -41,3 +41,15 @@ mac rfn(name params . body)
 
 mac afn(params . body)
   `(rfn self ,params ,@body)
+
+mac before-fn(f params . body)
+  `(let $old ,f
+     (def! ,f ,params
+       ,@body
+       ($old ,@params)))
+
+def after-fn(f params . body)
+  `(let $old ,f
+     (def! ,f ,params
+       (ret result ($old ,@params)
+         ,@body)))
