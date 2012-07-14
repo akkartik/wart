@@ -16,6 +16,16 @@ COMPILE_FN(register_failed_test, compiledFn_incTests, "($msg $expr)",
   return nil;
 )
 
+COMPILE_FN(hide-warnings, compiledFn_hide_warnings, "()",
+  pretendRaise = true;
+  return nil;
+)
+
+COMPILE_FN(show-warnings, compiledFn_show_warnings, "()",
+  pretendRaise = false;
+  return nil;
+)
+
 COMPILE_FN(mem_usage, compiledFn_mem_usage, "()",
   long numUnfreed();
   return mkref(newNum(numUnfreed()));
