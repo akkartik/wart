@@ -93,6 +93,5 @@ AstNode nextAstNode(CodeStream& c) {
   parseNext(tokens.begin(), tokens.end(), result);
   if (result.size() > 1) RAISE << "parse error\n" << DIE;
   if (result.empty()) return AstNode::of(Token::of("nil"));
-  cout << result.front() << endl;
   return result.front();
 }
