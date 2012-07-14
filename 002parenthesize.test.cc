@@ -335,7 +335,7 @@ void test_parenthesize_groups_nested_indents() {
 }
 
 void test_parenthesize_handles_quotes_and_comments() {
-  CodeStream c(stream("a b c  \n  '(d ef)\n\n  g ;abc"));
+  CodeStream c(stream("a b c  \n  '(d ef)\n\n  : g ;abc"));
   list<Token> tokens = nextExpr(c);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -343,6 +343,24 @@ void test_parenthesize_handles_quotes_and_comments() {
   checkEq(*p, "b"); ++p;
   checkEq(*p, "c"); ++p;
   checkEq(*p, "'"); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "d"); ++p;
+  checkEq(*p, "ef"); ++p;
+  checkEq(*p, ")"); ++p;
+  checkEq(*p, "g"); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == tokens.end());
+  check(c.fd.eof());
+}
+
+void test_parenthesize_handles_takes_indent_from_colon() {
+  CodeStream c(stream("a b c  \n  d ef\n  : g"));
+  list<Token> tokens = nextExpr(c);
+  list<Token>::iterator p = tokens.begin();
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, "c"); ++p;
   checkEq(*p, "("); ++p;
   checkEq(*p, "d"); ++p;
   checkEq(*p, "ef"); ++p;

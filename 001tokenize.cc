@@ -156,6 +156,9 @@ Token nextToken(istream& in, long& currIndent) {
     default:
       slurpWord(in, out); break;
   }
+
+  if (out.str() == ":") return nextToken(in, currIndent);
+
   return Token::of(out.str(), currIndent);
 }
 

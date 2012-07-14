@@ -106,7 +106,7 @@ void test_tokenize_suppresses_comments() {
 }
 
 void test_tokenize_suppresses_comments2() {
-  CodeStream c(stream("a b\n  c\n;abc\ndef\n  ghi\n\njkl"));
+  CodeStream c(stream("a : b\n  : c\n;abc\ndef :\n  ghi\n\njkl"));
   checkEq(nextToken(c), Token::indent(0));
   checkEq(nextToken(c), "a");
   checkEq(nextToken(c), "b");
