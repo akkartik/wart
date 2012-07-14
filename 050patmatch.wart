@@ -1,7 +1,7 @@
 mac matching(vars vals . body)
   `(if (is-match ',vars ,vals)
-     let ,strip_underscores.vars ,vals
-      ,@body)
+     (let ,strip_underscores.vars ,vals
+      ,@body))
 
 
 

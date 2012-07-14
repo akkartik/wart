@@ -6,9 +6,9 @@ let $fork fork
 
 mac preforking(n . body)
   `(do
-     repeat ,n
-       (fork ,@body)
-     repeat :forever
+     (repeat ,n
+       (fork ,@body))
+     (repeat :forever
        (wait_for_child)
        (prn "restart")
-       (fork ,@body))
+       (fork ,@body)))

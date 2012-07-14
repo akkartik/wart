@@ -160,10 +160,10 @@ def rename-vars-in-bindings(conflicts bindings)
     ~list?.bindings
       nil
     (conflicts car.bindings)
-      let new (conflicts car.bindings)
+      (let new (conflicts car.bindings)
         (list new cadr.bindings
               @(rename-vars-in-bindings conflicts
-                                        (replace car.bindings new cddr.bindings)))
+                                        (replace car.bindings new cddr.bindings))))
     ~list?:car.bindings
       (list car.bindings cadr.bindings  ; no rename in exp
             @(rename-vars-in-bindings conflicts cddr.bindings))
@@ -180,9 +180,9 @@ def mangle-all(body vars)
 def lookup-or-eval(f bindings)
   (if
     sym?.f
-      if bindings
+      (if bindings
         (or bindings.f
-            (lookup-or-eval f cdr.bindings))
+            (lookup-or-eval f cdr.bindings)))
     (is-match '(fn . _) f)
       eval.f)
 

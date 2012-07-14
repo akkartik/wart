@@ -30,8 +30,8 @@ def coerce(x 'dest-type)
 
 mac defcoerce(src dest f)
   `(do
-     if (~table_get coercions* ',dest)
-       (table_set coercions* ',dest (table))
+     (if (~table_get coercions* ',dest)
+       (table_set coercions* ',dest (table)))
      (table_set (table_get coercions* ',dest) ',src ,f))
 
 defcoerce nil list

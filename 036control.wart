@@ -24,11 +24,11 @@ mac iflet(var expr . branches)
   if !branches
     expr
     `(let $tmp ,expr
-       if $tmp
+       (if $tmp
          (let ,var $tmp
            ,car.branches)
          ,(if cdr.branches
-            `(iflet ,var ,@cdr.branches)))
+            `(iflet ,var ,@cdr.branches))))
 
 mac aif(expr . branches)
   `(iflet it ,expr ,@branches)
@@ -56,13 +56,13 @@ mac aand args
 mac while(test . body)
   `(when ,test
      ,@body
-     while ,test
-       ,@body)
+     (while ,test
+       ,@body))
 
 mac whilet(var test . body)
   `(let ,var nil
-     while (= ,var ,test)
-       ,@body)
+     (while (= ,var ,test)
+       ,@body))
 
 mac awhile(test . body)
   `(whilet it ,test
@@ -70,19 +70,19 @@ mac awhile(test . body)
 
 mac for(var start test update . body)
   `(let ,var ,start
-     while ,test
+     (while ,test
        ,@body
-       ,update)
+       ,update))
 
 mac each(var expr . body)
   `(for $i (as list ,expr) $i (zap cdr $i)
-      let ,var car.$i
-        ,@body)
+      (let ,var car.$i
+        ,@body))
 
 mac on(var expr . body)
   `(for ($i index) (list ,expr 0) $i  (do (zap cdr $i) ++.index)
-     let ,var car.$i
-      ,@body)
+     (let ,var car.$i
+       ,@body))
 
 mac forlen(var expr . body)
   `(for ,var 0 (< ,var len.,expr) ++.,var

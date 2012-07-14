@@ -11,14 +11,14 @@ let $mac mac
       `(,$mac ,name ,params ,@body)
       `(let $super ,name
          (mac! ,name ,params
-           if ,cadr.body
+           (if ,cadr.body
              (do ,@cddr.body)
-             ,(construct-macro-call `($super ,@params))))  ; call super with params
+             ,(construct-macro-call `($super ,@params)))))  ; call super with params
 
 mac def(name params . body) :case (iso :case car.body)
   `(let $old ,name
      (def! ,name $params
-       let ,params $params
-         if ,cadr.body
+       (let ,params $params
+         (if ,cadr.body
            (do ,@body)
-           ($old @$params)))
+           ($old @$params)))))

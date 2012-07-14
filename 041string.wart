@@ -23,9 +23,9 @@ defcoerce string symbol
 
 def str args
   (w/outstring
-    each arg args
-      if arg
-        pr.arg)
+    (each arg args
+      (if arg
+        pr.arg)))
 
 defcoerce symbol string
   str

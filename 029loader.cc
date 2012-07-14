@@ -1,11 +1,13 @@
 #include<dirent.h>
 
 void loadFile(const char* filename) {
+  cout << "=== " << filename << endl;
   ifstream f(filename);
   CodeStream c(f);
   bool old_interactive = interactive; interactive = false;
   while (!c.fd.eof()) {
     Cell* cell = read(c);
+    cout << "..... " << cell << endl;
     rmref(eval(cell));
     rmref(cell);
   }

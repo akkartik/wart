@@ -14,8 +14,8 @@ mac! do body
 def! prn args
   (if args
     (do
-      pr car.args
-      prn @cdr.args
+      (pr car.args)
+      (prn @cdr.args)
       car.args)
     (pr "
 "))

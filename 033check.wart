@@ -9,9 +9,9 @@ let $if if
 mac or args
   if args
     `(let $x ,car.args
-       if $x
+       (if $x
          $x
-         (or ,@cdr.args))
+         (or ,@cdr.args)))
 
 mac and args
   if !args
@@ -53,9 +53,9 @@ def only(f)
 
 mac check(x test else)
   `(let $x ,x
-     if (,test $x)
-      $x
-      ,else)
+     (if (,test $x)
+       $x
+       ,else))
 
 def maybe(f a b/to)
   if a

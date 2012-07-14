@@ -431,17 +431,15 @@ void test_parenthesize_groups_across_comments() {
   check(c.fd.eof());
 }
 
-void test_parenthesize_groups_inside_parens() {
+void test_parenthesize_does_not_group_inside_parens() {
   CodeStream c(stream("(def foo\n    ;a b c\n  d e)\nnewdef"));
   list<Token> tokens = nextExpr(c);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
   checkEq(*p, "def"); ++p;
   checkEq(*p, "foo"); ++p;
-  checkEq(*p, "("); ++p;
   checkEq(*p, "d"); ++p;
   checkEq(*p, "e"); ++p;
-  checkEq(*p, ")"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
   tokens = nextExpr(c); p = tokens.begin();
@@ -450,7 +448,7 @@ void test_parenthesize_groups_inside_parens() {
   check(c.fd.eof());
 }
 
-void test_parenthesize_groups_inside_parens2() {
+void test_parenthesize_does_not_group_inside_parens2() {
   CodeStream c(stream("`(def foo\n    ;a b c\n  d e)\nnewdef"));
   list<Token> tokens = nextExpr(c);
   list<Token>::iterator p = tokens.begin();
@@ -458,10 +456,8 @@ void test_parenthesize_groups_inside_parens2() {
   checkEq(*p, "("); ++p;
   checkEq(*p, "def"); ++p;
   checkEq(*p, "foo"); ++p;
-  checkEq(*p, "("); ++p;
   checkEq(*p, "d"); ++p;
   checkEq(*p, "e"); ++p;
-  checkEq(*p, ")"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
   tokens = nextExpr(c); p = tokens.begin();
@@ -470,7 +466,7 @@ void test_parenthesize_groups_inside_parens2() {
   check(c.fd.eof());
 }
 
-void test_parenthesize_groups_inside_indented_parens() {
+void test_parenthesize_does_not_group_inside_parens3() {
   CodeStream c(stream("  (a b c\n    d e)"));
   list<Token> tokens = nextExpr(c);
   list<Token>::iterator p = tokens.begin();
@@ -478,16 +474,14 @@ void test_parenthesize_groups_inside_indented_parens() {
   checkEq(*p, "a"); ++p;
   checkEq(*p, "b"); ++p;
   checkEq(*p, "c"); ++p;
-  checkEq(*p, "("); ++p;
   checkEq(*p, "d"); ++p;
   checkEq(*p, "e"); ++p;
-  checkEq(*p, ")"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
   check(c.fd.eof());
 }
 
-void test_parenthesize_passes_through_arglists() {
+void test_parenthesize_does_not_group_inside_arglists() {
   CodeStream c(stream("def foo(a (b)\n    c d)\n  d e\nnewdef"));
   list<Token> tokens = nextExpr(c);
   list<Token>::iterator p = tokens.begin();
@@ -510,61 +504,6 @@ void test_parenthesize_passes_through_arglists() {
   check(p == tokens.end());
   tokens = nextExpr(c); p = tokens.begin();
   checkEq(*p, "newdef"); ++p;
-  check(p == tokens.end());
-  check(c.fd.eof());
-}
-
-void test_parenthesize_passes_through_when_indented_by_one_space() {
-  CodeStream c(stream("    (a b c\n     d e\n     f g)"));
-  list<Token> tokens = nextExpr(c);
-  list<Token>::iterator p = tokens.begin();
-  checkEq(*p, "("); ++p;
-  checkEq(*p, "a"); ++p;
-  checkEq(*p, "b"); ++p;
-  checkEq(*p, "c"); ++p;
-  checkEq(*p, "d"); ++p;
-  checkEq(*p, "e"); ++p;
-  checkEq(*p, "f"); ++p;
-  checkEq(*p, "g"); ++p;
-  checkEq(*p, ")"); ++p;
-  check(p == tokens.end());
-  check(c.fd.eof());
-}
-
-void test_parenthesize_passes_through_when_indented_by_one_space2() {
-  CodeStream c(stream("    '(a b c\n     d e\n     f g)"));
-  list<Token> tokens = nextExpr(c);
-  list<Token>::iterator p = tokens.begin();
-  checkEq(*p, "'"); ++p;
-  checkEq(*p, "("); ++p;
-  checkEq(*p, "a"); ++p;
-  checkEq(*p, "b"); ++p;
-  checkEq(*p, "c"); ++p;
-  checkEq(*p, "d"); ++p;
-  checkEq(*p, "e"); ++p;
-  checkEq(*p, "f"); ++p;
-  checkEq(*p, "g"); ++p;
-  checkEq(*p, ")"); ++p;
-  check(p == tokens.end());
-  check(c.fd.eof());
-}
-
-void test_parenthesize_passes_through_when_indented_by_one_space3() {
-  CodeStream c(stream("a\n  (a b c\n   d e)"));
-  list<Token> tokens = nextExpr(c);
-  list<Token>::iterator p = tokens.begin();
-  checkEq(*p, "a"); ++p;
-  check(p == tokens.end());
-
-  tokens = nextExpr(c);
-  p = tokens.begin();
-  checkEq(*p, "("); ++p;
-  checkEq(*p, "a"); ++p;
-  checkEq(*p, "b"); ++p;
-  checkEq(*p, "c"); ++p;
-  checkEq(*p, "d"); ++p;
-  checkEq(*p, "e"); ++p;
-  checkEq(*p, ")"); ++p;
   check(p == tokens.end());
   check(c.fd.eof());
 }

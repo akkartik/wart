@@ -13,9 +13,9 @@ let $table table  ; ignore later refinements
 
   defcoerce list table
     (fn(_)
-      ret h ($table)
-        each (k v) _
-          (= h.k v))
+      (ret h ($table)
+        (each (k v) _
+          (= h.k v))))
 
 def! table args
   (as table pair.args)

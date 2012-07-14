@@ -184,53 +184,12 @@ If you don't like this approach, just use parens everywhere:
   (def foo()
     34)
 
-But you can't indent 'if' like in Common Lisp or Scheme:
-  (if expr1 body1
-      expr2 body2
-            else)
-=>
-  (if expr1
-        body1
-      (expr2 body2)   ; eek!
-        else)
+Indentation-sensitivity is disabled inside parens. This is particularly useful
+if you want multiple expressions on a single line:
 
-You'll also want to suppress grouping in two situations:
-
-a) When wrapping long lists to a new line, you must indent by exactly one
-space:
-  (foo a b c
-   d e f)             ; single space to avoid grouping this line
-=>
-  (foo a b c d e f)
-
-The parens are required in this situation:
-  foo a b c
-   d e f
-=>
-  (foo a b c
-   (d e f))           ; probably not what you want
-
-Indenting by one space looks better if you use keyword args:
-  (test "add works"
-   :valueof (+ 2 2)
-   :should be 4)
-That kinda reads like a stanza or a paragraph. Long expressions should use
-keyword args anyway.
-
-(Tabs count as 2 spaces. Don't mix tabs and spaces.)
-
-b) Wrapping param lists always works as long as its not on its own line:
-  def foo(a b c
-      d e f)          ; this line's indentation doesn't matter
-    34
-=>
-  (def foo(a b c d e f)
-    34)
-Parens opening in the middle of a line disable paren-insertion until they are
-closed.
-
-These 2 exceptions add (very slightly) to the writer's burden, but I think
-they never make reading harder.
+  (if test1 body1     ; parens required to avoid grouping test2 and body2
+      test2 body2
+            else-expr)
 
 --- Simple syntax
 

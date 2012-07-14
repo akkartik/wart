@@ -71,12 +71,11 @@ list<Token> nextExpr(CodeStream& c) {
   list<Token> result;
   stack<long> explicitParenStack; // parens in the original
   stack<long> implicitParenStack; // parens we inserted
-  long argParenCount=0; // depth of unprocessed parens not at start of line
   for (list<Token> line = nextLine(c); !line.empty(); line=nextLine(c)) {
     long thisLineIndent=line.front().indentLevel, nextLineIndent=line.back().indentLevel;
 
     bool insertedParenThisLine = false;
-    if (!argParenCount && numWordsInLine(line) > 1 && noParenAtStart(line) && !continuationLine(thisLineIndent, explicitParenStack)) {
+    if (explicitParenStack.empty() && numWordsInLine(line) > 1 && noParenAtStart(line)) {
       // open paren
       add(result, Token::of("("));
       implicitParenStack.push(thisLineIndent);
@@ -94,14 +93,7 @@ list<Token> nextExpr(CodeStream& c) {
           RAISE << "Unbalanced )" << endl << DIE;
         explicitParenStack.pop();
       }
-
-      if (*q == "(" && (argParenCount || q != firstNonQuote(line)))
-        ++argParenCount; // no more paren-insertion until it closes
-      if (*q == ")" && argParenCount) // it closed
-        --argParenCount;
     }
-
-    if (argParenCount) continue;
 
     if (nextLineIndent <= thisLineIndent && insertedParenThisLine) {
       // close paren for this line
@@ -116,7 +108,7 @@ list<Token> nextExpr(CodeStream& c) {
         implicitParenStack.pop();
       }
 
-    if (implicitParenStack.empty() && explicitParenStack.empty() && argParenCount == 0) {
+    if (implicitParenStack.empty() && explicitParenStack.empty()) {
       if (!c.fd.eof())
         // Clean up indent state for the next call.
         for (int i = 0; i < nextLineIndent; ++i)

@@ -19,7 +19,7 @@ mac shift places  ; multiple-eval to maintain places
 
 mac rotate places
   `(let $tmp ,car.places
-     shift ,@places $tmp)
+     (shift ,@places $tmp))
 
 mac swap(x y)
   `(rotate ,x ,y)
