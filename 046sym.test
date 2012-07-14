@@ -1,65 +1,65 @@
 (test "sym works with one arg"
- :valueof (sym "abc")
- :should be 'abc)
+  :valueof (sym "abc")
+  :should be 'abc)
 
 (test "sym works on empty string"
- :valueof (sym "")
- :should be nil)
+  :valueof (sym "")
+  :should be nil)
 
 (test "sym works with multiple args"
- :valueof (str:sym "abc" 42 :def)   ; keyword retains colon
- :should be "abc42:def")
+  :valueof (str:sym "abc" 42 :def)   ; keyword retains colon
+  :should be "abc42:def")
 
 (test "keyword? works"
- :valueof (keyword? 'abc)
- :should be nil)
+  :valueof (keyword? 'abc)
+  :should be nil)
 
 (test "keyword? works - 2"
- :valueof (keyword? :abc)
- :should ~be nil)
+  :valueof (keyword? :abc)
+  :should ~be nil)
 
 (test "sym converts keywords"
- :valueof (sym :abc)
- :should be 'abc)   ; keyword loses colon
+  :valueof (sym :abc)
+  :should be 'abc)   ; keyword loses colon
 
 
 
 (test "is-match treats any sym beginning with _ as wildcard"
- :valueof (is-match '(1 . _x) '(1 2 3))
- :should ~be nil)
+  :valueof (is-match '(1 . _x) '(1 2 3))
+  :should ~be nil)
 
 (test "is-match manages _sym identity"
- :valueof (is-match '(1 _x _x) '(1 2 3))
- :should be nil)
+  :valueof (is-match '(1 _x _x) '(1 2 3))
+  :should be nil)
 
 (test "is-match manages _sym identity - 2"
- :valueof (is-match '(1 _x _x) '(1 2 2))
- :should ~be nil)
+  :valueof (is-match '(1 _x _x) '(1 2 2))
+  :should ~be nil)
 
 (test "is-match matches $vars with their root"
- :valueof (is-match 'a_ 'a3)
- :should ~be nil)
+  :valueof (is-match 'a_ 'a3)
+  :should ~be nil)
 
 (test "is-match matches $vars with their root - 2"
- :valueof (is-match 'a_ 'a)
- :should be nil)
+  :valueof (is-match 'a_ 'a)
+  :should be nil)
 
 (test "is-match manages $var_sym identity"
- :valueof (is-match '(a_x a_x) '(a3 a3))
- :should ~be nil)
+  :valueof (is-match '(a_x a_x) '(a3 a3))
+  :should ~be nil)
 
 (test "is-match manages $var_sym identity - 2"
- :valueof (is-match '(a_x a_x) '(a2 a3))
- :should be nil)
+  :valueof (is-match '(a_x a_x) '(a2 a3))
+  :should be nil)
 
 (test "is-match manages $var_sym identity - 3"
- :valueof (is-match '(a_x a_x) '(a a3))
- :should be nil)
+  :valueof (is-match '(a_x a_x) '(a a3))
+  :should be nil)
 
 (test "match integrates with test"
- :valueof (list 'a3 'a3)
- :should match '(a_x a_x))
+  :valueof (list 'a3 'a3)
+  :should match '(a_x a_x))
 
 (test "sym-root works"
- :valueof (sym-root 'a3)
- :should be 'a)
+  :valueof (sym-root 'a3)
+  :should be 'a)

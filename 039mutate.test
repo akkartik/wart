@@ -1,32 +1,32 @@
 (test "assignment can process multiple pairs"
- :valueof (do
-            (= x 1 y 2)
-            (cons x y))
- :should be '(1 . 2))
+  :valueof (do
+             (= x 1 y 2)
+             (cons x y))
+  :should be '(1 . 2))
 
 (test "shift works"
- :valueof (with (x 3 y 4)
-            (shift x y 27)
-            (list x y))
- :should be '(4 27))
+  :valueof (with (x 3 y 4)
+             (shift x y 27)
+             (list x y))
+  :should be '(4 27))
 
 (test "rotate works"
- :valueof (with (x 3 y 4 z 5)
-            (rotate x y z)
-            (list x y z))
- :should be '(4 5 3))
+  :valueof (with (x 3 y 4 z 5)
+             (rotate x y z)
+             (list x y z))
+  :should be '(4 5 3))
 
 (test "swap works"
- :valueof (with (x 3 y 4)
-            (swap x y)
-            (list x y))
- :should be '(4 3))
+  :valueof (with (x 3 y 4)
+             (swap x y)
+             (list x y))
+  :should be '(4 3))
 
 (test "making works"
- :valueof (do
-            (= x 3)
-            (let f (fn() x)
-              (list f.
-                    (let x 4 f.)
-                    (making x 4 f.))))
- :should be '(3 3 4))
+  :valueof (do
+             (= x 3)
+             (let f (fn() x)
+               (list f.
+                     (let x 4 f.)
+                     (making x 4 f.))))
+  :should be '(3 3 4))

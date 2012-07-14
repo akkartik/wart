@@ -2,89 +2,89 @@ ern.
 date.
 
 (test "inline works on functions"
- :valueof (inline '(foo 3 4) (table 'foo (fn(x y) (+ x y))))
- :should be '(withs () (withs ((x y) (list 3 4)) (+ x y))))
+  :valueof (inline '(foo 3 4) (table 'foo (fn(x y) (+ x y))))
+  :should be '(withs () (withs ((x y) (list 3 4)) (+ x y))))
 
 (test "inline works on macros"
- :valueof (inline '(foo 3 4) (table 'foo (fn'(x y) (mac-eval `(+ ,x ,y) caller-scope))))
- :should be '(withs () (withs ((x y) (list 3 4)) (+ 3 4))))
+  :valueof (inline '(foo 3 4) (table 'foo (fn'(x y) (mac-eval `(+ ,x ,y) caller-scope))))
+  :should be '(withs () (withs ((x y) (list 3 4)) (+ 3 4))))
 
 (test "inline works on functions with unbound syms"
- :valueof (inline '(foo a b) (table 'foo (fn(x y) (+ x y))))
- :should be '(withs () (withs ((x y) (list a b)) (+ x y))))
+  :valueof (inline '(foo a b) (table 'foo (fn(x y) (+ x y))))
+  :should be '(withs () (withs ((x y) (list a b)) (+ x y))))
 
 (test "inline works on macros with unbound syms"
- :valueof (inline '(foo a b) (table 'foo (fn'(x y) (mac-eval `(+ ,x ,y) caller-scope))))
- :should be '(withs () (withs ((x y) (list a b)) (+ a b))))
+  :valueof (inline '(foo a b) (table 'foo (fn'(x y) (mac-eval `(+ ,x ,y) caller-scope))))
+  :should be '(withs () (withs ((x y) (list a b)) (+ a b))))
 
 
 
 (test "to-with-expr works"
- :valueof (to-with-expr '(foo 1 :a 2 (list 3 4) @(list 5 6) 7)
-                        (table 'foo (let x 34
-                                      (fn(a b (c d) e . f)
-                                        (list a b c d e f)))))
- :should be '(withs (x 34)
-               (withs ((a b (c d) e . f) (list 1 :a 2 (list 3 4) @(list 5 6) 7))
-                 (list a b c d e f))))
+  :valueof (to-with-expr '(foo 1 :a 2 (list 3 4) @(list 5 6) 7)
+                         (table 'foo (let x 34
+                                       (fn(a b (c d) e . f)
+                                         (list a b c d e f)))))
+  :should be '(withs (x 34)
+                (withs ((a b (c d) e . f) (list 1 :a 2 (list 3 4) @(list 5 6) 7))
+                  (list a b c d e f))))
 
 (test "to-with-expr passes through unknown calls"
- :valueof (to-with-expr '(foo 1 2) (table))
- :should be '(foo 1 2))
+  :valueof (to-with-expr '(foo 1 2) (table))
+  :should be '(foo 1 2))
 
 (test "to-with-expr handles nested calls"
- :valueof (to-with-expr '(foo 1 2)
-                        (table 'foo (fn(a b)
-                                      (bar a b))
-                               'bar (fn(c d)
-                                      (baz c d))))
- :should be '(withs ()
-               (withs ((a b) (list 1 2))
-                 (withs ()
-                   (withs ((c d) (list a b))
-                     (baz c d))))))
+  :valueof (to-with-expr '(foo 1 2)
+                         (table 'foo (fn(a b)
+                                       (bar a b))
+                                'bar (fn(c d)
+                                       (baz c d))))
+  :should be '(withs ()
+                (withs ((a b) (list 1 2))
+                  (withs ()
+                    (withs ((c d) (list a b))
+                      (baz c d))))))
 
 (test "to-with-expr skips recursive calls"
- :valueof (to-with-expr '(foo 1 2)
-                        (table 'foo (fn(a b)
-                                      (foo a b))))
- :should be '(withs ()
-               (withs ((a b) (list 1 2))
-                 (foo a b))))
+  :valueof (to-with-expr '(foo 1 2)
+                         (table 'foo (fn(a b)
+                                       (foo a b))))
+  :should be '(withs ()
+                (withs ((a b) (list 1 2))
+                  (foo a b))))
 
 (test "to-with-expr skips selectively quoted params"
- :valueof (to-with-expr '(foo x y)
-                        (table 'foo (fn('a 'b)
-                                      `(+ ,a ,b))))
- :should be '(withs ()
-               ((fn('a 'b) `(+ ,a ,b)) x y)))
+  :valueof (to-with-expr '(foo x y)
+                         (table 'foo (fn('a 'b)
+                                       `(+ ,a ,b))))
+  :should be '(withs ()
+                ((fn('a 'b) `(+ ,a ,b)) x y)))
 
 (test "to-with-expr handles macro calls"
- :valueof (to-with-expr '(foo x y)
-                        (table 'foo (fn'(a b)
-                                      (mac-eval `(+ ,a ,b) caller-scope))))
- :should be '(withs ()
-               (mac-withs ((a b) '(x y))
-                  (mac-eval `(+ ,a ,b)))))
+  :valueof (to-with-expr '(foo x y)
+                         (table 'foo (fn'(a b)
+                                       (mac-eval `(+ ,a ,b) caller-scope))))
+  :should be '(withs ()
+                (mac-withs ((a b) '(x y))
+                   (mac-eval `(+ ,a ,b)))))
 
 (test "to-with-expr leaves alone caller-scope outside macros"
- :valueof (to-with-expr '(foo 1 2)
-                        (table 'foo (fn(a b)
-                                      (mac-eval a caller-scope))))
- :should be '(withs ()
-               (withs ((a b) (list 1 2))
-                 (mac-eval a caller-scope))))
+  :valueof (to-with-expr '(foo 1 2)
+                         (table 'foo (fn(a b)
+                                       (mac-eval a caller-scope))))
+  :should be '(withs ()
+                (withs ((a b) (list 1 2))
+                  (mac-eval a caller-scope))))
 
 (test "to-with-expr handles functions in env"
- :valueof (to-with-expr '(foo x y)
-                        (table 'foo (let bar (fn(a b) (+ a b))
-                                      (fn(c d)
-                                        (bar c d)))))
- :should be `(withs (bar ,(fn(a b) (+ a b)))
-               (withs ((c d) (list x y))
-                 (withs ()
-                   (withs ((a b) (list c d))
-                     (+ a b))))))
+  :valueof (to-with-expr '(foo x y)
+                         (table 'foo (let bar (fn(a b) (+ a b))
+                                       (fn(c d)
+                                         (bar c d)))))
+  :should be `(withs (bar ,(fn(a b) (+ a b)))
+                (withs ((c d) (list x y))
+                  (withs ()
+                    (withs ((a b) (list c d))
+                      (+ a b))))))
 
 let expr '(withs (a x b y) (cons a b))
   (test "to-with-expr is idempotent"
@@ -94,162 +94,162 @@ let expr '(withs (a x b y) (cons a b))
 make-unbound!x
 make-unbound!y
 (test "to-with-expr inlines within with-exprs"
- :valueof (to-with-expr '(withs (a x b y) (foo a b))
-                        (table 'foo (fn(c d) (bar c d))))
- :should be '(withs (a x b y) (withs () (withs ((c d) (list a b)) (bar c d)))))
+  :valueof (to-with-expr '(withs (a x b y) (foo a b))
+                         (table 'foo (fn(c d) (bar c d))))
+  :should be '(withs (a x b y) (withs () (withs ((c d) (list a b)) (bar c d)))))
 
 
 
 (test "inline-macro-eval works"
- :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
-                                (mac-eval `(+ ,a ,b))))
- :should be '(withs ((a b) (list x y))
-               (+ x y)))
+  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
+                                 (mac-eval `(+ ,a ,b))))
+  :should be '(withs ((a b) (list x y))
+                (+ x y)))
 
 (test "inline-macro-eval reaches into with exprs"
- :valueof (inline-macro-eval '(withs (z 3)
-                                (mac-withs ((a b) '(x y))
-                                  (mac-eval `(+ ,a ,b)))))
- :should be '(withs (z 3)
-               (withs ((a b) (list x y))
-                 (+ x y))))
+  :valueof (inline-macro-eval '(withs (z 3)
+                                 (mac-withs ((a b) '(x y))
+                                   (mac-eval `(+ ,a ,b)))))
+  :should be '(withs (z 3)
+                (withs ((a b) (list x y))
+                  (+ x y))))
 
 (test "inline-macro-eval reaches into with exprs - 2"
- :valueof (inline-macro-eval '(withs (z 3)
-                                (mac-withs ((a b) '(x y))
-                                  (mac-eval `(+ ,a ,b ,z)))))
- :should be '(withs (z 3)
-               (withs ((a b) (list x y))
-                 (+ x y 3))))
+  :valueof (inline-macro-eval '(withs (z 3)
+                                 (mac-withs ((a b) '(x y))
+                                   (mac-eval `(+ ,a ,b ,z)))))
+  :should be '(withs (z 3)
+                (withs ((a b) (list x y))
+                  (+ x y 3))))
 
 (test "inline-macro-eval works with intermezzo code"
- :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
-                                (prn a)
-                                (mac-eval `(+ ,a ,b))))
- :should be '(withs ((a b) (list x y))
-               (prn 'x)
-               (+ x y)))
+  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
+                                 (prn a)
+                                 (mac-eval `(+ ,a ,b))))
+  :should be '(withs ((a b) (list x y))
+                (prn 'x)
+                (+ x y)))
 
 (test "inline-macro-eval works with intermezzo code - 2"
- :valueof (inline-macro-eval '(mac-withs ((a b) '((+ x 1) y))
-                                (prn a)
-                                (mac-eval `(+ ,a ,b))))
- :should be '(withs ((a b) (list (+ x 1) y))
-               (prn '(+ x 1))
-               (+ (+ x 1) y)))
+  :valueof (inline-macro-eval '(mac-withs ((a b) '((+ x 1) y))
+                                 (prn a)
+                                 (mac-eval `(+ ,a ,b))))
+  :should be '(withs ((a b) (list (+ x 1) y))
+                (prn '(+ x 1))
+                (+ (+ x 1) y)))
 
 (test "inline-macro-eval skips explicit list construction"
- :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
-                                (mac-eval (cons '+ a b))))
- :should be '(withs ((a b) '(x y))
-               (mac-eval (cons '+ a b))))
+  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
+                                 (mac-eval (cons '+ a b))))
+  :should be '(withs ((a b) '(x y))
+                (mac-eval (cons '+ a b))))
 
 (test "inline-macro-eval gives up with unbound vars"
- :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
-                                (mac-eval `(+ ,c ,b))))
- :should be '(withs ((a b) '(x y))
-               (mac-eval `(+ ,c ,b))))
+  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
+                                 (mac-eval `(+ ,c ,b))))
+  :should be '(withs ((a b) '(x y))
+                (mac-eval `(+ ,c ,b))))
 
 (test "inline-macro-eval works with comma expressions without side effects"
- :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
-                                (mac-eval `(+ ,a ,(if 3 b)))))
- :should be '(withs ((a b) (list x y))
-               (+ x y)))
+  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
+                                 (mac-eval `(+ ,a ,(if 3 b)))))
+  :should be '(withs ((a b) (list x y))
+                (+ x y)))
 
 (test "inline-macro-eval works with comma-splice expressions without side effects"
- :valueof (inline-macro-eval '(mac-withs (args '(x y))
-                                (mac-eval `(+ ,@args 3))))
- :should be '(withs (args (list x y))
-               (+ x y 3)))
+  :valueof (inline-macro-eval '(mac-withs (args '(x y))
+                                 (mac-eval `(+ ,@args 3))))
+  :should be '(withs (args (list x y))
+                (+ x y 3)))
 
 (test "inline-macro-eval works with nested backquotes"
- :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
-                                (mac-eval `(+ ,a ,(if 3 `(+ 3 ,b))))))
- :should be '(withs ((a b) (list x y))
-               (+ x (+ 3 y))))
+  :valueof (inline-macro-eval '(mac-withs ((a b) '(x y))
+                                 (mac-eval `(+ ,a ,(if 3 `(+ 3 ,b))))))
+  :should be '(withs ((a b) (list x y))
+                (+ x (+ 3 y))))
 
 
 
 (test "mangle-names leaves untouched by default"
- :valueof (mangle-names '(withs (a 3) (+ a 3)))
- :should be '(withs (a 3) (+ a 3)))
+  :valueof (mangle-names '(withs (a 3) (+ a 3)))
+  :should be '(withs (a 3) (+ a 3)))
 
 (test "mangle-names handles incoming exprs"
- :valueof (mangle-names '(withs (a (+ a 1)) (+ a 3)) '(a))
- :should match '(withs (a_x (+ a 1)) (+ a_x 3)))
+  :valueof (mangle-names '(withs (a (+ a 1)) (+ a 3)) '(a))
+  :should match '(withs (a_x (+ a 1)) (+ a_x 3)))
 
 (test "mangle-names handles multiple exprs in body"
- :valueof (mangle-names '(withs (a (+ a 1)) (+ a 2) (+ a 3)) '(a))
- :should match '(withs (a_x (+ a 1)) (+ a_x 2) (+ a_x 3)))
+  :valueof (mangle-names '(withs (a (+ a 1)) (+ a 2) (+ a 3)) '(a))
+  :should match '(withs (a_x (+ a 1)) (+ a_x 2) (+ a_x 3)))
 
 (test "mangle-names updates nested with exprs"
- :valueof (mangle-names '(withs (a 3) (withs (b 39) (+ a b))) '(a))
- :should match '(withs (a_x 3) (withs (b 39) (+ a_x b))))
+  :valueof (mangle-names '(withs (a 3) (withs (b 39) (+ a b))) '(a))
+  :should match '(withs (a_x 3) (withs (b 39) (+ a_x b))))
 
 (test "mangle-names updates exprs in nested bindings"
- :valueof (mangle-names '(withs (a 3) (withs (b (+ a 2)) (+ a b))) '(a))
- :should match '(withs (a_x 3) (withs (b (+ a_x 2)) (+ a_x b))))
+  :valueof (mangle-names '(withs (a 3) (withs (b (+ a 2)) (+ a b))) '(a))
+  :should match '(withs (a_x 3) (withs (b (+ a_x 2)) (+ a_x b))))
 
 (test "mangle-names creates new nested conflicts"
- :valueof (mangle-names '(withs (a 3) (withs (a (+ a 2)) (+ a b))) '(a))
- :should match '(withs (a_x 3) (withs (a_y (+ a_x 2)) (+ a_y b))))
+  :valueof (mangle-names '(withs (a 3) (withs (a (+ a 2)) (+ a b))) '(a))
+  :should match '(withs (a_x 3) (withs (a_y (+ a_x 2)) (+ a_y b))))
 
 (test "mangle-names handles exprs after nested exprs"
- :valueof (mangle-names '(withs (a 3)
-                           (a b c)
-                           (withs (a 4)
-                             (a d e))
-                           (a f g)))
- :should match '(withs (a 3)
-                  (a b c)
-                  (withs (a_x 4)
-                    (a_x d e))
-                  (a f g)))
+  :valueof (mangle-names '(withs (a 3)
+                            (a b c)
+                            (withs (a 4)
+                              (a d e))
+                            (a f g)))
+  :should match '(withs (a 3)
+                   (a b c)
+                   (withs (a_x 4)
+                     (a_x d e))
+                   (a f g)))
 
 (test "mangle-names watches conflict list"
- :valueof (mangle-names '(withs (a 3)
-                           (a b c)
-                           (withs (a 4)
-                             (a d e))
-                           (a f g))
-                        '(a))
- :should match '(withs (a_x 3)
-                  (a_x b c)
-                  (withs (a_y 4)
-                    (a_y d e))
-                  (a_x f g)))
+  :valueof (mangle-names '(withs (a 3)
+                            (a b c)
+                            (withs (a 4)
+                              (a d e))
+                            (a f g))
+                         '(a))
+  :should match '(withs (a_x 3)
+                   (a_x b c)
+                   (withs (a_y 4)
+                     (a_y d e))
+                   (a_x f g)))
 
 
 
 (test "rename-vars-in-bindings works"
- :valueof (rename-vars-in-bindings (table 'x 'x2) '(x 1 y 2))
- :should be '(x2 1 y 2))
+  :valueof (rename-vars-in-bindings (table 'x 'x2) '(x 1 y 2))
+  :should be '(x2 1 y 2))
 
 (test "rename-vars-in-bindings ignores expressions"
- :valueof (rename-vars-in-bindings (table 'x 'x2) '(a x b y))
- :should be '(a x b y))
+  :valueof (rename-vars-in-bindings (table 'x 'x2) '(a x b y))
+  :should be '(a x b y))
 
 (test "rename-vars-in-bindings replaces later expressions"
- :valueof (rename-vars-in-bindings (table 'x 'x2)
-                                   '(a x x (+ a 1) b x))
- :should be '(a x x2 (+ a 1) b x2))
+  :valueof (rename-vars-in-bindings (table 'x 'x2)
+                                    '(a x x (+ a 1) b x))
+  :should be '(a x x2 (+ a 1) b x2))
 
 (test "rename-vars-in-bindings replaces later expressions - 2"
- :valueof (rename-vars-in-bindings (table 'x 'x2) '(x (+ x 1) y x))
- :should be '(x2 (+ x 1) y x2))
+  :valueof (rename-vars-in-bindings (table 'x 'x2) '(x (+ x 1) y x))
+  :should be '(x2 (+ x 1) y x2))
 
 (test "rename-vars-in-bindings renames multiple vars"
- :valueof (rename-vars-in-bindings (table 'x 'x2 'y 'y2)
-                                   '(x (+ x 1) y x))
- :should be '(x2 (+ x 1) y2 x2))
+  :valueof (rename-vars-in-bindings (table 'x 'x2 'y 'y2)
+                                    '(x (+ x 1) y x))
+  :should be '(x2 (+ x 1) y2 x2))
 
 (test "scope->with-bindings and with-bindings->scope are converses"
- :valueof (with-bindings->scope (scope->with-bindings (table 'x 34)))
- :should be (table 'x 34))
+  :valueof (with-bindings->scope (scope->with-bindings (table 'x 34)))
+  :should be (table 'x 34))
 
 (test "new-vars updates conflicts with gensyms"
- :valueof (withs (got (new-vars '(a b c))
-                  expected  (table 'a 'a_ 'b 'b_ 'c 'c_))
-            (list (iso expected got)
-                  (~~is-match expected got)))
- :should be '(nil 1))
+  :valueof (withs (got (new-vars '(a b c))
+                   expected  (table 'a 'a_ 'b 'b_ 'c 'c_))
+             (list (iso expected got)
+                   (~~is-match expected got)))
+  :should be '(nil 1))
