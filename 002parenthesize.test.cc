@@ -353,7 +353,7 @@ void test_parenthesize_handles_quotes_and_comments() {
   check(c.fd.eof());
 }
 
-void test_parenthesize_handles_takes_indent_from_colon() {
+void test_parenthesize_takes_indent_from_colon() {
   CodeStream c(stream("a b c  \n  d ef\n  : g"));
   list<Token> tokens = nextExpr(c);
   list<Token>::iterator p = tokens.begin();
