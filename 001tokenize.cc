@@ -31,6 +31,13 @@ struct Token {
   bool isIndent() {
     return token == "";
   }
+  bool isParen() {
+    return token == "(" || token == ")";
+  }
+  bool isQuoteOrUnquote() {
+    return token == "'" || token == "`"
+        || token == "," || token == ",@" || token == "@";
+  }
 
   bool operator==(string x) {
     return token == x;

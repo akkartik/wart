@@ -58,13 +58,13 @@ list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterato
 
   if (*curr == ")") RAISE << "Unbalanced )" << endl << DIE;
 
-  if (*curr != "(" && !isQuoteOrUnquote(*curr)) {
+  if (*curr != "(" && !curr->isQuoteOrUnquote()) {
     out.push_back(AstNode::of(*curr));
     return ++curr;
   }
 
   list<AstNode> subform;
-  while (curr != end && isQuoteOrUnquote(*curr)) {
+  while (curr != end && curr->isQuoteOrUnquote()) {
     subform.push_back(*curr);
     ++curr;
   }

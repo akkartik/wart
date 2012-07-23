@@ -28,19 +28,11 @@ list<Token> nextLine(CodeStream& c) {
 
 
 
-                                  bool isParen(Token x) {
-                                    return x == "(" || x == ")";
-                                  }
-
-                                  bool isQuoteOrUnquote(Token x) {
-                                    return x == "'" || x == "`" || x == "," || x == ",@" || x == "@";
-                                  }
-
                                   long numWordsInLine(list<Token> line) {
                                     long numWords = 0;
                                     for (list<Token>::iterator p = line.begin(); p != line.end(); ++p)
-                                      if (!p->isIndent() && !isParen(*p)
-                                          && !isQuoteOrUnquote(*p))
+                                      if (!p->isIndent() && !p->isParen()
+                                          && !p->isQuoteOrUnquote())
                                         ++numWords;
                                     return numWords;
                                   }
@@ -52,7 +44,7 @@ list<Token> nextLine(CodeStream& c) {
 
                                   list<Token>::iterator firstNonQuote(list<Token>& line) {
                                     for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
-                                      if (!p->isIndent() && !isQuoteOrUnquote(*p))
+                                      if (!p->isIndent() && !p->isQuoteOrUnquote())
                                         return p;
                                     }
                                     return line.end();
