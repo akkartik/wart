@@ -473,11 +473,13 @@ void test_eval_handles_rest_params() {
 }
 
 void test_eval_handles_splice() {
-  Cell* expr = read(stream("(+ @b)"));
+  Cell* expr = read(stream("(cons @b)"));
   Cell* val = read(stream("3 4"));
   newDynamicScope("b", val);
   Cell* result = eval(expr);
-  checkEq(result, newNum(7));
+  check(isCons(result));
+  checkEq(car(result), newNum(3));
+  checkEq(cdr(result), newNum(4));
   rmref(result);
   endDynamicScope("b");
   rmref(val);
