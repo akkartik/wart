@@ -53,45 +53,44 @@ ostream& operator<<(ostream& os, AstNode x) {
   return os << endl;
 }
 
-list<Token>::iterator parseNext(list<Token>::iterator curr, list<Token>::iterator end, list<AstNode>& out) {
-  if (curr == end) return curr;
-
-  if (*curr == ")") RAISE << "Unbalanced )" << endl << DIE;
-
-  if (*curr != "(" && !curr->isQuoteOrUnquote()) {
-    out.push_back(AstNode::of(*curr));
-    return ++curr;
+// To disable whitespace-sensitivity, replace calls to nextParenInsertedToken
+// with nextNonWhitespaceToken.
+Token nextNonWhitespaceToken(CodeStream& c) {
+  while (!c.fd.eof()) {
+    Token curr = nextToken(c);
+    if (!curr.isIndent()) return curr;
   }
+  return Token::indent(0); // eof
+}
 
-  list<AstNode> subform;
-  while (curr != end && curr->isQuoteOrUnquote()) {
-    subform.push_back(*curr);
-    ++curr;
-  }
+Token nextParenInsertedToken(CodeStream& c) {
+  static list<Token> currExpr;
+  if (currExpr.empty()) currExpr = nextExpr(c);
+  if (currExpr.empty()) return Token::indent(0); // eof
+  Token result = currExpr.front();
+  currExpr.pop_front();
+  return result;
+}
 
-  if (*curr == "(") {
-    subform.push_back(*curr);
-    ++curr;
-    while (curr != end && *curr != ")")
-      curr = parseNext(curr, end, subform);
-    if (curr == end) RAISE << "Unbalanced (" << endl << DIE;
-    subform.push_back(*curr);
-    ++curr;
-  }
-  else {
-    subform.push_back(*curr);
-    ++curr;
-  }
-
-  out.push_back(subform);
-  return curr;
+bool eof(AstNode n) {
+  return n.atom.token == "" && n.elems.empty();
 }
 
 AstNode nextAstNode(CodeStream& c) {
-  list<Token> tokens = nextExpr(c);
-  list<AstNode> result;
-  parseNext(tokens.begin(), tokens.end(), result);
-  if (result.size() > 1) RAISE << "parse error\n" << DIE;
-  if (result.empty()) return AstNode::of(Token::of("nil"));
-  return result.front();
+  Token curr = nextParenInsertedToken(c);
+  if (curr != "(" && !curr.isQuoteOrUnquote())
+    return curr;
+
+  list<AstNode> subform;
+  subform.push_back(curr);
+  while (!eof(subform.back()) && subform.back().atom.isQuoteOrUnquote())
+    subform.push_back(nextParenInsertedToken(c));
+
+  if (subform.back() == "(") {
+    while (!eof(subform.back()) && subform.back().atom != ")")
+      subform.push_back(nextAstNode(c));
+    if (eof(subform.back())) RAISE << "Unbalanced (" << endl << DIE;
+  }
+
+  return AstNode::of(subform);
 }
