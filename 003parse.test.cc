@@ -22,6 +22,7 @@ void test_parse_handles_atoms() {
   checkEq(nextAstNode(c), Token("34"));
   checkEq(nextAstNode(c), Token("\"a b c\""));
   checkEq(nextAstNode(c), Token("3.4"));
+  checkEq(nextAstNode(c), eof());
   check(c.fd.eof());
 }
 
@@ -35,6 +36,7 @@ void test_parse_handles_forms() {
   checkEq(*p, Token("\"a b c\"")); ++p;
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
+  checkEq(nextAstNode(c), eof());
   check(c.fd.eof());
 }
 
@@ -57,6 +59,7 @@ void test_parse_handles_nested_forms() {
   checkEq(*p, Token("\"a b c\"")); ++p;
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
+  checkEq(nextAstNode(c), eof());
   check(c.fd.eof());
 }
 
@@ -79,6 +82,7 @@ void test_parse_handles_nested_forms_with_comments() {
 
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
+  checkEq(nextAstNode(c), eof());
   check(c.fd.eof());
 }
 
@@ -128,6 +132,7 @@ void test_parse_handles_quotes() {
 
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
+  checkEq(nextAstNode(c), eof());
   check(c.fd.eof());
 }
 
@@ -154,6 +159,7 @@ void test_parse_handles_splice_operators() {
     check(q == ast2.end());
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
+  checkEq(nextAstNode(c), eof());
   check(c.fd.eof());
 }
 
@@ -174,5 +180,6 @@ void test_parse_handles_indented_toplevel_forms() {
   checkEq(p->atom.token, "d"); ++p;
   checkEq(p->atom.token, ")"); ++p;
   check(p == n.elems.end());
+  checkEq(nextAstNode(c), eof());
   check(c.fd.eof());
 }
