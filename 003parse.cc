@@ -4,16 +4,8 @@ struct AstNode {
   Token atom;
   list<AstNode> elems;
 
-  AstNode(Token t) :atom(t) {}
-  AstNode(list<AstNode> l) :atom(Token::indent(0)), elems(l) {}
-  static AstNode of(Token t) {
-    AstNode result(t);
-    return result;
-  }
-  static AstNode of(list<AstNode> l) {
-    AstNode result(l);
-    return result;
-  }
+  explicit AstNode(Token t) :atom(t) {}
+  explicit AstNode(list<AstNode> l) :atom(Token::indent(0)), elems(l) {}
 
   bool isAtom() {
     return elems.empty();
@@ -79,12 +71,12 @@ bool eof(AstNode n) {
 AstNode nextAstNode(CodeStream& c) {
   Token curr = nextParenInsertedToken(c);
   if (curr != "(" && !curr.isQuoteOrUnquote())
-    return curr;
+    return AstNode(curr);
 
   list<AstNode> subform;
-  subform.push_back(curr);
+  subform.push_back(AstNode(curr));
   while (!eof(subform.back()) && subform.back().atom.isQuoteOrUnquote())
-    subform.push_back(nextParenInsertedToken(c));
+    subform.push_back(AstNode(nextParenInsertedToken(c)));
 
   if (subform.back() == "(") {
     while (!eof(subform.back()) && subform.back().atom != ")")
@@ -92,5 +84,5 @@ AstNode nextAstNode(CodeStream& c) {
     if (eof(subform.back())) RAISE << "Unbalanced (" << endl << DIE;
   }
 
-  return AstNode::of(subform);
+  return AstNode(subform);
 }
