@@ -1,11 +1,13 @@
 //// construct parse tree out of tokens
 
+                                  Token eof() { return Token(0); }
+
 struct AstNode {
   Token atom;
   list<AstNode> elems;
 
   explicit AstNode(Token t) :atom(t) {}
-  explicit AstNode(list<AstNode> l) :atom(Token::indent(0)), elems(l) {}
+  explicit AstNode(list<AstNode> l) :atom(eof()), elems(l) {}
 
   bool isAtom() {
     return elems.empty();
@@ -52,13 +54,13 @@ Token nextNonWhitespaceToken(CodeStream& c) {
     Token curr = nextToken(c);
     if (!curr.isIndent()) return curr;
   }
-  return Token::indent(0); // eof
+  return eof();
 }
 
 Token nextParenInsertedToken(CodeStream& c) {
   static list<Token> currExpr;
   if (currExpr.empty()) currExpr = nextExpr(c);
-  if (currExpr.empty()) return Token::indent(0); // eof
+  if (currExpr.empty()) return eof();
   Token result = currExpr.front();
   currExpr.pop_front();
   return result;

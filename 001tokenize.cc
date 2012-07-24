@@ -5,6 +5,10 @@ struct Token {
   string token;
   long indentLevel; // all tokens on a line share its indentLevel
 
+  explicit Token(string s)
+    :token(s), indentLevel(0) {}
+  explicit Token(long indent)
+    :token(""), indentLevel(indent) {}
   Token(const string x, const long l)
     :token(x), indentLevel(l) {}
   Token(const Token& rhs)
@@ -14,18 +18,6 @@ struct Token {
     token = rhs.token;
     indentLevel = rhs.indentLevel;
     return *this;
-  }
-
-  static Token of(string s) {
-    return of(s, 0);
-  }
-  static Token of(string s, long indent) {
-    Token result(s, indent);
-    return result;
-  }
-  static Token indent(long indent) {
-    Token result("", indent);
-    return result;
   }
 
   bool isIndent() {
@@ -137,10 +129,10 @@ struct Token {
 
 Token nextToken(istream& in, long& currIndent) {
   if (currIndent == -1) // initial
-    return Token::indent(currIndent=indent(in));
+    return Token(currIndent=indent(in));
   skipWhitespace(in);
   if (in.peek() == '\n' || in.peek() == ';')
-    return Token::indent(currIndent=indent(in));
+    return Token(currIndent=indent(in));
 
   ostringstream out;
   switch (in.peek()) { // now can't be whitespace
@@ -166,7 +158,7 @@ Token nextToken(istream& in, long& currIndent) {
 
   if (out.str() == ":") return nextToken(in, currIndent);
 
-  return Token::of(out.str(), currIndent);
+  return Token(out.str(), currIndent);
 }
 
 struct CodeStream {

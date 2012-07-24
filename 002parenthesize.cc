@@ -17,9 +17,9 @@ list<Token> nextLine(CodeStream& c) {
   if (endOfInput(c.fd)) return result;
 
   if (c.currIndent == -1)
-    result.push_back(Token::indent(c.currIndent=indent(c.fd)));
+    result.push_back(Token(c.currIndent=indent(c.fd)));
   else
-    result.push_back(Token::indent(c.currIndent));
+    result.push_back(Token(c.currIndent));
 
   do { result.push_back(nextToken(c)); }
   while (!endOfInput(c.fd) && !result.back().isIndent());
@@ -64,7 +64,7 @@ list<Token> nextExpr(CodeStream& c) {
 
     // open an implicit paren if necessary
     if (explicitParenStack.empty() && numWordsInLine(line) > 1 && noParenAtStart(line)) {
-      add(result, Token::of("("));
+      add(result, Token("("));
       implicitParenStack.push(thisLineIndent);
     }
 
@@ -83,7 +83,7 @@ list<Token> nextExpr(CodeStream& c) {
 
     // close all possible implicit parens
     while (!implicitParenStack.empty() && implicitParenStack.top() >= nextLineIndent) {
-      add(result, Token::of(")"));
+      add(result, Token(")"));
       implicitParenStack.pop();
     }
 
@@ -97,6 +97,6 @@ list<Token> nextExpr(CodeStream& c) {
   }
 
   for (unsigned long i=0; i < implicitParenStack.size(); ++i)
-    result.push_back(Token::of(")"));
+    result.push_back(Token(")"));
   return result;
 }
