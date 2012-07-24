@@ -272,6 +272,11 @@ void runTests() {
 
 
 
+                                  void reset(istream& in) {
+                                    in.get();
+                                    if (interactive) in.get();
+                                  }
+
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
     runTests();

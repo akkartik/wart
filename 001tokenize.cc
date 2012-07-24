@@ -103,10 +103,6 @@ struct Token {
                                     }
                                   }
 
-                                  void reset(istream& in) {
-                                    in.get(); in.get();
-                                  }
-
                                   long indent(istream& in) {
                                     long indent = 0;
                                     char c;
