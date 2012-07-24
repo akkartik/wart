@@ -68,12 +68,11 @@ struct Token {
                                     char lastc = '\0';
                                     char c;
                                     while (in >> c) {
-                                      if (ssyntaxChars.find(lastc) != string::npos
-                                          && quoteChars.find(c) != string::npos)
-                                        ; // wait for ssyntax expansion
                                       // keep this list sync'd with the nextToken switch below
-                                      else if (isspace(c) || c == ';' || c == '(' || c == ')' || c == '"'
-                                              || quoteChars.find(c) != string::npos) {
+                                      if (isspace(c) || c == ';' || c == '(' || c == ')' || c == '"'
+                                          || (quoteChars.find(c) != string::npos
+                                              // put off quotes inside ssyntax
+                                              && ssyntaxChars.find(lastc) == string::npos)) {
                                         in.putback(c);
                                         break;
                                       }
