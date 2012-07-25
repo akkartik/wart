@@ -76,7 +76,7 @@ struct Cell;
 extern Cell* nil;
 ostream& operator<<(ostream&, Cell*);
 struct CodeStream;
-Cell* read(CodeStream& c);
+Cell* read(CodeStream&);
 bool interactive = false; // eval on multiple newlines
 Cell* eval(Cell*);
 Cell* eval(Cell*, Cell*);
