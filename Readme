@@ -26,10 +26,10 @@ It will always be small. 10-20kLoC should provide a useable foundation for 'real
 
 ---
 
-Code sample:
+As a code sample, factorial in wart:
 
   def fact(n)
-    if (iso n 0)
+    if (iso n 0)                        ; iso is wart's comparison operator
       1
       (* n (fact (- n 1)))
 
