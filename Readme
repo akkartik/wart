@@ -262,6 +262,7 @@ run wart.
 
 Wart was inspired by Arc, a lisp dialect by Paul Graham and Robert Morris:
   http://www.paulgraham.com/arc.html
+It is distributed under the same license as Arc.
 
 Discussions on the Arc Forum generated all the ideas here:
   http://arclanguage.org/forum
