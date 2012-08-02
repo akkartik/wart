@@ -100,7 +100,7 @@ Keywords that don't match function parameters are passed through as arguments:
   wart> (foo :c 1 2)
   (:c 1)                                ; the third arg gets dropped
 
-(Keyword symbols starting with a colon always evaluate to themselves.)
+(Keyword symbols always evaluate to themselves.)
 
 This is useful primarily because you can pass keywords through layers of
 function calls:
