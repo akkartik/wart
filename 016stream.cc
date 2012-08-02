@@ -76,6 +76,7 @@ COMPILE_FN(outstring_buffer, compiledFn_outstring_buffer, "($stream)",
 
 
 #include<fcntl.h>
+#include<unistd.h>
 
 COMPILE_FN(input_fd, compiledFn_input_fd, "($name)",
   return mkref(newNum(open(toString(lookup("$name")).c_str(), O_RDONLY)));
