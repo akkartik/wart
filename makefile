@@ -1,4 +1,4 @@
-wart_bin: file_list transform_list compiled_fn_list test_list test_file_list
+wart_bin: file_list test_file_list test_list transform_list compiled_fn_list
 	g++ -g -Wall -Wextra boot.cc -o wart_bin
 	@echo
 
