@@ -60,7 +60,7 @@ void growHeap() {
   currCell = 0;
 }
 
-void resetHeap(Heap* h=firstHeap) {
+void resetHeap(Heap* h) {
   if (h->next)
     resetHeap(h->next);
   delete h;

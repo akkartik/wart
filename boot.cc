@@ -72,24 +72,24 @@ stringstream& stream(string s) {
   return result;
 }
 
-struct Cell;
-ostream& operator<<(ostream&, Cell*);
-struct CodeStream;
-Cell* read(CodeStream&);
 bool interactive = false; // eval on multiple newlines
-Cell* eval(Cell*);
-Cell* eval(Cell*, Cell*);
 
-
-
-// pre-compiled primitives
+#include "type_list"
 
 #define COMPILE_FN(op, name, params, body) \
   Cell* name() { body } /* we extract op and params into compiled_fn_list */
 
 typedef Cell* (*CompiledFn)();
 
-#include "file_list" // rest of the interpreter
+#include "function_list"
+
+// interpreter impl
+
+#include "file_list"
+
+
+
+// pre-compiled primitives
 
 struct CompiledFnMetadata {
   string name;
@@ -145,7 +145,7 @@ void init() {
   intLiterals.clear();
   symLiterals.clear();
   dynamics.clear(); // leaks memory for strings and tables
-  resetHeap();
+  resetHeap(firstHeap);
 
   setupNil();
   setupLexicalScope();
