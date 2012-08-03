@@ -64,12 +64,6 @@ Die DIE;
 
 // interpreter decls
 
-stringstream& stream(string s) {
-  stringstream& result = *new stringstream(s);
-  result << std::noskipws;
-  return result;
-}
-
 bool interactive = false; // eval on multiple newlines
 
 #include "type_list"
@@ -121,7 +115,26 @@ void teardownCompiledFns() {
 
 
 
-// transform code before eval (ssyntax, etc.)
+// misc
+
+void init() {
+  intLiterals.clear();
+  symLiterals.clear();
+  dynamics.clear(); // leaks memory for strings and tables
+  resetHeap(firstHeap);
+
+  setupNil();
+  setupLexicalScope();
+  setupStreams();
+  setupCompiledFns();
+  raiseCount = 0;
+}
+
+stringstream& stream(string s) {
+  stringstream& result = *new stringstream(s);
+  result << std::noskipws;
+  return result;
+}
 
 typedef Cell* (*transformer)(Cell*);
 const transformer transforms[] = {
@@ -136,19 +149,6 @@ Cell* transform(Cell* cell) {
 
 Cell* read(CodeStream& c) {
   return mkref(transform(nextRawCell(c)));
-}
-
-void init() {
-  intLiterals.clear();
-  symLiterals.clear();
-  dynamics.clear(); // leaks memory for strings and tables
-  resetHeap(firstHeap);
-
-  setupNil();
-  setupLexicalScope();
-  setupStreams();
-  setupCompiledFns();
-  raiseCount = 0;
 }
 
 
