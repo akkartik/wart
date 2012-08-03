@@ -75,7 +75,7 @@ bool interactive = false; // eval on multiple newlines
 #include "type_list"
 
 #define COMPILE_FN(op, name, params, body) \
-  Cell* name() { body } /* we extract op and params into compiled_fn_list */
+  Cell* name() { body } // op and params extracted into compiled_fn_list below
 
 typedef Cell* (*CompiledFn)();
 
