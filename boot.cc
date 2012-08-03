@@ -73,7 +73,6 @@ stringstream& stream(string s) {
 }
 
 struct Cell;
-extern Cell* nil;
 ostream& operator<<(ostream&, Cell*);
 struct CodeStream;
 Cell* read(CodeStream&);

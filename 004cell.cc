@@ -2,6 +2,8 @@
 
 unsigned long numAllocs = 0;
 
+extern Cell* nil;
+
 struct Cell {
   Cell* car; // aliased to long or float
   Cell* cdr;
