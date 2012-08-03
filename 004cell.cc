@@ -94,8 +94,6 @@ Cell* newCell() {
 
                                   typedef unordered_map<Cell*, Cell*> CellMap;
 
-                                  void rmref(Cell*);
-
 struct Table {
   CellMap table;
   Cell*& operator[](Cell* c) {

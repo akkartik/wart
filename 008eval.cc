@@ -269,10 +269,6 @@ void bindParams(Cell* params, Cell* args) {
 
                                   // when inMacro did we encounter ''?
                                   bool skippedAlreadyEvald = false;
-                                  Cell* maybeStripAlreadyEvald(bool keepAlreadyEvald, Cell* x) {
-                                    skippedAlreadyEvald = isAlreadyEvald(x);
-                                    return keepAlreadyEvald ? x : stripAlreadyEvald(x);
-                                  }
 
 Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
   if (!isCons(x)) return mkref(x);
@@ -310,6 +306,11 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
   rmref(car(result));
   rmref(cdr(result));
   return mkref(result);
+}
+
+Cell* maybeStripAlreadyEvald(bool keepAlreadyEvald, Cell* x) {
+  skippedAlreadyEvald = isAlreadyEvald(x);
+  return keepAlreadyEvald ? x : stripAlreadyEvald(x);
 }
 
 

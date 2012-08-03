@@ -137,7 +137,6 @@ Cell* transform(Cell* cell) {
 }
 
 Cell* read(CodeStream& c) {
-  Cell* mkref(Cell*);
   return mkref(transform(nextRawCell(c)));
 }
 

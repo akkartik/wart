@@ -114,8 +114,6 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
   return NULL;
 }
 
-                                  Cell* maybeStripAlreadyEvald(bool, Cell*);
-
 Cell* lookup(Cell* sym, Cell* scope, bool keepAlreadyEvald) {
   Cell* result = lookupLexicalBinding(sym, scope);
   if (result) return maybeStripAlreadyEvald(keepAlreadyEvald, result);
