@@ -10,6 +10,7 @@ COMPILE_FN(debug, compiledFn_debug, "($x)",
 )
 
 COMPILE_FN(register_failed_test, compiledFn_incTests, "($msg $expr)",
+  extern long numFailures;
   ++numFailures;
   cout << endl << "F "; print(lookup("$msg"), cout);
   cout << endl << "  got " << lookup("$expr") << endl;

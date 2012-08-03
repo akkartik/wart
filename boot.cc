@@ -36,11 +36,6 @@ using std::ostringstream;
 using std::ifstream;
 using std::ofstream;
 
-bool runningTests = false;
-long numFailures = 0;
-bool pretendRaise = false;
-long raiseCount = 0;
-
 
 
 // generate traces for debugging
@@ -51,16 +46,19 @@ long debug = 0;
 
 #define unused __attribute__((unused))
 
+bool pretendRaise = false;
+long raiseCount = 0;
+
+                           // ?: to avoid dangling-else warnings
+#define RAISE pretendRaise ? ++raiseCount,cout \
+                           : cerr << __FILE__ << ":" << __LINE__ << " "
+
 struct Die {};
 ostream& operator<<(unused ostream& os, unused Die die) {
   os << "dying";
   exit(1);
 }
 Die DIE;
-
-                           // ?: to avoid dangling-else warnings
-#define RAISE pretendRaise ? ++raiseCount,cout \
-                           : cerr << __FILE__ << ":" << __LINE__ << " "
 
 
 
@@ -225,6 +223,9 @@ void checkForLeaks() {
 
 
 // test harness
+
+bool runningTests = false;
+long numFailures = 0;
 
 #define check(X) if (!(X)) { \
     ++numFailures; \

@@ -123,6 +123,7 @@ void rmref(Cell* c) {
   --c->nrefs;
   if (c->nrefs > 0) return;
 
+  extern bool runningTests;
   if (isAtom(c) && c->type != STRING && c->type != FLOAT && !runningTests)
     RAISE << "deleted atom: " << (void*)c << endl;
 
