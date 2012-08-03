@@ -50,7 +50,7 @@ bool pretendRaise = false;
 long raiseCount = 0;
 
                            // ?: to avoid dangling-else warnings
-#define RAISE pretendRaise ? ++raiseCount,cout \
+#define RAISE pretendRaise ? ++raiseCount,cerr \
                            : cerr << __FILE__ << ":" << __LINE__ << " "
 
 struct Die {};
