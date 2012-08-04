@@ -29,7 +29,7 @@ ls [0-9](^*test.)cc [0-9]*.wart |sort -n |perl -pwe 's/\..*//' |
     index=$(($index+1))
   done > .layout
 
-$EDITOR -c "set nu" .layout # any $EDITOR as long as it's a vi
+vim -c "set nu" .layout
 
 #
 
