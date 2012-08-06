@@ -16,7 +16,7 @@ fi
 
 #
 
-index=1
+index=0
 ls [0-9](^*test.)cc [0-9]*.wart |sort -n |perl -pwe 's/\..*//' |
   while read file
   do
@@ -37,7 +37,7 @@ root() {
   echo $1 |perl -pwe 's/^[0-9]*//' |perl -pwe 's/\..*//'
 }
 
-index=1
+index=0
 cat .layout |
   while read file
   do
