@@ -1,3 +1,5 @@
+//// compiled primitives for I/O
+
                                   ostream& operator<<(ostream& os, Table* t) {
                                     static Cell* const NAME = newSym("name");
                                     os << "{";

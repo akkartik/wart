@@ -1,3 +1,5 @@
+//// bindings for some OS services
+
 COMPILE_FN(system, compiledFn_system, "($command)",
   return mkref(newNum(system(toString(lookup("$command")).c_str())));
 )

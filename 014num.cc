@@ -1,3 +1,5 @@
+//// compiled primitives for numbers
+
 COMPILE_FN(+, compiledFn_add, "($x $y)",
   Cell* x = lookup("$x"); Cell* y = lookup("$y");
   if (x->type == FLOAT || y->type == FLOAT)

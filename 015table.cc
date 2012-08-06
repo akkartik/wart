@@ -1,3 +1,5 @@
+//// compiled primitives for tables
+
 COMPILE_FN(table, compiledFn_table, "()",
   return mkref(newTable());
 )

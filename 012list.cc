@@ -1,3 +1,5 @@
+//// compiled primitives for lists
+
 COMPILE_FN(list_range, compiledFn_list_range, "($list $index $end)",
   Cell* list = lookup("$list");
   long index = toInt(lookup("$index"));

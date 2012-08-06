@@ -1,3 +1,5 @@
+//// compiled primitives for files and streams
+
 Cell* newIstream(istream* x) {
   return newObject("stream", newNum((long)x));
 }

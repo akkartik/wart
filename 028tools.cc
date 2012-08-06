@@ -1,4 +1,4 @@
-//// Bindings for underlying functions.
+//// bindings for underlying functions
 
 COMPILE_FN(addr, compiledFn_addr, "($x)",
   return mkref(newNum((long)lookup("$x")));

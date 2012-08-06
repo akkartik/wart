@@ -1,3 +1,5 @@
+//// compiled primitives for strings
+
 COMPILE_FN(string_range, compiledFn_string_get, "($string $index $end)",
   Cell* str = lookup("$string");
   if (!isString(str)) {
