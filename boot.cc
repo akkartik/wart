@@ -115,23 +115,6 @@ void teardownCompiledFns() {
 
 
 
-// misc
-
-void init() {
-  intLiterals.clear();
-  symLiterals.clear();
-  dynamics.clear(); // leaks memory for strings and tables
-  resetHeap(firstHeap);
-
-  setupNil();
-  setupLexicalScope();
-  setupStreams();
-  setupCompiledFns();
-  raiseCount = 0;
-}
-
-
-
 // check for leaks in tests
 
                                   void markAllCells(Cell* x, unordered_map<Cell*, int>& mark) {
@@ -246,6 +229,21 @@ void runTests() {
   cerr << numFailures << " failure";
       if (numFailures > 1) cerr << "s";
       cerr << endl;
+}
+
+
+
+void init() {
+  intLiterals.clear();
+  symLiterals.clear();
+  dynamics.clear(); // leaks memory for strings and tables
+  resetHeap(firstHeap);
+
+  setupNil();
+  setupLexicalScope();
+  setupStreams();
+  setupCompiledFns();
+  raiseCount = 0;
 }
 
 // C++ style:
