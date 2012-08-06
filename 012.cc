@@ -132,7 +132,7 @@ COMPILE_FN(iso, compiledFn_iso, "($x $y)",
 
 
 
-// list? will not be true of (type _ _) expressions, but cons? will.
+// list? will not be true of (object _ _) expressions, but cons? will
 COMPILE_FN(cons?, compiledFn_isCons, "($x)",
   Cell* x = lookup("$x");
   if (!isCons(x)) return nil;

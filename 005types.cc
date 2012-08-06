@@ -31,7 +31,7 @@ bool isNum(Cell* x) {
 }
 
 long toInt(Cell* x) {
-  // ignore endianness; Cells are never persisted.
+  // ignore endianness; Cells are never persisted
   if (x->type == INTEGER)
     return (long)x->car;
   if (x->type == FLOAT)

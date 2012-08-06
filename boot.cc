@@ -248,8 +248,6 @@ void runTests() {
       cerr << endl;
 }
 
-// style:
-//  minimal function prototypes
-//  immutable objects; copy everywhere; no pointers except Cell*
-//  long is the default integer type (it's always as large as a pointer)
-//  use int for Cell nrefs (to save space), and for system libs
+// C++ style:
+//  no pointers except Cell*; pass by value where possible
+//  use long as the default integer type; it's always as large as a pointer

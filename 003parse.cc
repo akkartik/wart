@@ -21,7 +21,7 @@ struct AstNode {
   }
 
   bool operator==(Token x) {
-    return elems.empty() && atom == x.token; // whitespace should be gone by now.
+    return elems.empty() && atom == x.token; // whitespace should be gone by now
   }
   bool operator==(string x) {
     return elems.empty() && atom == x;

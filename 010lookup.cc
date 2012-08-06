@@ -47,7 +47,7 @@ void assignDynamicVar(Cell* sym, Cell* val) {
 
 
 
-// the current lexical scope is a first-class dynamic variable
+// The current lexical scope is a first-class dynamic variable.
 Cell* CURR_LEXICAL_SCOPE;
 #define currLexicalScopes dynamics[CURR_LEXICAL_SCOPE]
 void setupLexicalScope() {
@@ -56,9 +56,8 @@ void setupLexicalScope() {
   initialSyms.insert(CURR_LEXICAL_SCOPE);
 }
 
-// entering and leaving lexical scopes *assigns the current dynamic*
-// binding of the currLexicalScope sym.
-// Calling functions will create new dynamic bindings.
+// Entering lexical scopes modifies the current dynamic binding of
+// currLexicalScope; calling functions creates new dynamic bindings to it.
 void newLexicalScope() {
   Cell* newScope = newTable();
   setCdr(newScope, currLexicalScopes.top());

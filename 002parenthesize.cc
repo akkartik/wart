@@ -89,7 +89,7 @@ list<Token> nextExpr(CodeStream& c) {
 
     if (implicitParenStack.empty() && explicitParenStack.empty()) {
       if (!c.fd.eof())
-        // Clean up indent state for the next call.
+        // clean up indent state for the next call
         for (int i = 0; i < nextLineIndent; ++i)
           c.fd.putback(' ');
       break;
