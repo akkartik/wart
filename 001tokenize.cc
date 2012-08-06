@@ -156,15 +156,6 @@ Token nextToken(istream& in, long& currIndent) {
   return Token(out.str(), currIndent);
 }
 
-struct CodeStream {
-  istream& fd;
-  long currIndent;
-
-  CodeStream(istream& in) :fd(in), currIndent(-1) {
-    fd >> std::noskipws;
-  }
-};
-
 Token nextToken(CodeStream& c) {
   return nextToken(c.fd, c.currIndent);
 }

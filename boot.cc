@@ -130,27 +130,6 @@ void init() {
   raiseCount = 0;
 }
 
-stringstream& stream(string s) {
-  stringstream& result = *new stringstream(s);
-  result << std::noskipws;
-  return result;
-}
-
-typedef Cell* (*transformer)(Cell*);
-const transformer transforms[] = {
-  #include "transform_list"
-};
-
-Cell* transform(Cell* cell) {
-  for (unsigned long i=0; i < sizeof(transforms)/sizeof(transforms[0]); ++i)
-    cell = (*transforms[i])(cell);
-  return cell;
-}
-
-Cell* read(CodeStream& c) {
-  return mkref(transform(nextRawCell(c)));
-}
-
 
 
 // check for leaks in tests
@@ -267,39 +246,6 @@ void runTests() {
   cerr << numFailures << " failure";
       if (numFailures > 1) cerr << "s";
       cerr << endl;
-}
-
-
-
-                                  void reset(istream& in) {
-                                    in.get();
-                                    if (interactive) in.get();
-                                  }
-
-int main(int argc, unused char* argv[]) {
-  if (argc > 1) {
-    runTests();
-    return 0;
-  }
-
-  init();
-  loadFiles(".wart");
-
-  interactive = true; // trigger eval on empty lines
-  catchCtrlC();
-
-  CodeStream cs(cin);
-  while (true) {
-    cout << numUnfreed() << " " << numAllocs << " " << "wart> ";
-    Cell* form = read(cs);
-    if (cin.eof()) break;
-    Cell* result = eval(form);
-    cout << result << endl;
-    rmref(result);
-    rmref(form);
-    reset(cin);
-  }
-  return 0;
 }
 
 // style:
