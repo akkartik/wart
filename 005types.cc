@@ -227,7 +227,7 @@ Cell* get(Cell* t, string k) {
 
 
 
-// pre-compiled primitives
+// compiled primitives
 
 typedef Cell* (*CompiledFn)();
 

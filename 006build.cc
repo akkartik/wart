@@ -1,8 +1,10 @@
 //// construct parse tree out of cells
 
-                                  bool isQuoteOrUnquote(AstNode n) {
-                                    return n == "'" || n == "`" || n == "," || n == ",@" || n == "@";
-                                  }
+Cell* nextRawCell(CodeStream c) {
+  c.fd.peek();
+  if (c.fd.eof()) return nil;
+  return buildCell(nextAstNode(c));
+}
 
 Cell* buildCell(AstNode n) {
   if (n.isNil())
@@ -59,8 +61,6 @@ Cell* buildCell(AstNode n) {
   return newForm;
 }
 
-Cell* nextRawCell(CodeStream c) {
-  c.fd.peek();
-  if (c.fd.eof()) return nil;
-  return buildCell(nextAstNode(c));
+bool isQuoteOrUnquote(AstNode n) {
+  return n == "'" || n == "`" || n == "," || n == ",@" || n == "@";
 }

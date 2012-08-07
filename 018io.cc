@@ -1,16 +1,5 @@
 //// compiled primitives for I/O
 
-                                  ostream& operator<<(ostream& os, Table* t) {
-                                    static Cell* const NAME = newSym("name");
-                                    os << "{";
-                                    if (t->table[NAME]) os << t->table[NAME] << ": ";
-                                    for (CellMap::iterator p = t->table.begin(); p != t->table.end(); ++p) {
-                                      if (p->second && p->first != NAME)
-                                        os << (Cell*)p->first << ", ";
-                                    }
-                                    return os << "}";
-                                  }
-
 ostream& operator<<(ostream& os, Cell* c) {
   if (c == NULL) return os << "NULLNULLNULL";
   if (c == nil) return os << "nil";
@@ -46,9 +35,15 @@ ostream& operator<<(ostream& os, Cell* c) {
   }
 }
 
-void print(Cell* x, ostream& out) {
-  if (isString(x)) out << toString(x);
-  else out << x;
+ostream& operator<<(ostream& os, Table* t) {
+  static Cell* const NAME = newSym("name");
+  os << "{";
+  if (t->table[NAME]) os << t->table[NAME] << ": ";
+  for (CellMap::iterator p = t->table.begin(); p != t->table.end(); ++p) {
+    if (p->second && p->first != NAME)
+      os << (Cell*)p->first << ", ";
+  }
+  return os << "}";
 }
 
 
@@ -82,16 +77,23 @@ COMPILE_FN(err, compiledFn_err, "($x)",
   return mkref(x);
 )
 
-                                  Cell* read(istream& in) {
-                                    CodeStream c(in);
-                                    return read(c);
-                                  }
+void print(Cell* x, ostream& out) {
+  if (isString(x)) out << toString(x);
+  else out << x;
+}
+
+
 
 COMPILE_FN(read, compiledFn_read, "('$eof)",
   if (toIstream(STDIN).eof())
     return mkref(lookup("$eof"));
   return mkref(read(toIstream(STDIN)));
 )
+
+Cell* read(istream& in) {
+  CodeStream c(in);
+  return read(c);
+}
 
 COMPILE_FN(read-byte, compiledFn_read_byte, "('$eof)",
   istream& f = toIstream(STDIN);

@@ -5,7 +5,7 @@
 
 COMPILE_FN(eval, compiledFn_eval, "($x . $scope)",
   Cell* scope = lookup("$scope");
-  if (scope == nil) scope = currLexicalScopes.top();
+  if (scope == nil) scope = currLexicalScope;
   else scope = car(scope);
   return eval(lookup("$x"), scope);
 )
@@ -13,7 +13,7 @@ COMPILE_FN(eval, compiledFn_eval, "($x . $scope)",
 // eval with extra smarts for handling @args
 COMPILE_FN(mac-eval, compiledFn_mac_eval, "('$x $scope)",
   inMacro.push(true);
-  Cell* x = eval(lookup("$x"), currLexicalScopes.top());
+  Cell* x = eval(lookup("$x"), currLexicalScope);
   Cell* ans = eval(x, lookup("$scope"));
   rmref(x);
   inMacro.pop();
@@ -42,7 +42,7 @@ COMPILE_FN(fn, compiledFn_fn, "'($params . $body)",
   Cell* f = newTable();
   set(f, newSym("sig"), lookup("$params"));
   set(f, newSym("body"), lookup("$body"));
-  set(f, newSym("env"), cdr(currLexicalScopes.top()));
+  set(f, newSym("env"), cdr(currLexicalScope));
   return mkref(newObject("function", f));
 )
 
@@ -58,22 +58,22 @@ COMPILE_FN(uniq, compiledFn_uniq, "($x)",
   return mkref(genSym(lookup("$x")));
 )
 
-                                  void assign(Cell* var, Cell* val) {
-                                    Cell* scope = scopeContainingBinding(var, currLexicalScopes.top());
-                                    if (!scope)
-                                      newDynamicScope(var, val);
-                                    else if (scope == nil)
-                                      assignDynamicVar(var, val);
-                                    else
-                                      unsafeSet(scope, var, val, false);
-                                  }
-
 COMPILE_FN(=, compiledFn_assign, "('$var $val)",
   Cell* var = lookup("$var");
   Cell* val = lookup("$val");
   assign(var, val);
   return mkref(val);
 )
+
+void assign(Cell* var, Cell* val) {
+  Cell* scope = scopeContainingBinding(var, currLexicalScope);
+  if (!scope)
+    newDynamicScope(var, val);
+  else if (scope == nil)
+    assignDynamicVar(var, val);
+  else
+    unsafeSet(scope, var, val, false);
+}
 
 COMPILE_FN(dyn_bind, compiledFn_dyn_bind, "('$var $val)",
   newDynamicScope(lookup("$var"), lookup("$val"));
@@ -88,7 +88,7 @@ COMPILE_FN(dyn_unbind, compiledFn_dyn_unbind, "('$var)",
 COMPILE_FN(bound?, compiledFn_isBound, "($var)",
   Cell* var = lookup("$var");
   if (var == nil) return mkref(newNum(1));
-  if (!scopeContainingBinding(var, currLexicalScopes.top()))
+  if (!scopeContainingBinding(var, currLexicalScope))
     return nil;
   return mkref(var);
 )

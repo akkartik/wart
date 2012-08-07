@@ -79,9 +79,9 @@ void test_reorderKeywordArgs_handles_improper_lists() {
 
 
 
-                                  Cell* evalArgs(Cell* params, Cell* args) {
-                                    return evalArgs(params, args, currLexicalScopes.top());
-                                  }
+Cell* evalArgs(Cell* params, Cell* args) {
+  return evalArgs(params, args, currLexicalScope);
+}
 
 void test_evalArgs_handles_unquoted_param() {
   newDynamicScope("a", newNum(3));
@@ -206,7 +206,7 @@ void test_bindParams_handles_vararg() {
   Cell* args = read(stream("(1)"));
   newLexicalScope();
   bindParams(params, args);
-  Cell* result = unsafeGet(currLexicalScopes.top(), newSym("a"));
+  Cell* result = unsafeGet(currLexicalScope, newSym("a"));
   checkEq(car(result), newNum(1));
   checkEq(cdr(result), nil);
   endLexicalScope();
@@ -219,8 +219,8 @@ void test_bindParams_binds_multiple_params() {
   Cell* args = read(stream("(1)"));
   newLexicalScope();
   bindParams(params, args);
-  checkEq(unsafeGet(currLexicalScopes.top(), newSym("a")), newNum(1));
-  checkEq(unsafeGet(currLexicalScopes.top(), newSym("b")), newNum(1));
+  checkEq(unsafeGet(currLexicalScope, newSym("a")), newNum(1));
+  checkEq(unsafeGet(currLexicalScope, newSym("b")), newNum(1));
   endLexicalScope();
   rmref(args);
   rmref(params);
@@ -228,9 +228,9 @@ void test_bindParams_binds_multiple_params() {
 
 
 
-                                  Cell* processUnquotes(Cell* x, long depth) {
-                                    return processUnquotes(x, depth, currLexicalScopes.top());
-                                  }
+Cell* processUnquotes(Cell* x, long depth) {
+  return processUnquotes(x, depth, currLexicalScope);
+}
 
 void test_processUnquotes_handles_unquote() {
   newDynamicScope("a", newNum(3));
@@ -752,7 +752,7 @@ void test_eval_on_fn_is_idempotent() {
 void test_eval_handles_closure() {
   Cell* expr = read(stream("(fn () 34)"));
   newLexicalScope();
-    Cell* newLexicalScope = currLexicalScopes.top();
+    Cell* newLexicalScope = currLexicalScope;
     checkEq(newLexicalScope->nrefs, 1);
     Cell* result = eval(expr);
     checkEq(newLexicalScope->nrefs, 2);
