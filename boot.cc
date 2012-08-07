@@ -62,8 +62,6 @@ Die DIE;
 
 // interpreter decls
 
-bool interactive = false; // eval on multiple newlines
-
 #include "type_list"
 
 #include "function_list"

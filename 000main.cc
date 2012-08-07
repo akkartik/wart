@@ -14,6 +14,8 @@ Cell* read(CodeStream&);
 Cell* eval(Cell*);
 ostream& operator<<(ostream&, Cell*);
 
+bool interactive = false; // trigger eval on empty lines
+
 extern unsigned long numAllocs;
 
 int main(int argc, unused char* argv[]) {
@@ -25,7 +27,7 @@ int main(int argc, unused char* argv[]) {
   init();
   loadFiles(".wart");
 
-  interactive = true; // trigger eval on empty lines
+  interactive = true;
   catchCtrlC();
 
   CodeStream cs(cin);
