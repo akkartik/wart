@@ -68,50 +68,11 @@ bool interactive = false; // eval on multiple newlines
 
 #include "type_list"
 
-#define COMPILE_FN(op, name, params, body) \
-  Cell* name() { body } // op and params extracted into compiled_fn_list below
-
-typedef Cell* (*CompiledFn)();
-
 #include "function_list"
 
 // interpreter impl
 
 #include "file_list"
-
-
-
-// pre-compiled primitives
-
-struct CompiledFnMetadata {
-  string name;
-  string params;
-  CompiledFn impl;
-};
-
-const CompiledFnMetadata compiledFns[] = {
-  #include "compiled_fn_list"
-};
-
-void setupCompiledFns() {
-  newDynamicScope("compiled", newTable());
-  for (unsigned long i=0; i < sizeof(compiledFns)/sizeof(compiledFns[0]); ++i) {
-    Cell* f = newTable();
-    unsafeSet(f, newSym("name"), newSym(compiledFns[i].name), false);
-    unsafeSet(f, newSym("sig"), nextRawCell(stream(compiledFns[i].params)), false);
-    unsafeSet(f, newSym("body"), newCompiledFn(compiledFns[i].impl), false);
-    Cell* obj = newObject("function", f);
-    newDynamicScope(compiledFns[i].name, obj);
-    // save to a second, immutable place
-    set(lookup("compiled"), compiledFns[i].name, obj);
-  }
-}
-
-void teardownCompiledFns() {
-  for (unsigned long i=0; i < sizeof(compiledFns)/sizeof(compiledFns[0]); ++i)
-    endDynamicScope(compiledFns[i].name);
-  endDynamicScope("compiled");
-}
 
 
 
