@@ -82,7 +82,7 @@ void verify() {
   if (raiseCount != 0) cerr << raiseCount << " errors encountered" << endl;
   teardownStreams();
   teardownCompiledFns();
-  teardownLiteralTables();
+  teardownCells();
 
   if (numUnfreed() > 0) {
     RAISE << "Memory leak!\n";
@@ -91,8 +91,7 @@ void verify() {
 }
 
 void setup() {
-  setupNil();
-  setupHeap();
+  setupCells();
   setupScopes();
   setupCompiledFns();
   setupStreams();
