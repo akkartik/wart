@@ -87,19 +87,6 @@ Die DIE;
 
 #include "test_file_list"
 
-void init() {
-  intLiterals.clear();
-  symLiterals.clear();
-  dynamics.clear(); // leaks memory for strings and tables
-  resetHeap(firstHeap);
-
-  setupNil();
-  setupLexicalScope();
-  setupStreams();
-  setupCompiledFns();
-  raiseCount = 0;
-}
-
 // C++ style:
 //  no pointers except Cell*; pass by value where possible
 //  use long as the default integer type; it's always as large as a pointer

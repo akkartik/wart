@@ -345,7 +345,13 @@ Cell* coerceQuoted(Cell* x, Cell* destType, Cell* coercions) {
 
 
 
-// internals
+// misc
+
+void setupHeap() {
+  intLiterals.clear();
+  symLiterals.clear();
+  resetHeap(firstHeap);
+}
 
 void teardownLiteralTables() {
   for (unordered_map<long, Cell*>::iterator p = intLiterals.begin(); p != intLiterals.end(); ++p) {

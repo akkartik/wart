@@ -153,7 +153,7 @@ void rmref(Cell* c) {
 
 
 
-// internals
+// misc
 
 extern unordered_set<Cell*> initialSyms;
 

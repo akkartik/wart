@@ -111,14 +111,6 @@ Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
   return NULL;
 }
 
-unordered_set<Cell*> initialSyms;
-
-void setupLexicalScope() {
-  CURR_LEXICAL_SCOPE = newSym("currLexicalScope");
-  newDynamicScope(CURR_LEXICAL_SCOPE, nil);
-  initialSyms.insert(CURR_LEXICAL_SCOPE);
-}
-
 void newLexicalScope() {
   Cell* newScope = newTable();
   setCdr(newScope, currLexicalScope);
@@ -148,4 +140,17 @@ void addLexicalBinding(string var, Cell* val, Cell* scope) {
 
 void addLexicalBinding(string var, Cell* val) {
   addLexicalBinding(newSym(var), val);
+}
+
+
+
+// misc
+
+unordered_set<Cell*> initialSyms;
+
+void setupScopes() {
+  dynamics.clear(); // leaks memory for strings and tables
+  CURR_LEXICAL_SCOPE = newSym("currLexicalScope");
+  newDynamicScope(CURR_LEXICAL_SCOPE, nil);
+  initialSyms.insert(CURR_LEXICAL_SCOPE);
 }

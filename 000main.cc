@@ -24,7 +24,7 @@ int main(int argc, unused char* argv[]) {
     return 0;
   }
 
-  init();
+  setup();
   loadFiles(".wart");
 
   interactive = true;
@@ -61,14 +61,13 @@ void runTests() {
   runningTests = true;
   pretendRaise = true;
   for (unsigned long i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
-    init();
+    setup();
     (*tests[i])();
-    if (raiseCount != 0) cerr << raiseCount << " errors encountered" << endl;
-    checkForLeaks();
+    verify();
   }
 
   pretendRaise = false;
-  init();
+  setup();
   loadFiles(".wart"); // after GC tests
   loadFiles(".test");
 
@@ -79,7 +78,8 @@ void runTests() {
       cerr << endl;
 }
 
-void checkForLeaks() {
+void verify() {
+  if (raiseCount != 0) cerr << raiseCount << " errors encountered" << endl;
   teardownStreams();
   teardownCompiledFns();
   teardownLiteralTables();
@@ -88,6 +88,15 @@ void checkForLeaks() {
     RAISE << "Memory leak!\n";
     dumpUnfreed();
   }
+}
+
+void setup() {
+  setupNil();
+  setupHeap();
+  setupScopes();
+  setupCompiledFns();
+  setupStreams();
+  raiseCount = 0;
 }
 
 
