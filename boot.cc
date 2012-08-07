@@ -76,75 +76,6 @@ bool interactive = false; // eval on multiple newlines
 
 
 
-// check for leaks in tests
-
-                                  void markAllCells(Cell* x, unordered_map<Cell*, int>& mark) {
-                                    if (x == nil) return;
-                                    ++mark[x];
-                                    switch (x->type) {
-                                    case INTEGER:
-                                    case FLOAT:
-                                    case SYMBOL:
-                                    case STRING:
-                                      break;
-                                    case CONS:
-                                      markAllCells(car(x), mark); break;
-                                    case TABLE: {
-                                      Table* t = (Table*)x->car;
-                                      for (CellMap::iterator p = t->table.begin(); p != t->table.end(); ++p) {
-                                        if (!p->second) continue;
-                                        markAllCells((Cell*)p->first, mark);
-                                        markAllCells(p->second, mark);
-                                      }
-                                      break;
-                                    }
-                                    case COMPILED_FN:
-                                      break;
-                                    default:
-                                      cerr << "Can't mark type " << x->type << endl << DIE;
-                                    }
-                                    markAllCells(cdr(x), mark);
-                                  }
-
-void dumpUnfreed() {
-  unordered_map<Cell*, int> numRefsRemaining;
-  for (Heap* h = firstHeap; h; h=h->next)
-    for (Cell* x = &h->cells[0]; x < &h->cells[HEAPCELLS]; ++x)
-      if (x->car)
-        markAllCells(x, numRefsRemaining);
-
-  for (Heap* h = firstHeap; h; h=h->next)
-    for (Cell* x = &h->cells[0]; x < &h->cells[HEAPCELLS]; ++x) {
-      if (!x->car) continue;
-      if (initialSyms.find(x) != initialSyms.end()) continue;
-      if (numRefsRemaining[x] > 1) continue;
-      cerr << "unfreed: " << (void*)x << " " << x << endl;
-    }
-}
-
-long numUnfreed() {
-  long n = 0;
-  for (Heap* h = firstHeap; h != currHeap; h=h->next)
-    n += HEAPCELLS;
-  n += currCell-initialSyms.size();
-  for (Cell* f = freelist; f; f=f->cdr)
-    --n;
-  return n;
-}
-
-void checkForLeaks() {
-  teardownStreams();
-  teardownCompiledFns();
-  teardownLiteralTables();
-
-  if (numUnfreed() > 0) {
-    RAISE << "Memory leak!\n";
-    dumpUnfreed();
-  }
-}
-
-
-
 // test harness
 
 bool runningTests = false;
@@ -190,6 +121,17 @@ void runTests() {
   cerr << numFailures << " failure";
       if (numFailures > 1) cerr << "s";
       cerr << endl;
+}
+
+void checkForLeaks() {
+  teardownStreams();
+  teardownCompiledFns();
+  teardownLiteralTables();
+
+  if (numUnfreed() > 0) {
+    RAISE << "Memory leak!\n";
+    dumpUnfreed();
+  }
 }
 
 
