@@ -1,6 +1,7 @@
 //// construct parse tree out of tokens
 
-                                  Token eof() { return Token(0); }
+// To disable whitespace-sensitivity, replace calls to nextParenInsertedToken
+// with nextNonWhitespaceToken.
 
 struct AstNode {
   Token atom;
@@ -31,45 +32,6 @@ struct AstNode {
   }
 };
 
-ostream& operator<<(ostream& os, Token y) {
-  if (y == "") return os << ":" << y.indentLevel;
-  else return os << y.token;
-}
-
-ostream& operator<<(ostream& os, AstNode x) {
-  if (x.elems.empty()) return os << x.atom;
-  bool prevWasOpen = true;
-  for (list<AstNode>::iterator p = x.elems.begin(); p != x.elems.end(); ++p) {
-    if (!(*p == ")" || prevWasOpen)) os << " ";
-    prevWasOpen = (*p == "(" || *p == "'" || *p == "," || *p == ",@" || *p == "@");
-    os << *p;
-  }
-  return os << endl;
-}
-
-// To disable whitespace-sensitivity, replace calls to nextParenInsertedToken
-// with nextNonWhitespaceToken.
-Token nextNonWhitespaceToken(CodeStream& c) {
-  while (!c.fd.eof()) {
-    Token curr = nextToken(c);
-    if (!curr.isIndent()) return curr;
-  }
-  return eof();
-}
-
-Token nextParenInsertedToken(CodeStream& c) {
-  static list<Token> currExpr;
-  if (currExpr.empty()) currExpr = nextExpr(c);
-  if (currExpr.empty()) return eof();
-  Token result = currExpr.front();
-  currExpr.pop_front();
-  return result;
-}
-
-bool eof(AstNode n) {
-  return n.atom.token == "" && n.elems.empty();
-}
-
 AstNode nextAstNode(CodeStream& c) {
   Token curr = nextParenInsertedToken(c);
   if (curr != "(" && !curr.isQuoteOrUnquote())
@@ -87,4 +49,49 @@ AstNode nextAstNode(CodeStream& c) {
   }
 
   return AstNode(subform);
+}
+
+
+
+// internals
+
+Token nextNonWhitespaceToken(CodeStream& c) {
+  while (!c.fd.eof()) {
+    Token curr = nextToken(c);
+    if (!curr.isIndent()) return curr;
+  }
+  return eof();
+}
+
+Token nextParenInsertedToken(CodeStream& c) {
+  static list<Token> currExpr;
+  if (currExpr.empty()) currExpr = nextExpr(c);
+  if (currExpr.empty()) return eof();
+  Token result = currExpr.front();
+  currExpr.pop_front();
+  return result;
+}
+
+Token eof() {
+  return Token(0);
+}
+
+bool eof(AstNode n) {
+  return n.atom.token == "" && n.elems.empty();
+}
+
+ostream& operator<<(ostream& os, Token y) {
+  if (y == "") return os << ":" << y.indentLevel;
+  else return os << y.token;
+}
+
+ostream& operator<<(ostream& os, AstNode x) {
+  if (x.elems.empty()) return os << x.atom;
+  bool prevWasOpen = true;
+  for (list<AstNode>::iterator p = x.elems.begin(); p != x.elems.end(); ++p) {
+    if (!(*p == ")" || prevWasOpen)) os << " ";
+    prevWasOpen = (*p == "(" || *p == "'" || *p == "," || *p == ",@" || *p == "@");
+    os << *p;
+  }
+  return os << endl;
 }
