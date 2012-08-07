@@ -45,83 +45,6 @@ struct Token {
   }
 };
 
-
-
-                                  void skip(istream& in) {
-                                    char dummy;
-                                    in >> dummy;
-                                  }
-
-                                  void skipWhitespace(istream& in) {
-                                    while (isspace(in.peek()) && in.peek() != '\n')
-                                      skip(in);
-                                  }
-
-                                  // slurp functions read a token when you're sure to be at it
-                                  void slurpChar(istream& in, ostream& out) {
-                                    out << (char)in.get();
-                                  }
-
-                                  void slurpWord(istream& in, ostream& out) {
-                                    static const string quoteChars = ",'`@";
-                                    static const string ssyntaxChars = ":~!.&"; // disjoint from quoteChars
-                                    char lastc = '\0';
-                                    char c;
-                                    while (in >> c) {
-                                      // keep this list sync'd with the nextToken switch below
-                                      if (isspace(c) || c == ';' || c == '(' || c == ')' || c == '"'
-                                          || (quoteChars.find(c) != string::npos
-                                              // put off quotes inside ssyntax
-                                              && ssyntaxChars.find(lastc) == string::npos)) {
-                                        in.putback(c);
-                                        break;
-                                      }
-                                      out << c;
-                                      lastc = c;
-                                    }
-                                  }
-
-                                  void slurpString(istream& in, ostream& out) {
-                                    slurpChar(in, out); // initial quote
-                                    char c;
-                                    while (in >> c) {
-                                      out << c;
-                                      if (c == '\\')
-                                        slurpChar(in, out); // blindly read next
-                                      else if (c == '"')
-                                        break;
-                                    }
-                                  }
-
-                                  void skipComment(istream& in) {
-                                    char c;
-                                    while (in >> c) {
-                                      if (c == '\n') {
-                                        in.putback(c);
-                                        break;
-                                      }
-                                    }
-                                  }
-
-                                  long indent(istream& in) {
-                                    long indent = 0;
-                                    char c;
-                                    while (in >> c) {
-                                      if (c == ';')
-                                        skipComment(in);
-
-                                      else if (!isspace(c)) {
-                                        in.putback(c);
-                                        break;
-                                      }
-
-                                      else if (c == ' ') ++indent;
-                                      else if (c == '\t') indent+=2;
-                                      else if (c == '\n') indent=0;
-                                    }
-                                    return indent;
-                                  }
-
 Token nextToken(CodeStream& c) {
   if (c.currIndent == -1) // initial
     return Token(c.currIndent=indent(c.fd));
@@ -154,4 +77,83 @@ Token nextToken(CodeStream& c) {
   if (out.str() == ":") return nextToken(c);
 
   return Token(out.str(), c.currIndent);
+}
+
+
+
+// internals
+
+void skip(istream& in) {
+  char dummy;
+  in >> dummy;
+}
+
+void skipWhitespace(istream& in) {
+  while (isspace(in.peek()) && in.peek() != '\n')
+    skip(in);
+}
+
+// slurp functions read a token when you're sure to be at it
+void slurpChar(istream& in, ostream& out) {
+  out << (char)in.get();
+}
+
+void slurpWord(istream& in, ostream& out) {
+  static const string quoteChars = ",'`@";
+  static const string ssyntaxChars = ":~!.&"; // disjoint from quoteChars
+  char lastc = '\0';
+  char c;
+  while (in >> c) {
+    // keep this list sync'd with the nextToken switch below
+    if (isspace(c) || c == ';' || c == '(' || c == ')' || c == '"'
+        || (quoteChars.find(c) != string::npos
+            // put off quotes inside ssyntax
+            && ssyntaxChars.find(lastc) == string::npos)) {
+      in.putback(c);
+      break;
+    }
+    out << c;
+    lastc = c;
+  }
+}
+
+void slurpString(istream& in, ostream& out) {
+  slurpChar(in, out); // initial quote
+  char c;
+  while (in >> c) {
+    out << c;
+    if (c == '\\')
+      slurpChar(in, out); // blindly read next
+    else if (c == '"')
+      break;
+  }
+}
+
+void skipComment(istream& in) {
+  char c;
+  while (in >> c) {
+    if (c == '\n') {
+      in.putback(c);
+      break;
+    }
+  }
+}
+
+long indent(istream& in) {
+  long indent = 0;
+  char c;
+  while (in >> c) {
+    if (c == ';')
+      skipComment(in);
+
+    else if (!isspace(c)) {
+      in.putback(c);
+      break;
+    }
+
+    else if (c == ' ') ++indent;
+    else if (c == '\t') indent+=2;
+    else if (c == '\n') indent=0;
+  }
+  return indent;
 }
