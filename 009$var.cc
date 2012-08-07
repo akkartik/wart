@@ -17,3 +17,10 @@ Cell* expandDollarVars(Cell* input, Table& map) {
   setCdr(input, expandDollarVars(cdr(input), map));
   return input;
 }
+
+Cell* genSym(Cell* x) {
+  static long counter = 0;
+  ostringstream os;
+  os << (x == nil ? "sym" : toString(x)) << ++counter;
+  return newSym(os.str());
+}

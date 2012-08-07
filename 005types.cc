@@ -144,13 +144,6 @@ string toString(Cell* x) {
   return *(string*)x->car;
 }
 
-Cell* genSym(Cell* x) {
-  static long counter = 0;
-  ostringstream os;
-  os << (x == nil ? "sym" : toString(x)) << ++counter;
-  return newSym(os.str());
-}
-
 
 
 // associative arrays
@@ -169,6 +162,24 @@ bool isTable(Cell* x) {
 Table* toTable(Cell* x) {
   if (!isTable(x)) return NULL;
   return (Table*)x->car;
+}
+
+void set(Cell* t, string k, Cell* val) {
+  unsafeSet(t, newSym(k), val, true);
+}
+
+void set(Cell* t, Cell* k, Cell* val) {
+  unsafeSet(t, k, val, true);
+}
+
+Cell* get(Cell* t, Cell* k) {
+  Cell* result = unsafeGet(t, k);
+  if (!result) return nil;
+  return result;
+}
+
+Cell* get(Cell* t, string k) {
+  return get(t, newSym(k));
 }
 
 void unsafeSet(Cell* t, Cell* key, Cell* val, bool deleteNils) {
@@ -198,14 +209,6 @@ void unsafeSet(Cell* t, string k, Cell* val, bool deleteNils) {
   unsafeSet(t, newSym(k), val, deleteNils);
 }
 
-void set(Cell* t, Cell* k, Cell* val) {
-  unsafeSet(t, k, val, true);
-}
-
-void set(Cell* t, string k, Cell* val) {
-  unsafeSet(t, newSym(k), val, true);
-}
-
 Cell* unsafeGet(Cell* t, Cell* key) {
   if (!isTable(t)) {
     RAISE << "get on a non-table" << endl;
@@ -213,16 +216,6 @@ Cell* unsafeGet(Cell* t, Cell* key) {
   }
   Table& table = *(Table*)(t->car);
   return table[key];
-}
-
-Cell* get(Cell* t, Cell* k) {
-  Cell* result = unsafeGet(t, k);
-  if (!result) return nil;
-  return result;
-}
-
-Cell* get(Cell* t, string k) {
-  return get(t, newSym(k));
 }
 
 
