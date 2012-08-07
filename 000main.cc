@@ -53,6 +53,7 @@ void reset(istream& in) {
   if (interactive) in.get();
 }
 
+// helper to read from string
 stringstream& stream(string s) {
   stringstream& result = *new stringstream(s);
   result << std::noskipws;
