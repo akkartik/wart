@@ -122,40 +122,36 @@ struct Token {
                                     return indent;
                                   }
 
-Token nextToken(istream& in, long& currIndent) {
-  if (currIndent == -1) // initial
-    return Token(currIndent=indent(in));
-  skipWhitespace(in);
-  if (in.peek() == '\n' || in.peek() == ';')
-    return Token(currIndent=indent(in));
+Token nextToken(CodeStream& c) {
+  if (c.currIndent == -1) // initial
+    return Token(c.currIndent=indent(c.fd));
+  skipWhitespace(c.fd);
+  if (c.fd.peek() == '\n' || c.fd.peek() == ';')
+    return Token(c.currIndent=indent(c.fd));
 
   ostringstream out;
-  switch (in.peek()) { // now can't be whitespace
+  switch (c.fd.peek()) { // now can't be whitespace
     case '"':
-      slurpString(in, out); break;
+      slurpString(c.fd, out); break;
 
     case '(':
     case ')':
     case '\'':
     case '`':
     case '@':
-      slurpChar(in, out); break;
+      slurpChar(c.fd, out); break;
 
     case ',':
-      slurpChar(in, out);
-      if (in.peek() == '@')
-        slurpChar(in, out);
+      slurpChar(c.fd, out);
+      if (c.fd.peek() == '@')
+        slurpChar(c.fd, out);
       break;
 
     default:
-      slurpWord(in, out); break;
+      slurpWord(c.fd, out); break;
   }
 
-  if (out.str() == ":") return nextToken(in, currIndent);
+  if (out.str() == ":") return nextToken(c);
 
-  return Token(out.str(), currIndent);
-}
-
-Token nextToken(CodeStream& c) {
-  return nextToken(c.fd, c.currIndent);
+  return Token(out.str(), c.currIndent);
 }
