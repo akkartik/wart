@@ -70,50 +70,7 @@ Die DIE;
 
 #include "file_list"
 
-
-
-// test harness
-
-bool runningTests = false;
-long numFailures = 0;
-
-typedef void (*TestFn)(void);
-const TestFn tests[] = {
-  #include "test_list"
-};
-
-void runTests() {
-  runningTests = true;
-  pretendRaise = true;
-  for (unsigned long i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
-    init();
-    (*tests[i])();
-    if (raiseCount != 0) cerr << raiseCount << " errors encountered" << endl;
-    checkForLeaks();
-  }
-
-  pretendRaise = false;
-  init();
-  loadFiles(".wart"); // after GC tests
-  loadFiles(".test");
-
-  cerr << endl;
-  if (numFailures == 0) return;
-  cerr << numFailures << " failure";
-      if (numFailures > 1) cerr << "s";
-      cerr << endl;
-}
-
-void checkForLeaks() {
-  teardownStreams();
-  teardownCompiledFns();
-  teardownLiteralTables();
-
-  if (numUnfreed() > 0) {
-    RAISE << "Memory leak!\n";
-    dumpUnfreed();
-  }
-}
+// interpreter tests
 
 #define check(X) if (!(X)) { \
     ++numFailures; \
