@@ -126,6 +126,15 @@ void test_list_splice_returns_list_being_spliced_in() {
   endDynamicScope("a");
 }
 
+void test_contains_handles_circular_lists() {
+  unordered_set<Cell*> done;
+  Cell* x = newCons(newNum(1));
+  setCdr(x, x);
+  check(!contains(x, newSym("a"), done));
+  x->cdr = nil; // break cycle for gc
+  rmref(x);
+}
+
 void test_list_sort() {
   Cell* expr = read(stream("(sort (fn(a b) (< len.a len.b)) '(\"abc\" \"d\" \"ef\"))"));
   Cell* result = eval(expr);

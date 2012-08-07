@@ -1,6 +1,56 @@
 //// primitive datatypes
 
-                                  unordered_map<long, Cell*> intLiterals;
+// lists
+
+Cell* car(Cell* x) {
+  if (x->type != CONS) {
+    RAISE << "car of non-cons: " << x << endl;
+    return nil;
+  }
+  return x->car;
+}
+
+Cell* cdr(Cell* x) {
+  return x->cdr;
+}
+
+void setCar(Cell* x, Cell* y) {
+  if (x == nil) {
+    RAISE << "setCar on nil" << endl;
+    return;
+  }
+  mkref(y);
+  if (isCons(x))
+    rmref(car(x));
+  x->car = y;
+}
+
+void setCdr(Cell* x, Cell* y) {
+  if (x == nil) {
+    RAISE << "setCdr on nil" << endl;
+    return;
+  }
+  mkref(y);
+  rmref(cdr(x));
+  x->cdr = y;
+}
+
+Cell* newCons(Cell* car, Cell* cdr) {
+  Cell* ans = newCell();
+  setCar(ans, car);
+  setCdr(ans, cdr);
+  return ans;
+}
+
+Cell* newCons(Cell* car) {
+  return newCons(car, nil);
+}
+
+
+
+// numbers
+
+unordered_map<long, Cell*> intLiterals;
 
 Cell* newNum(long x) {
   if (intLiterals[x])
@@ -55,10 +105,12 @@ bool equalFloats(float x, float y) {
 
 
 
-                                  template<class Data>
-                                  struct StringMap :public unordered_map<string, Data>{};
+// symbols
 
-                                  StringMap<Cell*> symLiterals;
+template<class Data>
+struct StringMap :public unordered_map<string, Data>{};
+
+StringMap<Cell*> symLiterals;
 
 Cell* newSym(string x) {
   if (symLiterals[x])
@@ -120,6 +172,82 @@ void teardownLiteralTables() {
 
 
 
+// associative arrays
+
+Cell* newTable() {
+  Cell* result = newCell();
+  result->type = TABLE;
+  result->car = (Cell*)new Table();
+  return result;
+}
+
+bool isTable(Cell* x) {
+  return x->type == TABLE;
+}
+
+Table* toTable(Cell* x) {
+  if (!isTable(x)) return NULL;
+  return (Table*)x->car;
+}
+
+void unsafeSet(Cell* t, Cell* key, Cell* val, bool deleteNils) {
+  if (!isTable(t)) {
+    RAISE << "set on a non-table: " << t << endl;
+    return;
+  }
+
+  Table& table = *(Table*)(t->car);
+  if (val == nil && deleteNils) {
+    if (table[key]) {
+      rmref(table[key]);
+      table[key] = NULL;
+      rmref(key);
+    }
+    return;
+  }
+
+  if (val == table[key]) return;
+
+  if (!table[key]) mkref(key);
+  else rmref(table[key]);
+  table[key] = mkref(val);
+}
+
+void unsafeSet(Cell* t, string k, Cell* val, bool deleteNils) {
+  unsafeSet(t, newSym(k), val, deleteNils);
+}
+
+void set(Cell* t, Cell* k, Cell* val) {
+  unsafeSet(t, k, val, true);
+}
+
+void set(Cell* t, string k, Cell* val) {
+  unsafeSet(t, newSym(k), val, true);
+}
+
+Cell* unsafeGet(Cell* t, Cell* key) {
+  if (!isTable(t)) {
+    RAISE << "get on a non-table" << endl;
+    return nil;
+  }
+  Table& table = *(Table*)(t->car);
+  return table[key];
+}
+
+Cell* get(Cell* t, Cell* k) {
+  Cell* result = unsafeGet(t, k);
+  if (!result) return nil;
+  return result;
+}
+
+Cell* get(Cell* t, string k) {
+  return get(t, newSym(k));
+}
+
+
+
+// pre-compiled primitives
+
 Cell* newCompiledFn(CompiledFn f) {
   Cell* result = newCell();
   result->type = COMPILED_FN;
@@ -139,77 +267,7 @@ CompiledFn toCompiledFn(Cell* x) {
 
 
 
-Cell* newTable() {
-  Cell* result = newCell();
-  result->type = TABLE;
-  result->car = (Cell*)new Table();
-  return result;
-}
-
-bool isTable(Cell* x) {
-  return x->type == TABLE;
-}
-
-Table* toTable(Cell* x) {
-  if (!isTable(x)) return NULL;
-  return (Table*)x->car;
-}
-
-                                  void unsafeSet(Cell* t, Cell* key, Cell* val, bool deleteNils) {
-                                    if (!isTable(t)) {
-                                      RAISE << "set on a non-table: " << t << endl;
-                                      return;
-                                    }
-
-                                    Table& table = *(Table*)(t->car);
-                                    if (val == nil && deleteNils) {
-                                      if (table[key]) {
-                                        rmref(table[key]);
-                                        table[key] = NULL;
-                                        rmref(key);
-                                      }
-                                      return;
-                                    }
-
-                                    if (val == table[key]) return;
-
-                                    if (!table[key]) mkref(key);
-                                    else rmref(table[key]);
-                                    table[key] = mkref(val);
-                                  }
-
-void unsafeSet(Cell* t, string k, Cell* val, bool deleteNils) {
-  unsafeSet(t, newSym(k), val, deleteNils);
-}
-
-void set(Cell* t, Cell* k, Cell* val) {
-  unsafeSet(t, k, val, true);
-}
-
-void set(Cell* t, string k, Cell* val) {
-  unsafeSet(t, newSym(k), val, true);
-}
-
-                                  Cell* unsafeGet(Cell* t, Cell* key) {
-                                    if (!isTable(t)) {
-                                      RAISE << "get on a non-table" << endl;
-                                      return nil;
-                                    }
-                                    Table& table = *(Table*)(t->car);
-                                    return table[key];
-                                  }
-
-Cell* get(Cell* t, Cell* k) {
-  Cell* result = unsafeGet(t, k);
-  if (!result) return nil;
-  return result;
-}
-
-Cell* get(Cell* t, string k) {
-  return get(t, newSym(k));
-}
-
-
+// user-defined types and coercion
 
 Cell* newObject(string type, Cell* rep) {
   return newCons(newSym("object"), newCons(newSym(type), newCons(rep)));
@@ -247,7 +305,7 @@ Cell* type(Cell* x) {
   }
 }
 
-// mkrefs its result
+// always mkrefs its result
 Cell* coerceQuoted(Cell* x, Cell* destType, Cell* coercions) {
   Cell* typ = type(x);
   if (typ == destType)

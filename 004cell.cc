@@ -92,7 +92,7 @@ Cell* newCell() {
 
 
 
-                                  typedef unordered_map<Cell*, Cell*> CellMap;
+typedef unordered_map<Cell*, Cell*> CellMap;
 
 struct Table {
   CellMap table;
@@ -150,115 +150,4 @@ void rmref(Cell* c) {
   c->cdr = freelist;
   freelist = c;
   return;
-}
-
-
-
-Cell* car(Cell* x) {
-  if (x->type != CONS) {
-    RAISE << "car of non-cons: " << x << endl;
-    return nil;
-  }
-  return x->car;
-}
-
-Cell* cdr(Cell* x) {
-  return x->cdr;
-}
-
-void setCar(Cell* x, Cell* y) {
-  if (x == nil) {
-    RAISE << "setCar on nil" << endl;
-    return;
-  }
-  mkref(y);
-  if (isCons(x))
-    rmref(car(x));
-  x->car = y;
-}
-
-void setCdr(Cell* x, Cell* y) {
-  if (x == nil) {
-    RAISE << "setCdr on nil" << endl;
-    return;
-  }
-  mkref(y);
-  rmref(cdr(x));
-  x->cdr = y;
-}
-
-Cell* newCons(Cell* car, Cell* cdr) {
-  Cell* ans = newCell();
-  setCar(ans, car);
-  setCdr(ans, cdr);
-  return ans;
-}
-
-Cell* newCons(Cell* car) {
-  return newCons(car, nil);
-}
-
-
-
-Cell* copyList(Cell* x) {
-  if (!isCons(x)) return x;
-  return newCons(copyList(car(x)),
-      copyList(cdr(x)));
-}
-
-bool equalList(Cell* a, Cell* b) {
-  if (!isCons(a)) return a == b;
-  return equalList(car(a), car(b))
-      && equalList(cdr(a), cdr(b));
-}
-
-Cell* nthCdr(Cell* x, long n) {
-  Cell* curr = x;
-  for (long idx = n; idx > 0; --idx) {
-    if (!isCons(curr))
-      RAISE << "list is too short: " << x << " " << n << endl;
-    curr=cdr(curr);
-  }
-  return curr;
-}
-
-void append(Cell* x, Cell* y) {
-  while(cdr(x) != nil)
-    x = cdr(x);
-  setCdr(x, y);
-}
-
-// useful idiom: create a dummy cell p, keep appending to it using addCons,
-// then return dropPtr(p) which GC's the dummy but mkrefs the rest.
-Cell* dropPtr(Cell* p) {
-  Cell* x = mkref(cdr(p));
-  rmref(p);
-  return x;
-}
-
-void addCons(Cell* p, Cell* x) {
-  setCdr(p, newCons(x));
-}
-
-// push p onto l and move one refcount to new head
-Cell* pushCons(Cell* p, Cell* l) {
-  Cell* result = newCons(p, l);
-  rmref(cdr(result));
-  return mkref(result);
-}
-
-bool contains(Cell* tree, Cell* a, unordered_set<Cell*>& done) {
-  // guard against cycles
-  if (done.find(tree) != done.end()) return false;
-  done.insert(tree);
-
-  if (tree == a) return true;
-  if (!isCons(tree)) return false;
-  return contains(car(tree), a, done)
-         || contains(cdr(tree), a, done);
-}
-
-bool contains(Cell* tree, Cell* a) {
-  unordered_set<Cell*> done;
-  return contains(tree, a, done);
 }
