@@ -38,8 +38,6 @@ using std::ofstream;
 
 
 
-// generate traces for debugging
-
 long debug = 0;
 #define dbg if(debug == 1) cerr
 #define dbg2 if(debug == 2) cerr
@@ -81,21 +79,6 @@ bool interactive = false; // eval on multiple newlines
 bool runningTests = false;
 long numFailures = 0;
 
-#define check(X) if (!(X)) { \
-    ++numFailures; \
-    cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
-  } \
-  else { cerr << "."; fflush(stderr); }
-
-#define checkEq(X, Y) if ((X) != (Y)) { \
-    ++numFailures; \
-    cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
-    cerr << "  got " << (X) << endl; /* BEWARE: multiple eval */ \
-  } \
-  else { cerr << "."; fflush(stderr); }
-
-#include "test_file_list"
-
 typedef void (*TestFn)(void);
 const TestFn tests[] = {
   #include "test_list"
@@ -134,7 +117,20 @@ void checkForLeaks() {
   }
 }
 
-
+#define check(X) if (!(X)) { \
+    ++numFailures; \
+    cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
+  } \
+  else { cerr << "."; fflush(stderr); }
+
+#define checkEq(X, Y) if ((X) != (Y)) { \
+    ++numFailures; \
+    cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
+    cerr << "  got " << (X) << endl; /* BEWARE: multiple eval */ \
+  } \
+  else { cerr << "."; fflush(stderr); }
+
+#include "test_file_list"
 
 void init() {
   intLiterals.clear();
