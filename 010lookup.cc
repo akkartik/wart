@@ -47,6 +47,8 @@ void assignDynamicVar(Cell* sym, Cell* val) {
 
 
 
+unordered_set<Cell*> initialSyms;
+
 // The current lexical scope is a first-class dynamic variable.
 Cell* CURR_LEXICAL_SCOPE;
 #define currLexicalScopes dynamics[CURR_LEXICAL_SCOPE]

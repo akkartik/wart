@@ -153,25 +153,6 @@ Cell* genSym(Cell* x) {
 
 
 
-unordered_set<Cell*> initialSyms;
-void teardownLiteralTables() {
-  for (unordered_map<long, Cell*>::iterator p = intLiterals.begin(); p != intLiterals.end(); ++p) {
-    if (p->second->nrefs > 1)
-      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
-    if (p->second->nrefs > 0)
-      rmref(p->second);
-  }
-  for (StringMap<Cell*>::iterator p = symLiterals.begin(); p != symLiterals.end(); ++p) {
-    if (initialSyms.find(p->second) != initialSyms.end()) continue;
-    if (p->second->nrefs > 1)
-      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
-    if (p->second->nrefs > 0)
-      rmref(p->second);
-  }
-}
-
-
-
 // associative arrays
 
 Cell* newTable() {
@@ -360,4 +341,24 @@ Cell* coerceQuoted(Cell* x, Cell* destType, Cell* coercions) {
   Cell* result = eval(expr);
   rmref(expr);
   return result; // already mkref'd
+}
+
+
+
+// internals
+
+void teardownLiteralTables() {
+  for (unordered_map<long, Cell*>::iterator p = intLiterals.begin(); p != intLiterals.end(); ++p) {
+    if (p->second->nrefs > 1)
+      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
+    if (p->second->nrefs > 0)
+      rmref(p->second);
+  }
+  for (StringMap<Cell*>::iterator p = symLiterals.begin(); p != symLiterals.end(); ++p) {
+    if (initialSyms.find(p->second) != initialSyms.end()) continue;
+    if (p->second->nrefs > 1)
+      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
+    if (p->second->nrefs > 0)
+      rmref(p->second);
+  }
 }
