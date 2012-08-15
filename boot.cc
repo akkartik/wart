@@ -1,3 +1,7 @@
+// C++ style:
+//  no pointers except Cell*; pass by value where possible
+//  use long as the default integer type; it's always as large as a pointer
+
 #include<cstdio>
 #include<cstring>
 #include<cstdlib>
@@ -86,7 +90,3 @@ Die DIE;
   else { cerr << "."; fflush(stderr); }
 
 #include "test_file_list"
-
-// C++ style:
-//  no pointers except Cell*; pass by value where possible
-//  use long as the default integer type; it's always as large as a pointer
