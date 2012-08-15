@@ -18,7 +18,7 @@ Cell* transform_ssyntax(Cell* input) {
       input = expandComplement(var);
   }
 
-  if (!isCons(input)) return input; // no tables or compiledFns in static code
+  if (!isCons(input)) return input;   // no tables or compiledFns in static code
   setCar(input, transform_ssyntax(car(input)));
   setCdr(input, transform_ssyntax(cdr(input)));
   return input;

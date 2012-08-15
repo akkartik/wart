@@ -17,7 +17,7 @@ void test_colon_is_compose() {
 
 void test_leading_colon() {
   Cell* sym = read(stream(":b"));
-  checkEq(sym, newSym(":b")); // just a keyword arg
+  checkEq(sym, newSym(":b"));   // just a keyword arg
   rmref(sym);
 }
 
@@ -80,7 +80,7 @@ void test_call_is_left_associative() {
 
 void test_complement_is_unary() {
   Cell* sym = read(stream("a~b"));
-  checkEq(sym, newSym("a~b")); // doesn't trigger for binary ops
+  checkEq(sym, newSym("a~b"));  // doesn't trigger for binary ops
   rmref(sym);
 
   Cell* cons = read(stream("~b"));

@@ -127,7 +127,7 @@ void endLexicalScope() {
 void addLexicalBinding(Cell* sym, Cell* val, Cell* scope) {
   if (unsafeGet(scope, sym))
     RAISE << "Can't rebind within a lexical scope" << endl << DIE;
-  unsafeSet(scope, sym, val, false); // deleting nil might expose a shadowed binding
+  unsafeSet(scope, sym, val, false);  // deleting nil might expose a shadowed binding
 }
 
 void addLexicalBinding(Cell* sym, Cell* val) {
@@ -149,7 +149,7 @@ void addLexicalBinding(string var, Cell* val) {
 unordered_set<Cell*> initialSyms;
 
 void setupScopes() {
-  dynamics.clear(); // leaks memory for strings and tables
+  dynamics.clear();   // leaks memory for strings and tables
   CURR_LEXICAL_SCOPE = newSym("currLexicalScope");
   newDynamicScope(CURR_LEXICAL_SCOPE, nil);
   initialSyms.insert(CURR_LEXICAL_SCOPE);

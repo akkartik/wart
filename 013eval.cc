@@ -27,7 +27,7 @@ Cell* eval(Cell* expr, Cell* scope) {
     return mkref(cdr(expr));
 
   if (isBackQuoted(expr))
-    return processUnquotes(cdr(expr), 1, scope); // already mkref'd
+    return processUnquotes(cdr(expr), 1, scope);  // already mkref'd
 
   if (isAlreadyEvald(expr))
     return mkref(keepAlreadyEvald() ? expr : stripAlreadyEvald(expr));
@@ -48,7 +48,7 @@ Cell* eval(Cell* expr, Cell* scope) {
 
   Cell* result = nil;
   if (isCompiledFn(body(fn)))
-    result = toCompiledFn(body(fn))(); // all compiledFns must mkref result
+    result = toCompiledFn(body(fn))();  // all compiledFns must mkref result
   else
     // eval all forms in body, save result of final form
     for (Cell* form = impl(fn); form != nil; form=cdr(form)) {
@@ -60,7 +60,7 @@ Cell* eval(Cell* expr, Cell* scope) {
   endDynamicScope(CURR_LEXICAL_SCOPE);
   rmref(evaldArgs);
   rmref(fn);
-  return result; // already mkref'd
+  return result;  // already mkref'd
 }
 
 Cell* processArgs(Cell* call, Cell* scope, Cell* fn) {
@@ -114,7 +114,7 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
   CellMap keywordArgs;
   Cell* nonKeywordArgs = extractKeywordArgs(params, args, keywordArgs);
   Cell* result = argsInParamOrder(params, nonKeywordArgs, keywordArgs);   rmref(nonKeywordArgs);
-  return result; // already mkref'd
+  return result;  // already mkref'd
 }
 
 // extract keyword args into the CellMap provided; return non-keyword args
@@ -126,17 +126,17 @@ Cell* extractKeywordArgs(Cell* params, Cell* args, CellMap& keywordArgs) {
       addCons(curr, car(args));
       curr=cdr(curr);
     }
-    else if (isCons(currArg)) { // rest keyword arg
-      keywordArgs[car(currArg)] = cdr(args); // ..must be final keyword arg
+    else if (isCons(currArg)) {   // rest keyword arg
+      keywordArgs[car(currArg)] = cdr(args);  // ..must be final keyword arg
       rmref(currArg);
       args = nil;
     }
     else {
-      args = cdr(args); // skip keyword arg
+      args = cdr(args);   // skip keyword arg
       keywordArgs[currArg] = car(args);
     }
   }
-  if (!isCons(args)) // improper list
+  if (!isCons(args))  // improper list
     setCdr(curr, args);
   return dropPtr(pNonKeywordArgs);
 }

@@ -5,7 +5,7 @@ unsigned long numAllocs = 0;
 extern Cell* nil;
 
 struct Cell {
-  Cell* car; // aliased to long or float
+  Cell* car;  // aliased to long or float
   Cell* cdr;
 
   // ints save space on 64-bit platforms
@@ -42,7 +42,7 @@ bool isAtom(Cell* x) {
 
 
 
-#define HEAPCELLS (1024*1024/sizeof(Cell)) // 1MB
+#define HEAPCELLS (1024*1024/sizeof(Cell))  // 1MB
 struct Heap {
   Cell cells[HEAPCELLS];
   Heap *next;
@@ -129,7 +129,7 @@ void rmref(Cell* c) {
   switch (c->type) {
   case INTEGER:
   case FLOAT:
-    break; // numbers don't need freeing
+    break;  // numbers don't need freeing
   case STRING:
   case SYMBOL:
     delete (string*)c->car; break;
@@ -138,7 +138,7 @@ void rmref(Cell* c) {
   case TABLE:
     delete (Table*)c->car; break;
   case COMPILED_FN:
-    break; // compiled functions don't need freeing
+    break;  // compiled functions don't need freeing
   default:
     RAISE << "Can't rmref type " << c->type << endl << DIE;
   }

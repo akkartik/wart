@@ -132,11 +132,11 @@ public:
 };
 
 COMPILE_FN(infd, compiledFn_infd, "($fd)",
-  return mkref(newIstream(new iostream(new FdStreamBuf(toInt(lookup("$fd")))))); // leak
+  return mkref(newIstream(new iostream(new FdStreamBuf(toInt(lookup("$fd"))))));  // leak
 )
 
 COMPILE_FN(outfd, compiledFn_outfd, "($fd)",
-  return mkref(newOstream(new iostream(new FdStreamBuf(toInt(lookup("$fd")))))); // leak
+  return mkref(newOstream(new iostream(new FdStreamBuf(toInt(lookup("$fd"))))));  // leak
 )
 
 COMPILE_FN(close, compiledFn_close, "($stream)",

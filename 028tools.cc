@@ -46,7 +46,7 @@ COMPILE_FN(time, compiledFn_time, "('$expr)",
   clock_t start = clock();
   Cell* result = eval(lookup("$expr"));
   cerr << clock()-start << "/" << CLOCKS_PER_SEC << endl;
-  return result; // already mkref'd
+  return result;  // already mkref'd
 )
 
 COMPILE_FN(quit, compiledFn_quit, "()",

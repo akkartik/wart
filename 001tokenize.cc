@@ -3,7 +3,7 @@
 // line contains 1 indent and zero or more regular tokens
 struct Token {
   string token;
-  long indentLevel; // all tokens on a line share its indentLevel
+  long indentLevel;   // all tokens on a line share its indentLevel
 
   explicit Token(string s)
     :token(s), indentLevel(0) {}
@@ -46,14 +46,14 @@ struct Token {
 };
 
 Token nextToken(CodeStream& c) {
-  if (c.currIndent == -1) // initial
+  if (c.currIndent == -1)   // initial
     return Token(c.currIndent=indent(c.fd));
   skipWhitespace(c.fd);
   if (c.fd.peek() == '\n' || c.fd.peek() == ';')
     return Token(c.currIndent=indent(c.fd));
 
   ostringstream out;
-  switch (c.fd.peek()) { // now can't be whitespace
+  switch (c.fd.peek()) {  // now can't be whitespace
     case '"':
       slurpString(c.fd, out); break;
 
@@ -100,7 +100,7 @@ void slurpChar(istream& in, ostream& out) {
 
 void slurpWord(istream& in, ostream& out) {
   static const string quoteChars = ",'`@";
-  static const string ssyntaxChars = ":~!.&"; // disjoint from quoteChars
+  static const string ssyntaxChars = ":~!.&";   // disjoint from quoteChars
   char lastc = '\0';
   char c;
   while (in >> c) {
@@ -118,12 +118,12 @@ void slurpWord(istream& in, ostream& out) {
 }
 
 void slurpString(istream& in, ostream& out) {
-  slurpChar(in, out); // initial quote
+  slurpChar(in, out);   // initial quote
   char c;
   while (in >> c) {
     out << c;
     if (c == '\\')
-      slurpChar(in, out); // blindly read next
+      slurpChar(in, out);   // blindly read next
     else if (c == '"')
       break;
   }

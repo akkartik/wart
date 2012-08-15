@@ -32,7 +32,7 @@ Cell* type(Cell* x) {
     return newSym("list");
   default:
     RAISE << "Undefined type: " << x->type << endl << DIE;
-    return nil; // never reached
+    return nil;   // never reached
   }
 }
 
@@ -56,5 +56,5 @@ Cell* coerceQuoted(Cell* x, Cell* destType, Cell* coercions) {
   Cell* expr = newCons(coercer, newCons(newCons(newSym("'"), x)));
   Cell* result = eval(expr);
   rmref(expr);
-  return result; // already mkref'd
+  return result;  // already mkref'd
 }

@@ -3,7 +3,7 @@
 typedef Cell* (*CompiledFn)();
 
 #define COMPILE_FN(op, name, params, body) \
-  Cell* name() { body } // op and params extracted into compiled_fn_list below
+  Cell* name() { body }   // op and params extracted into compiled_fn_list below
 
 struct CompiledFnMetadata {
   string name;

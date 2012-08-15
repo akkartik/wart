@@ -95,7 +95,7 @@ COMPILE_FN(bound?, compiledFn_isBound, "($var)",
 
 COMPILE_FN(make-unbound, compiledFn_make_unbound, "($var)",
   Cell* var = lookup("$var");
-  stack<Cell*>& bindings = dynamics[var]; // unbind just in dynamic scopes
+  stack<Cell*>& bindings = dynamics[var];   // unbind just in dynamic scopes
   while (!bindings.empty()) {
     rmref(var);
     rmref(bindings.top());
@@ -110,7 +110,7 @@ COMPILE_FN(type, compiledFn_type, "($x)",
 )
 
 COMPILE_FN(coerce-quoted, compiledFn_coerce_quoted, "'($x $dest-type)",
-  return coerceQuoted(lookup("$x"), lookup("$dest-type"), lookup("coercions*")); // already mkref'd
+  return coerceQuoted(lookup("$x"), lookup("$dest-type"), lookup("coercions*"));  // already mkref'd
 )
 
 COMPILE_FN(iso, compiledFn_iso, "($x $y)",

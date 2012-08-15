@@ -14,7 +14,7 @@ Cell* read(CodeStream&);
 Cell* eval(Cell*);
 ostream& operator<<(ostream&, Cell*);
 
-bool interactive = false; // trigger eval on empty lines
+bool interactive = false;   // trigger eval on empty lines
 
 extern unsigned long numAllocs;
 
@@ -59,7 +59,7 @@ const TestFn tests[] = {
 
 void runTests() {
   runningTests = true;
-  pretendRaise = true;
+  pretendRaise = true;  // for death tests
   for (unsigned long i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
     setup();
     (*tests[i])();
@@ -68,7 +68,7 @@ void runTests() {
 
   pretendRaise = false;
   setup();
-  loadFiles(".wart"); // after GC tests
+  loadFiles(".wart");   // after GC tests
   loadFiles(".test");
 
   cerr << endl;

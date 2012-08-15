@@ -30,7 +30,7 @@ COMPILE_FN(/, compiledFn_divide, "($x $y)",
 )
 
 COMPILE_FN(%, compiledFn_modulo, "($x $y)",
-  return mkref(newNum(toInt(lookup("$x")) % toInt(lookup("$y")))); // what does modulo of floats mean?
+  return mkref(newNum(toInt(lookup("$x")) % toInt(lookup("$y"))));  // what does modulo of floats mean?
 )
 
 COMPILE_FN(<, compiledFn_lesser, "($x $y)",

@@ -85,7 +85,7 @@ Die DIE;
 #define checkEq(X, Y) if ((X) != (Y)) { \
     ++numFailures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
-    cerr << "  got " << (X) << endl; /* BEWARE: multiple eval */ \
+    cerr << "  got " << (X) << endl;  /* BEWARE: multiple eval */ \
   } \
   else { cerr << "."; fflush(stderr); }
 

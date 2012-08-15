@@ -2,8 +2,8 @@
 
 list<Token> nextExpr(CodeStream& c) {
   list<Token> result;
-  stack<long> explicitParenStack; // parens in the original
-  stack<long> implicitParenStack; // parens we inserted
+  stack<long> explicitParenStack;   // parens in the original
+  stack<long> implicitParenStack;   // parens we inserted
   for (list<Token> line = nextLine(c); !line.empty(); line=nextLine(c)) {
     long thisLineIndent=line.front().indentLevel, nextLineIndent=line.back().indentLevel;
 

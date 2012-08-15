@@ -131,7 +131,7 @@ void test_contains_handles_circular_lists() {
   Cell* x = newCons(newNum(1));
   setCdr(x, x);
   check(!contains(x, newSym("a"), done));
-  x->cdr = nil; // break cycle for gc
+  x->cdr = nil;   // break cycle for gc
   rmref(x);
 }
 

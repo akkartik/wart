@@ -26,7 +26,7 @@ void test_build_handles_float() {
   Cell* c = nextRawCell(cs);
   check(isNum(c));
   check(equalFloats(toFloat(c), 3.4));
-  checkEq(c->nrefs, 0); // floats aren't interned
+  checkEq(c->nrefs, 0);   // floats aren't interned
   rmref(c);
   check(cs.fd.eof());
 }
@@ -34,7 +34,7 @@ void test_build_handles_float() {
 void test_build_creates_floats_on_overflow() {
   CodeStream cs(stream("100000000000000000000"));
   Cell* c = nextRawCell(cs);
-  checkEq(raiseCount, 1); raiseCount=0; // overflow warning
+  checkEq(raiseCount, 1); raiseCount=0;   // overflow warning
   checkEq(c->type, FLOAT);
   checkEq(c->nrefs, 0);
   rmref(c);
@@ -54,7 +54,7 @@ void test_build_handles_string() {
   CodeStream cs(stream("\"a\""));
   Cell* c = nextRawCell(cs);
   checkEq(toString(c), "a");
-  checkEq(c->nrefs, 0); // strings aren't interned
+  checkEq(c->nrefs, 0);   // strings aren't interned
   rmref(c);
   check(cs.fd.eof());
 }
@@ -291,7 +291,7 @@ void test_build_handles_quotes() {
 }
 
 void test_build_handles_indented_wrapped_lines() {
-  CodeStream cs(stream("a\n  (a b c\n   d e)")); // d e indented by just one space
+  CodeStream cs(stream("a\n  (a b c\n   d e)"));  // d e indented by just one space
   Cell *c0=nextRawCell(cs);
   checkEq(c0->nrefs, 1);
   checkEq(c0, newSym("a"));

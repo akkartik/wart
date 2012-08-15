@@ -29,7 +29,7 @@ COMPILE_FN(string_splice, compiledFn_string_splice, "($string $start $end $val)"
 
   size_t start = toInt(lookup("$start"));
   size_t end = toInt(lookup("$end"));
-  if (start > ((string*)str->car)->length()) { // append works
+  if (start > ((string*)str->car)->length()) {  // append works
     RAISE << "string too short: " << str << " " << start << endl;
     return nil;
   }
