@@ -117,7 +117,7 @@ Cell* mkref(Cell* c) {
 
 void rmref(Cell* c) {
   if (!c)
-    RAISE << " a cell was prematurely garbage-collected." << endl << DIE;
+    RAISE << "A cell was prematurely garbage-collected." << endl << DIE;
   if (c == nil) return;
 
   --c->nrefs;
