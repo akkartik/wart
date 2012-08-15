@@ -30,7 +30,7 @@ Cell* transform_ssyntax(Cell* input) {
 
 Cell* expandNot(string var) {
   var.replace(0, 1, "not ");
-  return nextRawCell(CodeStream(stream(var)));
+  return nextRawCell(stream(var));
 }
 
 Cell* expandCompose(string var) {
