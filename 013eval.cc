@@ -35,8 +35,8 @@ Cell* eval(Cell* expr, Cell* scope) {
   // expr is a call
   Cell* fn = toFn(eval(car(expr), scope));
   if (!isFn(fn))
-    RAISE << "not a call: " << expr << endl
-        << "  Perhaps you need to split the line in two." << endl << DIE;
+    RAISE << "Not a call: " << expr << endl
+        << "Perhaps you need to split the line in two." << endl << DIE;
 
   // eval its args in the caller's lexical environment
   Cell* evaldArgs = processArgs(expr, scope, fn);
