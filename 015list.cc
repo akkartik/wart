@@ -1,5 +1,44 @@
 //// compiled primitives for lists
 
+COMPILE_FN(cons?, compiledFn_isCons, "($x)",
+  Cell* x = lookup("$x");
+  if (!isCons(x)) return nil;
+  return mkref(x);
+)
+
+COMPILE_FN(cons, compiledFn_cons, "($x $y)",
+  return mkref(newCons(lookup("$x"), lookup("$y")));
+)
+
+COMPILE_FN(car, compiledFn_car, "($l)",
+  return mkref(car(lookup("$l")));
+)
+
+COMPILE_FN(cdr, compiledFn_cdr, "($l)",
+  return mkref(cdr(lookup("$l")));
+)
+
+COMPILE_FN(set_car, compiledFn_set_car, "($cons $val)",
+  setCar(lookup("$cons"), lookup("$val"));
+  return mkref(lookup("$val"));
+)
+
+COMPILE_FN(set_cdr, compiledFn_set_cdr, "($cons $val)",
+  setCdr(lookup("$cons"), lookup("$val"));
+  return mkref(lookup("$val"));
+)
+
+COMPILE_FN(len, compiledFn_len, "($x)",
+  Cell* x = lookup("$x");
+  if (isString(x))
+    return mkref(newNum((long)toString(x).length()));
+
+  long ans = 0;
+  for (; x != nil; x=cdr(x))
+    ++ans;
+  return mkref(newNum(ans));
+)
+
 COMPILE_FN(list_range, compiledFn_list_range, "($list $index $end)",
   Cell* list = lookup("$list");
   long index = toInt(lookup("$index"));

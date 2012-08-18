@@ -59,3 +59,17 @@ COMPILE_FN(globals, compiledFn_globals, "()",
       set(ans, p->first, p->second.top());
   return mkref(ans);
 )
+
+// eval in a sandbox
+COMPILE_FN(try-eval, compiledFn_try_eval, "($x . $scope)",
+  bool oldPretendRaise = pretendRaise;
+  pretendRaise = true;
+    Cell* ans = compiledFn_eval();
+  pretendRaise = oldPretendRaise;
+
+  if (raiseCount == 0) return ans;
+  // error
+  raiseCount = 0;
+  rmref(ans);
+  return nil;
+)
