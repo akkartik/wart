@@ -13,8 +13,7 @@ COMPILE_FN(fn, compiledFn_fn, "'($params . $body)",
 
 COMPILE_FN(eval, compiledFn_eval, "($x . $scope)",
   Cell* scope = lookup("$scope");
-  if (scope == nil) scope = currLexicalScope;
-  else scope = car(scope);
+  scope = (scope != nil) ? car(scope) : currLexicalScope;
   return eval(lookup("$x"), scope);
 )
 
