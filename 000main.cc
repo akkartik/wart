@@ -8,6 +8,8 @@ struct CodeStream {
   CodeStream(istream& in) :fd(in), currIndent(-1) {
     fd >> std::noskipws;
   }
+
+  bool eof() { return fd.eof(); }
 };
 CodeStream STDIN(cin);
 
@@ -22,13 +24,13 @@ int main(int argc, unused char* argv[]) {
   while (true) {
     prompt("wart> ");
     Cell* form = read(STDIN);
-    if (cin.eof()) break;
+    if (STDIN.eof()) break;
     Cell* result = eval(form);
     cout << result << endl;
 
     rmref(result);
     rmref(form);
-    reset(cin);
+    reset(STDIN);
   }
   return 0;
 }
@@ -110,9 +112,9 @@ void prompt(string msg) {
   cout << numUnfreed() << " " << numAllocs << " " << msg;
 }
 
-void reset(istream& in) {
-  in.get();
-  if (interactive) in.get();
+void reset(CodeStream& in) {
+  in.fd.get();
+  if (interactive) in.fd.get();
 }
 
 // helper to read from string
