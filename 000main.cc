@@ -1,4 +1,4 @@
-//// interpreter skeleton: either run tests or read-eval-print loop
+//// run unit tests or interactive interpreter
 
 // Whitespace-sensitivity requires remembering indent state across reads.
 struct CodeStream {
@@ -9,14 +9,7 @@ struct CodeStream {
     fd >> std::noskipws;
   }
 };
-
-Cell* read(CodeStream&);
-Cell* eval(Cell*);
-ostream& operator<<(ostream&, Cell*);
-
-bool interactive = false;   // trigger eval on empty lines
-
-extern unsigned long numAllocs;
+CodeStream STDIN(cin);
 
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
@@ -24,24 +17,25 @@ int main(int argc, unused char* argv[]) {
     return 0;
   }
 
-  setup();
-  loadFiles(".wart");
-
-  interactive = true;
-  catchCtrlC();
-
-  CodeStream cs(cin);
+  // Interpreter loop: prompt, read, eval, print
+  interactive_setup();
   while (true) {
-    cout << numUnfreed() << " " << numAllocs << " " << "wart> ";
-    Cell* form = read(cs);
+    prompt("wart> ");
+    Cell* form = read(STDIN);
     if (cin.eof()) break;
     Cell* result = eval(form);
     cout << result << endl;
+
     rmref(result);
     rmref(form);
     reset(cin);
   }
   return 0;
+}
+
+// read: tokenize, parenthesize, parse, build cells, transform
+Cell* read(CodeStream& c) {
+  return mkref(transform(nextRawCell(c)));
 }
 
 
@@ -102,8 +96,18 @@ void setup() {
 
 // misc
 
-Cell* read(CodeStream& c) {
-  return mkref(transform(nextRawCell(c)));
+bool interactive = false;   // trigger eval on empty lines
+void interactive_setup() {
+  setup();
+  loadFiles(".wart");
+  interactive = true;
+  catchCtrlC();
+}
+
+void prompt(string msg) {
+  extern unsigned long numAllocs;
+  extern long numUnfreed();
+  cout << numUnfreed() << " " << numAllocs << " " << msg;
 }
 
 void reset(istream& in) {
