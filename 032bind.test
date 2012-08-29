@@ -13,3 +13,7 @@
 (test "withs works"
   :valueof (withs (x 3 y '(1 2 3)) (list x @y))
   :should be '(3 1 2 3))
+
+(test "w/nils works"
+  :valueof (w/nils (x y z) (list x y z))
+  :should be '(nil nil nil))
