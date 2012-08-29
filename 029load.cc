@@ -19,7 +19,7 @@ void loadFile(const char* filename) {
   ifstream f(filename);
   CodeStream c(f);
   bool old_interactive = interactive; interactive = false;
-  while (!c.fd.eof()) {
+  while (!c.eof()) {
     Cell* cell = read(c);
     rmref(eval(cell));
     rmref(cell);

@@ -1,20 +1,20 @@
 void test_parse_handles_empty_stream() {
   CodeStream c(stream(""));
   checkEq(nextAstNode(c), eof());
-  check(c.fd.eof());
+  check(c.eof());
 }
 
 void test_parse_handles_trailing_comment() {
   CodeStream c(stream("34 ; abc"));
   checkEq(nextAstNode(c), Token("34"));
   checkEq(nextAstNode(c), eof());
-  check(c.fd.eof());
+  check(c.eof());
 }
 
 void test_parse_handles_atom() {
   CodeStream c(stream("34"));
   checkEq(nextAstNode(c), Token("34"));
-  check(c.fd.eof());
+  check(c.eof());
 }
 
 void test_parse_handles_atoms() {
@@ -23,7 +23,7 @@ void test_parse_handles_atoms() {
   checkEq(nextAstNode(c), Token("\"a b c\""));
   checkEq(nextAstNode(c), Token("3.4"));
   checkEq(nextAstNode(c), eof());
-  check(c.fd.eof());
+  check(c.eof());
 }
 
 void test_parse_handles_forms() {
@@ -37,7 +37,7 @@ void test_parse_handles_forms() {
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
   checkEq(nextAstNode(c), eof());
-  check(c.fd.eof());
+  check(c.eof());
 }
 
 void test_parse_handles_nested_forms() {
@@ -60,7 +60,7 @@ void test_parse_handles_nested_forms() {
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
   checkEq(nextAstNode(c), eof());
-  check(c.fd.eof());
+  check(c.eof());
 }
 
 void test_parse_handles_nested_forms_with_comments() {
@@ -83,7 +83,7 @@ void test_parse_handles_nested_forms_with_comments() {
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
   checkEq(nextAstNode(c), eof());
-  check(c.fd.eof());
+  check(c.eof());
 }
 
 void test_parse_handles_quotes() {
@@ -133,7 +133,7 @@ void test_parse_handles_quotes() {
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
   checkEq(nextAstNode(c), eof());
-  check(c.fd.eof());
+  check(c.eof());
 }
 
 void test_parse_handles_splice_operators() {
@@ -160,7 +160,7 @@ void test_parse_handles_splice_operators() {
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
   checkEq(nextAstNode(c), eof());
-  check(c.fd.eof());
+  check(c.eof());
 }
 
 void test_parse_handles_indented_toplevel_forms() {
@@ -181,5 +181,5 @@ void test_parse_handles_indented_toplevel_forms() {
   checkEq(p->atom.token, ")"); ++p;
   check(p == n.elems.end());
   checkEq(nextAstNode(c), eof());
-  check(c.fd.eof());
+  check(c.eof());
 }

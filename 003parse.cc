@@ -56,7 +56,7 @@ AstNode nextAstNode(CodeStream& c) {
 // internals
 
 Token nextNonWhitespaceToken(CodeStream& c) {
-  while (!c.fd.eof()) {
+  while (!c.eof()) {
     Token curr = nextToken(c);
     if (!curr.isIndent()) return curr;
   }
