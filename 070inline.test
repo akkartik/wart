@@ -1,4 +1,5 @@
 ern.
+err "-- inliner: "
 date.
 
 (test "inline works on functions"
