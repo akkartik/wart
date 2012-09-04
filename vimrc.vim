@@ -64,3 +64,8 @@ autocmd BufReadPost,BufNewFile *.wart,*.test,*.wtst call WartSettings()
 if (expand("%:e") =~ 'wart\|test\|wtst') " in case we loaded this too late on startup
   call WartSettings()
 endif
+
+autocmd FileType c,cpp syntax match Delimiter /[{}();,]/
+if (expand("%:e") =~ 'c\|cc\|cpp\|h') " in case we loaded this too late on startup
+  syntax match Delimiter /[{}();,]/
+endif
