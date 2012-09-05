@@ -1,6 +1,6 @@
 //// run unit tests or interactive interpreter
 
-// Whitespace-sensitivity requires remembering indent state across reads.
+// track indent state for whitespace-sensitivity
 struct CodeStream {
   istream& fd;
   long currIndent;

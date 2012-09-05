@@ -1,6 +1,6 @@
 // C++ style:
 //  no pointers except Cell*; pass by value where possible
-//  use long as the default integer type; it's always as large as a pointer
+//  use long as the default integer type; it's always large enough to hold pointers
 
 #include<cstdio>
 #include<cstring>
