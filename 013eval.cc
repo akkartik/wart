@@ -232,7 +232,7 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
       continue;
     }
 
-    if (isMacroWithoutBackquotes(fn))
+    if (isMacro(fn) && !contains(body(fn), newSym("`")))
       RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
     Cell* x = unsplice(car(curr), scope);
     for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
@@ -248,11 +248,6 @@ Cell* unsplice(Cell* arg, Cell* scope) {
 
 // supporting @ in macro calls
 stack<bool> inMacro;
-
-bool isMacroWithoutBackquotes(Cell* fn) {
-  if (!isMacro(fn)) return false;
-  return !contains(body(fn), newSym("`"));
-}
 
 // keep sync'd with mac
 bool isMacro(Cell* fn) {
