@@ -65,7 +65,7 @@ if (expand("%:e") =~ 'wart\|test\|wtst') " in case we loaded this too late on st
   call WartSettings()
 endif
 
-autocmd FileType c,cpp syntax match Delimiter /[{}();,]/
+autocmd FileType c,cpp syntax match Delimiter /[{}();,:.]/
 if (expand("%:e") =~ 'c\|cc\|cpp\|h') " in case we loaded this too late on startup
-  syntax match Delimiter /[{}();,]/
+  syntax match Delimiter /[{}();,:.]/
 endif
