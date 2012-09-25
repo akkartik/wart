@@ -104,7 +104,7 @@ void slurpWord(istream& in, ostream& out) {
   char lastc = '\0';
   char c;
   while (in >> c) {
-    // keep this list sync'd with the nextToken switch below
+    // keep this list sync'd with the nextToken switch
     if (isspace(c) || c == ';' || c == '(' || c == ')' || c == '"'
         || (quoteChars.find(c) != string::npos
             // put off quotes inside ssyntax
