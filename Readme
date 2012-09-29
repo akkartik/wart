@@ -218,6 +218,42 @@ possible, and it's easy to see what they expand to at the prompt:
   wart> 'a.b!c
   ((a b) 'c)
 
+--- Implicit gensyms
+
+Hygienic macros often need unique generated symbols or gensyms to avoid
+accidental capture:
+
+  mac bad-swap(x y)
+    `(let tmp ,x    ; tmp can be captured
+       (= ,x ,y)
+       (= ,y tmp))
+
+  wart> (withs (a 3 b 4)    (bad-swap a b)    (list a b))
+  (4 3)   ; seems ok
+
+  wart> (withs (a 3 tmp 4)  (bad-swap a tmp)  (list a tmp))
+  (3 4)   ; oops
+
+  mac better-swap(x y)
+    (let tmp (uniq)       ; (uniq) returns a gensym
+      `(let ,tmp ,x
+         (= ,x ,y)
+         (= ,y ,tmp)))
+
+  wart> (withs (a 3 tmp 4)  (better-swap a tmp)   (list a tmp))
+  (4 3)   ; now works
+
+Wart provides a feature to make this more convenient:
+
+  mac idiomatic-swap(x y)
+    `(let $tmp ,x         ; syms starting with $ are replaced with calls to uniq
+       (= ,x ,y)
+       (= ,y $tmp))
+
+Before running, every occurrence of $tmp within this top-level definition is
+replaced with a unique symbol, say tmp1037. Occurrences of $tmp outside this
+top-level definition are guaranteed to expand to a *different* unique symbol.
+
 --- Garbage collection
 
 Wart frees up unused memory using reference counting. Every Cell tracks the
