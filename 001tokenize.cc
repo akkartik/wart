@@ -45,6 +45,12 @@ struct Token {
   }
 };
 
+// The skeleton of a wart program.
+const string punctuationChars = "();\"";
+
+// Controlling eval and macros.
+const string quoteAndUnquoteChars = ",'`@";
+
 Token nextToken(CodeStream& c) {
   if (c.currIndent == -1)   // initial
     return Token(c.currIndent=indent(c.fd));
@@ -53,26 +59,17 @@ Token nextToken(CodeStream& c) {
     return Token(c.currIndent=indent(c.fd));
 
   ostringstream out;
-  switch (c.fd.peek()) {  // now can't be whitespace
-    case '"':
-      slurpString(c.fd, out); break;
-
-    case '(':
-    case ')':
-    case '\'':
-    case '`':
-    case '@':
-      slurpChar(c.fd, out); break;
-
-    case ',':
-      slurpChar(c.fd, out);
-      if (c.fd.peek() == '@')
-        slurpChar(c.fd, out);
-      break;
-
-    default:
-      slurpWord(c.fd, out); break;
-  }
+  char nextchar = c.fd.peek(); // guaranteed not to be whitespace
+  if (nextchar == '"')
+    slurpString(c.fd, out);
+  else if (find(punctuationChars, nextchar))
+    slurpChar(c.fd, out);
+  else if (nextchar == ',')
+    slurpUnquote(c.fd, out);
+  else if (find(quoteAndUnquoteChars, nextchar))
+    slurpChar(c.fd, out);
+  else
+    slurpWord(c.fd, out);     // delegate parsing of ssyntax, $vars, param aliases..
 
   if (out.str() == ":") return nextToken(c);
 
@@ -118,6 +115,12 @@ void slurpString(istream& in, ostream& out) {
     else if (c == '"')
       break;
   }
+}
+
+void slurpUnquote(istream& in, ostream& out) {
+  slurpChar(in, out);   // comma
+  if (in.peek() == '@')
+    slurpChar(in, out); // ..and maybe splice
 }
 
 void skipComment(istream& in) {
