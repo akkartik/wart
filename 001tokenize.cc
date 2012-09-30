@@ -101,11 +101,12 @@ void slurpChar(istream& in, ostream& out) {
 void slurpWord(istream& in, ostream& out) {
   static const string quoteChars = ",'`@";
   static const string ssyntaxChars = ":~!.&";   // disjoint from quoteChars
+  static const string punctuationChars = "();\"";
   char lastc = '\0';
   char c;
   while (in >> c) {
     // keep this list sync'd with the nextToken switch
-    if (isspace(c) || c == ';' || c == '(' || c == ')' || c == '"'
+    if (isspace(c) || punctuationChars.find(c) != string::npos
         || (quoteChars.find(c) != string::npos
             // put off quotes inside ssyntax
             && ssyntaxChars.find(lastc) == string::npos)) {
