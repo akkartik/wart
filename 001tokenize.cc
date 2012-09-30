@@ -159,3 +159,8 @@ const size_t NOT_FOUND = string::npos;
 bool find(string s, char c) {
   return s.find(c) != NOT_FOUND;
 }
+
+ostream& operator<<(ostream& os, Token y) {
+  if (y == "") return os << ":" << y.indentLevel;
+  else return os << y.token;
+}
