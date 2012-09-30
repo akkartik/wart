@@ -51,6 +51,9 @@ const string punctuationChars = "();\"";
 // Controlling eval and macros.
 const string quoteAndUnquoteChars = ",'`@";
 
+// Simple syntax abbreviations. Processed later.
+const string ssyntaxChars = ":~!.&";
+
 Token nextToken(CodeStream& c) {
   if (c.currIndent == -1)   // initial
     return Token(c.currIndent=indent(c.fd));
@@ -86,17 +89,13 @@ void slurpChar(istream& in, ostream& out) {
 }
 
 void slurpWord(istream& in, ostream& out) {
-  static const string quoteChars = ",'`@";
-  static const string ssyntaxChars = ":~!.&";   // disjoint from quoteChars
-  static const string punctuationChars = "();\"";
   char lastc = '\0';
   char c;
   while (in >> c) {
-    // keep this list sync'd with the nextToken switch
-    if (isspace(c) || find(punctuationChars, c)
-        || (find(quoteChars, c)
-            // put off quotes inside ssyntax
-            && !find(ssyntaxChars, lastc))) {
+    if (isspace(c)
+        || find(punctuationChars, c)
+        // let ssyntax phase deal with a.,b and so on.
+        || (find(quoteAndUnquoteChars, c) && !find(ssyntaxChars, lastc))) {
       in.putback(c);
       break;
     }
