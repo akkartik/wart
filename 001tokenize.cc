@@ -1,4 +1,7 @@
-//// tokenize input including newlines and indent
+//// split input into tokens separated by newlines, indent, and the following boundaries:
+const string punctuationChars = "();\""; // the skeleton of a wart program
+const string quoteAndUnquoteChars = ",'`@"; // controlling eval and macros
+const string ssyntaxChars = ":~!.&"; // simple syntax abbreviations; processed later
 
 // line contains 1 indent and zero or more regular tokens
 struct Token {
@@ -44,15 +47,6 @@ struct Token {
     return !(*this == x);
   }
 };
-
-// The skeleton of a wart program.
-const string punctuationChars = "();\"";
-
-// Controlling eval and macros.
-const string quoteAndUnquoteChars = ",'`@";
-
-// Simple syntax abbreviations. Processed later.
-const string ssyntaxChars = ":~!.&";
 
 Token nextToken(CodeStream& c) {
   if (c.currIndent == -1)   // initial
