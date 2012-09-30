@@ -93,7 +93,7 @@ void bindParams(Cell* params, Cell* args) {
 // split param sym at '/' and bind all resulting syms to val
 void bindParamAliases(Cell* param, Cell* val) {
   string name = toString(param);
-  if (name.find('/') == string::npos || name.find('/') == 0) {
+  if (!find(name, '/') || name.find('/') == 0) {
     addLexicalBinding(param, val);
     return;
   }
@@ -187,7 +187,7 @@ bool paramAliasMatch(Cell* arg, Cell* param) {
   if (!isSym(arg)) return false;
 
   string name = toString(param);
-  if (name.find('/') == string::npos || name.find('/') == 0)
+  if (!(find(name, '/') || name.find('/') == 0))
     return false;
 
   string expected = toString(arg);

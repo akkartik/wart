@@ -4,15 +4,15 @@ Cell* transform_ssyntax(Cell* input) {
   if (isSym(input)) {
     string var = toString(input);
     // avoid detecting floats as ssyntax
-    if (var.find_first_not_of("0123456789.:!~&") == string::npos)
+    if (var.find_first_not_of("0123456789.:!~&") == NOT_FOUND)
       ;
     else if (var[0] == '!')
       input = expandNot(var);
-    else if (var.find('.') != string::npos || var.find('!') < var.length()-1)
+    else if (find(var, '.') || var.find('!') < var.length()-1)
       input = expandCall(var);
-    else if (var[0] != ':' && var.find(':') != string::npos)
+    else if (var[0] != ':' && find(var, ':'))
       input = expandCompose(var);
-    else if (var.find('&') != string::npos)
+    else if (find(var, '&'))
       input = expandAndf(var);
     else if (var[0] == '~')
       input = expandComplement(var);
@@ -45,7 +45,7 @@ Cell* expandCall(string var) {
 
   size_t dot = var.rfind('.');
   size_t bang = end > 0 ? var.rfind('!', end-1) : var.rfind('!');
-  if (bang != string::npos && (dot == string::npos || bang > dot))
+  if (bang != NOT_FOUND && (dot == NOT_FOUND || bang > dot))
     var.replace(bang, 1, " '");
   else
     var.replace(dot, 1, " ");
