@@ -46,9 +46,9 @@ them in this manner.
   def len(x) :case (isa x queue)
     (queue-length x)
 
-Other features: first-class macros (fexprs) that are also open to extension,
-pervasive python-style keyword args, and it can deduce parens from indentation
-(but traditional lisp-with-parens will always work).
+Other features: first-class macros that are also open to extension, pervasive
+python-style keyword arguments, and it can deduce parens from indentation (but
+traditional lisp-with-parens will always work).
 
 You'll need linux and gcc.
 
@@ -79,7 +79,7 @@ By convention code in a '.cc' or '.wart' file stores its unit tests in the
 corresponding '.test.cc' or '.test' file respectively. To understand a strange
 name, find its tests.
 
---- Keyword args
+--- Keyword arguments
 
 You can change the order of arguments to a function -- or make their meaning
 more obvious -- by adding keywords. Keywords begin with a colon and are always
@@ -203,14 +203,14 @@ It also implies that backquoted expressions must be fully parenthesized:
 
 Wart uses a few simple syntax rules to reduce parens further:
 
-  a.b ; => (a b) unless a and b are all digits; 2.4 is a number
-  a.  ; => (a)
-  a!b ; => (a 'b)
-  !a  ; => (not a)
+  a.b                 ; => (a b) unless a and b are all digits; 2.4 is a number
+  a.                  ; => (a)
+  a!b                 ; => (a 'b)
+  !a                  ; => (not a)
 
-  f:g ; => (compose f g)
-  f&g ; => (andf f g)
-  ~f  ; => (complement f)
+  f:g                 ; => (compose f g)
+  f&g                 ; => (andf f g)
+  ~f                  ; => (complement f)
 
 The prededence rules for these operators are intended to be as intuitive as
 possible, and it's easy to see what they expand to at the prompt:
@@ -224,7 +224,7 @@ Hygienic macros often need unique generated symbols or gensyms to avoid
 accidental capture:
 
   mac bad-swap(x y)
-    `(let tmp ,x    ; tmp can be captured
+    `(let tmp ,x      ; tmp can be captured
        (= ,x ,y)
        (= ,y tmp))
 
@@ -235,7 +235,7 @@ accidental capture:
   (3 4)   ; oops
 
   mac better-swap(x y)
-    (let tmp (uniq)       ; (uniq) returns a gensym
+    (let tmp (uniq)           ; (uniq) returns a gensym
       `(let ,tmp ,x
          (= ,x ,y)
          (= ,y ,tmp)))
@@ -246,7 +246,7 @@ accidental capture:
 Wart provides a feature to make this more convenient:
 
   mac idiomatic-swap(x y)
-    `(let $tmp ,x         ; syms starting with $ are replaced with calls to uniq
+    `(let $tmp ,x             ; $tmp is search-and-replaced with (uniq)
        (= ,x ,y)
        (= ,y $tmp))
 
