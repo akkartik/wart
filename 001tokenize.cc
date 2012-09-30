@@ -7,19 +7,23 @@ const string ssyntaxChars = ":~!.&"; // simple syntax abbreviations; processed l
 struct Token {
   string token;
   long indentLevel;   // all tokens on a line share its indentLevel
+  // number of spaces between this token and the previous one on the line
+  // -1 = first token of line
+  long spacesBefore;
 
   explicit Token(string s)
-    :token(s), indentLevel(0) {}
+    :token(s), indentLevel(0), spacesBefore(0) {}
   explicit Token(long indent)
-    :token(""), indentLevel(indent) {}
-  Token(const string x, const long l)
-    :token(x), indentLevel(l) {}
+    :token(""), indentLevel(indent), spacesBefore(0) {}
+  Token(const string x, const long l, const long w)
+    :token(x), indentLevel(l), spacesBefore(w) {}
   Token(const Token& rhs)
-    :token(rhs.token), indentLevel(rhs.indentLevel) {}
+    :token(rhs.token), indentLevel(rhs.indentLevel), spacesBefore(rhs.spacesBefore) {}
   Token& operator=(const Token& rhs) {
     if (this == &rhs) return *this;
     token = rhs.token;
     indentLevel = rhs.indentLevel;
+    spacesBefore = rhs.spacesBefore;
     return *this;
   }
 
@@ -51,7 +55,7 @@ struct Token {
 Token nextToken(CodeStream& c) {
   if (c.currIndent == -1)   // initial
     return Token(c.currIndent=indent(c.fd));
-  skipWhitespace(c.fd);
+  int spacesBefore = skipWhitespace(c.fd);
   if (c.fd.peek() == '\n' || c.fd.peek() == ';')
     return Token(c.currIndent=indent(c.fd));
 
@@ -70,7 +74,7 @@ Token nextToken(CodeStream& c) {
 
   if (out.str() == ":") return nextToken(c);
 
-  return Token(out.str(), c.currIndent);
+  return Token(out.str(), c.currIndent, spacesBefore);
 }
 
 
@@ -145,9 +149,10 @@ long indent(istream& in) {
   return indent;
 }
 
-void skipWhitespace(istream& in) {
+int skipWhitespace(istream& in) {
   while (isspace(in.peek()) && in.peek() != '\n')
     skip(in);
+  return 0;
 }
 
 void skip(istream& in) {
