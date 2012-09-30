@@ -83,16 +83,6 @@ Token nextToken(CodeStream& c) {
 
 // internals
 
-void skip(istream& in) {
-  char dummy;
-  in >> dummy;
-}
-
-void skipWhitespace(istream& in) {
-  while (isspace(in.peek()) && in.peek() != '\n')
-    skip(in);
-}
-
 // slurp functions read a token when you're sure to be at it
 void slurpChar(istream& in, ostream& out) {
   out << (char)in.get();
@@ -157,4 +147,14 @@ long indent(istream& in) {
     else if (c == '\n') indent=0;
   }
   return indent;
+}
+
+void skipWhitespace(istream& in) {
+  while (isspace(in.peek()) && in.peek() != '\n')
+    skip(in);
+}
+
+void skip(istream& in) {
+  char dummy;
+  in >> dummy;
 }
