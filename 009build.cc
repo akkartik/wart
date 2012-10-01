@@ -3,7 +3,7 @@
 Cell* nextRawCell(CodeStream c) {
   c.fd.peek();
   if (c.fd.eof()) return nil;
-  return buildCell(nextAstNode(c));
+  return buildCell(transformInfix(nextAstNode(c)));
 }
 
 Cell* buildCell(AstNode n) {
