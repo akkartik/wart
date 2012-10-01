@@ -70,7 +70,7 @@ Token nextToken(CodeStream& c) {
   else if (find(quoteAndUnquoteChars, nextchar))
     slurpChar(c.fd, out);
   else
-    slurpWord(c.fd, out);     // delegate parsing of ssyntax, $vars, param aliases..
+    slurpWord(c.fd, out);
 
   if (out.str() == ":") return nextToken(c);
 
@@ -86,6 +86,8 @@ void slurpChar(istream& in, ostream& out) {
   out << (char)in.get();
 }
 
+// Tokenize by punctuation and quotes.
+// Later we'll deal with ssyntax, $vars, param aliases..
 void slurpWord(istream& in, ostream& out) {
   char lastc = '\0';
   char c;
@@ -120,15 +122,7 @@ void slurpUnquote(istream& in, ostream& out) {
     slurpChar(in, out); // ..and maybe splice
 }
 
-void skipComment(istream& in) {
-  char c;
-  while (in >> c) {
-    if (c == '\n') {
-      in.putback(c);
-      break;
-    }
-  }
-}
+
 
 // also modifies cs
 long indent(CodeStream& cs) {
@@ -151,6 +145,16 @@ long indent(CodeStream& cs) {
   return indent;
 }
 
+void skipComment(istream& in) {
+  char c;
+  while (in >> c) {
+    if (c == '\n') {
+      in.putback(c);
+      break;
+    }
+  }
+}
+
 int skipWhitespace(istream& in) {
   while (isspace(in.peek()) && in.peek() != '\n')
     skip(in);
@@ -161,6 +165,8 @@ void skip(istream& in) {
   char dummy;
   in >> dummy;
 }
+
+
 
 const size_t NOT_FOUND = string::npos;
 bool find(string s, char c) {
