@@ -54,10 +54,10 @@ struct Token {
 
 Token nextToken(CodeStream& c) {
   if (c.currIndent == -1)   // initial
-    return Token(c.currIndent=indent(c.fd));
+    return Token(indent(c));
   int spacesBefore = skipWhitespace(c.fd);
   if (c.fd.peek() == '\n' || c.fd.peek() == ';')
-    return Token(c.currIndent=indent(c.fd));
+    return Token(indent(c));
 
   ostringstream out;
   char nextchar = c.fd.peek(); // guaranteed not to be whitespace
@@ -130,15 +130,16 @@ void skipComment(istream& in) {
   }
 }
 
-long indent(istream& in) {
+// also modifies cs
+long indent(CodeStream& cs) {
   long indent = 0;
   char c;
-  while (in >> c) {
+  while (cs.fd >> c) {
     if (c == ';')
-      skipComment(in);
+      skipComment(cs.fd);
 
     else if (!isspace(c)) {
-      in.putback(c);
+      cs.fd.putback(c);
       break;
     }
 
@@ -146,6 +147,7 @@ long indent(istream& in) {
     else if (c == '\t') indent+=2;
     else if (c == '\n') indent=0;
   }
+  cs.currIndent = indent;
   return indent;
 }
 
