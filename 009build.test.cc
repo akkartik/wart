@@ -31,6 +31,16 @@ void test_build_handles_float() {
   check(cs.eof());
 }
 
+void test_build_warns_on_ambiguous_float() {
+  CodeStream cs(stream("-.4"));
+  Cell* c = nextRawCell(cs);
+  checkEq(raiseCount, 1); raiseCount=0;
+  check(isNum(c));
+  check(equalFloats(toFloat(c), -0.4));
+  rmref(c);
+  check(cs.eof());
+}
+
 void test_build_creates_floats_on_overflow() {
   CodeStream cs(stream("100000000000000000000"));
   Cell* c = nextRawCell(cs);

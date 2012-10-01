@@ -25,8 +25,12 @@ Cell* buildCell(AstNode n) {
       RAISE << "dropping precision for bignum " << n.atom.token << endl;
 
     float f = strtof(n.atom.token.c_str(), &end);
-    if (*end == '\0')
+    if (*end == '\0') {
+      if (n.atom.token.substr(0, 2) == "-.")
+        RAISE << "assuming '" << n.atom.token << "' is a float; to remove this warning say '-0" << n.atom.token.substr(1) << "'.\n"
+            << "If you mean to negate an int, skip the ssyntax: '-" << n.atom.token.substr(2) << "'.\n";
       return newNum(f);
+    }
 
     if (n.atom.token.c_str()[0] == '"')
       return newString(n.atom.token.substr(1, n.atom.token.length()-2));
