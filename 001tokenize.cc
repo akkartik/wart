@@ -55,7 +55,7 @@ struct Token {
 Token nextToken(CodeStream& c) {
   if (c.currIndent == -1)   // initial
     return Token(indent(c));
-  int spacesBefore = skipWhitespace(c.fd);
+  skipWhitespace(c);
   if (c.fd.peek() == '\n' || c.fd.peek() == ';')
     return Token(indent(c));
 
@@ -74,7 +74,7 @@ Token nextToken(CodeStream& c) {
 
   if (out.str() == ":") return nextToken(c);
 
-  return Token(out.str(), c.currIndent, spacesBefore);
+  return Token(out.str(), c.currIndent, c.spacesBefore);
 }
 
 
@@ -142,6 +142,8 @@ long indent(CodeStream& cs) {
     else if (c == '\n') indent=0;
   }
   cs.currIndent = indent;
+  cs.foundFirstTokenInLine = false;
+  cs.spacesBefore = -1;
   return indent;
 }
 
@@ -155,15 +157,21 @@ void skipComment(istream& in) {
   }
 }
 
-int skipWhitespace(istream& in) {
-  while (isspace(in.peek()) && in.peek() != '\n')
-    skip(in);
-  return 0;
-}
+// read whitespace from the stream, maybe recording their count
+void skipWhitespace(CodeStream& cs) {
+  int spaces = 0;
+  char c;
+  while (cs.fd >> c) {
+    if (!isspace(c) || c == '\n') {
+      cs.fd.putback(c);
+      break;
+    }
+    else if (c == ' ') ++spaces;
+    else if (c == '\t') spaces+=2;
+  }
 
-void skip(istream& in) {
-  char dummy;
-  in >> dummy;
+  if (cs.foundFirstTokenInLine) cs.spacesBefore = spaces;
+  cs.foundFirstTokenInLine = true;
 }
 
 
