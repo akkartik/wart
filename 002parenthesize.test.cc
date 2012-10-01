@@ -540,3 +540,39 @@ void test_parenthesize_errors_on_unbalanced_closed_paren() {
   checkEq(raiseCount, 1);       raiseCount=0;
   check(cs.eof());
 }
+
+void test_parenthesize_knows_spaces_before() {
+  CodeStream cs(stream("(a b  c)"));
+  list<Token> tokens = nextExpr(cs);
+  list<Token>::iterator p = tokens.begin();
+  checkEq(p->spacesBefore, -1);
+  checkEq(*p, "(");     ++p;
+  checkEq(p->spacesBefore, 0);
+  checkEq(*p, "a");   ++p;
+  checkEq(p->spacesBefore, 1);
+  checkEq(*p, "b");   ++p;
+  checkEq(p->spacesBefore, 2);
+  checkEq(*p, "c");     ++p;
+  checkEq(p->spacesBefore, 0);
+  checkEq(*p, ")");     ++p;
+  check(p == tokens.end());
+  check(cs.eof());
+}
+
+void test_parenthesize_knows_spaces_before2() {
+  CodeStream cs(stream("a b  c"));
+  list<Token> tokens = nextExpr(cs);
+  list<Token>::iterator p = tokens.begin();
+  checkEq(p->spacesBefore, -1);
+  checkEq(*p, "(");     ++p;
+  checkEq(p->spacesBefore, -1);
+  checkEq(*p, "a");   ++p;
+  checkEq(p->spacesBefore, 1);
+  checkEq(*p, "b");   ++p;
+  checkEq(p->spacesBefore, 2);
+  checkEq(*p, "c");     ++p;
+  checkEq(p->spacesBefore, -1);
+  checkEq(*p, ")");     ++p;
+  check(p == tokens.end());
+  check(cs.eof());
+}
