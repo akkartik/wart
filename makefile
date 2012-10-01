@@ -1,5 +1,5 @@
 wart_bin: type_list function_list file_list test_file_list test_list transform_list compiled_fn_list
-	g++ -g -Wall -Wextra boot.cc -o wart_bin
+	g++ -g -std=gnu++0x -Wall -Wextra boot.cc -o wart_bin
 	@echo
 
 type_list: *.cc
