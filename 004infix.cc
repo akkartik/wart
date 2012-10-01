@@ -1,5 +1,5 @@
 //// transform infix expressions into prefix
-const string extraSymChars = "?!_";
+const string extraSymChars = "$?!_";
 
 AstNode transformInfix(AstNode n) {
   if (infixOpCalledWithoutArgs(n))
@@ -14,6 +14,19 @@ bool isInfixOp(string name) {
     if (!isInfixChar(*p))
       return false;
   return true;
+}
+
+bool containsInfixChar(string name) {
+  for (string::iterator p = name.begin(); p != name.end(); ++p) {
+    if (isspace(*p) || find(punctuationChars, *p))
+      RAISE << "checked for infix chars in non-atom " << name << endl;
+
+    if (p == name.begin() && *p == '-')
+      continue;
+
+    if (isInfixChar(*p)) return true;
+  }
+  return false;
 }
 
 bool isInfixChar(char c) {
