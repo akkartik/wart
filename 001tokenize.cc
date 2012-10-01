@@ -12,9 +12,9 @@ struct Token {
   long spacesBefore;
 
   explicit Token(string s)
-    :token(s), indentLevel(0), spacesBefore(0) {}
+    :token(s), indentLevel(0), spacesBefore(-1) {}
   explicit Token(long indent)
-    :token(""), indentLevel(indent), spacesBefore(0) {}
+    :token(""), indentLevel(indent), spacesBefore(-1) {}
   Token(const string x, const long l, const long w)
     :token(x), indentLevel(l), spacesBefore(w) {}
   Token(const Token& rhs)
