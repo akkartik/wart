@@ -12,9 +12,9 @@ struct Token {
   long spacesBefore;
 
   explicit Token(string s)
-    :token(s), indentLevel(0), spacesBefore(-1) {}
+    :token(s), indentLevel(0), spacesBefore(0) {}
   explicit Token(long indent)
-    :token(""), indentLevel(indent), spacesBefore(-1) {}
+    :token(""), indentLevel(indent), spacesBefore(0) {}
   Token(const string x, const long l, const long w)
     :token(x), indentLevel(l), spacesBefore(w) {}
   Token(const Token& rhs)
@@ -54,10 +54,10 @@ struct Token {
 
 Token nextToken(CodeStream& c) {
   if (c.currIndent == -1)   // initial
-    return Token(indent(c));
-  skipWhitespace(c);
+    return Token(c.currIndent=indent(c.fd));
+  int spacesBefore = skipWhitespace(c.fd);
   if (c.fd.peek() == '\n' || c.fd.peek() == ';')
-    return Token(indent(c));
+    return Token(c.currIndent=indent(c.fd));
 
   ostringstream out;
   char nextchar = c.fd.peek(); // guaranteed not to be whitespace
@@ -74,7 +74,7 @@ Token nextToken(CodeStream& c) {
 
   if (out.str() == ":") return nextToken(c);
 
-  return Token(out.str(), c.currIndent, c.spacesBefore);
+  return Token(out.str(), c.currIndent, spacesBefore);
 }
 
 
@@ -125,15 +125,15 @@ void slurpUnquote(istream& in, ostream& out) {
 
 
 // also modifies cs
-long indent(CodeStream& cs) {
+long indent(istream& in) {
   long indent = 0;
   char c;
-  while (cs.fd >> c) {
+  while (in >> c) {
     if (c == ';')
-      skipComment(cs.fd);
+      skipComment(in);
 
     else if (!isspace(c)) {
-      cs.fd.putback(c);
+      in.putback(c);
       break;
     }
 
@@ -141,9 +141,6 @@ long indent(CodeStream& cs) {
     else if (c == '\t') indent+=2;
     else if (c == '\n') indent=0;
   }
-  cs.currIndent = indent;
-  cs.foundFirstTokenInLine = false;
-  cs.spacesBefore = -1;
   return indent;
 }
 
@@ -158,20 +155,19 @@ void skipComment(istream& in) {
 }
 
 // read whitespace from the stream, maybe recording their count
-void skipWhitespace(CodeStream& cs) {
+int skipWhitespace(istream& in) {
   int spaces = 0;
   char c;
-  while (cs.fd >> c) {
+  while (in >> c) {
     if (!isspace(c) || c == '\n') {
-      cs.fd.putback(c);
+      in.putback(c);
       break;
     }
     else if (c == ' ') ++spaces;
     else if (c == '\t') spaces+=2;
   }
 
-  if (cs.foundFirstTokenInLine) cs.spacesBefore = spaces;
-  cs.foundFirstTokenInLine = true;
+  return spaces;
 }
 
 

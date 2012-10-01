@@ -55,7 +55,7 @@ list<Token> nextLine(CodeStream& c) {
   if (endOfInput(c.fd)) return result;
 
   if (c.currIndent == -1)
-    result.push_back(Token(indent(c)));
+    result.push_back(Token(c.currIndent=indent(c.fd)));
   else
     result.push_back(Token(c.currIndent));
 

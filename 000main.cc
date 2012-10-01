@@ -4,8 +4,6 @@
 struct CodeStream {
   istream& fd;
   long currIndent;
-  long spacesBefore;
-  bool foundFirstTokenInLine;
   CodeStream(istream& in) :fd(in), currIndent(-1) { fd >> std::noskipws; }
   bool eof() { return fd.eof(); }
 };

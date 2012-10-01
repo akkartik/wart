@@ -221,10 +221,10 @@ void test_tokenize_populates_spaces_before() {
   CodeStream c(stream("  \nabc (def  ghi \n\n    \n  def"));
   Token t = nextToken(c);
   checkEq(t, indent(0));        t=nextToken(c);
-  checkEq(t.spacesBefore, -1);  t=nextToken(c);   // abc
+                                t=nextToken(c);   // abc
   checkEq(t.spacesBefore, 1);   t=nextToken(c);   // (
   checkEq(t.spacesBefore, 0);   t=nextToken(c);   // def
   checkEq(t.spacesBefore, 2);   t=nextToken(c);   // ghi
   checkEq(t, indent(2));        t=nextToken(c);
-  checkEq(t.spacesBefore, -1);  t=nextToken(c);   // def
+                                t=nextToken(c);   // def
 }
