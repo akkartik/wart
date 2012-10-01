@@ -2,6 +2,10 @@
   :valueof (+ 1 2 3 (* 1 2 2))
   :should be 10)
 
+(test "unary negation works"
+  :valueof (- 3)
+  :should be -3)
+
 (test "division works"
   :valueof (/ 4 2 2)
   :should be 1)
