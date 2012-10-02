@@ -35,7 +35,7 @@ let $iso iso
              (iso car.a car.b)
              (iso cdr.a cdr.b)))
 
-mac |=(var val)
+mac |=. (var val)
   `(or ,var
        (= ,var ,val))
 
