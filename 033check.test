@@ -169,24 +169,24 @@
 
 
 
-(test "or= works"
+(test "|= works"
   :valueof (ret x nil
-             (or= x 3))
+             (|= x 3))
   :should be 3)
 
-(test "or= shortcuts unnecessary evals"
+(test "|= shortcuts unnecessary evals"
   :valueof (with (x 3 y nil)
-             (or= x (= y 235)))
+             (|= x (= y 235)))
   :should be 3)
 
-(test "or= returns assigned value"
+(test "|= returns assigned value"
   :valueof (let x nil
-             (or= x 4))
+             (|= x 4))
   :should be 4)
 
-(test "or= returns old value on failure"
+(test "|= returns old value on failure"
   :valueof (let x 3
-             (or= x 4))
+             (|= x 4))
   :should be 3)
 
 

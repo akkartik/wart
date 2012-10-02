@@ -35,12 +35,12 @@ let $iso iso
              (iso car.a car.b)
              (iso cdr.a cdr.b)))
 
-mac or=(var val)
+mac |=(var val)
   `(or ,var
        (= ,var ,val))
 
 def is_match(a b bindings)
-  or= bindings (table)
+  |= bindings (table)
   (or (iso a b)
       (iso '_ a)  ; _ matches anything
       (and cons?.a cons?.b  ; default for objects
