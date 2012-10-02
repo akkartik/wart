@@ -37,10 +37,10 @@ def rpos(x seq n)
 def predicate(x) :case list?.x
   (fn(_) (pos _ x))
 
-def= car(seq x)
+def_assign car(seq x)
   (set_car seq x)
 
-def= cdr(seq x)
+def_assign cdr(seq x)
   (set_cdr seq x)
 
 def empty?(seq)
