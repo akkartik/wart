@@ -47,10 +47,10 @@ def >=. args
         pairwise.args)
 
 def min args
-  (best < args)
+  (best <. args)
 
 def max args
-  (best > args)
+  (best >. args)
 
 def <. (scorer) :case fn?.scorer
   (fn(x y)
