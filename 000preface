@@ -73,14 +73,15 @@ Misfits for the overall structure:
 
   sets of code files are preceded by high-level tests
 
-  so there's 3 tiers at which tests are grouped:
+  so there's 4 tiers at which tests are grouped:
+    design philosophy -- these writeups, currently not tested
     high-level design tests
     tests for individual functions
     tests for 'internal' functions
 
   keep each tier coherent without relying on lower levels. if an intrepid
   programmer decides to redo some subsystem he can ignore the tests of lower
-  levels with a clear conscience.
+  levels with a clear conscience. layered defense against regressions.
 
 some transitions are abrupt; this is deliberate. In spite of the volume of
 prose, this isn't a novel. It's a design, and abrupt transitions serve to
