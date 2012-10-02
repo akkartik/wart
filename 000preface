@@ -12,6 +12,9 @@
          (http://alistair.cockburn.us/ASD+book+extract%3A+%22Naur,+Ehn,+Musashi%22)
 
 
+Summarize the symptoms of the software crisis. One hypothesis: programmers
+don't all know the same theory. Blind men and elephant.
+
 Can the theory of a codebase be transmitted more easily between programmers?
 Most software either makes no attempt to rigorously state what it's trying to
 do, or does so using the isolated facts of tests. This codebase is an
