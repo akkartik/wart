@@ -95,7 +95,7 @@ Cell* read(istream& in) {
   return read(c);
 }
 
-COMPILE_FN(read-byte, compiledFn_read_byte, "('$eof)",
+COMPILE_FN(read_byte, compiledFn_read_byte, "('$eof)",
   istream& f = toIstream(STDIN);
   if (f.eof())
     return mkref(lookup("$eof"));

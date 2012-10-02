@@ -48,8 +48,8 @@ COMPILE_FN(type, compiledFn_type, "($x)",
   return mkref(type(lookup("$x")));
 )
 
-COMPILE_FN(coerce-quoted, compiledFn_coerce_quoted, "'($x $dest-type)",
-  return coerceQuoted(lookup("$x"), lookup("$dest-type"), lookup("coercions*"));  // already mkref'd
+COMPILE_FN(coerce_quoted, compiledFn_coerce_quoted, "'($x $dest_type)",
+  return coerceQuoted(lookup("$x"), lookup("$dest_type"), lookup("coercions*"));  // already mkref'd
 )
 
 // bindings
@@ -89,7 +89,7 @@ COMPILE_FN(bound?, compiledFn_isBound, "($var)",
   return mkref(var);
 )
 
-COMPILE_FN(make-unbound, compiledFn_make_unbound, "($var)",
+COMPILE_FN(make_unbound, compiledFn_make_unbound, "($var)",
   Cell* var = lookup("$var");
   stack<Cell*>& bindings = dynamics[var];   // unbind just in dynamic scopes
   while (!bindings.empty()) {
@@ -103,7 +103,7 @@ COMPILE_FN(make-unbound, compiledFn_make_unbound, "($var)",
 // macros
 
 // eval with extra smarts for handling @args
-COMPILE_FN(mac-eval, compiledFn_mac_eval, "('$x $scope)",
+COMPILE_FN(mac_eval, compiledFn_mac_eval, "('$x $scope)",
   inMacro.push(true);
   Cell* x = eval(lookup("$x"), currLexicalScope);
   Cell* ans = eval(x, lookup("$scope"));

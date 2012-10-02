@@ -8,7 +8,7 @@ mac =(lhs rhs) :case list?.lhs
 mac defset(type params . body)
   `(defcoerce ,type function=
      (fn ',params
-       (eval (do ,@body) caller-scope)))
+       (eval (do ,@body) caller_scope)))
 
 
 

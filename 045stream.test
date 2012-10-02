@@ -17,8 +17,8 @@ system "rm _x"
              read.)
   :should be 35)
 
-(test "read-byte works"
-  :valueof (w/instring "ab"
-             read-byte.
-             read-byte.)
+(test "read_byte works"
+  :valueof (w_instring "ab"
+             read_byte.
+             read_byte.)
   :should be 98)

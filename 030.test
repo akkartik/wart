@@ -43,13 +43,13 @@ date.
   :valueof (foo @'(1 (2 3)))
   :should be '(1 3))
 
-hide-warnings.
+hide_warnings.
 (def! foo(a b) `(cons ,a ,cdr.b))
 (mac! bar(a b) (foo a b))
 (test "macros calling function helpers work with splice"
   :valueof (bar @'(1 (2 3)))
   :should be '(1 3))
-show-warnings.
+show_warnings.
 
 
 

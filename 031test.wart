@@ -3,7 +3,7 @@ def test(msg pred/should expr/valueof expected)
     (err ".")
     (register_failed_test msg expr)
 
-def pending-test'(msg expr/valueof pred/should expected)
+def pending_test'(msg expr/valueof pred/should expected)
   (err "
 pending: ")
   (err msg)
@@ -12,4 +12,4 @@ alias be iso
 alias equal iso
 
 def match(a b)
-  (is-match b a)
+  (is_match b a)

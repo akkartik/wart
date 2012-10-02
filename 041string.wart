@@ -1,28 +1,28 @@
 defcall string(s idx . ends)
-  withs (idx (range-start s idx)
+  withs (idx (range_start s idx)
          end (if
                !ends
                  (+ idx 1)
                !car.ends
                  len.s
                :else
-                 (range-bounce s car.ends)))
+                 (range_bounce s car.ends)))
     (string_range s idx end)
 
 defset string((s idx . ends) val)
-  `(withs ($idx (range-start ,s ,idx)
+  `(withs ($idx (range_start ,s ,idx)
            $end ,(if !ends
                    `(+ $idx 1)
                    `(if !,car.ends
                       len.,s
-                      (range-bounce ,s ,car.ends))))
+                      (range_bounce ,s ,car.ends))))
       (string_splice ,s $idx $end (or ,val "")))
 
 defcoerce string symbol
   string_to_sym
 
 def str args
-  (w/outstring
+  (w_outstring
     (each arg args
       (if arg
         pr.arg)))

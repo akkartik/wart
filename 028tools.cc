@@ -16,12 +16,12 @@ COMPILE_FN(register_failed_test, compiledFn_incTests, "($msg $expr)",
   return nil;
 )
 
-COMPILE_FN(hide-warnings, compiledFn_hide_warnings, "()",
+COMPILE_FN(hide_warnings, compiledFn_hide_warnings, "()",
   pretendRaise = true;
   return nil;
 )
 
-COMPILE_FN(show-warnings, compiledFn_show_warnings, "()",
+COMPILE_FN(show_warnings, compiledFn_show_warnings, "()",
   pretendRaise = false;
   return nil;
 )
@@ -61,7 +61,7 @@ COMPILE_FN(globals, compiledFn_globals, "()",
 )
 
 // eval in a sandbox
-COMPILE_FN(try-eval, compiledFn_try_eval, "($x . $scope)",
+COMPILE_FN(try_eval, compiledFn_try_eval, "($x . $scope)",
   bool oldPretendRaise = pretendRaise;
   pretendRaise = true;
     Cell* ans = compiledFn_eval();

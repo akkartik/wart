@@ -13,8 +13,8 @@ void test_eval_handles_eval() {
 void test_eval_handles_nil_scope() {
   newLexicalScope();
   addLexicalBinding("x", newNum(34));
-  addLexicalBinding("caller-scope", nil);
-  Cell* call = read(stream("eval 'x caller-scope"));
+  addLexicalBinding("caller_scope", nil);
+  Cell* call = read(stream("eval 'x caller_scope"));
   Cell* result = eval(call);
   checkEq(result, nil);
   checkEq(raiseCount, 1);   raiseCount=0;

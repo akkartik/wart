@@ -44,7 +44,7 @@ Cell* eval(Cell* expr, Cell* scope) {
   newDynamicScope(CURR_LEXICAL_SCOPE, isCompiledFn(body(fn)) ? scope : env(fn));
   newLexicalScope();
   bindParams(sig(fn), evaldArgs);
-  addLexicalBinding("caller-scope", scope);
+  addLexicalBinding("caller_scope", scope);
 
   Cell* result = nil;
   if (isCompiledFn(body(fn)))
@@ -256,8 +256,8 @@ bool isMacro(Cell* fn) {
   Cell* forms = body(fn);
   if (cdr(forms) != nil) return false;
   Cell* form = car(forms);
-  if (car(form) != newSym("mac-eval")) return false;
-  if (car(cdr(cdr(form))) != newSym("caller-scope")) return false;
+  if (car(form) != newSym("mac_eval")) return false;
+  if (car(cdr(cdr(form))) != newSym("caller_scope")) return false;
   if (cdr(cdr(cdr(form))) != nil) return false;
   return true;
 }

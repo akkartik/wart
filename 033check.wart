@@ -39,13 +39,13 @@ mac or=(var val)
   `(or ,var
        (= ,var ,val))
 
-def is-match(a b bindings)
+def is_match(a b bindings)
   or= bindings (table)
   (or (iso a b)
       (iso '_ a)  ; _ matches anything
       (and cons?.a cons?.b  ; default for objects
-           (is-match car.a car.b bindings)
-           (is-match cdr.a cdr.b bindings)))
+           (is_match car.a car.b bindings)
+           (is_match cdr.a cdr.b bindings)))
 
 def only(f)
   (fn args

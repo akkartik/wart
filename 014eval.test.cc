@@ -608,7 +608,7 @@ void test_eval_handles_splice6() {
 }
 
 void test_eval_splice_on_macros_warns() {
-  Cell* expr = read(stream("(fn '(x y) (mac-eval (cons 'cons (cons x (cons y nil))) caller-scope))"));
+  Cell* expr = read(stream("(fn '(x y) (mac_eval (cons 'cons (cons x (cons y nil))) caller_scope))"));
   Cell* fn = eval(expr);
   newDynamicScope("f", fn);
   newDynamicScope("a", newNum(3));
@@ -630,7 +630,7 @@ void test_eval_splice_on_macros_warns() {
 }
 
 void test_eval_splice_on_macros_with_backquote() {
-  Cell* expr = read(stream("(fn '(x y) (mac-eval `(cons ,x ,y) caller-scope))"));
+  Cell* expr = read(stream("(fn '(x y) (mac_eval `(cons ,x ,y) caller_scope))"));
   Cell* fn = eval(expr);
   newDynamicScope("f", fn);
   newDynamicScope("a", newNum(3));
@@ -971,20 +971,6 @@ void test_eval_handles_keyword_args_for_fns2() {
   Cell* call = read(stream("(f :c 1 2)"));
   Cell* result = eval(call);
   checkEq(result, newNum(1));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  endDynamicScope("f");
-}
-
-void test_fns_can_have_params_starting_with_slash() {
-  Cell* fn = read(stream("(fn (/) /)"));
-  Cell* f = eval(fn);
-  newDynamicScope("f", f);
-  Cell* call = read(stream("(f 2)"));
-  Cell* result = eval(call);
-  checkEq(result, newNum(2));
   rmref(result);
   rmref(call);
   rmref(f);

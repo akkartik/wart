@@ -1,9 +1,9 @@
 = mac! (fn '(name params . body)
-  (mac-eval `(= ,name (fn ',params
+  (mac_eval `(= ,name (fn ',params
                         ; remember to update isMacro if you change this
-                        (mac-eval ((fn() ,@body))
-                                  caller-scope)))
-            caller-scope))
+                        (mac_eval ((fn() ,@body))
+                                  caller_scope)))
+            caller_scope))
 
 mac! def!(name params . body)
   `(= ,name (fn ,params ,@body))
@@ -36,7 +36,7 @@ mac alias(new old)  ; include later refinements
 
 def compose(f g)
   fn 'args
-    mac-eval `(,f (,g ,@args)) caller-scope
+    mac_eval `(,f (,g ,@args)) caller_scope
 
 def complement(f)
   (compose not f)
@@ -67,9 +67,9 @@ alias backquoted? backquote?:car
 = unquote (car:cadr '`(,1))
 def unquote?(_) (iso _ unquote)
 alias unquoted? unquote?:car
-= unquote-splice (car:cadr '`(,@1))
-def unquote-splice?(_) (iso _ unquote-splice)
-alias unquote-spliced? unquote-splice?:car
+= unquote_splice (car:cadr '`(,@1))
+def unquote_splice?(_) (iso _ unquote_splice)
+alias unquote_spliced? unquote_splice?:car
 = splice (car '@1)
 def splice?(_) (iso _ splice)
 alias spliced? splice?:car

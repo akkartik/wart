@@ -191,44 +191,44 @@
 
 
 
-(test "is-match - atom positive"
-  :valueof (is-match 3 3)
+(test "is_match - atom positive"
+  :valueof (is_match 3 3)
   :should ~be nil)
 
-(test "is-match - atom negative"
-  :valueof (is-match 3 4)
+(test "is_match - atom negative"
+  :valueof (is_match 3 4)
   :should be nil)
 
-(test "is-match - list positive"
-  :valueof (is-match '(1 (2 3)) '(1 (2 3)))
+(test "is_match - list positive"
+  :valueof (is_match '(1 (2 3)) '(1 (2 3)))
   :should ~be nil)
 
-(test "is-match - list negative"
-  :valueof (is-match '(2 (2 3)) '(1 (2 3)))
+(test "is_match - list negative"
+  :valueof (is_match '(2 (2 3)) '(1 (2 3)))
   :should be nil)
 
-(test "is-match treats _ as atom wildcard"
-  :valueof (is-match '_ 3)
+(test "is_match treats _ as atom wildcard"
+  :valueof (is_match '_ 3)
   :should ~be nil)
 
-(test "is-match - _ positive"
-  :valueof (is-match '(1 (_ 3 4)) '(1 (2 3 4)))
+(test "is_match - _ positive"
+  :valueof (is_match '(1 (_ 3 4)) '(1 (2 3 4)))
   :should ~be nil)
 
-(test "is-match - _ negative"
-  :valueof (is-match '(2 (_ 3 4)) '(1 (2 3 4)))
+(test "is_match - _ negative"
+  :valueof (is_match '(2 (_ 3 4)) '(1 (2 3 4)))
   :should be nil)
 
-(test "is-match - _ matches lists"
-  :valueof (is-match '_ '(3))
+(test "is_match - _ matches lists"
+  :valueof (is_match '_ '(3))
   :should ~be nil)
 
-(test "is-match - _ matches lists when dotted"
-  :valueof (is-match '(1 . _) '(1 2 3))
+(test "is_match - _ matches lists when dotted"
+  :valueof (is_match '(1 . _) '(1 2 3))
   :should ~be nil)
 
-(test "is-match - _ matches nil when dotted"
-  :valueof (is-match '(1 . _) '(1))
+(test "is_match - _ matches nil when dotted"
+  :valueof (is_match '(1 . _) '(1))
   :should ~be nil)
 
 

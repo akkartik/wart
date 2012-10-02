@@ -6,9 +6,7 @@ evalArgs != explicitly eval'ing a quoted param (handles @args)
 
 names to avoid because wart uses them internally:
   anything ending in a digit - $vars expand to digit suffixes
-  anything containing _ - match may misinterpret it
   anything containing / - conflicts with param aliases
-  mac-withs - internal to the inliner
 
 unary minus is problematic:
   -.3 => -0.3

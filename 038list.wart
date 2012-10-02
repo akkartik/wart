@@ -1,24 +1,24 @@
 defcall list(seq idx . ends)
-  withs (idx    (range-start seq idx)
+  withs (idx    (range_start seq idx)
          end    (if
                   !ends
                     (+ idx 1)
                   !car.ends
                     len.seq
                   :else
-                    (range-bounce seq car.ends))
+                    (range_bounce seq car.ends))
          slice  (list_range seq idx end))
     if ends
       slice
       car.slice
 
 defset list((seq idx . ends) val)
-  `(withs ($idx (range-start ,seq ,idx)
+  `(withs ($idx (range_start ,seq ,idx)
            $end ,(if !ends
                    `(+ $idx 1)
                    `(if !,car.ends
                       len.,seq
-                      (range-bounce ,seq ,car.ends))))
+                      (range_bounce ,seq ,car.ends))))
      ,(if ends
         `(list_splice ,seq $idx $end ,val)
         `(car:list_splice ,seq $idx $end list.,val)))
@@ -89,9 +89,9 @@ def zipmax(a b)
     (cons (list car.a car.b)
           (zipmax cdr.a cdr.b))
 
-def zip-flat(a b)
+def zip_flat(a b)
   if (and a b)
-    `(,car.a ,car.b ,@(zip-flat cdr.a cdr.b))
+    `(,car.a ,car.b ,@(zip_flat cdr.a cdr.b))
 
 def flatten(seq acc)
   (if
@@ -161,12 +161,12 @@ def best(f seq)
 
 ;; Internals
 
-def range-bounce(seq idx)
+def range_bounce(seq idx)
   if (< idx 0)
     (+ len.seq idx)
     idx
 
-def range-start(seq idx)
+def range_start(seq idx)
   if !idx
     0
-    (range-bounce seq idx)
+    (range_bounce seq idx)

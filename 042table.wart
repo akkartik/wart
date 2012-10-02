@@ -36,13 +36,13 @@ def iso(x y) :case table?.x
               (iso v y.k))
             (as list x)))
 
-def is-match(x y) :case table?.x
+def is_match(x y) :case table?.x
   (and table?.y
        (iso len:keys.x len:keys.y)
        (all (fn((k v))
-              (is-match v y.k))
+              (is_match v y.k))
             (as list x)))
 
-mac w/table(h . body)
+mac w_table(h . body)
   `(ret ,h (table)
      ,@body)

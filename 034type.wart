@@ -10,7 +10,7 @@ def table?(_)
   (isa _ table)
 def fn?(_)
   (isa _ function)
-def compiled-fn?(_)
+def compiled_fn?(_)
   (and (fn? _)
        (~cons? rep._!body))
 
@@ -24,8 +24,8 @@ def rep(x)
     x
     car:cddr.x
 
-def coerce(x 'dest-type)
-  eval `(coerce-quoted ,x ,dest-type)
+def coerce(x 'dest_type)
+  eval `(coerce_quoted ,x ,dest_type)
 = coercions* (table)
 
 mac defcoerce(src dest f)
@@ -51,7 +51,7 @@ mac as(type expr)
 
 def! compose(f g)
   fn 'args
-    eval `(,(as function f) (,(as function g) ,@args)) caller-scope
+    eval `(,(as function f) (,(as function g) ,@args)) caller_scope
 
 def sig(f)
   rep.f!sig
