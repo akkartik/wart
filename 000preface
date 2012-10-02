@@ -20,6 +20,16 @@ experiment in structuring tests into a higher-level organization.
 Transmitting theory requires more than just the codebase at hand. Some amount
 of the creator's belief system.
 
+Don't add constraints. Rely on programmer taste, and help future programmers
+bulk up their taste muscle.
+
+Here's a picture of my backpack: <img>
+
+Flat namespaces. Everything close at hand. Pockets sometimes useful, but ask
+if they're truly necessary. They'll increase the odds you'll leave something
+there to decay. No sub directories even though the major subsystems could be
+so grouped.
+
 
   If I look at any small part of it, I can see what is going on -- I don't
   need to refer to other parts to understand what something is doing.
@@ -33,6 +43,7 @@ of the creator's belief system.
       -- Richard Gabriel, The Quality Without A Name
          (http://dreamsongs.com/Files/PatternsOfSoftware.pdf, page 42)
 
+
 Outline of the project. Christopher Alexander's theory of 'misfit-driven
 design'.
 
@@ -44,11 +55,32 @@ back in time to a simpler version that exposes the skeleton.
 
 Misfits for the overall structure:
 
+  avoid getting locked into designs because of the order you chose to build
+  features in. redesign is hard; at least make it apparent what the current
+  design does. what needs to be duplicated?
+
   avoiding duplication between adding a file to a project and asking for it to
   be built
 
+  every code file with its own tests
+
+  no constraints but each code file puts the more important stuff first. At
+  the bottom are often functions internal to that file, that are seldom called
+  elsewhere.
+
   facilities for the enumeration of past designs, with their tests. so the
   reader can see how the design changed in response to new constraints.
+
+  sets of code files are preceded by high-level tests
+
+  so there's 3 tiers at which tests are grouped:
+    high-level design tests
+    tests for individual functions
+    tests for 'internal' functions
+
+  keep each tier coherent without relying on lower levels. if an intrepid
+  programmer decides to redo some subsystem he can ignore the tests of lower
+  levels with a clear conscience.
 
 some transitions are abrupt; this is deliberate. In spite of the volume of
 prose, this isn't a novel. It's a design, and abrupt transitions serve to
