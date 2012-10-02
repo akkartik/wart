@@ -41,7 +41,7 @@ Cell* expandCompose(string var) {
 Cell* expandCall(string var) {
   size_t end = var.length()-1;
   if (var.rfind('.') == end)
-    return newCons(newSym(var.substr(0, end)));
+    return nextRawCell(stream("("+var.substr(0, end)+")"));
 
   size_t dot = var.rfind('.');
   size_t bang = end > 0 ? var.rfind('!', end-1) : var.rfind('!');
