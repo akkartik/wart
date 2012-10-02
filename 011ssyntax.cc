@@ -1,27 +1,27 @@
 //// simple syntax shorthands transforming syms into forms
 
-Cell* transform_ssyntax(Cell* input) {
-  if (isSym(input)) {
-    string var = toString(input);
+Cell* transform_ssyntax(Cell* x) {
+  if (isSym(x)) {
+    string var = toString(x);
     // avoid detecting floats as ssyntax
     if (var.find_first_not_of("0123456789.:!~&") == NOT_FOUND)
       ;
     else if (var[0] == '!')
-      input = expandNot(var);
+      x = expandNot(var);
     else if (find(var, '.') || var.find('!') < var.length()-1)
-      input = expandCall(var);
+      x = expandCall(var);
     else if (var[0] != ':' && find(var, ':'))
-      input = expandCompose(var);
+      x = expandCompose(var);
     else if (find(var, '&'))
-      input = expandAndf(var);
+      x = expandAndf(var);
     else if (var[0] == '~')
-      input = expandComplement(var);
+      x = expandComplement(var);
   }
 
-  if (!isCons(input)) return input;   // no tables or compiledFns in static code
-  setCar(input, transform_ssyntax(car(input)));
-  setCdr(input, transform_ssyntax(cdr(input)));
-  return input;
+  if (!isCons(x)) return x;   // no tables or compiledFns in static code
+  setCar(x, transform_ssyntax(car(x)));
+  setCdr(x, transform_ssyntax(cdr(x)));
+  return x;
 }
 
 
