@@ -10,7 +10,10 @@ AstNode transformInfix(AstNode n) {
 
 
 bool isInfixOp(string name) {
-  for (string::iterator p = name.begin(); p != name.end(); ++p)
+  string::iterator p = name.begin();
+  if (*p != '$' && !isInfixChar(*p))
+    return false;
+  for (++p; p != name.end(); ++p)
     if (!isInfixChar(*p))
       return false;
   return true;
