@@ -12,6 +12,15 @@
          (http://alistair.cockburn.us/ASD+book+extract%3A+%22Naur,+Ehn,+Musashi%22)
 
 
+Can the theory of a codebase be transmitted more easily between programmers?
+Most software either makes no attempt to rigorously state what it's trying to
+do, or does so using the isolated facts of tests. This codebase is an
+experiment in structuring tests into a higher-level organization.
+
+Transmitting theory requires more than just the codebase at hand. Some amount
+of the creator's belief system.
+
+
   If I look at any small part of it, I can see what is going on -- I don't
   need to refer to other parts to understand what something is doing.
 
@@ -23,15 +32,6 @@
 
       -- Richard Gabriel, The Quality Without A Name
          (http://dreamsongs.com/Files/PatternsOfSoftware.pdf, page 42)
-
-
-Can the theory of a codebase be transmitted more easily between programmers?
-Most software either makes no attempt to rigorously state what it's trying to
-do, or does so using the isolated facts of tests. This codebase is an
-experiment in structuring tests into a higher-level organization.
-
-Transmitting theory requires more than just the codebase at hand. Some amount
-of the creator's belief system.
 
 Outline of the project. Christopher Alexander's theory of 'misfit-driven
 design'.

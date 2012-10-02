@@ -12,3 +12,28 @@ Invoke pieces to perform their semantics.
 Communicate semantics to other programmers using test scenarios.
 Invoke pieces with other pieces as arguments.
 Make the piece being invoked obvious to identify.
+
+Attempt 2 on index cards tries to cover the foundations:
+  Keep programs small.
+  Divide program into pieces.
+  Create new pieces at any time.
+  Create pieces in any order.
+  Provide pieces with parameters. [Fewer pieces => Keeps programs small]
+  Use basic primitives.
+  Specify semantics for new pieces using primitives.
+  Invoke pieces to perform their semantics.
+  Communicate semantics to other programmers using test scenarios.
+  Invoke pieces with other pieces as arguments.
+  Make the piece being invoked obvious to identify.
+
+Attempt 3:
+  Create pieces at any time.
+    (interactive vs compiled languages)
+  Create pieces in any order.
+    (module systems, lazy compilers)
+  Pieces can operate on other pieces.
+    (higher-order functions, macros)
+  Make the piece being invoked obvious to identify.
+    (always-prefix vs infix operators)
+  Invoking new pieces indistinguishable from basic ones.
+    (lisp vs fortran families)
