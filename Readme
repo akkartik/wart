@@ -116,7 +116,7 @@ function calls:
 
 If you want to refer to a param using a different keyword, use param aliases:
 
-  def test(msg pred/should expr/valueof expected)
+  def test(msg pred|should expr|valueof expected)
     ..
 
 Now test can refer to 'pred' and 'expr', but ':should' or ':valueof' may be

@@ -93,14 +93,14 @@ void bindParams(Cell* params, Cell* args) {
 // split param sym at '/' and bind all resulting syms to val
 void bindParamAliases(Cell* param, Cell* val) {
   string name = toString(param);
-  if (!find(name, '/') || name.find('/') == 0) {
+  if (!find(name, '|') || name.find('|') == 0) {
     addLexicalBinding(param, val);
     return;
   }
 
   char ns[name.length()+1];
   strcpy(ns, name.c_str());
-  for (char *tok = strtok(ns, "/"); tok; tok=strtok(NULL, "/"))
+  for (char *tok = strtok(ns, "|"); tok; tok=strtok(NULL, "|"))
     addLexicalBinding(newSym(tok), val);
 }
 
@@ -187,13 +187,13 @@ bool paramAliasMatch(Cell* arg, Cell* param) {
   if (!isSym(arg)) return false;
 
   string name = toString(param);
-  if (!(find(name, '/') || name.find('/') == 0))
+  if (!(find(name, '|') || name.find('|') == 0))
     return false;
 
   string expected = toString(arg);
   char ns[name.length()+1];
   strcpy(ns, name.c_str());
-  for (char *tok = strtok(ns, "/"); tok; tok=strtok(NULL, "/"))
+  for (char *tok = strtok(ns, "|"); tok; tok=strtok(NULL, "|"))
     if (expected == tok) return true;
   return false;
 }
