@@ -39,3 +39,52 @@ void test_infix_handles_dollar_op_without_args() {
   check(n.isAtom());
   checkEq(n.atom, Token("$+"));
 }
+
+void test_infix_handles_quoting() {
+  CodeStream cs(stream("',a"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token("'"));    ++p;
+  checkEq(*p, Token(","));    ++p;
+  checkEq(*p, Token("a"));    ++p;
+  check(p == n.elems.end());
+}
+
+void test_infix_handles_simple_lists() {
+  CodeStream cs(stream("a + b"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token("("));    ++p;
+  checkEq(*p, Token("+"));    ++p;
+  checkEq(*p, Token("a"));    ++p;
+  checkEq(*p, Token("b"));    ++p;
+  checkEq(*p, Token(")"));    ++p;
+  check(p == n.elems.end());
+}
+
+void test_infix_handles_infix_ops_in_prefix() {
+  CodeStream cs(stream("+ a b"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token("("));    ++p;
+  checkEq(*p, Token("+"));    ++p;
+  checkEq(*p, Token("a"));    ++p;
+  checkEq(*p, Token("b"));    ++p;
+  checkEq(*p, Token(")"));    ++p;
+  check(p == n.elems.end());
+}
+
+void test_infix_handles_infix_ops_in_unary_prefix() {
+  CodeStream cs(stream("+ a"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token("("));    ++p;
+  checkEq(*p, Token("+"));    ++p;
+  checkEq(*p, Token("a"));    ++p;
+  checkEq(*p, Token(")"));    ++p;
+  check(p == n.elems.end());
+}
