@@ -35,15 +35,15 @@ let $<. <.
          pairwise.args)
 
 def >. args
-  (all (fn((x y)) (< y x))
+  (all (fn((x y)) (y < x))
        pairwise.args)
 
 def <=. args
-  (none (fn((x y)) (< y x))
+  (none (fn((x y)) (y < x))
         pairwise.args)
 
 def >=. args
-  (none (fn((x y)) (< x y))
+  (none (fn((x y)) (x < y))
         pairwise.args)
 
 def min args
@@ -54,7 +54,7 @@ def max args
 
 def <. (scorer) :case fn?.scorer
   (fn(x y)
-    (< scorer.x scorer.y))
+    (scorer.x < scorer.y))
 
 
 

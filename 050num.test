@@ -39,7 +39,7 @@
   :should ~be nil)
 
 (test "< works inside if"
-  :valueof (if (< 3 0) 34 35)
+  :valueof (if (3 < 0) 34 35)
   :should be 35)
 
 (test "<= works"
@@ -83,7 +83,7 @@
   :should be '(1 10 2))
 
 (test "floats compare to within a tolerance"
-  :valueof (>= 2 2.0000001)
+  :valueof (2 >= 2.0000001)
   :should ~be nil)
 
 (test "sum works with zero args"

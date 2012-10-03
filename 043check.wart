@@ -40,7 +40,7 @@ mac |=. (var val)
        (= ,var ,val))
 
 def is_match(a b bindings)
-  |= bindings (table)
+  bindings |= (table)
   (or (iso a b)
       (iso '_ a)  ; _ matches anything
       (and cons?.a cons?.b  ; default for objects

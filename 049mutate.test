@@ -24,7 +24,7 @@
 
 (test "making works"
   :valueof (do
-             (= x 3)
+             (x = 3)
              (let f (fn() x)
                (list f.
                      (let x 4 f.)

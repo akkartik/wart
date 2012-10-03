@@ -69,15 +69,15 @@
 
 (test "or evals each arg at most once"
   :valueof (let x 0
-             (or (do (= x (+ x 1))
+             (or (do (x = (x + 1))
                      3)
-                 (do (= x (+ x 1))
+                 (do (x = (x + 1))
                      4))
              x)
   :should be 1)
 
 (test "or handles lexical scope"
-  :valueof (do (= x 35)
+  :valueof (do (x = 35)
                (let x 3
                  (or nil x)))
   :should be 3)
@@ -114,14 +114,14 @@
 
 (test "and short-circuits"
   :valueof (let x 0
-             (and (= x 3)
+             (and (x = 3)
                   nil
-                  (= x 4))
+                  (x = 4))
              x)
   :should be 3)
 
 (test "and handles dynamic scope"
-  :valueof (do (= x 35)
+  :valueof (do (x = 35)
                (and x 36))
   :should be 36)
 
@@ -176,7 +176,7 @@
 
 (test "|= shortcuts unnecessary evals"
   :valueof (with (x 3 y nil)
-             (|= x (= y 235)))
+             (|= x (y = 235)))
   :should be 3)
 
 (test "|= returns assigned value"

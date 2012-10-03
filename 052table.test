@@ -36,8 +36,8 @@
 (test "lists coerce to tables"
   :valueof (as table '((1 2) (3 4)))
   :should be (ret x (table)
-               (= x.1 2)
-               (= x.3 4)))
+               (x.1 = 2)
+               (x.3 = 4)))
 
 (test "tables coerce to lists"
   :valueof (as table (as list (table 1 2 3 4)))

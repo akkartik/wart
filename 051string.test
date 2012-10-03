@@ -32,38 +32,38 @@
 
 (test "string indices can be assigned to"
   :valueof (ret s "abc"
-             (= s.1 "z"))
+             (s.1 = "z"))
   :should be "azc")
 
 (test "string indices can be assigned to - 2"
   :valueof (ret s "abc"
-             (= s.-1 "z"))
+             (s.-1 = "z"))
   :should be "abz")
 
 (test "string slices can be assigned to"
   :valueof (ret s "abcdefgh"
-             (= (s 1 5) "xy"))
+             ((s 1 5) = "xy"))
   :should be "axyfgh")
 
 (test "string slices can be assigned to - 2"
   :valueof (ret s "abcdefgh"
-             (= (s -4 -1) "xy"))
+             ((s -4 -1) = "xy"))
   :should be "abcdxyh")
 
 (test "string slices can be assigned to - explicit nil"
   :valueof (ret s "abcdefgh"
-             (= (s -4 nil) "xy"))
+             ((s -4 nil) = "xy"))
   :should be "abcdxy")
 
 (test "string slices can be assigned to - explicit nil var"
   :valueof (ret s "abcdefgh"
              (let x nil
-               (= (s -4 x) "xy")))
+               ((s -4 x) = "xy")))
   :should be "abcdxy")
 
 (test "string index can be reset"
   :valueof (ret l "abc"
-             (= l.1 nil))
+             (l.1 = nil))
   :should be "ac")
 
 (test "each works on literal strings"
@@ -100,49 +100,49 @@
   :should be "ab")
 
 (test "< works on strings"
-  :valueof (< "a" "b")
+  :valueof ("a" < "b")
   :should ~be nil)
 
 (test "< works on strings - 2"
-  :valueof (< "b" "a")
+  :valueof ("b" < "a")
   :should be nil)
 
 (test "< works on strings - 3"
-  :valueof (< "a" "a")
+  :valueof ("a" < "a")
   :should be nil)
 
 (test "> works on strings"
-  :valueof (> "a" "b")
+  :valueof ("a" > "b")
   :should be nil)
 
 (test "> works on strings - 2"
-  :valueof (> "b" "a")
+  :valueof ("b" > "a")
   :should ~be nil)
 
-(test "> works on strings - 4"
-  :valueof (> "a" "a")
+(test "> works on strings - 3"
+  :valueof ("a" > "a")
   :should be nil)
 
 (test "<= works on strings"
-  :valueof (<= "a" "b")
+  :valueof ("a" <= "b")
   :should ~be nil)
 
 (test "<= works on strings - 2"
-  :valueof (<= "b" "a")
+  :valueof ("b" <= "a")
   :should be nil)
 
 (test "<= works on strings - 3"
-  :valueof (<= "a" "a")
+  :valueof ("a" <= "a")
   :should ~be nil)
 
 (test ">= works on strings"
-  :valueof (>= "a" "b")
+  :valueof ("a" >= "b")
   :should be nil)
 
 (test ">= works on strings - 2"
-  :valueof (>= "b" "a")
+  :valueof ("b" >= "a")
   :should ~be nil)
 
 (test ">= works on strings - 4"
-  :valueof (>= "a" "a")
+  :valueof ("a" >= "a")
   :should ~be nil)

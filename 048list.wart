@@ -24,11 +24,11 @@ defset list((seq idx . ends) val)
         `(car:list_splice ,seq $idx $end list.,val)))
 
 def pos(x seq n)
-  |= n 0
+  n |= 0
   if seq
     if (iso x car.seq)
       n
-      (pos x cdr.seq (+ n 1))
+      (pos x cdr.seq (n + 1))
 
 def rpos(x seq n)
   aif (pos x rev.seq n)
@@ -155,15 +155,15 @@ def best(f seq)
     ret winner car.seq
       each elem cdr.seq
         if (f elem winner)
-          = winner elem
+          winner = elem
 
 
 
 ;; Internals
 
 def range_bounce(seq idx)
-  if (< idx 0)
-    (+ len.seq idx)
+  if (idx < 0)
+    (len.seq + idx)
     idx
 
 def range_start(seq idx)

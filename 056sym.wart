@@ -9,11 +9,11 @@ def sym(s . rest) :case (and !rest keyword?.s)
   (as symbol (str.s 1 nil))
 
 def is_match(a b bindings) :case sym?.a
-  |= bindings (table)
+  bindings |= (table)
   (or (iso a b)
       (iso '_ a)
       (and (iso "_" str.a.0)  ; (_x _x) matches two of anything
-           (|= bindings.a b)
+           (bindings.a |= b)
            (iso bindings.a b))
       (and (iso "_" str.a.-1)   ; p_ matches any $p
            sym?.b
@@ -28,7 +28,7 @@ def is_match(a b bindings) :case sym?.a
              (and ai
                   (~iso acore str.b)
                   (iso sym.acore sym_root.b)
-                  (|= bindings.a b)
+                  (bindings.a |= b)
                   (iso bindings.a b)))))
 
 ; ignore the uniq part of a $sym

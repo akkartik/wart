@@ -58,14 +58,14 @@ show_warnings.
   :should be 4)
 
 (test "do evals all exprs"
-  :valueof ((fn(a) (do (= a (+ a 1))
-                       (= a (+ a 1))))
+  :valueof ((fn(a) (do (a = (a + 1))
+                       (a = (a + 1))))
                2)
   :should be 4)
 
 (test "compose works"
-  :valueof ((compose (fn(_) (+ _ 1))
-                     (fn(a b) (+ a b)))
+  :valueof ((compose (fn(_) (_ + 1))
+                     (fn(a b) (a + b)))
                3 4)
   :should be 8)
 
