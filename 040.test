@@ -1,5 +1,5 @@
 ern.
-err "-- 030.wart: "
+err "-- wart tests: "
 date.
 
 (mac! foo(x) `(+ 1 ,x))
