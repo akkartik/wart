@@ -88,5 +88,5 @@ ostream& operator<<(ostream& os, AstNode x) {
     prevWasOpen = (*p == "(" || *p == "'" || *p == "," || *p == ",@" || *p == "@");
     os << *p;
   }
-  return os << endl;
+  return os;
 }
