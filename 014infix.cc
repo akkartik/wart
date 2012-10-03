@@ -14,10 +14,10 @@ AstNode transformInfix(AstNode n) {
 
   // parse with an op stack
   stack<AstNode> ops, args;
-  auto p = ++n.elems.begin();
+  auto p = ++n.elems.begin();  // skip parens
   if (p->isAtom() && isInfixOp(p->atom.token))
     return n;   // disable infix when infix op is used in prefix
-  for (; p != --n.elems.end(); ++p) { // skip parens
+  for (; p != --n.elems.end(); ++p) {  // skip parens
     if (*p == Token("(") || *p == Token(")"))
       RAISE << "Unexpected paren inside AstNode " << n << endl;
     if (p->isAtom() && isInfixOp(p->atom.token))
@@ -34,17 +34,16 @@ AstNode transformInfix(AstNode n) {
     tmp.push_front(args.top());     args.pop();
     tmp.push_front(args.top());     args.pop();
     tmp.push_front(ops.top());      ops.pop();
+
+    tmp.push_front(AstNode(Token("(")));
+    tmp.push_back(AstNode(Token(")")));
     args.push(AstNode(tmp));
   }
 
   if (args.size() != 1)
     RAISE << "Error in parsing infix: " << n << endl << DIE;
 
-  AstNode result = args.top();
-  // reinsert parens
-  result.elems.push_front(n.elems.front()); // (
-  result.elems.push_back(n.elems.back()); // )
-  return result;
+  return args.top();
 }
 
 AstNode transformAll(AstNode n) {
