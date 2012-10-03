@@ -10,7 +10,7 @@ AstNode transformInfix(AstNode n) {
     return n;
 
   if (n.elems.front() != Token("("))
-    return n;
+    return transformAll(n);
 
   // parse with an op stack
   stack<AstNode> ops, args;
@@ -26,8 +26,8 @@ AstNode transformInfix(AstNode n) {
       args.push(transformInfix(*p));
   }
 
-  if (args.empty()) return n; // nil TODO: handle curried infix here?
-  if (ops.empty()) return n;
+  if (args.empty()) return transformAll(n); // TODO: handle curried infix here?
+  if (ops.empty()) return transformAll(n);
 
   while (!ops.empty()) {
     list<AstNode> tmp;
@@ -45,6 +45,15 @@ AstNode transformInfix(AstNode n) {
   result.elems.push_front(n.elems.front()); // (
   result.elems.push_back(n.elems.back()); // )
   return result;
+}
+
+AstNode transformAll(AstNode n) {
+  if (n.isAtom()) return n;
+  list<AstNode> results;
+  for (auto p = n.elems.begin(); p != n.elems.end(); ++p)
+    results.push_back(transformInfix(*p));
+  n.elems.swap(results);
+  return n;
 }
 
 

@@ -75,7 +75,7 @@
   :should ~be nil)
 
 (test "sort works"
-  :valueof (sort < '(1 12 3))
+  :valueof (sort <. '(1 12 3))
   :should be '(1 3 12))
 
 (test "sort works with scorer"

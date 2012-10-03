@@ -88,3 +88,19 @@ void test_infix_handles_infix_ops_in_unary_prefix() {
   checkEq(*p, Token(")"));    ++p;
   check(p == n.elems.end());
 }
+
+void test_infix_handles_infix_ops_in_nested_lists() {
+  CodeStream cs(stream("((a + b))"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  checkEq(n.elems.size(), 3);
+  AstNode n2 = *++n.elems.begin();
+  check(n2.isList());
+  list<AstNode>::iterator p = n2.elems.begin();
+  checkEq(*p, Token("("));    ++p;
+  checkEq(*p, Token("+"));    ++p;
+  checkEq(*p, Token("a"));    ++p;
+  checkEq(*p, Token("b"));    ++p;
+  checkEq(*p, Token(")"));    ++p;
+  check(p == n2.elems.end());
+}

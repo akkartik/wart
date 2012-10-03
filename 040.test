@@ -81,5 +81,5 @@ show_warnings.
 
 
 (test "map works"
-  :valueof (map ++ '(1 2 3))
+  :valueof (map ++. '(1 2 3))
   :should be '(2 3 4))
