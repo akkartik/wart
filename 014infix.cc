@@ -5,45 +5,51 @@ AstNode transformInfix(AstNode n) {
   if (infixOpCalledWithoutArgs(n))
     return *++n.elems.begin();
 
-  // TODO: split symbols and set their spacesBefore
-  if (n.isAtom())
+  if (n.isAtom() && !containsInfixChar(n.atom.token))
     return n;
+
+  if (n.isAtom())
+    n = tokenizeInfix(n);
 
   if (n.elems.front() != Token("("))
     return transformAll(n);
 
-  // parse with an op stack
-  stack<AstNode> ops, args;
-  auto p = ++n.elems.begin();  // skip parens
-  if (p->isAtom() && isInfixOp(p->atom.token))
-    return n;   // disable infix when infix op is used in prefix
-  for (; p != --n.elems.end(); ++p) {  // skip parens
-    if (*p == Token("(") || *p == Token(")"))
-      RAISE << "Unexpected paren inside AstNode " << n << endl;
-    if (p->isAtom() && isInfixOp(p->atom.token))
-      ops.push(*p);
-    else
-      args.push(transformInfix(*p));
-  }
+  if (n.elems.size() == 2)
+    return n;   // must be ()
 
-  if (args.empty()) return transformAll(n); // TODO: handle curried infix here?
-  if (ops.empty()) return transformAll(n);
+  int oldsize = n.elems.size();
 
-  while (!ops.empty()) {
+  // now n is guaranteed to have at least 3 ops
+  // slide a window of 3, pinching into s-exprs when middle elem is an op
+  auto prev = n.elems.begin();
+  auto curr=prev; ++curr;
+  auto next=curr; ++next;
+  for (; next != n.elems.end(); ++prev, ++curr, ++next) {
+    *curr = transformInfix(*curr);
+    if (!curr->isAtom() || !isInfixOp(curr->atom.token)) continue;
+    if (prev == n.elems.begin()) continue;  // prefix op
+    if (next == --n.elems.end()) continue;  // postfix op
     list<AstNode> tmp;
-    tmp.push_front(args.top());     args.pop();
-    tmp.push_front(args.top());     args.pop();
-    tmp.push_front(ops.top());      ops.pop();
-
+    tmp.push_back(*curr);  // op
+    tmp.push_back(*prev);
+    tmp.push_back(transformInfix(*next));
+    // parens
     tmp.push_front(AstNode(Token("(")));
     tmp.push_back(AstNode(Token(")")));
-    args.push(AstNode(tmp));
+    // insert the new s-expr
+    *curr = AstNode(tmp);
+    // update other iterators
+    n.elems.erase(prev);
+    prev=curr; --prev;
+    n.elems.erase(next);
+    next=curr; ++next;
   }
 
-  if (args.size() != 1)
-    RAISE << "Error in parsing infix: " << n << endl << DIE;
+  // (a + b) will have become ((+ a b)); strip out one pair of parens
+  if (n.elems.size() == 3 && oldsize > 3)
+    return *++n.elems.begin();
 
-  return args.top();
+  return n;
 }
 
 AstNode transformAll(AstNode n) {
@@ -52,6 +58,10 @@ AstNode transformAll(AstNode n) {
   for (auto p = n.elems.begin(); p != n.elems.end(); ++p)
     results.push_back(transformInfix(*p));
   n.elems.swap(results);
+  return n;
+}
+
+AstNode tokenizeInfix(AstNode n) {
   return n;
 }
 
@@ -69,9 +79,6 @@ bool isInfixOp(string name) {
 
 bool containsInfixChar(string name) {
   for (string::iterator p = name.begin(); p != name.end(); ++p) {
-    if (isspace(*p) || find(punctuationChars, *p))
-      RAISE << "checked for infix chars in non-atom " << name << endl;
-
     if (p == name.begin() && *p == '-')
       continue;
 
