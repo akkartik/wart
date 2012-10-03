@@ -7,23 +7,19 @@ const string ssyntaxChars = ":~!.&"; // simple syntax abbreviations; processed l
 struct Token {
   string token;
   long indentLevel;   // all tokens on a line share its indentLevel
-  // number of spaces between this token and the previous one on the line
-  // -1 = first token of line
-  long spacesBefore;
 
   explicit Token(string s)
-    :token(s), indentLevel(0), spacesBefore(0) {}
+    :token(s), indentLevel(0) {}
   explicit Token(long indent)
-    :token(""), indentLevel(indent), spacesBefore(0) {}
-  Token(const string x, const long l, const long w)
-    :token(x), indentLevel(l), spacesBefore(w) {}
+    :token(""), indentLevel(indent) {}
+  Token(const string x, const long l)
+    :token(x), indentLevel(l) {}
   Token(const Token& rhs)
-    :token(rhs.token), indentLevel(rhs.indentLevel), spacesBefore(rhs.spacesBefore) {}
+    :token(rhs.token), indentLevel(rhs.indentLevel) {}
   Token& operator=(const Token& rhs) {
     if (this == &rhs) return *this;
     token = rhs.token;
     indentLevel = rhs.indentLevel;
-    spacesBefore = rhs.spacesBefore;
     return *this;
   }
 
@@ -55,7 +51,7 @@ struct Token {
 Token nextToken(CodeStream& c) {
   if (c.currIndent == -1)   // initial
     return Token(c.currIndent=indent(c.fd));
-  int spacesBefore = skipWhitespace(c.fd);
+  skipWhitespace(c.fd);
   if (c.fd.peek() == '\n' || c.fd.peek() == ';')
     return Token(c.currIndent=indent(c.fd));
 
@@ -74,7 +70,7 @@ Token nextToken(CodeStream& c) {
 
   if (out.str() == ":") return nextToken(c);
 
-  return Token(out.str(), c.currIndent, spacesBefore);
+  return Token(out.str(), c.currIndent);
 }
 
 
@@ -154,20 +150,15 @@ void skipComment(istream& in) {
   }
 }
 
-// read whitespace from the stream, maybe recording their count
-int skipWhitespace(istream& in) {
-  int spaces = 0;
-  char c;
-  while (in >> c) {
-    if (!isspace(c) || c == '\n') {
-      in.putback(c);
-      break;
-    }
-    else if (c == ' ') ++spaces;
-    else if (c == '\t') spaces+=2;
-  }
 
-  return spaces;
+void skipWhitespace(istream& in) {
+  while (isspace(in.peek()) && in.peek() != '\n')
+    skip(in);
+}
+
+void skip(istream& in) {
+  char dummy;
+  in >> dummy;
 }
 
 

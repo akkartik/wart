@@ -183,29 +183,3 @@ void test_parse_handles_indented_toplevel_forms() {
   checkEq(nextAstNode(cs), eof());
   check(cs.eof());
 }
-
-void test_parse_receives_spacesBefore() {
-  CodeStream cs(stream("a  (b    c)"));
-  AstNode n = nextAstNode(cs);
-  check(n.isList());
-  list<AstNode>::iterator p = n.elems.begin();
-  check(p->isAtom());
-  checkEq(p->atom.token, "(");      ++p;
-  checkEq(p->atom.token, "a");      ++p;
-  check(p->isList());
-    list<AstNode> ast2 = p->elems;  ++p;
-    list<AstNode>::iterator q = ast2.begin();
-    check(q->isAtom());
-    checkEq(q->atom.spacesBefore, 2);
-    checkEq(q->atom.token, "(");    ++q;
-    checkEq(q->atom.token, "b");    ++q;
-    checkEq(q->atom.spacesBefore, 4);
-    checkEq(q->atom.token, "c");    ++q;
-    checkEq(q->atom.token, ")");    ++q;
-    check(q == ast2.end());
-  check(p->isAtom());
-  checkEq(p->atom.token, ")");      ++p;
-  check(p == n.elems.end());
-  checkEq(nextAstNode(cs), eof());
-  check(cs.eof());
-}
