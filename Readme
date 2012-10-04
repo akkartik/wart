@@ -53,7 +53,9 @@ traditional lisp-with-parens will always work).
 You'll need linux and gcc.
 
 To run it:
-  $ wart
+  $ git clone https://github.com/akkartik/wart.git
+  $ cd wart
+  $ ./wart
   wart>
 
 Hit <enter> twice to eval.
