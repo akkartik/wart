@@ -13,6 +13,9 @@ Communicate semantics to other programmers using test scenarios.
 Invoke pieces with other pieces as arguments.
 Make the piece being invoked obvious to identify.
 
+quoting
+closures
+
 Attempt 2 on index cards tries to cover the foundations:
   Keep programs small.
   Divide program into pieces.
