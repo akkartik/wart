@@ -228,3 +228,62 @@ void test_infix_handles_multiple_infix_ops() {
   checkEq(*p, Token(")"));          ++p;
   check(p == n.elems.end());
 }
+
+void test_infix_handles_op_without_spaces() {
+  CodeStream cs(stream("a+b"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token("("));          ++p;
+  checkEq(*p, Token("+"));          ++p;
+  checkEq(*p, Token("a"));          ++p;
+  checkEq(*p, Token("b"));          ++p;
+  checkEq(*p, Token(")"));          ++p;
+  check(p == n.elems.end());
+}
+
+void test_infix_gives_ops_without_spaces_precedence() {
+  CodeStream cs(stream("n * n-1"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token("("));    ++p;
+  checkEq(*p, Token("*"));    ++p;
+  checkEq(*p, Token("n"));    ++p;
+  AstNode n2 = *p;            ++p;
+    check(n2.isList());
+    list<AstNode>::iterator p2 = n2.elems.begin();
+    checkEq(*p2, Token("(")); ++p2;
+    checkEq(*p2, Token("-")); ++p2;
+    checkEq(*p2, Token("n")); ++p2;
+    checkEq(*p2, Token("1")); ++p2;
+    checkEq(*p2, Token(")")); ++p2;
+    check(p2 == n2.elems.end());
+  checkEq(*p, Token(")"));    ++p;
+  check(p == n.elems.end());
+}
+
+void test_infix_handles_ssyntax() {
+  CodeStream cs(stream("+."));
+  checkEq(transformInfix(nextAstNode(cs)), Token("+."));
+}
+
+void test_infix_handles_dollar_var() {
+  CodeStream cs(stream("$+"));
+  checkEq(transformInfix(nextAstNode(cs)), Token("$+"));
+}
+
+void test_infix_handles_negative_numbers_in_ssyntax() {
+  CodeStream cs(stream("l.-1"));
+  checkEq(transformInfix(nextAstNode(cs)), Token("l.-1"));
+}
+
+void test_infix_passes_through_strings() {
+  CodeStream cs(stream("\"a+b\""));
+  checkEq(transformInfix(nextAstNode(cs)), Token("\"a+b\""));
+}
+
+void test_infix_passes_through_floats() {
+  CodeStream cs(stream("2e-2"));
+  checkEq(transformInfix(nextAstNode(cs)), Token("2e-2"));
+}

@@ -8,6 +8,12 @@ AstNode transformInfix(AstNode n) {
   if (n.isAtom() && !containsInfixChar(n.atom.token))
     return n;
 
+  if (n.isAtom() && n.atom.token[0] == '\"')
+    return n;
+
+  if (n.isAtom() && parseableAsFloat(n.atom.token))
+    return n;
+
   if (n.isAtom())
     n = tokenizeInfix(n);
 
@@ -62,7 +68,22 @@ AstNode transformAll(AstNode n) {
 }
 
 AstNode tokenizeInfix(AstNode n) {
-  return n;
+  string var = n.atom.token;
+  string out;
+  out += var[0];
+  for (size_t x = 1; x < var.size(); ++x) {
+    if ((isInfixChar(var[x]) && isRegularChar(var[x-1])
+            // special-case: dollarvar
+            && var[x-1]!='$')
+        ||
+        (isRegularChar(var[x]) && isInfixChar(var[x-1])
+            // special-case: ssyntax followed by negative number
+            && (x <= 1 || !find(ssyntaxChars, var[x-2]) || var[x-1] != '-' || !isdigit(var[x]))))
+      out += " ";
+    out += var[x];
+  }
+  CodeStream cs(stream(out));
+  return nextAstNode(cs);
 }
 
 
@@ -93,6 +114,10 @@ bool isInfixChar(char c) {
       && !isalnum(c) && !find(extraSymChars, c);
 }
 
+bool isRegularChar(char c) {
+  return isalnum(c) || find(extraSymChars, c);
+}
+
 bool infixOpCalledWithoutArgs(AstNode n) {
   if (!n.isList() || n.elems.size() != 3) return false;
   list<AstNode>::iterator p = n.elems.begin();
@@ -102,4 +127,11 @@ bool infixOpCalledWithoutArgs(AstNode n) {
     return false;
   ++p;
   return *p == Token(")");
+}
+
+bool parseableAsFloat(string s) {
+  errno = 0;
+  char* end = NULL;
+  strtof(s.c_str(), &end);
+  return *end == '\0' && errno == 0;
 }

@@ -57,7 +57,7 @@ mac check(x test else)
        $x
        ,else))
 
-def maybe(f a (| b to))
+def maybe(f a b|to)
   if a
     (f a b)
     b

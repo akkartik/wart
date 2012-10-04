@@ -215,7 +215,7 @@ void test_bindParams_handles_vararg() {
 }
 
 void test_bindParams_binds_multiple_params() {
-  Cell* params = read(stream("((| a b))"));
+  Cell* params = read(stream("(a|b)"));
   Cell* args = read(stream("(1)"));
   newLexicalScope();
   bindParams(params, args);
@@ -965,7 +965,7 @@ void test_eval_handles_keyword_args_for_fns() {
 }
 
 void test_eval_handles_keyword_args_for_fns2() {
-  Cell* fn = read(stream("(fn (a b (| c x)) c)"));
+  Cell* fn = read(stream("(fn (a b c|x) c)"));
   Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read(stream("(f :c 1 2)"));
@@ -1071,7 +1071,7 @@ void test_eval_handles_non_keyword_arg_colon_syms() {
 }
 
 void test_eval_handles_body_keyword_synonym() {
-  Cell* fn = read(stream("(fn (a . (| body do)) body)"));
+  Cell* fn = read(stream("(fn (a . body|do) body)"));
   Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read(stream("(f 2 :do 1 3)"));
@@ -1087,7 +1087,7 @@ void test_eval_handles_body_keyword_synonym() {
 }
 
 void test_eval_handles_body_keyword_synonym2() {
-  Cell* fn = read(stream("(fn (a b . (| body do)) `(,a ,b ,body))"));
+  Cell* fn = read(stream("(fn (a b . body|do) `(,a ,b ,body))"));
   Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read(stream("(f 2 :do 1 3)"));

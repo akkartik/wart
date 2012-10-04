@@ -3,7 +3,7 @@ mac w_server_socket(socket port . body)
      (before close_socket.,socket
        ,@body))
 
-mac accepting(client_socket (| socket from) . body)
+mac accepting(client_socket socket|from . body)
   `(repeat :forever
      (let ,client_socket socket_accept.,socket
        (before close_socket.,client_socket
