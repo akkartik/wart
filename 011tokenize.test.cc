@@ -113,7 +113,7 @@ void test_tokenize_suppresses_comments() {
 }
 
 void test_tokenize_suppresses_comments2() {
-  CodeStream c(stream("a : b\n  : c\n;abc\ndef :\n  ghi\n\njkl"));
+  CodeStream c(stream("a b\n  c\n;abc\ndef\n  ghi\n\njkl"));
   Token t = nextToken(c);
   checkEq(t, indent(0));      t=nextToken(c);
   checkEq(t, "a");            t=nextToken(c);
