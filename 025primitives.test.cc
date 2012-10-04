@@ -137,3 +137,10 @@ void test_iso_handles_floats() {
   rmref(result);
   rmref(call);
 }
+
+void test_iso_float_vs_nil_works() {
+  Cell* call = read(stream("iso nil 1.5"));
+  eval(call);
+  checkEq(raiseCount, 0);
+  rmref(call);
+}

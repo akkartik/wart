@@ -31,6 +31,8 @@ COMPILE_FN(iso, compiledFn_iso, "($x $y)",
   Cell* result = nil;
   if (x == nil && y == nil)
     result = newNum(1);
+  else if (x == nil || y == nil)
+    result = nil;
   else if (x == y)
     result = x;
   else if (x->type == FLOAT || y->type == FLOAT)
