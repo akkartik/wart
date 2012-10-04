@@ -31,11 +31,11 @@ As a code sample, factorial in wart:
   def fact(n)
     if (iso n 0)                        ; iso is wart's comparison operator
       1
-      (* n (fact (- n 1)))
+      (n * (fact n-1))
 
   ; Alternatively
   def fact(n)
-    (* n (fact (- n 1)))
+    (n * (fact n-1))
   def fact(n) :case (iso n 0)
     1
 
@@ -190,13 +190,11 @@ If you don't like this approach, just use parens everywhere:
 
 Indentation-sensitivity is disabled inside parens. This rule is useful if you
 want multiple expressions on a single line:
-
   (if test1 body1     ; parens required to avoid grouping test2 and body2
       test2 body2
             else-expr)
 
 It also implies that backquoted expressions must be fully parenthesized:
-
   mac when(cond . body)
     `(if ,cond
        (do ,@body))   ; parens before 'do' are required
@@ -219,6 +217,119 @@ possible, and it's easy to see what they expand to at the prompt:
 
   wart> 'a.b!c
   ((a b) 'c)
+
+--- Infix operators with significant whitespace
+
+Unlike other lisps, wart supports infix operators.
+  wart> 3 + 1
+  4
+
+You don't need spaces around infix ops.
+  wart> 3+1
+  4
+
+Infix ops don't compromise homoiconicity; wart parses them into lisp forms so
+your macros don't have to worry about them:
+  a+b
+=>
+  (+ a b)
+
+Infix ops are always left-associative.
+  a+b+c
+=>
+  (+ (+ a b) c)
+
+Range comparisons are convenient as long as they return the first arg on
+success and pass nils through:
+  (a > b >= c)
+=>
+  (> a (>= b c))      ; >= returns b if condition is true; watch out if b is nil!
+
+  (> nil x)           ; should always be nil!
+
+You can mix infix ops with regular prefix lisp and the abbreviations above:
+  (a + (f b))
+=>
+  (+ a (f b))
+
+  (a + f.b)
+=>
+  (+ a (f b))
+
+  (fib n-1)
+=>
+  (fib (- n 1))
+
+There are no hardcoded precedence rules, just one rule: operators surrounded
+by whitespace have lower precedence than operators that are not.
+  (n * n-1)
+=>
+  (* n (- n 1))
+
+You can create your own infix ops:
+
+  def (<>) (a b)                        ; def <> (a b) would become <> def (a b)
+    (~iso a b)
+
+  wart> (1 <> 2)
+  1
+
+To permit arbitrary infix ops, wart makes them distinct from regular symbols.
+Regular symbols can only contain letters, digits, and the characters ':', '?',
+'!' and '_'. Infix ops can only contain other characters. Thus, the sets of
+'infix chars' and 'symbol chars' are disjoint. This implies that wart won't
+let you define some traditional lisp names that you might be used to:
+
+  wart> *global*
+  Error: ..
+
+  wart> 'uppercase-char-p
+  (- uppercase (- char p))              ; probably not what you want
+
+  wart> '(char> a "p")
+  ((> char a) p)                        ; probably not what you want
+
+To create multi-word symbols, use underscores or camelCase:
+
+  wart> 'a_b
+  a_b
+
+While regular symbols can't be used in infix mode, infix ops can be used like
+regular symbols. If you don't intend to use a function in infix mode you can
+name it using infix chars.
+
+  wart> '(+ a b)
+  (+ a b)
+
+To use an infix op in a higher-level function, wrap it in parens:
+
+  wart> (map ++ '(1 2 3))
+  Error: can't increment map
+
+  wart> (map (++) '(1 2 3))             ; hello haskell!
+  (2 3 4)
+
+Handy here is a simple syntax abbreviation from above:
+
+  wart> (map ++. '(1 2 3))
+
+Infix operators can coexist with paren-insertion:
+
+  a +
+    b+c * d
+
+=>
+
+  (a + (* (b + c) d))
+
+However, if your infix expressions need multiple lines, ask if they're worth
+doing in infix. The following is actually harder to read in infix:
+
+  (* some_function.some_argument
+     (+ some_other_function.some_other_argument
+        some_random_constant))
+
+I prefer to use infix only for simple expressions with short variable names.
 
 --- Implicit gensyms
 
