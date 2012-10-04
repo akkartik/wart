@@ -79,9 +79,14 @@ void bindParams(Cell* params, Cell* args) {
   params = stripQuote(params);
   if (params == nil) return;
 
+  if (isCons(params) && car(params) == newSym("|")) {
+    bindParamAliases(cdr(params), args);
+    return;
+  }
+
   Cell* orderedArgs = reorderKeywordArgs(params, args);
   if (isSym(params)) {
-    bindParamAliases(params, orderedArgs);
+    addLexicalBinding(params, orderedArgs);
   }
   else {
     bindParams(car(params), car(orderedArgs));
@@ -90,18 +95,9 @@ void bindParams(Cell* params, Cell* args) {
   rmref(orderedArgs);
 }
 
-// split param sym at '/' and bind all resulting syms to val
-void bindParamAliases(Cell* param, Cell* val) {
-  string name = toString(param);
-  if (!find(name, '|') || name.find('|') == 0) {
-    addLexicalBinding(param, val);
-    return;
-  }
-
-  char ns[name.length()+1];
-  strcpy(ns, name.c_str());
-  for (char *tok = strtok(ns, "|"); tok; tok=strtok(NULL, "|"))
-    addLexicalBinding(newSym(tok), val);
+void bindParamAliases(Cell* aliases, Cell* arg) {
+  for (; aliases != nil; aliases=cdr(aliases))
+    addLexicalBinding(car(aliases), arg);
 }
 
 
@@ -121,19 +117,36 @@ Cell* reorderKeywordArgs(Cell* params, Cell* args) {
 Cell* extractKeywordArgs(Cell* params, Cell* args, CellMap& keywordArgs) {
   Cell *pNonKeywordArgs = newCell(), *curr = pNonKeywordArgs;
   for (; isCons(args); args=cdr(args)) {
-    Cell* currArg = keywordArg(car(args), params);
-    if (currArg == nil) {
+    Cell* keywordParam = keywordArg(car(args), params);
+    if (keywordParam == nil) {
       addCons(curr, car(args));
       curr=cdr(curr);
     }
-    else if (isCons(currArg)) {   // rest keyword arg
-      keywordArgs[car(currArg)] = cdr(args);  // ..must be final keyword arg
-      rmref(currArg);
+    // keyword arg for rest param alias
+    else if (isCons(keywordParam) && cdr(keywordParam) == nil
+             && isCons(car(keywordParam)) && car(car(keywordParam)) == newSym("|")) {
+      args = cdr(args);   // skip keyword arg
+      for (Cell* p = cdr(car(keywordParam)); p != nil; p=cdr(p))
+        keywordArgs[car(p)] = args;
+      rmref(keywordParam);
       args = nil;
     }
+    // keyword arg for param alias
+    else if (isCons(keywordParam) && (car(keywordParam) == newSym("|"))) {
+      args = cdr(args);   // skip keyword arg
+      for (Cell* p = cdr(keywordParam); p != nil; p=cdr(p))
+        keywordArgs[car(p)] = car(args);
+    }
+    // simple rest keyword arg
+    else if (isCons(keywordParam)) {   // rest keyword arg
+      keywordArgs[car(keywordParam)] = cdr(args);  // ..must be final keyword arg
+      rmref(keywordParam);
+      args = nil;
+    }
+    // simple keyword arg
     else {
       args = cdr(args);   // skip keyword arg
-      keywordArgs[currArg] = car(args);
+      keywordArgs[keywordParam] = car(args);
     }
   }
   if (!isCons(args))  // improper list
@@ -149,7 +162,21 @@ Cell* argsInParamOrder(Cell* params, Cell* nonKeywordArgs, CellMap& keywordArgs)
       break;
     }
 
+    if (isCons(params) && car(params) == newSym("|")) {
+      if (keywordArgs[car(cdr(params))]) {
+        setCdr(curr, keywordArgs[car(cdr(params))]);
+        break;
+      }
+      else {
+        setCdr(curr, nonKeywordArgs);
+        break;
+      }
+    }
+
     Cell* param = stripQuote(car(params));
+    if (isCons(param) && car(param) == newSym("|"))
+      param = car(cdr(param));
+
     if (keywordArgs[param]) {
       addCons(curr, keywordArgs[param]);
     }
@@ -162,39 +189,40 @@ Cell* argsInParamOrder(Cell* params, Cell* nonKeywordArgs, CellMap& keywordArgs)
 }
 
 // return the appropriate param if arg is a valid keyword arg
-// handle param aliases; :a => a/b
+// handle param aliases; :a => (| a b)
 // respond to rest keyword args with (rest-param)
+// combining the two: respond to rest param aliases with ((| do body))
 // doesn't look inside destructured params
 Cell* keywordArg(Cell* arg, Cell* params) {
   if (!isColonSym(arg)) return nil;
-  Cell* realArg = newSym(toString(arg).substr(1));
+  Cell* candidate = newSym(toString(arg).substr(1));
   for (params=stripQuote(params); params != nil; params=stripQuote(cdr(params))) {
-    if (!isCons(params)) {
-      if (paramAliasMatch(realArg, params))
+    if (!isCons(params)) { // rest param
+      if (params == candidate)
+        return newCons(candidate);
+    }
+    else if (car(params) == newSym("|")) { // rest param aliases
+      if (paramAliasMatch(cdr(params), candidate))
         return newCons(params);
     }
-    else {
-      Cell* param = stripQuote(car(params));
-      if (paramAliasMatch(realArg, param))
-        return param;
+    // ignore destructuring except param aliases
+    else if (isCons(stripQuote(car(params)))
+             && car(stripQuote(car(params))) == newSym("|")) {
+      if (paramAliasMatch(cdr(stripQuote(car(params))), candidate))
+        return stripQuote(car(params));
+    }
+    else if (stripQuote(car(params)) == candidate) {
+      return candidate;
     }
   }
   return nil;
 }
 
-bool paramAliasMatch(Cell* arg, Cell* param) {
-  if (arg == param) return true;
-  if (!isSym(arg)) return false;
-
-  string name = toString(param);
-  if (!(find(name, '|') || name.find('|') == 0))
-    return false;
-
-  string expected = toString(arg);
-  char ns[name.length()+1];
-  strcpy(ns, name.c_str());
-  for (char *tok = strtok(ns, "|"); tok; tok=strtok(NULL, "|"))
-    if (expected == tok) return true;
+bool paramAliasMatch(Cell* aliases, Cell* candidate) {
+  for (; aliases != nil; aliases=cdr(aliases)) {
+    if (car(aliases) == candidate)
+      return true;
+  }
   return false;
 }
 
