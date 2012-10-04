@@ -10,8 +10,6 @@ Cell* transform_ssyntax(Cell* x) {
       x = expandNot(var);
     else if (find(var, '.') || var.find('!') < var.length()-1)
       x = expandCall(var);
-    else if (var[0] == '~')
-      x = expandComplement(var);
   }
 
   if (!isCons(x)) return x;   // no tables or compiledFns in static code
@@ -40,10 +38,5 @@ Cell* expandCall(string var) {
     var.replace(bang, 1, " '");
   else
     var.replace(dot, 1, " ");
-  return nextRawCell(stream(var));
-}
-
-Cell* expandComplement(string var) {
-  var.replace(0, 1, "complement ");
   return nextRawCell(stream(var));
 }

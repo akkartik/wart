@@ -68,24 +68,3 @@ void test_call_is_left_associative() {
   checkEq(cdr(cdr(cons)), nil);
   rmref(cons);
 }
-
-void test_complement_is_unary() {
-  Cell* sym = read(stream("a~b"));
-  checkEq(sym, newSym("a~b"));  // doesn't trigger for binary ops
-  rmref(sym);
-
-  Cell* cons = read(stream("~b"));
-  checkEq(car(cons), newSym("complement"));
-  checkEq(car(cdr(cons)), newSym("b"));
-  checkEq(cdr(cdr(cons)), nil);
-  rmref(cons);
-}
-
-void test_complement_before_call() {
-  Cell* cons = read(stream("~a.b"));
-  checkEq(car(car(cons)), newSym("complement"));
-  checkEq(car(cdr(car(cons))), newSym("a"));
-  checkEq(car(cdr(cons)), newSym("b"));
-  checkEq(cdr(cdr(cons)), nil);
-  rmref(cons);
-}

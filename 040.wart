@@ -43,6 +43,8 @@ alias :. compose
 def complement(f)
   (compose not f)
 
+alias ~. complement
+
 def list args
   if args
     (cons car.args

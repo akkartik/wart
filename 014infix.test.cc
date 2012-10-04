@@ -71,6 +71,19 @@ void test_infix_handles_op_without_args2() {
   check(p == n.elems.end());
 }
 
+void test_infix_handles_op_without_args3() {
+  CodeStream cs(stream("~a.b"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token("("));    ++p;
+  checkEq(*p, Token("~"));    ++p;
+  checkEq(*p, Token("a.b"));    ++p;
+  checkEq(*p, Token(")"));    ++p;
+  check(p == n.elems.end());
+  exit(0);
+}
+
 void test_infix_handles_dollar_op_without_args() {
   CodeStream cs(stream("($+)"));
   AstNode n = transformInfix(nextAstNode(cs));

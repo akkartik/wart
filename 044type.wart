@@ -30,7 +30,7 @@ Coercions = (table)
 
 mac defcoerce(src dest f)
   `(do
-     (if (~table_get Coercions ',dest)
+     (if (not (table_get Coercions ',dest))
        (table_set Coercions ',dest (table)))
      (table_set (table_get Coercions ',dest) ',src ,f))
 
