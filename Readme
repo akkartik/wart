@@ -156,22 +156,22 @@ Lines with a leading paren are never wrapped in parens:
     (prn x) x)
 
 Putting these rules together, parens are not required around 'if' in:
-  if (iso 1 (% x 2))
+  if (iso 1 x%2)
     'odd
     'even
 ..but they are required in:
   (if                 ; parens required because line has a single word
-    (iso 1 (% x 2))   ; parens required to avoid grouping with next line
+    (iso 1 x%2)       ; parens required to avoid grouping with next line
       'odd
     :else             ; optional, sometimes more clear
       'even)
 ..and, furthermore, this is wrong:
-  if (iso 1 (% x 2)
+  if (iso 1 x%2)
     'odd
   :else
     'even
 =>
-  (if (iso 1 (% x 2))
+  (if (iso 1 x%2)
     'odd)
   :else
   'even               ; wrong
