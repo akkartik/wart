@@ -70,14 +70,6 @@ void test_tokenize_handles_quote_comma_paren() {
   checkEq(t, ")");            t=nextToken(c);
 }
 
-void test_tokenize_doesnt_break_comma_right_after_ssyntax_char() {
-  CodeStream c(stream("'a:,b"));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));      t=nextToken(c);
-  checkEq(t, "'");            t=nextToken(c);
-  checkEq(t, "a:,b");         t=nextToken(c);
-}
-
 void test_tokenize_handles_splice_operators() {
   CodeStream c(stream("()',@ @, @b"));
   Token t = nextToken(c);

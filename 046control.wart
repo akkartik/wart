@@ -17,7 +17,7 @@ mac when(cond . body)
      (do ,@body))
 
 mac unless(cond . body)
-  `(if !,cond
+  `(if (not ,cond)
      (do ,@body))
 
 mac iflet(var expr . branches)
@@ -85,7 +85,7 @@ mac on(var expr . body)
        ,@body))
 
 mac forlen(var expr . body)
-  `(for ,var 0 (< ,var len.,expr) ++.,var
+  `(for ,var 0 (< ,var (len ,expr)) (++ ,var)
      ,@body)
 
 mac repeat(n . body)

@@ -1,7 +1,6 @@
 //// split input into tokens separated by newlines, indent, and the following boundaries:
 const string punctuationChars = "();\"";  // the skeleton of a wart program
 const string quoteAndUnquoteChars = ",'`@";   // controlling eval and macros
-const string ssyntaxChars = ":~!.";   // simple syntax abbreviations; processed later
 
 // line contains 1 indent and zero or more regular tokens
 struct Token {
@@ -90,8 +89,7 @@ void slurpWord(istream& in, ostream& out) {
   while (in >> c) {
     if (isspace(c)
         || find(punctuationChars, c)
-        // let ssyntax phase deal with a.,b and so on.
-        || (find(quoteAndUnquoteChars, c) && !find(ssyntaxChars, lastc))) {
+        || find(quoteAndUnquoteChars, c)) {
       in.putback(c);
       break;
     }

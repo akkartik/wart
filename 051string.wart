@@ -13,8 +13,8 @@ defset string((s idx . ends) val)
   `(withs ($idx (range_start ,s ,idx)
            $end ,(if !ends
                    `(+ $idx 1)
-                   `(if !,car.ends
-                      len.,s
+                   `(if (not ,car.ends)
+                      (len ,s)
                       (range_bounce ,s ,car.ends))))
       (string_splice ,s $idx $end (or ,val "")))
 
