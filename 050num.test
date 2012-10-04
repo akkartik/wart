@@ -22,6 +22,10 @@
   :valueof (divides 4 2)
   :should ~be nil)
 
+(test "comparing anything to nil always returns nil"
+  :valueof (< 3 nil)
+  :should be nil)
+
 (test "> works"
   :valueof (> 3 2 1)
   :should ~be nil)
@@ -97,3 +101,11 @@
 (test "sum works with multiple args"
   :valueof (sum '(1 2 3))
   :should be 6)
+
+(test "range checks work"
+  :valueof (1 <= 1 <= 2)
+  :should ~be nil)
+
+(test "range checks work - 2"
+  :valueof (3 >= 2 > 2)
+  :should be nil)

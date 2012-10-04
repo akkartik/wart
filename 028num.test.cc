@@ -31,3 +31,9 @@ void test_integer_drops_decimals() {
   rmref(result);
   rmref(call);
 }
+
+void test_lesser_always_passes_nil() {
+  Cell* call = read(stream("< 3 nil"));
+  checkEq(eval(call), nil);
+  rmref(call);
+}

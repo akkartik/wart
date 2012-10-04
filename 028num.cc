@@ -34,7 +34,9 @@ COMPILE_FN(%, compiledFn_modulo, "($x $y)",
 )
 
 COMPILE_FN(<, compiledFn_lesser, "($x $y)",
-  return toFloat(lookup("$x")) < toFloat(lookup("$y")) ? mkref(lookup("$x")) : nil;
+  if (lookup("$x") == nil || lookup("$y") == nil)
+    return nil;
+  return toFloat(lookup("$x")) < toFloat(lookup("$y")) ? mkref(lookup("$y")) : nil;
 )
 
 COMPILE_FN(int, compiledFn_integer, "($x)",

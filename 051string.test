@@ -120,6 +120,18 @@
   :should ~be nil)
 
 (test "> works on strings - 3"
+  :valueof (> "c" "b" "d")
+  :should be nil)
+
+(test "> works on strings - 4"
+  :valueof (> "c" "b" "a")
+  :should ~be nil)
+
+(test "> works on strings - 5"
+  :valueof (> "a" "b" "a")
+  :should be nil)
+
+(test "> works on strings - 3"
   :valueof ("a" > "a")
   :should be nil)
 
@@ -146,3 +158,11 @@
 (test ">= works on strings - 4"
   :valueof ("a" >= "a")
   :should ~be nil)
+
+(test "range checks work on strings"
+  :valueof ("a" <= "a" <= "b")
+  :should ~be nil)
+
+(test "range checks work on strings - 2"
+  :valueof ("c" >= "b" > "b")
+  :should be nil)
