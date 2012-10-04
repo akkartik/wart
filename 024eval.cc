@@ -379,7 +379,7 @@ bool isFn(Cell* x) {
 
 Cell* toFn(Cell* x) {
   if (x == nil || isFn(x)) return x;
-  Cell* result = coerceQuoted(x, newSym("function"), lookup("coercions*"));   rmref(x);
+  Cell* result = coerceQuoted(x, newSym("function"), lookup("Coercions"));   rmref(x);
   return result;
 }
 

@@ -49,7 +49,7 @@ COMPILE_FN(type, compiledFn_type, "($x)",
 )
 
 COMPILE_FN(coerce_quoted, compiledFn_coerce_quoted, "'($x $dest_type)",
-  return coerceQuoted(lookup("$x"), lookup("$dest_type"), lookup("coercions*"));  // already mkref'd
+  return coerceQuoted(lookup("$x"), lookup("$dest_type"), lookup("Coercions"));  // already mkref'd
 )
 
 // bindings

@@ -26,13 +26,13 @@ def rep(x)
 
 def coerce(x 'dest_type)
   eval `(coerce_quoted ,x ,dest_type)
-= coercions* (table)
+Coercions = (table)
 
 mac defcoerce(src dest f)
   `(do
-     (if (~table_get coercions* ',dest)
-       (table_set coercions* ',dest (table)))
-     (table_set (table_get coercions* ',dest) ',src ,f))
+     (if (~table_get Coercions ',dest)
+       (table_set Coercions ',dest (table)))
+     (table_set (table_get Coercions ',dest) ',src ,f))
 
 defcoerce nil list
   id

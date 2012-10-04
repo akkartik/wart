@@ -7,7 +7,7 @@ void test_string_range() {
 }
 
 void test_string_compare() {
-  Cell* expr = read(stream("string< \"abc\" \"abd\""));
+  Cell* expr = read(stream("string_lesser \"abc\" \"abd\""));
   Cell* result = eval(expr);
   checkEq(result, newNum(1))
   rmref(result);

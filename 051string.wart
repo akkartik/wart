@@ -47,7 +47,7 @@ defcoerce nil string
   (fn() "")
 
 def <. (a b) :case string?.a
-  (string< a b)
+  (string_lesser a b)
 
 def digit?(c)
   (and string?.c

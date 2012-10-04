@@ -61,7 +61,7 @@ COMPILE_FN(string_to_sym, compiledFn_string_to_sym, "($s)",
   return mkref(newSym(s));
 )
 
-COMPILE_FN(string<, compiledFn_string_lesser, "($x $y)",
+COMPILE_FN(string_lesser, compiledFn_string_lesser, "($x $y)",
   Cell* x = lookup("$x");
   Cell* y = lookup("$y");
   return toString(x) < toString(y) ? mkref(newNum(1)) : nil;

@@ -36,18 +36,18 @@ Cell* type(Cell* x) {
   }
 }
 
-// extensible coerce based on coercions* table
+// extensible coerce based on Coercions table
 // always mkrefs its result
 Cell* coerceQuoted(Cell* x, Cell* destType, Cell* coercions) {
   Cell* typ = type(x);
   if (typ == destType)
     return mkref(x);
 
-  if (coercions == nil) RAISE << "coercions* not initialized yet\n";
-  if (!isTable(coercions)) RAISE << "coercions* not a table\n";
+  if (coercions == nil) RAISE << "Coercions not initialized yet\n";
+  if (!isTable(coercions)) RAISE << "Coercions not a table\n";
   Cell* tmp = get(coercions, destType);
-  if (tmp == nil) RAISE << "coercions* for " << destType << " not initialized\n";
-  if (!isTable(coercions)) RAISE << "coercions* for " << destType << " not a table\n";
+  if (tmp == nil) RAISE << "Coercions for " << destType << " not initialized\n";
+  if (!isTable(coercions)) RAISE << "Coercions for " << destType << " not a table\n";
   Cell* coercer = get(tmp, typ);
   if (coercer == nil) {
     RAISE << "can't coerce " << typ << " " << x << " to " << destType << endl;
