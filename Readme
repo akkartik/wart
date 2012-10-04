@@ -320,7 +320,7 @@ Infix operators can coexist with paren-insertion:
 
 =>
 
-  (a + (* (b + c) d))
+  (+ a (* (+ b c) d))
 
 However, if your infix expressions need multiple lines, ask if they're worth
 doing in infix. The following is actually harder to read in infix:
@@ -330,6 +330,8 @@ doing in infix. The following is actually harder to read in infix:
         some_random_constant))
 
 I prefer to use infix only for simple expressions with short variable names.
+And I never use infix in macro expansions. After all, macros are the whole
+reason we have s-expressions.
 
 --- Implicit gensyms
 
