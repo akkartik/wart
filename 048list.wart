@@ -28,11 +28,11 @@ def pos(x seq n)
   if seq
     if (iso x car.seq)
       n
-      (pos x cdr.seq (n + 1))
+      (pos x cdr.seq n+1)
 
 def rpos(x seq n)
   aif (pos x rev.seq n)
-    (- len.seq 1 it)
+    (len.seq-1 - it)
 
 def predicate(x) :case list?.x
   (fn(_) (pos _ x))
