@@ -31,15 +31,24 @@ AstNode transformInfix(AstNode n) {
   auto curr=prev; ++curr;
   auto next=curr; ++next;
   for (; next != n.elems.end(); ++prev, ++curr, ++next) {
-    *curr = transformInfix(*curr);
-    if (!curr->isAtom() || !isInfixOp(curr->atom.token)) continue;
-    if (prev == n.elems.begin()) continue;  // prefix op
-    if (next == --n.elems.end()) continue;  // postfix op
+    if (!curr->isAtom() || !isInfixOp(curr->atom.token)) {
+      *curr = transformInfix(*curr);
+      continue;
+    }
+    if (prev == n.elems.begin()) {  // prefix op
+      *curr = transformInfix(*curr);
+      continue;
+    }
+    if (next == --n.elems.end()) {  // postfix op
+      *curr = transformInfix(*curr);
+      continue;
+    }
+    // switch to prefix
     list<AstNode> tmp;
-    tmp.push_back(*curr);  // op
+    tmp.push_back(transformInfix(*curr));  // op
     tmp.push_back(*prev);
     tmp.push_back(transformInfix(*next));
-    // parens
+    // wrap in parens
     tmp.push_front(AstNode(Token("(")));
     tmp.push_back(AstNode(Token(")")));
     // insert the new s-expr
