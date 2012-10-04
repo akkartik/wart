@@ -10,7 +10,7 @@ mac accepting(client_socket socket|from . body)
          ,@body)))  ; body must close client_socket
 
 def parse_request(client_socket)
-  making stdin infd:socket_fd.client_socket
+  making stdin (infd:socket_fd client_socket)
     let (verb url) read.
       url
 
@@ -19,7 +19,7 @@ def http_server(port)
     preforking 6  ; handler threads
       accepting client_socket :from socket
         let url parse_request.client_socket
-          making stdout infd:socket_fd.client_socket
+          making stdout (infd:socket_fd client_socket)
             prn "HTTP/1.0 200 OK"
             prn "Content-type: text/plain"
             prn.

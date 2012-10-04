@@ -53,6 +53,8 @@ def map(f seq)
 
 alias cadr car:cdr
 alias cddr cdr:cdr
+alias caar car:car
+alias cdar cdr:car
 
 def id(_)
   _

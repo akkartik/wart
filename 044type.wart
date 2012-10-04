@@ -22,7 +22,7 @@ def tag(type val)
 def rep(x)
   if (or ~cons?.x (~iso 'object car.x))
     x
-    car:cddr.x
+    (car:cddr x)
 
 def coerce(x 'dest_type)
   eval `(coerce_quoted ,x ,dest_type)

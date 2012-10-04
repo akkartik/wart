@@ -34,6 +34,6 @@ def is_match(a b bindings) :case sym?.a
 ; ignore the uniq part of a $sym
 def sym_root(x)
   let name (rev:as list str.x)
-    while (and name digit?:car.name)
+    while (and name (digit? car.name))
       (zap cdr name)
     (sym @rev.name)

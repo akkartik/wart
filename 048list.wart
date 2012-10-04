@@ -21,7 +21,7 @@ defset list((seq idx . ends) val)
                       (range_bounce ,seq ,car.ends))))
      ,(if ends
         `(list_splice ,seq $idx $end ,val)
-        `(car:list_splice ,seq $idx $end (list ,val))))
+        `(car (list_splice ,seq $idx $end (list ,val)))))
 
 def pos(x seq n)
   n |= 0
@@ -51,7 +51,7 @@ def blank?(seq)
 
 def copy(x)
   if cons?.x  ; piecewise copy for objects by default
-    (cons copy:car.x copy:cdr.x)
+    (cons (copy car.x) (copy cdr.x))
     x
 
 def single?(x)
@@ -60,8 +60,8 @@ def single?(x)
 def pair?(x)
   (and list?.x
        cdr.x
-       list?:cdr.x
-       ~cdr:cdr.x)
+       (list? cdr.x)
+       (~cdr cdr.x))
 
 def rev(seq acc)
   if !seq
@@ -75,7 +75,7 @@ def lastcons(seq)
     seq
 
 def last(seq)
-  car:lastcons.seq
+  (car lastcons.seq)
 
 
 
@@ -107,18 +107,18 @@ def flatten(seq acc)
 def join args
   if args
     if car.args
-      (cons car:car.args
-            (join cdr:car.args @cdr.args))
+      (cons caar.args
+            (join cdar.args @cdr.args))
       (join @cdr.args)
 
 def keep(f seq)
   if seq
-    if f:car.seq
+    if (f car.seq)
       (cons car.seq (keep f cdr.seq))
       (keep f cdr.seq)
 
 def rem(f seq)
-  (keep complement:predicate.f seq)
+  (keep (complement predicate.f) seq)
 alias skip rem
 
 def some(f seq)

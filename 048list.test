@@ -104,7 +104,7 @@
 
 (test "nested lists can be assigned to"
   :valueof (ret l '(1 (2 3))
-             (((l 1) 0) = 3))
+             (l.1.0 = 3))
   :should be '(1 (3 3)))
 
 (test "elems of other types can be assigned to"
