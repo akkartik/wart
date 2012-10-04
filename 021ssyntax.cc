@@ -12,8 +12,6 @@ Cell* transform_ssyntax(Cell* x) {
       x = expandCall(var);
     else if (var[0] != ':' && find(var, ':'))
       x = expandCompose(var);
-    else if (find(var, '&'))
-      x = expandAndf(var);
     else if (var[0] == '~')
       x = expandComplement(var);
   }
@@ -50,11 +48,6 @@ Cell* expandCall(string var) {
   else
     var.replace(dot, 1, " ");
   return nextRawCell(stream(var));
-}
-
-Cell* expandAndf(string var) {
-  var.replace(var.rfind('&'), 1, " ");
-  return nextRawCell(stream("andf "+var));
 }
 
 Cell* expandComplement(string var) {

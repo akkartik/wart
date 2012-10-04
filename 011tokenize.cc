@@ -1,7 +1,7 @@
 //// split input into tokens separated by newlines, indent, and the following boundaries:
 const string punctuationChars = "();\"";  // the skeleton of a wart program
 const string quoteAndUnquoteChars = ",'`@";   // controlling eval and macros
-const string ssyntaxChars = ":~!.&";   // simple syntax abbreviations; processed later
+const string ssyntaxChars = ":~!.";   // simple syntax abbreviations; processed later
 
 // line contains 1 indent and zero or more regular tokens
 struct Token {

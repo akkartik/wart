@@ -210,7 +210,6 @@ Wart uses a few simple syntax rules to reduce parens further:
 
   f:g                 ; => (compose f g)
   ~f                  ; => (complement f)
-  f&g                 ; => (andf f g)     ; fn that calls g if call to f succeeds
 
 The prededence rules for these operators are intended to be as intuitive as
 possible, and it's easy to see what they expand to at the prompt:
