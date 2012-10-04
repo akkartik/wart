@@ -4,12 +4,16 @@ Cell* transform_ssyntax(Cell* x) {
   if (isSym(x)) {
     string var = toString(x);
     // avoid detecting floats as ssyntax
-    if (var.find_first_not_of("0123456789."+ssyntaxChars) == NOT_FOUND)
+    if (var.find_first_not_of("0123456789.:!~&") == NOT_FOUND)
       ;
     else if (var[0] == '!')
       x = expandNot(var);
     else if (find(var, '.') || var.find('!') < var.length()-1)
       x = expandCall(var);
+    else if (var[0] != ':' && find(var, ':'))
+      x = expandCompose(var);
+    else if (var[0] == '~')
+      x = expandComplement(var);
   }
 
   if (!isCons(x)) return x;   // no tables or compiledFns in static code
@@ -27,6 +31,11 @@ Cell* expandNot(string var) {
   return nextRawCell(stream(var));
 }
 
+Cell* expandCompose(string var) {
+  var.replace(var.rfind(':'), 1, " ");
+  return nextRawCell(stream("compose "+var));
+}
+
 Cell* expandCall(string var) {
   size_t end = var.length()-1;
   if (var.rfind('.') == end)
@@ -38,5 +47,10 @@ Cell* expandCall(string var) {
     var.replace(bang, 1, " '");
   else
     var.replace(dot, 1, " ");
+  return nextRawCell(stream(var));
+}
+
+Cell* expandComplement(string var) {
+  var.replace(0, 1, "complement ");
   return nextRawCell(stream(var));
 }

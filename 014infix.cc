@@ -1,6 +1,6 @@
 //// transform infix expressions into prefix
 const string extraSymChars = "$?!_";
-const string ssyntaxChars = "!.";   // simple syntax abbreviations; processed later
+const string ssyntaxChars = ":~!.";   // simple syntax abbreviations; processed later
 
 AstNode transformInfix(AstNode n) {
   if (n.isAtom() && !containsInfixChar(n.atom.token))
@@ -70,8 +70,6 @@ AstNode transformInfix(AstNode n) {
 
 AstNode tokenizeInfix(AstNode n) {
   string var = n.atom.token;
-  // special-case: :sym is never infix
-  if (var[0] == ':') return n;
   string out;
   out += var[0];
   for (size_t x = 1; x < var.size(); ++x) {

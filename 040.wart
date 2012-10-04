@@ -38,12 +38,8 @@ def compose(f g)
   fn 'args
     mac_eval `(,f (,g ,@args)) caller_scope
 
-alias :. compose
-
 def complement(f)
   (compose not f)
-
-alias ~. complement
 
 def list args
   if args
@@ -57,8 +53,6 @@ def map(f seq)
 
 alias cadr car:cdr
 alias cddr cdr:cdr
-alias caar car:car
-alias cdar cdr:car
 
 def id(_)
   _
