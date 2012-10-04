@@ -2,9 +2,6 @@
 const string extraSymChars = "$?!_";
 
 AstNode transformInfix(AstNode n) {
-  if (infixOpCalledWithoutArgs(n))
-    return *++n.elems.begin();
-
   if (n.isAtom() && !containsInfixChar(n.atom.token))
     return n;
 
@@ -18,10 +15,13 @@ AstNode transformInfix(AstNode n) {
     n = tokenizeInfix(n);
 
   if (n.elems.front() != Token("("))
-    return transformAll(n);
+    return n;
 
-  if (n.elems.size() == 2)
-    return n;   // must be ()
+  if (n.elems.size() == 2)  // ()
+    return n;
+
+  if (infixOpCalledWithoutArgs(n))
+    return *++n.elems.begin();  // (++) => ++
 
   int oldsize = n.elems.size();
 
@@ -58,26 +58,17 @@ AstNode transformInfix(AstNode n) {
   return n;
 }
 
-AstNode transformAll(AstNode n) {
-  if (n.isAtom()) return n;
-  list<AstNode> results;
-  for (auto p = n.elems.begin(); p != n.elems.end(); ++p)
-    results.push_back(transformInfix(*p));
-  n.elems.swap(results);
-  return n;
-}
-
 AstNode tokenizeInfix(AstNode n) {
   string var = n.atom.token;
   string out;
   out += var[0];
   for (size_t x = 1; x < var.size(); ++x) {
     if ((isInfixChar(var[x]) && isRegularChar(var[x-1])
-            // special-case: dollarvar
+            // special-case: $var is not infix
             && var[x-1]!='$')
         ||
         (isRegularChar(var[x]) && isInfixChar(var[x-1])
-            // special-case: ssyntax followed by negative number
+            // special-case: l.-1 is not infix
             && (x <= 1 || !find(ssyntaxChars, var[x-2]) || var[x-1] != '-' || !isdigit(var[x]))))
       out += " ";
     out += var[x];
