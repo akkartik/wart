@@ -47,8 +47,8 @@ them in this manner.
     (queue-length x)
 
 Other features: first-class macros that are also open to extension, pervasive
-python-style keyword arguments, and it can deduce parens from indentation (but
-traditional lisp-with-parens will always work).
+python-style keyword arguments, and a more visually clean design than
+traditional lisp without compromising on homoiconicity.
 
 You'll need linux and gcc.
 
@@ -209,8 +209,8 @@ Wart uses a few simple syntax rules to reduce parens further:
   !a                  ; => (not a)
 
   f:g                 ; => (compose f g)
-  f&g                 ; => (andf f g)
   ~f                  ; => (complement f)
+  f&g                 ; => (andf f g)     ; fn that calls g if call to f succeeds
 
 The prededence rules for these operators are intended to be as intuitive as
 possible, and it's easy to see what they expand to at the prompt:
