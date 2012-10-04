@@ -13,10 +13,15 @@ void test_infix_passes_atoms2() {
 }
 
 void test_infix_passes_strings() {
-  CodeStream cs(stream("\"a\""));
+  CodeStream cs(stream("\"a+b\""));
   AstNode n = nextAstNode(cs);
   check(n.isAtom());
   checkEq(transformInfix(n), n.atom);
+}
+
+void test_infix_passes_floats() {
+  CodeStream cs(stream("2e-2"));
+  checkEq(transformInfix(nextAstNode(cs)), Token("2e-2"));
 }
 
 void test_infix_passes_dollar_vars() {
@@ -322,14 +327,4 @@ void test_infix_handles_dollar_var() {
 void test_infix_handles_negative_numbers_in_ssyntax() {
   CodeStream cs(stream("l.-1"));
   checkEq(transformInfix(nextAstNode(cs)), Token("l.-1"));
-}
-
-void test_infix_passes_through_strings() {
-  CodeStream cs(stream("\"a+b\""));
-  checkEq(transformInfix(nextAstNode(cs)), Token("\"a+b\""));
-}
-
-void test_infix_passes_through_floats() {
-  CodeStream cs(stream("2e-2"));
-  checkEq(transformInfix(nextAstNode(cs)), Token("2e-2"));
 }
