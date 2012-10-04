@@ -243,9 +243,9 @@ Range comparisons are convenient as long as they return the last arg on
 success (because of left-associativity) and pass nils through:
   (a > b >= c)
 =>
-  (> a (>= b c))      ; watch out if b is nil!
+  (>= (> a b) c)      ; watch out if b is nil!
 
-  (> nil x)           ; should always be nil!
+  (> nil x)           ; should always return nil!
 
 You can mix infix ops with regular prefix lisp and the abbreviations above:
   (a + (f b))
@@ -260,8 +260,9 @@ You can mix infix ops with regular prefix lisp and the abbreviations above:
 =>
   (fib (- n 1))
 
-There are no hardcoded precedence rules, just one rule: operators surrounded
-by whitespace have lower precedence than operators that are not.
+Operator precedence is not hardcoded. Instead, there is just one rule:
+operators surrounded by whitespace have lower precedence than operators that
+are not.
   (n * n-1)
 =>
   (* n (- n 1))
