@@ -26,6 +26,26 @@ void test_infix_passes_dollar_vars() {
   checkEq(transformInfix(n), n.atom);
 }
 
+void test_infix_passes_keyword_syms() {
+  CodeStream cs(stream(":a"));
+  AstNode n = nextAstNode(cs);
+  check(n.isAtom());
+  checkEq(transformInfix(n), n.atom);
+}
+
+void test_infix_passes_keyword_syms2() {
+  CodeStream cs(stream("f :a x"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token("("));    ++p;
+  checkEq(*p, Token("f"));    ++p;
+  checkEq(*p, Token(":a"));    ++p;
+  checkEq(*p, Token("x"));    ++p;
+  checkEq(*p, Token(")"));    ++p;
+  check(p == n.elems.end());
+}
+
 void test_infix_handles_op_without_args() {
   CodeStream cs(stream("(+)"));
   AstNode n = transformInfix(nextAstNode(cs));
@@ -249,6 +269,19 @@ void test_infix_handles_op_without_spaces() {
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("("));          ++p;
   checkEq(*p, Token("+"));          ++p;
+  checkEq(*p, Token("a"));          ++p;
+  checkEq(*p, Token("b"));          ++p;
+  checkEq(*p, Token(")"));          ++p;
+  check(p == n.elems.end());
+}
+
+void test_infix_handles_op_without_spaces2() {
+  CodeStream cs(stream("a:b"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token("("));          ++p;
+  checkEq(*p, Token(":"));          ++p;
   checkEq(*p, Token("a"));          ++p;
   checkEq(*p, Token("b"));          ++p;
   checkEq(*p, Token(")"));          ++p;

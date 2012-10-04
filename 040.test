@@ -78,6 +78,10 @@ show_warnings.
   :valueof ((compose foo foo) 1)
   :should be 3)
 
+(test "compose works in infix"
+  :valueof ((: car cdr) '(1 2))
+  :should be 2)
+
 
 
 (test "map works"

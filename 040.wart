@@ -38,6 +38,8 @@ def compose(f g)
   fn 'args
     mac_eval `(,f (,g ,@args)) caller_scope
 
+alias :. compose
+
 def complement(f)
   (compose not f)
 

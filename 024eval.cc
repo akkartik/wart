@@ -397,7 +397,9 @@ bool isUnquoteSplice(Cell* arg) {
 }
 
 bool isColonSym(Cell* x) {
-  return isSym(x) && toString(x)[0] == ':';
+  if (!isSym(x)) return false;
+  string name = toString(x);
+  return name[0] == ':' && !isInfixOp(name);
 }
 
 // fn = (object function {sig => .., body => .., env => ..})

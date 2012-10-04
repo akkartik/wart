@@ -10,8 +10,6 @@ Cell* transform_ssyntax(Cell* x) {
       x = expandNot(var);
     else if (find(var, '.') || var.find('!') < var.length()-1)
       x = expandCall(var);
-    else if (var[0] != ':' && find(var, ':'))
-      x = expandCompose(var);
     else if (var[0] == '~')
       x = expandComplement(var);
   }
@@ -29,11 +27,6 @@ Cell* transform_ssyntax(Cell* x) {
 Cell* expandNot(string var) {
   var.replace(0, 1, "not ");
   return nextRawCell(stream(var));
-}
-
-Cell* expandCompose(string var) {
-  var.replace(var.rfind(':'), 1, " ");
-  return nextRawCell(stream("compose "+var));
 }
 
 Cell* expandCall(string var) {

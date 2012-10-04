@@ -312,6 +312,15 @@ void test_colonsym_evals_to_itself() {
   rmref(expr);
 }
 
+void test_colon_is_an_op() {
+  Cell* expr = read(stream(":"));
+  Cell* result = eval(expr);
+  checkEq(result, nil);   // not yet bound
+  checkEq(raiseCount, 1);   raiseCount=0;
+  rmref(result);
+  rmref(expr);
+}
+
 void test_string_evals_to_itself() {
   Cell* expr = read(stream("\"ac bd\""));
   Cell* result = eval(expr);
