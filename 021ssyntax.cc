@@ -4,7 +4,7 @@ Cell* transform_ssyntax(Cell* x) {
   if (isSym(x)) {
     string var = toString(x);
     // avoid detecting floats as ssyntax
-    if (var.find_first_not_of("0123456789.:!~&") == NOT_FOUND)
+    if (var.find_first_not_of("0123456789."+ssyntaxChars) == NOT_FOUND)
       ;
     else if (var[0] == '!')
       x = expandNot(var);
