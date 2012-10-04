@@ -53,7 +53,7 @@ void runTests() {
   runningTests = true;
   pretendRaise = true;  // for death tests
   time_t t; time(&t);
-  cerr << "-- C tests: " << ctime(&t);
+  cerr << "C tests: " << ctime(&t);
   for (unsigned long i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
     setup();
     (*tests[i])();
