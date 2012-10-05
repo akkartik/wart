@@ -80,7 +80,7 @@ void slurpChar(istream& in, ostream& out) {
 }
 
 // Tokenize by punctuation and quotes.
-// Later we'll deal with ssyntax, $vars, param aliases..
+// Later we'll deal with infix, $vars, param aliases..
 void slurpWord(istream& in, ostream& out) {
   char c;
   while (in >> c) {
