@@ -22,6 +22,11 @@ AstNode transformInfix(AstNode n) {
     return result;
   }
 
+  if (n.elems.front() == Token("@")) {
+    n.elems.back() = transformInfix(n.elems.back());
+    return n;
+  }
+
   if (n.elems.front() != Token("("))
     return n;
 
