@@ -31,9 +31,9 @@ int main(int argc, unused char* argv[]) {
   return 0;
 }
 
-// read: tokenize, parenthesize, parse, transform infix, build cells, transform
+// read: tokenize, parenthesize, parse, transform infix, build cells, transform $vars
 Cell* read(CodeStream& c) {
-  return mkref(transform(nextRawCell(c)));
+  return mkref(transformDollarVars(nextRawCell(c)));
 }
 
 
