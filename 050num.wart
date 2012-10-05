@@ -1,62 +1,62 @@
-let $+. +.
-  def! +. args
-    (reduce $+. args 0)
+let ($+) (+)
+  def! (+) args
+    (reduce ($+) args 0)
 
-let $-. -.
-  def! -. args
-    (reduce $-. args)
+let ($-) (-)
+  def! (-) args
+    (reduce ($-) args)
 
-let $*. *.
-  def! *. args
-    (reduce $*. args 1)
+let ($*) (*)
+  def! (*) args
+    (reduce ($*) args 1)
 
-let $/. /.
-  def! /. args
-    (reduce $/. args)
+let ($/) (/)
+  def! (/) args
+    (reduce ($/) args)
 
-let $%. %.
-  def! %. args
-    (reduce $%. args)
+let ($%) (%)
+  def! (%) args
+    (reduce ($%) args)
 
-mac ++. (n)
+mac (++) (n)
   `(= ,n (+ ,n 1))
 
-mac --. (n)
+mac (--) (n)
   `(= ,n (- ,n 1))
 
-def -. (n ... rest) :case !rest
+def (-) (n ... rest) :case !rest
   (- 0 n)
 
 
 
-let $<. <.
-  def! <. args
+let ($<) (<)
+  def! (<) args
     (and (all (fn((x y)) ($< x y))
               pairwise.args)
          last.args)
 
-def >. args
+def (>) args
   (and (all (fn((x y)) (y < x))
             pairwise.args)
        last.args)
 
-def <=. args
+def (<=) args
   (and (none (fn((x y)) (y < x))
              pairwise.args)
        last.args)
 
-def >=. args
+def (>=) args
   (and (none (fn((x y)) (x < y))
              pairwise.args)
        last.args)
 
 def min args
-  (best <. args)
+  (best (<) args)
 
 def max args
-  (best >. args)
+  (best (>) args)
 
-def <. (scorer) :case fn?.scorer
+def (<) (scorer) :case fn?.scorer
   (fn(x y)
     (scorer.x < scorer.y))
 

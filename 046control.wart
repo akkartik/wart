@@ -97,7 +97,7 @@ mac repeat(n ... body) :case (iso :forever n)
 
 
 
-def &. fs
+def (&) fs
   (fn args
     (let sub (afn(fs)
                (if

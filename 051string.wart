@@ -46,7 +46,7 @@ defcoerce list string
 defcoerce nil string
   (fn() "")
 
-def <. (a b) :case string?.a
+def (<) (a b) :case string?.a
   (string_lesser a b)
 
 def digit?(c)
