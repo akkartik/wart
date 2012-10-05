@@ -21,7 +21,8 @@ void test_infix_passes_strings() {
 
 void test_infix_passes_floats() {
   CodeStream cs(stream("2e-2"));
-  checkEq(transformInfix(nextAstNode(cs)), Token("2e-2"));
+  AstNode n = nextAstNode(cs);
+  checkEq(transformInfix(n), n.atom);
 }
 
 void test_infix_passes_dollar_vars() {
