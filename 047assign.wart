@@ -5,7 +5,7 @@ mac =. (lhs rhs) :case list?.lhs
 
 ; support new types in =
 ; body must return a form that will be macro-eval'd
-mac defset(type params . body)
+mac defset(type params ... body)
   `(defcoerce ,type setter
      (fn ',params
        (eval (do ,@body) caller_scope)))
@@ -17,7 +17,7 @@ mac =. (lhs rhs) :case (and list?.lhs (table_get Coercions car.lhs))
   `((table_get Coercions ',car.lhs) ,@cdr.lhs ,rhs)
 
 ; support new keywords in =
-mac def_assign(op params . body)
+mac def_assign(op params ... body)
   `(table_set Coercions ',op (fn ,params ,@body))
 
 

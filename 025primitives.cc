@@ -3,7 +3,7 @@
 // these have access to caller scope
 // params start with $ by convention to avoid shadowing
 
-COMPILE_FN(fn, compiledFn_fn, "'($params . $body)",
+COMPILE_FN(fn, compiledFn_fn, "'($params ... $body)",
   Cell* f = newTable();
   set(f, newSym("sig"), lookup("$params"));
   set(f, newSym("body"), lookup("$body"));
@@ -11,7 +11,7 @@ COMPILE_FN(fn, compiledFn_fn, "'($params . $body)",
   return mkref(newObject("function", f));
 )
 
-COMPILE_FN(eval, compiledFn_eval, "($x . $scope)",
+COMPILE_FN(eval, compiledFn_eval, "($x ... $scope)",
   Cell* scope = lookup("$scope");
   scope = (scope != nil) ? car(scope) : currLexicalScope;
   return eval(lookup("$x"), scope);

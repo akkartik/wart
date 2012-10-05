@@ -110,7 +110,7 @@ This is useful primarily because you can pass keywords through layers of
 function calls:
 
   wart> (def A params (B @params))      ; all params get spliced into a call to B
-  wart> (def B(c . d) (list c @d))      ; d gets remaining args as in scheme
+  wart> (def B(c ... d) (list c @d))    ; d gets all but the first arg
   wart> (A 1 2 3)
   (1 2 3)
   wart> (A 1 2 :c 3)
@@ -195,7 +195,7 @@ want multiple expressions on a single line:
             else-expr)
 
 It also implies that backquoted expressions must be fully parenthesized:
-  mac when(cond . body)
+  mac when(cond ... body)
     `(if ,cond
        (do ,@body))   ; parens before 'do' are required
 

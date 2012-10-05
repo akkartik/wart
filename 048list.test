@@ -160,7 +160,7 @@
   :should be nil)
 
 (test "single? - 4"
-  :valueof (single? '(1 . 2))
+  :valueof (single? '(1 ... 2))
   :should be nil)
 
 (test "pair? - 1"
@@ -176,7 +176,7 @@
   :should ~be nil)
 
 (test "pair? - 4"
-  :valueof (pair? '(1 . 2))
+  :valueof (pair? '(1 ... 2))
   :should be nil)
 
 (test "pair? - 5"
@@ -198,7 +198,7 @@
   :should be '(a b c d e))
 
 (test "flatten works - 2"
-  :valueof (flatten '(a b (c d e) . f))
+  :valueof (flatten '(a b (c d e) ... f))
   :should be '(a b c d e f))
 
 

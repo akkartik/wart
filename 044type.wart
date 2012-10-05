@@ -38,7 +38,7 @@ defcoerce nil list
   id
 
 ; arbitrary types in function position
-mac defcall(type params . body)
+mac defcall(type params ... body)
   `(defcoerce ,type function
      (fn(,car.params)
        (fn ,cdr.params

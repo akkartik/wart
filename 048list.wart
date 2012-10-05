@@ -1,4 +1,4 @@
-defcall list(seq idx . ends)
+defcall list(seq idx ... ends)
   withs (idx    (range_start seq idx)
          end    (if
                   !ends
@@ -12,7 +12,7 @@ defcall list(seq idx . ends)
       slice
       car.slice
 
-defset list((seq idx . ends) val)
+defset list((seq idx ... ends) val)
   `(withs ($idx (range_start ,seq ,idx)
            $end ,(if !ends
                    `(+ $idx 1)
@@ -132,7 +132,7 @@ alias none ~some
 
 
 
-def map(f . seqs) :case cdr.seqs
+def map(f ... seqs) :case cdr.seqs
   if (all present? seqs)
     (cons (f @(map car seqs))
           (map f @(map cdr seqs)))

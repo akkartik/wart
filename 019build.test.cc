@@ -129,7 +129,7 @@ void test_build_handles_form() {
 }
 
 void test_build_handles_dot() {
-  CodeStream cs(stream("34 . 35"));
+  CodeStream cs(stream("34 ... 35"));
   Cell *c=nextRawCell(cs), *origc=c;
   checkEq(c->nrefs, 0);
   checkEq(car(c), newNum(34));

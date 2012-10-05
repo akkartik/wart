@@ -48,8 +48,8 @@ Cell* buildCell(AstNode n) {
   setCar(newForm, buildCell(n.elems.front()));
 
   list<AstNode>::iterator next = first; ++next;
-  if (*next == ".") {
-    if (n.elems.size() == 2) RAISE << "Syntax error: . can't terminate expr" << endl << DIE;
+  if (*next == "...") {
+    if (n.elems.size() == 2) RAISE << "Syntax error: ... can't terminate expr" << endl << DIE;
     setCdr(newForm, buildCell(*++next));  // dotted pair
   }
   else if (isQuoteOrUnquote(*first) && n.elems.size() == 2) {

@@ -62,7 +62,7 @@ def maybe(f a b|to)
     (f a b)
     b
 
-mac in(x . choices)
+mac in(x ... choices)
   `(let $x ,x
      (or ,@(map (fn(_) `(iso $x ,_))
                 choices)))
@@ -76,7 +76,7 @@ def predicate(x)
     :else
       (fn(_) (iso x _)))
 
-mac caselet(var expr . branches)
+mac caselet(var expr ... branches)
   let expand (afn(branches)
                (if ~cdr.branches
                  car.branches
@@ -85,8 +85,8 @@ mac caselet(var expr . branches)
                     ,(self cddr.branches))))
     `(let ,var ,expr ,expand.branches)
 
-mac case(expr . branches)
+mac case(expr ... branches)
   `(caselet $x ,expr ,@branches)
 
-mac acase(expr . branches)
+mac acase(expr ... branches)
   `(caselet it ,expr ,@branches)

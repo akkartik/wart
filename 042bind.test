@@ -3,7 +3,7 @@
   :should be 4)
 
 (test "let destructures"
-  :valueof (let (a . b) (cons 3 4) (a + b))
+  :valueof (let (a ... b) (cons 3 4) (a + b))
   :should be 7)
 
 (test "pair works"

@@ -43,6 +43,6 @@ def is_match(x y) :case table?.x
               (is_match v y.k))
             (as list x)))
 
-mac w_table(h . body)
+mac w_table(h ... body)
   `(ret ,h (table)
      ,@body)

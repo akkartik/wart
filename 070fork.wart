@@ -4,7 +4,7 @@ let $fork fork
        ,@body
        quit.)
 
-mac preforking(n . body)
+mac preforking(n ... body)
   `(do
      (repeat ,n
        (fork ,@body))

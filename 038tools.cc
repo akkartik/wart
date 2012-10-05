@@ -61,7 +61,7 @@ COMPILE_FN(globals, compiledFn_globals, "()",
 )
 
 // eval in a sandbox
-COMPILE_FN(try_eval, compiledFn_try_eval, "($x . $scope)",
+COMPILE_FN(try_eval, compiledFn_try_eval, "($x ... $scope)",
   bool oldPretendRaise = pretendRaise;
   pretendRaise = true;
     Cell* ans = compiledFn_eval();

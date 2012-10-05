@@ -5,7 +5,7 @@ def keyword?(s)
   (and sym?.s
        (iso ":" str.s.0))
 
-def sym(s . rest) :case (and !rest keyword?.s)
+def sym(s ... rest) :case (and !rest keyword?.s)
   (as symbol (str.s 1 nil))
 
 def is_match(a b bindings) :case sym?.a

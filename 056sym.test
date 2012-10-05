@@ -25,7 +25,7 @@
 
 
 (test "is_match treats any sym beginning with _ as wildcard"
-  :valueof (is_match '(1 . _x) '(1 2 3))
+  :valueof (is_match '(1 ... _x) '(1 2 3))
   :should ~be nil)
 
 (test "is_match manages _sym identity"

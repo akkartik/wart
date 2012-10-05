@@ -1,4 +1,4 @@
-mac let(var val . body)
+mac let(var val ... body)
   `((fn(,var) ,@body) ,val)
 
 def pair(seq)
@@ -11,47 +11,47 @@ def pair(seq)
       (cons (list car.seq cadr.seq)
             (pair cddr.seq)))
 
-mac with(bindings . body)
+mac with(bindings ... body)
   `((fn ,(map car pair.bindings)
      ,@body)
     ,@(map cadr pair.bindings))
 
-mac withs(bindings . body)
+mac withs(bindings ... body)
   if !bindings
     `(do ,@body)
     `(let ,car.bindings ,cadr.bindings
        (withs ,cddr.bindings ,@body))
 
-mac w_nils(vars . body)
+mac w_nils(vars ... body)
   `((fn ,vars ,@body))
 
 
 
-mac proc(name params . body)
+mac proc(name params ... body)
   `(def ,name ,params
      ,@body
      nil)
 
-mac ret(var val . body)
+mac ret(var val ... body)
   `(let ,var ,val
      ,@body
      ,var)
 
-mac rfn(name params . body)
+mac rfn(name params ... body)
   `(ret ,name nil
       (= ,name (fn ,params
                   ,@body)))
 
-mac afn(params . body)
+mac afn(params ... body)
   `(rfn self ,params ,@body)
 
-mac before_fn(f params . body)
+mac before_fn(f params ... body)
   `(let $old ,f
      (def! ,f ,params
        ,@body
        ($old ,@params)))
 
-def after_fn(f params . body)
+def after_fn(f params ... body)
   `(let $old ,f
      (def! ,f ,params
        (ret result ($old ,@params)

@@ -170,7 +170,7 @@ void test_evalArgs_handles_quoted_varargs_param() {
 void test_evalArgs_handles_rest_param() {
   newDynamicScope("a", newNum(3));
   newDynamicScope("b", newNum(4));
-  Cell* params = read(stream("x . y"));
+  Cell* params = read(stream("x ... y"));
   Cell* args = read(stream("(a b)"));
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newNum(3));
@@ -186,7 +186,7 @@ void test_evalArgs_handles_rest_param() {
 void test_evalArgs_handles_quoted_rest_param() {
   newDynamicScope("a", newNum(3));
   newDynamicScope("b", newNum(4));
-  Cell* params = read(stream("x . 'y"));
+  Cell* params = read(stream("x ... 'y"));
   Cell* args = read(stream("(a b)"));
   Cell* evaldArgs = evalArgs(params, args);
   checkEq(car(evaldArgs), newNum(3));
@@ -459,7 +459,7 @@ void test_eval_handles_quoted_destructured_params() {
 }
 
 void test_eval_handles_rest_params() {
-  Cell* call = read(stream("((fn (a b . c) c) 1 2 3 4 5)"));
+  Cell* call = read(stream("((fn (a b ... c) c) 1 2 3 4 5)"));
   Cell* result = eval(call);
   check(isCons(result));
   check(isNum(car(result)));
@@ -1007,7 +1007,7 @@ void test_eval_handles_quoted_keyword_args_for_fns2() {
 }
 
 void test_eval_handles_rest_keyword_arg_at_end() {
-  Cell* fn = read(stream("(fn (a . b) b)"));
+  Cell* fn = read(stream("(fn (a ... b) b)"));
   Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read(stream("(f 2 :b 1 3)"));
@@ -1023,7 +1023,7 @@ void test_eval_handles_rest_keyword_arg_at_end() {
 }
 
 void test_eval_handles_rest_keyword_arg_at_end2() {
-  Cell* fn = read(stream("(fn (a . b) b)"));
+  Cell* fn = read(stream("(fn (a ... b) b)"));
   Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read(stream("(f :b 1 2 3)"));
@@ -1040,7 +1040,7 @@ void test_eval_handles_rest_keyword_arg_at_end2() {
 }
 
 void test_eval_handles_quoted_rest_keyword_arg() {
-  Cell* fn = read(stream("(fn (a . 'b) b)"));
+  Cell* fn = read(stream("(fn (a ... 'b) b)"));
   Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read(stream("(f :b 1 2 3)"));
@@ -1071,7 +1071,7 @@ void test_eval_handles_non_keyword_arg_colon_syms() {
 }
 
 void test_eval_handles_body_keyword_synonym() {
-  Cell* fn = read(stream("(fn (a . body|do) body)"));
+  Cell* fn = read(stream("(fn (a ... body|do) body)"));
   Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read(stream("(f 2 :do 1 3)"));
@@ -1087,7 +1087,7 @@ void test_eval_handles_body_keyword_synonym() {
 }
 
 void test_eval_handles_body_keyword_synonym2() {
-  Cell* fn = read(stream("(fn (a b . body|do) `(,a ,b ,body))"));
+  Cell* fn = read(stream("(fn (a b ... body|do) `(,a ,b ,body))"));
   Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read(stream("(f 2 :do 1 3)"));

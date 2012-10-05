@@ -1,4 +1,4 @@
-defcall string(s idx . ends)
+defcall string(s idx ... ends)
   withs (idx (range_start s idx)
          end (if
                !ends
@@ -9,7 +9,7 @@ defcall string(s idx . ends)
                  (range_bounce s car.ends)))
     (string_range s idx end)
 
-defset string((s idx . ends) val)
+defset string((s idx ... ends) val)
   `(withs ($idx (range_start ,s ,idx)
            $end ,(if !ends
                    `(+ $idx 1)

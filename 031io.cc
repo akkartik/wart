@@ -12,7 +12,7 @@ ostream& operator<<(ostream& os, Cell* c) {
       if (isCons(curr))
         os << " " << car(curr);
       else
-        os << " . " << curr;
+        os << " ... " << curr;
     }
     return os << ")";
   case INTEGER:
