@@ -30,6 +30,9 @@ struct AstNode {
   bool operator!=(Token x) {
     return !(*this == x);
   }
+  bool operator!=(string x) {
+    return !(*this == x);
+  }
 };
 
 AstNode nextAstNode(CodeStream& c) {
