@@ -80,7 +80,7 @@ mac each(var expr ... body)
         ,@body))
 
 mac on(var expr ... body)
-  `(for ($i index) (list ,expr 0) $i  (do (zap cdr $i) ++.index)
+  `(for ($i index) (list ,expr 0) $i  (do (zap cdr $i) ++index)
      (let ,var car.$i
        ,@body))
 
@@ -89,7 +89,7 @@ mac forlen(var expr ... body)
      ,@body)
 
 mac repeat(n ... body)
-  `(for $i 0 (< $i ,n) ++.$i
+  `(for $i 0 (< $i ,n) ++$i
      ,@body)
 
 mac repeat(n ... body) :case (iso :forever n)

@@ -199,24 +199,6 @@ It also implies that backquoted expressions must be fully parenthesized:
     `(if ,cond
        (do ,@body))   ; parens before 'do' are required
 
---- Simple syntax
-
-Wart uses a few simple syntax rules to reduce parens further:
-
-  a.b                 ; => (a b) unless a and b are all digits; 2.4 is a number
-  a.                  ; => (a)
-  a!b                 ; => (a 'b)
-  !a                  ; => (not a)
-
-  f:g                 ; => (compose f g)
-  ~f                  ; => (complement f)
-
-The prededence rules for these operators are intended to be as intuitive as
-possible, and it's easy to see what they expand to at the prompt:
-
-  wart> 'a.b!c
-  ((a b) 'c)
-
 --- Infix operators with significant whitespace
 
 Unlike other lisps, wart supports infix operators.
@@ -246,12 +228,8 @@ success (because of left-associativity) and pass nils through:
 
   (> nil x)           ; should always return nil!
 
-You can mix infix ops with regular prefix lisp and the abbreviations above:
+You can mix infix ops with regular prefix lisp:
   (a + (f b))
-=>
-  (+ a (f b))
-
-  (a + f.b)
 =>
   (+ a (f b))
 
@@ -312,9 +290,23 @@ To use an infix op in a higher-level function, wrap it in parens:
 =>
   (2 3 4)
 
-Handy here is a simple syntax abbreviation from above:
+In addition to the usual arithmetic, wart defines a few infix ops:
 
-  (map ++. '(1 2 3))
+  a.b                 ; => (a b) unless a and b are all digits; 2.4 is a number
+  a.                  ; => (a)
+  a!b                 ; => (a 'b)
+  !a                  ; => (not a)
+  f:g                 ; => (compose f g)
+  ~f                  ; => (complement f)
+
+Prefix can also be combined with infix, and has highest-precedence because of
+the default left-associativity:
+  ~f.b                ; => ((complement f) b)
+
+One exception: prefix '!' has *lowest* precedence:
+  !a.b                ; => (not (a b))
+
+Another exception: symbols can end in '!', so 'reverse!' is just a symbol.
 
 Infix operators can coexist with paren-insertion:
 
@@ -333,6 +325,7 @@ doing in infix. The following is actually harder to read in infix:
 I prefer to use infix only for simple expressions with short variable names.
 And I never use infix in macro expansions. After all, macros are the whole
 reason we have s-expressions.
+
 
 --- Implicit gensyms
 

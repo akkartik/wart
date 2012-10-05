@@ -66,7 +66,7 @@ def zero?(n)
   (iso n 0)
 
 def divides(nr dr)
-  ((compose zero? %.) nr dr)
+  ((compose zero? (%)) nr dr)
 
 def even?(n)
   (divides n 2)

@@ -16,6 +16,17 @@ let if if   ; ignore later refinements for the rest of this file
   mac! do body
     `((fn() ,@body))
 
+  mac! (.) (f x)
+    `(,f ,x)
+
+  mac! (!) (f ... args)
+    if args
+      `(,f ',car.args)  ; 2 args = infix
+      `(not ,f)
+
+  def! (.-) (f x)
+    (f (- x))
+
   def! prn args
     (if args
       (do
@@ -43,8 +54,13 @@ let if if   ; ignore later refinements for the rest of this file
     fn 'args
       mac_eval `(,f (,g ,@args)) caller_scope
 
+  mac (:) args
+    `(compose ,@args)
+
   def complement(f)
     (compose not f)
+
+  alias (~) complement
 
   def list args
     if args

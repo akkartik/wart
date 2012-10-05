@@ -20,6 +20,14 @@ mac (=) (lhs rhs) :case (and list?.lhs (table_get Coercions car.lhs))
 mac def_assign(op params ... body)
   `(table_set Coercions ',op (fn ,params ,@body))
 
+; special-case: delegate assignments using . and !
+def_assign (.) '(f x val)
+  (mac_eval `(= (,f ,x) ,val) caller_scope)
+def_assign (.-) '(f x val)
+  (mac_eval `(= (,f (- ,x)) ,val) caller_scope)
+def_assign (!) '(f x val)
+  (mac_eval `(= (,f ',x) ,val) caller_scope)
+
 
 
 ; serial assignment
