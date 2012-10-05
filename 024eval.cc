@@ -407,6 +407,8 @@ bool isFn(Cell* x) {
 
 Cell* toFn(Cell* x) {
   if (x == nil || isFn(x)) return x;
+  if (!lookupDynamicBinding(newSym("Coercions")))
+    RAISE << "tried to call " << x << endl << DIE;
   Cell* result = coerceQuoted(x, newSym("function"), lookup("Coercions"));   rmref(x);
   return result;
 }
