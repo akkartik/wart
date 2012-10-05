@@ -15,15 +15,15 @@ AstNode transformInfix(AstNode n) {
   if (n.isAtom())
     n = tokenizeInfix(n);
 
-  if (n.elems.front() == Token("`")) {
+  if (n.elems.front() == "`") {
     n.elems.pop_front();
     AstNode result = transformInfix(n);
     result.elems.push_front(AstNode(Token("`")));
     return result;
   }
 
-  if (n.elems.front() == Token("@")
-      || n.elems.front() == Token(",@")) {
+  if (n.elems.front() == "@"
+      || n.elems.front() == ",@") {
     n.elems.back() = transformInfix(n.elems.back());
     return n;
   }
@@ -142,7 +142,7 @@ bool infixOpCalledWithoutArgs(AstNode n) {
   if (!isInfixOp(*p))
     return false;
   ++p;
-  return *p == Token(")");
+  return *p == ")";
 }
 
 bool parseableAsFloat(string s) {
