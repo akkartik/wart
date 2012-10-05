@@ -136,7 +136,7 @@ void test_contains_handles_circular_lists() {
 }
 
 void test_list_sort() {
-  Cell* expr = read(stream("(sort (fn(a b) (< len.a len.b)) '(\"abc\" \"d\" \"ef\"))"));
+  Cell* expr = read(stream("(sort (fn(a b) (< (len a) (len b))) '(\"abc\" \"d\" \"ef\"))"));
   Cell* result = eval(expr);
   checkEq(toString(car(result)), "d");
   checkEq(toString(car(cdr(result))), "ef");

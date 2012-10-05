@@ -108,7 +108,7 @@ void test_assign_overrides_lexical_var() {
 }
 
 void test_bound_works() {
-  Cell* call = read(stream("bound?!a"));
+  Cell* call = read(stream("bound? 'a"));
   Cell* result1 = eval(call);
   checkEq(result1, nil);
   newDynamicScope("a", newNum(3));
