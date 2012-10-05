@@ -44,7 +44,7 @@ AstNode transformInfix(AstNode n) {
   auto curr=prev; ++curr;
   auto next=curr; ++next;
   for (; next != n.elems.end(); ++prev, ++curr, ++next) {
-    if (!curr->isAtom() || !isInfixOp(curr->atom.token)) {
+    if (!isInfixOp(*curr)) {
       *curr = transformInfix(*curr);
       continue;
     }
@@ -101,11 +101,13 @@ AstNode tokenizeInfix(AstNode n) {
 
 
 
-bool isInfixOp(string name) {
-  string::iterator p = name.begin();
+bool isInfixOp(AstNode n) {
+  if (n.isList()) return false;
+  string s = n.atom.token;
+  string::iterator p = s.begin();
   if (*p != '$' && !isInfixChar(*p))
     return false;
-  for (++p; p != name.end(); ++p)
+  for (++p; p != s.end(); ++p)
     if (!isInfixChar(*p))
       return false;
   return true;
@@ -136,7 +138,7 @@ bool infixOpCalledWithoutArgs(AstNode n) {
   list<AstNode>::iterator p = n.elems.begin();
   if (*p != Token("(")) return false;
   ++p;
-  if (!p->isAtom() || !isInfixOp(p->atom.token))
+  if (!isInfixOp(*p))
     return false;
   ++p;
   return *p == Token(")");
