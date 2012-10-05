@@ -15,6 +15,13 @@ AstNode transformInfix(AstNode n) {
   if (n.isAtom())
     n = tokenizeInfix(n);
 
+  if (n.elems.front() == Token("`")) {
+    n.elems.pop_front();
+    AstNode result = transformInfix(n);
+    result.elems.push_front(AstNode(Token("`")));
+    return result;
+  }
+
   if (n.elems.front() != Token("("))
     return n;
 

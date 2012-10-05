@@ -295,3 +295,17 @@ void test_infix_handles_negative_numbers_in_ssyntax() {
   CodeStream cs(stream("l.-1"));
   checkEq(transformInfix(nextAstNode(cs)), Token("l.-1"));
 }
+
+void test_infix_handles_backquote() {
+  CodeStream cs(stream("`(a + b)"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token("`"));    ++p;
+  checkEq(*p, Token("("));    ++p;
+  checkEq(*p, Token("+"));    ++p;
+  checkEq(*p, Token("a"));    ++p;
+  checkEq(*p, Token("b"));    ++p;
+  checkEq(*p, Token(")"));    ++p;
+  check(p == n.elems.end());
+}
