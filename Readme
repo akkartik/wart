@@ -199,7 +199,7 @@ It also implies that backquoted expressions must be fully parenthesized:
     `(if ,cond
        (do ,@body))   ; parens before 'do' are required
 
---- Infix operators with significant whitespace
+--- Infix operators
 
 Unlike other lisps, wart supports infix operators.
   wart> 3 + 1
@@ -253,10 +253,9 @@ You can create your own infix ops:
   1
 
 To permit arbitrary infix ops, wart makes them distinct from regular symbols.
-Regular symbols can only contain letters, digits, and the characters ':', '?',
-'!' and '_'. Infix ops can only contain other characters. Thus, the sets of
-'infix chars' and 'symbol chars' are disjoint. This implies that wart won't
-let you define some traditional lisp names that you might be used to:
+The sets of 'infix chars' and 'symbol chars' are disjoint. This implies that
+wart won't let you define some traditional lisp names that you might be used
+to:
 
   *global*
 =>
@@ -291,7 +290,6 @@ To use an infix op in a higher-level function, wrap it in parens:
   (2 3 4)
 
 In addition to the usual arithmetic, wart defines a few infix ops:
-
   a.b                 ; => (a b) unless a and b are all digits; 2.4 is a number
   a.                  ; => (a)
   a!b                 ; => (a 'b)
@@ -304,7 +302,7 @@ the default left-associativity:
   ~f.b                ; => ((complement f) b)
 
 One exception: prefix '!' has *lowest* precedence:
-  !a.b                ; => (not (a b))
+  !odd?.n             ; => (not (odd? b))
 
 Another exception: symbols can end in '!', so 'reverse!' is just a symbol.
 
