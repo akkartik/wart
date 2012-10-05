@@ -8,72 +8,77 @@
 mac! def!(name params ... body)
   `(= ,name (fn ,params ,@body))
 
-mac! do body
-  `((fn() ,@body))
+mac! let(var val ... body)
+  `((fn(,var) ,@body) ,val)
 
-def! prn args
-  (if args
-    (do
-      (pr car.args)
-      (prn @cdr.args)
-      car.args)
-    (pr "
+let if if   ; ignore later refinements for the rest of this file
+
+  mac! do body
+    `((fn() ,@body))
+
+  def! prn args
+    (if args
+      (do
+        (pr car.args)
+        (prn @cdr.args)
+        car.args)
+      (pr "
 "))
 
-mac! def(name params ... body)
-  if bound?.name
-    (prn "redef: " name)
-  `(def! ,name ,params ,@body)
+  mac! def(name params ... body)
+    if bound?.name
+      (prn "redef: " name)
+    `(def! ,name ,params ,@body)
 
-mac! mac(name params ... body)
-  if bound?.name
-    (prn "redef: " name)
-  `(mac! ,name ,params ,@body)
+  mac! mac(name params ... body)
+    if bound?.name
+      (prn "redef: " name)
+    `(mac! ,name ,params ,@body)
 
-mac alias(new old)  ; include later refinements
-  `(mac ,new $args
-     `(,,old ,@$args))
+  mac alias(new old)  ; include later refinements
+    `(mac ,new $args
+       `(,,old ,@$args))
 
-def compose(f g)
-  fn 'args
-    mac_eval `(,f (,g ,@args)) caller_scope
+  def compose(f g)
+    fn 'args
+      mac_eval `(,f (,g ,@args)) caller_scope
 
-def complement(f)
-  (compose not f)
+  def complement(f)
+    (compose not f)
 
-def list args
-  if args
-    (cons car.args
-          (list @cdr.args))
+  def list args
+    if args
+      (cons car.args
+            (list @cdr.args))
 
-def map(f seq)
-  if seq
-    (cons (f car.seq)
-          (map f cdr.seq))
+  def map(f seq)
+    if seq
+      (cons (f car.seq)
+            (map f cdr.seq))
 
-alias cadr car:cdr
-alias cddr cdr:cdr
+  alias cadr car:cdr
+  alias cddr cdr:cdr
 
-def id(_)
-  _
-alias present? id
+  def id(_)
+    _
+  alias present? id
 
-= quote (car ''1)
-def quote?(_) (iso _ quote)
-alias quoted? quote?:car
-= backquote (car '`(1))
-def backquote?(_) (iso _ backquote)
-alias backquoted? backquote?:car
-= unquote (car:cadr '`(,1))
-def unquote?(_) (iso _ unquote)
-alias unquoted? unquote?:car
-= unquote_splice (car:cadr '`(,@1))
-def unquote_splice?(_) (iso _ unquote_splice)
-alias unquote_spliced? unquote_splice?:car
-= splice (car '@1)
-def splice?(_) (iso _ splice)
-alias spliced? splice?:car
+  = quote (car ''1)
+  def quote?(_) (iso _ quote)
+  alias quoted? quote?:car
+  = backquote (car '`(1))
+  def backquote?(_) (iso _ backquote)
+  alias backquoted? backquote?:car
+  = unquote (car:cadr '`(,1))
+  def unquote?(_) (iso _ unquote)
+  alias unquoted? unquote?:car
+  = unquote_splice (car:cadr '`(,@1))
+  def unquote_splice?(_) (iso _ unquote_splice)
+  alias unquote_spliced? unquote_splice?:car
+  = splice (car '@1)
+  def splice?(_) (iso _ splice)
+  alias spliced? splice?:car
 
-def die args
-  prn @args
-  quit.
+  def die args
+    prn @args
+    quit.

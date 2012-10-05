@@ -1,6 +1,3 @@
-mac let(var val ... body)
-  `((fn(,var) ,@body) ,val)
-
 def pair(seq)
   (if
     !seq
