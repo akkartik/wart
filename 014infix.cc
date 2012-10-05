@@ -14,6 +14,8 @@ AstNode transformInfix(AstNode n) {
 
   if (n.isAtom())
     n = tokenizeInfix(n);
+  if (n.isAtom())
+    return n;
 
   if (n.elems.front() == "`") {
     n.elems.pop_front();
@@ -22,13 +24,9 @@ AstNode transformInfix(AstNode n) {
     return result;
   }
 
-  if (n.elems.front() == ",")
+  if (isQuoteOrUnquote(n.elems.front())) {
     for (auto p = ++n.elems.begin(); p != n.elems.end(); ++p)
       *p = transformInfix(*p);
-
-  if (n.elems.front() == "@"
-      || n.elems.front() == ",@") {
-    n.elems.back() = transformInfix(n.elems.back());
     return n;
   }
 
