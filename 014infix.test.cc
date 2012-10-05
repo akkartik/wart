@@ -310,12 +310,31 @@ void test_infix_handles_backquote() {
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
 }
+
 void test_infix_handles_splice() {
   CodeStream cs(stream("@a+b"));
   AstNode n = transformInfix(nextAstNode(cs));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("@")); ++p;
+  AstNode n2 = *p; ++p;
+    check(n2.isList());
+    list<AstNode>::iterator p2 = n2.elems.begin();
+    checkEq(*p2, Token("(")); ++p2;
+    checkEq(*p2, Token("+")); ++p2;
+    checkEq(*p2, Token("a")); ++p2;
+    checkEq(*p2, Token("b")); ++p2;
+    checkEq(*p2, Token(")")); ++p2;
+    check(p2 == n2.elems.end());
+  check(p == n.elems.end());
+}
+
+void test_infix_handles_unquote_splice() {
+  CodeStream cs(stream(",@a+b"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token(",@")); ++p;
   AstNode n2 = *p; ++p;
     check(n2.isList());
     list<AstNode>::iterator p2 = n2.elems.begin();
