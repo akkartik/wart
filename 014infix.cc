@@ -51,29 +51,42 @@ AstNode transformInfix(AstNode n) {
       *curr = transformInfix(*curr);
       continue;
     }
-    if (prev == n.elems.begin()) {  // prefix op
+    if (*next == ")") {  // postfix op
       *curr = transformInfix(*curr);
       continue;
     }
-    if (next == --n.elems.end()) {  // postfix op
-      *curr = transformInfix(*curr);
-      continue;
-    }
-    // switch to prefix
+
     list<AstNode> tmp;
-    tmp.push_back(transformInfix(*curr));  // op
-    tmp.push_back(*prev);
-    tmp.push_back(transformInfix(*next));
+    tmp.push_back(transformInfix(*curr));
+    if (prev == n.elems.begin()) {
+      auto oldnext = next;
+      // prefix op; grab as many non-ops as you can
+      while (!isInfixOp(*next)) {
+        tmp.push_back(transformInfix(*next));
+        ++next;
+        if (next == --n.elems.end()) break;
+      }
+
+      // update next
+      n.elems.erase(oldnext, next);
+      next=curr; ++next;
+    }
+    else {
+      // infix op; switch to prefix
+      tmp.push_back(*prev);
+      tmp.push_back(transformInfix(*next));
+
+      // update both prev and next
+      n.elems.erase(prev);
+      prev=curr; --prev;
+      n.elems.erase(next);
+      next=curr; ++next;
+    }
     // wrap in parens
     tmp.push_front(AstNode(Token("(")));
     tmp.push_back(AstNode(Token(")")));
     // insert the new s-expr
     *curr = AstNode(tmp);
-    // update other iterators
-    n.elems.erase(prev);
-    prev=curr; --prev;
-    n.elems.erase(next);
-    next=curr; ++next;
   }
 
   // (a + b) will have become ((+ a b)); strip out one pair of parens
