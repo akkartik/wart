@@ -82,17 +82,13 @@ void slurpChar(istream& in, ostream& out) {
 // Tokenize by punctuation and quotes.
 // Later we'll deal with ssyntax, $vars, param aliases..
 void slurpWord(istream& in, ostream& out) {
-  char lastc = '\0';
   char c;
   while (in >> c) {
-    if (isspace(c)
-        || find(punctuationChars, c)
-        || find(quoteAndUnquoteChars, c)) {
+    if (isspace(c) || find(punctuationChars, c) || find(quoteAndUnquoteChars, c)) {
       in.putback(c);
       break;
     }
     out << c;
-    lastc = c;
   }
 }
 
