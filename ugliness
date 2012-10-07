@@ -3,7 +3,3 @@ nested ,@ doesn't work yet: http://people.csail.mit.edu/alan/ftp/quasiquote-v59.
 can't always call macros with @args
 macros need a special-cased eval to support @args
 evalArgs != explicitly eval'ing a quoted param (handles @args)
-
-can't use coerce in eval
-
-'int' converts floats to integers, but they're represented internally as 'long'
