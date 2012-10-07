@@ -4,10 +4,9 @@ help transmit the theory of a codebase
   Be familiar to english speakers.
   Exploit memories of high school math.
 
+keyword args, param aliases
 paren insertion
-simple syntax
-$vars
 infix
-param aliases
+$vars
 
-misfit: primitives don't create scopes
+primitives don't create scopes
