@@ -335,7 +335,7 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
     return mkref(result);
   }
 
-  if (unquoteDepth(x) == depth && isUnquoteSplice(car(x))) {
+  if (depth == 1 && isUnquoteSplice(car(x))) {
     Cell* result = eval(cdr(car(x)), scope);
     Cell* splice = processUnquotes(cdr(x), depth, scope);
     if (result == nil) return splice;
