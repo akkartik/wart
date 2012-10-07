@@ -1,9 +1,9 @@
 defcall string(s idx ... ends)
   withs (idx (range_start s idx)
          end (if
-               !ends
+               no.ends
                  (+ idx 1)
-               !car.ends
+               ~car.ends
                  len.s
                :else
                  (range_bounce s car.ends)))
@@ -11,7 +11,7 @@ defcall string(s idx ... ends)
 
 defset string((s idx ... ends) val)
   `(withs ($idx (range_start ,s ,idx)
-           $end ,(if !ends
+           $end ,(if no.ends
                    `(+ $idx 1)
                    `(if (not ,car.ends)
                       (len ,s)

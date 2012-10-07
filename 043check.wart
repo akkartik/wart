@@ -1,6 +1,6 @@
 let $if if
   mac! if args
-    $if !cdr.args
+    $if ~cdr.args
       car.args
       `(,$if ,car.args
          ,cadr.args
@@ -14,9 +14,9 @@ mac or args
          (or ,@cdr.args)))
 
 mac and args
-  if !args
+  if no.args
     1
-    if !cdr.args
+    if ~cdr.args
       car.args
       `(if ,car.args
          (and ,@cdr.args))

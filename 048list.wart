@@ -1,9 +1,9 @@
 defcall list(seq idx ... ends)
   withs (idx    (range_start seq idx)
          end    (if
-                  !ends
+                  no.ends
                     (+ idx 1)
-                  !car.ends
+                  ~car.ends
                     len.seq
                   :else
                     (range_bounce seq car.ends))
@@ -14,7 +14,7 @@ defcall list(seq idx ... ends)
 
 defset list((seq idx ... ends) val)
   `(withs ($idx (range_start ,seq ,idx)
-           $end ,(if !ends
+           $end ,(if no.ends
                    `(+ $idx 1)
                    `(if (not ,car.ends)
                       (len ,seq)
@@ -64,7 +64,7 @@ def pair?(x)
        ~cdr:cdr.x)
 
 def rev(seq acc)
-  if !seq
+  if no.seq
     acc
     (rev cdr.seq
          (cons car.seq acc))
@@ -95,7 +95,7 @@ def zip_flat(a b)
 
 def flatten(seq acc)
   (if
-    !seq
+    no.seq
       acc
     ~list?.seq
       (cons seq acc)
@@ -139,7 +139,7 @@ def map(f ... seqs) :case cdr.seqs
 
 def reduce(f seq init)  ; f is a binary op
   (if
-    !seq
+    no.seq
       init
     ~cdr.seq
       car.seq   ; f on one op is the identity function
@@ -167,6 +167,6 @@ def range_bounce(seq idx)
     idx
 
 def range_start(seq idx)
-  if !idx
+  if no.idx
     0
     (range_bounce seq idx)

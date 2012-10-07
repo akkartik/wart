@@ -1,6 +1,6 @@
 def foogen args
   args
-def foogen(s ... rest) :case (and !rest sym?.s)
+def foogen(s ... rest) :case (and no.rest sym?.s)
   s
 
 (test "def :case can handle rest params"
@@ -8,5 +8,5 @@ def foogen(s ... rest) :case (and !rest sym?.s)
   :should be '(3))
 
 (test "def :case can handle rest params - 2"
-  :valueof foogen!a
+  :valueof (foogen 'a)
   :should be 'a)

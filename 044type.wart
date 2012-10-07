@@ -13,7 +13,7 @@ def fn?(_)
   (isa _ function)
 def compiled_fn?(_)
   (and (fn? _)
-       (~cons? rep._!body))
+       (~cons? body._))
 
 
 
@@ -55,10 +55,10 @@ def! compose(f g)
     eval `(,(as function f) (,(as function g) ,@args)) caller_scope
 
 def sig(f)
-  rep.f!sig
+  rep.f'sig
 
 def! body(f)
-  rep.f!body
+  rep.f'body
 
 def env(f)
-  rep.f!env
+  rep.f'env

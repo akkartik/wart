@@ -21,7 +21,7 @@ mac unless(cond ... body)
      (do ,@body))
 
 mac iflet(var expr ... branches)
-  if !branches
+  if no.branches
     expr
     `(let $tmp ,expr
        (if $tmp
@@ -43,7 +43,7 @@ mac awhen(test ... body)
 
 mac aand args
   (if
-    !args
+    no.args
       1
     ~cdr.args
       car.args
@@ -101,7 +101,7 @@ def (&) fs
   (fn args
     (let sub (afn(fs)
                (if
-                  !fs
+                  no.fs
                     1
                   ~cdr.fs
                     (car.fs @args)

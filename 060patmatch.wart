@@ -9,7 +9,7 @@ mac matching(vars vals ... body)
 
 def strip_underscores(vars)
   (if
-    !vars
+    no.vars
       vars
     list?.vars
       (cons strip_underscores:car.vars strip_underscores:cdr.vars)

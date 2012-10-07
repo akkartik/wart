@@ -5,7 +5,7 @@ def enq(x q)
   do1 x
     let (l last len) rep.q
       rep.q.2 = (len + 1)
-      if !l
+      if no.l
         rep.q.1 = (rep.q.0 = list.x)
         rep.q.1 = (cdr.last = list.x)
 

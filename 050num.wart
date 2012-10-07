@@ -24,7 +24,7 @@ mac (++) (n)
 mac (--) (n)
   `(= ,n (- ,n 1))
 
-def (-) (n ... rest) :case !rest
+def (-) (n ... rest) :case no.rest
   (- 0 n)
 
 

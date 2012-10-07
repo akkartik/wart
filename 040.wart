@@ -19,11 +19,6 @@ let if if   ; ignore later refinements for the rest of this file
   mac! (.) (f x)
     `(,f ,x)
 
-  mac! (!) (f ... args)
-    if args
-      `(,f ',car.args)  ; 2 args = infix
-      `(not ,f)
-
   def! (.-) (f x)
     (f (- x))
 

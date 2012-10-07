@@ -1,8 +1,8 @@
 def pair(seq)
   (if
-    !seq
+    no.seq
       nil
-    !cdr.seq
+    ~cdr.seq
       (list:list car.seq)
     :else
       (cons (list car.seq cadr.seq)
@@ -14,7 +14,7 @@ mac with(bindings ... body)
     ,@(map cadr pair.bindings))
 
 mac withs(bindings ... body)
-  if !bindings
+  if no.bindings
     `(do ,@body)
     `(let ,car.bindings ,cadr.bindings
        (withs ,cddr.bindings ,@body))
