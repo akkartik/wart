@@ -404,45 +404,6 @@ void test_infix_handles_complement_as_usual() {
   check(p == n.elems.end());
 }
 
-void test_infix_passes_trailing_bang() {
-  CodeStream cs(stream("a!"));
-  AstNode n = nextAstNode(cs);
-  checkEq(transformInfix(n), n.atom);
-}
-
-void test_infix_handles_infix_bang() {
-  CodeStream cs(stream("a ! b"));
-  AstNode n = transformInfix(nextAstNode(cs));
-  check(n.isList());
-  list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("!")); ++p;
-  checkEq(*p, Token("a")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
-  check(p == n.elems.end());
-}
-
-void test_infix_handles_prefix_bang_with_lower_precedence() {
-  CodeStream cs(stream("!a.b"));
-  AstNode n = transformInfix(nextAstNode(cs));
-  check(n.isList());
-  list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("!")); ++p;
-  AstNode n2 = *p; ++p;
-    check(n2.isList());
-    list<AstNode>::iterator p2 = n2.elems.begin();
-    checkEq(*p2, Token("(")); ++p2;
-    checkEq(*p2, Token(".")); ++p2;
-    checkEq(*p2, Token("a")); ++p2;
-    checkEq(*p2, Token("b")); ++p2;
-    checkEq(*p2, Token(")")); ++p2;
-    check(p2 == n2.elems.end());
-  checkEq(*p, Token(")")); ++p;
-  check(p == n.elems.end());
-}
-
 void test_infix_handles_backquote() {
   CodeStream cs(stream("`(a + b)"));
   AstNode n = transformInfix(nextAstNode(cs));

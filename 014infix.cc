@@ -6,9 +6,6 @@ AstNode transformInfix(AstNode n) {
   if (n.isAtom() && n.atom.token == "...")
     return n;
 
-  if (n.isAtom() && n.atom.token == "!")
-    return n;
-
   if (n.isAtom() && !containsInfixChar(n.atom.token))
     return n;
 
@@ -116,21 +113,12 @@ AstNode tokenizeInfix(AstNode n) {
   if (var[0] == ':') return n;
   // special-case: $var is never infix
   if (var[0] == '$') return n;
-  // special-case: !x always processes at lowest precedence
-  if (var[0] == '!') {
-    var.insert(++var.begin(), ' ');
-    CodeStream cs(stream(var));
-    return transformInfix(nextAstNode(cs));
-  }
 
   string out;
   out += var[0];
   for (size_t x=1; x < var.size(); ++x) {
-    if ((isInfixChar(var[x]) && isRegularChar(var[x-1])
-            // special-case: trailing '!' is never an op
-            && (x != var.size()-1 || var[x] != '!'))
-        ||
-        (isRegularChar(var[x]) && isInfixChar(var[x-1])))
+    if ((isInfixChar(var[x]) && isRegularChar(var[x-1]))
+        || (isRegularChar(var[x]) && isInfixChar(var[x-1])))
       out += " ";
     out += var[x];
   }
@@ -141,28 +129,20 @@ AstNode tokenizeInfix(AstNode n) {
 
 
 bool isInfixOp(AstNode n) {
-  if (n == "!") return true;
   if (n.isList()) return false;
   string s = n.atom.token;
   string::iterator p = s.begin();
   if (*p != '$' && !isInfixChar(*p))
     return false;
-  string::iterator end = s.end();
-  if (s[s.size()-1] == '!')
-    --end;
-  for (++p; p != end; ++p)
+  for (++p; p != s.end(); ++p)
     if (!isInfixChar(*p))
       return false;
   return true;
 }
 
 bool containsInfixChar(string name) {
-  if (name == "!") return true;
   for (string::iterator p = name.begin(); p != name.end(); ++p) {
     if (p == name.begin() && *p == '-')
-      continue;
-
-    if (*p == '!' && p == --name.end())
       continue;
 
     if (isInfixChar(*p)) return true;
@@ -171,7 +151,6 @@ bool containsInfixChar(string name) {
 }
 
 bool isInfixChar(char c) {
-  if (c == '!') return true;  // ! is both infix and not
   return !find(punctuationChars, c)
       && !find(quoteAndUnquoteChars, c)
       && !isalnum(c) && !find(extraSymChars, c);
