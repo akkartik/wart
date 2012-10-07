@@ -47,8 +47,7 @@ them in this manner.
     (queue-length x)
 
 Other features: first-class macros that are also open to extension, pervasive
-python-style keyword arguments, and a more visually clean design than
-traditional lisp without compromising on homoiconicity.
+python-style keyword arguments, and a cleaner syntax than traditional lisp.
 
 You'll need linux and gcc.
 
