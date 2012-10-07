@@ -6,13 +6,13 @@ AstNode transformInfix(AstNode n) {
   if (n.isAtom() && n.atom.token == "...")
     return n;
 
-  if (n.isAtom() && !containsInfixChar(n.atom.token))
-    return n;
-
   if (n.isAtom() && n.atom.token[0] == '\"')
     return n;
 
   if (n.isAtom() && parseableAsFloat(n.atom.token))
+    return n;
+
+  if (n.isAtom() && !containsInfixChar(n.atom.token))
     return n;
 
   if (n.isAtom())
