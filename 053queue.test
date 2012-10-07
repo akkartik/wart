@@ -1,5 +1,5 @@
 (test "enq returns the elem being enqueued"
-  :valueof (enq 3 queue.)
+  :valueof (enq 3 (queue))
   :should be 3)
 
 (test "len works on queues"

@@ -51,17 +51,6 @@ void test_infix_handles_op_without_args() {
   checkEq(n.atom, Token("+"));
 }
 
-void test_infix_handles_sym_with_trailing_period() {
-  CodeStream cs(stream("op."));
-  AstNode n = transformInfix(nextAstNode(cs));
-  check(n.isList());
-  list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("op")); ++p;
-  checkEq(*p, Token(")")); ++p;
-  check(p == n.elems.end());
-}
-
 void test_infix_handles_op_without_args2() {
   CodeStream cs(stream("= (+) 3"));
   AstNode n = transformInfix(nextAstNode(cs));

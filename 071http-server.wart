@@ -11,7 +11,7 @@ mac accepting(client_socket socket|from ... body)
 
 def parse_request(client_socket)
   making stdin infd:socket_fd.client_socket
-    let (verb url) read.
+    let (verb url) (read)
       url
 
 def http_server(port)
@@ -22,5 +22,5 @@ def http_server(port)
           making stdout infd:socket_fd.client_socket
             prn "HTTP/1.0 200 OK"
             prn "Content-type: text/plain"
-            prn.
+            prn ""
             prn url

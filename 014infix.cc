@@ -42,12 +42,6 @@ AstNode transformInfix(AstNode n) {
   if (infixOpCalledWithoutArgs(n))
     return *++n.elems.begin();  // (++) => ++
 
-  // special-case: x. => (x)
-  if (simplePostfixPeriod(n)) {
-    n.elems.erase(----n.elems.end()); // drop the period
-    return n;
-  }
-
   int oldsize = n.elems.size();
 
   // now n is guaranteed to have at least 3 ops
@@ -167,16 +161,6 @@ bool infixOpCalledWithoutArgs(AstNode n) {
   if (*p != Token("(")) return false;
   ++p;
   return isInfixOp(*p);
-}
-
-bool simplePostfixPeriod(AstNode n) {
-  if (!n.isList() || n.elems.size() != 4) return false;
-  list<AstNode>::iterator p = n.elems.begin();
-  if (*p != Token("(")) return false;
-  ++p;
-  if (!p->isAtom()) return false;
-  ++p;
-  return *p == ".";
 }
 
 bool parseableAsFloat(string s) {

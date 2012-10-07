@@ -42,7 +42,7 @@
 
 
 (test "or handles 0 args"
-  :valueof or.
+  :valueof (or)
   :should be nil)
 
 (test "or handles nil arg"
@@ -89,7 +89,7 @@
 
 
 (test "and handles 0 args"
-  :valueof and.
+  :valueof (and)
   :should ~be nil)
 
 (test "and handles nil arg"

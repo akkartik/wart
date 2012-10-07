@@ -1,8 +1,8 @@
 let $fork fork
   mac! fork body
-    `(when (zero? ,$fork.)
+    `(when (zero? (,$fork))
        ,@body
-       quit.)
+       (quit))
 
 mac preforking(n ... body)
   `(do

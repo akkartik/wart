@@ -11,7 +11,7 @@ mac w_instring(s ... body)
      ,@body)
 
 mac w_outstring body
-  `(between (dyn_bind stdout outstring.) :and (do close_outfile.stdout dyn_unbind.stdout)
+  `(between (dyn_bind stdout (outstring)) :and (do close_outfile.stdout dyn_unbind.stdout)
      ,@body
      outstring_buffer.stdout)
 
