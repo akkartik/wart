@@ -42,6 +42,7 @@ AstNode transformInfix(AstNode n) {
   if (infixOpCalledWithoutArgs(n))
     return *++n.elems.begin();  // (++) => ++
 
+  // special-case: x. => (x)
   if (simplePostfixPeriod(n)) {
     n.elems.erase(----n.elems.end()); // drop the period
     return n;
