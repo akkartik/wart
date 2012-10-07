@@ -49,8 +49,7 @@ let if if   ; ignore later refinements for the rest of this file
     fn 'args
       mac_eval `(,f (,g ,@args)) caller_scope
 
-  mac (:) args
-    `(compose ,@args)
+  alias (:) compose
 
   def complement(f)
     (compose not f)
