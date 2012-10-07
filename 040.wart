@@ -78,6 +78,7 @@ let if if   ; ignore later refinements for the rest of this file
   def id(_)
     _
   alias present? id
+  alias no not
 
   = quote (car ''1)
   def quote?(_) (iso _ quote)

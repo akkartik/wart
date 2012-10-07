@@ -21,9 +21,6 @@ mac and args
       `(if ,car.args
          (and ,@cdr.args))
 
-alias nil? not
-alias no not
-
 let $iso iso ; ignore later refinements
   def isa(x 'Type)
     ($iso Type type.x)

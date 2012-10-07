@@ -1,3 +1,4 @@
+alias nil? not
 def sym?(_)
   (isa _ symbol)
 def list?(_)
