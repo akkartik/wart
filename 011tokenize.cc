@@ -88,8 +88,6 @@ void slurpChar(istream& in, ostream& out) {
   out << (char)in.get();
 }
 
-// Tokenize by punctuation and quotes.
-// Later we'll deal with infix, $vars, param aliases..
 void slurpWord(istream& in, ostream& out) {
   char c;
   while (in >> c) {
