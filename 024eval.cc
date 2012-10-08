@@ -325,17 +325,7 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
     Cell* result = eval(stripUnquote(x), scope);
     return skippedAlreadyEvald ? pushCons(newSym("''"), result) : result;
   }
-  else if (unquoteDepth(x) > 0) {
-    return mkref(x);
-  }
-
-  if (isBackQuoted(x)) {
-    Cell* result = newCons(car(x), processUnquotes(cdr(x), depth+1, scope));
-    rmref(cdr(result));
-    return mkref(result);
-  }
-
-  if (depth == 1 && isUnquoteSplice(car(x))) {
+  else if (depth == 1 && isUnquoteSplice(car(x))) {
     Cell* result = eval(cdr(car(x)), scope);
     Cell* splice = processUnquotes(cdr(x), depth, scope);
     if (result == nil) return splice;
@@ -346,6 +336,15 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
     append(resultcopy, splice);
     rmref(splice);
     return mkref(resultcopy);
+  }
+  else if (unquoteDepth(x) > 0) {
+    return mkref(x);
+  }
+
+  if (isBackQuoted(x)) {
+    Cell* result = newCons(car(x), processUnquotes(cdr(x), depth+1, scope));
+    rmref(cdr(result));
+    return mkref(result);
   }
 
   Cell* result = newCons(processUnquotes(car(x), depth, scope),
