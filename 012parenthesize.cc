@@ -1,5 +1,17 @@
 //// insert explicit parens based on indentation
 
+// Design considered the following:
+//  keywords in other languages to look different from functions: def, if, while, etc.
+//  fully-parenthesized expressions to not be messed with
+//    so ignore indent when lines start with parens
+//    so ignore indent inside parens
+//    so no way to disable this pass
+//  introduce no new operators
+//    so wart doesn't use nested lists like scheme's cond
+//    so lines with one word are never wrapped in parens, like x or ,f.sym
+//  encourage macros to fully parenthesize
+//    so ignore indent inside backquote
+
 list<Token> nextExpr(CodeStream& c) {
   list<Token> result;
   stack<long> explicitParenStack;   // parens in the original
