@@ -2,6 +2,15 @@
 const string punctuationChars = "();\"";  // the skeleton of a wart program
 const string quoteAndUnquoteChars = ",'`@";   // controlling eval and macros
 
+// Design considered the following:
+//  doing the minimum necessary to support macros later
+//    so backquote and unquote and splice are supported
+//    so infix ops are ignored
+//  supporting whitespace sensitivity
+//    preserve indent information because later passes can't recreate it
+//  avoid modifying strings
+//    so parse them here and make them easy for later passes to detect
+
 // line contains 1 indent and zero or more regular tokens
 struct Token {
   string token;
