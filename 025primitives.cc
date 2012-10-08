@@ -4,6 +4,7 @@
 //  compiled 'if' needs access to caller scope
 //  avoid accidental shadowing for params
 //    so params have a '$' prefix; user-defined functions won't have it because of implicit gensyms
+//  always increment the nrefs of a single Cell along all codepaths
 
 COMPILE_FN(fn, compiledFn_fn, "'($params ... $body)",
   Cell* f = newTable();

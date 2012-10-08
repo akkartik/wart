@@ -342,39 +342,6 @@ Before running, every occurrence of $tmp within this top-level definition is
 replaced with a unique symbol, say tmp1037. Occurrences of $tmp outside this
 top-level definition are guaranteed to expand to a *different* unique symbol.
 
---- Garbage collection
-
-Wart frees up unused memory using reference counting. Every Cell tracks the
-number of incoming pointers to it using a field called nrefs. Cycles must be
-explicitly broken to be collected.
-
-Wart must increment/decrement nrefs when saving a Cell inside another: in the
-car or cdr, or inside a Table. Never assign to car or cdr or a Table key by
-hand. Use an existing primitive: setCar, setCdr, set. They're thoroughly
-tested.
-
-Tests thoroughly audit nrefs using checkState, in order to detect errors as
-soon as possible.
-
-eval takes pains to increment the nrefs of *exactly* one Cell (the return
-value) across all paths. Nested calls to eval decrement nrefs of the result
-unless they return it. Structure other functions returning Cells the same way.
-
-To implement operations in C, use the COMPILE_FN macro. Each operation, like
-eval, is responsible for ensuring that the nrefs of exactly one Cell is
-incremented across all paths.
-
-If you hack on wart's cc files and forget to decrement nrefs you have a memory
-leak. If you forget to increment nrefs you have something worse: a prematurely
-garbage-collected cell that may now be used for something else entirely. Old
-pointers to it can no longer rely on what it contains; they may clobber or try
-to interpret arbitrary data as a string or a Table. All bets are off. Wart
-tries to loudly detect this insidious class of error as immediately as
-possible. Every time a Cell is freed it resets its pointers to NULL; when it's
-reused its pointers are initialized to nil. If wart ever complains that it ran
-across NULL, it means I or you forgot to decrement nrefs somewhere. All bets
-are off until it is fixed.
-
 --- Generated _lists
 
 To run its tests wart needs a list of tests to run. It constructs such a list

@@ -1,0 +1,25 @@
+Wart's garbage collection was designed around one consideration:
+  minimize memory use at all times
+
+To minimize memory use, wart uses reference counting.  Every Cell tracks the
+number of incoming pointers to it using a field called nrefs. Cycles must be
+explicitly broken to be collected. Unused Cells are immediately reclaimed.
+
+Functions that change global state must always increment the nrefs of
+*exactly* one Cell across all paths. That makes it easy to reason about the
+responsibilities of callers.
+
+Always increment and decrement nrefs when saving a Cell inside another: in the
+car or cdr, or inside a Table. Never assign to car or cdr or a Table key by
+hand. Use an existing primitive: setCar, setCdr, set.
+
+If you forget to decrement nrefs you have a memory leak. If you forget to
+increment nrefs you have something worse: a prematurely garbage-collected Cell
+that may now be used for something else entirely. Old pointers to it can no
+longer rely on what it contains; they may clobber or try to interpret
+arbitrary data as the wrong type. All bets are off. Wart tries to loudly
+detect this insidious class of error as immediately as possible. Every time a
+Cell is freed it resets its pointers to NULL; when it's reused its pointers
+are initialized to nil. If wart ever complains that it ran across NULL, it
+means you forgot to decrement nrefs somewhere. All bets are off until it is
+fixed.

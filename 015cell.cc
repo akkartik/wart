@@ -1,5 +1,9 @@
 //// cell: core lisp data structure with ref-counted garbage collection
 
+// Design considered the following:
+//  represent numbers, strings, symbols, lists, and hash-tables
+//  reclaim unused cells
+
 unsigned long numAllocs = 0;
 
 extern Cell* nil;
