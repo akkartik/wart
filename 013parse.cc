@@ -3,6 +3,10 @@
 // To disable whitespace-sensitivity, replace calls to nextParenInsertedToken
 // with nextNonWhitespaceToken.
 
+// Currently ,@(list x) creates a flat list: ,@ ( list x )
+// Equally valid to have it create a 2 level list: ,@ followed by ( list x )
+// Would require changing build phase appropriately.
+
 struct AstNode {
   Token atom;
   list<AstNode> elems;
