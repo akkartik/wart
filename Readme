@@ -342,15 +342,6 @@ Before running, every occurrence of $tmp within this top-level definition is
 replaced with a unique symbol, say tmp1037. Occurrences of $tmp outside this
 top-level definition are guaranteed to expand to a *different* unique symbol.
 
---- Generated _lists
-
-To run its tests wart needs a list of tests to run. It constructs such a list
-on the fly during compilation. Several other places use the same trick. The
-set of files to compile is auto-generated, as is the list of compiled
-primitives wart knows about. You can add new CompiledFns, or entirely new code
-in files new or old, and they'll be automatically included the next time you
-run wart.
-
 --- Credits
 
 Wart was inspired by Arc, a lisp dialect by Paul Graham and Robert Morris:

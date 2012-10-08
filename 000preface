@@ -26,35 +26,9 @@ of the creator's belief system.
 Don't add constraints. Rely on programmer taste, and help future programmers
 bulk up their taste muscle.
 
-Here's a picture of my backpack: <img>
-
-Flat namespaces. Everything close at hand. Pockets sometimes useful, but ask
-if they're truly necessary. They'll increase the odds you'll leave something
-there to decay. No sub directories even though the major subsystems could be
-so grouped.
-
-
-  If I look at any small part of it, I can see what is going on -- I don't
-  need to refer to other parts to understand what something is doing.
-
-  If I look at any large part in overview, I can see what is going on -- I
-  don't need to know all the details to get it.
-
-  Every level of detail is as locally coherent and as well thought-out as any
-  other level.
-
-      -- Richard Gabriel, The Quality Without A Name
-         (http://dreamsongs.com/Files/PatternsOfSoftware.pdf, page 42)
-
 
 Outline of the project. Christopher Alexander's theory of 'misfit-driven
 design'.
-
-tests help reading a codebase. what does this line do? comment it out and
-rerun the tests.
-
-version control helps reading a codebase. this function is too complex; go
-back in time to a simpler version that exposes the skeleton.
 
 Misfits for the overall structure:
 
