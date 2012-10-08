@@ -254,7 +254,7 @@ Cell* evalArg(Cell* params, Cell* arg, Cell* scope) {
 Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
   Cell *pResult = newCell(), *tip = pResult;
   for (Cell* curr = args; curr != nil; curr=cdr(curr)) {
-    if (!isSplice(car(curr))) {
+    if (!isSpliced(car(curr))) {
       addCons(tip, car(curr));
       tip=cdr(tip);
       continue;
@@ -325,7 +325,7 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
     Cell* result = eval(stripUnquote(x), scope);
     return skippedAlreadyEvald ? pushCons(newSym("''"), result) : result;
   }
-  else if (depth == 1 && isUnquoteSplice(car(x))) {
+  else if (depth == 1 && isUnquoteSpliced(car(x))) {
     Cell* result = eval(cdr(car(x)), scope);
     Cell* splice = processUnquotes(cdr(x), depth, scope);
     if (result == nil) return splice;
@@ -360,15 +360,15 @@ Cell* maybeStripAlreadyEvald(bool keepAlreadyEvald, Cell* x) {
 }
 
 long unquoteDepth(Cell* x) {
-  if (!isCons(x) || car(x) != newSym(","))
-    return 0;
-  return unquoteDepth(cdr(x))+1;
+  if (isUnquoted(x))
+    return unquoteDepth(cdr(x))+1;
+  return 0;
 }
 
 Cell* stripUnquote(Cell* x) {
-  if (!isCons(x) || car(x) != newSym(","))
-    return x;
-  return stripUnquote(cdr(x));
+  if (isUnquoted(x))
+    return stripUnquote(cdr(x));
+  return x;
 }
 
 
@@ -387,11 +387,15 @@ Cell* stripQuote(Cell* cell) {
   return isQuoted(cell) ? cdr(cell) : cell;
 }
 
-bool isSplice(Cell* arg) {
+bool isUnquoted(Cell* arg) {
+  return isCons(arg) && car(arg) == newSym(",");
+}
+
+bool isSpliced(Cell* arg) {
   return isCons(arg) && car(arg) == newSym("@");
 }
 
-bool isUnquoteSplice(Cell* arg) {
+bool isUnquoteSpliced(Cell* arg) {
   return isCons(arg) && car(arg) == newSym(",@");
 }
 
