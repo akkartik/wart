@@ -1,7 +1,9 @@
 //// core compiled primitives
 
-// these have access to caller scope
-// params start with $ by convention to avoid shadowing
+// Design considered the following:
+//  compiled 'if' needs access to caller scope
+//  avoid accidental shadowing for params
+//    so params have a '$' prefix; user-defined functions won't have it because of implicit gensyms
 
 COMPILE_FN(fn, compiledFn_fn, "'($params ... $body)",
   Cell* f = newTable();
