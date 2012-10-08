@@ -102,7 +102,7 @@ AstNode transformInfix(AstNode n) {
 }
 
 AstNode tokenizeInfix(AstNode n) {
-  string var = n.atom.token;
+  const char* var = n.atom.token.c_str();
 
   // special-case: :sym is never infix
   if (var[0] == ':') return n;
@@ -110,11 +110,25 @@ AstNode tokenizeInfix(AstNode n) {
   if (var[0] == '$') return n;
 
   string out;
-  out += var[0];
-  for (size_t x=1; x < var.size(); ++x) {
-    if ((isInfixChar(var[x]) && isRegularChar(var[x-1]))
-        || (isRegularChar(var[x]) && isInfixChar(var[x-1])))
+  for (size_t x=0; var[x] != '\0'; ++x) {
+    if (isdigit(var[x]) && (x == 0 || isInfixChar(var[x-1]))) {
+      const char* next = skipFloat(&var[x]);
+      if (next != &var[x]) {
+        out += " ";
+        while (var[x] != '\0' && &var[x] != next) {
+          out += var[x];
+          ++x;
+        }
+        --x;
+        continue;
+      }
+    }
+
+    if ((x > 0)
+          && ((isInfixChar(var[x]) && isRegularChar(var[x-1]))
+              || (isRegularChar(var[x]) && isInfixChar(var[x-1])))) {
       out += " ";
+    }
     out += var[x];
   }
   CodeStream cs(stream(out));
@@ -168,4 +182,10 @@ bool parseableAsFloat(string s) {
   char* end = NULL;
   strtof(s.c_str(), &end);
   return *end == '\0' && errno == 0;
+}
+
+const char* skipFloat(const char* s) {
+  char* end = NULL;
+  strtof(s, &end);
+  return end;
 }

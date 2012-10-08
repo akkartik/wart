@@ -332,6 +332,45 @@ void test_infix_handles_op_without_spaces() {
   check(p == n.elems.end());
 }
 
+void test_infix_handles_op_with_float() {
+  CodeStream cs(stream("a+1.0"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token("(")); ++p;
+  checkEq(*p, Token("+")); ++p;
+  checkEq(*p, Token("a")); ++p;
+  checkEq(*p, Token("1.0")); ++p;
+  checkEq(*p, Token(")")); ++p;
+  check(p == n.elems.end());
+}
+
+void test_infix_handles_op_with_float2() {
+  CodeStream cs(stream("3.0+1.0"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token("(")); ++p;
+  checkEq(*p, Token("+")); ++p;
+  checkEq(*p, Token("3.0")); ++p;
+  checkEq(*p, Token("1.0")); ++p;
+  checkEq(*p, Token(")")); ++p;
+  check(p == n.elems.end());
+}
+
+void test_infix_handles_op_with_float3() {
+  CodeStream cs(stream("a3.b"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token("(")); ++p;
+  checkEq(*p, Token(".")); ++p;
+  checkEq(*p, Token("a3")); ++p;
+  checkEq(*p, Token("b")); ++p;
+  checkEq(*p, Token(")")); ++p;
+  check(p == n.elems.end());
+}
+
 void test_infix_gives_ops_without_spaces_precedence() {
   CodeStream cs(stream("n * n-1"));
   AstNode n = transformInfix(nextAstNode(cs));

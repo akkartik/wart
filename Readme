@@ -297,10 +297,6 @@ Prefix can also be combined with infix, and has highest-precedence because of
 the default left-associativity:
   ~f.b                ; => ((complement f) b)
 
-You can't mix infix with floating-point numbers.
-
-  x-1.0               ; probably not what you want
-
 Infix operators can coexist with paren-insertion:
 
   a +
