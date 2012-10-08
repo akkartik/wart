@@ -210,37 +210,34 @@ You don't need spaces around infix ops.
 
 Infix ops don't compromise homoiconicity; wart parses them into lisp forms so
 your macros don't have to worry about them:
-  a+b
-=>
+  wart> 'a+b
   (+ a b)
 
 Infix ops are always left-associative.
-  a+b+c
-=>
+  wart> 'a+b+c
   (+ (+ a b) c)
 
 Range comparisons are convenient as long as they return the last arg on
 success (because of left-associativity) and pass nils through:
-  (a > b >= c)
-=>
+  wart> '(a > b >= c)
   (>= (> a b) c)      ; watch out if b is nil!
 
-  (> nil x)           ; should always return nil!
+  wart> '(< nil 34)
+  nil                 ; should always be true
+  wart> '(< 34 nil)
+  nil                 ; should always be true
 
 You can mix infix ops with regular prefix lisp:
-  (a + (f b))
-=>
+  wart> '(a + (f b))
   (+ a (f b))
 
-  (fib n-1)
-=>
+  wart> '(fib n-1)
   (fib (- n 1))
 
 Operator precedence is not hardcoded. Instead, there is just one rule:
 operators surrounded by whitespace have lower precedence than operators that
 are not.
-  (n * n-1)
-=>
+  wart> '(n * n-1)
   (* n (- n 1))
 
 You can create your own infix ops:
@@ -256,16 +253,13 @@ The sets of 'infix chars' and 'symbol chars' are disjoint. This implies that
 wart won't let you define some traditional lisp names that you might be used
 to:
 
-  *global*
-=>
-  error
+  wart> '*global*
+  ((* global) *)                        ; probably not what you want
 
-  uppercase-char-p
-=>
+  wart> 'uppercase-char-p
   (- uppercase (- char p))              ; probably not what you want
 
-  (char> a "p")
-=>
+  wart> '(char> a "p")
   ((> char a) p)                        ; probably not what you want
 
 To create multi-word symbols, use underscores or camelCase. I'm trying out
@@ -274,18 +268,15 @@ capitalizing globals.
 While regular symbols can't be used in infix mode, infix ops can be used like
 regular symbols.
 
-  (+ a b)
-=>
-  (+ a b)
+  wart> (+ 4 2)
+  6
 
 To use an infix op in a higher-level function, wrap it in parens:
 
-  (map ++ '(1 2 3))
-=>
+  wart> (map ++ '(1 2 3))
   Error: can't increment map
 
-  (map (++) '(1 2 3))                   ; hello haskell!
-=>
+  wart> (map (++) '(1 2 3))                   ; hello haskell!
   (2 3 4)
 
 In addition to the usual arithmetic, wart defines a few infix ops:
@@ -314,7 +305,6 @@ doing in infix. The following is actually harder to read in infix:
 I prefer to use infix only for simple expressions with short variable names.
 And I never use infix in macro expansions. After all, macros are the whole
 reason we have s-expressions.
-
 
 --- Implicit gensyms
 

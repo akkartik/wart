@@ -20,17 +20,24 @@ AstNode transformInfix(AstNode n) {
   if (n.isAtom())
     return n;
 
-  if (n.elems.front() == "`") {
-    n.elems.pop_front();
-    AstNode result = transformInfix(n);
-    result.elems.push_front(AstNode(Token("`")));
-    return result;
-  }
-
   if (isQuoteOrUnquote(n.elems.front())) {
-    for (auto p = ++n.elems.begin(); p != n.elems.end(); ++p)
-      *p = transformInfix(*p);
-    return n;
+    list<AstNode>::iterator p = n.elems.begin();
+    while (isQuoteOrUnquote(*p)) {
+      ++p;
+      if (p == n.elems.end()) return n;
+    }
+    AstNode result = (p == --n.elems.end())
+        ? transformInfix(*p)
+        : transformInfix(AstNode(list<AstNode>(p, n.elems.end())));
+    if (result.isAtom()) {
+      n.elems.pop_back();
+      n.elems.push_back(result);
+      return n;
+    }
+    else {
+      result.elems.insert(result.elems.begin(), n.elems.begin(), p);
+      return result;
+    }
   }
 
   if (n.elems.front() != Token("("))
