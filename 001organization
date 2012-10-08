@@ -42,3 +42,7 @@ functions. I assume function definitions lie on a single line. Such
 simplifying assumptions are possible because they're internal details without
 external consumers. They are useful because they minimize the amount of code
 needed for such infrastructure.
+
+Fewer constraints on code organization make it more likely that code
+organization will stay true to reality, with related code staying together,
+and unrelated code staying apart.
