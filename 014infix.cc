@@ -1,5 +1,6 @@
 //// transform infix expressions into prefix
-const string extraSymChars = "$?!_";
+
+const string extraSymChars = "$?!_";  // besides letters and digits
 
 AstNode transformInfix(AstNode n) {
   // special-case: ellipses are for dotted lists, not infix
