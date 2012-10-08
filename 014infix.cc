@@ -179,8 +179,7 @@ bool infixOpCalledWithoutArgs(AstNode n) {
 
 bool parseableAsFloat(string s) {
   errno = 0;
-  char* end = NULL;
-  strtof(s.c_str(), &end);
+  const char* end = skipFloat(s.c_str());
   return *end == '\0' && errno == 0;
 }
 
