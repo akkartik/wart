@@ -1,9 +1,11 @@
-//// create functions and macros; call them with @args, :keyword args
+//// creating functions and macros; calling them with args including @spliced and :keywords
 
 // Design considered the following:
 //  implicit eval: by default (f arg1 arg2 arg3) evals all the elems, then passes the args to f
 //  functions are just data: car = (object function {params: l, body: #compiled})
 //  user-defined functions are easy to reflect on: (fn '(x) 34) => (object function {params: (x), body: (34)})
+//  functions create a private scope, can continue to access outer bindings (lexical scope)
+//  user-defined functions can't see caller environment
 //  quote to suppress eval in expressions: 'abc => abc
 //  quote in param lists to suppress arg eval: ((fn '(x) x) abc) => abc
 //  varargs functions: ((fn params params) 1 2 3) => (1 2 3)
@@ -14,8 +16,7 @@
 //
 //  list templates: backquote to suppress eval, unquote to reenable eval inside backquote. `(+ ,a ,b)
 //  ability to splice multiple elements into lists: ,@vars inside backquote, @vars otherwise
-//  functions can refer to variables defined around them (lexical scope)
-//  provide access to caller_scope so we can define macros
+//  macros can access caller_scope
 //  permit @vars to work with macros that use backquote
 
 Cell* eval(Cell* expr) {
