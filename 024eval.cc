@@ -7,7 +7,7 @@
 //  functions create a private scope, can continue to access outer bindings (lexical scope)
 //  user-defined functions can't see caller environment
 //  quote to suppress eval in expressions: 'abc => abc
-//  quote in param lists to suppress arg eval: ((fn '(x) x) abc) => abc
+//  quoted params suppress arg eval: ((fn '(x) x) abc) => abc
 //  varargs functions: ((fn params params) 1 2 3) => (1 2 3)
 //  varargs functions with some named params: ((fn (fmt ... rest) (printf fmt rest)) "%d" 34) => 34
 //  passing in lists to functions: ((fn ((x y)) (+ x y)) '(3 4)) => 7
