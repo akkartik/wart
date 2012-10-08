@@ -1,4 +1,22 @@
-//// call functions with @args, 'quoted params, :keyword args, backquote exprs
+//// create functions and macros; call them with @args, :keyword args
+
+// Design considered the following:
+//  implicit eval: by default (f arg1 arg2 arg3) evals all the elems, then passes the args to f
+//  functions are just data: car = (object function {params: l, body: #compiled})
+//  user-defined functions are easy to reflect on: (fn '(x) 34) => (object function {params: (x), body: (34)})
+//  quote to suppress eval in expressions: 'abc => abc
+//  quote in param lists to suppress arg eval: ((fn '(x) x) abc) => abc
+//  varargs functions: ((fn params params) 1 2 3) => (1 2 3)
+//  varargs functions with some named params: ((fn (fmt ... rest) (printf fmt rest)) "%d" 34) => 34
+//  passing in lists to functions: ((fn ((x y)) (+ x y)) '(3 4)) => 7
+//  functions can reorder args using keyords: ((fn (a b c) b) :b 3 1 2) => 3
+//  functions can reorder args using a different keyword: ((fn (a b|x c) b) :x 3 1 2) => 3
+//
+//  list templates: backquote to suppress eval, unquote to reenable eval inside backquote. `(+ ,a ,b)
+//  ability to splice multiple elements into lists: ,@vars inside backquote, @vars otherwise
+//  functions can refer to variables defined around them (lexical scope)
+//  provide access to caller_scope so we can define macros
+//  permit @vars to work with macros that use backquote
 
 Cell* eval(Cell* expr) {
   return eval(expr, currLexicalScope);
