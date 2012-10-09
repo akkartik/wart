@@ -169,9 +169,9 @@ success (because of left-associativity) and pass nils through:
   (>= (> a b) c)      ; watch out if b is nil!
 
   wart> (nil < 34)
-  nil                 ; should always be true
+  nil                 ; should always be nil
   wart> (34 < nil)
-  nil                 ; should always be true
+  nil                 ; should always be nil
 
 You can mix infix ops with regular prefix lisp:
   wart> '(a + (f b))
