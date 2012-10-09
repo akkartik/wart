@@ -1,3 +1,5 @@
+=== Preface
+
   You can't really know anything if you just remember isolated facts.
   If the facts don't hang together on a latticework of theory, you don't
   have them in a usable form.
@@ -11,55 +13,91 @@
       -- paraphrasing Peter Naur
          (http://alistair.cockburn.us/ASD+book+extract%3A+%22Naur,+Ehn,+Musashi%22)
 
+Programming is hard. I think it's hard because of the difficulty of
+transmitting the theory of a codebase.
 
-Summarize the symptoms of the software crisis. One hypothesis: programmers
-don't all know the same theory. Blind men and elephant.
+  - We evaluate code for its semantics, not for readability or hackability.
+  - Programmers are more focused on building functionality than on readability
+    and hackability.
+  - New programmers on projects encounter a steep learning curve; tasks such
+    as building it, running it, running the tests, building specific features
+    -- all these require either persistence or access to experienced
+    programmers. These problems grow as codebases grow larger and older.
+  - Programmers acquire experience on a codebase in ad hoc fashion. Different
+    programmers know different facts about the codebase, have different holes
+    in their knowledge, and may believe contradictory facts without realizing
+    it. They become blind men to the codebase's elephant
+    (http://en.wikipedia.org/wiki/Blind_men_and_an_elephant)
+  - As projects grow, no single programmer sees the big picture anymore.
+  - As projects accumulate features their parts move in relation to one
+    another. Parts that used to work closely together grow apart, and parts
+    that seemed unrelated at the start get increasingly coupled. Ideally a
+    project would reorganize static code to reflect this changing reality. In
+    practice, this rarely happens, and the couplings are another thing new
+    programmers must imbibe -- either from their seniors or from painful
+    experience.
+  - Parnas's theory of information hiding
+    (http://www.cs.umd.edu/class/spring2003/cmsc838p/Design/criteria.pdf)
+    tells us that new feature requirements can radically change the ideal
+    design required to support them. Especially since reorganization is hard,
+    such redesign rarely happens, and codebases get more and more
+    unnecessarily complex as new features are added. Unnecessary complexity
+    gets harder to see over time as the current state gets set deeper and
+    deeper into its local optimum, but we can observe it indirectly through
+    symptoms like proliferating knobs and commandline flags that need to be
+    set in errorprone ways to get the system to run. Often errors of design
+    are best observed in the externality of deployment processes.
+  - Most experience with a codebase does not translate to other codebases.
+    Knowing one project well mostly doesn't help with other projects. This
+    causes programmers to become even more focused on the short term.
+
+This trajectory can be summarized thus: great things start to decay as people
+continue to work on them. We just see the problem more easily in software
+because the life-cycle is compressed. Dysfunctions in organizations that
+manifest over a decade become apparent in months in software.
 
 Can the theory of a codebase be transmitted more easily between programmers?
 Most software either makes no attempt to rigorously state what it's trying to
 do, or does so using the isolated facts of tests. This codebase is an
-experiment in structuring tests into a higher-level organization.
+experiment in structuring tests into a higher-level organization. I want to:
 
-Transmitting theory requires more than just the codebase at hand. Some amount
-of the creator's belief system.
+a) Make the overall organization instantly obvious to an outsider.
 
-Don't add constraints. Rely on programmer taste, and help future programmers
-bulk up their taste muscle.
+b) Concisely describe the design of sub-components. I try to follow
+Christopher Alexander's misfit-driven method for describing designs
+(www.amazon.com/Notes-Synthesis-Form-Harvard-Paperbacks/dp/0674627512). Rather
+than describe the current solution, I focus on the considerations and
+scenarios I thought of in building it.
 
+c) Write comprehensive tests. Most projects fail because they hold too tightly
+to a specific solution and ignore its input space. I focus on the input space
+and hold the current solution to be secondary. If past bugs are tightly held
+radical redesigns can be undertaken without fear of regressions.
 
-Outline of the project. Christopher Alexander's theory of 'misfit-driven
-design'.
+d) Make it as easy as possible to move code around in radical ways. Minimize
+explicit dependencies, make the build system smart enough to figure them out
+automatically.
 
-Misfits for the overall structure:
+e) Given flexibility in code ordering, organize the entire project top-down,
+with sub-components in separate files, and externally-used functions coming
+before internal details in each file.
 
-  avoid getting locked into designs because of the order you chose to build
-  features in. redesign is hard; at least make it apparent what the current
-  design does. what needs to be duplicated?
+f) Keep the tests for each level (overall design, subcomponent design, unit
+tests, tests of internal details) coherent. This provides layered defense
+against regression, but more importantly it allows us to fearlessly throw out
+tests for a subcomponent during redesigns that omit it.
 
-  avoiding duplication between adding a file to a project and asking for it to
-  be built
+g) Maintain and enumerate past designs with their tests. These aren't built to
+run on production, but their tests continue to run. This is work in progress.
 
-  every code file with its own tests
+h) When running top-level tests, make the state of sub-components visible to
+the programmer. This feature is useful both for onboarding newcomers to the
+codebase, and as an aid to redesigns. If we hold on to history we might avoid
+repeating old mistakes. Work on this is not yet begun.
 
-  no constraints but each code file puts the more important stuff first. At
-  the bottom are often functions internal to that file, that are seldom called
-  elsewhere.
-
-  facilities for the enumeration of past designs, with their tests. so the
-  reader can see how the design changed in response to new constraints.
-
-  sets of code files are preceded by high-level tests
-
-  so there's 4 tiers at which tests are grouped:
-    design philosophy -- these writeups, currently not tested
-    high-level design tests
-    tests for individual functions
-    tests for 'internal' functions
-
-  keep each tier coherent without relying on lower levels. if an intrepid
-  programmer decides to redo some subsystem he can ignore the tests of lower
-  levels with a clear conscience. layered defense against regressions.
-
-some transitions are abrupt; this is deliberate. In spite of the volume of
-prose, this isn't a novel. It's a design, and abrupt transitions serve to
-punctuate the boundaries between subsystems.
+Redesign is hard. It requires freeing one's mind from knowledge of the current
+solution to look for alternatives. Often a better design lies over the
+horizon; to find it we must cross a hill. To do better we must explore
+solutions that might be worse. No tool will do this for us. But perhaps better
+codebases and tools will eliminate other distractions and help us focus on the
+essence of programming.
