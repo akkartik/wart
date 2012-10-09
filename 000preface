@@ -1,5 +1,3 @@
-Have you read the Readme? (http://github.com/akkartik/wart/blob/master/Readme)
-
 === Preface
 
   You can't really know anything if you just remember isolated facts.
@@ -102,7 +100,8 @@ solution to look for alternatives. Often a better design lies over the
 horizon; to find it we must cross a hill. To do better we must explore
 solutions that might be worse. No tool will do this for us. But perhaps better
 codebases and tools will eliminate other distractions and help us focus on the
-essence of programming.
+essence of programming. This codebase is a live case study in such tools, an
+exercise in building something useful that is also easy to redesign over time.
 
 Next: 001organization (http://github.com/akkartik/wart/blob/master/001organization)
 
