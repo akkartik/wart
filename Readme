@@ -66,9 +66,6 @@ To run tests:
   $ wart test
   $ # success
 
-Wart started out as a Common Lisp implementation, which may be an easier read
-if you aren't fluent with C: http://github.com/akkartik/wart/tree/sbcl
-
 I love feedback: wart@akkartik.com
 
 --- Credits
