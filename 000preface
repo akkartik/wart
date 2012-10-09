@@ -43,12 +43,12 @@ transmitting the theory of a codebase.
     tells us that new feature requirements can radically change the ideal
     design required to support them. Especially since reorganization is hard,
     such redesign rarely happens, and codebases get more and more
-    unnecessarily complex as new features are added. Unnecessary complexity
-    gets harder to see over time as the current state gets set deeper and
-    deeper into its local optimum, but we can observe it indirectly through
-    symptoms like proliferating knobs and commandline flags that need to be
-    set in errorprone ways to get the system to run. Often errors of design
-    are best observed in the externality of deployment processes.
+    unnecessarily complex as new features are bolted on. Unnecessary
+    complexity gets harder to see over time as the current state gets set
+    deeper and deeper into its local optimum. But we can observe it indirectly
+    through symptoms like proliferating knobs and commandline flags that need
+    to be set in error-prone ways to get the system to run. Often errors of
+    design are best observed in the externality of deployment processes.
   - Most experience with a codebase does not translate to other codebases.
     Knowing one project well mostly doesn't help with other projects. This
     causes programmers to become even more focused on the short term.
