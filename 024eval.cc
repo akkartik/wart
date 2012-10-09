@@ -346,8 +346,8 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
     Cell* result = eval(stripUnquote(x), scope);
     return skippedAlreadyEvald ? pushCons(newSym("''"), result) : result;
   }
-  else if (depth == 1 && isUnquoteSpliced(car(x))) {
-    Cell* result = eval(cdr(car(x)), scope);
+  else if (unquoteSpliceDepth(car(x)) == depth) {
+    Cell* result = eval(stripUnquoteSplice(car(x)), scope);
     Cell* splice = processUnquotes(cdr(x), depth, scope);
     if (result == nil) return splice;
 
@@ -390,6 +390,18 @@ Cell* stripUnquote(Cell* x) {
   if (isUnquoted(x))
     return stripUnquote(cdr(x));
   return x;
+}
+
+long unquoteSpliceDepth(Cell* x) {
+  if (isUnquoteSpliced(x))
+    return 1;
+  if (isUnquoted(x))
+    return unquoteSpliceDepth(cdr(x))+1;
+  return 1000; // never try to splice
+}
+
+Cell* stripUnquoteSplice(Cell* x) {
+  return cdr(stripUnquote(x));
 }
 
 
