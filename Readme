@@ -46,8 +46,10 @@ them in this manner.
   def len(x) :case (isa x queue)
     (queue-length x)
 
-Other features: first-class macros that are also open to extension, pervasive
-python-style keyword arguments, and a cleaner syntax than traditional lisp.
+Other features: full-strength lisp macros that can be similarly extended and
+passed to other functions/macros (i.e. they're first-class); a cleaner syntax
+than traditional lisp; pervasive python-style keyword arguments for
+readability; unit tests and a build system for hackability.
 
 You'll need linux and gcc.
 
@@ -69,187 +71,6 @@ if you aren't fluent with C: http://github.com/akkartik/wart/tree/sbcl
 
 I love feedback: wart@akkartik.com
 
---- Optional parens
-
-Wart is indentation sensitive. Multi-word lines without leading parens are
-implicitly grouped with later indented lines:
-  if (> n 0)
-    * n (- n 1)
-=>
-  (if (> n 0)
-    (* n (- n 1))
-
-No indented lines after? They're grouped in isolation:
-  a b
-  c d
-=>
-  (a b)
-  (c d)
-
-Lines with a single word are never wrapped in parens:
-  def foo()
-    x
-=>
-  (def foo()
-    x)    ; x is returned as a value, never called
-
-Lines with a leading paren are never wrapped in parens:
-  def foo(x)
-    (prn x) x
-=>
-  (def foo(x)
-    (prn x) x)
-
-Putting these rules together, parens are not required around 'if' in:
-  if (iso 1 x%2)
-    'odd
-    'even
-..but they are required in:
-  (if                 ; parens required because line has a single word
-    (iso 1 x%2)       ; parens required to avoid grouping with next line
-      'odd
-    :else             ; optional, sometimes more clear
-      'even)
-..and, furthermore, this is wrong:
-  if (iso 1 x%2)
-    'odd
-  :else
-    'even
-=>
-  (if (iso 1 x%2)
-    'odd)
-  :else
-  'even               ; wrong
-
---- "But I hate significant whitespace!"
-
-I'm not trying to minimize parens typed; I'm trying to make lisp code more
-readable to non-lispers. Wart's codebase tastefully removes parens from just
-control-flow operators (def/mac/if/while/..), leaving them alone everywhere
-else. When in doubt, I insert parens.
-
-If you don't like this approach, just use parens everywhere:
-  (def foo() 34)
-  (def foo()
-    34)
-
-Indentation-sensitivity is disabled inside parens. This rule is useful if you
-want multiple expressions on a single line:
-  (if test1 body1     ; parens required to avoid grouping test2 and body2
-      test2 body2
-            else-expr)
-
-It also implies that backquoted expressions must be fully parenthesized:
-  mac when(cond ... body)
-    `(if ,cond
-       (do ,@body))   ; parens before 'do' are required
-
---- Infix operators
-
-Unlike other lisps, wart supports infix operators.
-  wart> 3 + 1
-  4
-
-You don't need spaces around infix ops.
-  wart> 3+1
-  4
-
-Infix ops don't compromise homoiconicity; wart parses them into lisp forms so
-your macros don't have to worry about them:
-  wart> 'a+b
-  (+ a b)
-
-Infix ops are always left-associative.
-  wart> 'a+b+c
-  (+ (+ a b) c)
-
-Range comparisons are convenient as long as they return the last arg on
-success (because of left-associativity) and pass nils through:
-  wart> '(a > b >= c)
-  (>= (> a b) c)      ; watch out if b is nil!
-
-  wart> (nil < 34)
-  nil                 ; should always be nil
-  wart> (34 < nil)
-  nil                 ; should always be nil
-
-You can mix infix ops with regular prefix lisp:
-  wart> '(a + (f b))
-  (+ a (f b))
-
-  wart> '(fib n-1)
-  (fib (- n 1))
-
-Operator precedence is not hardcoded. Instead, there is just one rule:
-operators surrounded by whitespace have lower precedence than operators that
-are not.
-  wart> '(n * n-1)
-  (* n (- n 1))
-
-You can create your own infix ops:
-
-  def (<>) (a b)                        ; def <> (a b) would become <> def (a b)
-    (~iso a b)
-
-  wart> (1 <> 2)
-  1
-
-To permit arbitrary infix ops, wart makes them distinct from regular symbols.
-The sets of 'infix chars' and 'symbol chars' are disjoint. This implies that
-wart won't let you define some traditional lisp names that you might be used
-to:
-
-  wart> '*global*
-  ((* global) *)                        ; probably not what you want
-
-  wart> 'uppercase-char-p
-  (- uppercase (- char p))              ; probably not what you want
-
-  wart> '(char> a "p")
-  ((> char a) p)                        ; probably not what you want
-
-To create multi-word symbols, use underscores or camelCase. I'm trying out
-capitalizing globals.
-
-While regular symbols can't be used in infix mode, infix ops can be used like
-regular symbols.
-
-  wart> (+ 4 2)
-  6
-
-To use an infix op in a higher-level function, wrap it in parens:
-
-  wart> (map ++ '(1 2 3))
-  Error: can't increment map
-
-  wart> (map (++) '(1 2 3))                   ; hello haskell!
-  (2 3 4)
-
-In addition to the usual arithmetic, wart defines a few infix ops:
-  a.b                 ; => (a b) unless a and b are all digits; 2.4 is a number
-  f:g                 ; => (compose f g)
-  ~f                  ; => (complement f)
-
-Prefix can also be combined with infix, and has highest-precedence because of
-the default left-associativity:
-  ~f.b                ; => ((complement f) b)
-
-Infix operators can coexist with paren-insertion:
-
-  a +
-    b+c * d
-=>
-  (+ a (* (+ b c) d))
-
-However, if your infix expressions need multiple lines, ask if they're worth
-doing in infix. The following is actually harder to read in infix:
-
-  (* some_function.some_argument
-     (+ some_other_function.some_other_argument
-        some_random_constant))
-
-I prefer to use infix only for simple expressions with short variable names.
-
 --- Credits
 
 Wart was inspired by Arc, a lisp dialect by Paul Graham and Robert Morris:
@@ -267,6 +88,5 @@ Story arc (pun intended):
   Why wart has just one kind of equality: http://arclanguage.org/item?id=13690
   In praise of late binding: http://arclanguage.org/item?id=15655
   Libraries suck: http://www.arclanguage.org/item?id=13283
+  Making macros even more first-class: http://arclanguage.org/item?id=16378
   Infix: http://arclanguage.org/item?id=16775
-
-Feedback: wart@akkartik.com
