@@ -249,8 +249,6 @@ doing in infix. The following is actually harder to read in infix:
         some_random_constant))
 
 I prefer to use infix only for simple expressions with short variable names.
-And I never use infix in macro expansions. After all, macros are the whole
-reason we have s-expressions.
 
 --- Credits
 
@@ -269,5 +267,6 @@ Story arc (pun intended):
   Why wart has just one kind of equality: http://arclanguage.org/item?id=13690
   In praise of late binding: http://arclanguage.org/item?id=15655
   Libraries suck: http://www.arclanguage.org/item?id=13283
+  Infix: http://arclanguage.org/item?id=16775
 
 Feedback: wart@akkartik.com
