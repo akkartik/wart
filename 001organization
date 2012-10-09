@@ -46,3 +46,7 @@ needed for such infrastructure.
 Fewer constraints on code organization make it more likely that code
 organization will stay true to reality, with related code staying together,
 and unrelated code staying apart.
+
+Next: 002main.cc (http://github.com/akkartik/wart/blob/master/002main.cc)
+
+Give feedback: wart@akkartik.com

@@ -1,3 +1,5 @@
+Have you read the Readme? (http://github.com/akkartik/wart/blob/master/Readme)
+
 === Preface
 
   You can't really know anything if you just remember isolated facts.
@@ -101,3 +103,7 @@ horizon; to find it we must cross a hill. To do better we must explore
 solutions that might be worse. No tool will do this for us. But perhaps better
 codebases and tools will eliminate other distractions and help us focus on the
 essence of programming.
+
+Next: 001organization (http://github.com/akkartik/wart/blob/master/001organization)
+
+Give feedback: wart@akkartik.com

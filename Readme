@@ -53,7 +53,7 @@ readability; unit tests and a build system for hackability.
 
 You'll need linux and gcc.
 
-To run it:
+Now install it:
   $ git clone https://github.com/akkartik/wart.git
   $ cd wart
   $ ./wart
@@ -65,6 +65,8 @@ Hit ctrl-d to quit.
 To run tests:
   $ wart test
   $ # success
+
+To learn more, read on: 000preface (http://github.com/akkartik/wart/blob/master/000preface)
 
 I love feedback: wart@akkartik.com
 
