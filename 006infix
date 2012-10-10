@@ -60,7 +60,7 @@ to:
   (- uppercase (- char p))              ; probably not what you want
 
   wart> '(char> a "p")
-  ((> char a) p)                        ; probably not what you want
+  ((> char a) "p")                      ; probably not what you want
 
 To create multi-word symbols, use underscores or camelCase. I'm trying out
 capitalizing globals.
