@@ -63,9 +63,9 @@ a) Make the overall organization instantly obvious to an outsider.
 
 b) Concisely describe the design of sub-components. I try to follow
 Christopher Alexander's misfit-driven method for describing designs
-(www.amazon.com/Notes-Synthesis-Form-Harvard-Paperbacks/dp/0674627512). Rather
-than describe the current solution, I focus on the considerations and
-scenarios I thought of in building it.
+(http://www.amazon.com/Notes-Synthesis-Form-Harvard-Paperbacks/dp/0674627512).
+Rather than describe a specific implementation, I focus on the considerations
+and scenarios I considered in building it.
 
 c) Write comprehensive tests. Most projects fail because they hold too tightly
 to a specific solution and ignore its input space. I focus on the input space
