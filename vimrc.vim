@@ -43,9 +43,10 @@ function! WartSettings()
   syntax match lispAtom "\([^ \t'.!~(),@`]\)\@<!:[^ \t'.!~(),@`:&]\+"
   syntax cluster lispListCluster add=lispAtom
 
-  syntax match lispOperator /[^a-zA-Z0-9_?!$"#]/
-  highlight link lispOperator Delimiter
-
+  " deemphasize period operator
+  syntax match wartCall /[^ .]\zs\./
+  syntax cluster lispListCluster add=wartCall
+  highlight link wartCall Delimiter
   " hack: symbols are interfering with operators
   syntax clear lispSymbol
   syntax clear lispFunc
