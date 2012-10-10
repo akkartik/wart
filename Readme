@@ -34,7 +34,7 @@ implementation uniformly adds features to language primitives by extending
 them in this manner.
 
   def len(x) :case (isa x queue)
-    (queue-length x)
+    (queue_length x)
 
 Other features: full-strength lisp macros that can be similarly extended and
 passed to other functions/macros (i.e. they're first-class); a cleaner syntax
