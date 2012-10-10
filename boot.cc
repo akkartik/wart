@@ -56,7 +56,7 @@ long raiseCount = 0;
                            : cerr << __FILE__ << ":" << __LINE__ << " "
 
 struct Die {};
-ostream& operator<<(unused ostream& os, unused Die die) {
+ostream& operator<<(ostream& os, unused Die die) {
   os << "dying";
   exit(1);
 }
