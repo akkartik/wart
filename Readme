@@ -12,13 +12,13 @@
 
 Wart is a small, thoroughly unit-tested language with an emphasis on
 readability and hackability. The primary goal is to be super easy to
-understand and modify. Everything is extensible, there are few distinctions
-between the language core and applications.
+understand and modify. Everything is extensible, and there is little that
+can't be done as a library.
 
 Here's factorial in wart:
 
   def fact(n)
-    if (iso n 0)         # iso ('isomorphic') is wart's equality operator
+    if (iso n 0)         # iso ('isomorphic') is wart's comparison function
       1
       (n * (fact n-1))
 
