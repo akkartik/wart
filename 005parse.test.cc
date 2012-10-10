@@ -5,7 +5,7 @@ void test_parse_handles_empty_stream() {
 }
 
 void test_parse_handles_trailing_comment() {
-  CodeStream cs(stream("34 ; abc"));
+  CodeStream cs(stream("34 # abc"));
   checkEq(nextAstNode(cs), Token("34"));
   checkEq(nextAstNode(cs), eof());
   check(cs.eof());
@@ -64,7 +64,7 @@ void test_parse_handles_nested_forms() {
 }
 
 void test_parse_handles_nested_forms_with_comments() {
-  CodeStream cs(stream("(a b (c d ;\n))"));
+  CodeStream cs(stream("(a b (c d #\n))"));
   AstNode n = nextAstNode(cs);
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();

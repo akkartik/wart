@@ -1,7 +1,7 @@
 mac zap(f x)
   `(= ,x (,f ,x))
 
-; infinite nil generator
+# infinite nil generator
 = nils '(nil)   cdr.nils nils
 
 mac wipe places
@@ -14,7 +14,7 @@ mac pop(seq)
   `(do1 (car ,seq)
      (zap cdr ,seq))
 
-mac shift places  ; multiple-eval to maintain places
+mac shift places  # multiple-eval to maintain places
   `(= ,@(zip_flat places cdr.places))
 
 mac rotate places

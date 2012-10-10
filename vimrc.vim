@@ -19,6 +19,9 @@ function! WartSettings()
   set iskeyword-=!
   set iskeyword-=& | set iskeyword-=38
 
+  syntax clear lispComment
+  syntax match lispComment /#.*$/  contains=@lispCommentGroup
+
   "" ssyntax
   " !a !~a.b:c!d&:e.f!.g!!h?.i j. k!( l!' !,k
   "     ^ ^ ^   ^  ^  ^     ^   ^   ^   ^ ^       highlight these like parens

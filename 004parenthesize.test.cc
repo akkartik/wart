@@ -335,7 +335,7 @@ void test_parenthesize_groups_nested_indents() {
 }
 
 void test_parenthesize_handles_quotes_and_comments() {
-  CodeStream cs(stream("a b c  \n  '(d ef)\n\n  g ;abc"));
+  CodeStream cs(stream("a b c  \n  '(d ef)\n\n  g #abc"));
   list<Token> tokens = nextExpr(cs);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -354,7 +354,7 @@ void test_parenthesize_handles_quotes_and_comments() {
 }
 
 void test_parenthesize_groups_before_outdents() {
-  CodeStream cs(stream("a b c  \n    '(d ef)\n\n  g ;abc"));
+  CodeStream cs(stream("a b c  \n    '(d ef)\n\n  g #abc"));
   list<Token> tokens = nextExpr(cs);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -413,7 +413,7 @@ void test_parenthesize_groups_before_too_much_outdent() {
 }
 
 void test_parenthesize_groups_across_comments() {
-  CodeStream cs(stream("def foo\n;a b c\n  d e\nnew"));
+  CodeStream cs(stream("def foo\n#a b c\n  d e\nnew"));
   list<Token> tokens = nextExpr(cs);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -432,7 +432,7 @@ void test_parenthesize_groups_across_comments() {
 }
 
 void test_parenthesize_does_not_group_inside_parens() {
-  CodeStream cs(stream("(def foo\n    ;a b c\n  d e)\nnew"));
+  CodeStream cs(stream("(def foo\n    #a b c\n  d e)\nnew"));
   list<Token> tokens = nextExpr(cs);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -449,7 +449,7 @@ void test_parenthesize_does_not_group_inside_parens() {
 }
 
 void test_parenthesize_does_not_group_inside_parens2() {
-  CodeStream cs(stream("`(def foo\n    ;a b c\n  d e)\nnew"));
+  CodeStream cs(stream("`(def foo\n    #a b c\n  d e)\nnew"));
   list<Token> tokens = nextExpr(cs);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "`"); ++p;

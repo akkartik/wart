@@ -1,6 +1,6 @@
 = mac! (fn '(name params ... body)
   (mac_eval `(= ,name (fn ',params
-                        ; remember to update isMacro if you change this
+                        # remember to update isMacro if you change this
                         (mac_eval ((fn() ,@body))
                                   caller_scope)))
             caller_scope))
@@ -11,7 +11,7 @@ mac! def!(name params ... body)
 mac! let(var val ... body)
   `((fn(,var) ,@body) ,val)
 
-let if if   ; ignore later refinements for the rest of this file
+let if if   # ignore later refinements for the rest of this file
 
   mac! do body
     `((fn() ,@body))
@@ -41,7 +41,7 @@ let if if   ; ignore later refinements for the rest of this file
       (prn "redef: " name)
     `(mac! ,name ,params ,@body)
 
-  mac alias(new old)  ; include later refinements
+  mac alias(new old)  # include later refinements
     `(mac ,new $args
        `(,,old ,@$args))
 

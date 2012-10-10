@@ -1,5 +1,5 @@
 //// split input into tokens separated by newlines, indent, and the following boundaries:
-const string punctuationChars = "();\"";  // the skeleton of a wart program
+const string punctuationChars = "()#\"";  // the skeleton of a wart program
 const string quoteAndUnquoteChars = ",'`@";   // controlling eval and macros
 
 // Design considered the following:
@@ -60,7 +60,7 @@ Token nextToken(CodeStream& c) {
   if (c.currIndent == -1)   // initial
     return Token(c.currIndent=indent(c.fd));
   skipWhitespace(c.fd);
-  if (c.fd.peek() == '\n' || c.fd.peek() == ';')
+  if (c.fd.peek() == '\n' || c.fd.peek() == '#')
     return Token(c.currIndent=indent(c.fd));
 
   ostringstream out;
@@ -124,7 +124,7 @@ long indent(istream& in) {
   long indent = 0;
   char c;
   while (in >> c) {
-    if (c == ';')
+    if (c == '#')
       skipComment(in);
 
     else if (!isspace(c)) {

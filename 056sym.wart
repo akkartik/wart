@@ -12,16 +12,16 @@ def is_match(a b bindings) :case sym?.a
   bindings |= (table)
   (or (iso a b)
       (iso '_ a)
-      (and (iso "_" str.a.0)  ; (_x _x) matches two of anything
+      (and (iso "_" str.a.0)  # (_x _x) matches two of anything
            (bindings.a |= b)
            (iso bindings.a b))
-      (and (iso "_" str.a.-1)   ; p_ matches any $p
+      (and (iso "_" str.a.-1)   # p_ matches any $p
            sym?.b
            (let acore (str.a 0 -1)
-             (and (~iso acore str.b)  ; ..but not p
+             (and (~iso acore str.b)  # ..but not p
                   (iso sym.acore sym_root.b))))
       (and sym?.b
-           (digit? str.b.-1)  ; (p_x p_x) matches two of any $p
+           (digit? str.b.-1)  # (p_x p_x) matches two of any $p
            (withs (sa   str.a
                    ai   (pos "_" (as list sa))
                    acore  (if ai (sa 0 ai)))
@@ -31,7 +31,7 @@ def is_match(a b bindings) :case sym?.a
                   (bindings.a |= b)
                   (iso bindings.a b)))))
 
-; ignore the uniq part of a $sym
+# ignore the uniq part of a $sym
 def sym_root(x)
   let name (rev:as list str.x)
     while (and name digit?:car.name)

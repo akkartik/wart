@@ -5,7 +5,7 @@ mac matching(vars vals ... body)
 
 
 
-;; Internals
+## Internals
 
 def strip_underscores(vars)
   (if

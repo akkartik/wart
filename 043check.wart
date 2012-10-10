@@ -21,14 +21,14 @@ mac and args
       `(if ,car.args
          (and ,@cdr.args))
 
-let $iso iso ; ignore later refinements
+let $iso iso # ignore later refinements
   def isa(x 'Type)
     ($iso Type type.x)
 
 let $iso iso
   def! iso(a b)
     (or ($iso a b)
-        (and cons?.a cons?.b   ; default for objects
+        (and cons?.a cons?.b   # default for objects
              (iso car.a car.b)
              (iso cdr.a cdr.b)))
 
@@ -39,8 +39,8 @@ mac (|=) (var val)
 def is_match(a b bindings)
   bindings |= (table)
   (or (iso a b)
-      (iso '_ a)  ; _ matches anything
-      (and cons?.a cons?.b  ; default for objects
+      (iso '_ a)  # _ matches anything
+      (and cons?.a cons?.b  # default for objects
            (is_match car.a car.b bindings)
            (is_match cdr.a cdr.b bindings)))
 

@@ -50,7 +50,7 @@ def blank?(seq)
   (or nil?.seq empty?.seq)
 
 def copy(x)
-  if cons?.x  ; piecewise copy for objects by default
+  if cons?.x  # piecewise copy for objects by default
     (cons copy:car.x copy:cdr.x)
     x
 
@@ -137,12 +137,12 @@ def map(f ... seqs) :case cdr.seqs
     (cons (f @(map car seqs))
           (map f @(map cdr seqs)))
 
-def reduce(f seq init)  ; f is a binary op
+def reduce(f seq init)  # f is a binary op
   (if
     no.seq
       init
     ~cdr.seq
-      car.seq   ; f on one op is the identity function
+      car.seq   # f on one op is the identity function
     :else
       (reduce f (cons (f car.seq cadr.seq)
                       cddr.seq)))
@@ -159,7 +159,7 @@ def best(f seq)
 
 
 
-;; Internals
+## Internals
 
 def range_bounce(seq idx)
   if (idx < 0)

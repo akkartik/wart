@@ -1,10 +1,10 @@
-; basic type-based dispatch
+# basic type-based dispatch
 mac (=) (lhs rhs) :case list?.lhs
-  ; multiple-eval in case car.lhs needs assigning to
+  # multiple-eval in case car.lhs needs assigning to
   `((table_get (table_get Coercions 'setter) (type ,car.lhs)) ,lhs ,rhs)
 
-; support new types in =
-; body must return a form that will be macro-eval'd
+# support new types in =
+# body must return a form that will be macro-eval'd
 mac defset(type params ... body)
   `(defcoerce ,type setter
      (fn ',params
@@ -12,15 +12,15 @@ mac defset(type params ... body)
 
 
 
-; keyword-based dispatch
+# keyword-based dispatch
 mac (=) (lhs rhs) :case (and list?.lhs (table_get Coercions car.lhs))
   `((table_get Coercions ',car.lhs) ,@cdr.lhs ,rhs)
 
-; support new keywords in =
+# support new keywords in =
 mac def_assign(op params ... body)
   `(table_set Coercions ',op (fn ,params ,@body))
 
-; special-case: delegate assignments using .
+# special-case: delegate assignments using .
 def_assign (.) '(f x val)
   (mac_eval `(= (,f ,x) ,val) caller_scope)
 def_assign (.-) '(f x val)
@@ -28,8 +28,8 @@ def_assign (.-) '(f x val)
 
 
 
-; serial assignment
-; this should be after clauses inspecting args
+# serial assignment
+# this should be after clauses inspecting args
 let ($=) (=)
   mac! (=) args
     if args

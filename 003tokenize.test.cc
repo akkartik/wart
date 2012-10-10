@@ -85,7 +85,7 @@ void test_tokenize_handles_splice_operators() {
 }
 
 void test_tokenize_handles_comment() {
-  CodeStream c(stream("()',@ ;abc def ghi"));
+  CodeStream c(stream("()',@ #abc def ghi"));
   Token t = nextToken(c);
   checkEq(t, indent(0));      t=nextToken(c);
   checkEq(t, "(");            t=nextToken(c);
@@ -95,14 +95,14 @@ void test_tokenize_handles_comment() {
 }
 
 void test_tokenize_ends_comment_at_newline() {
-  CodeStream c(stream(";abc def ghi\nabc"));
+  CodeStream c(stream("#abc def ghi\nabc"));
   Token t = nextToken(c);
   checkEq(t, indent(0));      t=nextToken(c);
   checkEq(t, "abc");          t=nextToken(c);
 }
 
 void test_tokenize_suppresses_comments() {
-  CodeStream c(stream("abc\n;abc\ndef\nghi"));
+  CodeStream c(stream("abc\n#abc\ndef\nghi"));
   Token t = nextToken(c);
   checkEq(t, indent(0));      t=nextToken(c);
   checkEq(t, "abc");          t=nextToken(c);
@@ -113,7 +113,7 @@ void test_tokenize_suppresses_comments() {
 }
 
 void test_tokenize_suppresses_comments2() {
-  CodeStream c(stream("a b\n  c\n;abc\ndef\n  ghi\n\njkl"));
+  CodeStream c(stream("a b\n  c\n#abc\ndef\n  ghi\n\njkl"));
   Token t = nextToken(c);
   checkEq(t, indent(0));      t=nextToken(c);
   checkEq(t, "a");            t=nextToken(c);
@@ -184,7 +184,7 @@ void test_tokenize_suppresses_whitespace_lines2() {
 }
 
 void test_tokenize_handles_sexpr() {
-  CodeStream c(stream("('a '(boo) \"foo\nbar\" `c `,d ,@e)\nabc ;def ghi\ndef"));
+  CodeStream c(stream("('a '(boo) \"foo\nbar\" `c `,d ,@e)\nabc #def ghi\ndef"));
   Token t = nextToken(c);
   checkEq(t, indent(0));      t=nextToken(c);
   checkEq(t, "(");            t=nextToken(c);

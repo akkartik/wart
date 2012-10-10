@@ -7,7 +7,7 @@ defset table((h k) v)
 defcoerce table list
   table_to_list
 
-let $table table  ; ignore later refinements
+let $table table  # ignore later refinements
   defcoerce nil table
     $table
 
