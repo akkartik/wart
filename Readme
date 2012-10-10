@@ -38,8 +38,7 @@ them in this manner.
 
 Other features: full-strength lisp macros that can be similarly extended and
 passed to other functions/macros (i.e. they're first-class); a cleaner syntax
-than traditional lisp; pervasive python-style keyword arguments for
-readability.
+than traditional lisp; pervasive python-style keyword arguments.
 
 You'll need linux and gcc.
 
