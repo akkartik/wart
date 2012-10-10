@@ -3,7 +3,7 @@
 // Design considered the following:
 //  implicit eval: by default (f arg1 arg2 arg3) evals all the elems, then passes the args to f
 //  functions are just data: car = (object function {params: l, body: #compiled})
-//  user-defined functions are easy to reflect on: (fn '(x) 34) => (object function {params: (x), body: (34)})
+//  user-defined functions are easy to reflect on: (fn (x) 34) => (object function {params: (x), body: (34)})
 //  functions create a private scope, can continue to access outer bindings (lexical scope)
 //  user-defined functions can't see caller environment
 //  quote to suppress eval in expressions: 'abc => abc
