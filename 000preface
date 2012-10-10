@@ -69,7 +69,7 @@ and scenarios I considered in building it.
 
 c) Write comprehensive tests. Most projects fail because they hold too tightly
 to a specific solution and ignore its input space. I focus on the input space
-and hold the current solution to be secondary. If past bugs are tightly held
+and hold the current solution to be secondary. If past bugs are tightly held,
 radical redesigns can be undertaken without fear of regressions.
 
 d) Make it as easy as possible to move code around in radical ways. Minimize
