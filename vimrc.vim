@@ -22,24 +22,6 @@ function! WartSettings()
   syntax clear lispComment
   syntax match lispComment /#.*$/  contains=@lispCommentGroup
 
-  "" ssyntax
-  " !a !~a.b:c!d&:e.f!.g!!h?.i j. k!( l!' !,k
-  "     ^ ^ ^   ^  ^  ^     ^   ^   ^   ^ ^       highlight these like parens
-  syntax match SSyntax /[^ ]\zs\./  " period after sym
-  syntax match SSyntax /[^ ]\zs[:&]\([^ ]\)\@=/   " infix colon or ampersand
-  syntax match SSyntax /\~\([^ ]\)\@=/  " tilde before sym
-  syntax cluster lispListCluster add=SSyntax
-  highlight link SSyntax Delimiter
-  " hack: symbols are interfering with SSyntax
-  syntax clear lispSymbol
-  syntax clear lispFunc
-  " have to redo numbers; lispNumber depended on lispSymbol
-  " a2 b-3 c%4 d?5 should not highlight digits
-  " 34 3.5 .1 1.3e5 (34) (a 3) b.34 c!34 d:34 e&35 should
-  syntax clear lispNumber
-  syntax match Number "\([^ (\t'.!()@`:&]\)\@<![+-]*\(\.\d\+\|\d\+\(\.\d*\)\=\)\([eE][-+]\=\d\+\)\="
-  syntax cluster lispListCluster add=Number
-
   "" unquote and splice
   " ,@a (,@b)
   syntax match Unquote /,@\|,/
@@ -60,6 +42,19 @@ function! WartSettings()
   "     ^      ^   ^ ^    ^ ^   ^x                delimiter
   syntax match lispAtom "\([^ \t'.!~(),@`]\)\@<!:[^ \t'.!~(),@`:&]\+"
   syntax cluster lispListCluster add=lispAtom
+
+  syntax match lispOperator /[^a-zA-Z0-9_?!$"#]/
+  highlight link lispOperator Delimiter
+
+  " hack: symbols are interfering with operators
+  syntax clear lispSymbol
+  syntax clear lispFunc
+  " have to redo numbers; lispNumber depended on lispSymbol
+  " a2 b-3 c%4 d?5 should not highlight digits
+  " 34 3.5 .1 1.3e5 (34) (a 3) b.34 c!34 d:34 e&35 should
+  syntax clear lispNumber
+  syntax match Number "\([^ (\t'.!()@`:&]\)\@<![+-]*\(\.\d\+\|\d\+\(\.\d*\)\=\)\([eE][-+]\=\d\+\)\="
+  syntax cluster lispListCluster add=Number
 endfunction
 
 autocmd BufReadPost,BufNewFile *.wart,*.test,*.wtst call WartSettings()
