@@ -21,40 +21,38 @@ transmitting the theory of a codebase.
     and hackability.
   - New programmers on projects encounter a steep learning curve; tasks such
     as building it, running it, running the tests, building specific features
-    -- all these require either persistence or access to experienced
-    programmers. These problems grow as codebases grow larger and older.
+    -- all these require either persistence or access to veterans of the
+    codebase. These problems grow as codebases grow and age.
   - Programmers acquire experience on a codebase in ad hoc fashion. Different
     programmers know different facts about the codebase, have different holes
     in their knowledge, and may believe contradictory facts without realizing
-    it. They become blind men to the codebase's elephant
+    it. As projects grow, no single programmer sees the big picture anymore.
+    They become blind men to the codebase's elephant
     (http://en.wikipedia.org/wiki/Blind_men_and_an_elephant)
-  - As projects grow, no single programmer sees the big picture anymore.
-  - As projects accumulate features their parts move in relation to one
+  - As projects accumulate features, their parts move in relation to one
     another. Parts that used to work closely together grow apart, and parts
     that seemed unrelated at the start get increasingly coupled. Ideally a
     project would reorganize static code to reflect this changing reality. In
     practice, this rarely happens, and the couplings are another thing new
     programmers must imbibe -- either from their seniors or from painful
     experience.
-  - Parnas's theory of information hiding
-    (http://www.cs.umd.edu/class/spring2003/cmsc838p/Design/criteria.pdf)
-    tells us that new feature requirements can radically change the ideal
-    design required to support them. Especially since reorganization is hard,
-    such redesign rarely happens, and codebases get more and more
-    unnecessarily complex as new features are bolted on. Unnecessary
-    complexity gets harder to see over time as the current state gets set
-    deeper and deeper into its local optimum. But we can observe it indirectly
-    through symptoms like proliferating knobs and commandline flags that need
-    to be set in error-prone ways to get the system to run. Often errors of
-    design are best observed in the externality of deployment processes.
-  - Most experience with a codebase does not translate to other codebases.
-    Knowing one project well mostly doesn't help with other projects. This
-    causes programmers to become even more focused on the short term.
+  - New feature requirements can radically change the ideal design required to
+    support them. Such redesign rarely happens, especially since reorganization is hard.
+    Instead, codebases get more and more unnecessarily complex as new features
+    are bolted on. Unnecessary complexity gets harder to see over time as the
+    existing design gets set deeper and deeper into its local optimum. But we
+    can observe it indirectly through symptoms like proliferating knobs and
+    commandline flags that need to be set in error-prone ways to get the
+    system to run. Often errors of design are best observed in the externality
+    of deployment processes.
+  - Experience with a codebase rarely translates to faster learning on other
+    codebases. This causes programmers to become even more focused on the
+    short term.
 
-This trajectory can be summarized thus: great things start to decay as people
-continue to work on them. We just see the problem more easily in software
-because the life-cycle is compressed. Dysfunctions in organizations that
-manifest over a decade become apparent in months in software.
+This trajectory also occurs in the real world: great things start to decay as
+people work on them over time. We just see the problem more easily in software
+because the life-cycle is compressed. Dysfunctions in organizations manifest
+over a decade, in software they become apparent in months.
 
 Can the theory of a codebase be transmitted more easily between programmers?
 Most software either makes no attempt to rigorously state what it's trying to
