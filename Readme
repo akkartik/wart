@@ -10,30 +10,20 @@
       -- Richard Gabriel, The Quality Without A Name
          (http://dreamsongs.com/Files/PatternsOfSoftware.pdf, page 42)
 
-Wart is a small, *super* readable, thoroughly unit-tested lisp.
-Wart returns to the roots of lisp: no constraints, maximum flexibility, extreme late-binding.
-Wart is not a platform. It exposes no interface, releases no version numbers.
-Anything can change at any time. If you use it, write lots of tests. Or God help you.
-Everything is open to question -- but you'll have to pry macros out of my cold dead hands.
+Wart is a small, thoroughly unit-tested language with an emphasis on
+readability and hackability. The primary goal is to be super easy to
+understand and modify. Everything is extensible, there are few distinctions
+between the language core and applications.
 
-Wart is intended above all to be read.
-If you write programs using it, put them in this directory. Don't hide wart away
-somewhere in your path.
-Feel free to make changes to the language. You know your needs best.
-
-Wart will eventually be 'fast enough'. Right now it's 3-5 orders of magnitude too slow.
-It will always be small. 10-20kLoC should provide a useable foundation for 'real' apps.
-
----
-
-As a code sample, factorial in wart:
+Here's factorial in wart:
 
   def fact(n)
-    if (iso n 0)                        ; iso is wart's comparison operator
+    if (iso n 0)         ; iso ('isomorphic') is wart's equality operator
       1
       (n * (fact n-1))
 
-  ; Alternatively
+Alternatively:
+
   def fact(n)
     (n * (fact n-1))
   def fact(n) :case (iso n 0)
@@ -49,20 +39,20 @@ them in this manner.
 Other features: full-strength lisp macros that can be similarly extended and
 passed to other functions/macros (i.e. they're first-class); a cleaner syntax
 than traditional lisp; pervasive python-style keyword arguments for
-readability; unit tests and a build system for hackability.
+readability.
 
 You'll need linux and gcc.
 
-Now install it:
-  $ git clone https://github.com/akkartik/wart.git
+To install it:
+  $ git clone http://github.com/akkartik/wart.git
   $ cd wart
   $ ./wart
   wart>
 
-Hit <enter> twice to eval.
+Type <enter> twice to run code at the prompt.
 Hit ctrl-d to quit.
 
-To run tests:
+To run its tests:
   $ wart test
   $ # success
 
@@ -72,14 +62,14 @@ I love feedback: wart@akkartik.com
 
 --- Credits
 
-Wart was inspired by Arc, a lisp dialect by Paul Graham and Robert Morris:
+Wart is an experiment in designing software. Inspirations:
+  Christopher Alexander (http://www.amazon.com/Notes-Synthesis-Form-Harvard-Paperbacks/dp/0674627512)
+  David Parnas (http://www.cs.umd.edu/class/spring2003/cmsc838p/Design/criteria.pdf)
+  Peter Naur (http://alistair.cockburn.us/ASD+book+extract%3A+%22Naur,+Ehn,+Musashi%22)
+
+As a language, wart was inspired by Arc, a dialect of lisp:
   http://www.paulgraham.com/arc.html
-It is distributed under the same license as Arc.
-
-Discussions on the Arc Forum generated all the ideas here:
-  http://arclanguage.org/forum
-
-Story arc (pun intended):
+Discussions on the arc forum helped develop many of its features:
   "The wart atop the mountain": http://arclanguage.org/item?id=12814
   Generic functions: http://arclanguage.org/item?id=11779, http://arclanguage.org/item?id=13790
   Python-style keyword args: http://arclanguage.org/item?id=12657
@@ -89,3 +79,6 @@ Story arc (pun intended):
   Libraries suck: http://www.arclanguage.org/item?id=13283
   Making macros even more first-class: http://arclanguage.org/item?id=16378
   Infix: http://arclanguage.org/item?id=16775
+
+Wart is distributed under the Perl Foundation's artistic license 2.0:
+  http://dev.perl.org/licenses/artistic.html
