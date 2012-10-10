@@ -17,15 +17,15 @@ arguments in order. This will be familiar to python programmers:
 Keywords that don't match function parameters are passed through as arguments:
 
   wart> (foo :c 1 2)
-  (:c 1)                                ; the third arg gets dropped
+  (:c 1)                                # the third arg gets dropped
 
 (Keyword symbols always evaluate to themselves.)
 
 This is useful primarily because you can pass keywords through layers of
 function calls:
 
-  wart> (def A params (B @params))      ; all params get spliced into a call to B
-  wart> (def B(c ... d) (list c @d))    ; d gets all but the first arg
+  wart> (def A params (B @params))      # all params get spliced into a call to B
+  wart> (def B(c ... d) (list c @d))    # d gets all but the first arg
   wart> (A 1 2 3)
   (1 2 3)
   wart> (A 1 2 :c 3)

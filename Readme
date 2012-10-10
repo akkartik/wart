@@ -18,7 +18,7 @@ between the language core and applications.
 Here's factorial in wart:
 
   def fact(n)
-    if (iso n 0)         ; iso ('isomorphic') is wart's equality operator
+    if (iso n 0)         # iso ('isomorphic') is wart's equality operator
       1
       (n * (fact n-1))
 

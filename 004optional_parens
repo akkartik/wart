@@ -20,7 +20,7 @@ Lines with a single word are never wrapped in parens:
     x
 =>
   (def foo()
-    x)    ; x is returned as a value, never called
+    x)    # x is returned as a value, never called
 
 Lines with a leading paren are never wrapped in parens:
   def foo(x)
@@ -34,10 +34,10 @@ Putting these rules together, parens are not required around 'if' in:
     'odd
     'even
 ..but they are required in:
-  (if                 ; parens required because line has a single word
-    (iso 1 x%2)       ; parens required to avoid grouping with next line
+  (if                 # parens required because line has a single word
+    (iso 1 x%2)       # parens required to avoid grouping with next line
       'odd
-    :else             ; optional, sometimes more clear
+    :else             # optional, sometimes more clear
       'even)
 ..and, furthermore, this is wrong:
   if (iso 1 x%2)
@@ -48,7 +48,7 @@ Putting these rules together, parens are not required around 'if' in:
   (if (iso 1 x%2)
     'odd)
   :else
-  'even               ; wrong
+  'even               # wrong
 
 --- "But I hate significant whitespace!"
 
@@ -64,11 +64,11 @@ If you don't like this approach, just use parens everywhere:
 
 Indentation-sensitivity is disabled inside parens. This rule is useful if you
 want multiple expressions on a single line:
-  (if test1 body1     ; parens required to avoid grouping test2 and body2
+  (if test1 body1     # parens required to avoid grouping test2 and body2
       test2 body2
             else-expr)
 
 It also implies that backquoted expressions must be fully parenthesized:
   mac when(cond ... body)
     `(if ,cond
-       (do ,@body))   ; parens before 'do' are required
+       (do ,@body))   # parens before 'do' are required

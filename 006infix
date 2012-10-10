@@ -20,12 +20,12 @@ Infix ops are always left-associative.
 Range comparisons are convenient as long as they return the last arg on
 success (because of left-associativity) and pass nils through:
   wart> '(a > b >= c)
-  (>= (> a b) c)      ; watch out if b is nil!
+  (>= (> a b) c)      # watch out if b is nil!
 
   wart> (nil < 34)
-  nil                 ; should always be nil
+  nil                 # should always be nil
   wart> (34 < nil)
-  nil                 ; should always be nil
+  nil                 # should always be nil
 
 You can mix infix ops with regular prefix lisp:
   wart> '(a + (f b))
@@ -42,7 +42,7 @@ are not.
 
 You can create your own infix ops:
 
-  def (<>) (a b)                        ; def <> (a b) would become <> def (a b)
+  def (<>) (a b)                        # def <> (a b) would become <> def (a b)
     (~iso a b)
 
   wart> (1 <> 2)
@@ -54,13 +54,13 @@ wart won't let you define some traditional lisp names that you might be used
 to:
 
   wart> '*global*
-  ((* global) *)                        ; probably not what you want
+  ((* global) *)                        # probably not what you want
 
   wart> 'uppercase-char-p
-  (- uppercase (- char p))              ; probably not what you want
+  (- uppercase (- char p))              # probably not what you want
 
   wart> '(char> a "p")
-  ((> char a) "p")                      ; probably not what you want
+  ((> char a) "p")                      # probably not what you want
 
 To create multi-word symbols, use underscores or camelCase. I'm trying out
 capitalizing globals.
@@ -76,17 +76,17 @@ To use an infix op in a higher-level function, wrap it in parens:
   wart> (map ++ '(1 2 3))
   Error: can't increment map
 
-  wart> (map (++) '(1 2 3))                   ; hello haskell!
+  wart> (map (++) '(1 2 3))                   # hello haskell!
   (2 3 4)
 
 In addition to the usual arithmetic, wart defines a few infix ops:
-  a.b                 ; => (a b) unless a and b are all digits; 2.4 is a number
-  f:g                 ; => (compose f g)
-  ~f                  ; => (complement f)
+  a.b                 # => (a b) unless a and b are all digits; 2.4 is a number
+  f:g                 # => (compose f g)
+  ~f                  # => (complement f)
 
 Prefix can also be combined with infix, and has highest-precedence because of
 the default left-associativity:
-  ~f.b                ; => ((complement f) b)
+  ~f.b                # => ((complement f) b)
 
 Infix operators can coexist with paren-insertion:
 
