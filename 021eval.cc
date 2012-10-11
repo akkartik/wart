@@ -461,7 +461,7 @@ Cell* body(Cell* fn) {
 }
 
 Cell* impl(Cell* fn) {
-  Cell* impl = get(rep(fn), newSym("optimized-body"));
+  Cell* impl = get(rep(fn), newSym("optimized_body"));
   return (impl != nil) ? impl : body(fn);
 }
 
