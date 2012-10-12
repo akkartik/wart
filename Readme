@@ -43,12 +43,15 @@ single function keeps from getting entangled together.
 
 Other features: full-strength lisp macros that can be similarly extended and
 passed to other functions/macros without constraint, a cleaner syntax than
-traditional lisp, and function calls can take keyword arguments for
+traditional lisp, and function calls that can always add keyword arguments for
 readability.
 
-  wart> (subtract 4 3)
+  wart> 4-3
   1
-  wart> (subtract 3 :from 4)
+  wart> def subtract(a|from b) a-b
+  wart> subtract 4 3
+  1
+  wart> subtract 3 :from 4
   1
 
 You'll need linux and gcc.
