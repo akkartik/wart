@@ -18,27 +18,38 @@ can't be done as a library.
 Here's factorial in wart:
 
   def fact(n)
-    if (iso n 0)         # iso ('isomorphic') is wart's comparison function
+    if (iso n 0)        # iso ('isomorphic') is wart's comparison function
       1
       (n * (fact n-1))
 
-Alternatively:
+Parens are used for function calls, not grouping; ((f)) is not the same as (f).
+
+Here's another way to define factorial:
 
   def fact(n)
     (n * (fact n-1))
+
   def fact(n) :case (iso n 0)
     1
 
 All functions are generic and can be extended or overridden at any time. The
+two definitions above could be in completely different files. The
 implementation uniformly adds features to language primitives by extending
-them in this manner.
+them in this manner. Related code stays together, and unrelated code in a
+single function keeps from getting entangled together.
 
   def len(x) :case (isa x queue)
     (queue_length x)
 
 Other features: full-strength lisp macros that can be similarly extended and
-passed to other functions/macros (i.e. they're first-class); a cleaner syntax
-than traditional lisp; pervasive python-style keyword arguments.
+passed to other functions/macros without constraint, a cleaner syntax than
+traditional lisp, and function calls can take keyword arguments for
+readability.
+
+  wart> (subtract 4 3)
+  1
+  wart> (subtract 3 :from 4)
+  1
 
 You'll need linux and gcc.
 
