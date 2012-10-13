@@ -59,7 +59,7 @@ COMPILE_FN(coerce_quoted, compiledFn_coerce_quoted, "'($x $dest_type)",
 
 // bindings
 
-COMPILE_FN(=, compiledFn_assign, "('$var $val)",
+COMPILE_FN(<-, compiledFn_assign, "('$var $val)",
   Cell* var = lookup("$var");
   Cell* val = lookup("$val");
   assign(var, val);

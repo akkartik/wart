@@ -36,7 +36,7 @@ mac ret(var val ... body)
 
 mac rfn(name params ... body)
   `(ret ,name nil
-      (= ,name (fn ,params
+      (,name <- (fn ,params
                   ,@body)))
 
 mac afn(params ... body)

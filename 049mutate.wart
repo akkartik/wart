@@ -1,21 +1,22 @@
 mac zap(f x)
-  `(= ,x (,f ,x))
+  `(,x <- (,f ,x))
 
 # infinite nil generator
-= nils '(nil)   cdr.nils nils
+<- nils '(nil)
+<- cdr.nils nils
 
 mac wipe places
-  `(= ,@(zip_flat places nils))
+  `(<- ,@(zip_flat places nils))
 
 mac push(x seq)
-  `(= ,seq (cons ,x ,seq))
+  `(<- ,seq (cons ,x ,seq))
 
 mac pop(seq)
   `(do1 (car ,seq)
      (zap cdr ,seq))
 
 mac shift places  # multiple-eval to maintain places
-  `(= ,@(zip_flat places cdr.places))
+  `(<- ,@(zip_flat places cdr.places))
 
 mac rotate places
   `(let $tmp ,car.places
@@ -29,4 +30,4 @@ mac making(var val ... body)
      ,@body)
 
 mac coerce!(var type)
-  `(= ,var (coerce ,var ,type))
+  `(,var <- (coerce ,var ,type))

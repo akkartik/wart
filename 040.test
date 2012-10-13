@@ -13,7 +13,7 @@ err "wart tests: "
   :should be '(1 2 3))
 
 (test "macros work with splice when not eventually eval'd"
-  :valueof ((fn() (= @'(foo 3)) foo))
+  :valueof ((fn() (<- @'(foo 3)) foo))
   :should be 3)
 
 (mac! foo(a b) `(cons ,a ,b))
@@ -58,8 +58,8 @@ err "wart tests: "
   :should be 4)
 
 (test "do evals all exprs"
-  :valueof ((fn(a) (do (a = a+1)
-                       (a = a+1)))
+  :valueof ((fn(a) (do (a <- a+1)
+                       (a <- a+1)))
                2)
   :should be 4)
 

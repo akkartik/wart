@@ -1,12 +1,13 @@
-= mac! (fn '(name params ... body)
-  (mac_eval `(= ,name (fn ',params
-                        # remember to update isMacro if you change this
-                        (mac_eval ((fn() ,@body))
-                                  caller_scope)))
-            caller_scope))
+<- mac!
+   (fn '(name params ... body)
+     (mac_eval `(,name <- (fn ',params
+                            # remember to update isMacro if you change this
+                            (mac_eval ((fn() ,@body))
+                                      caller_scope)))
+               caller_scope))
 
 mac! def!(name params ... body)
-  `(= ,name (fn ,params ,@body))
+  `(,name <- (fn ,params ,@body))
 
 mac! let(var val ... body)
   `((fn(,var) ,@body) ,val)
@@ -74,19 +75,19 @@ let if if   # ignore later refinements for the rest of this file
   alias present? id
   alias no not
 
-  = quote (car ''1)
+  <- quote (car ''1)
   def quote?(_) (iso _ quote)
   alias quoted? quote?:car
-  = backquote (car '`(1))
+  <- backquote (car '`(1))
   def backquote?(_) (iso _ backquote)
   alias backquoted? backquote?:car
-  = unquote (car:cadr '`(,1))
+  <- unquote (car:cadr '`(,1))
   def unquote?(_) (iso _ unquote)
   alias unquoted? unquote?:car
-  = unquote_splice (car:cadr '`(,@1))
+  <- unquote_splice (car:cadr '`(,@1))
   def unquote_splice?(_) (iso _ unquote_splice)
   alias unquote_spliced? unquote_splice?:car
-  = splice (car '@1)
+  <- splice (car '@1)
   def splice?(_) (iso _ splice)
   alias spliced? splice?:car
 

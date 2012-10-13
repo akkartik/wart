@@ -1,6 +1,6 @@
 (test "assignment can process multiple pairs"
   :valueof (do
-             (= x 1 y 2)
+             (<- x 1 y 2)
              (cons x y))
   :should be '(1 ... 2))
 
@@ -24,7 +24,7 @@
 
 (test "making works"
   :valueof (do
-             (x = 3)
+             (x <- 3)
              (let f (fn() x)
                (list (f)
                      (let x 4 (f))

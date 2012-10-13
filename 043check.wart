@@ -34,7 +34,7 @@ let $iso iso
 
 mac default(var val|to)
   `(or ,var
-       (= ,var ,val))
+       (,var <- ,val))
 
 def is_match(a b bindings)
   default bindings :to (table)  # used in later refinements

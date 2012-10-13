@@ -47,7 +47,7 @@ void test_cons_works() {
 }
 
 void test_assign_to_fn() {
-  Cell* fn = read(stream("= foo (fn() 34)"));
+  Cell* fn = read(stream("<- foo (fn() 34)"));
   Cell* def = eval(fn);
   Cell* scope = env(lookup("foo"));
   checkEq(scope, nil);
@@ -57,7 +57,7 @@ void test_assign_to_fn() {
 }
 
 void test_assign_lexical_var() {
-  Cell* fn = read(stream("((fn(x) (= x 34) x))"));
+  Cell* fn = read(stream("((fn(x) (x <- 34) x))"));
   Cell* call = eval(fn);
   checkEq(call, newNum(34));
   rmref(call);
@@ -65,9 +65,9 @@ void test_assign_lexical_var() {
 }
 
 void test_assign_overrides_dynamic_vars() {
-  Cell* init1 = read(stream("= x 3"));
+  Cell* init1 = read(stream("<- x 3"));
   Cell* call1 = eval(init1);
-  Cell* init2 = read(stream("= x 5"));
+  Cell* init2 = read(stream("x <- 5"));   // infix <- for variety
   Cell* call2 = eval(init2);
   checkEq(lookup("x"), newNum(5));
   endDynamicScope("x");
@@ -78,9 +78,9 @@ void test_assign_overrides_dynamic_vars() {
 }
 
 void test_assign_overrides_within_lexical_scope() {
-  Cell* init1 = read(stream("= x 3"));
+  Cell* init1 = read(stream("<- x 3"));
   Cell* call1 = eval(init1);
-  Cell* init2 = read(stream("((fn() (= x 5)))"));
+  Cell* init2 = read(stream("((fn() (x <- 5)))"));
   Cell* call2 = eval(init2);
   checkEq(lookup("x"), newNum(5));
   endDynamicScope("x");
@@ -91,7 +91,7 @@ void test_assign_overrides_within_lexical_scope() {
 }
 
 void test_assign_never_overrides_lexical_vars_in_caller_scope() {
-  Cell* fn = read(stream("((fn(x) (= y x)) 34)"));
+  Cell* fn = read(stream("((fn(x) (<- y x)) 34)"));  // prefix <- for variety
   Cell* def = eval(fn);
   checkEq(lookup("y"), newNum(34));
   endDynamicScope("y");
@@ -100,7 +100,7 @@ void test_assign_never_overrides_lexical_vars_in_caller_scope() {
 }
 
 void test_assign_overrides_lexical_var() {
-  Cell* fn = read(stream("((fn(x) (= x 35) (= x 36) x) 34)"));
+  Cell* fn = read(stream("((fn(x) (x <- 35) (x <- 36) x) 34)"));
   Cell* call = eval(fn);
   checkEq(call, newNum(36));
   rmref(call);

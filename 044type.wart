@@ -27,7 +27,7 @@ def rep(x)
 
 def coerce(x 'dest_type)
   eval `(coerce_quoted ,x ,dest_type)
-Coercions = (table)
+<- Coercions (table)
 
 mac defcoerce(src dest f)
   `(do

@@ -155,7 +155,7 @@ def best(f seq)
     ret winner car.seq
       each elem cdr.seq
         if (f elem winner)
-          winner = elem
+          winner <- elem
 
 
 

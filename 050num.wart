@@ -19,10 +19,10 @@ let ($%) (%)
     (reduce ($%) args)
 
 mac (++) (n)
-  `(= ,n (+ ,n 1))
+  `(,n <- (,n + 1))
 
 mac (--) (n)
-  `(= ,n (- ,n 1))
+  `(,n <- (,n - 1))
 
 def (-) (n ... rest) :case no.rest
   (- 0 n)

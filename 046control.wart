@@ -61,7 +61,7 @@ mac while(test ... body)
 
 mac whilet(var test ... body)
   `(let ,var nil
-     (while (= ,var ,test)
+     (while (,var <- ,test)
        ,@body))
 
 mac awhile(test ... body)
