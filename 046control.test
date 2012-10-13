@@ -8,11 +8,11 @@
              (let x 0
                (while (x < 3)
                  (push x ans)
-                 (x = (x + 1)))))
+                 (x = x+1))))
   :should be '(2 1 0))
 
 (test "for works"
   :valueof (ret ans nil
-             (for x 0 (x < 3) (x = (x + 1))
+             (for x 0 (x < 3) (x = x+1)
                (push x ans)))
   :should be '(2 1 0))
