@@ -7,7 +7,7 @@
 
 let $mac mac
   mac! mac(name params ... body)
-    if (~equal car.body :case)
+    if (car.body ~= :case)
       `(,$mac ,name ,params ,@body)
       `(let $super ,name
          (mac! ,name ,params

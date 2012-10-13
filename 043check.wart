@@ -31,6 +31,8 @@ let ($=) (=) # ignore later refinements
              (car.a = car.b)
              (cdr.a = cdr.b)))
 
+alias (~=) ~equal
+
 mac default(var val|to)
   `(or ,var
        (,var <- ,val))
