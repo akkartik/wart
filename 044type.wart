@@ -21,7 +21,7 @@ def tag(type val)
   (list 'object type val)
 
 def rep(x)
-  if (or ~cons?.x (~iso 'object car.x))
+  if (or ~cons?.x (~equal 'object car.x))
     x
     car:cddr.x
 

@@ -92,7 +92,7 @@ mac repeat(n ... body)
   `(for $i 0 (< $i ,n) ++$i
      ,@body)
 
-mac repeat(n ... body) :case (iso :forever n)
+mac repeat(n ... body) :case (n = :forever)
   `(while 1 ,@body)
 
 

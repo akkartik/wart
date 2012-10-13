@@ -26,7 +26,7 @@ defset list((seq idx ... ends) val)
 def pos(x seq n)
   default n :to 0
   if seq
-    if (iso x car.seq)
+    if (car.seq = x)
       n
       (pos x cdr.seq n+1)
 

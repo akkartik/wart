@@ -3,33 +3,33 @@ def sym args
 
 def keyword?(s)
   (and sym?.s
-       (iso ":" str.s.0))
+       (str.s.0 = ":"))
 
 def sym(s ... rest) :case (and no.rest keyword?.s)
   (as symbol (str.s 1 nil))
 
 def is_match(a b bindings) :case sym?.a
   default bindings :to (table)
-  (or (iso a b)
-      (iso '_ a)
-      (and (iso "_" str.a.0)  # (_x _x) matches two of anything
+  (or (a = b)
+      (a = '_)
+      (and (str.a.0 = "_")  # (_x _x) matches two of anything
            (default bindings.a :to b)
-           (iso bindings.a b))
-      (and (iso "_" str.a.-1)   # p_ matches any $p
+           (bindings.a = b))
+      (and (str.a.-1 = "_")   # p_ matches any $p
            sym?.b
            (let acore (str.a 0 -1)
-             (and (~iso acore str.b)  # ..but not p
-                  (iso sym.acore sym_root.b))))
+             (and (~equal acore str.b)  # ..but not p
+                  (sym.acore = sym_root.b))))
       (and sym?.b
            (digit? str.b.-1)  # (p_x p_x) matches two of any $p
            (withs (sa   str.a
                    ai   (pos "_" (as list sa))
                    acore  (if ai (sa 0 ai)))
              (and ai
-                  (~iso acore str.b)
-                  (iso sym.acore sym_root.b)
+                  (~equal acore str.b)
+                  (sym.acore = sym_root.b)
                   (default bindings.a :to b)
-                  (iso bindings.a b)))))
+                  (bindings.a = b)))))
 
 # ignore the uniq part of a $sym
 def sym_root(x)

@@ -76,19 +76,19 @@ let if if   # ignore later refinements for the rest of this file
   alias no not
 
   <- quote (car ''1)
-  def quote?(_) (iso _ quote)
+  def quote?(_) (_ = quote)
   alias quoted? quote?:car
   <- backquote (car '`(1))
-  def backquote?(_) (iso _ backquote)
+  def backquote?(_) (_ = backquote)
   alias backquoted? backquote?:car
   <- unquote (car:cadr '`(,1))
-  def unquote?(_) (iso _ unquote)
+  def unquote?(_) (_ = unquote)
   alias unquoted? unquote?:car
   <- unquote_splice (car:cadr '`(,@1))
-  def unquote_splice?(_) (iso _ unquote_splice)
+  def unquote_splice?(_) (_ = unquote_splice)
   alias unquote_spliced? unquote_splice?:car
   <- splice (car '@1)
-  def splice?(_) (iso _ splice)
+  def splice?(_) (_ = splice)
   alias spliced? splice?:car
 
   def die args

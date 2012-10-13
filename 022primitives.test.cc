@@ -120,8 +120,8 @@ void test_bound_works() {
   rmref(call);
 }
 
-void test_iso_nil() {
-  Cell* call = read(stream("iso nil nil"));
+void test_equality_handls_nil() {
+  Cell* call = read(stream("nil = nil"));
   Cell* result = eval(call);
   check(result);
   check(result != nil);
@@ -129,8 +129,8 @@ void test_iso_nil() {
   rmref(call);
 }
 
-void test_iso_handles_floats() {
-  Cell* call = read(stream("iso (/ 3.0 2) 1.5"));
+void test_equality_handles_floats() {
+  Cell* call = read(stream("((/ 3.0 2) = 1.5)"));
   Cell* result = eval(call);
   check(result);
   check(result != nil);
@@ -138,8 +138,8 @@ void test_iso_handles_floats() {
   rmref(call);
 }
 
-void test_iso_float_vs_nil_works() {
-  Cell* call = read(stream("iso nil 1.5"));
+void test_equality_handles_float_vs_nil() {
+  Cell* call = read(stream("nil = 1.5"));
   eval(call);
   checkEq(raiseCount, 0);
   rmref(call);

@@ -34,7 +34,7 @@ def join args :case string?:car.args
   (str @args)
 
 def empty?(s) :case string?.s
-  (iso "" s)
+  (s = "")
 
 defcoerce string list
   string_to_list
@@ -51,11 +51,11 @@ def (<) (a b) :case string?.a
 
 def digit?(c)
   (and string?.c
-       (iso 1 len.c)
+       (len.c = 1)
        (<= "0" c "9"))
 
 def letter?(c)
   (and string?.c
-       (iso 1 len.c)
+       (len.c = 1)
        (or (<= "A" c "Z")
            (<= "a" c "z")))

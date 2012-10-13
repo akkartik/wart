@@ -7,7 +7,7 @@
 
 let $mac mac
   mac! mac(name params ... body)
-    if (~iso :case car.body)
+    if (~equal car.body :case)
       `(,$mac ,name ,params ,@body)
       `(let $super ,name
          (mac! ,name ,params
@@ -15,7 +15,7 @@ let $mac mac
              (do ,@cddr.body)
              ,(construct_macro_call `($super ,@params)))))  # call super with params
 
-mac def(name params ... body) :case (iso :case car.body)
+mac def(name params ... body) :case (car.body = :case)
   `(let $old ,name
      (def! ,name $params
        (let ,params $params

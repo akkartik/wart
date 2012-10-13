@@ -1,5 +1,5 @@
 def converge(f x)
   let y f.x
-    if (iso x y)
+    if (x = y)
       x
       (converge f y)

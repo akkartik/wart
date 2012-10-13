@@ -131,40 +131,40 @@
 
 
 
-(test "iso handles nils"
-  :valueof (iso nil 3)
+(test "equality handles nils"
+  :valueof (nil = 3)
   :should be nil)
 
-(test "iso compares nils"
-  :valueof (iso nil nil)
+(test "equality compares nils"
+  :valueof (nil = nil)
   :should ~be nil)
 
-(test "iso handles ints"
-  :valueof (iso 3 4)
+(test "equality handles ints"
+  :valueof (3 = 4)
   :should be nil)
 
-(test "iso handles ints - 2"
-  :valueof (iso 3 3)
+(test "equality handles ints - 2"
+  :valueof (3 = 3)
   :should ~be nil)
 
-(test "iso handles strings"
-  :valueof (iso "a" "b")
+(test "equality handles strings"
+  :valueof ("a" = "b")
   :should be nil)
 
-(test "iso handles strings - 2"
-  :valueof (iso "a" "a")
+(test "equality handles strings - 2"
+  :valueof ("a" = "a")
   :should ~be nil)
 
-(test "iso handles lists"
-  :valueof (iso list.1 list.2)
+(test "equality handles lists"
+  :valueof (list.1 = list.2)
   :should be nil)
 
-(test "iso handles lists - 2"
-  :valueof (iso list.1 list.1)
+(test "equality handles lists - 2"
+  :valueof (list.1 = list.1)
   :should ~be nil)
 
-(test "iso handles user-defined types"
-  :valueof (iso '(type foo 3) '(type foo 3))
+(test "equality handles user-defined types"
+  :valueof ('(type foo 3) = '(type foo 3))
   :should ~be nil)
 
 

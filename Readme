@@ -18,7 +18,7 @@ can't be done as a library.
 Here's factorial in wart:
 
   def fact(n)
-    if (iso n 0)        # iso ('isomorphic') is wart's comparison function
+    if (n = 0)
       1
       (n * (fact n-1))
 
@@ -29,7 +29,7 @@ Here's another way to define factorial:
   def fact(n)
     (n * (fact n-1))
 
-  def fact(n) :case (iso n 0)
+  def fact(n) :case (n = 0)
     1
 
 All functions are generic and can be extended or overridden at any time. The

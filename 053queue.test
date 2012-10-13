@@ -20,3 +20,7 @@
              (deq q)
              len.q)
   :should be 4)
+
+(test "equality works on queues"
+  :valueof ((queue '(1 2 3)) = (queue '(1 2 3)))
+  :should ~be nil)

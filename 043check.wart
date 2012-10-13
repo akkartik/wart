@@ -21,16 +21,15 @@ mac and args
       `(if ,car.args
          (and ,@cdr.args))
 
-let $iso iso # ignore later refinements
+let ($=) (=) # ignore later refinements
   def isa(x 'Type)
-    ($iso Type type.x)
+    ($= type.x Type)
 
-let $iso iso
-  def! iso(a b)
-    (or ($iso a b)
+  def! (=) (a b)
+    (or ($= a b)
         (and cons?.a cons?.b   # default for objects
-             (iso car.a car.b)
-             (iso cdr.a cdr.b)))
+             (car.a = car.b)
+             (cdr.a = cdr.b)))
 
 mac default(var val|to)
   `(or ,var
@@ -38,8 +37,8 @@ mac default(var val|to)
 
 def is_match(a b bindings)
   default bindings :to (table)  # used in later refinements
-  (or (iso a b)
-      (iso '_ a)  # _ matches anything
+  (or (a = b)
+      (a = '_)  # _ matches anything
       (and cons?.a cons?.b  # default for objects
            (is_match car.a car.b bindings)
            (is_match cdr.a cdr.b bindings)))
@@ -61,17 +60,17 @@ def maybe(f a b|to)
 
 mac in(x ... choices)
   `(let $x ,x
-     (or ,@(map (fn(_) `(iso $x ,_))
+     (or ,@(map (fn(_) `(,_ = $x))
                 choices)))
 
 def predicate(x)
   (if
     (isa x function)
       x
-    (iso x :else)
+    (x = :else)
       (fn() 1)
     :else
-      (fn(_) (iso x _)))
+      (fn(_) (x = _)))
 
 mac caselet(var expr ... branches)
   let expand (afn(branches)

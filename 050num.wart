@@ -63,7 +63,7 @@ def (<) (scorer) :case fn?.scorer
 
 
 def zero?(n)
-  (iso n 0)
+  (n = 0)
 
 def divides(nr dr)
   ((compose zero? (%)) nr dr)

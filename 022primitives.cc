@@ -28,7 +28,7 @@ COMPILE_FN(not, compiledFn_not, "($x)",
   return lookup("$x") == nil ? mkref(newNum(1)) : nil;
 )
 
-COMPILE_FN(iso, compiledFn_iso, "($x $y)",
+COMPILE_FN(=, compiledFn_equal, "($x $y)",
   Cell* x = lookup("$x");
   Cell* y = lookup("$y");
   Cell* result = nil;
