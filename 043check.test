@@ -176,8 +176,9 @@
 
 (test "default shortcuts unnecessary evals"
   :valueof (with (x 3 y nil)
-             (default x :to (y = 235)))
-  :should be 3)
+             (default x :to (y = 235))
+             (list x y))
+  :should be '(3 nil))
 
 (test "default returns assigned value"
   :valueof (let x nil
