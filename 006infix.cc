@@ -134,8 +134,6 @@ AstNode tokenizeInfix(AstNode n) {
 
   // special-case: :sym is never infix
   if (var[0] == ':') return n;
-  // special-case: $var is never infix
-  if (var[0] == '$') return n;
 
   string out;
   for (size_t x=0; var[x] != '\0'; ++x) {
@@ -153,7 +151,7 @@ AstNode tokenizeInfix(AstNode n) {
     }
 
     if ((x > 0)
-          && ((isInfixChar(var[x]) && isRegularChar(var[x-1]))
+          && ((isInfixChar(var[x]) && isRegularChar(var[x-1]) && var[x-1] != '$')
               || (isRegularChar(var[x]) && isInfixChar(var[x-1])))) {
       out += " ";
     }

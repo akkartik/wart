@@ -332,6 +332,19 @@ void test_infix_handles_op_without_spaces() {
   check(p == n.elems.end());
 }
 
+void test_infix_handles_op_without_spaces2() {
+  CodeStream cs(stream("$a+b"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token("(")); ++p;
+  checkEq(*p, Token("+")); ++p;
+  checkEq(*p, Token("$a")); ++p;
+  checkEq(*p, Token("b")); ++p;
+  checkEq(*p, Token(")")); ++p;
+  check(p == n.elems.end());
+}
+
 void test_infix_handles_op_with_float() {
   CodeStream cs(stream("a+1.0"));
   AstNode n = transformInfix(nextAstNode(cs));
