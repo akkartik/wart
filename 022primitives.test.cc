@@ -100,9 +100,9 @@ void test_assign_never_overrides_lexical_vars_in_caller_scope() {
 }
 
 void test_assign_overrides_lexical_var() {
-  Cell* fn = read(stream("((fn(x) (= x 34) (= x 35) x) 34)"));
+  Cell* fn = read(stream("((fn(x) (= x 35) (= x 36) x) 34)"));
   Cell* call = eval(fn);
-  checkEq(call, newNum(35));
+  checkEq(call, newNum(36));
   rmref(call);
   rmref(fn);
 }
