@@ -19,8 +19,8 @@ let if if   # ignore later refinements for the rest of this file
   mac! (.) (f x)
     `(,f ,x)
 
-  def! (.-) (f x)
-    (f (- x))
+  mac! (.-) (f x)
+    `(,f (- ,x))
 
   def! prn args
     (if args
