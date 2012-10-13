@@ -169,24 +169,24 @@
 
 
 
-(test "|= works"
+(test "default works"
   :valueof (ret x nil
-             (|= x 3))
+             (default x 3))
   :should be 3)
 
-(test "|= shortcuts unnecessary evals"
+(test "default shortcuts unnecessary evals"
   :valueof (with (x 3 y nil)
-             (|= x (y = 235)))
+             (default x :to (y = 235)))
   :should be 3)
 
-(test "|= returns assigned value"
+(test "default returns assigned value"
   :valueof (let x nil
-             (|= x 4))
+             (default x :to 4))
   :should be 4)
 
-(test "|= returns old value on failure"
+(test "default returns old value on failure"
   :valueof (let x 3
-             (|= x 4))
+             (default x :to 4))
   :should be 3)
 
 

@@ -24,7 +24,7 @@ defset list((seq idx ... ends) val)
         `(car:list_splice ,seq $idx $end (list ,val))))
 
 def pos(x seq n)
-  n |= 0
+  default n :to 0
   if seq
     if (iso x car.seq)
       n
