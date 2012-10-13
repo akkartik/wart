@@ -21,6 +21,7 @@ void loadFile(const char* filename) {
   bool old_interactive = interactive; interactive = false;
   while (!c.eof()) {
     Cell* cell = read(c);
+//?     cerr << cell << endl;   // uncomment this to track down errors in wart files
     rmref(eval(cell));
     rmref(cell);
   }
