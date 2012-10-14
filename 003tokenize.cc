@@ -67,7 +67,7 @@ Token nextToken(CodeStream& c) {
   }
 
   ostringstream out;
-  char nextchar = c.fd.peek(); // guaranteed not to be whitespace
+  char nextchar = c.fd.peek();  // guaranteed not to be whitespace
   if (nextchar == '"')
     slurpString(c.fd, out);
   else if (find(punctuationChars, nextchar))

@@ -397,7 +397,7 @@ long unquoteSpliceDepth(Cell* x) {
     return 1;
   if (isUnquoted(x))
     return unquoteSpliceDepth(cdr(x))+1;
-  return 1000; // never try to splice
+  return 1000;  // never try to splice
 }
 
 Cell* stripUnquoteSplice(Cell* x) {
