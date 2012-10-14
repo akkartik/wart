@@ -12,3 +12,7 @@ Manually load a .wart file at the repl.
 
 Add a comment at the end of one of the .wart files.
 $ wart test
+
+Add a comment at the prompt.
+wart> (prn "world") # this is a comment!<Enter>
+<Enter>
