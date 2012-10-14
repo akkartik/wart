@@ -134,9 +134,9 @@ void interactive_setup() {
 }
 
 void prompt(string msg) {
-  extern unsigned long numAllocs;
-  extern long numUnfreed();
-  cout << numUnfreed() << " " << numAllocs << " " << msg;
+//?   extern unsigned long numAllocs;
+//?   cout << numUnfreed() << " " << numAllocs << endl;  // uncomment this to monitor memory usage
+  cout << msg;
 }
 
 void reset(CodeStream& in) {
