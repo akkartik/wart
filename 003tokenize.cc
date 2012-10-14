@@ -76,6 +76,8 @@ Token nextToken(CodeStream& c) {
   else
     slurpWord(c.fd, out);
 
+  if (interactive && c.fd.peek() == '\n') prompt("      ");
+
   return Token(out.str(), c.currIndent);
 }
 
