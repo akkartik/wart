@@ -60,8 +60,11 @@ Token nextToken(CodeStream& c) {
   if (c.currIndent == -1)   // initial
     return Token(c.currIndent=indent(c.fd));
   skipWhitespace(c.fd);
-  if (c.fd.peek() == '\n' || c.fd.peek() == '#')
-    return Token(c.currIndent=indent(c.fd));
+  if (c.fd.peek() == '\n' || c.fd.peek() == '#') {
+    c.currIndent = indent(c.fd);
+    if (interactive && c.fd.peek() == '\n') prompt("      ");
+    return Token(c.currIndent);
+  }
 
   ostringstream out;
   char nextchar = c.fd.peek(); // guaranteed not to be whitespace
