@@ -2,9 +2,9 @@
 
 # show commands if run
 # show nothing if not run
+# exit if commands failed
 make |grep -v "is up to date" >&2
-# hack: exit if commands failed
-make >&/dev/null || exit 1
+[ ${PIPESTATUS[0]} -eq 0 ] || exit 1
 
 if command which rlwrap >/dev/null
 then
