@@ -1,10 +1,7 @@
 #!/bin/sh
 
-# show commands if run
-# show nothing if not run
-# exit if commands failed
-make |grep -v "is up to date" >&2
-[ ${PIPESTATUS[0]} -eq 0 ] || exit 1
+# silent if up to date
+make -q || make || exit 1
 
 if command which rlwrap >/dev/null
 then
