@@ -55,7 +55,7 @@ int main(int argc, unused char* argv[]) {
 
     rmref(result);
     rmref(form);
-    reset(STDIN);
+    reset(STDIN.fd);
   }
   return 0;
 }
@@ -139,9 +139,14 @@ void prompt(string msg) {
   cout << msg;
 }
 
-void reset(CodeStream& in) {
-  in.fd.get();
-  if (interactive) in.fd.get();
+void reset(istream& in) {
+  skipNewline(in);
+  if (interactive) skipNewline(in);
+}
+
+void skipNewline(istream& in) {
+  char c = in.get();
+  if (c != '\n') in.putback(c);
 }
 
 // helper to read from string
