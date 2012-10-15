@@ -151,6 +151,7 @@ void skipComment(istream& in) {
   while (in >> c) {
     if (c == '\n') {
       in.putback(c);
+      if (interactive) prompt("      ");
       break;
     }
   }

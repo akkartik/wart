@@ -33,3 +33,11 @@ wart> () 34<Enter>
 nil
 34
 wart>
+
+Comment on the first line:
+wart> # skip
+      34<Enter>
+nil
+      <Enter>
+34
+wart>
