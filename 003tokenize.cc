@@ -128,6 +128,7 @@ long indent(istream& in) {
   while (in >> c) {
     if (c == '#') {
       skipComment(in);
+      if (interactive) return 0;
     }
 
     else if (!isspace(c)) {
