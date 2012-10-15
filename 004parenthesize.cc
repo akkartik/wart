@@ -85,9 +85,9 @@ bool endOfInput(istream& in) {
   bool ans = false;
   char c = in.get();
   if (c == '#') {
+    prompt("      ");
     skipComment(in);
     c = in.get();
-    prompt("      ");
     if (!in.eof() && in.peek() == '\n')
       ans = true;
     in.putback(c);
