@@ -7,6 +7,8 @@ Cell* nextRawCell(CodeStream c) {
 }
 
 Cell* buildCell(AstNode n) {
+  if (n == "") return nil;  // void
+
   if (n.isNil())
     return nil;
   if (n.isList() && n.elems.front() == ")") {
