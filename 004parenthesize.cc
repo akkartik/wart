@@ -82,7 +82,7 @@ bool endOfInput(istream& in) {
   // in interactive mode two <Enter>s are like eof
   bool ans = false;
   char c = in.get();
-  if (c == '\n') prompt("      ");
+  if (c == '\n' || c == '#') prompt("      ");
   if (c == '\n' && !in.eof() && in.peek() == '\n')
     ans = true;
   in.putback(c);
