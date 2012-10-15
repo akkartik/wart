@@ -1,23 +1,30 @@
+I
 wart> ^D
 
+II
 wart> 1<Enter>
       <Enter>
 1
 wart> ^D
 
+III
 wart> def foo()<Enter>
         34<Enter>
       <Enter>
 
+IV
 Manually load a .wart file at the repl.
 
+V
 Add a comment at the end of one of the .wart files.
 $ wart test
 
+VI
 Add a comment at the prompt.
 wart> (prn "world") # this is a comment!<Enter>
       <Enter>
 
+VII
 Multiple lines at the prompt:
 wart> 34<Enter>
       (prn "hi")<Enter>
@@ -27,6 +34,7 @@ hi
 "hi"
 wart>
 
+VIII
 Two expressions on a single line:
 wart> () 34<Enter>
       <Enter>
@@ -34,18 +42,21 @@ nil
 34
 wart>
 
+IX
 Comment on the first line:
 wart> # skip<Enter>
       <Enter>
 nil
 wart>
 
+X
 Comment after whitespace, followed by empty line:
 wart>   # skip<Enter>
       <Enter>
 nil
 wart>
 
+XI
 Comment after newline:
 wart> <Enter>
       # skip<Enter>
