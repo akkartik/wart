@@ -71,11 +71,10 @@ Token nextNonWhitespaceToken(CodeStream& c) {
 }
 
 Token nextParenInsertedToken(CodeStream& c) {
-  static list<Token> currExpr;
-  if (currExpr.empty()) currExpr = nextExpr(c);
-  if (currExpr.empty()) return eof();
-  Token result = currExpr.front();
-  currExpr.pop_front();
+  if (bufferedTokens.empty()) bufferedTokens = nextExpr(c);
+  if (bufferedTokens.empty()) return eof();
+  Token result = bufferedTokens.front();
+  bufferedTokens.pop_front();
   return result;
 }
 

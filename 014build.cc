@@ -1,8 +1,10 @@
 //// construct parse tree out of cells
 
 Cell* nextRawCell(CodeStream c) {
-  c.fd.peek();
-  if (c.fd.eof()) return nil;
+  if (bufferedTokens.empty()) {
+    c.fd.peek();
+    if (c.fd.eof()) return nil;
+  }
   return buildCell(transformInfix(nextAstNode(c)));
 }
 

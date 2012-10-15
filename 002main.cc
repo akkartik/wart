@@ -38,6 +38,8 @@ struct CodeStream {
 };
 CodeStream STDIN(cin);
 
+list<Token> bufferedTokens;
+
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
     runTests();
@@ -56,7 +58,7 @@ int main(int argc, unused char* argv[]) {
 
       rmref(result);
       rmref(form);
-    } while (!twoNewlines());
+    } while (!twoNewlines() || !bufferedTokens.empty());
   }
 }
 
