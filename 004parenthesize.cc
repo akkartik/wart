@@ -83,14 +83,17 @@ bool endOfInput(istream& in) {
   bool ans = false;
   skipWhitespace(in);
   char c = in.get();
-  if (c == '\n' || c == '#') prompt("      ");
   if (c == '#') {
     skipComment(in);
-    ans = true;
     c = in.get();
-  }
-  if (c == '\n' && !in.eof() && in.peek() == '\n')
     ans = true;
+  }
+
+  if (c == '\n') {
+    prompt("      ");
+    if (!in.eof() && in.peek() == '\n')
+      ans = true;
+  }
   in.putback(c);
   return ans;
 }
