@@ -55,7 +55,8 @@ int main(int argc, unused char* argv[]) {
 
     rmref(result);
     rmref(form);
-    reset(STDIN.fd);
+    if (cin.peek() == '\n') cin.get();
+    if (cin.peek() == '\n') cin.get();
   }
   return 0;
 }
@@ -137,16 +138,6 @@ void prompt(string msg) {
 //?   extern unsigned long numAllocs;
 //?   cout << numUnfreed() << " " << numAllocs << endl;  // uncomment this to monitor memory usage
   cout << msg;
-}
-
-void reset(istream& in) {
-  skipNewline(in);
-  if (interactive) skipNewline(in);
-}
-
-void skipNewline(istream& in) {
-  char c = in.get();
-  if (c != '\n') in.putback(c);
 }
 
 // helper to read from string

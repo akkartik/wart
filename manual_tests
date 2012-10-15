@@ -1,11 +1,12 @@
 wart> ^D
 
 wart> 1<Enter>
-<Enter>
+      <Enter>
+1
 wart> ^D
 
 wart> def foo()<Enter>
-  34<Enter>
+        34<Enter>
 <Enter>
 
 Manually load a .wart file at the repl.
@@ -19,4 +20,8 @@ wart> (prn "world") # this is a comment!<Enter>
 
 Multiple lines at the prompt:
 wart> 34
-(prn "hi")
+      (prn "hi")
+34
+wart> <Enter>
+hi
+"hi"
