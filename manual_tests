@@ -45,3 +45,10 @@ wart>   # skip<Enter>
       <Enter>
 nil
 wart>
+
+Comment after newline:
+wart> <Enter>
+      # skip<Enter>
+      <Enter>
+nil
+wart>
