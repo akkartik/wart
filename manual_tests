@@ -49,6 +49,7 @@ wart>
 Comment after newline:
 wart> <Enter>
       # skip<Enter>
+nil
       <Enter>
 nil
 wart>
