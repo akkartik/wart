@@ -90,9 +90,9 @@ bool endOfInput(istream& in) {
   // next char must be a newline
   prompt("      ");
   in.get();
-  in.peek();  // use the secondary prompt before yielding to the repl
+  char nextChar = in.peek();
   in.putback('\n');
-  return true;
+  return nextChar == '\n';
 }
 
 long numWordsInLine(list<Token> line) {
