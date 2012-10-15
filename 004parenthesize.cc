@@ -85,12 +85,12 @@ bool endOfInput(istream& in) {
   bool ans = false;
   char c = in.get();
   if (c == '#') {
-    prompt("      ");
     skipComment(in);
-    c = in.get();
-    if (!in.eof() && in.peek() == '\n')
-      ans = true;
-    in.putback(c);
+    prompt("      ");
+    // wait for further input before yielding to the repl
+    in.get();   // newline
+    in.peek();
+    in.putback('\n');
     return true;
   }
 
