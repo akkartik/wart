@@ -41,3 +41,12 @@ nil
       <Enter>
 34
 wart>
+
+Comment followed by empty line:
+wart> # skip<Enter>
+      <Enter>
+      34<Enter>
+nil
+      <Enter>
+34
+wart>

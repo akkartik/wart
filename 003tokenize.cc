@@ -62,7 +62,6 @@ Token nextToken(CodeStream& c) {
   skipWhitespace(c.fd);
   if (c.fd.peek() == '\n' || c.fd.peek() == '#') {
     c.currIndent = indent(c.fd);
-    if (interactive && c.fd.peek() == '\n') prompt("      ");
     return Token(c.currIndent);
   }
 
@@ -78,8 +77,6 @@ Token nextToken(CodeStream& c) {
     slurpChar(c.fd, out);
   else
     slurpWord(c.fd, out);
-
-  if (interactive && c.fd.peek() == '\n') prompt("      ");
 
   return Token(out.str(), c.currIndent);
 }
@@ -131,7 +128,6 @@ long indent(istream& in) {
   while (in >> c) {
     if (c == '#') {
       skipComment(in);
-      if (interactive) return 0;
     }
 
     else if (!isspace(c)) {
@@ -151,7 +147,6 @@ void skipComment(istream& in) {
   while (in >> c) {
     if (c == '\n') {
       in.putback(c);
-      if (interactive) prompt("      ");
       break;
     }
   }
