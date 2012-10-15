@@ -58,8 +58,7 @@ int main(int argc, unused char* argv[]) {
 
       rmref(result);
       rmref(form);
-      if (bufferedTokens.empty()) twoNewlines();
-    } while (!bufferedTokens.empty());
+    } while (!showPrompt());
   }
 }
 
@@ -142,7 +141,8 @@ void prompt(string msg) {
   cout << msg;
 }
 
-bool twoNewlines() {
+bool showPrompt() {
+  if (!bufferedTokens.empty()) return false;
   if (cin.peek() == '\n') cin.get();
   else return false;
   if (cin.peek() == '\n') cin.get();
