@@ -83,23 +83,16 @@ bool endOfInput(istream& in) {
   skipWhitespace(in);
   if (in.peek() != '\n' && in.peek() != '#') return false;
   prompt("      ");
-  if (in.peek() == '#') {
+  if (in.peek() == '#')
     // scan past the comment and wait for further input before yielding to the repl
     skipComment(in);
-    in.get();   // newline
-    in.peek();
-    in.putback('\n');
-    return true;
-  }
 
-  bool ans = false;
-  char c = in.get();
-  if (c == '\n') {
-    if (!in.eof() && in.peek() == '\n')
-      ans = true;
-  }
-  in.putback(c);
-  return ans;
+  // next char must be a newline
+  // make sure there's further input before yielding to the repl
+  in.get();
+  in.peek();
+  in.putback('\n');
+  return true;
 }
 
 long numWordsInLine(list<Token> line) {
