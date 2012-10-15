@@ -79,18 +79,18 @@ list<Token> nextLine(CodeStream& c) {
 bool endOfInput(istream& in) {
   if (in.eof()) return true;
   if (!interactive) return false;
+
   // in interactive mode signal eof after either a comment or two <Enter>s
   skipWhitespace(in);
-  if (in.peek() != '\n' && in.peek() != '#') return false;
-  prompt("      ");
   if (in.peek() == '#')
     // scan past the comment and wait for further input before yielding to the repl
     skipComment(in);
+  if (in.peek() != '\n') return false;
 
   // next char must be a newline
-  // make sure there's further input before yielding to the repl
+  prompt("      ");
   in.get();
-  in.peek();
+  in.peek();  // use the secondary prompt before yielding to the repl
   in.putback('\n');
   return true;
 }
