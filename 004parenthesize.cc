@@ -79,8 +79,9 @@ list<Token> nextLine(CodeStream& c) {
 bool endOfInput(istream& in) {
   if (in.eof()) return true;
   if (!interactive) return false;
-  // in interactive mode two <Enter>s are like eof
+  // in interactive mode signal eof after either a comment or two <Enter>s
   bool ans = false;
+  skipWhitespace(in);
   char c = in.get();
   if (c == '\n' || c == '#') prompt("      ");
   if (c == '#') {
