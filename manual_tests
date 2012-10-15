@@ -7,7 +7,7 @@ wart> ^D
 
 wart> def foo()<Enter>
         34<Enter>
-<Enter>
+      <Enter>
 
 Manually load a .wart file at the repl.
 
@@ -16,11 +16,11 @@ $ wart test
 
 Add a comment at the prompt.
 wart> (prn "world") # this is a comment!<Enter>
-<Enter>
+      <Enter>
 
 Multiple lines at the prompt:
-wart> 34
-      (prn "hi")
+wart> 34<Enter>
+      (prn "hi")<Enter>
 34
       <Enter>
 hi
@@ -28,7 +28,8 @@ hi
 wart>
 
 Two expressions on a single line:
-wart> () 34
+wart> () 34<Enter>
+      <Enter>
 nil
-wart> <Enter>
 34
+wart>

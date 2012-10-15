@@ -58,7 +58,8 @@ int main(int argc, unused char* argv[]) {
 
       rmref(result);
       rmref(form);
-    } while (!twoNewlines() || !bufferedTokens.empty());
+      if (bufferedTokens.empty()) twoNewlines();
+    } while (!bufferedTokens.empty());
   }
 }
 
