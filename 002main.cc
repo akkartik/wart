@@ -38,8 +38,6 @@ struct CodeStream {
 };
 CodeStream STDIN(cin);
 
-list<Token> bufferedTokens;
-
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
     runTests();
@@ -140,6 +138,8 @@ void prompt(string msg) {
 //?   cout << numUnfreed() << " " << numAllocs << endl;  // uncomment this to monitor memory usage
   cout << msg;
 }
+
+list<Token> bufferedTokens;   // if repl has multiple top-level exprs in a single line
 
 bool showPrompt() {
   if (!bufferedTokens.empty()) return false;
