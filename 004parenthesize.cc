@@ -82,20 +82,19 @@ bool endOfInput(istream& in) {
   // in interactive mode signal eof after either a comment or two <Enter>s
   skipWhitespace(in);
   if (in.peek() != '\n' && in.peek() != '#') return false;
-  bool ans = false;
-  char c = in.get();
-  if (c == '#') {
+  prompt("      ");
+  if (in.peek() == '#') {
+    // scan past the comment and wait for further input before yielding to the repl
     skipComment(in);
-    prompt("      ");
-    // wait for further input before yielding to the repl
     in.get();   // newline
     in.peek();
     in.putback('\n');
     return true;
   }
 
+  bool ans = false;
+  char c = in.get();
   if (c == '\n') {
-    prompt("      ");
     if (!in.eof() && in.peek() == '\n')
       ans = true;
   }
