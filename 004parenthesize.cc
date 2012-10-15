@@ -80,13 +80,18 @@ bool endOfInput(istream& in) {
   if (in.eof()) return true;
   if (!interactive) return false;
   // in interactive mode signal eof after either a comment or two <Enter>s
-  bool ans = false;
   skipWhitespace(in);
+  if (in.peek() != '\n' && in.peek() != '#') return false;
+  bool ans = false;
   char c = in.get();
   if (c == '#') {
     skipComment(in);
     c = in.get();
-    ans = true;
+    prompt("      ");
+    if (!in.eof() && in.peek() == '\n')
+      ans = true;
+    in.putback(c);
+    return true;
   }
 
   if (c == '\n') {
