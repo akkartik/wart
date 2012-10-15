@@ -48,17 +48,16 @@ int main(int argc, unused char* argv[]) {
   interactive_setup();
   while (true) {
     prompt("wart> ");
-    Cell* form = read(STDIN);
-    if (STDIN.eof()) break;
-    Cell* result = eval(form);
-    cout << result << endl;
+    do {
+      Cell* form = read(STDIN);
+      if (STDIN.eof()) return 0;
+      Cell* result = eval(form);
+      cout << result << endl;
 
-    rmref(result);
-    rmref(form);
-    if (cin.peek() == '\n') cin.get();
-    if (cin.peek() == '\n') cin.get();
+      rmref(result);
+      rmref(form);
+    } while (!twoNewlines());
   }
-  return 0;
 }
 
 // read: tokenize, parenthesize, parse, transform infix, build cells, transform $vars
@@ -138,6 +137,14 @@ void prompt(string msg) {
 //?   extern unsigned long numAllocs;
 //?   cout << numUnfreed() << " " << numAllocs << endl;  // uncomment this to monitor memory usage
   cout << msg;
+}
+
+bool twoNewlines() {
+  if (cin.peek() == '\n') cin.get();
+  else return false;
+  if (cin.peek() == '\n') cin.get();
+  else return false;
+  return true;
 }
 
 // helper to read from string

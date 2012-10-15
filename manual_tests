@@ -22,6 +22,13 @@ Multiple lines at the prompt:
 wart> 34
       (prn "hi")
 34
-wart> <Enter>
+      <Enter>
 hi
 "hi"
+wart>
+
+Two expressions on a single line:
+wart> () 34
+nil
+wart> <Enter>
+34
