@@ -142,6 +142,7 @@ void prompt(string msg) {
 list<Token> bufferedTokens;   // if repl has multiple top-level exprs in a single line
 
 bool showPrompt() {
+  // either we still have stuff to read, or the user typed in 2 enters
   if (!bufferedTokens.empty()) return false;
   if (cin.peek() == '\n') cin.get();
   else return false;
