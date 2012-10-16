@@ -1,105 +1,74 @@
-=== Preface
+Good programmers write clean, simple codebases. But even good programmers
+can't seem to *keep* codebases clean over time. There are several reasons for
+this:
 
-  You can't really know anything if you just remember isolated facts.
-  If the facts don't hang together on a latticework of theory, you don't
-  have them in a usable form.
+X Over time the codebase accumulates constraints its programmers can't
+  control. Backwards compatibility considerations, subcomponents that must be
+  invoked in a specific order, arranging things to satisfy the build system or
+  other tools, etc. As the space of possible changes is increasingly
+  constrained, programmers gradually lose their sense of ownership toward the
+  codebase. It becomes hard enough to just get the codebase to do what you
+  want.
 
-      -- Charlie Munger (http://ycombinator.com/munger.html)
+X Codebases with even moderate success acquire new programmers. Even talented
+  newcomers don't understand why things are the way they are. They make
+  changes that, while internally consistent, go against the grain of the
+  design in subtle ways. The owners/veterans start out watching such changes
+  closely and guiding newcomers, but over time this becomes harder and harder.
+  Once you admit some kinds of ugliness it becomes easier to live with others
+  (http://en.wikipedia.org/wiki/Broken_windows_theory). As other constraints
+  grow and sense of ownership decays, newcomers get less guidance, more noob
+  code is mixed in, and the coherence of the original design is diluted.
 
+X Newcomers gain experience with the codebase in ad hoc ways, with gaps in
+  their knowledge. Their guidance to the next generation is less coherent
+  still, and may even contradict the original authors.
 
-  More than source code, specifications or documentation, a programmer builds
-  a theory of how certain affairs will be handled by a computer program.
+X As the original coherence decays, the quality of the codebase decays as
+  well. The original design principles become less and less useful,
+  accelerating their demise.
 
-      -- paraphrasing Peter Naur
-         (http://alistair.cockburn.us/ASD+book+extract%3A+%22Naur,+Ehn,+Musashi%22)
+This trajectory shows two sources of entropy: shifting requirements that make
+the once-ideal design less ideal, and in transmitting even an ideal design to
+newcomers. Both sources of entropy can be attacked with a single imperative:
+make rewrites easier and less risky.
 
-Programming is hard. I think it's hard because of the difficulty of
-transmitting the theory of a codebase.
+- Write lots of tests. Tests can't avoid bugs, but they should guard against
+  *known* bugs. The contract: if the tests pass, no regressions have been
+  introduced.
 
-  - We evaluate code for its semantics, not for readability or hackability.
-  - Programmers are more focused on building functionality than on readability
-    and hackability.
-  - New programmers on projects encounter a steep learning curve; tasks such
-    as building it, running it, running the tests, building specific features
-    -- all these require either persistence or access to veterans of the
-    codebase. These problems grow as codebases grow and age.
-  - Programmers acquire experience on a codebase in ad hoc fashion. Different
-    programmers know different facts about the codebase, have different holes
-    in their knowledge, and may believe contradictory facts without realizing
-    it. As projects grow, no single programmer sees the big picture anymore.
-    They become blind men to the codebase's elephant
-    (http://en.wikipedia.org/wiki/Blind_men_and_an_elephant)
-  - As projects accumulate features, their parts move in relation to one
-    another. Parts that used to work closely together grow apart, and parts
-    that seemed unrelated at the start get increasingly coupled. Ideally a
-    project would reorganize static code to reflect this changing reality. In
-    practice, this rarely happens, and the couplings are another thing new
-    programmers must imbibe -- either from their seniors or from painful
-    experience.
-  - New feature requirements can radically change the ideal design required to
-    support them. Such redesign rarely happens, especially since reorganization
-    is hard. Instead, codebases get more and more unnecessarily complex as new
-    features are bolted on. Unnecessary complexity gets harder to see over
-    time as the existing design gets set deeper and deeper into its local
-    optimum. But we can observe it indirectly through symptoms like
-    proliferating knobs and commandline flags that need to be set in
-    error-prone ways to get the system to run. Often errors of design are best
-    observed in the externality of deployment processes.
-  - Experience with a codebase rarely translates to faster learning on other
-    codebases. This causes programmers to become even more focused on the
-    short term.
+  Tests help newcomers read an unfamiliar codebase. "Why is this not written
+  like that?" Try it, run tests. What failed? "Ah, I hadn't thought of feature
+  x."
 
-This trajectory also occurs in the real world: great things start to decay as
-people work on them over time. We just see the problem more easily in software
-because the life-cycle is compressed. Dysfunctions in organizations manifest
-over a decade, in software they become apparent in months.
+- Tier tests into levels, and make each level of tests coherent and
+  self-contained.
 
-Can the theory of a codebase be transmitted more easily between programmers?
-Most software either makes no attempt to rigorously state what it's trying to
-do, or does so using the isolated facts of tests. This codebase is an
-experiment in structuring tests into a higher-level organization. I want to:
+  Layered tests simplify major redesign experimenting. Just throw out
+  sub-components *and all their tests* without fear of regressions.
 
-a) Make the overall organization instantly obvious to an outsider.
+  Layering also helps organize the knowledge encoded in tests into a higher
+  structure that is easier for outsiders to read.
 
-b) Concisely describe the design of sub-components. I try to follow
-Christopher Alexander's misfit-driven method for describing designs
-(http://www.amazon.com/Notes-Synthesis-Form-Harvard-Paperbacks/dp/0674627512).
-Rather than describe a specific implementation, I focus on the considerations
-and scenarios I considered in building it.
+- Keep the programmer fully in control.
+  - Declarations in any order.
+  - All primitives open to extension or overriding.
+  - No backwards compatibility guarantees for programmers. Expect app-level
+    tests to warn of errors after upgrading libraries.
 
-c) Write comprehensive tests. Most projects fail because they hold too tightly
-to a specific solution and ignore its input space. I focus on the input space
-and hold the current solution to be secondary. If past bugs are tightly held,
-radical redesigns can be undertaken without fear of regressions.
+  This helps maintain programmers' sense of ownership and motivation. It also
+  fosters accountability; with complete flexibility there's less excuse for
+  convoluted APIs, for codebase layout to not reflect program behavior.
 
-d) Make it as easy as possible to move code around in radical ways. Minimize
-explicit dependencies, make the build system smart enough to figure them out
-automatically.
+- Document as concisely as possible the constraints that drove the design.
+  Focus on what you guard against, not what the implementation does. (See top
+  of tokenize.cc for an example.)
 
-e) Given flexibility in code ordering, organize the entire project top-down,
-with sub-components in separate files, and externally-used functions coming
-before internal details in each file.
-
-f) Keep the tests for each level (overall design, subcomponent design, unit
-tests, tests of internal details) coherent. This provides layered defense
-against regression, but more importantly it allows us to fearlessly throw out
-tests for a subcomponent during redesigns that omit it.
-
-g) Maintain and enumerate past designs with their tests. These aren't built to
-run on production, but their tests continue to run. This is work in progress.
-
-h) When running top-level tests, make the state of sub-components visible to
-the programmer. This feature is useful both for onboarding newcomers to the
-codebase, and as an aid to redesigns. If we hold on to history we might avoid
-repeating old mistakes. Work on this is not yet begun.
-
-Redesign is hard. It requires freeing one's mind from knowledge of the current
-solution to look for alternatives. Often a better design lies over the
-horizon; to find it we must cross a hill. To do better we must explore
-solutions that might be worse. No tool will do this for us. But perhaps better
-codebases and tools will eliminate other distractions and help us focus on the
-essence of programming. This codebase is a live case study in such tools, an
-exercise in building something useful that is also easy to redesign over time.
+  This helps newcomers glimpse the history and the 'theory' of the codebase,
+  why things are the way they are. These notes aren't complete, but they
+  highlight what's important, and can trigger conversation with veterans. They
+  also help outsiders gauge the quality of a codebase. What scenarios did the
+  programmers consider? Do they seem comprehensive?
 
 Next: 001organization (http://github.com/akkartik/wart/blob/master/001organization)
 
