@@ -29,7 +29,7 @@ X As the original coherence decays, the quality of the codebase decays as
   accelerating their demise.
 
 This trajectory shows two sources of entropy: shifting requirements that make
-the once-ideal design less ideal, and in transmitting even an ideal design to
+the once-ideal design less ideal, and transmitting even an ideal design to
 newcomers. Both sources of entropy can be attacked with a single imperative:
 make rewrites easier and less risky.
 
