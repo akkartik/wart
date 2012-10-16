@@ -119,7 +119,6 @@ void slurpUnquote(istream& in, ostream& out) {
 
 
 
-// also modifies cs
 long indent(istream& in) {
   long indent = 0;
   char c;

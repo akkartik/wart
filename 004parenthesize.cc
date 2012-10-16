@@ -80,15 +80,13 @@ bool endOfInput(istream& in) {
   if (in.eof()) return true;
   if (!interactive) return false;
 
-  // in interactive mode signal eof after either a comment or two <Enter>s
+  // in interactive mode signal eof after two <Enter>s
   skipWhitespace(in);
   if (in.peek() == '#')
-    // scan past the comment and wait for further input before yielding to the repl
     skipComment(in);
   if (in.peek() != '\n') return false;
 
-  // next char must be a newline
-  prompt("      ");
+  prompt("      ");   // since user hit <Enter>
   in.get();
   char nextChar = in.peek();
   in.putback('\n');
