@@ -1,15 +1,3 @@
-  If I look at any small part of it, I can see what is going on -- I don't
-  need to refer to other parts to understand what something is doing.
-
-  If I look at any large part in overview, I can see what is going on -- I
-  don't need to know all the details to get it.
-
-  Every level of detail is as locally coherent and as well thought-out as any
-  other level.
-
-      -- Richard Gabriel, The Quality Without A Name
-         (http://dreamsongs.com/Files/PatternsOfSoftware.pdf, page 42)
-
 Wart is a small, thoroughly unit-tested language with an emphasis on
 readability and hackability. The primary goal is to be super easy to
 understand and modify. Everything is extensible, and there is little that
