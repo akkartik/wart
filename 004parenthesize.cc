@@ -69,7 +69,7 @@ list<Token> nextExpr(CodeStream& c) {
     }
 
     line.clear();
-    if (!endOfInput(c.fd)) {
+    if (!endOfInput(c.fd) && (openExplicitParens != 0 || !implicitParenStack.empty())) {
       long openExplicitParens2 = openExplicitParens;
       if (c.currIndent == -1)
         line.push_back(Token(c.currIndent=indent(c.fd)));
