@@ -71,3 +71,12 @@ wart> () (def foo()<Enter>
       <Enter>
       34)<Enter>
 wart>
+
+XIII
+Expr and partial expr and comment:
+wart> (def foo()<Enter>
+        34) # abc<Enter>
+      <Enter>
+(object function {body, })
+nil
+wart>
