@@ -57,8 +57,6 @@ struct Token {
 };
 
 Token nextToken(CodeStream& c) {
-  if (c.currIndent == -1)   // start of stream
-    return Token(c.currIndent=indent(c.fd));
   skipWhitespace(c.fd);
   if (c.fd.peek() == '\n' || c.fd.peek() == '#')
     return Token(c.currIndent=indent(c.fd));
