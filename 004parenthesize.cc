@@ -27,7 +27,6 @@ list<Token> nextExpr(CodeStream& c) {
     do { line.push_back(nextToken(c)); }
     while (!endOfInput(c.fd) && !line.back().isIndent());
   }
-
   while (!line.empty()) {
     long thisLineIndent=line.front().indentLevel, nextLineIndent=line.back().indentLevel;
 
@@ -60,14 +59,17 @@ list<Token> nextExpr(CodeStream& c) {
       break;
     }
 
-    line.clear();
     if (!endOfInput(c.fd) && (openExplicitParens != 0 || !implicitParenStack.empty())) {
+      line.clear();
       if (c.currIndent == -1)
         line.push_back(Token(c.currIndent=indent(c.fd)));
       else
         line.push_back(Token(c.currIndent));
       do { line.push_back(nextToken(c)); }
       while (!endOfInput(c.fd) && !line.back().isIndent());
+    }
+    else {
+      break;
     }
   }
 
