@@ -270,7 +270,7 @@ void test_infix_always_has_higher_precedence_than_call() {
   check(p == n.elems.end());
 }
 
-void test_infix_always_has_lower_precedence_than_infix() {
+void test_infix_always_has_lower_precedence_than_prefix() {
   CodeStream cs(stream("-a+b"));
   AstNode n = transformInfix(nextAstNode(cs));
   check(n.isList());
