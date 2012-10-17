@@ -18,15 +18,7 @@ list<Token> nextExpr(CodeStream& c) {
   long openExplicitParens = 0;  // parens in the original
   stack<long> implicitParenStack;   // parens we inserted
 
-  list<Token> line;
-  if (!endOfInput(c.fd)) {
-    if (c.currIndent == -1)
-      line.push_back(Token(c.currIndent=indent(c.fd)));
-    else
-      line.push_back(Token(c.currIndent));
-    do { line.push_back(nextToken(c)); }
-    while (!endOfInput(c.fd) && !line.back().isIndent());
-  }
+  list<Token> line = nextLine(c);
   while (!line.empty()) {
     long thisLineIndent=line.front().indentLevel, nextLineIndent=line.back().indentLevel;
 
@@ -59,13 +51,7 @@ list<Token> nextExpr(CodeStream& c) {
       break;
     }
     else if (!endOfInput(c.fd)) {
-      line.clear();
-      if (c.currIndent == -1)
-        line.push_back(Token(c.currIndent=indent(c.fd)));
-      else
-        line.push_back(Token(c.currIndent));
-      do { line.push_back(nextToken(c)); }
-      while (!endOfInput(c.fd) && !line.back().isIndent());
+      line = nextLine(c);
     }
     else {
       break;
@@ -80,6 +66,20 @@ list<Token> nextExpr(CodeStream& c) {
 
 
 // internals
+
+list<Token> nextLine(CodeStream& c) {
+  list<Token> result;
+  if (endOfInput(c.fd)) return result;
+
+  if (c.currIndent == -1)
+    result.push_back(Token(c.currIndent=indent(c.fd)));
+  else
+    result.push_back(Token(c.currIndent));
+
+  do { result.push_back(nextToken(c)); }
+  while (!endOfInput(c.fd) && !result.back().isIndent());
+  return result;
+}
 
 bool endOfInput(istream& in) {
   if (in.eof()) return true;
