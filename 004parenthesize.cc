@@ -20,11 +20,19 @@ list<Token> nextExpr(CodeStream& c) {
 
   list<Token> line;
   if (!endOfInput(c.fd)) {
+    long openExplicitParens2 = openExplicitParens;
     if (c.currIndent == -1)
       line.push_back(Token(c.currIndent=indent(c.fd)));
     else
       line.push_back(Token(c.currIndent));
-    do { line.push_back(nextToken(c)); }
+    do {
+      Token curr = nextToken(c);
+      if (curr == "(") ++openExplicitParens2;
+      else if (curr == ")") --openExplicitParens2;
+      if (openExplicitParens2 < 0)
+        RAISE << "Unbalanced )" << endl << DIE;
+      line.push_back(curr);
+    }
     while (!endOfInput(c.fd) && !line.back().isIndent());
   }
 
@@ -62,11 +70,19 @@ list<Token> nextExpr(CodeStream& c) {
 
     line.clear();
     if (!endOfInput(c.fd)) {
+      long openExplicitParens2 = openExplicitParens;
       if (c.currIndent == -1)
         line.push_back(Token(c.currIndent=indent(c.fd)));
       else
         line.push_back(Token(c.currIndent));
-      do { line.push_back(nextToken(c)); }
+      do {
+        Token curr = nextToken(c);
+        if (curr == "(") ++openExplicitParens2;
+        else if (curr == ")") --openExplicitParens2;
+        if (openExplicitParens2 < 0)
+          RAISE << "Unbalanced )" << endl << DIE;
+        line.push_back(curr);
+      }
       while (!endOfInput(c.fd) && !line.back().isIndent());
     }
   }
