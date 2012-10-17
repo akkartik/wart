@@ -58,8 +58,7 @@ list<Token> nextExpr(CodeStream& c) {
           c.fd.putback(' ');
       break;
     }
-
-    if (!endOfInput(c.fd) && (openExplicitParens != 0 || !implicitParenStack.empty())) {
+    else if (!endOfInput(c.fd)) {
       line.clear();
       if (c.currIndent == -1)
         line.push_back(Token(c.currIndent=indent(c.fd)));
