@@ -17,6 +17,7 @@ void loadFiles(const char* ext) {
 
 void loadFile(const char* filename) {
   ifstream f(filename);
+  if (f.fail()) return;
   CodeStream c(f);
   bool old_interactive = interactive; interactive = false;
   while (!c.eof()) {
