@@ -1,4 +1,7 @@
 wart_bin: type_list function_list file_list test_file_list test_list compiled_fn_list
+	g++     -std=gnu++0x -Wall -Wextra -fno-strict-aliasing boot.cc -o wart_bin
+
+opt:  		type_list function_list file_list test_file_list test_list compiled_fn_list
 	g++ -O3 -std=gnu++0x -Wall -Wextra -fno-strict-aliasing boot.cc -o wart_bin
 
 type_list: *.cc
@@ -23,3 +26,5 @@ compiled_fn_list: *.cc
 
 clean:
 	rm -rf wart_bin* *_list
+
+.PHONY: opt, clean
