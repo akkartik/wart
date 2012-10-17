@@ -65,7 +65,7 @@ Cell* eval(Cell* expr, Cell* scope) {
   newDynamicScope(CURR_LEXICAL_SCOPE, isCompiledFn(body(fn)) ? scope : env(fn));
   newLexicalScope();
   bindParams(sig(fn), evaldArgs);
-  addLexicalBinding("caller_scope", scope);
+  addLexicalBinding(sym_caller_scope, scope);
 
   Cell* result = nil;
   if (isCompiledFn(body(fn)))
@@ -100,7 +100,7 @@ void bindParams(Cell* params, Cell* args) {
   params = stripQuote(params);
   if (params == nil) return;
 
-  if (isCons(params) && car(params) == newSym("|")) {
+  if (isCons(params) && car(params) == sym_param_alias) {
     bindParamAliases(cdr(params), args);
     return;
   }
@@ -145,7 +145,7 @@ Cell* extractKeywordArgs(Cell* params, Cell* args, CellMap& keywordArgs) {
     }
     // keyword arg for rest param alias
     else if (isCons(keywordParam) && cdr(keywordParam) == nil
-             && isCons(car(keywordParam)) && car(car(keywordParam)) == newSym("|")) {
+             && isCons(car(keywordParam)) && car(car(keywordParam)) == sym_param_alias) {
       args = cdr(args);   // skip keyword arg
       for (Cell* p = cdr(car(keywordParam)); p != nil; p=cdr(p))
         keywordArgs[car(p)] = args;
@@ -153,7 +153,7 @@ Cell* extractKeywordArgs(Cell* params, Cell* args, CellMap& keywordArgs) {
       args = nil;
     }
     // keyword arg for param alias
-    else if (isCons(keywordParam) && (car(keywordParam) == newSym("|"))) {
+    else if (isCons(keywordParam) && (car(keywordParam) == sym_param_alias)) {
       args = cdr(args);   // skip keyword arg
       for (Cell* p = cdr(keywordParam); p != nil; p=cdr(p))
         keywordArgs[car(p)] = car(args);
@@ -183,7 +183,7 @@ Cell* argsInParamOrder(Cell* params, Cell* nonKeywordArgs, CellMap& keywordArgs)
       break;
     }
 
-    if (isCons(params) && car(params) == newSym("|")) {
+    if (isCons(params) && car(params) == sym_param_alias) {
       if (keywordArgs[car(cdr(params))]) {
         setCdr(curr, keywordArgs[car(cdr(params))]);
         break;
@@ -195,7 +195,7 @@ Cell* argsInParamOrder(Cell* params, Cell* nonKeywordArgs, CellMap& keywordArgs)
     }
 
     Cell* param = stripQuote(car(params));
-    if (isCons(param) && car(param) == newSym("|"))
+    if (isCons(param) && car(param) == sym_param_alias)
       param = car(cdr(param));
 
     if (keywordArgs[param]) {
@@ -222,13 +222,13 @@ Cell* keywordArg(Cell* arg, Cell* params) {
       if (params == candidate)
         return newCons(candidate);
     }
-    else if (car(params) == newSym("|")) { // rest param aliases
+    else if (car(params) == sym_param_alias) { // rest param aliases
       if (paramAliasMatch(cdr(params), candidate))
         return newCons(params);
     }
     // ignore destructuring except param aliases
     else if (isCons(stripQuote(car(params)))
-             && car(stripQuote(car(params))) == newSym("|")) {
+             && car(stripQuote(car(params))) == sym_param_alias) {
       if (paramAliasMatch(cdr(stripQuote(car(params))), candidate))
         return stripQuote(car(params));
     }
@@ -281,7 +281,7 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
       continue;
     }
 
-    if (isMacro(fn) && !contains(body(fn), newSym("`")))
+    if (isMacro(fn) && !contains(body(fn), sym_backquote))
       RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
     Cell* x = unsplice(car(curr), scope);
     for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
@@ -305,8 +305,8 @@ bool isMacro(Cell* fn) {
   Cell* forms = body(fn);
   if (cdr(forms) != nil) return false;
   Cell* form = car(forms);
-  if (car(form) != newSym("mac_eval")) return false;
-  if (car(cdr(cdr(form))) != newSym("caller_scope")) return false;
+  if (car(form) != sym_mac_eval) return false;
+  if (car(cdr(cdr(form))) != sym_caller_scope) return false;
   if (cdr(cdr(cdr(form))) != nil) return false;
   return true;
 }
@@ -318,11 +318,11 @@ bool keepAlreadyEvald() {
 
 Cell* tagAlreadyEvald(Cell* cell) {
   if (isColonSym(cell)) return cell;
-  return newCons(newSym("''"), cell);
+  return newCons(sym_alreadyEvald, cell);
 }
 
 bool isAlreadyEvald(Cell* cell) {
-  return isCons(cell) && car(cell) == newSym("''");
+  return isCons(cell) && car(cell) == sym_alreadyEvald;
 }
 
 Cell* stripAlreadyEvald(Cell* cell) {
@@ -344,7 +344,7 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
   if (unquoteDepth(x) == depth) {
     skippedAlreadyEvald = false;
     Cell* result = eval(stripUnquote(x), scope);
-    return skippedAlreadyEvald ? pushCons(newSym("''"), result) : result;
+    return skippedAlreadyEvald ? pushCons(sym_alreadyEvald, result) : result;
   }
   else if (unquoteSpliceDepth(car(x)) == depth) {
     Cell* result = eval(stripUnquoteSplice(car(x)), scope);
@@ -409,11 +409,11 @@ Cell* stripUnquoteSplice(Cell* x) {
 // misc helpers
 
 bool isQuoted(Cell* cell) {
-  return isCons(cell) && car(cell) == newSym("'");
+  return isCons(cell) && car(cell) == sym_quote;
 }
 
 bool isBackQuoted(Cell* cell) {
-  return isCons(cell) && car(cell) == newSym("`");
+  return isCons(cell) && car(cell) == sym_backquote;
 }
 
 Cell* stripQuote(Cell* cell) {
@@ -421,15 +421,15 @@ Cell* stripQuote(Cell* cell) {
 }
 
 bool isUnquoted(Cell* arg) {
-  return isCons(arg) && car(arg) == newSym(",");
+  return isCons(arg) && car(arg) == sym_unquote;
 }
 
 bool isSpliced(Cell* arg) {
-  return isCons(arg) && car(arg) == newSym("@");
+  return isCons(arg) && car(arg) == sym_splice;
 }
 
 bool isUnquoteSpliced(Cell* arg) {
-  return isCons(arg) && car(arg) == newSym(",@");
+  return isCons(arg) && car(arg) == sym_unquoteSplice;
 }
 
 bool isColonSym(Cell* x) {
@@ -441,30 +441,30 @@ bool isColonSym(Cell* x) {
 
 // fn = (object function {sig => .., body => .., env => ..})
 bool isFn(Cell* x) {
-  return isCons(x) && toString(type(x)) == "function";
+  return isCons(x) && type(x) == sym_function;
 }
 
 Cell* toFn(Cell* x) {
   if (x == nil || isFn(x)) return x;
-  if (!lookupDynamicBinding(newSym("Coercions")))
+  if (!lookupDynamicBinding(sym_Coercions))
     RAISE << "tried to call " << x << endl << DIE;
-  Cell* result = coerceQuoted(x, newSym("function"), lookup("Coercions"));   rmref(x);
+  Cell* result = coerceQuoted(x, sym_function, lookup(sym_Coercions));   rmref(x);
   return result;
 }
 
 Cell* sig(Cell* fn) {
-  return get(rep(fn), newSym("sig"));
+  return get(rep(fn), sym_sig);
 }
 
 Cell* body(Cell* fn) {
-  return get(rep(fn), newSym("body"));
+  return get(rep(fn), sym_body);
 }
 
 Cell* impl(Cell* fn) {
-  Cell* impl = get(rep(fn), newSym("optimized_body"));
+  Cell* impl = get(rep(fn), sym_optimized_body);
   return (impl != nil) ? impl : body(fn);
 }
 
 Cell* env(Cell* fn) {
-  return get(rep(fn), newSym("env"));
+  return get(rep(fn), sym_env);
 }

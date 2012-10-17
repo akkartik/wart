@@ -115,6 +115,7 @@ void verify() {
 
 void setup() {
   setupCells();
+  setupCommonSyms();
   setupScopes();
   setupCompiledFns();
   setupStreams();

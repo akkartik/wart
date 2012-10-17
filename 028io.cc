@@ -5,7 +5,7 @@ ostream& operator<<(ostream& os, Cell* c) {
   if (c == nil) return os << "nil";
   switch(c->type) {
   case CONS:
-    if (car(c) == newSym("'") || car(c) == newSym("`") || car(c) == newSym(",") || car(c) == newSym(",@") || car(c) == newSym("@"))
+    if (car(c) == sym_quote || car(c) == sym_backquote || car(c) == sym_unquote || car(c) == sym_splice || car(c) == sym_unquoteSplice)
       return os << car(c) << cdr(c);
     os << "(" << car(c);
     for (Cell* curr = cdr(c); curr != nil; curr = cdr(curr)) {
@@ -36,11 +36,10 @@ ostream& operator<<(ostream& os, Cell* c) {
 }
 
 ostream& operator<<(ostream& os, Table* t) {
-  static Cell* const NAME = newSym("name");
   os << "{";
-  if (t->table[NAME]) os << t->table[NAME] << ": ";
+  if (t->table[sym_name]) os << t->table[sym_name] << ": ";
   for (CellMap::iterator p = t->table.begin(); p != t->table.end(); ++p) {
-    if (p->second && p->first != NAME)
+    if (p->second && p->first != sym_name)
       os << (Cell*)p->first << ", ";
   }
   return os << "}";

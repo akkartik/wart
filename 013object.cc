@@ -1,11 +1,11 @@
 //// user-defined types and coercion
 
 Cell* newObject(string type, Cell* rep) {
-  return newCons(newSym("object"), newCons(newSym(type), newCons(rep)));
+  return newCons(sym_object, newCons(newSym(type), newCons(rep)));
 }
 
 bool isObject(Cell* x) {
-  return car(x) == newSym("object");
+  return car(x) == sym_object;
 }
 
 Cell* rep(Cell* x) {
@@ -17,19 +17,19 @@ Cell* type(Cell* x) {
   switch(x->type) {
   case INTEGER:
   case FLOAT:
-    return newSym("number");
+    return sym_number;
   case SYMBOL:
-    return newSym("symbol");
+    return sym_symbol;
   case STRING:
-    return newSym("string");
+    return sym_string;
   case TABLE:
-    return newSym("table");
+    return sym_table;
   case COMPILED_FN:
-    return newSym("function");
+    return sym_function;
   case CONS:
     if (isObject(x))
       return car(cdr(x));
-    return newSym("list");
+    return sym_list;
   default:
     RAISE << "Undefined type: " << x->type << endl << DIE;
     return nil;   // never reached
@@ -53,7 +53,7 @@ Cell* coerceQuoted(Cell* x, Cell* destType, Cell* coercions) {
     RAISE << "can't coerce " << typ << " " << x << " to " << destType << endl;
     return nil;
   }
-  Cell* expr = newCons(coercer, newCons(newCons(newSym("'"), x)));
+  Cell* expr = newCons(coercer, newCons(newCons(sym_quote, x)));
   Cell* result = eval(expr);
   rmref(expr);
   return result;  // already mkref'd

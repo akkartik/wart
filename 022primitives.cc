@@ -8,9 +8,9 @@
 
 COMPILE_FN(fn, compiledFn_fn, "'($params ... $body)",
   Cell* f = newTable();
-  set(f, newSym("sig"), lookup("$params"));
-  set(f, newSym("body"), lookup("$body"));
-  set(f, newSym("env"), cdr(currLexicalScope));
+  set(f, sym_sig, lookup("$params"));
+  set(f, sym_body, lookup("$body"));
+  set(f, sym_env, cdr(currLexicalScope));
   return mkref(newObject("function", f));
 )
 
@@ -54,7 +54,7 @@ COMPILE_FN(type, compiledFn_type, "($x)",
 )
 
 COMPILE_FN(coerce_quoted, compiledFn_coerce_quoted, "'($x $dest_type)",
-  return coerceQuoted(lookup("$x"), lookup("$dest_type"), lookup("Coercions"));  // already mkref'd
+  return coerceQuoted(lookup("$x"), lookup("$dest_type"), lookup(sym_Coercions));  // already mkref'd
 )
 
 // bindings

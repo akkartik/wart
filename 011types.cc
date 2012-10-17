@@ -248,3 +248,39 @@ void teardownCells() {
       rmref(p->second);
   }
 }
+
+// optimize lookups of common symbols
+Cell *sym_quote, *sym_backquote, *sym_unquote, *sym_splice, *sym_unquoteSplice, *sym_alreadyEvald;
+Cell *sym_list, *sym_number, *sym_symbol, *sym_string, *sym_table;
+Cell *sym_object, *sym_Coercions;
+Cell *sym_function, *sym_name, *sym_sig, *sym_body, *sym_optimized_body, *sym_env, *sym_compiled, *sym_param_alias;
+Cell *sym_mac_eval, *sym_caller_scope;
+void setupCommonSyms() {
+  sym_quote = newSym("'");
+  sym_backquote = newSym("`");
+  sym_unquote = newSym(",");
+  sym_splice = newSym("@");
+  sym_unquoteSplice = newSym(",@");
+  sym_alreadyEvald = newSym("''");
+
+  sym_list = newSym("list");
+  sym_number = newSym("number");
+  sym_symbol = newSym("symbol");
+  sym_string = newSym("string");
+  sym_table = newSym("table");
+
+  sym_object = newSym("object");
+  sym_Coercions = newSym("Coercions");
+
+  sym_function = newSym("function");
+  sym_name = newSym("name");
+  sym_sig = newSym("sig");
+  sym_body = newSym("body");
+  sym_optimized_body = newSym("optimized_body");
+  sym_env = newSym("env");
+  sym_compiled = newSym("compiled");
+  sym_param_alias = newSym("|");
+
+  sym_mac_eval = newSym("mac_eval");
+  sym_caller_scope = newSym("caller_scope");
+}

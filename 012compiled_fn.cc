@@ -16,23 +16,23 @@ const CompiledFnMetadata compiledFns[] = {
 };
 
 void setupCompiledFns() {
-  newDynamicScope("compiled", newTable());
+  newDynamicScope(sym_compiled, newTable());
   for (unsigned long i=0; i < sizeof(compiledFns)/sizeof(compiledFns[0]); ++i) {
     Cell* f = newTable();
-    set(f, newSym("name"), newSym(compiledFns[i].name));
-    set(f, newSym("sig"), nextRawCell(stream(compiledFns[i].params)));
-    set(f, newSym("body"), newCompiledFn(compiledFns[i].impl));
+    set(f, sym_name, newSym(compiledFns[i].name));
+    set(f, sym_sig, nextRawCell(stream(compiledFns[i].params)));
+    set(f, sym_body, newCompiledFn(compiledFns[i].impl));
     Cell* obj = newObject("function", f);
     newDynamicScope(compiledFns[i].name, obj);
     // save to a second, immutable place
-    set(lookup("compiled"), compiledFns[i].name, obj);
+    set(lookup(sym_compiled), compiledFns[i].name, obj);
   }
 }
 
 void teardownCompiledFns() {
   for (unsigned long i=0; i < sizeof(compiledFns)/sizeof(compiledFns[0]); ++i)
     endDynamicScope(compiledFns[i].name);
-  endDynamicScope("compiled");
+  endDynamicScope(sym_compiled);
 }
 
 Cell* newCompiledFn(CompiledFn f) {
