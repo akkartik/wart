@@ -18,8 +18,7 @@ list<Token> nextExpr(CodeStream& c) {
   long openExplicitParens = 0;  // parens in the original
   stack<long> implicitParenStack;   // parens we inserted
 
-  list<Token> line = nextLine(c);
-  while (!line.empty()) {
+  for (list<Token> line = nextLine(c); !line.empty(); line=nextLine(c)) {
     long thisLineIndent=line.front().indentLevel, nextLineIndent=line.back().indentLevel;
 
     // open an implicit paren if necessary
@@ -43,17 +42,12 @@ list<Token> nextExpr(CodeStream& c) {
       implicitParenStack.pop();
     }
 
-    if (implicitParenStack.empty() && openExplicitParens == 0) {
+    if ((implicitParenStack.empty() && openExplicitParens == 0)
+        || endOfInput(c.fd)) {
       if (!c.fd.eof())
         // clean up indent state for the next call
         for (int i = 0; i < nextLineIndent; ++i)
           c.fd.putback(' ');
-      break;
-    }
-    else if (!endOfInput(c.fd)) {
-      line = nextLine(c);
-    }
-    else {
       break;
     }
   }
