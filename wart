@@ -1,14 +1,7 @@
 #!/bin/sh
 
-# if running tests, assume we're making constant changes
-# otherwise turn on optimizations
-if [ "$1" == "test" ]
-then
-  # silent if up to date
-  make -q || make >&2 || exit 1
-else
-  make -q || make opt >&2 || exit 1
-fi
+# silent if up to date
+make -q || make >&2 || exit 1
 
 if command which rlwrap >/dev/null
 then
