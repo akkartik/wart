@@ -11,6 +11,7 @@
 //    so lines with one word are never wrapped in parens, like x or ,f.sym
 //  encourage macros to fully parenthesize
 //    so ignore indent inside backquote
+//  performs flow control at the repl, decides when to show the prompt again
 
 list<Token> nextExpr(CodeStream& c) {
   list<Token> result;
