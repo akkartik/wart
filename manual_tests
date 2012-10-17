@@ -64,3 +64,10 @@ nil
       <Enter>
 nil
 wart>
+
+XII
+Expr and partial expr on a single line:
+wart> () (def foo()<Enter>
+      <Enter>
+      34)<Enter>
+wart>
