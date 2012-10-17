@@ -1,5 +1,5 @@
 wart_bin: type_list function_list file_list test_file_list test_list compiled_fn_list
-	g++ -g -std=gnu++0x -Wall -Wextra boot.cc -o wart_bin
+	g++ -O3 -std=gnu++0x -Wall -Wextra -fno-strict-aliasing boot.cc -o wart_bin
 
 type_list: *.cc
 	@grep -h "^struct .*{$$" *.cc |perl -pwe 's/(struct *[^ ]*).*/$$1;/' > type_list
