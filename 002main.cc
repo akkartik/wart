@@ -47,7 +47,7 @@ int main(int argc, unused char* argv[]) {
 
   // Interpreter loop: prompt, read, eval, print
   interactive_setup();
-  cout << "ready!\n";
+  cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (true) {
     Cell* form = read(STDIN);
     if (STDIN.eof()) return 0;
