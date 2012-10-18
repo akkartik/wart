@@ -2,15 +2,15 @@
 
 // Variables defined in macros can cause subtle bugs:
 //   mac bad-swap(x y)
-//     `(let tmp ,x             ; tmp can be captured
+//     `(let tmp ,x             # tmp can be captured
 //        (,x = ,y)
 //        (,y = tmp))
 //
 //   wart> (withs (a 3 b 4)    (bad-swap a b)    (list a b))
-//   (4 3)   ; seems ok
+//   (4 3)   # seems ok
 //
 //   wart> (withs (a 3 tmp 4)  (bad-swap a tmp)  (list a tmp))
-//   (3 4)   ; oops
+//   (3 4)   # oops
 //
 // To avoid such bugs, use an implicit gensym:
 //   mac good-swap(x y)
@@ -32,7 +32,7 @@
 // Design alternative: older lisps use explicit gensyms, which make for less
 // concise macros:
 //   mac old-swap(x y)
-//     let tmp (uniq 'tmp)      ; uniq was called gensym in older lisps
+//     let tmp (uniq 'tmp)      # uniq was called gensym in older lisps
 //       `(let ,tmp ,x
 //          (,x = ,y)
 //          (,y = ,tmp))
