@@ -37,6 +37,7 @@ struct CodeStream {
   bool eof() { return fd.eof(); }
 };
 CodeStream STDIN(cin);
+extern Cell* nil;
 
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
@@ -47,12 +48,12 @@ int main(int argc, unused char* argv[]) {
   // Interpreter loop: prompt, read, eval, print
   interactive_setup();
   while (true) {
-    prompt("wart> ");
+    prompt("---\n");
     do {
       Cell* form = read(STDIN);
       if (STDIN.eof()) return 0;
       Cell* result = eval(form);
-      cout << result << endl;
+      cout << "=> " << result << endl;
 
       rmref(result);
       rmref(form);

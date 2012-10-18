@@ -85,8 +85,6 @@ bool endOfInput(istream& in) {
     skipComment(in);
   if (in.peek() != '\n') return false;
 
-  prompt("      ");   // since user hit <Enter>
-
   in.get();
   char nextChar = in.peek();
   in.putback('\n');
