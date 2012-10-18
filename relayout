@@ -1,4 +1,7 @@
 #!/usr/bin/env zsh
+# Helper to change the numerical prefixes across the repo, say if you want to
+# create room between 023 and 024, and so on.
+
 setopt extendedglob
 
 if [[ $# -eq 0 && `git diff HEAD |wc -l` -gt 0 ]]
