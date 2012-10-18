@@ -1,0 +1,16 @@
+#!/bin/sh
+# It's hard to remember the numeric prefix for say generic.wart.
+# Run this script to create names more mnemonic and more amenable to
+# autocompletion.
+
+for file in [0-9]*.{cc,wart,test}
+do
+  newfile=`echo $file |perl -pwe 's/[0-9]//g'`
+  if [[ $newfile != "."* ]]
+  then
+    ln -s "$file" "$newfile"
+  fi
+done
+
+# To safely delete these symlinks, use:
+#   $ find . -maxdepth 1 -type l -exec rm {} \;
