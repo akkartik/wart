@@ -1,19 +1,16 @@
 I. ctrl-d quits
-wart> ^D
+^D
 
 II. 2 newlines eval
-wart> 1<Enter>
-      <Enter>
-1
-wart> ^D
+1<Enter>
+<Enter>
+=> 1
 
 III. Indent-based multi-line form
-wart> def foo()<Enter>
-        34<Enter>
-      <Enter>
-      (object function ..)
-      nil
-wart>
+def foo()<Enter>
+  34<Enter>
+<Enter>
+=> (object function ..)
 
 IV. Manually load a .wart file at the repl.
 
@@ -21,56 +18,47 @@ V Add a comment at the end of one of the .wart files.
 $ wart test
 
 VI. Add a comment at the prompt.
-wart> (prn "world") # this is a comment!<Enter>
-      <Enter>
+(prn "world") # this is a comment!<Enter>
+<Enter>
 
 VII. Multiple lines at the prompt:
-wart> 34<Enter>
-      (prn "hi")<Enter>
-34
-      <Enter>
+34<Enter>
+(prn "hi")<Enter>
+=> 34
+<Enter>
 hi
-"hi"
-wart>
+=> "hi"
 
 VIII. Two expressions on a single line:
-wart> () 34<Enter>
-      <Enter>
-nil
-34
-wart>
+() 34<Enter>
+<Enter>
+=> nil
+=> 34
 
 IX. Comment on the first line:
-wart> # skip<Enter>
-      <Enter>
-nil
-wart>
+# skip<Enter>
+<Enter>
+=> nil
 
 X. Comment after whitespace, followed by empty line:
-wart>   # skip<Enter>
-      <Enter>
-nil
-wart>
+  # skip<Enter>
+<Enter>
+=> nil
 
 XI. Comment after newline:
-wart> <Enter>
-      # skip<Enter>
-nil
-      <Enter>
-nil
-wart>
+<Enter>
+# skip<Enter>
+=> nil
 
 XII. Partial expr waits to complete:
-wart> (def foo()<Enter>
-      <Enter>
-      34)<Enter>
-wart>
+(def foo()<Enter>
+<Enter>
+34)<Enter>
+=> (object function ..)
 
 XIII. Expr and partial expr and comment:
-wart> () (def foo()<Enter>
-        34) # abc<Enter>
-      <Enter>
-nil
-(object function {body, })
-nil
-wart>
+() (def foo()<Enter>
+  34) # abc<Enter>
+<Enter>
+=> nil
+=> (object function ..)

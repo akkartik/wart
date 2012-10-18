@@ -47,13 +47,12 @@ int main(int argc, unused char* argv[]) {
 
   // Interpreter loop: prompt, read, eval, print
   interactive_setup();
-  cout << "Welcome to wart!\n";
+  cout << "ready!\n";
   while (true) {
     Cell* form = read(STDIN);
     if (STDIN.eof()) return 0;
     Cell* result = eval(form);
-    if (result != nil)
-      cout << "=> " << result << endl;
+    cout << "=> " << result << endl;
 
     rmref(result);
     rmref(form);
