@@ -78,3 +78,5 @@ let if if   # ignore later refinements for the rest of this file
   def die args
     prn @args
     (quit)
+
+  alias exit quit
