@@ -1,31 +1,30 @@
-I
+I. ctrl-d quits
 wart> ^D
 
-II
+II. 2 newlines eval
 wart> 1<Enter>
       <Enter>
 1
 wart> ^D
 
-III
+III. Indent-based multi-line form
 wart> def foo()<Enter>
         34<Enter>
       <Enter>
+      (object function ..)
+      nil
+wart>
 
-IV
-Manually load a .wart file at the repl.
+IV. Manually load a .wart file at the repl.
 
-V
-Add a comment at the end of one of the .wart files.
+V Add a comment at the end of one of the .wart files.
 $ wart test
 
-VI
-Add a comment at the prompt.
+VI. Add a comment at the prompt.
 wart> (prn "world") # this is a comment!<Enter>
       <Enter>
 
-VII
-Multiple lines at the prompt:
+VII. Multiple lines at the prompt:
 wart> 34<Enter>
       (prn "hi")<Enter>
 34
@@ -34,30 +33,26 @@ hi
 "hi"
 wart>
 
-VIII
-Two expressions on a single line:
+VIII. Two expressions on a single line:
 wart> () 34<Enter>
       <Enter>
 nil
 34
 wart>
 
-IX
-Comment on the first line:
+IX. Comment on the first line:
 wart> # skip<Enter>
       <Enter>
 nil
 wart>
 
-X
-Comment after whitespace, followed by empty line:
+X. Comment after whitespace, followed by empty line:
 wart>   # skip<Enter>
       <Enter>
 nil
 wart>
 
-XI
-Comment after newline:
+XI. Comment after newline:
 wart> <Enter>
       # skip<Enter>
 nil
@@ -65,18 +60,17 @@ nil
 nil
 wart>
 
-XII
-Expr and partial expr on a single line:
-wart> () (def foo()<Enter>
+XII. Partial expr waits to complete:
+wart> (def foo()<Enter>
       <Enter>
       34)<Enter>
 wart>
 
-XIII
-Expr and partial expr and comment:
-wart> (def foo()<Enter>
+XIII. Expr and partial expr and comment:
+wart> () (def foo()<Enter>
         34) # abc<Enter>
       <Enter>
+nil
 (object function {body, })
 nil
 wart>
