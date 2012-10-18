@@ -47,18 +47,18 @@ int main(int argc, unused char* argv[]) {
 
   // Interpreter loop: prompt, read, eval, print
   interactive_setup();
+  cout << "Welcome to wart!\n";
   while (true) {
-    prompt("---\n");
-    do {
-      Cell* form = read(STDIN);
-      if (STDIN.eof()) return 0;
-      Cell* result = eval(form);
-      if (result != nil)
-        cout << "=> " << result << endl;
+    Cell* form = read(STDIN);
+    if (STDIN.eof()) return 0;
+    Cell* result = eval(form);
+    if (result != nil)
+      cout << "=> " << result << endl;
 
-      rmref(result);
-      rmref(form);
-    } while (!showPrompt());
+    rmref(result);
+    rmref(form);
+    if (cin.peek() == '\n') cin.get();
+    if (cin.peek() == '\n') cin.get();
   }
 }
 
@@ -134,24 +134,6 @@ void interactive_setup() {
   loadFiles(".wart");
   interactive = true;
   catchCtrlC();
-}
-
-void prompt(string msg) {
-//?   extern unsigned long numAllocs;
-//?   cout << numUnfreed() << " " << numAllocs << endl;  // uncomment this to monitor memory usage
-  cout << msg;
-}
-
-list<Token> bufferedTokens;   // if repl has multiple top-level exprs in a single line
-
-bool showPrompt() {
-  // either we still have stuff to read, or the user typed in 2 enters
-  if (!bufferedTokens.empty()) return false;
-  if (cin.peek() == '\n') cin.get();
-  else return false;
-  if (cin.peek() == '\n') cin.get();
-  else return false;
-  return true;
 }
 
 // helper to read from string

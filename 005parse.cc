@@ -70,6 +70,8 @@ Token nextNonWhitespaceToken(CodeStream& c) {
   return eof();
 }
 
+list<Token> bufferedTokens;
+
 Token nextParenInsertedToken(CodeStream& c) {
   if (bufferedTokens.empty()) bufferedTokens = nextExpr(c);
   if (bufferedTokens.empty()) return eof();
