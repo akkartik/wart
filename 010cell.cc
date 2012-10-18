@@ -3,6 +3,8 @@
 // Design considered the following:
 //  represent numbers, strings, symbols, lists, and hash-tables
 //  reclaim unused cells
+//  avoid fragmentation
+//    so all cells try to have the same size (exceptions: strings, tables)
 
 unsigned long numAllocs = 0;
 
