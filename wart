@@ -3,7 +3,7 @@
 # silent if up to date
 make -q || make >&2 || exit 1
 
-if command which rlwrap >/dev/null
+if command which rlwrap >&/dev/null
 then
   rlwrap -C wart ./wart_bin $*
 else
