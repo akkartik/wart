@@ -45,7 +45,7 @@ int main(int argc, unused char* argv[]) {
     return 0;
   }
 
-  // Interpreter loop: prompt, read, eval, print
+  // Interpreter loop: read, eval, print
   interactive_setup();
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (true) {
