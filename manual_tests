@@ -14,7 +14,7 @@ def foo()<Enter>
 
 IV. Manually load a .wart file at the repl.
 
-V Add a comment at the end of one of the .wart files.
+V. Add a comment at the end of one of the .wart files.
 $ wart test
 
 VI. Add a comment at the prompt.
