@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Design of this script considered the following:
 #  minimize dependencies (hence sh)
