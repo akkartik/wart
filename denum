@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # It's hard to remember the numeric prefix for say generic.wart.
-# Run this script to create names more mnemonic and more amenable to
+# Run this script to create filenames more mnemonic and more amenable to
 # autocompletion.
 
 # Design considered the following:
