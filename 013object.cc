@@ -1,5 +1,10 @@
 //// user-defined types and coercion
 
+// Design considered the following:
+//  functions matching for specific types
+//  extensible coercion between arbitrary types
+//  arbitrary types in function position
+
 Cell* newObject(string type, Cell* rep) {
   return newCons(sym_object, newCons(newSym(type), newCons(rep)));
 }

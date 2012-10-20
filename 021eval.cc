@@ -18,8 +18,8 @@
 //
 //  list templates: backquote to suppress eval, unquote to reenable eval inside backquote. `(+ ,a ,b)
 //  ability to splice multiple elements into lists: ,@vars inside backquote, @vars otherwise
-//  macros can access caller_scope
-//  permit @vars to work with macros that use backquote
+//  macros need to access caller's scope
+//  @splicing args into macro calls just like regular functions
 
 Cell* eval(Cell* expr) {
   return eval(expr, currLexicalScope);
