@@ -37,7 +37,6 @@ struct CodeStream {
   bool eof() { return fd.eof(); }
 };
 CodeStream STDIN(cin);
-extern Cell* nil;
 
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
