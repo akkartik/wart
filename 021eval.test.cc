@@ -438,7 +438,7 @@ void test_eval_evals_comma_quote() {
 void test_eval_handles_nested_quotes() {
   Cell* expr = read(stream("`(,a `(,a ,,a ,,@b))"));
   newDynamicScope("a", newSym("x"));
-  newDynamicScope("b", newCons(newSym("x"), nil));
+  newDynamicScope("b", newCons(newSym("x"), newCons(newSym("y"), nil)));
   Cell* result = eval(expr);
   checkEq(car(result), newSym("x"));
   Cell* nestedExpr = car(cdr(result));
@@ -453,7 +453,8 @@ void test_eval_handles_nested_quotes() {
   checkEq(car(nestedExpr2), newSym("x"));
   nestedExpr2 = cdr(nestedExpr2);
   checkEq(car(nestedExpr2), newSym("x"));
-  checkEq(cdr(nestedExpr2), nil);
+  checkEq(car(cdr(nestedExpr2)), newSym("y"));
+  checkEq(cdr(cdr(nestedExpr2)), nil);
   rmref(result);
   endDynamicScope("b");
   endDynamicScope("a");
