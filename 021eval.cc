@@ -86,8 +86,8 @@ Cell* eval(Cell* expr, Cell* scope) {
 
 Cell* processArgs(Cell* call, Cell* scope, Cell* fn) {
   Cell* splicedArgs = spliceArgs(cdr(call), scope, fn);
-  Cell* orderedArgs = reorderKeywordArgs(sig(fn), splicedArgs);   rmref(splicedArgs);
-  Cell* evaldArgs = evalArgs(sig(fn), orderedArgs, scope);  rmref(orderedArgs);
+  Cell* orderedArgs = reorderKeywordArgs(splicedArgs, sig(fn));   rmref(splicedArgs);
+  Cell* evaldArgs = evalArgs(orderedArgs, sig(fn), scope);  rmref(orderedArgs);
   dbg << car(call) << "/" << keepAlreadyEvald() << ": " << evaldArgs << endl;
   return evaldArgs;
 }
@@ -105,7 +105,7 @@ void bindParams(Cell* params, Cell* args) {
     return;
   }
 
-  Cell* orderedArgs = reorderKeywordArgs(params, args);
+  Cell* orderedArgs = reorderKeywordArgs(args, params);
   if (isSym(params)) {
     addLexicalBinding(params, orderedArgs);
   }
@@ -125,7 +125,7 @@ void bindParamAliases(Cell* aliases, Cell* arg) {
 
 // process :keyword args and reorder args to param order -- respecting param aliases
 
-Cell* reorderKeywordArgs(Cell* params, Cell* args) {
+Cell* reorderKeywordArgs(Cell* args, Cell* params) {
   if (!isCons(stripQuote(params))) return mkref(args);
 
   CellMap keywordArgs;
@@ -251,17 +251,17 @@ bool paramAliasMatch(Cell* aliases, Cell* candidate) {
 
 // eval args as necessary depending on corresponding params
 
-Cell* evalArgs(Cell* params, Cell* args, Cell* scope) {
+Cell* evalArgs(Cell* args, Cell* params, Cell* scope) {
   if (args == nil) return nil;
   if (isQuoted(params)) return mkref(args);
 
   Cell* result = newCell();
-  setCar(result, evalArg(params, car(args), scope));  rmref(car(result));
-  setCdr(result, evalArgs(cdr(params), cdr(args), scope));  rmref(cdr(result));
+  setCar(result, evalArg(car(args), params, scope));  rmref(car(result));
+  setCdr(result, evalArgs(cdr(args), cdr(params), scope));  rmref(cdr(result));
   return mkref(result);
 }
 
-Cell* evalArg(Cell* params, Cell* arg, Cell* scope) {
+Cell* evalArg(Cell* arg, Cell* params, Cell* scope) {
   if (isAlreadyEvald(arg)) return mkref(stripAlreadyEvald(arg));
   if (isCons(params) && isQuoted(car(params))) return mkref(arg);
   return eval(arg, scope);

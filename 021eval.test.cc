@@ -60,16 +60,16 @@ void test_spliceArgs_works_with_keywords() {
 }
 
 void test_reorderKeywordArgs_keeps_nil_rest_args() {
-  checkEq(reorderKeywordArgs(newSym("a"), nil), nil);
+  checkEq(reorderKeywordArgs(nil, newSym("a")), nil);
   Cell* params = newCons(newSym("'"), newSym("a"));
-  checkEq(reorderKeywordArgs(params, nil), nil);
+  checkEq(reorderKeywordArgs(nil, params), nil);
   rmref(params);
 }
 
 void test_reorderKeywordArgs_handles_improper_lists() {
-  Cell* params = newCons(newSym("a"), newSym("b"));
   Cell* args = newCons(newNum(3), newNum(4));
-  Cell* orderedArgs = reorderKeywordArgs(params, args);
+  Cell* params = newCons(newSym("a"), newSym("b"));
+  Cell* orderedArgs = reorderKeywordArgs(args, params);
   checkEq(car(orderedArgs), car(args));
   checkEq(cdr(orderedArgs), cdr(args));
   rmref(orderedArgs);
@@ -79,15 +79,15 @@ void test_reorderKeywordArgs_handles_improper_lists() {
 
 
 
-Cell* evalArgs(Cell* params, Cell* args) {
-  return evalArgs(params, args, currLexicalScope);
+Cell* evalArgs(Cell* args, Cell* params) {
+  return evalArgs(args, params, currLexicalScope);
 }
 
 void test_evalArgs_handles_unquoted_param() {
   newDynamicScope("a", newNum(3));
   Cell* params = read(stream("(x)"));
   Cell* args = read(stream("(a)"));
-  Cell* evaldArgs = evalArgs(params, args);
+  Cell* evaldArgs = evalArgs(args, params);
   checkEq(car(evaldArgs), newNum(3));
   checkEq(cdr(evaldArgs), nil);
   rmref(evaldArgs);
@@ -100,7 +100,7 @@ void test_evalArgs_handles_quoted_param() {
   newDynamicScope("a", newNum(3));
   Cell* params = read(stream("('x)"));
   Cell* args = read(stream("(a)"));
-  Cell* evaldArgs = evalArgs(params, args);
+  Cell* evaldArgs = evalArgs(args, params);
   checkEq(car(evaldArgs), newSym("a"));
   checkEq(cdr(evaldArgs), nil);
   rmref(evaldArgs);
@@ -113,7 +113,7 @@ void test_evalArgs_handles_alreadyEvald_arg() {
   newDynamicScope("a", newNum(3));
   Cell* params = read(stream("(x)"));
   Cell* args = newCons(tagAlreadyEvald(newSym("a")));
-  Cell* evaldArgs = evalArgs(params, args);
+  Cell* evaldArgs = evalArgs(args, params);
   checkEq(car(evaldArgs), newSym("a"));
   checkEq(cdr(evaldArgs), nil);
   rmref(evaldArgs);
@@ -126,7 +126,7 @@ void test_evalArgs_handles_multiply_alreadyEvald_arg() {
   newDynamicScope("a", newNum(3));
   Cell* params = read(stream("(x)"));
   Cell* args = newCons(tagAlreadyEvald(tagAlreadyEvald(newSym("a"))));
-  Cell* evaldArgs = evalArgs(params, args);
+  Cell* evaldArgs = evalArgs(args, params);
   checkEq(car(evaldArgs), newSym("a"));
   checkEq(cdr(evaldArgs), nil);
   rmref(evaldArgs);
@@ -140,7 +140,7 @@ void test_evalArgs_handles_varargs_param() {
   newDynamicScope("b", newNum(4));
   Cell* params = read(stream("x"));
   Cell* args = read(stream("(a b)"));
-  Cell* evaldArgs = evalArgs(params, args);
+  Cell* evaldArgs = evalArgs(args, params);
   checkEq(car(evaldArgs), newNum(3));
   checkEq(car(cdr(evaldArgs)), newNum(4));
   checkEq(cdr(cdr(evaldArgs)), nil);
@@ -156,7 +156,7 @@ void test_evalArgs_handles_quoted_varargs_param() {
   newDynamicScope("b", newNum(4));
   Cell* params = read(stream("'x"));
   Cell* args = read(stream("(a b)"));
-  Cell* evaldArgs = evalArgs(params, args);
+  Cell* evaldArgs = evalArgs(args, params);
   checkEq(car(evaldArgs), newSym("a"));
   checkEq(car(cdr(evaldArgs)), newSym("b"));
   checkEq(cdr(cdr(evaldArgs)), nil);
@@ -172,7 +172,7 @@ void test_evalArgs_handles_rest_param() {
   newDynamicScope("b", newNum(4));
   Cell* params = read(stream("x ... y"));
   Cell* args = read(stream("(a b)"));
-  Cell* evaldArgs = evalArgs(params, args);
+  Cell* evaldArgs = evalArgs(args, params);
   checkEq(car(evaldArgs), newNum(3));
   checkEq(car(cdr(evaldArgs)), newNum(4));
   checkEq(cdr(cdr(evaldArgs)), nil);
@@ -188,7 +188,7 @@ void test_evalArgs_handles_quoted_rest_param() {
   newDynamicScope("b", newNum(4));
   Cell* params = read(stream("x ... 'y"));
   Cell* args = read(stream("(a b)"));
-  Cell* evaldArgs = evalArgs(params, args);
+  Cell* evaldArgs = evalArgs(args, params);
   checkEq(car(evaldArgs), newNum(3));
   checkEq(car(cdr(evaldArgs)), newSym("b"));
   checkEq(cdr(cdr(evaldArgs)), nil);
