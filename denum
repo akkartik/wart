@@ -17,3 +17,6 @@ done
 
 # To safely delete these symlinks, use:
 #   $ find . -maxdepth 1 -type l -exec rm {} \;
+# To unclutter your git status, use:
+#   $ find . -maxdepth 1 -type l -printf "%P\n" > .gitignore
+# Make sure you haven't manually created any symlinks or a .gitignore file.
