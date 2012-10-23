@@ -15,6 +15,10 @@
              h.3)
   :should be 4)
 
+(test "len works on tables"
+  :valueof (len (table 'a 1 'b 2))
+  :should be 2)
+
 (test "each works on tables"
   :valueof (ret ans 0
              (each (k v) (table 1 2 3 4)

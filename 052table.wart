@@ -23,6 +23,9 @@ def! table args
 def copy(x) :case table?.x
   (as table (as list x))
 
+def len(x) :case table?.x
+  table_length.x
+
 def keys(h)
   map car (as list h)
 

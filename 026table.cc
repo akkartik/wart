@@ -32,3 +32,8 @@ COMPILE_FN(table_to_list, compiledFn_table_to_list, "($table)",
   }
   return dropPtr(result);
 )
+
+COMPILE_FN(table_length, compiledFn_table_length, "($table)",
+  CellMap table = toTable(lookup("$table"))->table;
+  return mkref(newNum((long)table.size()));
+)
