@@ -52,10 +52,10 @@ def (<) (a b) :case string?.a
 def digit?(c)
   (and string?.c
        (len.c = 1)
-       (<= "0" c "9"))
+       ("0" <= c <= "9"))
 
 def letter?(c)
   (and string?.c
        (len.c = 1)
-       (or (<= "A" c "Z")
-           (<= "a" c "z")))
+       (or ("A" <= c <= "Z")
+           ("a" <= c <= "z")))
