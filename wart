@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Design of this script considered the following:
-#  minimize dependencies (hence sh)
+#  minimize dependencies
 #  minimize output during initialization (just make commands)
 #  build output to stderr
 #  better commandline editing where possible
