@@ -89,7 +89,7 @@ Cell* processArgs(Cell* call, Cell* scope, Cell* fn) {
   Cell* orderedArgs = reorderKeywordArgs(splicedArgs, sig(fn));   rmref(splicedArgs);
   Cell* evaldArgs = evalArgs(orderedArgs, sig(fn), scope);  rmref(orderedArgs);
   dbg << car(call) << "/" << keepAlreadyEvald() << ": " << evaldArgs << endl;
-  return evaldArgs;
+  return evaldArgs;   // already mkref'd
 }
 
 
