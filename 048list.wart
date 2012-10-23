@@ -61,7 +61,7 @@ def pair?(x)
   (and list?.x
        cdr.x
        list?:cdr.x
-       ~cdr:cdr.x)
+       ~cddr.x)
 
 def rev(seq acc)
   if no.seq
