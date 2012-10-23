@@ -2,14 +2,14 @@
 
 // Design considered the following:
 //  implicit eval: by default (f arg1 arg2 arg3) evals all the elems, then passes the args to f
-//  functions are just data: car = (object function {params: l, body: #compiled})
+//  functions are just data: car => (object function {params: l, body: #compiled})
 //  user-defined functions are easy to reflect on: (fn (x) 34) => (object function {params: (x), body: (34)})
 //  functions create a private scope, can continue to access outer bindings (lexical scope)
 //  user-defined functions can't see caller environment
 //  quote to suppress eval in expressions: 'abc => abc
 //  quoted params suppress arg eval: ((fn '(x) x) abc) => abc
 //  varargs functions: ((fn params params) 1 2 3) => (1 2 3)
-//  varargs functions with some named params: ((fn (fmt ... rest) (printf fmt rest)) "%d" 34) => 34
+//  varargs functions with some named params: ((fn (fmt ... rest) (printf fmt rest)) "%d%d" 34 35) => "3435"
 //  passing in lists to functions: ((fn ((x y)) (+ x y)) '(3 4)) => 7
 //  functions can reorder args using keyords: ((fn (a b c) b) :b 3 1 2) => 3
 //  functions can document keyword args with a different name: ((fn (a b|returning c) b) :returning 3 1 2) => 3
@@ -18,7 +18,7 @@
 //
 //  list templates: backquote to suppress eval, unquote to reenable eval inside backquote. `(+ ,a ,b)
 //  ability to splice multiple elements into lists: ,@vars inside backquote, @vars otherwise
-//  macros need to access caller's scope
+//  macros need to access caller environment
 //  @splicing args into macro calls just like regular functions
 
 Cell* eval(Cell* expr) {
