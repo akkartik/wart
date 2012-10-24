@@ -1,66 +1,66 @@
 --- Infix operators
 
 Unlike other lisps, wart supports infix operators.
-  wart> 3 + 1
-  4
+  3 + 1
+  => 4
 
 You don't need spaces around infix ops.
-  wart> 3+1
-  4
+  3+1
+  => 4
 
 Infix ops don't compromise homoiconicity; wart parses them into lisp forms so
 your macros don't have to worry about them:
-  wart> 'a+b
-  (+ a b)
+  'a+b
+  => (+ a b)
 
 Infix ops are always left-associative.
-  wart> 'a+b+c
-  (+ (+ a b) c)
+  'a+b+c
+  => (+ (+ a b) c)
 
 Range comparisons are convenient as long as they return the last arg on
 success (because of left-associativity) and pass nils through:
-  wart> '(a > b >= c)
-  (>= (> a b) c)      # watch out if b is nil!
+  '(a > b >= c)
+  => (>= (> a b) c)      # watch out if b is nil!
 
-  wart> (nil < 34)
-  nil                 # should always be nil
-  wart> (34 < nil)
-  nil                 # should always be nil
+  (nil < 34)
+  => nil                 # should always be nil
+  (34 < nil)
+  => nil                 # should always be nil
 
 You can mix infix ops with regular prefix lisp:
-  wart> '(a + (f b))
-  (+ a (f b))
+  '(a + (f b))
+  => (+ a (f b))
 
-  wart> '(fib n-1)
-  (fib (- n 1))
+  '(fib n-1)
+  => (fib (- n 1))
 
 Operator precedence is not hardcoded. Instead, there is just one rule:
 operators surrounded by whitespace have lower precedence than operators that
 are not.
-  wart> '(n * n-1)
-  (* n (- n 1))
+  '(n * n-1)
+  => (* n (- n 1))
 
 You can create your own infix ops:
 
   def (<>) (a b)                        # def <> (a b) would become <> def (a b)
     (~equal a b)
 
-  wart> (1 <> 2)
-  1
+  (1 <> 2)
+  => 1
 
 To permit arbitrary infix ops, wart makes them distinct from regular symbols.
 The sets of 'infix chars' and 'symbol chars' are disjoint. This implies that
 wart won't let you define some traditional lisp names that you might be used
 to:
 
-  wart> '*global*
-  ((* global) *)                        # probably not what you want
+  '*global*
+  => ((* global) *)                     # probably not what you want
 
-  wart> 'uppercase-char-p
-  (- uppercase (- char p))              # probably not what you want
+  'uppercase-char-p
+  => (- uppercase (- char p))           # probably not what you want
 
-  wart> '(char> a "p")
-  ((> char a) "p")                      # probably not what you want
+  '(char> a "p")
+  => ((> char a) "p")                   # probably not what you want
 
 To create multi-word symbols, use underscores or camelCase. I'm trying out
 capitalizing globals.
@@ -68,16 +68,16 @@ capitalizing globals.
 While regular symbols can't be used in infix mode, infix ops can be used like
 regular symbols.
 
-  wart> (+ 4 2)
-  6
+  (+ 4 2)
+  => 6
 
 To use an infix op in a higher-level function, wrap it in parens:
 
-  wart> (map ++ '(1 2 3))
+  (map ++ '(1 2 3))
   Error: can't increment map
 
-  wart> (map (++) '(1 2 3))                   # hello haskell!
-  (2 3 4)
+  (map (++) '(1 2 3))                   # hello haskell!
+  => (2 3 4)
 
 In addition to the usual arithmetic, wart defines a few infix ops:
   a.b                 # => (a b) unless a and b are all digits; 2.4 is a number

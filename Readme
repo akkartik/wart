@@ -34,13 +34,16 @@ passed to other functions/macros without constraint, a cleaner syntax than
 traditional lisp, and function calls that can always add keyword arguments for
 readability.
 
-  wart> 4-3
-  1
-  wart> def subtract(a|from b) a-b
-  wart> subtract 4 3
-  1
-  wart> subtract 3 :from 4
-  1
+  4-3
+  => 1
+
+  def subtract(a|from b)
+    a-b
+
+  subtract 4 3
+  => 1
+  subtract 3 :from 4
+  => 1
 
 You'll need linux and gcc.
 
@@ -48,10 +51,7 @@ To install it:
   $ git clone http://github.com/akkartik/wart.git
   $ cd wart
   $ ./wart
-  wart>
-
-Type <enter> twice to run code at the prompt.
-Hit ctrl-d to quit.
+  ready! type in an expression, then hit enter twice. ctrl-d exits.
 
 To run its tests:
   $ wart test
