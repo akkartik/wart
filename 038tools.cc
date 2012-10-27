@@ -47,8 +47,8 @@ COMPILE_FN(time, compiledFn_time, "('$expr)",
   return result;  // already mkref'd
 )
 
-COMPILE_FN(quit, compiledFn_quit, "()",
-  exit(0);
+COMPILE_FN(exit, compiledFn_exit, "($status)",
+  exit(toInt(lookup("$status")));
   return nil;
 )
 
