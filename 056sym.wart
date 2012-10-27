@@ -1,39 +1,39 @@
 def sym args
-  (as symbol (str @args))
+  (as symbol (string @args))
 
 def keyword?(s)
   (and sym?.s
-       (str.s.0 = ":"))
+       (string.s.0 = ":"))
 
 def sym(s ... rest) :case (and no.rest keyword?.s)
-  (as symbol (str.s 1 nil))
+  (as symbol (string.s 1 nil))
 
 def is_match(a b bindings) :case sym?.a
   default bindings :to (table)
   (or (a = b)
       (a = '_)
-      (and (str.a.0 = "_")  # (_x _x) matches two of anything
+      (and (string.a.0 = "_")  # (_x _x) matches two of anything
            (default bindings.a :to b)
            (bindings.a = b))
-      (and (str.a.-1 = "_")   # p_ matches any $p
+      (and (string.a.-1 = "_")   # p_ matches any $p
            sym?.b
-           (let acore (str.a 0 -1)
-             (and (acore ~= str.b)  # ..but not p
+           (let acore (string.a 0 -1)
+             (and (acore ~= string.b)  # ..but not p
                   (sym.acore = sym_root.b))))
       (and sym?.b
-           (digit? str.b.-1)  # (p_x p_x) matches two of any $p
-           (withs (sa   str.a
+           (digit? string.b.-1)  # (p_x p_x) matches two of any $p
+           (withs (sa   string.a
                    ai   (pos "_" (as list sa))
                    acore  (if ai (sa 0 ai)))
              (and ai
-                  (acore ~= str.b)
+                  (acore ~= string.b)
                   (sym.acore = sym_root.b)
                   (default bindings.a :to b)
                   (bindings.a = b)))))
 
 # ignore the uniq part of a $sym
 def sym_root(x)
-  let name (rev:as list str.x)
+  let name (rev:as list string.x)
     while (and name digit?:car.name)
       (zap cdr name)
     (sym @rev.name)

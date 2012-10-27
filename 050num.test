@@ -75,7 +75,7 @@
   :should be 21)
 
 (test "< works with scorer"
-  :valueof ((< str) 'a 'b)
+  :valueof ((< string) 'a 'b)
   :should ~be nil)
 
 (test "sort works"
@@ -83,7 +83,7 @@
   :should be '(1 3 12))
 
 (test "sort works with scorer"
-  :valueof (sort (< str) '(1 2 10))  # lexicographic sort
+  :valueof (sort (< string) '(1 2 10))  # lexicographic sort
   :should be '(1 10 2))
 
 (test "floats compare to within a tolerance"

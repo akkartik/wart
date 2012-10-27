@@ -21,17 +21,17 @@ defset string((s idx ... ends) val)
 defcoerce string symbol
   string_to_sym
 
-def str args
+def string args
   (w_outstring
     (each arg args
       (if arg
         pr.arg)))
 
 defcoerce symbol string
-  str
+  string
 
 def join args :case string?:car.args
-  (str @args)
+  (string @args)
 
 def empty?(s) :case string?.s
   (s = "")
@@ -41,7 +41,7 @@ defcoerce string list
 
 defcoerce list string
   (fn(_)
-    (str @_))
+    (string @_))
 
 defcoerce nil string
   (fn() "")

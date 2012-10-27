@@ -79,12 +79,12 @@
                  (push c ans))))
   :should be '("c" "b" "a"))
 
-(test "str works with multiple args"
-  :valueof (str 'a 43)
+(test "string works with multiple args"
+  :valueof (string 'a 43)
   :should be "a43")
 
-(test "str works with nil"
-  :valueof str.nil
+(test "string works with nil"
+  :valueof string.nil
   :should be "")
 
 (test "string coerces to list"
