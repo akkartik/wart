@@ -23,10 +23,10 @@ Cell* lookup(Cell* sym, Cell* scope, bool keepAlreadyEvald) {
   if (result) return maybeStripAlreadyEvald(keepAlreadyEvald, result);
   result = lookupDynamicBinding(sym);
   if (result) return maybeStripAlreadyEvald(keepAlreadyEvald, result);
-//?   RAISE << "No binding for " << toString(sym) << endl;
-//?   if (!pretendRaise)
-//?     cerr << "Was it defined using indentation? Wart ignores indentation inside parens." << endl;
-  return newSym("__wart_lookup_error");
+  RAISE << "No binding for " << toString(sym) << endl;
+  if (!pretendRaise)
+    cerr << "Was it defined using indentation? Wart ignores indentation inside parens." << endl;
+  return nil;
 }
 
 Cell* lookup(Cell* sym) {
