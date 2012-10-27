@@ -70,13 +70,27 @@ Cell* read(CodeStream& c) {
 // test harness
 
 bool runningTests = false;
-long numFailures = 0;
 
 typedef void (*TestFn)(void);
 
 const TestFn tests[] = {
   #include "test_list"
 };
+
+long numFailures = 0;
+
+#define check(X) if (!(X)) { \
+    ++numFailures; \
+    cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
+  } \
+  else { cerr << "."; fflush(stderr); }
+
+#define checkEq(X, Y) if ((X) != (Y)) { \
+    ++numFailures; \
+    cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
+    cerr << "  got " << (X) << endl;  /* BEWARE: multiple eval */ \
+  } \
+  else { cerr << "."; fflush(stderr); }
 
 void runTests() {
   runningTests = true;

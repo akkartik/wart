@@ -76,17 +76,4 @@ Die DIE;
 
 // interpreter tests
 
-#define check(X) if (!(X)) { \
-    ++numFailures; \
-    cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
-  } \
-  else { cerr << "."; fflush(stderr); }
-
-#define checkEq(X, Y) if ((X) != (Y)) { \
-    ++numFailures; \
-    cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
-    cerr << "  got " << (X) << endl;  /* BEWARE: multiple eval */ \
-  } \
-  else { cerr << "."; fflush(stderr); }
-
 #include "test_file_list"
