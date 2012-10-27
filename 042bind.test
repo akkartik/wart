@@ -18,3 +18,11 @@
 (test "w_nils works"
   :valueof (w_nils (x y z) (list x y z))
   :should be '(nil nil nil))
+
+let foo_calls 0
+  def! foo(x) 34
+  after_fn foo(x) ++foo_calls
+  def! bar() foo_calls
+(test "after_fn works"
+  :valueof (do (foo 3) (bar))
+  :should be 1)

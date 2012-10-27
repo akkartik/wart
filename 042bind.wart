@@ -48,7 +48,7 @@ mac before_fn(f params ... body)
        ,@body
        ($old ,@params)))
 
-def after_fn(f params ... body)
+mac after_fn(f params ... body)
   `(let $old ,f
      (def! ,f ,params
        (ret result ($old ,@params)
