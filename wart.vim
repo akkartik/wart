@@ -53,6 +53,6 @@ highlight link wartAssign Special
 syntax match wartParenError /)/
 highlight link wartParenError Error
 
-syntax cluster wartListCluster contains=wartComment,wartString,wartAtom,wartNumber,wartQuote,wartCons,wartList,wartBackquote,wartUnquote,wartSplice,wartCall
+syntax cluster wartListCluster contains=wartComment,wartString,wartAtom,wartNumber,wartQuote,wartCons,wartList,wartBackquote,wartUnquote,wartSplice,wartCall,wartAssign
 
 let &cpo = s:save_cpo
