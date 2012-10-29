@@ -20,7 +20,7 @@ setlocal iskeyword=@,48-57,?,!,_,$
 syntax match wartComment /#.*$/
 highlight link wartComment Comment
 
-syntax region	wartString start=+"+ skip=+\\\\\|\\"+ end=+"+	contains=@Spell
+syntax region wartString start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=@Spell
 highlight link wartString String
 
 syntax match wartAtom /[^\s#"()',@]/
@@ -34,14 +34,6 @@ highlight link wartQuote Delimiter
 syntax match wartCons /\.\.\./
 highlight link wartCons Delimiter
 
-syntax region wartList matchgroup=Delimiter start="("   skip="|.\{-}|"			matchgroup=Delimiter end=")"	contains=@wartListCluster
-syntax match wartSplice /@/
-highlight link wartSplice Delimiter
-
-syntax region wartBackquote matchgroup=Preproc start="`(" matchgroup=Preproc end=")" contains=@wartListCluster
-syntax match wartUnquote /,@\|,/
-highlight link wartUnquote Preproc
-
 " deemphasize period operator
 syntax match wartCall /\./
 highlight link wartCall Delimiter
@@ -50,9 +42,17 @@ highlight link wartCall Delimiter
 syntax match wartAssign /<-/
 highlight link wartAssign Special
 
+syntax match wartSplice /@/
+highlight link wartSplice Delimiter
+
+syntax match wartUnquote /,@\|,/
+highlight link wartUnquote Preproc
+
+syntax region wartList      matchgroup=Delimiter start="(" matchgroup=Delimiter end=")" contains=@wartListCluster
+syntax region wartBackquote matchgroup=Preproc start="`(" matchgroup=Preproc end=")" contains=@wartListCluster
+syntax cluster wartListCluster contains=wartComment,wartString,wartAtom,wartNumber,wartQuote,wartCons,wartCall,wartAssign,wartSplice,wartUnquote,wartList,wartBackquote
+
 syntax match wartParenError /)/
 highlight link wartParenError Error
-
-syntax cluster wartListCluster contains=wartComment,wartString,wartAtom,wartNumber,wartQuote,wartCons,wartList,wartBackquote,wartUnquote,wartSplice,wartCall,wartAssign
 
 let &cpo = s:save_cpo
