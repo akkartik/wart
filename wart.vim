@@ -24,7 +24,10 @@ highlight link wartComment Comment
 syntax region wartString start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=@Spell
 highlight link wartString String
 
-syntax match wartNumber "-\=\(\.\d\+\|\d\+\(\.\d*\)\=\)\([dDeEfFlL][-+]\=\d\+\)\="
+" 3 4 3.4 -3.4 -.5 2.9e-3.4 f23
+" ^ ^ ^   ^      ^ ^      ^     numbers
+syntax match wartNumber "\(\W\)\@<=-\=\(\.\d\+\|\d\+\(\.\d*\)\=\)\([dDeEfFlL][-+]\=\d\+\)\="
+syntax match wartNumber "^-\=\(\.\d\+\|\d\+\(\.\d*\)\=\)\([dDeEfFlL][-+]\=\d\+\)\="
 highlight link wartNumber Constant
 
 " :foo a:b a?:b (f :a x) (:b)
