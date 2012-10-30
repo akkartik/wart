@@ -48,7 +48,8 @@ COMPILE_FN(time, compiledFn_time, "('$expr)",
 )
 
 COMPILE_FN(exit, compiledFn_exit, "($status)",
-  exit(toInt(lookup("$status")));
+  Cell* s = lookup("$status");
+  exit(isNum(s) ? toInt(s) : -1);
   return nil;
 )
 
