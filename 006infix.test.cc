@@ -121,19 +121,6 @@ void test_infix_passes_wrapped_op2() {
   check(p == n.elems.end());
 }
 
-void test_infix_passes_ellipses_in_prefix() {
-  CodeStream cs(stream("a ... b"));
-  AstNode n = transformInfix(nextAstNode(cs));
-  check(n.isList());
-  list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("a")); ++p;
-  checkEq(*p, Token("...")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
-  check(p == n.elems.end());
-}
-
 void test_infix_handles_infix_ops_in_prefix() {
   CodeStream cs(stream("+ a b"));
   AstNode n = transformInfix(nextAstNode(cs));
@@ -142,6 +129,19 @@ void test_infix_handles_infix_ops_in_prefix() {
   checkEq(*p, Token("(")); ++p;
   checkEq(*p, Token("+")); ++p;
   checkEq(*p, Token("a")); ++p;
+  checkEq(*p, Token("b")); ++p;
+  checkEq(*p, Token(")")); ++p;
+  check(p == n.elems.end());
+}
+
+void test_infix_passes_ellipses_in_prefix() {
+  CodeStream cs(stream("a ... b"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token("(")); ++p;
+  checkEq(*p, Token("a")); ++p;
+  checkEq(*p, Token("...")); ++p;
   checkEq(*p, Token("b")); ++p;
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
