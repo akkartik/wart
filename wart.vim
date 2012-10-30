@@ -30,8 +30,6 @@ highlight link wartNumber Constant
 syntax match wartKeyword /\W\zs:[a-zA-Z0-9?!_$]\+/
 highlight link wartKeyword Constant
 
-syntax match wartAtom /[^:\s#"()',@][^\s#"()',@]\*/
-
 syntax match wartQuote /'/
 highlight link wartQuote Delimiter
 
@@ -54,7 +52,7 @@ highlight link wartUnquote Preproc
 
 syntax region wartList      matchgroup=Delimiter start="(" matchgroup=Delimiter end=")" contains=@wartListCluster
 syntax region wartBackquote matchgroup=Preproc start="`(" matchgroup=Preproc end=")" contains=@wartListCluster
-syntax cluster wartListCluster contains=wartComment,wartString,wartNumber,wartKeyword,wartAtom,wartQuote,wartCons,wartCall,wartAssign,wartSplice,wartUnquote,wartList,wartBackquote
+syntax cluster wartListCluster contains=wartComment,wartString,wartNumber,wartKeyword,wartQuote,wartCons,wartCall,wartAssign,wartSplice,wartUnquote,wartList,wartBackquote
 
 syntax match wartParenError /)/
 highlight link wartParenError Error
