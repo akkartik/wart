@@ -165,6 +165,7 @@ AstNode tokenizeInfix(AstNode n) {
 
 bool isInfixOp(AstNode n) {
   if (n.isList()) return false;
+  if (n == "...") return false;
   string s = n.atom.token;
   string::iterator p = s.begin();
   if (*p != '$' && !isInfixChar(*p))

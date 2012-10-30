@@ -147,6 +147,19 @@ void test_infix_passes_ellipses_in_infix() {
   check(p == n.elems.end());
 }
 
+void test_infix_passes_op_with_ellipses() {
+  CodeStream cs(stream("+ ... b"));
+  AstNode n = transformInfix(nextAstNode(cs));
+  check(n.isList());
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, Token("(")); ++p;
+  checkEq(*p, Token("+")); ++p;
+  checkEq(*p, Token("...")); ++p;
+  checkEq(*p, Token("b")); ++p;
+  checkEq(*p, Token(")")); ++p;
+  check(p == n.elems.end());
+}
+
 void test_infix_handles_infix_ops_in_unary_prefix() {
   CodeStream cs(stream("+ a"));
   AstNode n = transformInfix(nextAstNode(cs));
