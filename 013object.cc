@@ -51,7 +51,7 @@ Cell* coerceQuoted(Cell* x, Cell* destType, Cell* coercions) {
   if (coercions == nil) RAISE << "Coercions not initialized yet\n";
   if (!isTable(coercions)) RAISE << "Coercions not a table\n";
   Cell* tmp = get(coercions, destType);
-  if (tmp == nil) RAISE << "Coercions for " << destType << " not initialized\n";
+  if (tmp == nil) RAISE << "Coercions for " << destType << " not initialized when eval'ing " << x << endl;
   if (!isTable(coercions)) RAISE << "Coercions for " << destType << " not a table\n";
   Cell* coercer = get(tmp, typ);
   if (coercer == nil) {
