@@ -26,7 +26,7 @@
   :should be 34)
 
 (test "lists can take negative indices"
-  :valueof (let l '(1 2 3) l.-1)
+  :valueof (let l '(1 2 3) (l -1))
   :should be 3)
 
 (test "lists can take slices"

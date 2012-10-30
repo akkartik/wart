@@ -75,7 +75,7 @@
   :should be 21)
 
 (test "< works with scorer"
-  :valueof ((< string) 'a 'b)
+  :valueof ((< (fn(_) _%3)) 4 2)
   :should ~be nil)
 
 (test "sort works"
@@ -83,8 +83,8 @@
   :should be '(1 3 12))
 
 (test "sort works with scorer"
-  :valueof (sort (< string) '(1 2 10))  # lexicographic sort
-  :should be '(1 10 2))
+  :valueof (sort (< (fn(_) _%3)) '(5 7 6))  # modulo sort
+  :should be '(6 7 5))
 
 (test "floats compare to within a tolerance"
   :valueof (2 >= 2.0000001)
