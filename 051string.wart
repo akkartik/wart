@@ -21,7 +21,7 @@ defset string((s idx ... ends) val)
 defcoerce string symbol
   string_to_sym
 
-def string args
+def (string ... args)
   (w_outstring
     (each arg args
       (if arg
@@ -30,10 +30,10 @@ def string args
 defcoerce symbol string
   string
 
-def join args :case string?:car.args
+def (join ... args) :case string?:car.args
   (string @args)
 
-def empty?(s) :case string?.s
+def (empty? s) :case string?.s
   (s = "")
 
 defcoerce string list
@@ -46,15 +46,15 @@ defcoerce list string
 defcoerce nil string
   (fn() "")
 
-def (<) (a b) :case string?.a
+def (a < b) :case string?.a
   (string_lesser a b)
 
-def digit?(c)
+def (digit? c)
   (and string?.c
        (len.c = 1)
        ("0" <= c <= "9"))
 
-def letter?(c)
+def (letter? c)
   (and string?.c
        (len.c = 1)
        (or ("A" <= c <= "Z")

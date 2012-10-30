@@ -1,4 +1,4 @@
-def converge(f x)
+def (converge f x)
   let y f.x
     if (x = y)
       x

@@ -1,9 +1,9 @@
-def l(f)
+def (l f)
   load (join string.f ".wart")
 
-def die args
+def (die ... args)
   prn @args
   exit.1
 
-def quit()
+def (quit)
   exit.0

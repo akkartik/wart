@@ -1,26 +1,26 @@
-mac do1 body
+mac (do1 ... body)
   `(ret $ret ,car.body
      ,@cdr.body)
 
-mac between(before after|and ... body)
+mac (between before after|and ... body)
   `(do1
      (do ,before ,@body)
      ,after)
 
-mac before(cleanup ... body)
+mac (before cleanup ... body)
   `(do1
      (do ,@body)
      ,cleanup)
 
-mac when(cond ... body)
+mac (when cond ... body)
   `(if ,cond
      (do ,@body))
 
-mac unless(cond ... body)
+mac (unless cond ... body)
   `(if (not ,cond)
      (do ,@body))
 
-mac iflet(var expr ... branches)
+mac (iflet var expr ... branches)
   if no.branches
     expr
     `(let $tmp ,expr
@@ -30,18 +30,18 @@ mac iflet(var expr ... branches)
          ,(if cdr.branches
             `(iflet ,var ,@cdr.branches))))
 
-mac aif(expr ... branches)
+mac (aif expr ... branches)
   `(iflet it ,expr ,@branches)
 
-mac whenlet(var test ... body)
+mac (whenlet var test ... body)
   `(iflet ,var ,test
       (do ,@body))
 
-mac awhen(test ... body)
+mac (awhen test ... body)
   `(whenlet it ,test
       ,@body)
 
-mac aand args
+mac (aand ... args)
   (if
     no.args
       1
@@ -53,51 +53,51 @@ mac aand args
 
 
 
-mac while(test ... body)
+mac (while test ... body)
   `(when ,test
      ,@body
      (while ,test
        ,@body))
 
-mac whilet(var test ... body)
+mac (whilet var test ... body)
   `(let ,var nil
      (while (,var <- ,test)
        ,@body))
 
-mac awhile(test ... body)
+mac (awhile test ... body)
   `(whilet it ,test
      ,@body)
 
-mac for(var start test update ... body)
+mac (for var start test update ... body)
   `(let ,var ,start
      (while ,test
        ,@body
        ,update))
 
-mac each(var expr ... body)
+mac (each var expr ... body)
   `(for $i (as list ,expr) $i (zap cdr $i)
       (let ,var car.$i
         ,@body))
 
-mac on(var expr ... body)
+mac (on var expr ... body)
   `(for ($i index) (list ,expr 0) $i  (do (zap cdr $i) ++index)
      (let ,var car.$i
        ,@body))
 
-mac forlen(var expr ... body)
+mac (forlen var expr ... body)
   `(for ,var 0 (< ,var (len ,expr)) (++ ,var)
      ,@body)
 
-mac repeat(n ... body)
+mac (repeat n ... body)
   `(for $i 0 (< $i ,n) ++$i
      ,@body)
 
-mac repeat(n ... body) :case (n = :forever)
+mac (repeat n ... body) :case (n = :forever)
   `(while 1 ,@body)
 
 
 
-def (&) fs
+def (& ... fs)
   (fn args
     (let sub (afn(fs)
                (if

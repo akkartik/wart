@@ -1,19 +1,19 @@
 let $if if
-  mac! if args
+  mac! (if ... args)
     $if ~cdr.args
       car.args
       `(,$if ,car.args
          ,cadr.args
          (if ,@cddr.args))
 
-mac or args
+mac (or ... args)
   if args
     `(let $x ,car.args
        (if $x
          $x
          (or ,@cdr.args)))
 
-mac and args
+mac (and ... args)
   if no.args
     1
     if ~cdr.args
@@ -22,11 +22,11 @@ mac and args
          (and ,@cdr.args))
 
 let ($=) (=) # ignore later refinements
-  def isa(x 'Type)
+  def (isa x 'Type)
     ($= type.x Type)
 
-  def! (=) (a b)
-    (or ($= a b)
+  def! (a = b)
+    (or (a $= b)
         (and cons?.a cons?.b   # default for objects
              (car.a = car.b)
              (cdr.a = cdr.b)))
@@ -35,11 +35,11 @@ let ($=) (=) # ignore later refinements
 # '=' signals comparison; '<>' seems similar to '<-'
 alias (~=) ~equal
 
-mac default(var val|to)
+mac (default var val|to)
   `(or ,var
        (,var <- ,val))
 
-def is_match(a b bindings)
+def (is_match a b bindings)
   default bindings :to (table)  # used in later refinements
   (or (a = b)
       (a = '_)  # _ matches anything
@@ -47,27 +47,27 @@ def is_match(a b bindings)
            (is_match car.a car.b bindings)
            (is_match cdr.a cdr.b bindings)))
 
-def only(f)
+def (only f)
   (fn args
     (if f (f @args)))
 
-mac check(x test else)
+mac (check x test else)
   `(let $x ,x
      (if (,test $x)
        $x
        ,else))
 
-def maybe(f a b|to)
+def (maybe f a b|to)
   if a
     (f a b)
     b
 
-mac in(x ... choices)
+mac (in x ... choices)
   `(let $x ,x
      (or ,@(map (fn(_) `(,_ = $x))
                 choices)))
 
-def predicate(x)
+def (predicate x)
   (if
     (isa x function)
       x
@@ -76,7 +76,7 @@ def predicate(x)
     :else
       (fn(_) (x = _)))
 
-mac caselet(var expr ... branches)
+mac (caselet var expr ... branches)
   let expand (afn(branches)
                (if ~cdr.branches
                  car.branches
@@ -85,8 +85,8 @@ mac caselet(var expr ... branches)
                     ,(self cddr.branches))))
     `(let ,var ,expr ,expand.branches)
 
-mac case(expr ... branches)
+mac (case expr ... branches)
   `(caselet $x ,expr ,@branches)
 
-mac acase(expr ... branches)
+mac (acase expr ... branches)
   `(caselet it ,expr ,@branches)

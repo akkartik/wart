@@ -1,4 +1,4 @@
-mac matching(vars vals ... body)
+mac (matching vars vals ... body)
   `(if (is_match ',vars ,vals)
      (let ,strip_underscores.vars ,vals
       ,@body))
@@ -7,7 +7,7 @@ mac matching(vars vals ... body)
 
 ## Internals
 
-def strip_underscores(vars)
+def (strip_underscores vars)
   (if
     no.vars
       vars

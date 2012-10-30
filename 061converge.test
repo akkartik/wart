@@ -1,4 +1,4 @@
-def newton_raphson_sqrt_of_2(x)
+def (newton_raphson_sqrt_of_2 x)
   ((x + (2.0 / x)) / 2)
 
 (test "converge works"

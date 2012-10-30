@@ -1,35 +1,35 @@
 alias nil? not
-def sym?(_)
+def (sym? _)
   (isa _ symbol)
-def list?(_)
+def (list? _)
   (isa _ list)
-def num?(_)
+def (num? _)
   (isa _ number)
-def string?(_)
+def (string? _)
   (isa _ string)
-def table?(_)
+def (table? _)
   (isa _ table)
-def fn?(_)
+def (fn? _)
   (isa _ function)
-def compiled_fn?(_)
+def (compiled_fn? _)
   (and (fn? _)
        (~cons? body._))
 
 
 
-def tag(type val)
+def (tag type val)
   (list 'object type val)
 
-def rep(x)
+def (rep x)
   if (or ~cons?.x (car.x ~= 'object))
     x
     car:cddr.x
 
-def coerce(x 'dest_type)
+def (coerce x 'dest_type)
   eval `(coerce_quoted ,x ,dest_type)
 <- Coercions (table)
 
-mac defcoerce(src dest f)
+mac (defcoerce src dest f)
   `(do
      (if (~table_get Coercions ',dest)
        (table_set Coercions ',dest (table)))
@@ -39,7 +39,7 @@ defcoerce nil list
   id
 
 # arbitrary types in function position
-mac defcall(type params ... body)
+mac (defcall type params ... body)
   `(defcoerce ,type function
      (fn(,car.params)
        (fn ,cdr.params
@@ -47,18 +47,18 @@ mac defcall(type params ... body)
 
 
 
-mac as(type expr)
+mac (as type expr)
   `(coerce ,expr ,type)
 
-def! compose(f g)
+def! (compose f g)
   fn 'args
     eval `(,(as function f) (,(as function g) ,@args)) caller_scope
 
-def sig(f)
+def (sig f)
   rep.f'sig
 
-def! body(f)
+def! (body f)
   rep.f'body
 
-def env(f)
+def (env f)
   rep.f'env

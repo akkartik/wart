@@ -1,9 +1,9 @@
-def test(msg pred|should expr|valueof expected)
+def (test msg pred|should expr|valueof expected)
   if (pred expr expected)
     (err ".")
     (register_failed_test msg expr)
 
-def pending_test'(msg expr|valueof pred|should expected)
+def (pending_test 'msg 'expr|valueof 'pred|should 'expected)
   (err "
 pending: ")
   (err msg)
@@ -11,5 +11,5 @@ pending: ")
 alias be (=)
 alias equal (=)
 
-def match(a b)
+def (match a b)
   (is_match b a)

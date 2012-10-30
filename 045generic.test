@@ -1,6 +1,6 @@
-def foogen args
+def (foogen ... args)
   args
-def foogen(s ... rest) :case (and no.rest sym?.s)
+def (foogen s ... rest) :case (and no.rest sym?.s)
   s
 
 (test "def :case can handle rest params"

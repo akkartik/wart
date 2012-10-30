@@ -1,23 +1,24 @@
                                   # given params, return code to construct the args
                                   # (mac arg1 arg2 ... body) => `(,mac ,arg1 ,arg2 ,@body)
-                                  def construct_macro_call(args)
+                                  def (construct_macro_call args)
                                     if list?.args
-                                      `(cons ,car.args ,(construct_macro_call cdr.args))
+                                      `(cons ,(construct_macro_call car.args)
+                                             ,(construct_macro_call cdr.args))
                                       args
 
 let $mac mac
-  mac! mac(name params ... body)
+  mac! (mac (name ... params) ... body)
     if (car.body ~= :case)
-      `(,$mac ,name ,params ,@body)
+      `(,$mac (,name ,@params) ,@body)
       `(let $super ,name
-         (mac! ,name ,params
+         (mac! (,name ,@params)
            (if ,cadr.body
              (do ,@cddr.body)
              ,(construct_macro_call `($super ,@params)))))  # call super with params
 
-mac def(name params ... body) :case (car.body = :case)
+mac (def (name ... params) ... body) :case (car.body = :case)
   `(let $old ,name
-     (def! ,name $params
+     (def! (,name ... $params)
        (let ,params $params
          (if ,cadr.body
            (do ,@body)
