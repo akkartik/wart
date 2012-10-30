@@ -134,7 +134,7 @@ void test_infix_handles_infix_ops_in_prefix() {
   check(p == n.elems.end());
 }
 
-void test_infix_passes_ellipses_in_prefix() {
+void test_infix_passes_ellipses_in_infix() {
   CodeStream cs(stream("a ... b"));
   AstNode n = transformInfix(nextAstNode(cs));
   check(n.isList());
