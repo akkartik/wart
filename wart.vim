@@ -27,7 +27,9 @@ highlight link wartString String
 syntax match wartNumber "-\=\(\.\d\+\|\d\+\(\.\d*\)\=\)\([dDeEfFlL][-+]\=\d\+\)\="
 highlight link wartNumber Constant
 
-syntax match wartKeyword /\W\zs:[a-zA-Z0-9?!_$]\+/
+" :foo a:b a?:b (f :a x) (:b)
+" ^                ^      ^     keywords
+syntax match wartKeyword /^:[a-zA-Z0-9?!_$]\+\|\([^a-zA-Z0-9?!_$]\)\@<=:[a-zA-Z0-9?!_$]\+/
 highlight link wartKeyword Constant
 
 syntax match wartQuote /'/
