@@ -11,6 +11,8 @@ Here's factorial in wart:
       (n * (fact n-1))
 
 Parens are used for function calls, not grouping; ((f)) is not the same as (f).
+But functions don't have to come first: (a * b) is a call to function '*',
+just like (* a b).
 
 Here's another way to define factorial:
 
