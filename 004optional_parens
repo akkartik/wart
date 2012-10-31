@@ -16,17 +16,17 @@ No indented lines after? They're grouped in isolation:
   (c d)
 
 Lines with a single word are never wrapped in parens:
-  def foo()
+  def (foo)
     x
 =>
-  (def foo()
+  (def (foo)
     x)    # x is returned as a value, never called
 
 Lines with a leading paren are never wrapped in parens:
-  def foo(x)
+  def (foo x)
     (prn x) x
 =>
-  (def foo(x)
+  (def (foo x)
     (prn x) x)
 
 Putting these rules together, parens are not required around 'if' in:
@@ -58,8 +58,8 @@ control-flow operators (def/mac/if/while/..), leaving them alone everywhere
 else. When in doubt, I insert parens.
 
 If you don't like this approach, just use parens everywhere:
-  (def foo() 34)
-  (def foo()
+  (def (foo) 34)
+  (def (foo)
     34)
 
 Indentation-sensitivity is disabled inside parens. This rule is useful if you
@@ -69,6 +69,6 @@ want multiple expressions on a single line:
             else-expr)
 
 It also implies that backquoted expressions must be fully parenthesized:
-  mac when(cond ... body)
+  mac (when cond ... body)
     `(if ,cond
        (do ,@body))   # parens before 'do' are required

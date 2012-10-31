@@ -3,7 +3,7 @@ more obvious -- by adding keywords. Keywords begin with a colon and are always
 optional. Wart will first scan the keywords in a call, then bind the remaining
 arguments in order. This will be familiar to python programmers:
 
-  (def foo(a b)
+  (def (foo a b)
     (list a b))
   (foo 1 3)
   => (1 3)
@@ -17,15 +17,15 @@ arguments in order. This will be familiar to python programmers:
 Keywords that don't match function parameters are passed through as arguments:
 
   (foo :c 1 2)
-  => (:c 1)                       # the third arg gets dropped
+  => (:c 1)                         # the third arg gets dropped
 
 (Keyword symbols always evaluate to themselves.)
 
 This is useful primarily because you can pass keywords through layers of
 function calls:
 
-  (def A params (B @params))      # all params get spliced into a call to B
-  (def B(c ... d) (list c @d))    # d gets all args but the first
+  (def (A ... params) (B @params))  # all params get spliced into a call to B
+  (def (B c ... d) (list c @d))      # d gets all args but the first
   (A 1 2 3)
   => (1 2 3)
   (A 1 2 :c 3)
@@ -33,7 +33,7 @@ function calls:
 
 If you want to refer to a param using a different keyword, use param aliases:
 
-  def test(msg pred|should expr|valueof expected)
+  def (test msg pred|should expr|valueof expected)
     ..
 
 Now test can refer to 'pred' and 'expr', but ':should' or ':valueof' may be
