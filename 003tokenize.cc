@@ -151,12 +151,7 @@ void skipComment(istream& in) {
 
 void skipWhitespace(istream& in) {
   while (isspace(in.peek()) && in.peek() != '\n')
-    skip(in);
-}
-
-void skip(istream& in) {
-  char dummy;
-  in >> dummy;
+    in.get();
 }
 
 
