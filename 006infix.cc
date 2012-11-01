@@ -74,9 +74,9 @@ AstNode transformInfix(AstNode n) {
 
   // now n is guaranteed to have at least 3 ops
   // slide a window of 3, pinching into s-exprs when middle elem is an op
-  auto prev = n.elems.begin();
-  auto curr=prev; ++curr;
-  auto next=curr; ++next;
+  list<AstNode>::iterator prev = n.elems.begin();
+  list<AstNode>::iterator curr=prev; ++curr;
+  list<AstNode>::iterator next=curr; ++next;
   for (; next != n.elems.end(); ++prev, ++curr, ++next) {
     if (curr->atom.token == "...") continue;
 
@@ -92,7 +92,7 @@ AstNode transformInfix(AstNode n) {
     list<AstNode> tmp;
     tmp.push_back(transformInfix(*curr));
     if (prev == n.elems.begin()) {
-      auto oldnext = next;
+      list<AstNode>::iterator oldnext = next;
       // prefix op; grab as many non-ops as you can
       while (!isInfixOp(*next)) {
         tmp.push_back(transformInfix(*next));
