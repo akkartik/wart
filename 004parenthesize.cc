@@ -48,7 +48,6 @@ list<Token> nextExpr(CodeStream& c) {
         // clean up indent state for the next call
         for (int i = 0; i < nextLineIndent; ++i)
           c.fd.putback(' ');
-      cerr << "Exiting\n";
       break;
     }
   }
@@ -66,28 +65,14 @@ list<Token> nextLine(CodeStream& c) {
   list<Token> result;
   if (endOfInput(c.fd)) return result;
 
-  if (c.currIndent == -1) {
-    cerr << "AAAA\n";
-    result.push_back(Token(c.currIndent=indent(c.fd))); //nextToken(c));
-  }
-  else {
-    cerr << "BBBB\n";
+  if (c.currIndent == -1)
+    result.push_back(nextToken(c));
+  else
     result.push_back(Token(c.currIndent));
-  }
 
-  cerr << "CCCC\n";
   do { result.push_back(nextToken(c)); }
   while (!endOfInput(c.fd) && !result.back().isIndent());
-  cerr << "AA: " << result.size() << endl;
   return result;
-}
-
-void foo() {
-//?   nextRawCell(stream("()"));
-  CodeStream c(stream("1"));
-  list<Token> l = nextExpr(c);
-  cerr << l.size() << endl;
-  exit(0);
 }
 
 bool endOfInput(istream& in) {
@@ -111,7 +96,6 @@ long numWordsInLine(list<Token> line) {
 }
 
 void add(list<Token>& l, Token x) {
-  cerr << "add: " << x << endl;
   if (!x.isIndent() && !x.newline)
     l.push_back(x);
 }

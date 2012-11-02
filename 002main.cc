@@ -39,7 +39,6 @@ struct CodeStream {
 CodeStream STDIN(cin);
 
 int main(int argc, unused char* argv[]) {
-  foo();
   if (argc > 1) {
     runTests();
     return 0;

@@ -65,16 +65,9 @@ struct Token {
 };
 
 Token nextToken(CodeStream& c) {
-  cerr << "indent: " << c.currIndent << endl;
-  Token t = nextToken2(c);
-  cerr << "nextToken: " << t << endl;
-  return t;
-}
-Token nextToken2(CodeStream& c) {
   static bool atStartOfLine = true;
   if (c.currIndent == -1) atStartOfLine = true;
 
-  cerr << "SoL: " << atStartOfLine << endl;
   if (atStartOfLine) {
     if (c.fd.peek() == '#')
       skipComment(c.fd);
