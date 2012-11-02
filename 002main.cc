@@ -83,6 +83,7 @@ long numFailures = 0;
 #define check(X) if (!(X)) { \
     ++numFailures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
+    return; \
   } \
   else { cerr << "."; fflush(stderr); }
 
@@ -90,6 +91,7 @@ long numFailures = 0;
     ++numFailures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
     cerr << "  got " << (X) << endl;  /* BEWARE: multiple eval */ \
+    return; \
   } \
   else { cerr << "."; fflush(stderr); }
 
