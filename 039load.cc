@@ -19,14 +19,12 @@ void loadFile(const char* filename) {
   ifstream f(filename);
   if (f.fail()) return;
   CodeStream c(f);
-  bool old_interactive = interactive; interactive = false;
   while (!c.eof()) {
     Cell* cell = read(c);
 //?     cerr << cell << endl;   // uncomment this to track down errors in wart files
     rmref(eval(cell));
     rmref(cell);
   }
-  interactive = old_interactive;
 }
 
 vector<char*> sortedFiles(const char* dirname, const char* ext) {

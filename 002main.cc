@@ -143,11 +143,9 @@ void setup() {
 
 // misc
 
-bool interactive = false;   // trigger eval on empty lines
 void interactive_setup() {
   setup();
   loadFiles(".wart");
-  interactive = true;
   catchCtrlC();
 }
 

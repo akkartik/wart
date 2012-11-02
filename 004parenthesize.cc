@@ -42,8 +42,7 @@ list<Token> nextExpr(CodeStream& c) {
       implicitParenStack.pop();
     }
 
-    if ((implicitParenStack.empty() && openExplicitParens == 0)
-        || endOfInput(c.fd)) {
+    if (implicitParenStack.empty() && openExplicitParens == 0) {
       if (!c.fd.eof())
         // clean up indent state for the next call
         for (int i = 0; i < nextLineIndent; ++i)
@@ -63,7 +62,7 @@ list<Token> nextExpr(CodeStream& c) {
 
 list<Token> nextLine(CodeStream& c) {
   list<Token> result;
-  if (endOfInput(c.fd)) return result;
+  if (c.fd.eof()) return result;
 
   if (c.currIndent == -1)
     result.push_back(nextToken(c));
@@ -71,20 +70,8 @@ list<Token> nextLine(CodeStream& c) {
     result.push_back(Token(c.currIndent));
 
   do { result.push_back(nextToken(c)); }
-  while (!endOfInput(c.fd) && !result.back().isIndent());
+  while (!c.fd.eof() && !result.back().isIndent());
   return result;
-}
-
-bool endOfInput(istream& in) {
-  if (in.eof()) return true;
-  if (!interactive) return false;
-
-  // in interactive mode signal eof after two <Enter>s
-  if (in.peek() != '\n') return false;
-  in.get();
-  char nextChar = in.peek();
-  in.putback('\n');
-  return nextChar == '\n';
 }
 
 long numWordsInLine(list<Token> line) {
