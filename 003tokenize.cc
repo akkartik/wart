@@ -15,15 +15,16 @@ const string quoteAndUnquoteChars = ",'`@";   // controlling eval and macros
 // and a newline token at the end
 struct Token {
   string token;
-  long indentLevel;   // all tokens on a line share its indentLevel
+  long indentLevel;
   bool newline;
 
   explicit Token(string s)
-    :token(s), indentLevel(0), newline(false) {}
+    :token(s), indentLevel(-1), newline(false) {}
   explicit Token(long indent)
     :token(""), indentLevel(indent), newline(false) {}
-  Token(const string x, const long l)
-    :token(x), indentLevel(l), newline(false) {}
+  static Token Newline() {
+    Token t(0); t.newline = true; return t; }
+
   Token(const Token& rhs)
     :token(rhs.token), indentLevel(rhs.indentLevel), newline(rhs.newline) {}
   Token& operator=(const Token& rhs) {
@@ -32,11 +33,6 @@ struct Token {
     indentLevel = rhs.indentLevel;
     newline = rhs.newline;
     return *this;
-  }
-  static Token Newline() {
-    Token t(0);
-    t.newline = true;
-    return t;
   }
 
   bool isIndent() {
@@ -103,7 +99,7 @@ Token nextToken(CodeStream& c) {
   else
     slurpWord(c.fd, out);
 
-  return Token(out.str(), c.currIndent);
+  return Token(out.str());
 }
 
 
