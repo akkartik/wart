@@ -65,10 +65,7 @@ struct Token {
 };
 
 Token nextToken(CodeStream& c) {
-  static bool atStartOfLine = true;
-  if (c.currIndent == -1) atStartOfLine = true;
-
-  if (atStartOfLine) {
+  if (c.atStartOfLine) {
     if (c.fd.peek() == '#')
       skipComment(c.fd);
     if (c.fd.peek() == '\n') {
@@ -80,7 +77,7 @@ Token nextToken(CodeStream& c) {
       skipComment(c.fd);
     if (c.fd.peek() == '\n')
       return nextToken(c);
-    atStartOfLine = false;
+    c.atStartOfLine = false;
     c.currIndent=t.indentLevel;
     return t;
   }
@@ -90,7 +87,7 @@ Token nextToken(CodeStream& c) {
     skipComment(c.fd);
   if (c.fd.peek() == '\n') {
     c.fd.get();
-    atStartOfLine = true;
+    c.atStartOfLine = true;
     return Token::Newline();
   }
 
