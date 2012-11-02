@@ -66,7 +66,7 @@ list<Token> nextLine(CodeStream& c) {
   if (endOfInput(c.fd)) return result;
 
   if (c.currIndent == -1)
-    result.push_back(Token(c.currIndent=indent(c.fd)));
+    result.push_back(nextToken(c));
   else
     result.push_back(Token(c.currIndent));
 
@@ -90,14 +90,13 @@ bool endOfInput(istream& in) {
 long numWordsInLine(list<Token> line) {
   long numWords = 0;
   for (list<Token>::iterator p = line.begin(); p != line.end(); ++p)
-    if (!p->isIndent() && !p->isParen()
-        && !p->isQuoteOrUnquote())
+    if (!p->isIndent() && !p->newline && !p->isParen() && !p->isQuoteOrUnquote())
       ++numWords;
   return numWords;
 }
 
 void add(list<Token>& l, Token x) {
-  if (!x.isIndent())
+  if (!x.isIndent() && !x.newline)
     l.push_back(x);
 }
 

@@ -12,27 +12,35 @@ const string quoteAndUnquoteChars = ",'`@";   // controlling eval and macros
 //    so parse them here and make them easy for later passes to detect
 
 // line contains 1 indent and zero or more regular tokens
+// and a newline token at the end
 struct Token {
   string token;
   long indentLevel;   // all tokens on a line share its indentLevel
+  bool newline;
 
   explicit Token(string s)
-    :token(s), indentLevel(0) {}
+    :token(s), indentLevel(0), newline(false) {}
   explicit Token(long indent)
-    :token(""), indentLevel(indent) {}
+    :token(""), indentLevel(indent), newline(false) {}
   Token(const string x, const long l)
-    :token(x), indentLevel(l) {}
+    :token(x), indentLevel(l), newline(false) {}
   Token(const Token& rhs)
-    :token(rhs.token), indentLevel(rhs.indentLevel) {}
+    :token(rhs.token), indentLevel(rhs.indentLevel), newline(rhs.newline) {}
   Token& operator=(const Token& rhs) {
     if (this == &rhs) return *this;
     token = rhs.token;
     indentLevel = rhs.indentLevel;
+    newline = rhs.newline;
     return *this;
+  }
+  static Token Newline() {
+    Token t(0);
+    t.newline = true;
+    return t;
   }
 
   bool isIndent() {
-    return token == "";
+    return token == "" && !newline;
   }
   bool isParen() {
     return token == "(" || token == ")";
@@ -49,7 +57,7 @@ struct Token {
     return !(*this == x);
   }
   bool operator==(Token x) {
-    return token == x.token && indentLevel == x.indentLevel;
+    return token == x.token && indentLevel == x.indentLevel && newline == x.newline;
   }
   bool operator!=(Token x) {
     return !(*this == x);
@@ -57,19 +65,43 @@ struct Token {
 };
 
 Token nextToken(CodeStream& c) {
+  static bool atStartOfLine = true;
+  if (c.currIndent == -1) atStartOfLine = true;
+
+  if (atStartOfLine) {
+    if (c.fd.peek() == '#')
+      skipComment(c.fd);
+    if (c.fd.peek() == '\n') {
+      c.fd.get();
+      return Token::Newline();
+    }
+    Token t = Token(indent(c.fd));
+    if (c.fd.peek() == '#')
+      skipComment(c.fd);
+    if (c.fd.peek() == '\n')
+      return nextToken(c);
+    atStartOfLine = false;
+    c.currIndent=t.indentLevel;
+    return t;
+  }
+
   skipWhitespace(c.fd);
-  if (c.fd.peek() == '\n' || c.fd.peek() == '#')
-    return Token(c.currIndent=indent(c.fd));
+  if (c.fd.peek() == '#')
+    skipComment(c.fd);
+  if (c.fd.peek() == '\n') {
+    c.fd.get();
+    atStartOfLine = true;
+    return Token::Newline();
+  }
 
   ostringstream out;
-  char nextchar = c.fd.peek();  // guaranteed not to be whitespace
-  if (nextchar == '"')
+  if (c.fd.peek() == '"')
     slurpString(c.fd, out);
-  else if (find(punctuationChars, nextchar))
+  else if (find(punctuationChars, c.fd.peek()))
     slurpChar(c.fd, out);
-  else if (nextchar == ',')
+  else if (c.fd.peek() == ',')
     slurpUnquote(c.fd, out);
-  else if (find(quoteAndUnquoteChars, nextchar))
+  else if (find(quoteAndUnquoteChars, c.fd.peek()))
     slurpChar(c.fd, out);
   else
     slurpWord(c.fd, out);
@@ -121,19 +153,13 @@ long indent(istream& in) {
   long indent = 0;
   char c;
   while (in >> c) {
-    if (c == '#') {
-      skipComment(in);
-      if (interactive) return 0;
-    }
-
-    else if (!isspace(c)) {
+    if (!isspace(c) || c == '\n') {
       in.putback(c);
       break;
     }
 
     else if (c == ' ') ++indent;
     else if (c == '\t') indent+=2;
-    else if (c == '\n') indent=0;
   }
   return indent;
 }
@@ -162,6 +188,7 @@ bool find(string s, char c) {
 }
 
 ostream& operator<<(ostream& os, Token y) {
+  if (y.newline) return os << "\\n";
   if (y == "") return os << ":" << y.indentLevel;
   else return os << y.token;
 }
