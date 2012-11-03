@@ -39,6 +39,11 @@ struct AstNode {
   }
 };
 
+AstNode nextAstNode(istream& in) {
+  CodeStream cs(in);
+  return nextAstNode(cs);
+}
+
 AstNode nextAstNode(CodeStream& cs) {
   Token curr = nextParenInsertedToken(cs);
   if (curr != "(" && !curr.isQuoteOrUnquote())

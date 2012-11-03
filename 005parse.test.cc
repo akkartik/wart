@@ -1,30 +1,30 @@
 void test_parse_handles_empty_stream() {
-  CodeStream cs(stream(""));
-  checkEq(nextAstNode(cs), eof());
+  stringstream in("");
+  checkEq(nextAstNode(in), eof());
 }
 
 void test_parse_handles_trailing_comment() {
-  CodeStream cs(stream("34 # abc"));
-  checkEq(nextAstNode(cs), Token("34"));
-  checkEq(nextAstNode(cs), eof());
+  stringstream in("34 # abc");
+  checkEq(nextAstNode(in), Token("34"));
+  checkEq(nextAstNode(in), eof());
 }
 
 void test_parse_handles_atom() {
-  CodeStream cs(stream("34"));
-  checkEq(nextAstNode(cs), Token("34"));
+  stringstream in("34");
+  checkEq(nextAstNode(in), Token("34"));
 }
 
 void test_parse_handles_atoms() {
-  CodeStream cs(stream("34\n\"a b c\"\n3.4"));
-  checkEq(nextAstNode(cs), Token("34"));
-  checkEq(nextAstNode(cs), Token("\"a b c\""));
-  checkEq(nextAstNode(cs), Token("3.4"));
-  checkEq(nextAstNode(cs), eof());
+  stringstream in("34\n\"a b c\"\n3.4");
+  checkEq(nextAstNode(in), Token("34"));
+  checkEq(nextAstNode(in), Token("\"a b c\""));
+  checkEq(nextAstNode(in), Token("3.4"));
+  checkEq(nextAstNode(in), eof());
 }
 
 void test_parse_handles_forms() {
-  CodeStream cs(stream("34 \"a b c\""));
-  AstNode n = nextAstNode(cs);
+  stringstream in("34 \"a b c\"");
+  AstNode n = nextAstNode(in);
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("(")); ++p;
@@ -32,12 +32,12 @@ void test_parse_handles_forms() {
   checkEq(*p, Token("\"a b c\"")); ++p;
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
-  checkEq(nextAstNode(cs), eof());
+  checkEq(nextAstNode(in), eof());
 }
 
 void test_parse_handles_nested_forms() {
-  CodeStream cs(stream("34 (2 3) \"a b c\""));
-  AstNode n = nextAstNode(cs);
+  stringstream in("34 (2 3) \"a b c\"");
+  AstNode n = nextAstNode(in);
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("(")); ++p;
@@ -54,12 +54,12 @@ void test_parse_handles_nested_forms() {
   checkEq(*p, Token("\"a b c\"")); ++p;
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
-  checkEq(nextAstNode(cs), eof());
+  checkEq(nextAstNode(in), eof());
 }
 
 void test_parse_handles_nested_forms_with_comments() {
-  CodeStream cs(stream("(a b (c d #\n))"));
-  AstNode n = nextAstNode(cs);
+  stringstream in("(a b (c d #\n))");
+  AstNode n = nextAstNode(in);
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("(")); ++p;
@@ -76,12 +76,12 @@ void test_parse_handles_nested_forms_with_comments() {
 
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
-  checkEq(nextAstNode(cs), eof());
+  checkEq(nextAstNode(in), eof());
 }
 
 void test_parse_handles_quotes() {
-  CodeStream cs(stream("34 `(2 ,b) ',35 ,',36 ,'a"));
-  AstNode n = nextAstNode(cs);
+  stringstream in("34 `(2 ,b) ',35 ,',36 ,'a");
+  AstNode n = nextAstNode(in);
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("(")); ++p;
@@ -125,12 +125,12 @@ void test_parse_handles_quotes() {
 
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
-  checkEq(nextAstNode(cs), eof());
+  checkEq(nextAstNode(in), eof());
 }
 
 void test_parse_handles_splice_operators() {
-  CodeStream cs(stream("`(2 ,@b @,c)"));
-  AstNode n = nextAstNode(cs);
+  stringstream in("`(2 ,@b @,c)");
+  AstNode n = nextAstNode(in);
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("`")); ++p;
@@ -151,16 +151,16 @@ void test_parse_handles_splice_operators() {
     check(q == ast2.end());
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
-  checkEq(nextAstNode(cs), eof());
+  checkEq(nextAstNode(in), eof());
 }
 
 void test_parse_handles_indented_toplevel_forms() {
-  CodeStream cs(stream("a\n  a b c\n    d"));
-  AstNode n = nextAstNode(cs);
+  stringstream in("a\n  a b c\n    d");
+  AstNode n = nextAstNode(in);
   check(n.isAtom());
   checkEq(n.atom.token, "a");
 
-  n = nextAstNode(cs);
+  n = nextAstNode(in);
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
   check(p->isAtom());
@@ -171,5 +171,5 @@ void test_parse_handles_indented_toplevel_forms() {
   checkEq(p->atom.token, "d"); ++p;
   checkEq(p->atom.token, ")"); ++p;
   check(p == n.elems.end());
-  checkEq(nextAstNode(cs), eof());
+  checkEq(nextAstNode(in), eof());
 }
