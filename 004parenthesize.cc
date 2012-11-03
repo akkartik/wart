@@ -21,32 +21,10 @@ list<Token> nextExpr(istream& i) {
   long openExplicitParens = 0;  // parens in the original
   stack<long> implicitParenStack;   // parens we inserted
 
-  if (!in.atStartOfLine) {
-    // multiple exprs on a single line
-    // retreat to indent-insensitive mode
-    while (!in.fd.eof()) {
-      Token curr = nextToken(in);
-      if (curr.newline || curr.isIndent()) {
-      }
-      else if (curr.isQuoteOrUnquote()) {
-        result.push_back(curr);
-      }
-      else if (curr == "(") {
-        result.push_back(curr);
-        ++openExplicitParens;
-      }
-      else if (curr == ")") {
-        result.push_back(curr);
-        --openExplicitParens;
-        if (openExplicitParens == 0) return result;
-      }
-      else { // word
-        result.push_back(curr);
-        if (openExplicitParens == 0) return result;
-      }
-    }
-    return result;
-  }
+  if (!in.atStartOfLine)
+    // we're in the middle of a line,
+    // because there were multiple exprs on a single line
+    return indentInsensitiveExpr(in);
 
   long thisLineIndent = skipInitialNewlinesToFirstIndent(in);
 
@@ -144,6 +122,33 @@ void restoreIndent(long indent, IndentSensitiveStream& in) {
   for (int i = 0; i < indent; ++i)
     in.fd.putback(' ');
   in.atStartOfLine = true;
+}
+
+list<Token> indentInsensitiveExpr(IndentSensitiveStream& in) {
+  list<Token> result;
+  long openExplicitParens = 0;
+  while (!in.fd.eof()) {
+    Token curr = nextToken(in);
+    if (curr.newline || curr.isIndent()) {
+    }
+    else if (curr.isQuoteOrUnquote()) {
+      result.push_back(curr);
+    }
+    else if (curr == "(") {
+      result.push_back(curr);
+      ++openExplicitParens;
+    }
+    else if (curr == ")") {
+      result.push_back(curr);
+      --openExplicitParens;
+      if (openExplicitParens == 0) break;
+    }
+    else { // word
+      result.push_back(curr);
+      if (openExplicitParens == 0) break;
+    }
+  }
+  return result;
 }
 
 #include<assert.h>
