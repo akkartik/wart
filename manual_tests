@@ -7,7 +7,7 @@ II. 2 newlines eval
 => 1
 
 III. Indent-based multi-line form
-def foo()<Enter>
+def (foo)<Enter>
   34<Enter>
 <Enter>
 => (object function ..)
@@ -51,13 +51,13 @@ XI. Comment after newline:
 => nil
 
 XII. Partial expr waits to complete:
-(def foo()<Enter>
+(def (foo)<Enter>
 <Enter>
 34)<Enter>
 => (object function ..)
 
 XIII. Expr and partial expr and comment:
-() (def foo()<Enter>
+() (def (foo)<Enter>
   34) # abc<Enter>
 <Enter>
 => nil

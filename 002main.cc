@@ -35,11 +35,9 @@ int main(int argc, unused char* argv[]) {
     return 0;
   }
 
-  setup();
-  loadFiles(".wart");
-  catchCtrlC();
-
   // Interpreter loop: read, eval, print
+  interactive_setup();
+  loadFiles(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (true) {
     Cell* form = read(cin);
@@ -123,6 +121,8 @@ void verify() {
   }
 }
 
+
+
 void setup() {
   setupCells();
   setupCommonSyms();
@@ -132,7 +132,12 @@ void setup() {
   raiseCount = 0;
 }
 
-
+bool interactive = false;
+void interactive_setup() {
+  setup();
+  interactive = true;
+  catchCtrlC();
+}
 
 // helper to read from string
 // leaks memory so don't overuse it; mostly for tests

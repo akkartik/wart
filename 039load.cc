@@ -16,6 +16,7 @@ void loadFiles(const char* ext) {
 // internals
 
 void loadFile(const char* filename) {
+  bool old_interactive = interactive; interactive = false;
   ifstream f(filename);
   if (f.fail()) return;
   while (!f.eof()) {
@@ -24,6 +25,7 @@ void loadFile(const char* filename) {
     rmref(eval(cell));
     rmref(cell);
   }
+  interactive = old_interactive;
 }
 
 vector<char*> sortedFiles(const char* dirname, const char* ext) {

@@ -54,6 +54,9 @@ list<Token> nextExpr(istream& i) {
   while (!in.fd.eof()) {
     Token curr = nextToken(in);
     if (curr.newline) {
+      if (interactive && openExplicitParens == 0
+          && (implicitParenStack.empty() || in.fd.peek() == '\n'))
+        break;
     }
     else if (curr.isQuoteOrUnquote()) {
       if (numWordsInLine < 2)
