@@ -13,12 +13,15 @@
 //    so ignore indent inside backquote
 //  performs flow control at the repl, decides when to show the prompt again
 
+#include<assert.h>
+
 list<Token> nextExpr(CodeStream& c) {
   list<Token> result;
   long openExplicitParens = 0;  // parens in the original
   stack<long> implicitParenStack;   // parens we inserted
 
   Token indent = nextToken(c);  // indent token; sets currIndent
+  assert(indent.isIndent() || indent.newline);
 
   list<Token> line;
   long numWordsInLine = 0;
