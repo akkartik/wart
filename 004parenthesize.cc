@@ -11,7 +11,7 @@
 //    so lines with one word are never wrapped in parens, like x or ,f.sym
 //  encourage macros to fully parenthesize
 //    so ignore indent inside backquote
-//  performs flow control at the repl, decides when to show the prompt again
+//  read the minimum possible from the stream for interactive repls
 
 list<Token> nextExpr(istream& i) {
   list<Token> result;
@@ -64,7 +64,7 @@ list<Token> nextExpr(istream& i) {
       if (numWordsInLine < 2)
         buffer.push_back(curr);
       else
-        result.push_back(curr);
+        emit(curr, result, openExplicitParens);
     }
     else if (curr.isParen()) {
       if (!parenAtStartOfLine)
@@ -73,13 +73,8 @@ list<Token> nextExpr(istream& i) {
         buffer.push_back(curr);
       }
       else {
-        flush(buffer, result, openExplicitParens);
-
-        result.push_back(curr);
-        if (curr == "(") ++openExplicitParens;
-        if (curr == ")") --openExplicitParens;
-        if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
-
+        emitAll(buffer, result, openExplicitParens);
+        emit(curr, result, openExplicitParens);
         if (openExplicitParens == 0 && implicitParenStack.empty())
           break;
       }
@@ -89,23 +84,20 @@ list<Token> nextExpr(istream& i) {
       if (numWordsInLine < 2) {
         buffer.push_back(curr);
       }
-      else if (numWordsInLine == 2) {
-        if (openExplicitParens == 0 && !parenAtStartOfLine) {
-          result.push_back(Token("("));
-          implicitParenStack.push(thisLineIndent);
-        }
-
-        flush(buffer, result, openExplicitParens);
-        result.push_back(curr);
-      }
       else {
-        result.push_back(curr);
+        if (numWordsInLine == 2) {
+          if (openExplicitParens == 0 && !parenAtStartOfLine) {
+            result.push_back(Token("("));
+            implicitParenStack.push(thisLineIndent);
+          }
+          emitAll(buffer, result, openExplicitParens);
+        }
+        emit(curr, result, openExplicitParens);
       }
     }
     else { // curr.isIndent()
       long nextLineIndent = curr.indentLevel;
-      flush(buffer, result, openExplicitParens);
-
+      emitAll(buffer, result, openExplicitParens);
       while (!implicitParenStack.empty() && nextLineIndent <= implicitParenStack.top()) {
         result.push_back(Token(")"));
         implicitParenStack.pop();
@@ -126,10 +118,7 @@ list<Token> nextExpr(istream& i) {
     }
   }
 
-  for (list<Token>::iterator p = buffer.begin(); p != buffer.end(); ++p)
-    result.push_back(*p);
-  buffer.clear();
-
+  emitAll(buffer, result, openExplicitParens);
   for (unsigned long i=0; i < implicitParenStack.size(); ++i)
     result.push_back(Token(")"));
   return result;
@@ -139,13 +128,16 @@ list<Token> nextExpr(istream& i) {
 
 // Internals.
 
-void flush(list<Token>& buffer, list<Token>& out, long& openExplicitParens) {
-  for (list<Token>::iterator p = buffer.begin(); p != buffer.end(); ++p) {
-    out.push_back(*p);
-    if (*p == "(") ++openExplicitParens;
-    if (*p == ")") --openExplicitParens;
-    if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
-  }
+void emit(Token& t, list<Token>& out, long& openExplicitParens) {
+  out.push_back(t);
+  if (t == "(") ++openExplicitParens;
+  if (t == ")") --openExplicitParens;
+  if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
+}
+
+void emitAll(list<Token>& buffer, list<Token>& out, long& openExplicitParens) {
+  for (list<Token>::iterator p = buffer.begin(); p != buffer.end(); ++p)
+    emit(*p, out, openExplicitParens);
   buffer.clear();
 }
 
