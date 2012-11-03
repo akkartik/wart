@@ -1,3 +1,15 @@
+void test_parenthesize_handles_initial_comment() {
+  CodeStream cs(stream("#a\na b"));
+  list<Token> tokens = nextExpr(cs);
+  list<Token>::iterator p = tokens.begin();
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == tokens.end());
+  check(cs.eof());
+}
+
 void test_parenthesize_handles_lines_with_initial_parens() {
   CodeStream cs(stream("(a b c)"));
   list<Token> tokens = nextExpr(cs);
