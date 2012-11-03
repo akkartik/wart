@@ -7,7 +7,6 @@ void test_parenthesize_handles_initial_comment() {
   checkEq(*p, "b"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_handles_lines_with_initial_parens() {
@@ -20,7 +19,6 @@ void test_parenthesize_handles_lines_with_initial_parens() {
   checkEq(*p, "c"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_handles_lines_with_initial_parens2() {
@@ -35,7 +33,6 @@ void test_parenthesize_handles_lines_with_initial_parens2() {
   checkEq(*p, ")"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_skips_indent_tokens() {
@@ -48,7 +45,6 @@ void test_parenthesize_skips_indent_tokens() {
   checkEq(*p, "c"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_skips_outdent_tokens() {
@@ -64,7 +60,6 @@ void test_parenthesize_skips_outdent_tokens() {
   checkEq(*p, "gh"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_preserves_following_indent() {
@@ -97,7 +92,6 @@ void test_parenthesize_handles_fully_parenthesized_expressions_regardless_of_ind
   checkEq(*p, ")"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_passes_through_single_word_lines() {
@@ -106,7 +100,6 @@ void test_parenthesize_passes_through_single_word_lines() {
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "a"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_passes_through_single_word_lines2() {
@@ -121,7 +114,6 @@ void test_parenthesize_passes_through_single_word_lines2() {
   tokens = nextExpr(cs); p = tokens.begin();
   checkEq(*p, "c"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_words_on_single_line() {
@@ -134,7 +126,6 @@ void test_parenthesize_groups_words_on_single_line() {
   checkEq(*p, "c"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_words_on_single_line2() {
@@ -149,7 +140,6 @@ void test_parenthesize_groups_words_on_single_line2() {
   checkEq(*p, ")"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_words_on_single_line3() {
@@ -165,7 +155,6 @@ void test_parenthesize_groups_words_on_single_line3() {
   checkEq(*p, ")"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_words_on_accidentally_indented_line() {
@@ -178,7 +167,6 @@ void test_parenthesize_groups_words_on_accidentally_indented_line() {
   checkEq(*p, "c"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_quoted_words() {
@@ -192,7 +180,6 @@ void test_parenthesize_groups_quoted_words() {
   checkEq(*p, "c"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_quoted_words2() {
@@ -206,7 +193,6 @@ void test_parenthesize_groups_quoted_words2() {
   checkEq(*p, "c"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_quoted_words3() {
@@ -220,7 +206,6 @@ void test_parenthesize_groups_quoted_words3() {
   checkEq(*p, "c"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_passes_through_nested_quoted_words() {
@@ -238,7 +223,6 @@ void test_parenthesize_passes_through_nested_quoted_words() {
   checkEq(*p, "e"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_passes_through_quoted_groups() {
@@ -252,7 +236,6 @@ void test_parenthesize_passes_through_quoted_groups() {
   checkEq(*p, "c"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_passes_through_quoted_groups2() {
@@ -266,7 +249,6 @@ void test_parenthesize_passes_through_quoted_groups2() {
   checkEq(*p, "c"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_passes_through_quoted_groups3() {
@@ -281,7 +263,6 @@ void test_parenthesize_passes_through_quoted_groups3() {
   checkEq(*p, "c"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_words_on_single_indented_line() {
@@ -297,7 +278,6 @@ void test_parenthesize_groups_words_on_single_indented_line() {
   tokens = nextExpr(cs); p=tokens.begin();
   checkEq(*p, "34"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_words_on_each_line_without_indent() {
@@ -316,7 +296,6 @@ void test_parenthesize_groups_words_on_each_line_without_indent() {
   checkEq(*p, "ef"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_across_indent() {
@@ -333,7 +312,6 @@ void test_parenthesize_groups_across_indent() {
   checkEq(*p, ")"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_across_indent2() {
@@ -350,7 +328,6 @@ void test_parenthesize_groups_across_indent2() {
   checkEq(*p, ")"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_across_indent3() {
@@ -368,7 +345,6 @@ void test_parenthesize_groups_across_indent3() {
   checkEq(*p, "g"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_nested_indents() {
@@ -389,7 +365,6 @@ void test_parenthesize_groups_nested_indents() {
   tokens = nextExpr(cs); p = tokens.begin();
   checkEq(*p, "y"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_handles_quotes_and_comments() {
@@ -408,7 +383,6 @@ void test_parenthesize_handles_quotes_and_comments() {
   checkEq(*p, "g"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_before_outdents() {
@@ -427,7 +401,6 @@ void test_parenthesize_groups_before_outdents() {
   checkEq(*p, "g"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_before_outdents2() {
@@ -451,7 +424,6 @@ void test_parenthesize_groups_before_outdents2() {
   tokens = nextExpr(cs); p = tokens.begin();
   checkEq(*p, "newdef"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_before_too_much_outdent() {
@@ -467,7 +439,6 @@ void test_parenthesize_groups_before_too_much_outdent() {
   tokens = nextExpr(cs); p = tokens.begin();
   checkEq(*p, "y"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_groups_across_comments() {
@@ -486,7 +457,6 @@ void test_parenthesize_groups_across_comments() {
   tokens = nextExpr(cs); p = tokens.begin();
   checkEq(*p, "new"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_does_not_group_inside_parens() {
@@ -503,7 +473,6 @@ void test_parenthesize_does_not_group_inside_parens() {
   tokens = nextExpr(cs); p = tokens.begin();
   checkEq(*p, "new"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_does_not_group_inside_parens2() {
@@ -521,7 +490,6 @@ void test_parenthesize_does_not_group_inside_parens2() {
   tokens = nextExpr(cs); p = tokens.begin();
   checkEq(*p, "new"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_does_not_group_inside_parens3() {
@@ -536,7 +504,6 @@ void test_parenthesize_does_not_group_inside_parens3() {
   checkEq(*p, "e"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_does_not_group_inside_arglists() {
@@ -563,7 +530,6 @@ void test_parenthesize_does_not_group_inside_arglists() {
   tokens = nextExpr(cs); p = tokens.begin();
   checkEq(*p, "new"); ++p;
   check(p == tokens.end());
-  check(cs.eof());
 }
 
 void test_parenthesize_passes_through_unbalanced_open_paren() {
@@ -571,12 +537,22 @@ void test_parenthesize_passes_through_unbalanced_open_paren() {
   list<Token> tokens = nextExpr(cs);
   checkEq(tokens.size(), 1);
   checkEq(tokens.front(), "(");
-  check(cs.eof());
 }
 
 void test_parenthesize_errors_on_unbalanced_closed_paren() {
   CodeStream cs(stream(")"));
   list<Token> tokens = nextExpr(cs);
   check(raiseCount > 0);   raiseCount=0;
-  check(cs.eof());
+}
+
+void test_parenthesize_handles_multiple_exprs_on_a_line() {
+  CodeStream cs(stream("() 1"));
+  list<Token> tokens = nextExpr(cs);
+  list<Token>::iterator p = tokens.begin();
+  checkEq(*p, "("); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == tokens.end());
+  tokens = nextExpr(cs); p = tokens.begin();
+  checkEq(*p, "1"); ++p;
+  check(p == tokens.end());
 }

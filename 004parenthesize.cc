@@ -13,8 +13,6 @@
 //    so ignore indent inside backquote
 //  performs flow control at the repl, decides when to show the prompt again
 
-#include<assert.h>
-
 list<Token> nextExpr(CodeStream& cs) {
   list<Token> result;
   long openExplicitParens = 0;  // parens in the original
@@ -22,7 +20,31 @@ list<Token> nextExpr(CodeStream& cs) {
 
   if (cs.fd.eof()) return result;
 
-  assert(cs.atStartOfLine);
+  if (!cs.atStartOfLine) {
+    while (!cs.fd.eof()) {
+      Token curr = nextToken(cs);
+      if (curr.newline || curr.isIndent()) {
+      }
+      else if (curr.isQuoteOrUnquote()) {
+        result.push_back(curr);
+      }
+      else if (curr == "(") {
+        result.push_back(curr);
+        ++openExplicitParens;
+      }
+      else if (curr == ")") {
+        result.push_back(curr);
+        --openExplicitParens;
+        if (openExplicitParens == 0) return result;
+      }
+      else { // word
+        result.push_back(curr);
+        if (openExplicitParens == 0) return result;
+      }
+    }
+    return result;
+  }
+
   long thisLineIndent = skipInitialNewlinesToFirstIndent(cs);
 
   list<Token> line;
@@ -39,10 +61,10 @@ list<Token> nextExpr(CodeStream& cs) {
         result.push_back(curr);
     }
     else if (curr.isParen()) {
-      if (numWordsInLine < 2) {
+      if (!parenAtStartOfLine)
+        parenAtStartOfLine = (curr == "(" && numWordsInLine == 0);
+      if (numWordsInLine < 2 && openExplicitParens == 0 && !parenAtStartOfLine) {
         line.push_back(curr);
-        if (!parenAtStartOfLine)
-          parenAtStartOfLine = (curr == "(" && numWordsInLine == 0);
       }
       else {
         for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
@@ -57,6 +79,9 @@ list<Token> nextExpr(CodeStream& cs) {
         if (curr == "(") ++openExplicitParens;
         if (curr == ")") --openExplicitParens;
         if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
+
+        if (openExplicitParens == 0 && implicitParenStack.empty())
+          break;
       }
     }
     else if (!curr.isIndent()) { // curr is a 'word' token
@@ -128,6 +153,8 @@ list<Token> nextExpr(CodeStream& cs) {
 
 
 // Internals.
+
+#include<assert.h>
 
 long skipInitialNewlinesToFirstIndent(CodeStream& cs) {
   for (;;) {
