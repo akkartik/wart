@@ -55,10 +55,11 @@ list<Token> nextExpr(CodeStream& c) {
       }
     }
     else if (!curr.isIndent()) { // curr is a 'word' token
-      if (numWordsInLine < 1) {
+      ++numWordsInLine;
+      if (numWordsInLine < 2) {
         line.push_back(curr);
       }
-      else if (numWordsInLine == 1) {
+      else if (numWordsInLine == 2) {
         if (openExplicitParens == 0 && !parenAtStartOfLine) {
           result.push_back(Token("("));
           implicitParenStack.push(c.currIndent);
@@ -77,7 +78,6 @@ list<Token> nextExpr(CodeStream& c) {
       else {
         result.push_back(curr);
       }
-      ++numWordsInLine;
     }
     else { // curr.isIndent()
       if (!line.empty()) {
