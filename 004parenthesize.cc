@@ -22,6 +22,8 @@ list<Token> nextExpr(istream& i) {
   stack<long> implicitParenStack;   // parens we inserted
 
   if (!in.atStartOfLine) {
+    // multiple exprs on a single line
+    // retreat to indent-insensitive mode
     while (!in.fd.eof()) {
       Token curr = nextToken(in);
       if (curr.newline || curr.isIndent()) {
@@ -48,7 +50,7 @@ list<Token> nextExpr(istream& i) {
 
   long thisLineIndent = skipInitialNewlinesToFirstIndent(in);
 
-  list<Token> line;
+  list<Token> buffer;   // when you might need to insert an implicit paren
   long numWordsInLine = 0;
   bool parenAtStartOfLine = false;
   while (!in.fd.eof()) {
@@ -60,7 +62,7 @@ list<Token> nextExpr(istream& i) {
     }
     else if (curr.isQuoteOrUnquote()) {
       if (numWordsInLine < 2)
-        line.push_back(curr);
+        buffer.push_back(curr);
       else
         result.push_back(curr);
     }
@@ -68,16 +70,16 @@ list<Token> nextExpr(istream& i) {
       if (!parenAtStartOfLine)
         parenAtStartOfLine = (curr == "(" && numWordsInLine == 0);
       if (numWordsInLine < 2 && openExplicitParens == 0 && !parenAtStartOfLine) {
-        line.push_back(curr);
+        buffer.push_back(curr);
       }
       else {
-        for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
+        for (list<Token>::iterator p = buffer.begin(); p != buffer.end(); ++p) {
           result.push_back(*p);
           if (*p == "(") ++openExplicitParens;
           if (*p == ")") --openExplicitParens;
           if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
         }
-        line.clear();
+        buffer.clear();
 
         result.push_back(curr);
         if (curr == "(") ++openExplicitParens;
@@ -91,7 +93,7 @@ list<Token> nextExpr(istream& i) {
     else if (!curr.isIndent()) { // curr is a 'word' token
       ++numWordsInLine;
       if (numWordsInLine < 2) {
-        line.push_back(curr);
+        buffer.push_back(curr);
       }
       else if (numWordsInLine == 2) {
         if (openExplicitParens == 0 && !parenAtStartOfLine) {
@@ -99,13 +101,13 @@ list<Token> nextExpr(istream& i) {
           implicitParenStack.push(thisLineIndent);
         }
 
-        for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
+        for (list<Token>::iterator p = buffer.begin(); p != buffer.end(); ++p) {
           result.push_back(*p);
           if (*p == "(") ++openExplicitParens;
           if (*p == ")") --openExplicitParens;
           if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
         }
-        line.clear();
+        buffer.clear();
 
         result.push_back(curr);
       }
@@ -115,14 +117,14 @@ list<Token> nextExpr(istream& i) {
     }
     else { // curr.isIndent()
       long nextLineIndent = curr.indentLevel;
-      if (!line.empty()) {
-        for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
+      if (!buffer.empty()) {
+        for (list<Token>::iterator p = buffer.begin(); p != buffer.end(); ++p) {
           result.push_back(*p);
           if (*p == "(") ++openExplicitParens;
           if (*p == ")") --openExplicitParens;
           if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
         }
-        line.clear();
+        buffer.clear();
       }
 
       while (!implicitParenStack.empty() && nextLineIndent <= implicitParenStack.top()) {
@@ -145,9 +147,9 @@ list<Token> nextExpr(istream& i) {
     }
   }
 
-  for (list<Token>::iterator p = line.begin(); p != line.end(); ++p)
+  for (list<Token>::iterator p = buffer.begin(); p != buffer.end(); ++p)
     result.push_back(*p);
-  line.clear();
+  buffer.clear();
 
   for (unsigned long i=0; i < implicitParenStack.size(); ++i)
     result.push_back(Token(")"));

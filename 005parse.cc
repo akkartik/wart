@@ -111,7 +111,6 @@ Token nextNonWhitespaceToken(istream& in) {
   return eof();
 }
 
-// whitespace-insensitive
 Token nextToken(istream& in) {
   IndentSensitiveStream cs(in);
   return nextToken(cs);
