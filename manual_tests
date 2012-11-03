@@ -2,63 +2,43 @@ I. ctrl-d quits
 ^D
 
 II. 2 newlines eval
-1<Enter>
+prn 3<Enter>
 <Enter>
-=> 1
+3
+=> 3
 
-III. Indent-based multi-line form
+III. Fully-parenthesized form immediately evals
+(prn "world")<Enter>
+=> "world"
+34<Enter>
+=> 34
+
+IV. Indent-based multi-line form
 def (foo)<Enter>
   34<Enter>
 <Enter>
 => (object function ..)
 
-IV. Manually load a .wart file at the repl.
-
-V. Add a comment at the end of one of the .wart files.
-$ wart test
-
-VI. Add a comment at the prompt.
+V. Add a comment at the prompt.
 (prn "world") # this is a comment!<Enter>
-<Enter>
 
-VII. Multiple lines at the prompt:
-34<Enter>
-(prn "hi")<Enter>
-=> 34
-<Enter>
-hi
-=> "hi"
-
-VIII. Two expressions on a single line:
+VI. Two expressions on a single line:
 () 34<Enter>
-<Enter>
 => nil
 => 34
 
-IX. Comment on the first line:
+VII. Comments and newlines silently wait for next input
 # skip<Enter>
-<Enter>
-=> nil
 
-X. Comment after whitespace, followed by empty line:
-  # skip<Enter>
-<Enter>
-=> nil
-
-XI. Comment after newline:
-<Enter>
-# skip<Enter>
-=> nil
-
-XII. Partial expr waits to complete:
+VIII. Partial expr waits to complete:
 (def (foo)<Enter>
 <Enter>
 34)<Enter>
 => (object function ..)
 
-XIII. Expr and partial expr and comment:
+IX. Expr and partial expr and comment:
 () (def (foo)<Enter>
+=> nil
   34) # abc<Enter>
 <Enter>
-=> nil
 => (object function ..)
