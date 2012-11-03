@@ -15,19 +15,19 @@
 
 #include<assert.h>
 
-list<Token> nextExpr(CodeStream& c) {
+list<Token> nextExpr(CodeStream& cs) {
   list<Token> result;
   long openExplicitParens = 0;  // parens in the original
   stack<long> implicitParenStack;   // parens we inserted
 
-  Token indent = nextToken(c);  // indent token; sets currIndent
+  Token indent = nextToken(cs);  // indent token; sets currIndent
   assert(indent.isIndent() || indent.newline);
 
   list<Token> line;
   long numWordsInLine = 0;
   bool parenAtStartOfLine = false;
-  while (!c.fd.eof()) {
-    Token curr = nextToken(c);
+  while (!cs.fd.eof()) {
+    Token curr = nextToken(cs);
     if (curr.newline) {
     }
     else if (curr.isQuoteOrUnquote()) {
@@ -65,7 +65,7 @@ list<Token> nextExpr(CodeStream& c) {
       else if (numWordsInLine == 2) {
         if (openExplicitParens == 0 && !parenAtStartOfLine) {
           result.push_back(Token("("));
-          implicitParenStack.push(c.currIndent);
+          implicitParenStack.push(cs.currIndent);
         }
 
         for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
@@ -93,16 +93,16 @@ list<Token> nextExpr(CodeStream& c) {
         line.clear();
       }
 
-      while (!implicitParenStack.empty() && c.currIndent <= implicitParenStack.top()) {
+      while (!implicitParenStack.empty() && cs.currIndent <= implicitParenStack.top()) {
         result.push_back(Token(")"));
         implicitParenStack.pop();
       }
 
       if (implicitParenStack.empty() && openExplicitParens == 0) {
-        if (!c.fd.eof())
-          for (int i = 0; i < c.currIndent; ++i)
-            c.fd.putback(' ');
-        c.atStartOfLine = true;
+        if (!cs.fd.eof())
+          for (int i = 0; i < cs.currIndent; ++i)
+            cs.fd.putback(' ');
+        cs.atStartOfLine = true;
         break;
       }
 
