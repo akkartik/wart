@@ -90,14 +90,6 @@ list<Token> nextExpr(CodeStream& c) {
         line.clear();
       }
 
-      if (implicitParenStack.empty() && openExplicitParens == 0) {
-        if (!c.fd.eof())
-          for (int i = 0; i < c.currIndent; ++i)
-            c.fd.putback(' ');
-        c.atStartOfLine = true;
-        break;
-      }
-
       while (!implicitParenStack.empty() && c.currIndent <= implicitParenStack.top()) {
         result.push_back(Token(")"));
         implicitParenStack.pop();
