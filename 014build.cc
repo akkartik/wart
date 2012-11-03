@@ -1,10 +1,9 @@
 //// construct parse tree out of cells
 
-Cell* nextRawCell(CodeStream cs) {
-  if (cs.bufferedTokens.empty()) {
-    cs.fd.peek();
-    if (cs.fd.eof()) return nil;
-  }
+Cell* nextRawCell(istream& in) {
+  in.peek();
+  if (in.eof()) return nil;
+  CodeStream cs(in);
   return buildCell(transformInfix(nextAstNode(cs)));
 }
 

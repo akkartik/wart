@@ -51,19 +51,9 @@ int main(int argc, unused char* argv[]) {
   }
 }
 
-struct CodeStream {
-  istream& fd;
-  // miscellaneous state that needs buffering while reading wart code
-  bool atStartOfLine;
-  list<Token> bufferedTokens;
-  CodeStream(istream& in) :fd(in), atStartOfLine(true) { fd >> std::noskipws; }
-  bool eof() { return fd.eof(); }
-};
-
 // read: tokenize, parenthesize, parse, transform infix, build cells, transform $vars
 Cell* read(istream& in) {
-  CodeStream cs(in);
-  return mkref(transformDollarVars(nextRawCell(cs)));
+  return mkref(transformDollarVars(nextRawCell(in)));
 }
 
 
@@ -150,8 +140,7 @@ void interactive_setup() {
 }
 
 // helper to read from string
+// leaks memory so don't overuse it; mostly for tests
 stringstream& stream(string s) {
-  stringstream& result = *new stringstream(s);
-  result << std::noskipws;
-  return result;
+  return *new stringstream(s);
 }

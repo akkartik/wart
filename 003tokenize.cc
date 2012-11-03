@@ -60,6 +60,15 @@ struct Token {
   }
 };
 
+struct CodeStream {
+  istream& fd;
+  // miscellaneous state that needs buffering while reading wart code
+  bool atStartOfLine;
+  list<Token> bufferedTokens;
+  CodeStream(istream& in) :fd(in), atStartOfLine(true) { fd >> std::noskipws; }
+  bool eof() { return fd.eof(); }
+};
+
 Token nextToken(CodeStream& cs) {
   if (cs.atStartOfLine) {
     if (cs.fd.peek() == '#')
