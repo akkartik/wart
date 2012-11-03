@@ -73,13 +73,7 @@ list<Token> nextExpr(istream& i) {
         buffer.push_back(curr);
       }
       else {
-        for (list<Token>::iterator p = buffer.begin(); p != buffer.end(); ++p) {
-          result.push_back(*p);
-          if (*p == "(") ++openExplicitParens;
-          if (*p == ")") --openExplicitParens;
-          if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
-        }
-        buffer.clear();
+        flush(buffer, result, openExplicitParens);
 
         result.push_back(curr);
         if (curr == "(") ++openExplicitParens;
@@ -101,14 +95,7 @@ list<Token> nextExpr(istream& i) {
           implicitParenStack.push(thisLineIndent);
         }
 
-        for (list<Token>::iterator p = buffer.begin(); p != buffer.end(); ++p) {
-          result.push_back(*p);
-          if (*p == "(") ++openExplicitParens;
-          if (*p == ")") --openExplicitParens;
-          if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
-        }
-        buffer.clear();
-
+        flush(buffer, result, openExplicitParens);
         result.push_back(curr);
       }
       else {
@@ -117,15 +104,7 @@ list<Token> nextExpr(istream& i) {
     }
     else { // curr.isIndent()
       long nextLineIndent = curr.indentLevel;
-      if (!buffer.empty()) {
-        for (list<Token>::iterator p = buffer.begin(); p != buffer.end(); ++p) {
-          result.push_back(*p);
-          if (*p == "(") ++openExplicitParens;
-          if (*p == ")") --openExplicitParens;
-          if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
-        }
-        buffer.clear();
-      }
+      flush(buffer, result, openExplicitParens);
 
       while (!implicitParenStack.empty() && nextLineIndent <= implicitParenStack.top()) {
         result.push_back(Token(")"));
@@ -159,6 +138,16 @@ list<Token> nextExpr(istream& i) {
 
 
 // Internals.
+
+void flush(list<Token>& buffer, list<Token>& out, long& openExplicitParens) {
+  for (list<Token>::iterator p = buffer.begin(); p != buffer.end(); ++p) {
+    out.push_back(*p);
+    if (*p == "(") ++openExplicitParens;
+    if (*p == ")") --openExplicitParens;
+    if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
+  }
+  buffer.clear();
+}
 
 #include<assert.h>
 
