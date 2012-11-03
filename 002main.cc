@@ -29,16 +29,6 @@
 // Read is the time for optimizations, when subsidiary functions can be
 // specialized to a specific call-site.
 
-struct CodeStream {
-  istream& fd;
-  // miscellaneous state that needs buffering while reading wart code
-  bool atStartOfLine;
-  list<Token> bufferedTokens;
-  CodeStream(istream& in) :fd(in), atStartOfLine(true) { fd >> std::noskipws; }
-  bool eof() { return fd.eof(); }
-};
-CodeStream STDIN(cin);
-
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
     runTests();
@@ -49,8 +39,8 @@ int main(int argc, unused char* argv[]) {
   interactive_setup();
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (true) {
-    Cell* form = read(STDIN);
-    if (STDIN.eof()) return 0;
+    Cell* form = read(cin);
+    if (cin.eof()) return 0;
     Cell* result = eval(form);
     cout << "=> " << result << endl;
 
@@ -61,8 +51,18 @@ int main(int argc, unused char* argv[]) {
   }
 }
 
+struct CodeStream {
+  istream& fd;
+  // miscellaneous state that needs buffering while reading wart code
+  bool atStartOfLine;
+  list<Token> bufferedTokens;
+  CodeStream(istream& in) :fd(in), atStartOfLine(true) { fd >> std::noskipws; }
+  bool eof() { return fd.eof(); }
+};
+
 // read: tokenize, parenthesize, parse, transform infix, build cells, transform $vars
-Cell* read(CodeStream& cs) {
+Cell* read(istream& in) {
+  CodeStream cs(in);
   return mkref(transformDollarVars(nextRawCell(cs)));
 }
 
