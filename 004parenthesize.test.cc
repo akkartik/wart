@@ -11,6 +11,21 @@ void test_parenthesize_handles_lines_with_initial_parens() {
   check(cs.eof());
 }
 
+void test_parenthesize_handles_lines_with_initial_parens2() {
+  CodeStream cs(stream("(a (b c))"));
+  list<Token> tokens = nextExpr(cs);
+  list<Token>::iterator p = tokens.begin();
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, "c"); ++p;
+  checkEq(*p, ")"); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == tokens.end());
+  check(cs.eof());
+}
+
 void test_parenthesize_skips_indent_tokens() {
   CodeStream cs(stream("  (a\tb c)"));
   list<Token> tokens = nextExpr(cs);
@@ -105,6 +120,37 @@ void test_parenthesize_groups_words_on_single_line() {
   checkEq(*p, "a"); ++p;
   checkEq(*p, "b"); ++p;
   checkEq(*p, "c"); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == tokens.end());
+  check(cs.eof());
+}
+
+void test_parenthesize_groups_words_on_single_line2() {
+  CodeStream cs(stream("a (b c)"));
+  list<Token> tokens = nextExpr(cs);
+  list<Token>::iterator p = tokens.begin();
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, "c"); ++p;
+  checkEq(*p, ")"); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == tokens.end());
+  check(cs.eof());
+}
+
+void test_parenthesize_groups_words_on_single_line3() {
+  CodeStream cs(stream("a `(b c)"));
+  list<Token> tokens = nextExpr(cs);
+  list<Token>::iterator p = tokens.begin();
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "`"); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, "c"); ++p;
+  checkEq(*p, ")"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
   check(cs.eof());

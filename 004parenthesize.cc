@@ -18,13 +18,10 @@ list<Token> nextExpr(CodeStream& c) {
   long openExplicitParens = 0;  // parens in the original
   stack<long> implicitParenStack;   // parens we inserted
 
-  debug = 1;
   dbg << "--- nextExpr\n";
-//?   if (c.currIndent == -1) {
-    dbg << "consuming indent token\n";
-    Token indent = nextToken(c);  // indent token; sets currIndent
-    dbg << "is it indent? " << indent << endl;
-//?   }
+  dbg << "consuming indent token\n";
+  Token indent = nextToken(c);  // indent token; sets currIndent
+  dbg << "is it indent? " << indent << endl;
   dbg << "currIndent " << c.currIndent << endl;
 
   list<Token> line;
@@ -39,6 +36,9 @@ list<Token> nextExpr(CodeStream& c) {
         for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
           dbg << "unbuffering1 " << *p << endl;
           result.push_back(*p);
+          if (*p == "(") ++openExplicitParens;
+          if (*p == ")") --openExplicitParens;
+          if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
         }
         line.clear();
 
@@ -47,7 +47,7 @@ list<Token> nextExpr(CodeStream& c) {
       }
     }
     else if (curr.isQuoteOrUnquote()) {
-      if (numWordsInLine < 1) {
+      if (numWordsInLine < 2) {
         dbg << "buffering1 " << curr << endl;
         line.push_back(curr);
       }
@@ -60,24 +60,28 @@ list<Token> nextExpr(CodeStream& c) {
       if (numWordsInLine < 2) {
         dbg << "buffering2 " << curr << endl;
         line.push_back(curr);
+        if (!parenAtStartOfLine)
+          parenAtStartOfLine = (curr == "(" && numWordsInLine == 0);
       }
       else {
         for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
-          dbg << "unbuffering2 " << *p << endl;
+          dbg << "unbuffering5 " << *p << endl;
           result.push_back(*p);
+          if (*p == "(") ++openExplicitParens;
+          if (*p == ")") --openExplicitParens;
+          if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
         }
         line.clear();
 
         dbg << "adding2 " << curr << endl;
         result.push_back(curr);
+        if (curr == "(") ++openExplicitParens;
+        if (curr == ")") --openExplicitParens;
+        if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
       }
-      parenAtStartOfLine = (curr == "(" && numWordsInLine == 0);
-      if (curr == "(") ++openExplicitParens;
-      if (curr == ")") --openExplicitParens;
-      if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
     }
     else if (!curr.isIndent()) { // curr is a 'word' token
-      dbg << "word\n";
+      dbg << "word " << numWordsInLine << ": " << curr << endl;
       if (numWordsInLine < 1) {
         dbg << "buffering3 " << curr << endl;
         line.push_back(curr);
@@ -92,6 +96,9 @@ list<Token> nextExpr(CodeStream& c) {
         for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
           dbg << "unbuffering2 " << *p << endl;
           result.push_back(*p);
+          if (*p == "(") ++openExplicitParens;
+          if (*p == ")") --openExplicitParens;
+          if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
         }
         line.clear();
 
@@ -103,8 +110,7 @@ list<Token> nextExpr(CodeStream& c) {
         result.push_back(curr);
       }
       ++numWordsInLine;
-      if (numWordsInLine < 2)
-        dbg << curr << " -- words in line now " << numWordsInLine << endl;
+      dbg << curr << " -- words in line now " << numWordsInLine << endl;
     }
     else { // curr.isIndent()
       dbg << "indent now " << c.currIndent << endl;
@@ -112,6 +118,9 @@ list<Token> nextExpr(CodeStream& c) {
         for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
           dbg << "unbuffering3 " << *p << endl;
           result.push_back(*p);
+          if (*p == "(") ++openExplicitParens;
+          if (*p == ")") --openExplicitParens;
+          if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
         }
         line.clear();
       }
