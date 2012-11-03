@@ -1,20 +1,17 @@
 void test_parse_handles_empty_stream() {
   CodeStream cs(stream(""));
   checkEq(nextAstNode(cs), eof());
-  check(cs.eof());
 }
 
 void test_parse_handles_trailing_comment() {
   CodeStream cs(stream("34 # abc"));
   checkEq(nextAstNode(cs), Token("34"));
   checkEq(nextAstNode(cs), eof());
-  check(cs.eof());
 }
 
 void test_parse_handles_atom() {
   CodeStream cs(stream("34"));
   checkEq(nextAstNode(cs), Token("34"));
-  check(cs.eof());
 }
 
 void test_parse_handles_atoms() {
@@ -23,7 +20,6 @@ void test_parse_handles_atoms() {
   checkEq(nextAstNode(cs), Token("\"a b c\""));
   checkEq(nextAstNode(cs), Token("3.4"));
   checkEq(nextAstNode(cs), eof());
-  check(cs.eof());
 }
 
 void test_parse_handles_forms() {
@@ -37,7 +33,6 @@ void test_parse_handles_forms() {
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
   checkEq(nextAstNode(cs), eof());
-  check(cs.eof());
 }
 
 void test_parse_handles_nested_forms() {
@@ -60,7 +55,6 @@ void test_parse_handles_nested_forms() {
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
   checkEq(nextAstNode(cs), eof());
-  check(cs.eof());
 }
 
 void test_parse_handles_nested_forms_with_comments() {
@@ -83,7 +77,6 @@ void test_parse_handles_nested_forms_with_comments() {
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
   checkEq(nextAstNode(cs), eof());
-  check(cs.eof());
 }
 
 void test_parse_handles_quotes() {
@@ -133,7 +126,6 @@ void test_parse_handles_quotes() {
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
   checkEq(nextAstNode(cs), eof());
-  check(cs.eof());
 }
 
 void test_parse_handles_splice_operators() {
@@ -160,7 +152,6 @@ void test_parse_handles_splice_operators() {
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
   checkEq(nextAstNode(cs), eof());
-  check(cs.eof());
 }
 
 void test_parse_handles_indented_toplevel_forms() {
@@ -181,5 +172,4 @@ void test_parse_handles_indented_toplevel_forms() {
   checkEq(p->atom.token, ")"); ++p;
   check(p == n.elems.end());
   checkEq(nextAstNode(cs), eof());
-  check(cs.eof());
 }
