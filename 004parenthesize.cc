@@ -84,14 +84,15 @@ list<Token> nextExpr(istream& i) {
       if (numWordsInLine < 2) {
         buffer.push_back(curr);
       }
-      else {
-        if (numWordsInLine == 2) {
-          if (openExplicitParens == 0 && !parenAtStartOfLine) {
-            result.push_back(Token("("));
-            implicitParenStack.push(thisLineIndent);
-          }
-          emitAll(buffer, result, openExplicitParens);
+      else if (numWordsInLine == 2) {
+        if (openExplicitParens == 0 && !parenAtStartOfLine) {
+          result.push_back(Token("("));
+          implicitParenStack.push(thisLineIndent);
         }
+        emitAll(buffer, result, openExplicitParens);
+        emit(curr, result, openExplicitParens);
+      }
+      else {  // later words
         emit(curr, result, openExplicitParens);
       }
     }
@@ -104,10 +105,7 @@ list<Token> nextExpr(istream& i) {
       }
 
       if (implicitParenStack.empty() && openExplicitParens == 0) {
-        if (!in.fd.eof())
-          for (int i = 0; i < nextLineIndent; ++i)
-            in.fd.putback(' ');
-        in.atStartOfLine = true;
+        restoreIndent(nextLineIndent, in);
         break;
       }
 
@@ -139,6 +137,13 @@ void emitAll(list<Token>& buffer, list<Token>& out, long& openExplicitParens) {
   for (list<Token>::iterator p = buffer.begin(); p != buffer.end(); ++p)
     emit(*p, out, openExplicitParens);
   buffer.clear();
+}
+
+void restoreIndent(long indent, IndentSensitiveStream& in) {
+  if (in.fd.eof()) return;
+  for (int i = 0; i < indent; ++i)
+    in.fd.putback(' ');
+  in.atStartOfLine = true;
 }
 
 #include<assert.h>
