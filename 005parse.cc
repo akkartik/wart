@@ -39,7 +39,7 @@ struct AstNode {
 struct TokenBufferedStream {
   istream& fd;
   list<Token> bufferedTokens;
-  TokenBufferedStream(istream& in) :fd(in) { fd >> std::noskipws; }
+  TokenBufferedStream(istream& in) :fd(in) {}
   bool eof() { return fd.eof(); }
 };
 
