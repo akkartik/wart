@@ -39,19 +39,19 @@ struct AstNode {
   }
 };
 
-AstNode nextAstNode(CodeStream& c) {
-  Token curr = nextParenInsertedToken(c);
+AstNode nextAstNode(CodeStream& cs) {
+  Token curr = nextParenInsertedToken(cs);
   if (curr != "(" && !curr.isQuoteOrUnquote())
     return AstNode(curr);
 
   list<AstNode> subform;
   subform.push_back(AstNode(curr));
   while (!eof(subform.back()) && subform.back().atom.isQuoteOrUnquote())
-    subform.push_back(AstNode(nextParenInsertedToken(c)));
+    subform.push_back(AstNode(nextParenInsertedToken(cs)));
 
   if (subform.back() == "(") {
     while (!eof(subform.back()) && subform.back().atom != ")")
-      subform.push_back(nextAstNode(c));
+      subform.push_back(nextAstNode(cs));
     if (eof(subform.back())) RAISE << "Unbalanced (" << endl << DIE;
   }
 
@@ -62,9 +62,9 @@ AstNode nextAstNode(CodeStream& c) {
 
 // internals
 
-Token nextNonWhitespaceToken(CodeStream& c) {
-  while (!c.eof()) {
-    Token curr = nextToken(c);
+Token nextNonWhitespaceToken(CodeStream& cs) {
+  while (!cs.eof()) {
+    Token curr = nextToken(cs);
     if (!curr.isIndent()) return curr;
   }
   return eof();
@@ -72,8 +72,8 @@ Token nextNonWhitespaceToken(CodeStream& c) {
 
 list<Token> bufferedTokens;
 
-Token nextParenInsertedToken(CodeStream& c) {
-  if (bufferedTokens.empty()) bufferedTokens = nextExpr(c);
+Token nextParenInsertedToken(CodeStream& cs) {
+  if (bufferedTokens.empty()) bufferedTokens = nextExpr(cs);
   if (bufferedTokens.empty()) return eof();
   Token result = bufferedTokens.front();
   bufferedTokens.pop_front();

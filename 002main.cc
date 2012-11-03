@@ -61,8 +61,8 @@ int main(int argc, unused char* argv[]) {
 }
 
 // read: tokenize, parenthesize, parse, transform infix, build cells, transform $vars
-Cell* read(CodeStream& c) {
-  return mkref(transformDollarVars(nextRawCell(c)));
+Cell* read(CodeStream& cs) {
+  return mkref(transformDollarVars(nextRawCell(cs)));
 }
 
 

@@ -18,9 +18,9 @@ void loadFiles(const char* ext) {
 void loadFile(const char* filename) {
   ifstream f(filename);
   if (f.fail()) return;
-  CodeStream c(f);
-  while (!c.eof()) {
-    Cell* cell = read(c);
+  CodeStream cs(f);
+  while (!cs.eof()) {
+    Cell* cell = read(cs);
 //?     cerr << cell << endl;   // uncomment this to track down errors in wart files
     rmref(eval(cell));
     rmref(cell);
