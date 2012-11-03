@@ -18,23 +18,16 @@ list<Token> nextExpr(CodeStream& c) {
   long openExplicitParens = 0;  // parens in the original
   stack<long> implicitParenStack;   // parens we inserted
 
-  dbg << "--- nextExpr\n";
-  dbg << "consuming indent token\n";
   Token indent = nextToken(c);  // indent token; sets currIndent
-  dbg << "is it indent? " << indent << endl;
-  dbg << "currIndent " << c.currIndent << endl;
 
   list<Token> line;
   long numWordsInLine = 0;
   bool parenAtStartOfLine = false;
   while (!c.fd.eof()) {
     Token curr = nextToken(c);
-    dbg << "token: " << curr << endl;
     if (curr.newline) {
-      dbg << "newline\n";
       if (!line.empty()) {
         for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
-          dbg << "unbuffering1 " << *p << endl;
           result.push_back(*p);
           if (*p == "(") ++openExplicitParens;
           if (*p == ")") --openExplicitParens;
@@ -47,25 +40,19 @@ list<Token> nextExpr(CodeStream& c) {
       }
     }
     else if (curr.isQuoteOrUnquote()) {
-      if (numWordsInLine < 2) {
-        dbg << "buffering1 " << curr << endl;
+      if (numWordsInLine < 2)
         line.push_back(curr);
-      }
-      else {
-        dbg << "adding1 " << curr << endl;
+      else
         result.push_back(curr);
-      }
     }
     else if (curr.isParen()) {
       if (numWordsInLine < 2) {
-        dbg << "buffering2 " << curr << endl;
         line.push_back(curr);
         if (!parenAtStartOfLine)
           parenAtStartOfLine = (curr == "(" && numWordsInLine == 0);
       }
       else {
         for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
-          dbg << "unbuffering5 " << *p << endl;
           result.push_back(*p);
           if (*p == "(") ++openExplicitParens;
           if (*p == ")") --openExplicitParens;
@@ -73,7 +60,6 @@ list<Token> nextExpr(CodeStream& c) {
         }
         line.clear();
 
-        dbg << "adding2 " << curr << endl;
         result.push_back(curr);
         if (curr == "(") ++openExplicitParens;
         if (curr == ")") --openExplicitParens;
@@ -81,20 +67,16 @@ list<Token> nextExpr(CodeStream& c) {
       }
     }
     else if (!curr.isIndent()) { // curr is a 'word' token
-      dbg << "word " << numWordsInLine << ": " << curr << endl;
       if (numWordsInLine < 1) {
-        dbg << "buffering3 " << curr << endl;
         line.push_back(curr);
       }
       else if (numWordsInLine == 1) {
         if (openExplicitParens == 0 && !parenAtStartOfLine) {
-          dbg << "inserting implicit (\n";
           result.push_back(Token("("));
           implicitParenStack.push(c.currIndent);
         }
 
         for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
-          dbg << "unbuffering2 " << *p << endl;
           result.push_back(*p);
           if (*p == "(") ++openExplicitParens;
           if (*p == ")") --openExplicitParens;
@@ -102,21 +84,16 @@ list<Token> nextExpr(CodeStream& c) {
         }
         line.clear();
 
-        dbg << "adding3 " << curr << endl;
         result.push_back(curr);
       }
       else {
-        dbg << "adding4 " << curr << endl;
         result.push_back(curr);
       }
       ++numWordsInLine;
-      dbg << curr << " -- words in line now " << numWordsInLine << endl;
     }
     else { // curr.isIndent()
-      dbg << "indent now " << c.currIndent << endl;
       if (!line.empty()) {
         for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
-          dbg << "unbuffering3 " << *p << endl;
           result.push_back(*p);
           if (*p == "(") ++openExplicitParens;
           if (*p == ")") --openExplicitParens;
@@ -134,7 +111,6 @@ list<Token> nextExpr(CodeStream& c) {
       }
 
       while (!implicitParenStack.empty() && c.currIndent <= implicitParenStack.top()) {
-        dbg << "inserting implicit )\n";
         result.push_back(Token(")"));
         implicitParenStack.pop();
       }
@@ -153,46 +129,11 @@ list<Token> nextExpr(CodeStream& c) {
     }
   }
 
-  dbg << "wrapping up\n";
-  for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
-    dbg << "unbuffering4 " << *p << endl;
+  for (list<Token>::iterator p = line.begin(); p != line.end(); ++p)
     result.push_back(*p);
-  }
   line.clear();
 
-  for (unsigned long i=0; i < implicitParenStack.size(); ++i) {
-    dbg << "inserting2 implicit )\n";
+  for (unsigned long i=0; i < implicitParenStack.size(); ++i)
     result.push_back(Token(")"));
-  }
   return result;
-}
-
-
-
-// internals
-
-long numWordsInLine(list<Token> line) {
-  long numWords = 0;
-  for (list<Token>::iterator p = line.begin(); p != line.end(); ++p)
-    if (!p->isIndent() && !p->newline && !p->isParen() && !p->isQuoteOrUnquote())
-      ++numWords;
-  return numWords;
-}
-
-void add(list<Token>& l, Token x) {
-  if (!x.isIndent() && !x.newline)
-    l.push_back(x);
-}
-
-list<Token>::iterator firstNonQuote(list<Token>& line) {
-  for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
-    if (!p->isIndent() && !p->isQuoteOrUnquote())
-      return p;
-  }
-  return line.end();
-}
-
-bool noParenAtStart(list<Token> line) {
-  list<Token>::iterator p = firstNonQuote(line);
-  return p != line.end() && *p != "(";
 }
