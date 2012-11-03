@@ -26,18 +26,6 @@ list<Token> nextExpr(CodeStream& c) {
   while (!c.fd.eof()) {
     Token curr = nextToken(c);
     if (curr.newline) {
-      if (!line.empty()) {
-        for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
-          result.push_back(*p);
-          if (*p == "(") ++openExplicitParens;
-          if (*p == ")") --openExplicitParens;
-          if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
-        }
-        line.clear();
-
-        if (implicitParenStack.empty() && openExplicitParens == 0)
-          break;
-      }
     }
     else if (curr.isQuoteOrUnquote()) {
       if (numWordsInLine < 2)
