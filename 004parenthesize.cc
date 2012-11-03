@@ -13,7 +13,8 @@
 //    so ignore indent inside backquote
 //  performs flow control at the repl, decides when to show the prompt again
 
-list<Token> nextExpr(CodeStream& cs) {
+list<Token> nextExpr(istream& in) {
+  CodeStream cs(in);
   list<Token> result;
   long openExplicitParens = 0;  // parens in the original
   stack<long> implicitParenStack;   // parens we inserted
