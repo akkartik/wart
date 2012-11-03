@@ -13,17 +13,17 @@
 //    so ignore indent inside backquote
 //  performs flow control at the repl, decides when to show the prompt again
 
-list<Token> nextExpr(istream& in) {
-  CodeStream cs(in);
+list<Token> nextExpr(istream& i) {
   list<Token> result;
+  if (i.eof()) return result;
+
+  IndentSensitiveStream in(i);
   long openExplicitParens = 0;  // parens in the original
   stack<long> implicitParenStack;   // parens we inserted
 
-  if (cs.fd.eof()) return result;
-
-  if (!cs.atStartOfLine) {
-    while (!cs.fd.eof()) {
-      Token curr = nextToken(cs);
+  if (!in.atStartOfLine) {
+    while (!in.fd.eof()) {
+      Token curr = nextToken(in);
       if (curr.newline || curr.isIndent()) {
       }
       else if (curr.isQuoteOrUnquote()) {
@@ -46,13 +46,13 @@ list<Token> nextExpr(istream& in) {
     return result;
   }
 
-  long thisLineIndent = skipInitialNewlinesToFirstIndent(cs);
+  long thisLineIndent = skipInitialNewlinesToFirstIndent(in);
 
   list<Token> line;
   long numWordsInLine = 0;
   bool parenAtStartOfLine = false;
-  while (!cs.fd.eof()) {
-    Token curr = nextToken(cs);
+  while (!in.fd.eof()) {
+    Token curr = nextToken(in);
     if (curr.newline) {
     }
     else if (curr.isQuoteOrUnquote()) {
@@ -128,10 +128,10 @@ list<Token> nextExpr(istream& in) {
       }
 
       if (implicitParenStack.empty() && openExplicitParens == 0) {
-        if (!cs.fd.eof())
+        if (!in.fd.eof())
           for (int i = 0; i < nextLineIndent; ++i)
-            cs.fd.putback(' ');
-        cs.atStartOfLine = true;
+            in.fd.putback(' ');
+        in.atStartOfLine = true;
         break;
       }
 
@@ -157,9 +157,9 @@ list<Token> nextExpr(istream& in) {
 
 #include<assert.h>
 
-long skipInitialNewlinesToFirstIndent(CodeStream& cs) {
+long skipInitialNewlinesToFirstIndent(IndentSensitiveStream& in) {
   for (;;) {
-    Token token = nextToken(cs);
+    Token token = nextToken(in);
     if (token.isIndent()) return token.indentLevel;
     assert(token.newline);
   }

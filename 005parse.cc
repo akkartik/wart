@@ -1,8 +1,5 @@
 //// construct parse tree out of tokens
 
-// To disable whitespace-sensitivity, replace calls to nextParenInsertedToken
-// with nextNonWhitespaceToken.
-
 // Currently ,@(list x) creates a flat list: ,@ ( list x )
 // Equally valid to have it create a 2 level list: ,@ followed by ( list x )
 // Would require changing build phase appropriately.
@@ -74,14 +71,6 @@ AstNode nextAstNode(TokenBufferedStream& in) {
 
 // internals
 
-Token nextNonWhitespaceToken(istream& in) {
-  while (!in.eof()) {
-    Token curr = nextToken(in);
-    if (!curr.isIndent()) return curr;
-  }
-  return eof();
-}
-
 Token nextParenInsertedToken(TokenBufferedStream& in) {
   if (in.bufferedTokens.empty()) in.bufferedTokens = nextExpr(in.fd);
   if (in.bufferedTokens.empty()) return eof();
@@ -107,4 +96,23 @@ ostream& operator<<(ostream& os, AstNode x) {
     os << *p;
   }
   return os;
+}
+
+
+
+// To disable whitespace-sensitivity, replace calls to nextParenInsertedToken
+// with nextNonWhitespaceToken.
+
+Token nextNonWhitespaceToken(istream& in) {
+  while (!in.eof()) {
+    Token curr = nextToken(in);
+    if (!curr.isIndent()) return curr;
+  }
+  return eof();
+}
+
+// whitespace-insensitive
+Token nextToken(istream& in) {
+  IndentSensitiveStream cs(in);
+  return nextToken(cs);
 }

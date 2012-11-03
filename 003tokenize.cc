@@ -60,15 +60,14 @@ struct Token {
   }
 };
 
-struct CodeStream {
+struct IndentSensitiveStream {
   istream& fd;
-  // miscellaneous state that needs buffering while reading wart code
   bool atStartOfLine;
-  CodeStream(istream& in) :fd(in), atStartOfLine(true) { fd >> std::noskipws; }
+  IndentSensitiveStream(istream& in) :fd(in), atStartOfLine(true) { fd >> std::noskipws; }
   bool eof() { return fd.eof(); }
 };
 
-Token nextToken(CodeStream& cs) {
+Token nextToken(IndentSensitiveStream& cs) {
   if (cs.atStartOfLine) {
     if (cs.fd.peek() == '#')
       skipComment(cs.fd);
@@ -191,10 +190,4 @@ ostream& operator<<(ostream& os, Token y) {
   if (y.newline) return os << "\\n";
   if (y == "") return os << ":" << y.indentLevel;
   else return os << y.token;
-}
-
-// whitespace-insensitive
-Token nextToken(istream& in) {
-  CodeStream cs(in);
-  return nextToken(cs);
 }
