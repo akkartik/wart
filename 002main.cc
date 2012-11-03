@@ -33,6 +33,7 @@
 struct CodeStream {
   istream& fd;
   bool atStartOfLine;
+  list<Token> bufferedTokens;
   CodeStream(istream& in) :fd(in), atStartOfLine(true) { fd >> std::noskipws; }
   bool eof() { return fd.eof(); }
 };

@@ -1,7 +1,7 @@
 //// construct parse tree out of cells
 
 Cell* nextRawCell(CodeStream cs) {
-  if (bufferedTokens.empty()) {
+  if (cs.bufferedTokens.empty()) {
     cs.fd.peek();
     if (cs.fd.eof()) return nil;
   }
