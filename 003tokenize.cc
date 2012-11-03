@@ -67,43 +67,43 @@ struct IndentSensitiveStream {
   bool eof() { return fd.eof(); }
 };
 
-Token nextToken(IndentSensitiveStream& cs) {
-  if (cs.atStartOfLine) {
-    if (cs.fd.peek() == '#')
-      skipComment(cs.fd);
-    if (cs.fd.peek() == '\n') {
-      cs.fd.get();
+Token nextToken(IndentSensitiveStream& in) {
+  if (in.atStartOfLine) {
+    if (in.fd.peek() == '#')
+      skipComment(in.fd);
+    if (in.fd.peek() == '\n') {
+      in.fd.get();
       return Token::Newline();
     }
-    Token t = Token(indent(cs.fd));
-    if (cs.fd.peek() == '#')
-      skipComment(cs.fd);
-    if (cs.fd.peek() == '\n')
-      return nextToken(cs);
-    cs.atStartOfLine = false;
+    Token t = Token(indent(in.fd));
+    if (in.fd.peek() == '#')
+      skipComment(in.fd);
+    if (in.fd.peek() == '\n')
+      return nextToken(in);
+    in.atStartOfLine = false;
     return t;
   }
 
-  skipWhitespace(cs.fd);
-  if (cs.fd.peek() == '#')
-    skipComment(cs.fd);
-  if (cs.fd.peek() == '\n') {
-    cs.fd.get();
-    cs.atStartOfLine = true;
+  skipWhitespace(in.fd);
+  if (in.fd.peek() == '#')
+    skipComment(in.fd);
+  if (in.fd.peek() == '\n') {
+    in.fd.get();
+    in.atStartOfLine = true;
     return Token::Newline();
   }
 
   ostringstream out;
-  if (cs.fd.peek() == '"')
-    slurpString(cs.fd, out);
-  else if (find(punctuationChars, cs.fd.peek()))
-    slurpChar(cs.fd, out);
-  else if (cs.fd.peek() == ',')
-    slurpUnquote(cs.fd, out);
-  else if (find(quoteAndUnquoteChars, cs.fd.peek()))
-    slurpChar(cs.fd, out);
+  if (in.fd.peek() == '"')
+    slurpString(in.fd, out);
+  else if (find(punctuationChars, in.fd.peek()))
+    slurpChar(in.fd, out);
+  else if (in.fd.peek() == ',')
+    slurpUnquote(in.fd, out);
+  else if (find(quoteAndUnquoteChars, in.fd.peek()))
+    slurpChar(in.fd, out);
   else
-    slurpWord(cs.fd, out);
+    slurpWord(in.fd, out);
 
   return Token(out.str());
 }
