@@ -18,7 +18,7 @@ list<Token> nextExpr(CodeStream& cs) {
   long openExplicitParens = 0;  // parens in the original
   stack<long> implicitParenStack;   // parens we inserted
 
-  skipInitialNewlinesToFirstIndent(cs);
+  long thisLineIndent = skipInitialNewlinesToFirstIndent(cs);
 
   list<Token> line;
   long numWordsInLine = 0;
@@ -62,7 +62,7 @@ list<Token> nextExpr(CodeStream& cs) {
       else if (numWordsInLine == 2) {
         if (openExplicitParens == 0 && !parenAtStartOfLine) {
           result.push_back(Token("("));
-          implicitParenStack.push(cs.currIndent);
+          implicitParenStack.push(thisLineIndent);
         }
 
         for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
@@ -80,6 +80,7 @@ list<Token> nextExpr(CodeStream& cs) {
       }
     }
     else { // curr.isIndent()
+      long nextLineIndent = curr.indentLevel;
       if (!line.empty()) {
         for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
           result.push_back(*p);
@@ -90,20 +91,21 @@ list<Token> nextExpr(CodeStream& cs) {
         line.clear();
       }
 
-      while (!implicitParenStack.empty() && cs.currIndent <= implicitParenStack.top()) {
+      while (!implicitParenStack.empty() && nextLineIndent <= implicitParenStack.top()) {
         result.push_back(Token(")"));
         implicitParenStack.pop();
       }
 
       if (implicitParenStack.empty() && openExplicitParens == 0) {
         if (!cs.fd.eof())
-          for (int i = 0; i < cs.currIndent; ++i)
+          for (int i = 0; i < nextLineIndent; ++i)
             cs.fd.putback(' ');
         cs.atStartOfLine = true;
         break;
       }
 
       // reset
+      thisLineIndent = nextLineIndent;
       numWordsInLine = 0;
       parenAtStartOfLine = false;
     }
@@ -124,10 +126,10 @@ list<Token> nextExpr(CodeStream& cs) {
 
 #include<assert.h>
 
-void skipInitialNewlinesToFirstIndent(CodeStream& cs) {
+long skipInitialNewlinesToFirstIndent(CodeStream& cs) {
   for (;;) {
     Token token = nextToken(cs);
-    if (token.isIndent()) break;
+    if (token.isIndent()) return token.indentLevel;
     assert(token.newline);
   }
 }

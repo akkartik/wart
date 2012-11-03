@@ -32,9 +32,8 @@
 // track indent state when reading code from disk
 struct CodeStream {
   istream& fd;
-  long currIndent;
   bool atStartOfLine;
-  CodeStream(istream& in) :fd(in), currIndent(-1), atStartOfLine(true) { fd >> std::noskipws; }
+  CodeStream(istream& in) :fd(in), atStartOfLine(true) { fd >> std::noskipws; }
   bool eof() { return fd.eof(); }
 };
 CodeStream STDIN(cin);

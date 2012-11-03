@@ -74,7 +74,6 @@ Token nextToken(CodeStream& c) {
     if (c.fd.peek() == '\n')
       return nextToken(c);
     c.atStartOfLine = false;
-    c.currIndent=t.indentLevel;
     return t;
   }
 
