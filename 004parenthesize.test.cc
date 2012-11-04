@@ -1,5 +1,5 @@
 void test_parenthesize_handles_initial_comment() {
-  stringstream in("#a\na b");
+  IndentSensitiveStream in("#a\na b");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -10,7 +10,7 @@ void test_parenthesize_handles_initial_comment() {
 }
 
 void test_parenthesize_handles_lines_with_initial_parens() {
-  stringstream in("(a b c)");
+  IndentSensitiveStream in("(a b c)");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -22,7 +22,7 @@ void test_parenthesize_handles_lines_with_initial_parens() {
 }
 
 void test_parenthesize_handles_lines_with_initial_parens2() {
-  stringstream in("(a (b c))");
+  IndentSensitiveStream in("(a (b c))");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -36,7 +36,7 @@ void test_parenthesize_handles_lines_with_initial_parens2() {
 }
 
 void test_parenthesize_skips_indent_tokens() {
-  stringstream in("  (a\tb c)");
+  IndentSensitiveStream in("  (a\tb c)");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -48,7 +48,7 @@ void test_parenthesize_skips_indent_tokens() {
 }
 
 void test_parenthesize_skips_outdent_tokens() {
-  stringstream in("(a b c\n  bc\n    def\n  gh)");
+  IndentSensitiveStream in("(a b c\n  bc\n    def\n  gh)");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -63,13 +63,13 @@ void test_parenthesize_skips_outdent_tokens() {
 }
 
 void test_parenthesize_preserves_following_indent() {
-  stringstream in("a\n  b");
+  IndentSensitiveStream in("a\n  b");
   nextExpr(in);
-  checkEq(in.peek(), ' ');
+  checkEq(in.fd.peek(), ' ');
 }
 
 void test_parenthesize_handles_fully_parenthesized_expressions_regardless_of_indent() {
-  stringstream in("(a b c\n  (def gh)\n    (i j k)\n  lm\n\n\n    (no p))");
+  IndentSensitiveStream in("(a b c\n  (def gh)\n    (i j k)\n  lm\n\n\n    (no p))");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -95,7 +95,7 @@ void test_parenthesize_handles_fully_parenthesized_expressions_regardless_of_ind
 }
 
 void test_parenthesize_passes_through_single_word_lines() {
-  stringstream in("a");
+  IndentSensitiveStream in("a");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "a"); ++p;
@@ -103,7 +103,7 @@ void test_parenthesize_passes_through_single_word_lines() {
 }
 
 void test_parenthesize_passes_through_single_word_lines2() {
-  stringstream in("a  \nb\nc");
+  IndentSensitiveStream in("a  \nb\nc");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "a"); ++p;
@@ -117,7 +117,7 @@ void test_parenthesize_passes_through_single_word_lines2() {
 }
 
 void test_parenthesize_groups_words_on_single_line() {
-  stringstream in("a b c  ");
+  IndentSensitiveStream in("a b c  ");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -129,7 +129,7 @@ void test_parenthesize_groups_words_on_single_line() {
 }
 
 void test_parenthesize_groups_words_on_single_line2() {
-  stringstream in("a (b c)");
+  IndentSensitiveStream in("a (b c)");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -143,7 +143,7 @@ void test_parenthesize_groups_words_on_single_line2() {
 }
 
 void test_parenthesize_groups_words_on_single_line3() {
-  stringstream in("a `(b c)");
+  IndentSensitiveStream in("a `(b c)");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -158,7 +158,7 @@ void test_parenthesize_groups_words_on_single_line3() {
 }
 
 void test_parenthesize_groups_words_on_accidentally_indented_line() {
-  stringstream in(" a b c");
+  IndentSensitiveStream in(" a b c");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -170,7 +170,7 @@ void test_parenthesize_groups_words_on_accidentally_indented_line() {
 }
 
 void test_parenthesize_groups_quoted_words() {
-  stringstream in(",a b c");
+  IndentSensitiveStream in(",a b c");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -183,7 +183,7 @@ void test_parenthesize_groups_quoted_words() {
 }
 
 void test_parenthesize_groups_quoted_words2() {
-  stringstream in(",@a b c");
+  IndentSensitiveStream in(",@a b c");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -196,7 +196,7 @@ void test_parenthesize_groups_quoted_words2() {
 }
 
 void test_parenthesize_groups_quoted_words3() {
-  stringstream in("'a b c");
+  IndentSensitiveStream in("'a b c");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -209,7 +209,7 @@ void test_parenthesize_groups_quoted_words3() {
 }
 
 void test_parenthesize_passes_through_nested_quoted_words() {
-  stringstream in("a b\n  'c\n  ,d\n  @e");
+  IndentSensitiveStream in("a b\n  'c\n  ,d\n  @e");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -226,7 +226,7 @@ void test_parenthesize_passes_through_nested_quoted_words() {
 }
 
 void test_parenthesize_passes_through_quoted_groups() {
-  stringstream in(",(a b c)");
+  IndentSensitiveStream in(",(a b c)");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, ","); ++p;
@@ -239,7 +239,7 @@ void test_parenthesize_passes_through_quoted_groups() {
 }
 
 void test_parenthesize_passes_through_quoted_groups2() {
-  stringstream in(",@(a b c)");
+  IndentSensitiveStream in(",@(a b c)");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, ",@"); ++p;
@@ -252,7 +252,7 @@ void test_parenthesize_passes_through_quoted_groups2() {
 }
 
 void test_parenthesize_passes_through_quoted_groups3() {
-  stringstream in(",,(a b c)");
+  IndentSensitiveStream in(",,(a b c)");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, ","); ++p;
@@ -266,7 +266,7 @@ void test_parenthesize_passes_through_quoted_groups3() {
 }
 
 void test_parenthesize_groups_words_on_single_indented_line() {
-  stringstream in("    a b c\n  34");
+  IndentSensitiveStream in("    a b c\n  34");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -281,7 +281,7 @@ void test_parenthesize_groups_words_on_single_indented_line() {
 }
 
 void test_parenthesize_groups_words_on_each_line_without_indent() {
-  stringstream in("a b c  \nd ef");
+  IndentSensitiveStream in("a b c  \nd ef");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -299,7 +299,7 @@ void test_parenthesize_groups_words_on_each_line_without_indent() {
 }
 
 void test_parenthesize_groups_across_indent() {
-  stringstream in("a b c  \n  d ef");
+  IndentSensitiveStream in("a b c  \n  d ef");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -315,7 +315,7 @@ void test_parenthesize_groups_across_indent() {
 }
 
 void test_parenthesize_groups_across_indent2() {
-  stringstream in("a b c  \n  (d ef)");
+  IndentSensitiveStream in("a b c  \n  (d ef)");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -331,7 +331,7 @@ void test_parenthesize_groups_across_indent2() {
 }
 
 void test_parenthesize_groups_across_indent3() {
-  stringstream in("a b c  \n  (d ef)\n\n  g");
+  IndentSensitiveStream in("a b c  \n  (d ef)\n\n  g");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -348,7 +348,7 @@ void test_parenthesize_groups_across_indent3() {
 }
 
 void test_parenthesize_groups_nested_indents() {
-  stringstream in("a b c\n  d e\n    f\ny");
+  IndentSensitiveStream in("a b c\n  d e\n    f\ny");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -368,7 +368,7 @@ void test_parenthesize_groups_nested_indents() {
 }
 
 void test_parenthesize_handles_quotes_and_comments() {
-  stringstream in("a b c  \n  '(d ef)\n\n  g #abc");
+  IndentSensitiveStream in("a b c  \n  '(d ef)\n\n  g #abc");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -386,7 +386,7 @@ void test_parenthesize_handles_quotes_and_comments() {
 }
 
 void test_parenthesize_groups_before_outdents() {
-  stringstream in("a b c  \n    '(d ef)\n\n  g #abc");
+  IndentSensitiveStream in("a b c  \n    '(d ef)\n\n  g #abc");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -404,7 +404,7 @@ void test_parenthesize_groups_before_outdents() {
 }
 
 void test_parenthesize_groups_before_outdents2() {
-  stringstream in("def foo\n    a b c\n  d e\nnewdef");
+  IndentSensitiveStream in("def foo\n    a b c\n  d e\nnewdef");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -427,7 +427,7 @@ void test_parenthesize_groups_before_outdents2() {
 }
 
 void test_parenthesize_groups_before_too_much_outdent() {
-  stringstream in("  a a\n    a\ny");
+  IndentSensitiveStream in("  a a\n    a\ny");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -442,7 +442,7 @@ void test_parenthesize_groups_before_too_much_outdent() {
 }
 
 void test_parenthesize_groups_across_comments() {
-  stringstream in("def foo\n#a b c\n  d e\nnew");
+  IndentSensitiveStream in("def foo\n#a b c\n  d e\nnew");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -460,7 +460,7 @@ void test_parenthesize_groups_across_comments() {
 }
 
 void test_parenthesize_does_not_group_inside_parens() {
-  stringstream in("(def foo\n    #a b c\n  d e)\nnew");
+  IndentSensitiveStream in("(def foo\n    #a b c\n  d e)\nnew");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -476,7 +476,7 @@ void test_parenthesize_does_not_group_inside_parens() {
 }
 
 void test_parenthesize_does_not_group_inside_parens2() {
-  stringstream in("`(def foo\n    #a b c\n  d e)\nnew");
+  IndentSensitiveStream in("`(def foo\n    #a b c\n  d e)\nnew");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "`"); ++p;
@@ -493,7 +493,7 @@ void test_parenthesize_does_not_group_inside_parens2() {
 }
 
 void test_parenthesize_does_not_group_inside_parens3() {
-  stringstream in("  (a b c\n    d e)");
+  IndentSensitiveStream in("  (a b c\n    d e)");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -507,7 +507,7 @@ void test_parenthesize_does_not_group_inside_parens3() {
 }
 
 void test_parenthesize_does_not_group_inside_arglists() {
-  stringstream in("def foo(a (b)\n    c d)\n  d e\nnew");
+  IndentSensitiveStream in("def foo(a (b)\n    c d)\n  d e\nnew");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -533,20 +533,20 @@ void test_parenthesize_does_not_group_inside_arglists() {
 }
 
 void test_parenthesize_passes_through_unbalanced_open_paren() {
-  stringstream in("(");
+  IndentSensitiveStream in("(");
   list<Token> tokens = nextExpr(in);
   checkEq(tokens.size(), 1);
   checkEq(tokens.front(), "(");
 }
 
 void test_parenthesize_errors_on_unbalanced_closed_paren() {
-  stringstream in(")");
+  IndentSensitiveStream in(")");
   list<Token> tokens = nextExpr(in);
   check(raiseCount > 0);   raiseCount=0;
 }
 
 void test_parenthesize_handles_multiple_exprs_on_a_line() {
-  stringstream in("() 1");
+  IndentSensitiveStream in("() 1 2");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
@@ -554,5 +554,8 @@ void test_parenthesize_handles_multiple_exprs_on_a_line() {
   check(p == tokens.end());
   tokens = nextExpr(in); p = tokens.begin();
   checkEq(*p, "1"); ++p;
+  check(p == tokens.end());
+  tokens = nextExpr(in); p = tokens.begin();
+  checkEq(*p, "2"); ++p;
   check(p == tokens.end());
 }

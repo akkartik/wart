@@ -1,21 +1,21 @@
 void test_parse_handles_empty_stream() {
-  stringstream in("");
+  TokenBufferedStream in("");
   checkEq(nextAstNode(in), eof());
 }
 
 void test_parse_handles_trailing_comment() {
-  stringstream in("34 # abc");
+  TokenBufferedStream in("34 # abc");
   checkEq(nextAstNode(in), Token("34"));
   checkEq(nextAstNode(in), eof());
 }
 
 void test_parse_handles_atom() {
-  stringstream in("34");
+  TokenBufferedStream in("34");
   checkEq(nextAstNode(in), Token("34"));
 }
 
 void test_parse_handles_atoms() {
-  stringstream in("34\n\"a b c\"\n3.4");
+  TokenBufferedStream in("34\n\"a b c\"\n3.4");
   checkEq(nextAstNode(in), Token("34"));
   checkEq(nextAstNode(in), Token("\"a b c\""));
   checkEq(nextAstNode(in), Token("3.4"));
@@ -23,7 +23,7 @@ void test_parse_handles_atoms() {
 }
 
 void test_parse_handles_forms() {
-  stringstream in("34 \"a b c\"");
+  TokenBufferedStream in("34 \"a b c\"");
   AstNode n = nextAstNode(in);
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -36,7 +36,7 @@ void test_parse_handles_forms() {
 }
 
 void test_parse_handles_nested_forms() {
-  stringstream in("34 (2 3) \"a b c\"");
+  TokenBufferedStream in("34 (2 3) \"a b c\"");
   AstNode n = nextAstNode(in);
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -58,7 +58,7 @@ void test_parse_handles_nested_forms() {
 }
 
 void test_parse_handles_nested_forms_with_comments() {
-  stringstream in("(a b (c d #\n))");
+  TokenBufferedStream in("(a b (c d #\n))");
   AstNode n = nextAstNode(in);
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -76,11 +76,12 @@ void test_parse_handles_nested_forms_with_comments() {
 
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
+  cerr << "AAA\n";
   checkEq(nextAstNode(in), eof());
 }
 
 void test_parse_handles_quotes() {
-  stringstream in("34 `(2 ,b) ',35 ,',36 ,'a");
+  TokenBufferedStream in("34 `(2 ,b) ',35 ,',36 ,'a");
   AstNode n = nextAstNode(in);
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -129,7 +130,7 @@ void test_parse_handles_quotes() {
 }
 
 void test_parse_handles_splice_operators() {
-  stringstream in("`(2 ,@b @,c)");
+  TokenBufferedStream in("`(2 ,@b @,c)");
   AstNode n = nextAstNode(in);
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -155,7 +156,7 @@ void test_parse_handles_splice_operators() {
 }
 
 void test_parse_handles_indented_toplevel_forms() {
-  stringstream in("a\n  a b c\n    d");
+  TokenBufferedStream in("a\n  a b c\n    d");
   AstNode n = nextAstNode(in);
   check(n.isAtom());
   checkEq(n.atom.token, "a");

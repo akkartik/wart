@@ -27,18 +27,30 @@ VI. Two expressions on a single line:
 => nil
 => 34
 
-VII. Comments and newlines silently wait for next input
+VII. Three expressions on a single line:
+() 3 4<Enter>
+=> nil
+=> 3
+=> 4
+
+VIII. Comments and newlines silently wait for next input
 # skip<Enter>
 
-VIII. Partial expr waits to complete:
+IX. Partial expr waits to complete:
 (def (foo)<Enter>
 <Enter>
 34)<Enter>
 => (object function ..)
 
-IX. Expr and partial expr and comment:
+X. Expr and partial expr and comment:
 () (def (foo)<Enter>
 => nil
   34) # abc<Enter>
 <Enter>
 => (object function ..)
+
+XI. Implicit parens after explicit
+(prn 'a)
+=> 'a
+prn 'a
+=> 'a

@@ -1,14 +1,14 @@
                                   Token indent(long n) { return Token(n); }
 
 void test_tokenize_always_starts_a_line_with_indent() {
-  IndentSensitiveStream in(stream("34"));
+  IndentSensitiveStream in("34");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "34");            t=nextToken(in);
 }
 
 void test_tokenize_handles_multiple_atoms() {
-  IndentSensitiveStream in(stream("34 abc 3.4"));
+  IndentSensitiveStream in("34 abc 3.4");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "34");            t=nextToken(in);
@@ -17,7 +17,7 @@ void test_tokenize_handles_multiple_atoms() {
 }
 
 void test_tokenize_handles_string_literal() {
-  IndentSensitiveStream in(stream("34 \"abc\""));
+  IndentSensitiveStream in("34 \"abc\"");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "34");            t=nextToken(in);
@@ -25,7 +25,7 @@ void test_tokenize_handles_string_literal() {
 }
 
 void test_tokenize_handles_multiple_lines() {
-  IndentSensitiveStream in(stream("34\n\"abc\""));
+  IndentSensitiveStream in("34\n\"abc\"");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "34");            t=nextToken(in);
@@ -35,7 +35,7 @@ void test_tokenize_handles_multiple_lines() {
 }
 
 void test_tokenize_handles_string_with_space() {
-  IndentSensitiveStream in(stream("34\n\"abc def\""));
+  IndentSensitiveStream in("34\n\"abc def\"");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "34");            t=nextToken(in);
@@ -45,7 +45,7 @@ void test_tokenize_handles_string_with_space() {
 }
 
 void test_tokenize_handles_string_with_escape() {
-  IndentSensitiveStream in(stream("34\n\"abc \\\"quote def\""));
+  IndentSensitiveStream in("34\n\"abc \\\"quote def\"");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "34");            t=nextToken(in);
@@ -55,7 +55,7 @@ void test_tokenize_handles_string_with_escape() {
 }
 
 void test_tokenize_handles_quote_comma() {
-  IndentSensitiveStream in(stream("',35"));
+  IndentSensitiveStream in("',35");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "'");             t=nextToken(in);
@@ -64,7 +64,7 @@ void test_tokenize_handles_quote_comma() {
 }
 
 void test_tokenize_handles_quote_comma_paren() {
-  IndentSensitiveStream in(stream("(',)"));
+  IndentSensitiveStream in("(',)");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "(");             t=nextToken(in);
@@ -74,7 +74,7 @@ void test_tokenize_handles_quote_comma_paren() {
 }
 
 void test_tokenize_handles_splice_operators() {
-  IndentSensitiveStream in(stream("()',@ @, @b"));
+  IndentSensitiveStream in("()',@ @, @b");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "(");             t=nextToken(in);
@@ -88,7 +88,7 @@ void test_tokenize_handles_splice_operators() {
 }
 
 void test_tokenize_handles_comment() {
-  IndentSensitiveStream in(stream("()',@ #abc def ghi"));
+  IndentSensitiveStream in("()',@ #abc def ghi");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "(");             t=nextToken(in);
@@ -98,7 +98,7 @@ void test_tokenize_handles_comment() {
 }
 
 void test_tokenize_ends_comment_at_newline() {
-  IndentSensitiveStream in(stream("#abc def ghi\nabc"));
+  IndentSensitiveStream in("#abc def ghi\nabc");
   Token t = nextToken(in);
   checkEq(t, Token::Newline()); t=nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
@@ -106,7 +106,7 @@ void test_tokenize_ends_comment_at_newline() {
 }
 
 void test_tokenize_suppresses_comments() {
-  IndentSensitiveStream in(stream("abc\n#abc\ndef\nghi"));
+  IndentSensitiveStream in("abc\n#abc\ndef\nghi");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "abc");           t=nextToken(in);
@@ -120,7 +120,7 @@ void test_tokenize_suppresses_comments() {
 }
 
 void test_tokenize_suppresses_comments2() {
-  IndentSensitiveStream in(stream("a b\n  c\n#abc\ndef\n  ghi\n\njkl"));
+  IndentSensitiveStream in("a b\n  c\n#abc\ndef\n  ghi\n\njkl");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "a");             t=nextToken(in);
@@ -142,7 +142,7 @@ void test_tokenize_suppresses_comments2() {
 }
 
 void test_tokenize_suppresses_trailing_whitespace() {
-  IndentSensitiveStream in(stream("a \nb\r\nc"));
+  IndentSensitiveStream in("a \nb\r\nc");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "a");             t=nextToken(in);
@@ -155,7 +155,7 @@ void test_tokenize_suppresses_trailing_whitespace() {
 }
 
 void test_tokenize_suppresses_repeated_newline() {
-  IndentSensitiveStream in(stream("34\n\n\"abc \\\"quote def\""));
+  IndentSensitiveStream in("34\n\n\"abc \\\"quote def\"");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "34");            t=nextToken(in);
@@ -166,7 +166,7 @@ void test_tokenize_suppresses_repeated_newline() {
 }
 
 void test_tokenize_handles_indent_outdent() {
-  IndentSensitiveStream in(stream("abc def ghi\n\n    abc\n  def"));
+  IndentSensitiveStream in("abc def ghi\n\n    abc\n  def");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "abc");           t=nextToken(in);
@@ -182,7 +182,7 @@ void test_tokenize_handles_indent_outdent() {
 }
 
 void test_tokenize_suppresses_whitespace_lines() {
-  IndentSensitiveStream in(stream("abc def ghi\n\n    \n  def"));
+  IndentSensitiveStream in("abc def ghi\n\n    \n  def");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "abc");           t=nextToken(in);
@@ -196,7 +196,7 @@ void test_tokenize_suppresses_whitespace_lines() {
 }
 
 void test_tokenize_suppresses_whitespace_lines2() {
-  IndentSensitiveStream in(stream("  \nabc def ghi\n\n    \n  def"));
+  IndentSensitiveStream in("  \nabc def ghi\n\n    \n  def");
   Token t = nextToken(in);
   checkEq(t, Token::Newline()); t=nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
@@ -211,7 +211,7 @@ void test_tokenize_suppresses_whitespace_lines2() {
 }
 
 void test_tokenize_handles_sexpr() {
-  IndentSensitiveStream in(stream("('a '(boo) \"foo\nbar\" `c `,d ,@e)\nabc #def ghi\ndef"));
+  IndentSensitiveStream in("('a '(boo) \"foo\nbar\" `c `,d ,@e)\nabc #def ghi\ndef");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "(");             t=nextToken(in);

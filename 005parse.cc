@@ -37,15 +37,17 @@ struct AstNode {
 };
 
 struct TokenBufferedStream {
-  istream& fd;
+  IndentSensitiveStream& fd;
   list<Token> bufferedTokens;
-  TokenBufferedStream(istream& in) :fd(in) {}
+  explicit TokenBufferedStream(IndentSensitiveStream& in) :fd(in) {}
+  // leaky version just for convenient tests
+  explicit TokenBufferedStream(string s) :fd(*new IndentSensitiveStream(s)) {}
   bool eof() { return fd.eof(); }
 };
 
-AstNode nextAstNode(istream& in) {
-  TokenBufferedStream s(in);
-  return nextAstNode(s);
+AstNode nextAstNode(IndentSensitiveStream& in) {
+  TokenBufferedStream in2(in);
+  return nextAstNode(in2);
 }
 
 AstNode nextAstNode(TokenBufferedStream& in) {

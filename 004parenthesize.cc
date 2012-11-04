@@ -13,11 +13,22 @@
 //    so ignore indent inside backquote
 //  read the minimum possible from the stream for interactive repls
 
-list<Token> nextExpr(istream& i) {
-  list<Token> result;
-  if (i.eof()) return result;
+#include<assert.h>
 
-  IndentSensitiveStream in(i);
+list<Token> nextExpr(IndentSensitiveStream& in) {
+  list<Token> result;
+  if (in.eof()) return result;
+
+  if (!in.atStartOfLine) {
+    // we're in the middle of a line,
+    // because there were multiple exprs on a single line
+    result = indentInsensitiveExpr(in);
+    if (!result.empty()) return result;
+  }
+
+  if (in.eof()) return result;
+  assert(in.atStartOfLine);
+
   long openExplicitParens = 0;  // parens in the original
   stack<long> implicitParenStack;   // parens we inserted
 
@@ -119,7 +130,36 @@ void restoreIndent(long indent, IndentSensitiveStream& in) {
   in.atStartOfLine = true;
 }
 
-#include<assert.h>
+list<Token> indentInsensitiveExpr(IndentSensitiveStream& in) {
+  list<Token> result;
+  long openExplicitParens = 0;
+  while (!in.fd.eof()) {
+    Token curr = nextToken(in);
+    if (curr.newline) {
+      in.atStartOfLine = true;
+      if (openExplicitParens == 0) break;
+    }
+    else if (curr.isIndent()) {
+    }
+    else if (curr.isQuoteOrUnquote()) {
+      result.push_back(curr);
+    }
+    else if (curr == "(") {
+      result.push_back(curr);
+      ++openExplicitParens;
+    }
+    else if (curr == ")") {
+      result.push_back(curr);
+      --openExplicitParens;
+      if (openExplicitParens == 0) break;
+    }
+    else { // word
+      result.push_back(curr);
+      if (openExplicitParens == 0) break;
+    }
+  }
+  return result;
+}
 
 long skipInitialNewlinesToFirstIndent(IndentSensitiveStream& in) {
   for (;;) {

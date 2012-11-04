@@ -60,13 +60,6 @@ struct Token {
   }
 };
 
-struct IndentSensitiveStream {
-  istream& fd;
-  bool atStartOfLine;
-  IndentSensitiveStream(istream& in) :fd(in), atStartOfLine(true) { fd >> std::noskipws; }
-  bool eof() { return fd.eof(); }
-};
-
 Token nextToken(IndentSensitiveStream& in) {
   if (in.atStartOfLine) {
     if (in.fd.peek() == '#')

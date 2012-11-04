@@ -1,58 +1,58 @@
 void test_infix_passes_atoms() {
-  stringstream in("abc");
+  TokenBufferedStream in("abc");
   AstNode n = nextAstNode(in);
   check(n.isAtom());
   checkEq(transformInfix(n), n.atom);
 }
 
 void test_infix_passes_ellipses() {
-  stringstream in("...");
+  TokenBufferedStream in("...");
   AstNode n = nextAstNode(in);
   check(n.isAtom());
   checkEq(transformInfix(n), n.atom);
 }
 
 void test_infix_passes_atoms2() {
-  stringstream in("-3.2");
+  TokenBufferedStream in("-3.2");
   AstNode n = nextAstNode(in);
   check(n.isAtom());
   checkEq(transformInfix(n), n.atom);
 }
 
 void test_infix_passes_strings() {
-  stringstream in("\"a b+c\"");
+  TokenBufferedStream in("\"a b+c\"");
   AstNode n = nextAstNode(in);
   check(n.isAtom());
   checkEq(transformInfix(n), n.atom);
 }
 
 void test_infix_passes_floats() {
-  stringstream in("2e-2");
+  TokenBufferedStream in("2e-2");
   AstNode n = nextAstNode(in);
   checkEq(transformInfix(n), n.atom);
 }
 
 void test_infix_passes_dollar_vars() {
-  stringstream in("$a");
+  TokenBufferedStream in("$a");
   AstNode n = nextAstNode(in);
   check(n.isAtom());
   checkEq(transformInfix(n), n.atom);
 }
 
 void test_infix_handles_dollar_op() {
-  stringstream in("$+");
+  TokenBufferedStream in("$+");
   checkEq(transformInfix(nextAstNode(in)), Token("$+"));
 }
 
 void test_infix_handles_op_without_args() {
-  stringstream in("(+)");
+  TokenBufferedStream in("(+)");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isAtom());
   checkEq(n.atom, Token("+"));
 }
 
 void test_infix_handles_op_without_args2() {
-  stringstream in("= (+) 3");
+  TokenBufferedStream in("= (+) 3");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -65,14 +65,14 @@ void test_infix_handles_op_without_args2() {
 }
 
 void test_infix_handles_dollar_op_without_args() {
-  stringstream in("($+)");
+  TokenBufferedStream in("($+)");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isAtom());
   checkEq(n.atom, Token("$+"));
 }
 
 void test_infix_handles_quoting() {
-  stringstream in("',a");
+  TokenBufferedStream in("',a");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -83,7 +83,7 @@ void test_infix_handles_quoting() {
 }
 
 void test_infix_handles_simple_lists() {
-  stringstream in("a + b");
+  TokenBufferedStream in("a + b");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -96,7 +96,7 @@ void test_infix_handles_simple_lists() {
 }
 
 void test_infix_passes_wrapped_op() {
-  stringstream in("a (+) b");
+  TokenBufferedStream in("a (+) b");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -109,7 +109,7 @@ void test_infix_passes_wrapped_op() {
 }
 
 void test_infix_passes_wrapped_op2() {
-  stringstream in("a (:) b");
+  TokenBufferedStream in("a (:) b");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -122,7 +122,7 @@ void test_infix_passes_wrapped_op2() {
 }
 
 void test_infix_handles_infix_ops_in_prefix() {
-  stringstream in("+ a b");
+  TokenBufferedStream in("+ a b");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -135,7 +135,7 @@ void test_infix_handles_infix_ops_in_prefix() {
 }
 
 void test_infix_passes_ellipses_in_infix() {
-  stringstream in("a ... b");
+  TokenBufferedStream in("a ... b");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -148,7 +148,7 @@ void test_infix_passes_ellipses_in_infix() {
 }
 
 void test_infix_passes_op_with_ellipses() {
-  stringstream in("+ ... b");
+  TokenBufferedStream in("+ ... b");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -161,7 +161,7 @@ void test_infix_passes_op_with_ellipses() {
 }
 
 void test_infix_handles_infix_ops_in_unary_prefix() {
-  stringstream in("+ a");
+  TokenBufferedStream in("+ a");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -173,7 +173,7 @@ void test_infix_handles_infix_ops_in_unary_prefix() {
 }
 
 void test_infix_handles_infix_ops_in_nested_lists() {
-  stringstream in("((a + b))");
+  TokenBufferedStream in("((a + b))");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   checkEq(n.elems.size(), 3);
@@ -189,7 +189,7 @@ void test_infix_handles_infix_ops_in_nested_lists() {
 }
 
 void test_infix_handles_infix_ops_in_nested_lists2() {
-  stringstream in("(do (a + b))");
+  TokenBufferedStream in("(do (a + b))");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -209,7 +209,7 @@ void test_infix_handles_infix_ops_in_nested_lists2() {
 }
 
 void test_infix_handles_infix_ops_in_nested_lists3() {
-  stringstream in("(a = (a + 1))");
+  TokenBufferedStream in("(a = (a + 1))");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -230,7 +230,7 @@ void test_infix_handles_infix_ops_in_nested_lists3() {
 }
 
 void test_infix_left_associates() {
-  stringstream in("(a + b + c)");
+  TokenBufferedStream in("(a + b + c)");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -251,7 +251,7 @@ void test_infix_left_associates() {
 }
 
 void test_infix_handles_op() {
-  stringstream in("a + b");
+  TokenBufferedStream in("a + b");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -264,7 +264,7 @@ void test_infix_handles_op() {
 }
 
 void test_infix_always_has_higher_precedence_than_call() {
-  stringstream in("f a + b");
+  TokenBufferedStream in("f a + b");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -284,7 +284,7 @@ void test_infix_always_has_higher_precedence_than_call() {
 }
 
 void test_infix_always_has_lower_precedence_than_prefix() {
-  stringstream in("-a+b");
+  TokenBufferedStream in("-a+b");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -304,7 +304,7 @@ void test_infix_always_has_lower_precedence_than_prefix() {
 }
 
 void test_infix_handles_multiple_infix_ops() {
-  stringstream in("f a + b c + d");
+  TokenBufferedStream in("f a + b c + d");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -333,7 +333,7 @@ void test_infix_handles_multiple_infix_ops() {
 }
 
 void test_infix_handles_op_without_spaces() {
-  stringstream in("a+b");
+  TokenBufferedStream in("a+b");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -346,7 +346,7 @@ void test_infix_handles_op_without_spaces() {
 }
 
 void test_infix_handles_op_without_spaces2() {
-  stringstream in("$a+b");
+  TokenBufferedStream in("$a+b");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -359,7 +359,7 @@ void test_infix_handles_op_without_spaces2() {
 }
 
 void test_infix_handles_op_with_float() {
-  stringstream in("a+1.0");
+  TokenBufferedStream in("a+1.0");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -372,7 +372,7 @@ void test_infix_handles_op_with_float() {
 }
 
 void test_infix_handles_op_with_float2() {
-  stringstream in("3.0+1.0");
+  TokenBufferedStream in("3.0+1.0");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -385,7 +385,7 @@ void test_infix_handles_op_with_float2() {
 }
 
 void test_infix_handles_op_with_float3() {
-  stringstream in("a3.b");
+  TokenBufferedStream in("a3.b");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -398,7 +398,7 @@ void test_infix_handles_op_with_float3() {
 }
 
 void test_infix_gives_ops_without_spaces_precedence() {
-  stringstream in("n * n-1");
+  TokenBufferedStream in("n * n-1");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -419,14 +419,14 @@ void test_infix_gives_ops_without_spaces_precedence() {
 }
 
 void test_infix_passes_keyword_syms() {
-  stringstream in(":a");
+  TokenBufferedStream in(":a");
   AstNode n = nextAstNode(in);
   check(n.isAtom());
   checkEq(transformInfix(n), n.atom);
 }
 
 void test_infix_passes_keyword_syms2() {
-  stringstream in("f :a x");
+  TokenBufferedStream in("f :a x");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -439,7 +439,7 @@ void test_infix_passes_keyword_syms2() {
 }
 
 void test_infix_handles_complement_as_usual() {
-  stringstream in("~a.b");
+  TokenBufferedStream in("~a.b");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -459,7 +459,7 @@ void test_infix_handles_complement_as_usual() {
 }
 
 void test_infix_handles_backquote() {
-  stringstream in("`(a + b)");
+  TokenBufferedStream in("`(a + b)");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -473,7 +473,7 @@ void test_infix_handles_backquote() {
 }
 
 void test_infix_handles_splice() {
-  stringstream in("@a+b");
+  TokenBufferedStream in("@a+b");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -487,7 +487,7 @@ void test_infix_handles_splice() {
 }
 
 void test_infix_handles_unquote_splice() {
-  stringstream in(",@a+b");
+  TokenBufferedStream in(",@a+b");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();
@@ -500,7 +500,7 @@ void test_infix_handles_unquote_splice() {
   check(p == n.elems.end());
 }
 void test_infix_handles_unquote_splice2() {
-  stringstream in(",@(a + b)");
+  TokenBufferedStream in(",@(a + b)");
   AstNode n = transformInfix(nextAstNode(in));
   check(n.isList());
   list<AstNode>::iterator p = n.elems.begin();

@@ -29,6 +29,15 @@
 // Read is the time for optimizations, when subsidiary functions can be
 // specialized to a specific call-site.
 
+struct IndentSensitiveStream {
+  istream& fd;
+  bool atStartOfLine;
+  explicit IndentSensitiveStream(istream& in) :fd(in), atStartOfLine(true) { fd >> std::noskipws; }
+  // leaky version just for convenient tests
+  explicit IndentSensitiveStream(string s) :fd(*new stringstream(s)), atStartOfLine(true) { fd >> std::noskipws; }
+  bool eof() { return fd.eof(); }
+} STDIN(cin);
+
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
     runTests();
@@ -40,20 +49,18 @@ int main(int argc, unused char* argv[]) {
   loadFiles(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (true) {
-    Cell* form = read(cin);
-    if (cin.eof()) return 0;
+    Cell* form = read(STDIN);
+    if (STDIN.eof()) return 0;
     Cell* result = eval(form);
     cout << "=> " << result << endl;
 
     rmref(result);
     rmref(form);
-    if (cin.peek() == '\n') cin.get();
-    if (cin.peek() == '\n') cin.get();
   }
 }
 
 // read: tokenize, parenthesize, parse, transform infix, build cells, transform $vars
-Cell* read(istream& in) {
+Cell* read(IndentSensitiveStream& in) {
   return mkref(transformDollarVars(nextRawCell(in)));
 }
 
@@ -137,10 +144,4 @@ void interactive_setup() {
   setup();
   interactive = true;
   catchCtrlC();
-}
-
-// helper to read from string
-// leaks memory so don't overuse it; mostly for tests
-stringstream& stream(string s) {
-  return *new stringstream(s);
 }

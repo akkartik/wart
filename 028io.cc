@@ -89,6 +89,17 @@ COMPILE_FN(read, compiledFn_read, "('$eof)",
   return mkref(read(toIstream(STDIN)));
 )
 
+Cell* read(istream& in) {
+  IndentSensitiveStream in2(in);
+  return read(in2);
+}
+
+// helper to read from string
+// leaks memory; just for convenient tests
+Cell* read(string s) {
+  return read(*new stringstream(s));
+}
+
 COMPILE_FN(read_byte, compiledFn_read_byte, "('$eof)",
   istream& f = toIstream(STDIN);
   if (f.eof())

@@ -158,7 +158,9 @@ AstNode tokenizeInfix(AstNode n) {
     out += var[x];
   }
   stringstream ss(out);
-  return nextAstNode(ss);
+  IndentSensitiveStream tmp(ss);
+  TokenBufferedStream tmp2(tmp);
+  return nextAstNode(tmp2);
 }
 
 
