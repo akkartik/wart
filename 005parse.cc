@@ -11,17 +11,6 @@ struct AstNode {
   explicit AstNode(Token t) :atom(t) {}
   explicit AstNode(list<AstNode> l) :atom(eof()), elems(l) {}
 
-  bool isAtom() const {
-    return elems.empty();
-  }
-  bool isList() const {
-    return !elems.empty();
-  }
-  bool isNil() const {
-    return atom == "nil"
-        || (elems.size() == 2 && elems.front() == "(" && elems.back() == ")");
-  }
-
   bool operator==(const Token& x) const {
     return elems.empty() && atom == x.token;  // whitespace should be gone by now
   }
@@ -44,7 +33,7 @@ AstNode nextAstNode(IndentSensitiveStream& in) {
 AstNode nextAstNode(list<Token>& buffer) {
   list<AstNode> subform;
   subform.push_back(AstNode(nextToken(buffer)));
-  while (!eof(subform.back()) && isQuoteOrUnquote(subform.back()))
+  while (!eof(subform.back()) && isQuoteOrUnquote(subform.back().atom))
     subform.push_back(AstNode(nextToken(buffer)));
 
   if (subform.back() == "(") {
@@ -86,10 +75,4 @@ ostream& operator<<(ostream& os, AstNode x) {
     skipNextSpace = (*p == "(" || isQuoteOrUnquote(*p));
   }
   return os;
-}
-
-
-
-bool isQuoteOrUnquote(const AstNode& n) {
-  return n.isAtom() && isQuoteOrUnquote(n.atom);
 }

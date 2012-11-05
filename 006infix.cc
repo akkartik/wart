@@ -24,21 +24,21 @@ const string extraSymChars = "$?!_";  // besides letters and digits
 
 AstNode transformInfix(AstNode n) {
   // special-case: ellipses are for dotted lists, not infix
-  if (n.isAtom() && n.atom.token == "...")
+  if (isAtom(n) && n.atom.token == "...")
     return n;
 
-  if (n.isAtom() && n.atom.token[0] == '\"')
+  if (isAtom(n) && n.atom.token[0] == '\"')
     return n;
 
-  if (n.isAtom() && parseableAsFloat(n.atom.token))
+  if (isAtom(n) && parseableAsFloat(n.atom.token))
     return n;
 
-  if (n.isAtom() && !containsInfixChar(n.atom.token))
+  if (isAtom(n) && !containsInfixChar(n.atom.token))
     return n;
 
-  if (n.isAtom())
+  if (isAtom(n))
     n = tokenizeInfix(n);
-  if (n.isAtom())
+  if (isAtom(n))
     return n;
 
   if (isQuoteOrUnquote(n.elems.front())) {
@@ -50,7 +50,7 @@ AstNode transformInfix(AstNode n) {
     AstNode result = (p == --n.elems.end())
         ? transformInfix(*p)
         : transformInfix(AstNode(list<AstNode>(p, n.elems.end())));
-    if (result.isAtom()) {
+    if (isAtom(result)) {
       n.elems.pop_back();
       n.elems.push_back(result);
       return n;
@@ -165,7 +165,7 @@ AstNode tokenizeInfix(AstNode n) {
 
 
 bool isInfixOp(AstNode n) {
-  if (n.isList()) return false;
+  if (isList(n)) return false;
   if (n == "...") return false;
   string s = n.atom.token;
   string::iterator p = s.begin();
@@ -198,7 +198,7 @@ bool isRegularChar(char c) {
 }
 
 bool infixOpCalledWithoutArgs(AstNode n) {
-  if (!n.isList() || n.elems.size() != 3) return false;
+  if (!isList(n) || n.elems.size() != 3) return false;
   list<AstNode>::iterator p = n.elems.begin();
   if (*p != Token("(")) return false;
   ++p;
@@ -215,4 +215,16 @@ const char* skipFloat(const char* s) {
   char* end = NULL;
   strtof(s, &end);
   return end;
+}
+
+bool isList(const AstNode& n) {
+  return !n.elems.empty();
+}
+
+bool isAtom(const AstNode& n) {
+  return n.elems.empty();
+}
+
+bool isQuoteOrUnquote(const AstNode& n) {
+  return isAtom(n) && isQuoteOrUnquote(n.atom);
 }

@@ -25,7 +25,7 @@ void test_parse_handles_atoms() {
 void test_parse_handles_forms() {
   IndentSensitiveStream in("34 \"a b c\"");
   AstNode n = nextAstNode(in);
-  check(n.isList());
+  check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("(")); ++p;
   checkEq(*p, Token("34")); ++p;
@@ -38,11 +38,11 @@ void test_parse_handles_forms() {
 void test_parse_handles_nested_forms() {
   IndentSensitiveStream in("34 (2 3) \"a b c\"");
   AstNode n = nextAstNode(in);
-  check(n.isList());
+  check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("(")); ++p;
   checkEq(*p, Token("34")); ++p;
-  check(p->isList());
+  check(!p->elems.empty());
     list<AstNode> ast2 = p->elems; ++p;
     list<AstNode>::iterator q = ast2.begin();
     checkEq(*q, Token("(")); ++q;
@@ -60,12 +60,12 @@ void test_parse_handles_nested_forms() {
 void test_parse_handles_nested_forms_with_comments() {
   IndentSensitiveStream in("(a b (c d #\n))");
   AstNode n = nextAstNode(in);
-  check(n.isList());
+  check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("(")); ++p;
   checkEq(*p, Token("a")); ++p;
   checkEq(*p, Token("b")); ++p;
-  check(p->isList());
+  check(!p->elems.empty());
     list<AstNode> ast2 = p->elems; ++p;
     list<AstNode>::iterator q = ast2.begin();
     checkEq(*q, Token("(")); ++q;
@@ -82,17 +82,17 @@ void test_parse_handles_nested_forms_with_comments() {
 void test_parse_handles_quotes() {
   IndentSensitiveStream in("34 `(2 ,b) ',35 ,',36 ,'a");
   AstNode n = nextAstNode(in);
-  check(n.isList());
+  check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("(")); ++p;
   checkEq(*p, Token("34")); ++p;
-  check(p->isList());
+  check(!p->elems.empty());
     list<AstNode> ast2 = p->elems; ++p;
     list<AstNode>::iterator q = ast2.begin();
     checkEq(*q, Token("`")); ++q;
     checkEq(*q, Token("(")); ++q;
     checkEq(*q, Token("2")); ++q;
-    check(q->isList());
+    check(!q->elems.empty());
       list<AstNode> ast3 = q->elems; ++q;
       list<AstNode>::iterator r = ast3.begin();
       checkEq(*r, Token(",")); ++r;
@@ -100,14 +100,14 @@ void test_parse_handles_quotes() {
       check(r == ast3.end());
     checkEq(*q, Token(")")); ++q;
     check(q == ast2.end());
-  check(p->isList());
+  check(!p->elems.empty());
     ast2 = p->elems; ++p;
     q = ast2.begin();
     checkEq(*q, Token("'")); ++q;
     checkEq(*q, Token(",")); ++q;
     checkEq(*q, Token("35")); ++q;
     check(q == ast2.end());
-  check(p->isList());
+  check(!p->elems.empty());
     ast2 = p->elems; ++p;
     q = ast2.begin();
     checkEq(*q, Token(",")); ++q;
@@ -115,7 +115,7 @@ void test_parse_handles_quotes() {
     checkEq(*q, Token(",")); ++q;
     checkEq(*q, Token("36")); ++q;
     check(q == ast2.end());
-  check(p->isList());
+  check(!p->elems.empty());
     ast2 = p->elems; ++p;
     q = ast2.begin();
     checkEq(*q, Token(",")); ++q;
@@ -131,18 +131,18 @@ void test_parse_handles_quotes() {
 void test_parse_handles_splice_operators() {
   IndentSensitiveStream in("`(2 ,@b @,c)");
   AstNode n = nextAstNode(in);
-  check(n.isList());
+  check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("`")); ++p;
   checkEq(*p, Token("(")); ++p;
   checkEq(*p, Token("2")); ++p;
-  check(p->isList());
+  check(!p->elems.empty());
     list<AstNode> ast2 = p->elems; ++p;
     list<AstNode>::iterator q = ast2.begin();
     checkEq(*q, Token(",@")); ++q;
     checkEq(*q, Token("b")); ++q;
     check(q == ast2.end());
-  check(p->isList());
+  check(!p->elems.empty());
     ast2 = p->elems; ++p;
     q = ast2.begin();
     checkEq(*q, Token("@")); ++q;
@@ -157,13 +157,13 @@ void test_parse_handles_splice_operators() {
 void test_parse_handles_indented_toplevel_forms() {
   IndentSensitiveStream in("a\n  a b c\n    d");
   AstNode n = nextAstNode(in);
-  check(n.isAtom());
+  check(n.elems.empty());
   checkEq(n.atom.token, "a");
 
   n = nextAstNode(in);
-  check(n.isList());
+  check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
-  check(p->isAtom());
+  check(p->elems.empty());
   checkEq(p->atom.token, "("); ++p;
   checkEq(p->atom.token, "a"); ++p;
   checkEq(p->atom.token, "b"); ++p;
