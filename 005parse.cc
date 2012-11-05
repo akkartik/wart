@@ -36,33 +36,24 @@ struct AstNode {
   }
 };
 
-struct TokenBufferedStream {
-  IndentSensitiveStream& fd;
-  list<Token> bufferedTokens;
-  explicit TokenBufferedStream(IndentSensitiveStream& in) :fd(in) {}
-  // leaky version just for convenient tests
-  explicit TokenBufferedStream(string s) :fd(*new IndentSensitiveStream(s)) {}
-  bool eof() { return fd.eof(); }
-};
-
 AstNode nextAstNode(IndentSensitiveStream& in) {
-  TokenBufferedStream in2(in);
-  return nextAstNode(in2);
+  list<Token> bufferedTokens = nextExpr(in);
+  return nextAstNode(bufferedTokens);
 }
 
-AstNode nextAstNode(TokenBufferedStream& in) {
-  Token curr = nextParenInsertedToken(in);
+AstNode nextAstNode(list<Token>& buffer) {
+  Token curr = nextToken(buffer);
   if (curr != "(" && !isQuoteOrUnquote(curr))
     return AstNode(curr);
 
   list<AstNode> subform;
   subform.push_back(AstNode(curr));
   while (!eof(subform.back()) && isQuoteOrUnquote(subform.back()))
-    subform.push_back(AstNode(nextParenInsertedToken(in)));
+    subform.push_back(AstNode(nextToken(buffer)));
 
   if (subform.back() == "(") {
     while (!eof(subform.back()) && subform.back().atom != ")")
-      subform.push_back(nextAstNode(in));
+      subform.push_back(nextAstNode(buffer));
     if (eof(subform.back())) RAISE << "Unbalanced (" << endl << DIE;
   }
 
@@ -73,11 +64,9 @@ AstNode nextAstNode(TokenBufferedStream& in) {
 
 // internals
 
-Token nextParenInsertedToken(TokenBufferedStream& in) {
-  if (in.bufferedTokens.empty()) in.bufferedTokens = nextExpr(in.fd);
-  if (in.bufferedTokens.empty()) return eof();
-  Token result = in.bufferedTokens.front();
-  in.bufferedTokens.pop_front();
+Token nextToken(list<Token>& buffer) {
+  if(buffer.empty()) return eof();
+  Token result = buffer.front(); buffer.pop_front();
   return result;
 }
 
