@@ -46,16 +46,16 @@ struct Token {
         || token == "," || token == ",@" || token == "@";
   }
 
-  bool operator==(string x) {
+  bool operator==(const string& x) const {
     return token == x;
   }
-  bool operator!=(string x) {
+  bool operator!=(const string& x) const {
     return !(*this == x);
   }
-  bool operator==(Token x) {
+  bool operator==(const Token& x) const {
     return token == x.token && indentLevel == x.indentLevel && newline == x.newline;
   }
-  bool operator!=(Token x) {
+  bool operator!=(const Token& x) const {
     return !(*this == x);
   }
 };

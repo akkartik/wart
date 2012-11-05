@@ -11,27 +11,27 @@ struct AstNode {
   explicit AstNode(Token t) :atom(t) {}
   explicit AstNode(list<AstNode> l) :atom(eof()), elems(l) {}
 
-  bool isAtom() {
+  bool isAtom() const {
     return elems.empty();
   }
-  bool isList() {
+  bool isList() const {
     return !elems.empty();
   }
-  bool isNil() {
+  bool isNil() const {
     return atom == "nil"
         || (elems.size() == 2 && elems.front() == "(" && elems.back() == ")");
   }
 
-  bool operator==(Token x) {
+  bool operator==(const Token& x) const {
     return elems.empty() && atom == x.token;  // whitespace should be gone by now
   }
-  bool operator==(string x) {
+  bool operator==(const string& x) const {
     return elems.empty() && atom == x;
   }
-  bool operator!=(Token x) {
+  bool operator!=(const Token& x) const {
     return !(*this == x);
   }
-  bool operator!=(string x) {
+  bool operator!=(const string& x) const {
     return !(*this == x);
   }
 };

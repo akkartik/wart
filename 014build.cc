@@ -66,6 +66,6 @@ Cell* buildCell(AstNode n) {
   return newForm;
 }
 
-bool isQuoteOrUnquote(AstNode n) {
+bool isQuoteOrUnquote(const AstNode& n) {
   return n == "'" || n == "`" || n == "," || n == ",@" || n == "@";
 }
