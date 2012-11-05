@@ -50,7 +50,6 @@ AstNode nextAstNode(list<Token>& buffer) {
 // internals
 
 Token nextToken(list<Token>& buffer) {
-  if(buffer.empty()) return eof();
   Token result = buffer.front(); buffer.pop_front();
   return result;
 }
