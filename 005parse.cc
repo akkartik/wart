@@ -1,8 +1,4 @@
-//// construct parse tree out of tokens
-
-// Currently ,@(list x) creates a flat list: ,@ ( list x )
-// Equally valid to have it create a 2 level list: ,@ followed by ( list x )
-// Would require changing build phase appropriately.
+//// construct parse tree out of a list of tokens
 
 struct AstNode {
   Token atom;
