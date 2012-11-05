@@ -42,12 +42,8 @@ AstNode nextAstNode(IndentSensitiveStream& in) {
 }
 
 AstNode nextAstNode(list<Token>& buffer) {
-  Token curr = nextToken(buffer);
-  if (curr != "(" && !isQuoteOrUnquote(curr))
-    return AstNode(curr);
-
   list<AstNode> subform;
-  subform.push_back(AstNode(curr));
+  subform.push_back(AstNode(nextToken(buffer)));
   while (!eof(subform.back()) && isQuoteOrUnquote(subform.back()))
     subform.push_back(AstNode(nextToken(buffer)));
 
@@ -57,6 +53,8 @@ AstNode nextAstNode(list<Token>& buffer) {
     if (eof(subform.back())) RAISE << "Unbalanced (" << endl << DIE;
   }
 
+  if (subform.size() == 1)
+    return AstNode(subform.back());
   return AstNode(subform);
 }
 
