@@ -128,6 +128,12 @@ void verify() {
   }
 }
 
+// helper to read from string
+// leaks memory; just for convenient tests
+Cell* read(string s) {
+  return read(*new stringstream(s));
+}
+
 
 
 void setup() {

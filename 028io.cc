@@ -94,12 +94,6 @@ Cell* read(istream& in) {
   return read(in2);
 }
 
-// helper to read from string
-// leaks memory; just for convenient tests
-Cell* read(string s) {
-  return read(*new stringstream(s));
-}
-
 COMPILE_FN(read_byte, compiledFn_read_byte, "('$eof)",
   istream& f = toIstream(STDIN);
   if (f.eof())
