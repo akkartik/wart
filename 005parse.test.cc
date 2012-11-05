@@ -76,7 +76,6 @@ void test_parse_handles_nested_forms_with_comments() {
 
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
-  cerr << "AAA\n";
   checkEq(nextAstNode(in), eof());
 }
 
