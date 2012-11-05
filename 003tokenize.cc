@@ -40,29 +40,25 @@ struct Token {
 };
 
 Token nextToken(IndentSensitiveStream& in) {
-  if (in.atStartOfLine) {
-    if (in.fd.peek() == '#')
-      skipComment(in.fd);
-    if (in.fd.peek() == '\n') {
-      in.fd.get();
-      return Token::Newline();
-    }
-    Token t = Token(indent(in.fd));
-    if (in.fd.peek() == '#')
-      skipComment(in.fd);
-    if (in.fd.peek() == '\n')
-      return nextToken(in);
-    in.atStartOfLine = false;
-    return t;
-  }
+  if (!in.atStartOfLine)
+    skipWhitespace(in.fd);
 
-  skipWhitespace(in.fd);
+  Token maybeIndent("");
+  if (in.atStartOfLine)
+    maybeIndent = Token(indent(in.fd));
+
   if (in.fd.peek() == '#')
     skipComment(in.fd);
   if (in.fd.peek() == '\n') {
     in.fd.get();
     in.atStartOfLine = true;
     return Token::Newline();
+  }
+
+  if (in.atStartOfLine) {
+    // still here? no comment or newline?
+    in.atStartOfLine = false;
+    return maybeIndent;
   }
 
   ostringstream out;
