@@ -28,14 +28,16 @@ AstNode nextAstNode(IndentSensitiveStream& in) {
 
 AstNode nextAstNode(list<Token>& buffer) {
   list<AstNode> subform;
+  if (buffer.empty()) return AstNode(subform);
+
   subform.push_back(AstNode(nextToken(buffer)));
-  while (!eof(subform.back()) && isQuoteOrUnquote(subform.back().atom))
+  while (!buffer.empty() && isQuoteOrUnquote(subform.back().atom))
     subform.push_back(AstNode(nextToken(buffer)));
 
   if (subform.back() == "(") {
-    while (!eof(subform.back()) && subform.back().atom != ")")
+    while (!buffer.empty() && subform.back() != ")")
       subform.push_back(nextAstNode(buffer));
-    if (eof(subform.back())) RAISE << "Unbalanced (" << endl << DIE;
+    if (subform.back() != ")") RAISE << "Unbalanced (" << endl << DIE;
   }
 
   if (subform.size() == 1)
@@ -55,10 +57,6 @@ Token nextToken(list<Token>& buffer) {
 
 Token eof() {
   return Token(0);
-}
-
-bool eof(AstNode n) {
-  return n.atom.token == "" && n.elems.empty();
 }
 
 ostream& operator<<(ostream& os, AstNode x) {
