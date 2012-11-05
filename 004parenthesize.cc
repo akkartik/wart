@@ -16,7 +16,7 @@
 #include<assert.h>
 
 list<Token> nextExpr(IndentSensitiveStream& in) {
-  list<Token> result;
+  list<Token> result;   // emit tokens here
   if (in.eof()) return result;
 
   if (!in.atStartOfLine) {
@@ -29,37 +29,35 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
   if (in.eof()) return result;
   assert(in.atStartOfLine);
 
-  long openExplicitParens = 0;  // parens in the original
-  stack<long> implicitParenStack;   // parens we inserted
-
-  long thisLineIndent = skipInitialNewlinesToFirstIndent(in);
-
-  list<Token> buffer;   // when you might need to insert an implicit paren
+  long explicitOpenParens = 0;  // parens in the original
+  stack<long> implicitOpenParens;   // parens we inserted with their indent levels
+  list<Token> buffer;   // if implicit paren might need to go first
   long numWordsInLine = 0;
   bool parenAtStartOfLine = false;
+  long thisLineIndent = skipInitialNewlinesToFirstIndent(in);
   while (!in.fd.eof()) {
     Token curr = nextToken(in);
     if (curr.newline) {
-      if (interactive && openExplicitParens == 0
-          && (implicitParenStack.empty() || in.fd.peek() == '\n'))
+      if (interactive && explicitOpenParens == 0
+          && (implicitOpenParens.empty() || in.fd.peek() == '\n'))
         break;
     }
     else if (isQuoteOrUnquote(curr)) {
       if (numWordsInLine < 2)
         buffer.push_back(curr);
       else
-        emit(curr, result, openExplicitParens);
+        emit(curr, result, explicitOpenParens);
     }
     else if (isParen(curr)) {
       if (!parenAtStartOfLine)
         parenAtStartOfLine = (curr == "(" && numWordsInLine == 0);
-      if (numWordsInLine < 2 && openExplicitParens == 0 && !parenAtStartOfLine) {
+      if (numWordsInLine < 2 && explicitOpenParens == 0 && !parenAtStartOfLine) {
         buffer.push_back(curr);
       }
       else {
-        emitAll(buffer, result, openExplicitParens);
-        emit(curr, result, openExplicitParens);
-        if (openExplicitParens == 0 && implicitParenStack.empty())
+        emitAll(buffer, result, explicitOpenParens);
+        emit(curr, result, explicitOpenParens);
+        if (explicitOpenParens == 0 && implicitOpenParens.empty())
           break;
       }
     }
@@ -69,26 +67,26 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
         buffer.push_back(curr);
       }
       else if (numWordsInLine == 2) {
-        if (openExplicitParens == 0 && !parenAtStartOfLine) {
+        if (explicitOpenParens == 0 && !parenAtStartOfLine) {
           result.push_back(Token("("));
-          implicitParenStack.push(thisLineIndent);
+          implicitOpenParens.push(thisLineIndent);
         }
-        emitAll(buffer, result, openExplicitParens);
-        emit(curr, result, openExplicitParens);
+        emitAll(buffer, result, explicitOpenParens);
+        emit(curr, result, explicitOpenParens);
       }
       else {  // later words
-        emit(curr, result, openExplicitParens);
+        emit(curr, result, explicitOpenParens);
       }
     }
     else { // curr.isIndent()
       long nextLineIndent = curr.indentLevel;
-      emitAll(buffer, result, openExplicitParens);
-      while (!implicitParenStack.empty() && nextLineIndent <= implicitParenStack.top()) {
+      emitAll(buffer, result, explicitOpenParens);
+      while (!implicitOpenParens.empty() && nextLineIndent <= implicitOpenParens.top()) {
         result.push_back(Token(")"));
-        implicitParenStack.pop();
+        implicitOpenParens.pop();
       }
 
-      if (implicitParenStack.empty() && openExplicitParens == 0) {
+      if (implicitOpenParens.empty() && explicitOpenParens == 0) {
         restoreIndent(nextLineIndent, in);
         break;
       }
@@ -100,8 +98,8 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
     }
   }
 
-  emitAll(buffer, result, openExplicitParens);
-  for (unsigned long i=0; i < implicitParenStack.size(); ++i)
+  emitAll(buffer, result, explicitOpenParens);
+  for (unsigned long i=0; i < implicitOpenParens.size(); ++i)
     result.push_back(Token(")"));
   return result;
 }
@@ -110,16 +108,16 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
 
 // internals
 
-void emit(Token& t, list<Token>& out, long& openExplicitParens) {
+void emit(Token& t, list<Token>& out, long& explicitOpenParens) {
   out.push_back(t);
-  if (t == "(") ++openExplicitParens;
-  if (t == ")") --openExplicitParens;
-  if (openExplicitParens < 0) RAISE << "Unbalanced )" << endl;
+  if (t == "(") ++explicitOpenParens;
+  if (t == ")") --explicitOpenParens;
+  if (explicitOpenParens < 0) RAISE << "Unbalanced )" << endl;
 }
 
-void emitAll(list<Token>& buffer, list<Token>& out, long& openExplicitParens) {
+void emitAll(list<Token>& buffer, list<Token>& out, long& explicitOpenParens) {
   for (list<Token>::iterator p = buffer.begin(); p != buffer.end(); ++p)
-    emit(*p, out, openExplicitParens);
+    emit(*p, out, explicitOpenParens);
   buffer.clear();
 }
 
@@ -132,12 +130,12 @@ void restoreIndent(long indent, IndentSensitiveStream& in) {
 
 list<Token> indentInsensitiveExpr(IndentSensitiveStream& in) {
   list<Token> result;
-  long openExplicitParens = 0;
+  long explicitOpenParens = 0;
   while (!in.fd.eof()) {
     Token curr = nextToken(in);
     if (curr.newline) {
       in.atStartOfLine = true;
-      if (openExplicitParens == 0) break;
+      if (explicitOpenParens == 0) break;
     }
     else if (isIndent(curr)) {
     }
@@ -146,16 +144,16 @@ list<Token> indentInsensitiveExpr(IndentSensitiveStream& in) {
     }
     else if (curr == "(") {
       result.push_back(curr);
-      ++openExplicitParens;
+      ++explicitOpenParens;
     }
     else if (curr == ")") {
       result.push_back(curr);
-      --openExplicitParens;
-      if (openExplicitParens == 0) break;
+      --explicitOpenParens;
+      if (explicitOpenParens == 0) break;
     }
     else { // word
       result.push_back(curr);
-      if (openExplicitParens == 0) break;
+      if (explicitOpenParens == 0) break;
     }
   }
   return result;
