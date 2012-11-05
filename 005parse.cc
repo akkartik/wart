@@ -80,11 +80,12 @@ bool eof(AstNode n) {
 
 ostream& operator<<(ostream& os, AstNode x) {
   if (x.elems.empty()) return os << x.atom;
-  bool prevWasOpen = true;
+  bool skipNextSpace = true;
   for (list<AstNode>::iterator p = x.elems.begin(); p != x.elems.end(); ++p) {
-    if (!(*p == ")" || prevWasOpen)) os << " ";
-    prevWasOpen = (*p == "(" || *p == "'" || *p == "," || *p == ",@" || *p == "@");
+    if (*p != ")" && !skipNextSpace)
+      os << " ";
     os << *p;
+    skipNextSpace = (*p == "(" || isQuoteOrUnquote(*p));
   }
   return os;
 }
