@@ -11,7 +11,7 @@
 //    so lines with one word are never wrapped in parens, like x or ,f.sym
 //  encourage macros to fully parenthesize
 //    so ignore indent inside backquote
-//  read the minimum possible from the stream for interactive repls
+//  read the minimum possible from the stream (to support interactive repls)
 
 #include<assert.h>
 
