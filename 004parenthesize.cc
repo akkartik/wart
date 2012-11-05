@@ -44,13 +44,13 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
           && (implicitParenStack.empty() || in.fd.peek() == '\n'))
         break;
     }
-    else if (curr.isQuoteOrUnquote()) {
+    else if (isQuoteOrUnquote(curr)) {
       if (numWordsInLine < 2)
         buffer.push_back(curr);
       else
         emit(curr, result, openExplicitParens);
     }
-    else if (curr.isParen()) {
+    else if (isParen(curr)) {
       if (!parenAtStartOfLine)
         parenAtStartOfLine = (curr == "(" && numWordsInLine == 0);
       if (numWordsInLine < 2 && openExplicitParens == 0 && !parenAtStartOfLine) {
@@ -63,7 +63,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
           break;
       }
     }
-    else if (!curr.isIndent()) { // curr is a 'word' token
+    else if (!isIndent(curr)) { // curr is a 'word' token
       ++numWordsInLine;
       if (numWordsInLine < 2) {
         buffer.push_back(curr);
@@ -139,9 +139,9 @@ list<Token> indentInsensitiveExpr(IndentSensitiveStream& in) {
       in.atStartOfLine = true;
       if (openExplicitParens == 0) break;
     }
-    else if (curr.isIndent()) {
+    else if (isIndent(curr)) {
     }
-    else if (curr.isQuoteOrUnquote()) {
+    else if (isQuoteOrUnquote(curr)) {
       result.push_back(curr);
     }
     else if (curr == "(") {
@@ -164,7 +164,20 @@ list<Token> indentInsensitiveExpr(IndentSensitiveStream& in) {
 long skipInitialNewlinesToFirstIndent(IndentSensitiveStream& in) {
   for (;;) {
     Token token = nextToken(in);
-    if (token.isIndent()) return token.indentLevel;
+    if (isIndent(token)) return token.indentLevel;
     assert(token.newline);
   }
+}
+
+bool isIndent(const Token& t) {
+  return t.token == "" && !t.newline;
+}
+
+bool isParen(const Token& t) {
+  return t == "(" || t == ")";
+}
+
+bool isQuoteOrUnquote(const Token& t) {
+  return t == "'" || t == "`"
+      || t == "," || t == ",@" || t == "@";
 }

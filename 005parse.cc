@@ -52,12 +52,12 @@ AstNode nextAstNode(IndentSensitiveStream& in) {
 
 AstNode nextAstNode(TokenBufferedStream& in) {
   Token curr = nextParenInsertedToken(in);
-  if (curr != "(" && !curr.isQuoteOrUnquote())
+  if (curr != "(" && !isQuoteOrUnquote(curr))
     return AstNode(curr);
 
   list<AstNode> subform;
   subform.push_back(AstNode(curr));
-  while (!eof(subform.back()) && subform.back().atom.isQuoteOrUnquote())
+  while (!eof(subform.back()) && isQuoteOrUnquote(subform.back()))
     subform.push_back(AstNode(nextParenInsertedToken(in)));
 
   if (subform.back() == "(") {
@@ -108,7 +108,7 @@ ostream& operator<<(ostream& os, AstNode x) {
 Token nextNonWhitespaceToken(istream& in) {
   while (!in.eof()) {
     Token curr = nextToken(in);
-    if (!curr.isIndent()) return curr;
+    if (!isIndent(curr)) return curr;
   }
   return eof();
 }
@@ -116,4 +116,8 @@ Token nextNonWhitespaceToken(istream& in) {
 Token nextToken(istream& in) {
   IndentSensitiveStream cs(in);
   return nextToken(cs);
+}
+
+bool isQuoteOrUnquote(const AstNode& n) {
+  return n.isAtom() && isQuoteOrUnquote(n.atom);
 }

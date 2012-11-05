@@ -35,17 +35,6 @@ struct Token {
     return *this;
   }
 
-  bool isIndent() {
-    return token == "" && !newline;
-  }
-  bool isParen() {
-    return token == "(" || token == ")";
-  }
-  bool isQuoteOrUnquote() {
-    return token == "'" || token == "`"
-        || token == "," || token == ",@" || token == "@";
-  }
-
   bool operator==(const string& x) const {
     return token == x;
   }
