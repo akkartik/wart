@@ -102,22 +102,6 @@ ostream& operator<<(ostream& os, AstNode x) {
 
 
 
-// To disable whitespace-sensitivity, replace calls to nextParenInsertedToken
-// with nextNonWhitespaceToken.
-
-Token nextNonWhitespaceToken(istream& in) {
-  while (!in.eof()) {
-    Token curr = nextToken(in);
-    if (!isIndent(curr)) return curr;
-  }
-  return eof();
-}
-
-Token nextToken(istream& in) {
-  IndentSensitiveStream cs(in);
-  return nextToken(cs);
-}
-
 bool isQuoteOrUnquote(const AstNode& n) {
   return n.isAtom() && isQuoteOrUnquote(n.atom);
 }
