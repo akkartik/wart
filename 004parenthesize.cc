@@ -108,7 +108,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
 
 
 
-// Internals.
+// internals
 
 void emit(Token& t, list<Token>& out, long& openExplicitParens) {
   out.push_back(t);

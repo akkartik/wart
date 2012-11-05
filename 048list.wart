@@ -159,7 +159,7 @@ def (best f seq)
 
 
 
-## Internals
+# internals
 
 def (range_bounce seq idx)
   if (idx < 0)
