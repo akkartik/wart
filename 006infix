@@ -42,8 +42,8 @@ are not.
 
 You can create your own infix ops:
 
-  def (<>) (a b)                        # def <> (a b) would become <> def (a b)
-    (~equal a b)
+  def (a <> b)
+    (not (a = b))
 
   (1 <> 2)
   => 1
