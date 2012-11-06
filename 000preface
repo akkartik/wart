@@ -31,44 +31,59 @@ X As the original coherence decays, the quality of the codebase decays as
 This trajectory shows two sources of entropy: shifting requirements that make
 the once-ideal design less ideal, and transmitting even an ideal design to
 newcomers. Both sources of entropy can be attacked with a single imperative:
-make rewrites easier and less risky.
+make rewrites easier and less risky. An easy-to-rewrite codebase can respond
+to new requirements with radical reorganizations. And it allows newcomers to
+test their knowledge by attempting lots of reorganizations in sandboxes.
 
-- Write lots of tests. Tests can't avoid bugs, but they should guard against
-  *known* bugs. The contract: if the tests pass, no regressions have been
-  introduced.
+But how can we make rewrite-friendly codebases? Some parts of the answer are
+easier to find:
 
-  Tests help newcomers read an unfamiliar codebase. "Why is this not written
-  like that?" Try it, run tests. What failed? "Ah, I hadn't thought of feature
-  x."
+a) High-level features keep codebases small and increase their chances of
+fitting in a programmer's head. Programmers can only rewrite what fits in
+their heads.
 
-- Tier tests into levels, and make each level of tests coherent and
-  self-contained.
+b) Comprehensive tests reduce rewrite risk by providing feedback. They also
+allow programmers to offload state about lots of different corner cases and
+reimport them as needed.
 
-  Layered tests simplify major redesign experimenting. Just throw out
-  sub-components *and all their tests* without fear of regressions.
+c) Rewrite-friendly codebases must be reorganization-friendly. This implies
+smarter compilers that don't impose constraints on code ordering, and that
+permit lots of ways of dividing up behavior into subsystems, files and
+declarations.
 
-  Layering also helps organize the knowledge encoded in tests into a higher
-  structure that is easier for outsiders to read.
+Other parts are harder. Radical reorganizations might shift subsystem
+boundaries, which can break lots of tests. How to rewrite with confidence when
+we need to change tests a well? I have a few ideas:
 
-- Keep the programmer fully in control.
-  - Declarations in any order.
-  - All primitives open to extension or overriding.
-  - No backwards compatibility guarantees for programmers. Expect app-level
-    tests to warn of errors after upgrading libraries.
+d) Tier tests into levels, and make each level coherent and self-contained.
+This creates redundancy between tests at different levels, so that we can
+throw out sub-components and all their tests. But surely this isn't always
+practical. The reason we unit-test heavily at the finest possible granularity
+is to avoid the combinatorial explosion of codepaths that comes with
+hooking up subsystems together.
 
-  This helps maintain programmers' sense of ownership and motivation. It also
-  fosters accountability; with complete flexibility there's less excuse for
-  convoluted APIs, for codebase layout to not reflect program behavior.
+e) Documentation. Documentation is deeply unsatisfying because it's hard to
+police it for staleness or comprehensiveness. I've been experimenting with
+extremely concise statements of what a subsystem tries to avoid. They aren't
+comprehensive (that's what tests are for), but they highlight what's
+important, help newcomers glimpse the history and the 'theory' of the
+codebase, and can trigger conversations with veterans. They also help
+outsiders gauge the quality of a codebase. What scenarios did the programmers
+consider? Do they seem comprehensive?
 
-- Document as concisely as possible the constraints that drove the design.
-  Focus on what you guard against, not what the implementation does. (See top
-  of tokenize.cc for an example.)
+f) Minimize constraints on the end product to maximize programmers' sense of
+ownership. In particular, make backwards-compatibility guarantees only in the
+UX, not at the level of code. If a codebase is consumed by other programmers
+(if it provides an API, for example), force them to write unit tests for
+*their* apps. Most significant upgrades are non-trivial in the real-world; all
+we are doing is admitting this in advance.
 
-  This helps newcomers glimpse the history and the 'theory' of the codebase,
-  why things are the way they are. These notes aren't complete, but they
-  highlight what's important, and can trigger conversation with veterans. They
-  also help outsiders gauge the quality of a codebase. What scenarios did the
-  programmers consider? Do they seem comprehensive?
+These ideas are more speculative and almost certainly not a complete answer.
+This project is an ongoing experiment in maintaining a rewrite-friendly
+codebase. My plan is to build something I enjoy working on and something I
+enjoy using, to pile on features without letting the design settle into a
+local optimum. What techniques and tools will I need to keep up redesign in
+the presence of constant change?
 
 Next: 001organization (http://github.com/akkartik/wart/blob/master/001organization)
 
