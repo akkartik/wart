@@ -117,8 +117,11 @@ void bindParams(Cell* params, Cell* args) {
 }
 
 void bindParamAliases(Cell* aliases, Cell* arg) {
+  if (cdr(aliases) == nil)
+    RAISE << "just one param alias: " << car(aliases) << "; are you sure?\n";
   for (; aliases != nil; aliases=cdr(aliases))
-    bindParams(car(aliases), arg);
+    if (isSym(car(aliases)) || isCons(arg))
+      bindParams(car(aliases), arg);
 }
 
 
