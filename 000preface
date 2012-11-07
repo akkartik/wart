@@ -36,7 +36,7 @@ to new requirements with radical reorganizations. And it allows newcomers to
 test their knowledge by attempting lots of reorganizations in sandboxes.
 
 But how can we make rewrite-friendly codebases? Some parts of the answer are
-easier to find:
+easier to state:
 
 a) High-level features keep codebases small and increase their chances of
 fitting in a programmer's head. Programmers can only rewrite what fits in
@@ -49,11 +49,13 @@ reimport them as needed.
 c) Rewrite-friendly codebases must be reorganization-friendly. This implies
 smarter compilers that don't impose constraints on code ordering, and that
 permit lots of ways of dividing up behavior into subsystems, files and
-declarations.
+declarations. Contrast say C++'s constraints on declarations before use, which
+make file reorganization -- especially header file reorganization -- so
+onerous as to doom projects from the start.
 
 Other parts are harder. Radical reorganizations might shift subsystem
 boundaries, which can break lots of tests. How to rewrite with confidence when
-we need to change tests a well? I have a few ideas:
+we need to change tests as well? I have a few ideas:
 
 d) Tier tests into levels, and make each level coherent and self-contained.
 This creates redundancy between tests at different levels, so that we can
@@ -81,9 +83,9 @@ we are doing is admitting this in advance.
 These ideas are more speculative and almost certainly not a complete answer.
 This project is an ongoing experiment in maintaining a rewrite-friendly
 codebase. My plan is to build something I enjoy working on and something I
-enjoy using, to pile on features without letting the design settle into a
-local optimum. What techniques and tools will I need to keep up redesign in
-the presence of constant change?
+enjoy using. If I can pile on features without letting the design settle into
+a local optimum, that would be some measure of success. What techniques and
+tools will I need to keep up redesign in the presence of constant change?
 
 Next: 001organization (http://github.com/akkartik/wart/blob/master/001organization)
 
