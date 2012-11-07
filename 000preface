@@ -66,7 +66,8 @@ hooking up subsystems together.
 
 e) Documentation. Documentation is deeply unsatisfying because it's hard to
 police it for staleness or comprehensiveness. I've been experimenting with
-extremely concise statements of what a subsystem tries to avoid. They aren't
+extremely concise statements of scenarios considered and situations to avoid
+(e.g. http://github.com/akkartik/wart/blob/master/006infix.cc). They aren't
 comprehensive (that's what tests are for), but they highlight what's
 important, help newcomers glimpse the history and the 'theory' of the
 codebase, and can trigger conversations with veterans. They also help
