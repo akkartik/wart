@@ -8,6 +8,7 @@ const string quoteAndUnquoteChars = ",'`@";   // controlling eval and macros
 //    so infix ops are ignored
 //  supporting whitespace sensitivity
 //    preserve indent information because later passes can't recreate it
+//    skip indent in empty lines
 //  avoid modifying strings
 //    so parse them here and make them easy for later passes to detect
 
