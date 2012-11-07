@@ -23,12 +23,12 @@ defset list ((seq idx ... ends) val)
         `(list_splice ,seq $idx $end ,val)
         `(car:list_splice ,seq $idx $end (list ,val))))
 
-def (pos x seq n)
+def (pos x (seq | (head ... tail)) n)
   default n :to 0
   if seq
-    if (car.seq = x)
+    if (head = x)
       n
-      (pos x cdr.seq n+1)
+      (pos x tail n+1)
 
 def (rpos x seq n)
   aif (pos x rev.seq n)
@@ -49,10 +49,10 @@ def (empty? seq)
 def (blank? seq)
   (or nil?.seq empty?.seq)
 
-def (copy x)
-  if cons?.x  # piecewise copy for objects by default
-    (cons copy:car.x copy:cdr.x)
+def (copy (x | (head ... tail)))
+  if (~bound? 'head)  # piecewise copy for objects by default
     x
+    (cons copy.head copy.tail)
 
 def (single? x)
   (and list?.x ~cdr.x)
