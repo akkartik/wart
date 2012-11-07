@@ -118,7 +118,7 @@ void bindParams(Cell* params, Cell* args) {
 
 void bindParamAliases(Cell* aliases, Cell* arg) {
   for (; aliases != nil; aliases=cdr(aliases))
-    addLexicalBinding(car(aliases), arg);
+    bindParams(car(aliases), arg);
 }
 
 

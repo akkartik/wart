@@ -226,6 +226,20 @@ void test_bindParams_binds_multiple_params() {
   rmref(params);
 }
 
+void test_bindParams_binds_as_params() {
+  Cell* params = read("(| a (b c))");
+  Cell* args = read("(1 2)");
+  newLexicalScope();
+  bindParams(params, args);
+  checkEq(car(unsafeGet(currLexicalScope, newSym("a"))), newNum(1));
+  checkEq(car(cdr(unsafeGet(currLexicalScope, newSym("a")))), newNum(2));
+  checkEq(unsafeGet(currLexicalScope, newSym("b")), newNum(1));
+  checkEq(unsafeGet(currLexicalScope, newSym("c")), newNum(2));
+  endLexicalScope();
+  rmref(args);
+  rmref(params);
+}
+
 
 
 Cell* processUnquotes(Cell* x, long depth) {
