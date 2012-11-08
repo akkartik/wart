@@ -55,7 +55,7 @@ COMPILE_FN(list_range, compiledFn_list_range, "($list $index $end)",
 
 COMPILE_FN(list_splice, compiledFn_list_splice, "('$list $start $end $val)",
   Cell* binding = lookup("$list");
-  Cell* list = eval(binding);
+  Cell* list = evalUnbox(binding);
   long start = toInt(lookup("$start"));
   Cell* prePtr = nthCdr(list, start-1);
   Cell* startPtr = nthCdr(list, start);
@@ -152,7 +152,7 @@ struct CellLt :public std::binary_function<Cell*, Cell*, bool> {
   CellLt(Cell* f) :comparer(f) {}
   bool operator()(Cell* a, Cell* b) {
     Cell* expr = newCons(comparer, newCons(a, newCons(b)));
-    Cell* result = eval(expr);
+    Cell* result = evalUnbox(expr);
     bool ans = (stripAlreadyEvald(result) != nil);
     rmref(result);
     rmref(expr);

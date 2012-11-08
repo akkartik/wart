@@ -42,7 +42,7 @@ COMPILE_FN(date, compiledFn_date, "()",
 
 COMPILE_FN(time, compiledFn_time, "('$expr)",
   clock_t start = clock();
-  Cell* result = eval(lookup("$expr"));
+  Cell* result = evalUnbox(lookup("$expr"));
   cerr << clock()-start << "/" << CLOCKS_PER_SEC << endl;
   return result;  // already mkref'd
 )

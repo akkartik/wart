@@ -40,8 +40,8 @@ void test_if_sees_args_in_then_and_else() {
 void test_cons_works() {
   Cell* call = read("cons 1 2");
   Cell* result = eval(call);
-  checkEq(car(result), newNum(1));
-  checkEq(cdr(result), newNum(2));
+  checkEq(car(rep(result)), newNum(1));
+  checkEq(cdr(rep(result)), newNum(2));
   rmref(result);
   rmref(call);
 }

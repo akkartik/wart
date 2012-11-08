@@ -22,7 +22,7 @@ void loadFile(const char* filename) {
   while (!f.eof()) {
     Cell* cell = read(f);
 //?     cerr << cell << endl;   // uncomment this to track down errors in wart files
-    rmref(eval(cell));
+    rmref(evalUnbox(cell));
     rmref(cell);
   }
   interactive = old_interactive;

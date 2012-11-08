@@ -22,6 +22,27 @@
 //  macros need to access caller environment
 //  @splicing args into macro calls just like regular functions
 
+// like eval, but unbox list objects
+Cell* evalUnbox(Cell* expr) {
+  return evalUnbox(expr, currLexicalScope);
+}
+Cell* evalUnbox(Cell* expr, Cell* scope) {
+  Cell* result = eval(expr, scope);
+  if (type(result) == sym_list) return nil; // nothing should ever hit this
+  if (type(result) != sym_List) return result;
+  Cell* result2 = mkref(rep(result));
+  rmref(result);
+  return result2;
+}
+
+Cell* box(Cell* expr) {
+  if (type(expr) != sym_list)
+    return expr;
+  Cell* result = mkref(newObject("List", expr));
+  rmref(expr);
+  return result;
+}
+
 Cell* eval(Cell* expr) {
   return eval(expr, currLexicalScope);
 }
@@ -37,7 +58,7 @@ Cell* eval(Cell* expr, Cell* scope) {
     return mkref(expr);
 
   if (isSym(expr))
-    return mkref(lookup(expr, scope, keepAlreadyEvald()));
+    return box(mkref(lookup(expr, scope, keepAlreadyEvald())));
 
   if (isAtom(expr))
     return mkref(expr);
@@ -46,16 +67,16 @@ Cell* eval(Cell* expr, Cell* scope) {
     return mkref(expr);
 
   if (isQuoted(expr))
-    return mkref(cdr(expr));
+    return box(mkref(cdr(expr)));
 
   if (isBackQuoted(expr))
-    return processUnquotes(cdr(expr), 1, scope);  // already mkref'd
+    return box(processUnquotes(cdr(expr), 1, scope));  // already mkref'd
 
   if (isAlreadyEvald(expr))
-    return mkref(keepAlreadyEvald() ? expr : stripAlreadyEvald(expr));
+    return box(mkref(keepAlreadyEvald() ? expr : stripAlreadyEvald(expr)));
 
   // expr is a call
-  Cell* fn = toFn(eval(car(expr), scope));
+  Cell* fn = toFn(evalUnbox(car(expr), scope));
   if (!isFn(fn))
     RAISE << "Not a call: " << expr << endl
         << "Perhaps you need to split the line in two." << endl;
@@ -75,14 +96,14 @@ Cell* eval(Cell* expr, Cell* scope) {
     // eval all forms in body, save result of final form
     for (Cell* form = impl(fn); form != nil; form=cdr(form)) {
       rmref(result);
-      result = eval(car(form), currLexicalScope);
+      result = evalUnbox(car(form), currLexicalScope);
     }
 
   endLexicalScope();
   endDynamicScope(CURR_LEXICAL_SCOPE);
   rmref(evaldArgs);
   rmref(fn);
-  return result;  // already mkref'd
+  return box(result);  // already mkref'd
 }
 
 Cell* processArgs(Cell* call, Cell* scope, Cell* fn) {
@@ -268,7 +289,7 @@ Cell* evalArgs(Cell* args, Cell* params, Cell* scope) {
 Cell* evalArg(Cell* arg, Cell* params, Cell* scope) {
   if (isAlreadyEvald(arg)) return mkref(stripAlreadyEvald(arg));
   if (isCons(params) && isQuoted(car(params))) return mkref(arg);
-  return eval(arg, scope);
+  return evalUnbox(arg, scope);
 }
 
 
@@ -296,7 +317,7 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
 }
 
 Cell* unsplice(Cell* arg, Cell* scope) {
-  return eval(cdr(arg), scope);
+  return evalUnbox(cdr(arg), scope);
 }
 
 // supporting @ in macro calls
@@ -347,11 +368,11 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
 
   if (unquoteDepth(x) == depth) {
     skippedAlreadyEvald = false;
-    Cell* result = eval(stripUnquote(x), scope);
+    Cell* result = evalUnbox(stripUnquote(x), scope);
     return skippedAlreadyEvald ? pushCons(sym_alreadyEvald, result) : result;
   }
   else if (unquoteSpliceDepth(car(x)) == depth) {
-    Cell* result = eval(stripUnquoteSplice(car(x)), scope);
+    Cell* result = evalUnbox(stripUnquoteSplice(car(x)), scope);
     Cell* splice = processUnquotes(cdr(x), depth, scope);
     if (result == nil) return splice;
 

@@ -51,7 +51,7 @@ int main(int argc, unused char* argv[]) {
   while (true) {
     Cell* form = read(STDIN);
     if (STDIN.eof()) return 0;
-    Cell* result = eval(form);
+    Cell* result = evalUnbox(form);
     cout << "=> " << result << endl;
 
     rmref(result);
