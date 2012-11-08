@@ -51,7 +51,7 @@ COMPILE_FN(make_socket, compiledFn_socket, "($host $port)",
   hostent *host = gethostbyname(toString(lookup("$host")).c_str());
   bzero(&sock->addr, sizeof(sock->addr));
   sock->addr.sin_family = AF_INET;
-  bcopy((char*)host->h_addr, (char*)sock->addr.sin_addr.s_addr, host->h_length);
+  bcopy((char*)&host->h_addr, (char*)&sock->addr.sin_addr.s_addr, host->h_length);
   sock->addr.sin_port = htons(toInt(lookup("$port")));
   PERR(connect(sock->fd, (sockaddr*)&sock->addr, sizeof(sock->addr)));
   return mkref(newSocket(sock));
