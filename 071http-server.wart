@@ -11,7 +11,7 @@ mac (accepting client_socket socket|from ... body)
 
 def (parse_request client_socket)
   making stdin infd:socket_fd.client_socket
-    let (verb url) (read)
+    let (verb url) (split:read_line)
       url
 
 def (http_server port)

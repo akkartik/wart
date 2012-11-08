@@ -66,3 +66,16 @@ COMPILE_FN(string_lesser, compiledFn_string_lesser, "($x $y)",
   Cell* y = lookup("$y");
   return toString(x) < toString(y) ? mkref(newNum(1)) : nil;
 )
+
+COMPILE_FN(split, compiledFn_split, "($s $delim)",
+  Cell* d = lookup("$delim");
+  char delim = (d != nil) ? toString(d)[0] : ' ';
+  stringstream ss(toString(lookup("$s")));
+  Cell* pResult = newCell();
+  for (Cell* curr = pResult; !ss.eof(); curr=cdr(curr)) {
+    string word;
+    getline(ss, word, delim);
+    addCons(curr, newString(word));
+  }
+  return dropPtr(pResult);
+)
