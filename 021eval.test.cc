@@ -353,8 +353,10 @@ void test_colonsym_evals_to_itself() {
 
 void test_colon_evals() {
   Cell* expr = read(":");
-  eval(expr);
-  checkEq(raiseCount, 1);     raiseCount=0;   // no binding yet
+  newDynamicScope(":", nil);
+  Cell* result = eval(expr);
+  checkEq(result, nil);
+  endDynamicScope(":");
   rmref(expr);
 }
 
