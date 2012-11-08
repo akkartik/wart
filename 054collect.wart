@@ -3,4 +3,4 @@ mac (collect ... body)
            yield  (fn(_)
                     (enq _ $acc)))
      ,@body
-     (car rep.$acc))
+     (as list $acc))
