@@ -1,3 +1,10 @@
+(test "enq works"
+  :valueof (let q (queue)
+             (enq 1 q)
+             (enq 2 q)
+             (as list q))
+  :should be '(1 2))
+
 (test "enq returns the elem being enqueued"
   :valueof (enq 3 (queue))
   :should be 3)
