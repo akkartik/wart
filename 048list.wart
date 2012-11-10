@@ -49,11 +49,10 @@ def (empty? seq)
 def (blank? seq)
   (or nil?.seq empty?.seq)
 
-def (copy (x | (head ... tail)))
-  if (~bound? 'head)  # piecewise copy for objects by default
+def (copy x)
+  if ~cons?.x
     x
-    (cons copy.head   # copying the head ensures a deep copy
-          copy.tail)
+    (cons copy:car.x copy:cdr.x)  # piecewise copy for objects by default
 
 def (single? x)
   (and list?.x ~cdr.x)
