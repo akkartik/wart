@@ -52,3 +52,7 @@
   :should be (ret x (table)
                (x.1 <- 2)
                (x.3 <- 4)))
+
+(test "copy can take additional args to merge in"
+  :valueof (copy (table 1 2 3 4) 3 5 4 6)
+  :should be (table 1 2 3 5 4 6))
