@@ -58,9 +58,7 @@ let if if   # ignore later refinements for the rest of this file
   alias (~) complement
 
   def (list ... args)
-    if args
-      (cons car.args
-            (list @cdr.args))
+    args
 
   def (map f seq)
     if seq
