@@ -1,7 +1,6 @@
 //// construct parse tree out of cells
 
 Cell* nextRawCell(IndentSensitiveStream& in) {
-  in.fd.peek();  if (in.eof()) return nil;
   return buildCell(transformInfix(nextAstNode(in)));
 }
 
