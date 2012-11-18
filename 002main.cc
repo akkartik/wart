@@ -124,7 +124,6 @@ void verify() {
   teardownCompiledFns();
   teardownCells();
   if (!passed) return;
-  passed = true;
   if (raiseCount != 0) cerr << raiseCount << " errors encountered" << endl;
   if (numUnfreed() > 0) dumpUnfreed();
 }
@@ -144,6 +143,7 @@ void setup() {
   setupCompiledFns();
   setupStreams();
   raiseCount = 0;
+  passed = true;
 }
 
 bool interactive = false;
