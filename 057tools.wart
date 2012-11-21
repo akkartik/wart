@@ -1,5 +1,5 @@
 def (l f)
-  load (join string.f ".wart")
+  load (f + ".wart")
 
 def (die ... args)
   prn @args

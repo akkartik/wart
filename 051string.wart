@@ -30,8 +30,11 @@ def (string ... args)
 defcoerce symbol string
   string
 
-def (join ... args) :case string?:car.args
-  (string @args)
+def (join head ... tail) :case (or string?.head sym?.head)
+  (string head @tail)
+
+def (+ head ... tail) :case (or string?.head sym?.head)
+  (string head @tail)
 
 def (empty? s) :case string?.s
   (s = "")
