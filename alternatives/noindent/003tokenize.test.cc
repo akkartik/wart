@@ -1,5 +1,3 @@
-                                  Token indent(long n) { return Token(n); }
-
 void test_tokenize_always_starts_a_line_with_indent() {
   stringstream in("34");
   Token t = nextToken(in);

@@ -19,10 +19,6 @@ list<Token> nextExpr(istream& in) {
 
 // internals
 
-bool isIndent(const Token& t) {
-  return t.token == "" && !t.newline;
-}
-
 bool isParen(const Token& t) {
   return t == "(" || t == ")";
 }

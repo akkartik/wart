@@ -1,4 +1,4 @@
-//// split input into tokens separated by newlines, indent, and the following boundaries:
+//// split input into tokens separated by the following boundaries:
 const string punctuationChars = "()#\"";  // the skeleton of a wart program
 const string quoteAndUnquoteChars = ",'`@";   // controlling eval and macros
 
@@ -12,33 +12,7 @@ const string quoteAndUnquoteChars = ",'`@";   // controlling eval and macros
 //  avoid modifying strings
 //    so parse them here and make them easy for later passes to detect
 
-// line contains 1 indent and zero or more regular tokens
-// and a newline token at the end
-struct Token {
-  string token;
-  long indentLevel;
-  bool newline;
-
-  explicit Token(string s)
-    :token(s), indentLevel(-1), newline(false) {}
-  explicit Token(long indent)
-    :token(""), indentLevel(indent), newline(false) {}
-  static Token Newline() {
-    Token t(0); t.newline = true; return t; }
-
-  bool operator==(const string& x) const {
-    return token == x;
-  }
-  bool operator!=(const string& x) const {
-    return !(*this == x);
-  }
-  bool operator==(const Token& x) const {
-    return token == x.token && indentLevel == x.indentLevel && newline == x.newline;
-  }
-  bool operator!=(const Token& x) const {
-    return !(*this == x);
-  }
-};
+typedef string Token;
 
 Token nextToken(istream& in) {
   in >> std::noskipws;
@@ -60,7 +34,7 @@ Token nextToken(istream& in) {
   else
     slurpWord(in, out);
 
-  return Token(out.str());
+  return out.str();
 }
 
 
@@ -137,10 +111,4 @@ void skipWhitespace(istream& in) {
 const size_t NOT_FOUND = string::npos;
 bool find(string s, char c) {
   return s.find(c) != NOT_FOUND;
-}
-
-ostream& operator<<(ostream& os, Token y) {
-  if (y.newline) return os << "\\n";
-  if (y == "") return os << ":" << y.indentLevel;
-  else return os << y.token;
 }

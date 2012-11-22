@@ -24,16 +24,16 @@ const string extraSymChars = "$?!_";  // besides letters and digits
 
 AstNode transformInfix(AstNode n) {
   // special-case: ellipses are for dotted lists, not infix
-  if (isAtom(n) && n.atom.token == "...")
+  if (isAtom(n) && n.atom == "...")
     return n;
 
-  if (isAtom(n) && n.atom.token[0] == '\"')
+  if (isAtom(n) && n.atom[0] == '\"')
     return n;
 
-  if (isAtom(n) && parseableAsFloat(n.atom.token))
+  if (isAtom(n) && parseableAsFloat(n.atom))
     return n;
 
-  if (isAtom(n) && !containsInfixChar(n.atom.token))
+  if (isAtom(n) && !containsInfixChar(n.atom))
     return n;
 
   if (isAtom(n))
@@ -78,7 +78,7 @@ AstNode transformInfix(AstNode n) {
   list<AstNode>::iterator curr=prev; ++curr;
   list<AstNode>::iterator next=curr; ++next;
   for (; next != n.elems.end(); ++prev, ++curr, ++next) {
-    if (curr->atom.token == "...") continue;
+    if (curr->atom == "...") continue;
 
     if (!isInfixOp(*curr)) {
       *curr = transformInfix(*curr);
@@ -130,7 +130,7 @@ AstNode transformInfix(AstNode n) {
 }
 
 AstNode tokenizeInfix(AstNode n) {
-  const char* var = n.atom.token.c_str();
+  const char* var = n.atom.c_str();
 
   // special-case: :sym is never infix
   if (var[0] == ':') return n;
@@ -166,7 +166,7 @@ AstNode tokenizeInfix(AstNode n) {
 bool isInfixOp(AstNode n) {
   if (isList(n)) return false;
   if (n == "...") return false;
-  string s = n.atom.token;
+  string s = n.atom;
   string::iterator p = s.begin();
   if (*p != '$' && !isInfixChar(*p))
     return false;

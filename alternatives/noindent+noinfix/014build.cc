@@ -17,25 +17,25 @@ Cell* buildCell(AstNode n) {
   if (isAtom(n)) {
     errno = 0;
     char* end;
-    long v = strtol(n.atom.token.c_str(), &end, 0);
+    long v = strtol(n.atom.c_str(), &end, 0);
     if (*end == '\0' && errno == 0)
       return newNum(v);
 
     if (errno == ERANGE || errno == EOVERFLOW)
-      RAISE << "dropping precision for bignum " << n.atom.token << endl;
+      RAISE << "dropping precision for bignum " << n.atom << endl;
 
-    float f = strtof(n.atom.token.c_str(), &end);
+    float f = strtof(n.atom.c_str(), &end);
     if (*end == '\0') {
-      if (n.atom.token.substr(0, 2) == "-.")
-        RAISE << "assuming '" << n.atom.token << "' is a float; to remove this warning say '-0" << n.atom.token.substr(1) << "'.\n"
-            << "If you mean to negate an int, skip the ssyntax: '-" << n.atom.token.substr(2) << "'.\n";
+      if (n.atom.substr(0, 2) == "-.")
+        RAISE << "assuming '" << n.atom << "' is a float; to remove this warning say '-0" << n.atom.substr(1) << "'.\n"
+            << "If you mean to negate an int, skip the ssyntax: '-" << n.atom.substr(2) << "'.\n";
       return newNum(f);
     }
 
-    if (n.atom.token.c_str()[0] == '"')
-      return newString(n.atom.token.substr(1, n.atom.token.length()-2));
+    if (n.atom.c_str()[0] == '"')
+      return newString(n.atom.substr(1, n.atom.length()-2));
 
-    return newSym(n.atom.token);
+    return newSym(n.atom);
   }
 
   list<AstNode>::iterator first = n.elems.begin();

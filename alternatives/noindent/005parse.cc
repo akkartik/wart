@@ -8,15 +8,9 @@ struct AstNode {
   explicit AstNode(list<AstNode> l) :atom(eof()), elems(l) {}
 
   bool operator==(const Token& x) const {
-    return elems.empty() && atom == x.token;
-  }
-  bool operator==(const string& x) const {
     return elems.empty() && atom == x;
   }
   bool operator!=(const Token& x) const {
-    return !(*this == x);
-  }
-  bool operator!=(const string& x) const {
     return !(*this == x);
   }
 };
