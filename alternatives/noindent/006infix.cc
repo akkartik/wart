@@ -16,7 +16,6 @@
 //  convenient range comparison: (0 <= k < n)
 //    so comparers should return last arg on success: (1 < 3) => 3
 //    so comparers should return any nil passed in (1 < nil) => nil; (nil < 1) => nil
-//  interaction with paren insertion
 //  use ':' for compose, but ':sym' for keyword args
 //  rely on user to support a.-b, l.-1 by defining .- op
 
