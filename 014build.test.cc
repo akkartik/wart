@@ -283,7 +283,7 @@ void test_build_handles_quotes() {
 }
 
 void test_build_handles_indented_wrapped_lines() {
-  IndentSensitiveStream in("a\n  (a b c\n   d e)");  // d e indented by just one space
+  IndentSensitiveStream in("a\n  (a b c\n   d e)");
   Cell *c0=nextRawCell(in);
   checkEq(c0->nrefs, 1);
   checkEq(c0, newSym("a"));
