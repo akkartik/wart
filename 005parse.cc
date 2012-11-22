@@ -58,6 +58,18 @@ Token eof() {
   return Token(0);
 }
 
+bool isList(const AstNode& n) {
+  return !n.elems.empty();
+}
+
+bool isAtom(const AstNode& n) {
+  return n.elems.empty();
+}
+
+bool isQuoteOrUnquote(const AstNode& n) {
+  return isAtom(n) && isQuoteOrUnquote(n.atom);
+}
+
 ostream& operator<<(ostream& os, AstNode x) {
   if (x.elems.empty()) return os << x.atom;
   bool skipNextSpace = true;

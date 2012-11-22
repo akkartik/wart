@@ -216,15 +216,3 @@ const char* skipFloat(const char* s) {
   strtof(s, &end);
   return end;
 }
-
-bool isList(const AstNode& n) {
-  return !n.elems.empty();
-}
-
-bool isAtom(const AstNode& n) {
-  return n.elems.empty();
-}
-
-bool isQuoteOrUnquote(const AstNode& n) {
-  return isAtom(n) && isQuoteOrUnquote(n.atom);
-}
