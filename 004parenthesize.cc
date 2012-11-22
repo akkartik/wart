@@ -35,7 +35,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
   long numWordsInLine = 0;
   bool parenAtStartOfLine = false;
   long thisLineIndent = skipInitialNewlinesToFirstIndent(in);
-  while (!in.fd.eof()) {
+  while (!in.eof()) {
     Token curr = nextToken(in);
     if (curr.newline) {
       if (interactive && explicitOpenParens == 0
@@ -122,7 +122,7 @@ void emitAll(list<Token>& buffer, list<Token>& out, long& explicitOpenParens) {
 }
 
 void restoreIndent(long indent, IndentSensitiveStream& in) {
-  if (in.fd.eof()) return;
+  if (in.eof()) return;
   for (int i = 0; i < indent; ++i)
     in.fd.putback(' ');
   in.atStartOfLine = true;
@@ -131,7 +131,7 @@ void restoreIndent(long indent, IndentSensitiveStream& in) {
 list<Token> indentInsensitiveExpr(IndentSensitiveStream& in) {
   list<Token> result;
   long explicitOpenParens = 0;
-  while (!in.fd.eof()) {
+  while (!in.eof()) {
     Token curr = nextToken(in);
     if (curr.newline) {
       in.atStartOfLine = true;
