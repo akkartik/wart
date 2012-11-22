@@ -23,7 +23,7 @@ void test_parse_handles_atoms() {
 }
 
 void test_parse_handles_forms() {
-  IndentSensitiveStream in("34 \"a b c\"");
+  IndentSensitiveStream in("(34 \"a b c\")");
   AstNode n = nextAstNode(in);
   check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
@@ -36,7 +36,7 @@ void test_parse_handles_forms() {
 }
 
 void test_parse_handles_nested_forms() {
-  IndentSensitiveStream in("34 (2 3) \"a b c\"");
+  IndentSensitiveStream in("(34 (2 3) \"a b c\")");
   AstNode n = nextAstNode(in);
   check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
@@ -80,7 +80,7 @@ void test_parse_handles_nested_forms_with_comments() {
 }
 
 void test_parse_handles_quotes() {
-  IndentSensitiveStream in("34 `(2 ,b) ',35 ,',36 ,'a");
+  IndentSensitiveStream in("(34 `(2 ,b) ',35 ,',36 ,'a)");
   AstNode n = nextAstNode(in);
   check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();

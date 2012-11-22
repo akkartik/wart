@@ -52,7 +52,7 @@ void test_infix_handles_op_without_args() {
 }
 
 void test_infix_handles_op_without_args2() {
-  IndentSensitiveStream in("= (+) 3");
+  IndentSensitiveStream in("(= (+) 3)");
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
@@ -83,7 +83,7 @@ void test_infix_handles_quoting() {
 }
 
 void test_infix_handles_simple_lists() {
-  IndentSensitiveStream in("a + b");
+  IndentSensitiveStream in("(a + b)");
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
@@ -96,7 +96,7 @@ void test_infix_handles_simple_lists() {
 }
 
 void test_infix_passes_wrapped_op() {
-  IndentSensitiveStream in("a (+) b");
+  IndentSensitiveStream in("(a (+) b)");
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
@@ -109,7 +109,7 @@ void test_infix_passes_wrapped_op() {
 }
 
 void test_infix_passes_wrapped_op2() {
-  IndentSensitiveStream in("a (:) b");
+  IndentSensitiveStream in("(a (:) b)");
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
@@ -122,7 +122,7 @@ void test_infix_passes_wrapped_op2() {
 }
 
 void test_infix_handles_infix_ops_in_prefix() {
-  IndentSensitiveStream in("+ a b");
+  IndentSensitiveStream in("(+ a b)");
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
@@ -135,7 +135,7 @@ void test_infix_handles_infix_ops_in_prefix() {
 }
 
 void test_infix_passes_ellipses_in_infix() {
-  IndentSensitiveStream in("a ... b");
+  IndentSensitiveStream in("(a ... b)");
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
@@ -148,7 +148,7 @@ void test_infix_passes_ellipses_in_infix() {
 }
 
 void test_infix_passes_op_with_ellipses() {
-  IndentSensitiveStream in("+ ... b");
+  IndentSensitiveStream in("(+ ... b)");
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
@@ -161,7 +161,7 @@ void test_infix_passes_op_with_ellipses() {
 }
 
 void test_infix_handles_infix_ops_in_unary_prefix() {
-  IndentSensitiveStream in("+ a");
+  IndentSensitiveStream in("(+ a)");
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
@@ -251,7 +251,7 @@ void test_infix_left_associates() {
 }
 
 void test_infix_handles_op() {
-  IndentSensitiveStream in("a + b");
+  IndentSensitiveStream in("(a + b)");
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
@@ -264,7 +264,7 @@ void test_infix_handles_op() {
 }
 
 void test_infix_always_has_higher_precedence_than_call() {
-  IndentSensitiveStream in("f a + b");
+  IndentSensitiveStream in("(f a + b)");
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
@@ -304,7 +304,7 @@ void test_infix_always_has_lower_precedence_than_prefix() {
 }
 
 void test_infix_handles_multiple_infix_ops() {
-  IndentSensitiveStream in("f a + b c + d");
+  IndentSensitiveStream in("(f a + b c + d)");
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
@@ -398,7 +398,7 @@ void test_infix_handles_op_with_float3() {
 }
 
 void test_infix_gives_ops_without_spaces_precedence() {
-  IndentSensitiveStream in("n * n-1");
+  IndentSensitiveStream in("(n * n-1)");
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
@@ -426,7 +426,7 @@ void test_infix_passes_keyword_syms() {
 }
 
 void test_infix_passes_keyword_syms2() {
-  IndentSensitiveStream in("f :a x");
+  IndentSensitiveStream in("(f :a x)");
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();

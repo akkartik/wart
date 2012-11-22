@@ -2,7 +2,7 @@ void test_spliceArgs_works() {
   newDynamicScope("a", newNum(3));
   newDynamicScope("b", newCons(newNum(4), newCons(newNum(5))));
   Cell* args = read("(a @b a)");
-  Cell* f = read("fn nil 3");
+  Cell* f = read("(fn nil 3)");
   Cell* fn = eval(f);
   Cell* splicedArgs = spliceArgs(args, nil, fn);
   checkEq(car(splicedArgs), newSym("a"));
@@ -24,7 +24,7 @@ void test_spliceArgs_works_with_nil() {
   newDynamicScope("a", newNum(3));
   newDynamicScope("b", nil);
   Cell* args = read("(a @b a)");
-  Cell* f = read("fn nil 3");
+  Cell* f = read("(fn nil 3)");
   Cell* fn = eval(f);
   Cell* splicedArgs = spliceArgs(args, nil, fn);
   checkEq(car(splicedArgs), newSym("a"));
@@ -42,7 +42,7 @@ void test_spliceArgs_works_with_keywords() {
   newDynamicScope("a", newNum(3));
   newDynamicScope("b", newCons(newNum(4), newCons(newSym(":x"))));
   Cell* args = read("(a @b a)");
-  Cell* f = read("fn nil 3");
+  Cell* f = read("(fn nil 3)");
   Cell* fn = eval(f);
   Cell* splicedArgs = spliceArgs(args, nil, fn);
   checkEq(car(splicedArgs), newSym("a"));
@@ -170,7 +170,7 @@ void test_evalArgs_handles_quoted_varargs_param() {
 void test_evalArgs_handles_rest_param() {
   newDynamicScope("a", newNum(3));
   newDynamicScope("b", newNum(4));
-  Cell* params = read("x ... y");
+  Cell* params = read("(x ... y)");
   Cell* args = read("(a b)");
   Cell* evaldArgs = evalArgs(args, params);
   checkEq(car(evaldArgs), newNum(3));
@@ -186,7 +186,7 @@ void test_evalArgs_handles_rest_param() {
 void test_evalArgs_handles_quoted_rest_param() {
   newDynamicScope("a", newNum(3));
   newDynamicScope("b", newNum(4));
-  Cell* params = read("x ... 'y");
+  Cell* params = read("(x ... 'y)");
   Cell* args = read("(a b)");
   Cell* evaldArgs = evalArgs(args, params);
   checkEq(car(evaldArgs), newNum(3));
@@ -369,7 +369,7 @@ void test_string_evals_to_itself() {
 }
 
 void test_object_expr_evals_to_itself() {
-  Cell* expr = read("object foo 4");
+  Cell* expr = read("(object foo 4)");
   Cell* result = eval(expr);
   checkEq(result, expr);
   rmref(result);
@@ -424,7 +424,7 @@ void test_eval_handles_unquote() {
 
 void test_eval_handles_unquote_splice() {
   Cell* expr = read("`(a ,@b)");
-  Cell* val = read("34 35");
+  Cell* val = read("(34 35)");
   newDynamicScope("b", val);
   Cell* result = eval(expr);
   checkEq(car(rep(result)), newSym("a"));
@@ -527,7 +527,7 @@ void test_eval_handles_rest_params() {
 
 void test_eval_handles_splice() {
   Cell* expr = read("(cons @b)");
-  Cell* val = read("3 4");
+  Cell* val = read("(3 4)");
   newDynamicScope("b", val);
   Cell* result = eval(expr);
   check(isCons(result));
