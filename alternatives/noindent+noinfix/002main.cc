@@ -29,14 +29,6 @@
 // Read is the time for optimizations, when subsidiary functions can be
 // specialized to a specific call-site.
 
-struct IndentSensitiveStream {
-  istream& fd;
-  explicit IndentSensitiveStream(istream& in) :fd(in) { fd >> std::noskipws; }
-  // leaky version just for convenient tests
-  explicit IndentSensitiveStream(string s) :fd(*new stringstream(s)) { fd >> std::noskipws; }
-  bool eof() { return fd.eof(); }
-} STDIN(cin);
-
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
     runTests();
@@ -48,8 +40,8 @@ int main(int argc, unused char* argv[]) {
   loadFiles(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (true) {
-    Cell* form = read(STDIN);
-    if (STDIN.eof()) return 0;
+    Cell* form = read(cin);
+    if (cin.eof()) return 0;
     Cell* result = evalUnbox(form);
     cout << "=> " << result << endl;
 
@@ -59,7 +51,7 @@ int main(int argc, unused char* argv[]) {
 }
 
 // read: segment next top-level, parse, build cells, transform $vars
-Cell* read(IndentSensitiveStream& in) {
+Cell* read(istream& in) {
   return mkref(transformDollarVars(nextRawCell(in)));
 }
 

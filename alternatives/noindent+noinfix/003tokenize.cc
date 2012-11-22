@@ -40,24 +40,25 @@ struct Token {
   }
 };
 
-Token nextToken(IndentSensitiveStream& in) {
-  while (in.fd.peek() == '#' || isspace(in.fd.peek())) {
-    skipWhitespace(in.fd);
-    if (in.fd.peek() == '#')
-      skipComment(in.fd);
+Token nextToken(istream& in) {
+  in >> std::noskipws;
+  while (in.peek() == '#' || isspace(in.peek())) {
+    skipWhitespace(in);
+    if (in.peek() == '#')
+      skipComment(in);
   }
 
   ostringstream out;
-  if (in.fd.peek() == '"')
-    slurpString(in.fd, out);
-  else if (find(punctuationChars, in.fd.peek()))
-    slurpChar(in.fd, out);
-  else if (in.fd.peek() == ',')
-    slurpUnquote(in.fd, out);
-  else if (find(quoteAndUnquoteChars, in.fd.peek()))
-    slurpChar(in.fd, out);
+  if (in.peek() == '"')
+    slurpString(in, out);
+  else if (find(punctuationChars, in.peek()))
+    slurpChar(in, out);
+  else if (in.peek() == ',')
+    slurpUnquote(in, out);
+  else if (find(quoteAndUnquoteChars, in.peek()))
+    slurpChar(in, out);
   else
-    slurpWord(in.fd, out);
+    slurpWord(in, out);
 
   return Token(out.str());
 }

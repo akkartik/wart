@@ -21,7 +21,7 @@ struct AstNode {
   }
 };
 
-AstNode nextAstNode(IndentSensitiveStream& in) {
+AstNode nextAstNode(istream& in) {
   list<Token> bufferedTokens = nextExpr(in);
   return nextAstNode(bufferedTokens);
 }

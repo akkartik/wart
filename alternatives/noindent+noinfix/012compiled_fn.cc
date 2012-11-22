@@ -20,7 +20,7 @@ void setupCompiledFns() {
   for (unsigned long i=0; i < sizeof(compiledFns)/sizeof(compiledFns[0]); ++i) {
     Cell* f = newTable();
     set(f, sym_name, newSym(compiledFns[i].name));
-    set(f, sym_sig, nextRawCell(*new IndentSensitiveStream(compiledFns[i].params)));
+    set(f, sym_sig, nextRawCell(*new stringstream(compiledFns[i].params)));
     set(f, sym_body, newCompiledFn(compiledFns[i].impl));
     Cell* obj = newObject("function", f);
     newDynamicScope(compiledFns[i].name, obj);

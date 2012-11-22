@@ -1,21 +1,21 @@
 void test_parse_handles_empty_stream() {
-  IndentSensitiveStream in("");
+  stringstream in("");
   checkEq(nextAstNode(in), eof());
 }
 
 void test_parse_handles_trailing_comment() {
-  IndentSensitiveStream in("34 # abc");
+  stringstream in("34 # abc");
   checkEq(nextAstNode(in), Token("34"));
   checkEq(nextAstNode(in), eof());
 }
 
 void test_parse_handles_atom() {
-  IndentSensitiveStream in("34");
+  stringstream in("34");
   checkEq(nextAstNode(in), Token("34"));
 }
 
 void test_parse_handles_atoms() {
-  IndentSensitiveStream in("34\n\"a b c\"\n3.4");
+  stringstream in("34\n\"a b c\"\n3.4");
   checkEq(nextAstNode(in), Token("34"));
   checkEq(nextAstNode(in), Token("\"a b c\""));
   checkEq(nextAstNode(in), Token("3.4"));
@@ -23,7 +23,7 @@ void test_parse_handles_atoms() {
 }
 
 void test_parse_handles_forms() {
-  IndentSensitiveStream in("(34 \"a b c\")");
+  stringstream in("(34 \"a b c\")");
   AstNode n = nextAstNode(in);
   check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
@@ -36,7 +36,7 @@ void test_parse_handles_forms() {
 }
 
 void test_parse_handles_nested_forms() {
-  IndentSensitiveStream in("(34 (2 3) \"a b c\")");
+  stringstream in("(34 (2 3) \"a b c\")");
   AstNode n = nextAstNode(in);
   check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
@@ -58,7 +58,7 @@ void test_parse_handles_nested_forms() {
 }
 
 void test_parse_handles_nested_forms_with_comments() {
-  IndentSensitiveStream in("(a b (c d #\n))");
+  stringstream in("(a b (c d #\n))");
   AstNode n = nextAstNode(in);
   check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
@@ -80,7 +80,7 @@ void test_parse_handles_nested_forms_with_comments() {
 }
 
 void test_parse_handles_quotes() {
-  IndentSensitiveStream in("(34 `(2 ,b) ',35 ,',36 ,'a)");
+  stringstream in("(34 `(2 ,b) ',35 ,',36 ,'a)");
   AstNode n = nextAstNode(in);
   check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
@@ -129,7 +129,7 @@ void test_parse_handles_quotes() {
 }
 
 void test_parse_handles_splice_operators() {
-  IndentSensitiveStream in("`(2 ,@b @,c)");
+  stringstream in("`(2 ,@b @,c)");
   AstNode n = nextAstNode(in);
   check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();

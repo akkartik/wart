@@ -1,6 +1,6 @@
 //// construct parse tree out of cells
 
-Cell* nextRawCell(IndentSensitiveStream& in) {
+Cell* nextRawCell(istream& in) {
   return buildCell(transformInfix(nextAstNode(in)));
 }
 

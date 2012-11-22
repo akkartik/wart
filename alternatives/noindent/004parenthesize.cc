@@ -1,6 +1,6 @@
 //// segment the tokens into top-level expressions
 
-list<Token> nextExpr(IndentSensitiveStream& in) {
+list<Token> nextExpr(istream& in) {
   list<Token> result;   // emit tokens here
 
   long explicitOpenParens = 0;
