@@ -1,0 +1,93 @@
+Good programmers write clean, simple codebases. But even good programmers
+can't seem to *keep* codebases clean over time. There are several reasons for
+this:
+
+X Over time the codebase accumulates constraints its programmers can't
+  control. Backwards compatibility considerations, subcomponents that must be
+  invoked in a specific order, arranging things to satisfy the build system or
+  other tools, etc. As the space of possible changes is increasingly
+  constrained, programmers gradually lose their sense of ownership toward the
+  codebase. It becomes hard enough to just get the codebase to do what you
+  want.
+
+X Codebases with even moderate success acquire new programmers. Even talented
+  newcomers don't understand why things are the way they are. They make
+  changes that, while internally consistent, go against the grain of the
+  design in subtle ways. The owners/veterans start out watching such changes
+  closely and guiding newcomers, but over time this becomes harder and harder.
+  Once you admit some kinds of ugliness it becomes easier to live with others
+  (http://en.wikipedia.org/wiki/Broken_windows_theory). As other constraints
+  grow and sense of ownership decays, newcomers get less guidance, more noob
+  code is mixed in, and the coherence of the original design is diluted.
+
+X Newcomers gain experience with the codebase in ad hoc ways, with gaps in
+  their knowledge. Their guidance to the next generation is less coherent
+  still, and may even contradict the original authors.
+
+X As the original coherence decays, the quality of the codebase decays as
+  well. The original design principles become less and less useful,
+  accelerating their demise.
+
+This trajectory shows two sources of entropy: shifting requirements that make
+the once-ideal design less ideal, and transmitting even an ideal design to
+newcomers. Both sources of entropy can be attacked with a single imperative:
+make rewrites easier and less risky. An easy-to-rewrite codebase can respond
+to new requirements with radical reorganizations. And it allows newcomers to
+test their knowledge by attempting lots of reorganizations in sandboxes.
+
+But how can we make rewrite-friendly codebases? Some parts of the answer are
+easier to state:
+
+a) High-level features keep codebases small and increase their chances of
+fitting in a programmer's head. Programmers can only rewrite what fits in
+their heads.
+
+b) Comprehensive tests reduce rewrite risk by providing feedback. They also
+allow programmers to offload state about lots of different corner cases and
+reimport them as needed.
+
+c) Rewrite-friendly codebases must be reorganization-friendly. This implies
+smarter compilers that don't impose constraints on code ordering, and that
+permit lots of ways of dividing up behavior into subsystems, files and
+declarations. Contrast say C++'s constraints on declarations before use, which
+make file reorganization -- especially header file reorganization -- so
+onerous as to doom projects from the start.
+
+Other parts are harder. Radical reorganizations might shift subsystem
+boundaries, which can break lots of tests. How to rewrite with confidence when
+we need to change tests as well? I have a few ideas:
+
+d) Tier tests into levels, and make each level coherent and self-contained.
+This creates redundancy between tests at different levels, so that we can
+throw out sub-components and all their tests. But surely this isn't always
+practical. The reason we unit-test heavily at the finest possible granularity
+is to avoid the combinatorial explosion of codepaths that comes with
+hooking up subsystems together.
+
+e) Documentation. Documentation is deeply unsatisfying because it's hard to
+police it for staleness or comprehensiveness. I've been experimenting with
+extremely concise statements of scenarios considered and situations to avoid
+(e.g. http://github.com/akkartik/wart/blob/master/006infix.cc). They aren't
+comprehensive (that's what tests are for), but they highlight what's
+important, help newcomers glimpse the history and the 'theory' of the
+codebase, and can trigger conversations with veterans. They also help
+outsiders gauge the quality of a codebase. What scenarios did the programmers
+consider? Do they seem comprehensive?
+
+f) Minimize constraints on the end product to maximize programmers' sense of
+ownership. In particular, make backwards-compatibility guarantees only in the
+UX, not at the level of code. If a codebase is consumed by other programmers
+(if it provides an API, for example), force them to write unit tests for
+*their* apps. Most significant upgrades are non-trivial in the real-world; all
+we are doing is admitting this in advance.
+
+These ideas are more speculative and almost certainly not a complete answer.
+This project is an ongoing experiment in maintaining a rewrite-friendly
+codebase. My plan is to build something I enjoy working on and something I
+enjoy using. If I can pile on features without letting the design settle into
+a local optimum, that would be some measure of success. What techniques and
+tools will I need to keep up redesign in the presence of constant change?
+
+Next: 001organization (http://github.com/akkartik/wart/blob/master/001organization)
+
+Give feedback: wart@akkartik.com

@@ -1,0 +1,74 @@
+--- Optional parens
+
+Wart is indentation sensitive. Multi-word lines without leading parens are
+implicitly grouped with later indented lines:
+  if (> n 0)
+    * n (- n 1)
+=>
+  (if (> n 0)
+    (* n (- n 1))
+
+No indented lines after? They're grouped in isolation:
+  a b
+  c d
+=>
+  (a b)
+  (c d)
+
+Lines with a single word are never wrapped in parens:
+  def (foo)
+    x
+=>
+  (def (foo)
+    x)    # x is returned as a value, never called
+
+Lines with a leading paren are never wrapped in parens:
+  def (foo x)
+    (prn x) x
+=>
+  (def (foo x)
+    (prn x) x)
+
+Putting these rules together, parens are not required around 'if' in:
+  if (x%2 = 1)
+    'odd
+    'even
+..but they are required in:
+  (if                 # parens required because line has a single word
+    (x%2 = 1)         # parens required to avoid grouping with next line
+      'odd
+    :else             # optional, sometimes more clear
+      'even)
+..and, furthermore, this is wrong:
+  if (x%2 = 1)
+    'odd
+  :else
+    'even
+=>
+  (if (x%2 = 1)
+    'odd)
+  :else
+  'even               # wrong
+
+--- "But I hate significant whitespace!"
+
+I'm not trying to minimize parens typed; I'm trying to make lisp code more
+readable to non-lispers. Wart's codebase tastefully removes parens from just
+control-flow operators (def/mac/if/while/..), leaving them alone everywhere
+else. When in doubt, I insert parens.
+
+If you don't like this approach, just use parens everywhere:
+  (def (foo) 34)
+  (def (foo)
+    34)
+
+Indentation-sensitivity is disabled inside parens. This rule is useful if you
+want multiple expressions on a single line:
+  (if test1 body1     # parens required to avoid grouping test2 and body2
+      test2 body2
+            else-expr)
+
+It also implies that backquoted expressions must be fully parenthesized:
+  mac (when cond ... body)
+    `(if ,cond
+       (do ,@body))   # parens before 'do' are required
