@@ -1,12 +1,6 @@
 I. ctrl-d quits
 ^D
 
-II. 2 newlines eval
-prn 3<Enter>
-<Enter>
-3
-=> 3
-
 III. Fully-parenthesized form immediately evals
 (prn "world")<Enter>
 => "world"

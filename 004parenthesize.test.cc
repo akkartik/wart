@@ -559,3 +559,24 @@ void test_parenthesize_handles_multiple_exprs_on_a_line() {
   checkEq(*p, "2"); ++p;
   check(p == tokens.end());
 }
+
+void test_parenthesize_breaks_at_empty_lines_when_interactive() {
+  list<Token> tokens = nextExpr(*new IndentSensitiveStream("34 35\n\n  36"));
+  list<Token>::iterator p = tokens.begin();
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "34"); ++p;
+  checkEq(*p, "35"); ++p;
+  checkEq(*p, "36"); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == tokens.end());
+
+  interactive = true;
+  tokens = nextExpr(*new IndentSensitiveStream("34 35\n\n  36"));
+    p = tokens.begin();
+    checkEq(*p, "("); ++p;
+    checkEq(*p, "34"); ++p;
+    checkEq(*p, "35"); ++p;
+    checkEq(*p, ")"); ++p;
+    check(p == tokens.end());
+  interactive = false;
+}
