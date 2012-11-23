@@ -580,3 +580,26 @@ void test_parenthesize_breaks_at_empty_lines_when_interactive() {
     check(p == tokens.end());
   interactive = false;
 }
+
+void test_parenthesize_breaks_indent_at_empty_lines_when_interactive() {
+  list<Token> tokens = nextExpr(*new IndentSensitiveStream("a b\n  c\n\n  d"));
+  list<Token>::iterator p = tokens.begin();
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, "c"); ++p;
+  checkEq(*p, "d"); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == tokens.end());
+
+  interactive = true;
+  tokens = nextExpr(*new IndentSensitiveStream("a b\n  c\n\n  d"));
+    p = tokens.begin();
+    checkEq(*p, "("); ++p;
+    checkEq(*p, "a"); ++p;
+    checkEq(*p, "b"); ++p;
+    checkEq(*p, "c"); ++p;
+    checkEq(*p, ")"); ++p;
+    check(p == tokens.end());
+  interactive = false;
+}

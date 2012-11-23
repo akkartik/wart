@@ -7,12 +7,6 @@ III. Fully-parenthesized form immediately evals
 34<Enter>
 => 34
 
-IV. Indent-based multi-line form
-def (foo)<Enter>
-  34<Enter>
-<Enter>
-=> (object function ..)
-
 V. Add a comment at the prompt.
 (prn "world") # this is a comment!<Enter>
 
