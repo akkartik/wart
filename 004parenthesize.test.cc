@@ -603,3 +603,25 @@ void test_parenthesize_breaks_indent_at_empty_lines_when_interactive() {
     check(p == tokens.end());
   interactive = false;
 }
+
+void test_parenthesize_resets_stream_after_multiple_exprs_in_a_line() {
+  IndentSensitiveStream in("() a\nc d");
+  list<Token> tokens = nextExpr(in);
+  list<Token>::iterator p = tokens.begin();
+  checkEq(*p, "("); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == tokens.end());
+
+  tokens = nextExpr(in);
+  p = tokens.begin();
+  checkEq(*p, "a"); ++p;
+  check(p == tokens.end());
+
+  tokens = nextExpr(in);
+  p = tokens.begin();
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "c"); ++p;
+  checkEq(*p, "d"); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == tokens.end());
+}

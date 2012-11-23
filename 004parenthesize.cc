@@ -134,7 +134,7 @@ list<Token> indentInsensitiveExpr(IndentSensitiveStream& in) {
   while (!in.eof()) {
     Token curr = nextToken(in);
     if (curr.newline) {
-      in.atStartOfLine = true;
+      assert(in.atStartOfLine);
       if (explicitOpenParens == 0) break;
     }
     else if (isIndent(curr)) {
