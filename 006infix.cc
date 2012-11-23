@@ -213,6 +213,6 @@ bool parseableAsFloat(string s) {
 
 const char* skipFloat(const char* s) {
   char* end = NULL;
-  strtof(s, &end);
+  unused float dummy = strtof(s, &end);
   return end;
 }
