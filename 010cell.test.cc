@@ -35,17 +35,12 @@ void test_nthCdr() {
 }
 
 void test_Cell_layout_constraints() {
-  // no wasting space
   Cell cell;
   check((sizeof(cell.car)%4) == 0);
   check((sizeof(cell.cdr)%4) == 0);
   check((sizeof(cell.type)%4) == 0);
   check((sizeof(cell.nrefs)%4) == 0);
 
-  // all Cells are the same size so we don't fragment memory
-  // (except for strings)
-
-  // car and cdr can store numbers
   check(sizeof(long) <= sizeof(Cell*));
   check(sizeof(float) <= sizeof(Cell*));
   check(sizeof(size_t) <= sizeof(Cell*));

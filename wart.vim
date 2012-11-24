@@ -20,6 +20,11 @@ setlocal iskeyword=@,48-57,?,!,_,$
 
 syntax match wartComment /#.*$/
 highlight link wartComment Comment
+syntax match wartSalientComment /##.*$/
+highlight link wartSalientComment SalientComment
+" I have these in my dark colorscheme across all languages.
+highlight Comment ctermfg=Blue
+highlight SalientComment ctermfg=Cyan
 
 syntax region wartString start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=@Spell
 highlight link wartString String

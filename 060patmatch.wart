@@ -5,7 +5,7 @@ mac (matching vars vals ... body)
 
 
 
-# internals
+## internals
 
 def (strip_underscores vars)
   (if

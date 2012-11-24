@@ -64,11 +64,11 @@ AstNode transformInfix(AstNode n) {
   if (n.elems.front() != Token("("))
     return n;
 
-  if (n.elems.size() == 2)  // ()
+  if (n.elems.size() == 2)  //// ()
     return n;
 
   if (infixOpCalledWithoutArgs(n))
-    return *++n.elems.begin();  // (++) => ++
+    return *++n.elems.begin();  //// (++) => ++
 
   int oldsize = n.elems.size();
 
@@ -84,7 +84,7 @@ AstNode transformInfix(AstNode n) {
       *curr = transformInfix(*curr);
       continue;
     }
-    if (*next == ")") {  // postfix op
+    if (*next == ")") {  //// postfix op
       *curr = transformInfix(*curr);
       continue;
     }
@@ -92,8 +92,8 @@ AstNode transformInfix(AstNode n) {
     list<AstNode> tmp;
     tmp.push_back(transformInfix(*curr));
     if (prev == n.elems.begin()) {
+      //// prefix op; grab as many non-ops as you can
       list<AstNode>::iterator oldnext = next;
-      // prefix op; grab as many non-ops as you can
       while (!isInfixOp(*next)) {
         tmp.push_back(transformInfix(*next));
         ++next;
@@ -105,7 +105,7 @@ AstNode transformInfix(AstNode n) {
       next=curr; ++next;
     }
     else {
-      // infix op; switch to prefix
+      //// infix op; switch to prefix
       tmp.push_back(*prev);
       tmp.push_back(transformInfix(*next));
 

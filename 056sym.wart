@@ -31,6 +31,10 @@ def (is_match a b bindings) :case sym?.a
                   (default bindings.a :to b)
                   (bindings.a = b)))))
 
+
+
+## internals
+
 # ignore the uniq part of a $sym
 def (sym_root x)
   let name (rev:as list string.x)

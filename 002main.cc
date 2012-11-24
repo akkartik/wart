@@ -44,7 +44,7 @@ int main(int argc, unused char* argv[]) {
     return 0;
   }
 
-  // Interpreter loop: read, eval, print
+  //// Interpreter loop: read, eval, print
   interactive_setup();
   loadFiles(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
@@ -59,14 +59,14 @@ int main(int argc, unused char* argv[]) {
   }
 }
 
-// read: tokenize, parenthesize, parse, transform infix, build cells, transform $vars
+//// read: tokenize, parenthesize, parse, transform infix, build cells, transform $vars
 Cell* read(IndentSensitiveStream& in) {
   return mkref(transformDollarVars(nextRawCell(in)));
 }
 
 
 
-// test harness
+//// test harness
 
 bool runningTests = false;
 

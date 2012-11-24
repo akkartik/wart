@@ -1,4 +1,4 @@
-# basic type-based dispatch
+## basic type-based dispatch
 mac (lhs <- rhs) :case list?.lhs
   # multiple-eval in case car.lhs needs assigning to
   `((table_get (table_get Coercions 'setter) (type ,car.lhs)) ,lhs ,rhs)
@@ -12,7 +12,7 @@ mac (defset type params ... body)
 
 
 
-# keyword-based dispatch
+## keyword-based dispatch
 mac (lhs <- rhs) :case (and list?.lhs (table_get Coercions car.lhs))
   `((table_get Coercions ',car.lhs) ,@cdr.lhs ,rhs)
 
@@ -28,7 +28,7 @@ def_assign (.-) '(f x val)
 
 
 
-# serial assignment
+## serial assignment
 # this should be after clauses inspecting args
 let ($<-) (<-)
   mac! (<- ... args)

@@ -61,7 +61,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
           break;
       }
     }
-    else if (!isIndent(curr)) { // curr is a 'word' token
+    else if (!isIndent(curr)) { //// curr is a 'word' token
       ++numWordsInLine;
       if (numWordsInLine < 2) {
         buffer.push_back(curr);
@@ -74,11 +74,11 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
         emitAll(buffer, result, explicitOpenParens);
         emit(curr, result, explicitOpenParens);
       }
-      else {  // later words
+      else {  //// later words
         emit(curr, result, explicitOpenParens);
       }
     }
-    else { // curr.isIndent()
+    else { //// curr.isIndent()
       long nextLineIndent = curr.indentLevel;
       emitAll(buffer, result, explicitOpenParens);
       while (!implicitOpenParens.empty() && nextLineIndent <= implicitOpenParens.top()) {
@@ -91,7 +91,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
         break;
       }
 
-      // reset
+      //// reset
       thisLineIndent = nextLineIndent;
       numWordsInLine = 0;
       parenAtStartOfLine = false;
@@ -106,7 +106,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
 
 
 
-// internals
+//// internals
 
 void emit(Token& t, list<Token>& out, long& explicitOpenParens) {
   out.push_back(t);
@@ -151,7 +151,7 @@ list<Token> indentInsensitiveExpr(IndentSensitiveStream& in) {
       --explicitOpenParens;
       if (explicitOpenParens == 0) break;
     }
-    else { // word
+    else { //// word
       result.push_back(curr);
       if (explicitOpenParens == 0) break;
     }

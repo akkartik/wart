@@ -1,6 +1,4 @@
-//// primitive datatypes
-
-// lists
+//// primitive datatypes: lists
 
 Cell* car(Cell* x) {
   if (x->type != CONS) {
@@ -48,7 +46,7 @@ Cell* newCons(Cell* car) {
 
 
 
-// numbers
+//// numbers
 
 unordered_map<long, Cell*> intLiterals;
 
@@ -105,7 +103,7 @@ bool equalFloats(float x, float y) {
 
 
 
-// symbols
+//// symbols
 
 template<class Data>
 struct StringMap :public unordered_map<string, Data>{};
@@ -146,7 +144,7 @@ string toString(Cell* x) {
 
 
 
-// associative arrays
+//// associative arrays
 
 Cell* newTable() {
   Cell* result = newCell();
@@ -220,7 +218,7 @@ Cell* unsafeGet(Cell* t, Cell* key) {
 
 
 
-// misc
+//// internals
 
 void setupCells() {
   setupNil();

@@ -1,5 +1,3 @@
-#include<dirent.h>
-
 COMPILE_FN(load, compiledFn_load, "($f)",
   loadFile(toString(lookup("$f")).c_str());
   return nil;
@@ -13,7 +11,7 @@ void loadFiles(const char* ext) {
 
 
 
-// internals
+//// internals
 
 void loadFile(const char* filename) {
   bool old_interactive = interactive; interactive = false;
@@ -27,6 +25,8 @@ void loadFile(const char* filename) {
   }
   interactive = old_interactive;
 }
+
+#include<dirent.h>
 
 vector<char*> sortedFiles(const char* dirname, const char* ext) {
   vector<char*> result;
