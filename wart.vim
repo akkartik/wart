@@ -6,7 +6,7 @@
 "
 " Copy this into your ftplugin directory, and add the following to your vimrc:
 "   autocmd BufReadPost,BufNewFile *.wart,*.test set filetype=wart
-" Screenshot: http://i.imgur.com/4uYrH.png (colors not provided)
+" Screenshot: http://i.imgur.com/H1h7M.png (colors not provided)
 
 let s:save_cpo = &cpo
 set cpo&vim
