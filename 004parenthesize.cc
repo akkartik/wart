@@ -13,6 +13,8 @@
 //    so ignore indent inside backquote
 //  support interactive repls
 //    so read the minimum possible from the stream
+//    be robust to leading whitespace and empty lines
+//    but greedily slurp trailing whitespace as early as possible, in case we need to support secondary prompts
 
 #include<assert.h>
 
@@ -41,9 +43,10 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
     if (curr.newline) {
       if (explicitOpenParens == 0 && implicitOpenParens.empty())
         break;
-
-      if (explicitOpenParens == 0 && interactive && in.fd.peek() == '\n')
+      if (explicitOpenParens == 0 && interactive && in.fd.peek() == '\n') {
+        in.fd.get();
         break;
+      }
     }
     else if (isQuoteOrUnquote(curr)) {
       if (numWordsInLine < 2)
@@ -60,7 +63,8 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
       else {
         emitAll(buffer, result, explicitOpenParens);
         emit(curr, result, explicitOpenParens);
-        if (explicitOpenParens == 0 && implicitOpenParens.empty())
+        skipWhitespace(in.fd);
+        if (explicitOpenParens == 0 && implicitOpenParens.empty() && in.fd.peek() != '\n')
           break;
       }
     }
@@ -152,11 +156,13 @@ list<Token> indentInsensitiveExpr(IndentSensitiveStream& in) {
     else if (curr == ")") {
       result.push_back(curr);
       --explicitOpenParens;
-      if (explicitOpenParens == 0) break;
+      skipWhitespace(in.fd);
+      if (explicitOpenParens == 0 && in.fd.peek() != '\n') break;
     }
     else { //// word
       result.push_back(curr);
-      if (explicitOpenParens == 0) break;
+      skipWhitespace(in.fd);
+      if (explicitOpenParens == 0 && in.fd.peek() != '\n') break;
     }
   }
   return result;
