@@ -1,0 +1,9 @@
+def (l f)
+  load (f + ".wart")
+
+def (die ... args)
+  prn @args
+  exit.1
+
+def (quit)
+  exit.0

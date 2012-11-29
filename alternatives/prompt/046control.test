@@ -1,0 +1,18 @@
+(test "aand works"
+  :valueof (let x list.3
+             (aand x (car.it < 4)))
+  :should ~be nil)
+
+(test "while works"
+  :valueof (ret ans nil
+             (let x 0
+               (while (x < 3)
+                 (ans <- (cons x ans))
+                 (x <- x+1))))
+  :should be '(2 1 0))
+
+(test "for works"
+  :valueof (ret ans nil
+             (for x 0 (x < 3) (x <- x+1)
+               (ans <- (cons x ans))))
+  :should be '(2 1 0))

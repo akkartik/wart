@@ -1,0 +1,55 @@
+def (pair seq)
+  (if
+    no.seq
+      nil
+    ~cdr.seq
+      (list:list car.seq)
+    :else
+      (cons (list car.seq cadr.seq)
+            (pair cddr.seq)))
+
+mac (with bindings ... body)
+  `((fn ,(map car pair.bindings)
+     ,@body)
+    ,@(map cadr pair.bindings))
+
+mac (withs bindings ... body)
+  if no.bindings
+    `(do ,@body)
+    `(let ,car.bindings ,cadr.bindings
+       (withs ,cddr.bindings ,@body))
+
+mac (w_nils vars ... body)
+  `((fn ,vars ,@body))
+
+
+
+mac (proc name params ... body)
+  `(def ,name ,params
+     ,@body
+     nil)
+
+mac (ret var val ... body)
+  `(let ,var ,val
+     ,@body
+     ,var)
+
+mac (rfn name params ... body)
+  `(ret ,name nil
+      (,name <- (fn ,params
+                  ,@body)))
+
+mac (afn params ... body)
+  `(rfn self ,params ,@body)
+
+mac (before_fn (f ... params) ... body)
+  `(let $old ,f
+     (def! (,f ,@params)
+       ,@body
+       ($old ,@params)))
+
+mac (after_fn (f ... params) ... body)
+  `(let $old ,f
+     (def! (,f ,@params)
+       (ret result ($old ,@params)
+         ,@body)))

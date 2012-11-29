@@ -1,0 +1,28 @@
+(test "let works"
+  :valueof (let x 3 x+1)
+  :should be 4)
+
+(test "let destructures"
+  :valueof (let (a ... b) (cons 3 4)
+             a+b)
+  :should be 7)
+
+(test "pair works"
+  :valueof (pair '(1 2 3 4 5))
+  :should be '((1 2) (3 4) (5)))
+
+(test "withs works"
+  :valueof (withs (x 3 y '(1 2 3)) (list x @y))
+  :should be '(3 1 2 3))
+
+(test "w_nils works"
+  :valueof (w_nils (x y z) (list x y z))
+  :should be '(nil nil nil))
+
+let foo_calls 0
+  def! (foo x) 34
+  after_fn (foo x) (foo_calls <- foo_calls+1)
+  def! (bar) foo_calls
+(test "after_fn works"
+  :valueof (do (foo 3) (bar))
+  :should be 1)
