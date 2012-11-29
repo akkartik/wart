@@ -145,7 +145,7 @@ list<Token> indentInsensitiveExpr(IndentSensitiveStream& in) {
     if (curr.newline) {
       assert(in.atStartOfLine);
       if (explicitOpenParens == 0) break;
-      if (interactive) cout << "    > ";
+      if (interactive) cout << "      ";
     }
     else if (isIndent(curr)) {
     }
@@ -176,7 +176,7 @@ long skipInitialNewlinesToFirstIndent(IndentSensitiveStream& in) {
     Token token = nextToken(in);
     if (isIndent(token)) return token.indentLevel;
     assert(token.newline);
-    if (interactive) cout << "    - ";
+    if (interactive) cout << "      ";
   }
 }
 
