@@ -39,8 +39,10 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
   while (!in.eof()) {
     Token curr = nextToken(in);
     if (curr.newline) {
-      if (interactive && explicitOpenParens == 0
-          && (implicitOpenParens.empty() || in.fd.peek() == '\n'))
+      if (explicitOpenParens == 0 && implicitOpenParens.empty())
+        break;
+
+      if (explicitOpenParens == 0 && interactive && in.fd.peek() == '\n')
         break;
     }
     else if (isQuoteOrUnquote(curr)) {
