@@ -17,7 +17,7 @@ list<Token> nextExpr(istream& in) {
 
 
 
-// internals
+//// internals
 
 bool isParen(const Token& t) {
   return t == "(" || t == ")";

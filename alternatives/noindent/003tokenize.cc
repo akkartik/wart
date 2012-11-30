@@ -36,7 +36,7 @@ Token nextToken(istream& in) {
 
 
 
-// internals
+//// internals
 
 // slurp functions read a token when you're sure to be at it
 void slurpChar(istream& in, ostream& out) {

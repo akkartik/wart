@@ -39,7 +39,7 @@ Cell* lookup(Cell* sym, Cell* scope) {
 
 
 
-// dynamic scope
+//// dynamic scope
 
 Cell* lookupDynamicBinding(Cell* sym) {
   stack<Cell*>& bindings = dynamics[sym];
@@ -87,7 +87,7 @@ void assignDynamicVar(Cell* sym, Cell* val) {
 
 
 
-// lexical scope
+//// lexical scope
 
 Cell* lookupLexicalBinding(Cell* sym, Cell* scope) {
   Cell* result = NULL;
@@ -144,7 +144,7 @@ void addLexicalBinding(string var, Cell* val) {
 
 
 
-// misc
+//// internals
 
 unordered_set<Cell*> initialSyms;
 

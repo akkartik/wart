@@ -41,7 +41,7 @@ AstNode nextAstNode(list<Token>& buffer) {
 
 
 
-// internals
+//// internals
 
 Token nextToken(list<Token>& buffer) {
   Token result = buffer.front(); buffer.pop_front();
