@@ -14,39 +14,28 @@ struct AstNode {
   explicit AstNode(Token t) :atom(t) {}
   explicit AstNode(list<AstNode> l) :atom(eof()), elems(l) {}
 
-  bool isAtom() {
-    return elems.empty();
-  }
-  bool isList() {
-    return !elems.empty();
-  }
-  bool isNil() {
-    return atom == "nil"
-        || (elems.size() == 2 && elems.front() == "(" && elems.back() == ")");
-  }
-
-  bool operator==(Token x) {
+  bool operator==(const Token& x) const {
     return elems.empty() && atom == x.token;  // whitespace should be gone by now
   }
-  bool operator==(string x) {
+  bool operator==(const string& x) const {
     return elems.empty() && atom == x;
   }
-  bool operator!=(Token x) {
+  bool operator!=(const Token& x) const {
     return !(*this == x);
   }
-  bool operator!=(string x) {
+  bool operator!=(const string& x) const {
     return !(*this == x);
   }
 };
 
 AstNode nextAstNode(IndentSensitiveStream& c) {
   Token curr = nextParenInsertedToken(c);
-  if (curr != "(" && !curr.isQuoteOrUnquote())
+  if (curr != "(" && !isQuoteOrUnquote(curr))
     return AstNode(curr);
 
   list<AstNode> subform;
   subform.push_back(AstNode(curr));
-  while (!eof(subform.back()) && subform.back().atom.isQuoteOrUnquote())
+  while (!eof(subform.back()) && isQuoteOrUnquote(subform.back().atom))
     subform.push_back(AstNode(nextParenInsertedToken(c)));
 
   if (subform.back() == "(") {
@@ -65,7 +54,7 @@ AstNode nextAstNode(IndentSensitiveStream& c) {
 Token nextNonWhitespaceToken(IndentSensitiveStream& c) {
   while (!c.eof()) {
     Token curr = nextToken(c);
-    if (!curr.isIndent()) return curr;
+    if (!isIndent(curr)) return curr;
   }
   return eof();
 }
@@ -82,6 +71,18 @@ Token nextParenInsertedToken(IndentSensitiveStream& c) {
 
 Token eof() {
   return Token(0);
+}
+
+bool isList(const AstNode& n) {
+  return !n.elems.empty();
+}
+
+bool isAtom(const AstNode& n) {
+  return n.elems.empty();
+}
+
+bool isQuoteOrUnquote(const AstNode& n) {
+  return isAtom(n) && isQuoteOrUnquote(n.atom);
 }
 
 bool eof(AstNode n) {

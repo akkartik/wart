@@ -72,26 +72,26 @@ list<Token> nextLine(IndentSensitiveStream& c) {
     result.push_back(Token(c.currIndent));
 
   do { result.push_back(nextToken(c)); }
-  while (!c.fd.eof() && !result.back().isIndent());
+  while (!c.fd.eof() && !isIndent(result.back()));
   return result;
 }
 
 long numWordsInLine(list<Token> line) {
   long numWords = 0;
   for (list<Token>::iterator p = line.begin(); p != line.end(); ++p)
-    if (!p->isIndent() && !p->newline && !p->isParen() && !p->isQuoteOrUnquote())
+    if (!isIndent(*p) && !p->newline && !isParen(*p) && !isQuoteOrUnquote(*p))
       ++numWords;
   return numWords;
 }
 
 void add(list<Token>& l, Token x) {
-  if (!x.isIndent() && !x.newline)
+  if (!isIndent(x) && !x.newline)
     l.push_back(x);
 }
 
 list<Token>::iterator firstNonQuote(list<Token>& line) {
   for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
-    if (!p->isIndent() && !p->isQuoteOrUnquote())
+    if (!isIndent(*p) && !isQuoteOrUnquote(*p))
       return p;
   }
   return line.end();
@@ -100,4 +100,17 @@ list<Token>::iterator firstNonQuote(list<Token>& line) {
 bool noParenAtStart(list<Token> line) {
   list<Token>::iterator p = firstNonQuote(line);
   return p != line.end() && *p != "(";
+}
+
+bool isIndent(const Token& t) {
+  return t.token == "" && !t.newline;
+}
+
+bool isParen(const Token& t) {
+  return t == "(" || t == ")";
+}
+
+bool isQuoteOrUnquote(const Token& t) {
+  return t == "'" || t == "`"
+      || t == "," || t == ",@" || t == "@";
 }

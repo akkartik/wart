@@ -11,14 +11,14 @@ Cell* nextRawCell(IndentSensitiveStream c) {
 Cell* buildCell(AstNode n) {
   if (n == "") return nil;  // void
 
-  if (n.isNil())
+  if (isNil(n))
     return nil;
-  if (n.isList() && n.elems.front() == ")") {
+  if (isList(n) && n.elems.front() == ")") {
     if (n.elems.size() > 1) RAISE << "Syntax error: ) not at end of expr" << endl << DIE;
     return nil;
   }
 
-  if (n.isAtom()) {
+  if (isAtom(n)) {
     errno = 0;
     char* end;
     long v = strtol(n.atom.token.c_str(), &end, 0);
@@ -69,6 +69,7 @@ Cell* buildCell(AstNode n) {
   return newForm;
 }
 
-bool isQuoteOrUnquote(AstNode n) {
-  return n == "'" || n == "`" || n == "," || n == ",@" || n == "@";
+bool isNil(const AstNode& n) {
+  return n.atom == "nil"
+      || (n.elems.size() == 2 && n.elems.front() == "(" && n.elems.back() == ")");
 }
