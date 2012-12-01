@@ -1,239 +1,240 @@
                                   Token indent(long n) { return Token(n); }
 
 void test_tokenize_always_starts_a_line_with_indent() {
-  IndentSensitiveStream c(stream("34"));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "34");            t=nextToken(c);
+  IndentSensitiveStream in("34");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "34");            t=nextToken(in);
 }
 
 void test_tokenize_handles_multiple_atoms() {
-  IndentSensitiveStream c(stream("34 abc 3.4"));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "34");            t=nextToken(c);
-  checkEq(t, "abc");           t=nextToken(c);
-  checkEq(t, "3.4");           t=nextToken(c);
+  IndentSensitiveStream in("34 abc 3.4");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "34");            t=nextToken(in);
+  checkEq(t, "abc");           t=nextToken(in);
+  checkEq(t, "3.4");           t=nextToken(in);
 }
 
 void test_tokenize_handles_string_literal() {
-  IndentSensitiveStream c(stream("34 \"abc\""));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "34");            t=nextToken(c);
-  checkEq(t, "\"abc\"");       t=nextToken(c);
+  IndentSensitiveStream in("34 \"abc\"");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "34");            t=nextToken(in);
+  checkEq(t, "\"abc\"");       t=nextToken(in);
 }
 
 void test_tokenize_handles_multiple_lines() {
-  IndentSensitiveStream c(stream("34\n\"abc\""));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "34");            t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "\"abc\"");       t=nextToken(c);
+  IndentSensitiveStream in("34\n\"abc\"");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "34");            t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "\"abc\"");       t=nextToken(in);
 }
 
 void test_tokenize_handles_string_with_space() {
-  IndentSensitiveStream c(stream("34\n\"abc def\""));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "34");            t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "\"abc def\"");   t=nextToken(c);
+  IndentSensitiveStream in("34\n\"abc def\"");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "34");            t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "\"abc def\"");   t=nextToken(in);
 }
 
 void test_tokenize_handles_string_with_escape() {
-  IndentSensitiveStream c(stream("34\n\"abc \\\"quote def\""));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "34");            t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
+  IndentSensitiveStream in("34\n\"abc \\\"quote def\"");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "34");            t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "\"abc \\\"quote def\"");
 }
 
 void test_tokenize_handles_quote_comma() {
-  IndentSensitiveStream c(stream("',35"));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "'");            t=nextToken(c);
-  checkEq(t, ",");            t=nextToken(c);
-  checkEq(t, "35");           t=nextToken(c);
+  IndentSensitiveStream in("',35");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "'");             t=nextToken(in);
+  checkEq(t, ",");             t=nextToken(in);
+  checkEq(t, "35");            t=nextToken(in);
 }
 
 void test_tokenize_handles_quote_comma_paren() {
-  IndentSensitiveStream c(stream("(',)"));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "(");            t=nextToken(c);
-  checkEq(t, "'");            t=nextToken(c);
-  checkEq(t, ",");            t=nextToken(c);
-  checkEq(t, ")");            t=nextToken(c);
+  IndentSensitiveStream in("(',)");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "(");             t=nextToken(in);
+  checkEq(t, "'");             t=nextToken(in);
+  checkEq(t, ",");             t=nextToken(in);
+  checkEq(t, ")");             t=nextToken(in);
 }
 
 void test_tokenize_handles_splice_operators() {
-  IndentSensitiveStream c(stream("()',@ @, @b"));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "(");            t=nextToken(c);
-  checkEq(t, ")");            t=nextToken(c);
-  checkEq(t, "'");            t=nextToken(c);
-  checkEq(t, ",@");           t=nextToken(c);
-  checkEq(t, "@");            t=nextToken(c);
-  checkEq(t, ",");            t=nextToken(c);
-  checkEq(t, "@");            t=nextToken(c);
-  checkEq(t, "b");            t=nextToken(c);
+  IndentSensitiveStream in("()',@ @, @b");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "(");             t=nextToken(in);
+  checkEq(t, ")");             t=nextToken(in);
+  checkEq(t, "'");             t=nextToken(in);
+  checkEq(t, ",@");            t=nextToken(in);
+  checkEq(t, "@");             t=nextToken(in);
+  checkEq(t, ",");             t=nextToken(in);
+  checkEq(t, "@");             t=nextToken(in);
+  checkEq(t, "b");             t=nextToken(in);
 }
 
 void test_tokenize_handles_comment() {
-  IndentSensitiveStream c(stream("()',@ #abc def ghi"));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "(");            t=nextToken(c);
-  checkEq(t, ")");            t=nextToken(c);
-  checkEq(t, "'");            t=nextToken(c);
-  checkEq(t, ",@");           t=nextToken(c);
+  IndentSensitiveStream in("()',@ #abc def ghi");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "(");             t=nextToken(in);
+  checkEq(t, ")");             t=nextToken(in);
+  checkEq(t, "'");             t=nextToken(in);
+  checkEq(t, ",@");            t=nextToken(in);
 }
 
 void test_tokenize_ends_comment_at_newline() {
-  IndentSensitiveStream c(stream("#abc def ghi\nabc"));
-  Token t = nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(0));      t=nextToken(c);
-  checkEq(t, "abc");          t=nextToken(c);
+  IndentSensitiveStream in("#abc def ghi\nabc");
+  Token t = nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "abc");           t=nextToken(in);
 }
 
 void test_tokenize_suppresses_comments() {
-  IndentSensitiveStream c(stream("abc\n#abc\ndef\nghi"));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "abc");          t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(0));      t=nextToken(c);
-  checkEq(t, "def");          t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(0));      t=nextToken(c);
-  checkEq(t, "ghi");          t=nextToken(c);
+  IndentSensitiveStream in("abc\n#abc\ndef\nghi");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "abc");           t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "def");           t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "ghi");           t=nextToken(in);
 }
 
 void test_tokenize_suppresses_comments2() {
-  IndentSensitiveStream c(stream("a b\n  c\n#abc\ndef\n  ghi\n\njkl"));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "a");            t=nextToken(c);
-  checkEq(t, "b");            t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(2));      t=nextToken(c);
-  checkEq(t, "c");            t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(0));      t=nextToken(c);
-  checkEq(t, "def");          t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(2));      t=nextToken(c);
-  checkEq(t, "ghi");          t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(0));      t=nextToken(c);
-  checkEq(t, "jkl");          t=nextToken(c);
+  IndentSensitiveStream in("a b\n  c\n#abc\ndef\n  ghi\n\njkl");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "a");             t=nextToken(in);
+  checkEq(t, "b");             t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(2));       t=nextToken(in);
+  checkEq(t, "c");             t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "def");           t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(2));       t=nextToken(in);
+  checkEq(t, "ghi");           t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "jkl");           t=nextToken(in);
 }
 
 void test_tokenize_suppresses_trailing_whitespace() {
-  IndentSensitiveStream c(stream("a \nb\r\nc"));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "a");            t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(0));      t=nextToken(c);
-  checkEq(t, "b");            t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(0));      t=nextToken(c);
-  checkEq(t, "c");            t=nextToken(c);
+  IndentSensitiveStream in("a \nb\r\nc");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "a");             t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "b");             t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "c");             t=nextToken(in);
 }
 
 void test_tokenize_suppresses_repeated_newline() {
-  IndentSensitiveStream c(stream("34\n\n\"abc \\\"quote def\""));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "34");           t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(0));      t=nextToken(c);
+  IndentSensitiveStream in("34\n\n\"abc \\\"quote def\"");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "34");            t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "\"abc \\\"quote def\"");
 }
 
 void test_tokenize_handles_indent_outdent() {
-  IndentSensitiveStream c(stream("abc def ghi\n\n    abc\n  def"));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "abc");          t=nextToken(c);
-  checkEq(t, "def");          t=nextToken(c);
-  checkEq(t, "ghi");          t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(4));      t=nextToken(c);
-  checkEq(t, "abc");          t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(2));      t=nextToken(c);
-  checkEq(t, "def");          t=nextToken(c);
+  IndentSensitiveStream in("abc def ghi\n\n    abc\n  def");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "abc");           t=nextToken(in);
+  checkEq(t, "def");           t=nextToken(in);
+  checkEq(t, "ghi");           t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(4));       t=nextToken(in);
+  checkEq(t, "abc");           t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(2));       t=nextToken(in);
+  checkEq(t, "def");           t=nextToken(in);
 }
 
 void test_tokenize_suppresses_whitespace_lines() {
-  IndentSensitiveStream c(stream("abc def ghi\n\n    \n  def"));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));       t=nextToken(c);
-  checkEq(t, "abc");          t=nextToken(c);
-  checkEq(t, "def");          t=nextToken(c);
-  checkEq(t, "ghi");          t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(2));      t=nextToken(c);
-  checkEq(t, "def");          t=nextToken(c);
+  IndentSensitiveStream in("abc def ghi\n\n    \n  def");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "abc");           t=nextToken(in);
+  checkEq(t, "def");           t=nextToken(in);
+  checkEq(t, "ghi");           t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(2));       t=nextToken(in);
+  checkEq(t, "def");           t=nextToken(in);
 }
 
 void test_tokenize_suppresses_whitespace_lines2() {
-  IndentSensitiveStream c(stream("  \nabc def ghi\n\n    \n  def"));
-  Token t = nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(0));      t=nextToken(c);
-  checkEq(t, "abc");          t=nextToken(c);
-  checkEq(t, "def");          t=nextToken(c);
-  checkEq(t, "ghi");          t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(2));      t=nextToken(c);
-  checkEq(t, "def");          t=nextToken(c);
+  IndentSensitiveStream in("  \nabc def ghi\n\n    \n  def");
+  Token t = nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "abc");           t=nextToken(in);
+  checkEq(t, "def");           t=nextToken(in);
+  checkEq(t, "ghi");           t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(2));       t=nextToken(in);
+  checkEq(t, "def");           t=nextToken(in);
 }
 
 void test_tokenize_handles_sexpr() {
-  IndentSensitiveStream c(stream("('a '(boo) \"foo\nbar\" `c `,d ,@e)\nabc #def ghi\ndef"));
-  Token t = nextToken(c);
-  checkEq(t, indent(0));      t=nextToken(c);
-  checkEq(t, "(");            t=nextToken(c);
-  checkEq(t, "'");            t=nextToken(c);
-  checkEq(t, "a");            t=nextToken(c);
-  checkEq(t, "'");            t=nextToken(c);
-  checkEq(t, "(");            t=nextToken(c);
-  checkEq(t, "boo");          t=nextToken(c);
-  checkEq(t, ")");            t=nextToken(c);
-  checkEq(t, "\"foo\nbar\""); t=nextToken(c);
-  checkEq(t, "`");            t=nextToken(c);
-  checkEq(t, "c");            t=nextToken(c);
-  checkEq(t, "`");            t=nextToken(c);
-  checkEq(t, ",");            t=nextToken(c);
-  checkEq(t, "d");            t=nextToken(c);
-  checkEq(t, ",@");           t=nextToken(c);
-  checkEq(t, "e");            t=nextToken(c);
-  checkEq(t, ")");            t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(0));      t=nextToken(c);
-  checkEq(t, "abc");          t=nextToken(c);
-  checkEq(t, Token::Newline()); t=nextToken(c);
-  checkEq(t, indent(0));      t=nextToken(c);
-  checkEq(t, "def");          t=nextToken(c);
+  IndentSensitiveStream in("('a '(boo) \"foo\nbar\" `c `,d ,@e)\nabc #def ghi\ndef");
+  Token t = nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "(");             t=nextToken(in);
+  checkEq(t, "'");             t=nextToken(in);
+  checkEq(t, "a");             t=nextToken(in);
+  checkEq(t, "'");             t=nextToken(in);
+  checkEq(t, "(");             t=nextToken(in);
+  checkEq(t, "boo");           t=nextToken(in);
+  checkEq(t, ")");             t=nextToken(in);
+  checkEq(t, "\"foo\nbar\"");  t=nextToken(in);
+  checkEq(t, "`");             t=nextToken(in);
+  checkEq(t, "c");             t=nextToken(in);
+  checkEq(t, "`");             t=nextToken(in);
+  checkEq(t, ",");             t=nextToken(in);
+  checkEq(t, "d");             t=nextToken(in);
+  checkEq(t, ",@");            t=nextToken(in);
+  checkEq(t, "e");             t=nextToken(in);
+  checkEq(t, ")");             t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "abc");           t=nextToken(in);
+  checkEq(t, Token::Newline()); t=nextToken(in);
+  checkEq(t, indent(0));       t=nextToken(in);
+  checkEq(t, "def");           t=nextToken(in);
 }
+

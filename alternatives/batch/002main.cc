@@ -69,10 +69,13 @@ const TestFn tests[] = {
 };
 
 long numFailures = 0;
+bool passed = true;
 
 #define check(X) if (!(X)) { \
     ++numFailures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
+    passed = false; \
+    return; \
   } \
   else { cerr << "."; fflush(stderr); }
 
@@ -80,6 +83,8 @@ long numFailures = 0;
     ++numFailures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
     cerr << "  got " << (X) << endl;  /* BEWARE: multiple eval */ \
+    passed = false; \
+    return; \
   } \
   else { cerr << "."; fflush(stderr); }
 
@@ -107,16 +112,21 @@ void runTests() {
 }
 
 void verify() {
-  if (raiseCount != 0) cerr << raiseCount << " errors encountered" << endl;
   teardownStreams();
   teardownCompiledFns();
   teardownCells();
-
-  if (numUnfreed() > 0) {
-    RAISE << "Memory leak!\n";
-    dumpUnfreed();
-  }
+  if (!passed) return;
+  if (raiseCount != 0) cerr << raiseCount << " errors encountered" << endl;
+  if (numUnfreed() > 0) dumpUnfreed();
 }
+
+// helper to read from string
+// leaks memory; just for convenient tests
+Cell* read(string s) {
+  return read(*new stringstream(s));
+}
+
+
 
 void setup() {
   setupCells();
@@ -125,15 +135,5 @@ void setup() {
   setupCompiledFns();
   setupStreams();
   raiseCount = 0;
-}
-
-
-
-//// internals
-
-// helper to read from string
-stringstream& stream(string s) {
-  stringstream& result = *new stringstream(s);
-  result << std::noskipws;
-  return result;
+  passed = true;
 }

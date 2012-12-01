@@ -157,7 +157,7 @@ AstNode tokenizeInfix(AstNode n) {
     }
     out += var[x];
   }
-  IndentSensitiveStream cs(stream(out));
+  IndentSensitiveStream cs(out);
   return nextAstNode(cs);
 }
 

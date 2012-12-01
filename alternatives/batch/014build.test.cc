@@ -1,72 +1,64 @@
 // check all nrefs except quotes/unquotes
 
 void test_build_handles_nil() {
-  IndentSensitiveStream cs(stream("()"));
-  checkEq(nextRawCell(cs), nil);
-  check(cs.eof());
+  IndentSensitiveStream in("()");
+  checkEq(nextRawCell(in), nil);
 }
 
 void test_build_handles_nil2() {
-  IndentSensitiveStream cs(stream("nil"));
-  checkEq(nextRawCell(cs), nil);
-  check(cs.eof());
+  IndentSensitiveStream in("nil");
+  checkEq(nextRawCell(in), nil);
 }
 
 void test_build_handles_integer() {
-  IndentSensitiveStream cs(stream("34"));
-  Cell* c = nextRawCell(cs);
+  IndentSensitiveStream in("34");
+  Cell* c = nextRawCell(in);
   checkEq(c, newNum(34));
   checkEq(c->nrefs, 1);
   rmref(c);
-  check(cs.eof());
 }
 
 void test_build_handles_float() {
-  IndentSensitiveStream cs(stream("3.4"));
-  Cell* c = nextRawCell(cs);
+  IndentSensitiveStream in("3.4");
+  Cell* c = nextRawCell(in);
   check(isNum(c));
   check(equalFloats(toFloat(c), 3.4));
   checkEq(c->nrefs, 0);   // floats aren't interned
   rmref(c);
-  check(cs.eof());
 }
 
 void test_build_warns_on_ambiguous_float() {
-  IndentSensitiveStream cs(stream("-.4"));
-  Cell* c = nextRawCell(cs);
+  IndentSensitiveStream in("-.4");
+  Cell* c = nextRawCell(in);
   checkEq(raiseCount, 1); raiseCount=0;
   check(isNum(c));
   check(equalFloats(toFloat(c), -0.4));
   rmref(c);
-  check(cs.eof());
 }
 
 void test_build_creates_floats_on_overflow() {
-  IndentSensitiveStream cs(stream("100000000000000000000"));
-  Cell* c = nextRawCell(cs);
+  IndentSensitiveStream in("100000000000000000000");
+  Cell* c = nextRawCell(in);
   checkEq(raiseCount, 1); raiseCount=0;   // overflow warning
   checkEq(c->type, FLOAT);
   checkEq(c->nrefs, 0);
   rmref(c);
-  check(cs.eof());
 }
 
 void test_build_handles_sym() {
-  IndentSensitiveStream cs(stream("a"));
-  Cell* c = nextRawCell(cs);
+  IndentSensitiveStream in("a");
+  Cell* c = nextRawCell(in);
   checkEq(c, newSym("a"));
   checkEq(c->nrefs, 1);
   rmref(c);
-  check(cs.eof());
 }
 
 void test_build_handles_string() {
-  IndentSensitiveStream cs(stream("\"a\""));
-  Cell* c = nextRawCell(cs);
+  IndentSensitiveStream in("\"a\"");
+  Cell* c = nextRawCell(in);
   checkEq(toString(c), "a");
   checkEq(c->nrefs, 0);   // strings aren't interned
   rmref(c);
-  check(cs.eof());
 }
 
 void test_build_doesnt_mix_syms_and_strings() {
@@ -76,44 +68,40 @@ void test_build_doesnt_mix_syms_and_strings() {
 }
 
 void test_build_handles_quoted_sym() {
-  IndentSensitiveStream cs(stream("'a"));
-  Cell* c = nextRawCell(cs);
+  IndentSensitiveStream in("'a");
+  Cell* c = nextRawCell(in);
   checkEq(car(c), newSym("'"));
   checkEq(cdr(c), newSym("a"));
   checkEq(cdr(c)->nrefs, 2);
   rmref(c);
-  check(cs.eof());
 }
 
 void test_build_handles_nested_quote() {
-  IndentSensitiveStream cs(stream("',a"));
-  Cell* c = nextRawCell(cs);
+  IndentSensitiveStream in("',a");
+  Cell* c = nextRawCell(in);
   checkEq(car(c), newSym("'"));
   checkEq(car(cdr(c)), newSym(","));
   checkEq(cdr(cdr(c)), newSym("a"));
   checkEq(cdr(cdr(c))->nrefs, 2);
   rmref(c);
-  check(cs.eof());
 }
 
 void test_build_handles_multiple_atoms() {
-  IndentSensitiveStream cs(stream("34\n35"));
-  Cell* c = nextRawCell(cs);
+  IndentSensitiveStream in("34\n35");
+  Cell* c = nextRawCell(in);
   checkEq(c, newNum(34));
   checkEq(c->nrefs, 1);
   checkEq(cdr(c), nil);
 
-  c = nextRawCell(cs);
+  c = nextRawCell(in);
   checkEq(c, newNum(35));
   checkEq(c->nrefs, 1);
   checkEq(cdr(c), nil);
-
-  check(cs.eof());
 }
 
 void test_build_handles_form() {
-  IndentSensitiveStream cs(stream("34 35"));
-  Cell *c=nextRawCell(cs), *origc=c;
+  IndentSensitiveStream in("(34 35)");
+  Cell *c=nextRawCell(in), *origc=c;
   checkEq(c->nrefs, 0);
   checkEq(car(c), newNum(34));
   checkEq(car(c)->nrefs, 2);
@@ -125,12 +113,11 @@ void test_build_handles_form() {
 
   checkEq(cdr(c), nil);
   rmref(origc);
-  check(cs.eof());
 }
 
 void test_build_handles_dot() {
-  IndentSensitiveStream cs(stream("34 ... 35"));
-  Cell *c=nextRawCell(cs), *origc=c;
+  IndentSensitiveStream in("(34 ... 35)");
+  Cell *c=nextRawCell(in), *origc=c;
   checkEq(c->nrefs, 0);
   checkEq(car(c), newNum(34));
   checkEq(car(c)->nrefs, 2);
@@ -140,12 +127,11 @@ void test_build_handles_dot() {
   checkEq(c->nrefs, 2);
 
   rmref(origc);
-  check(cs.eof());
 }
 
 void test_build_handles_nested_form() {
-  IndentSensitiveStream cs(stream("(3 7 (33 23))"));
-  Cell *c=nextRawCell(cs), *origc=c;
+  IndentSensitiveStream in("(3 7 (33 23))");
+  Cell *c=nextRawCell(in), *origc=c;
   checkEq(c->nrefs, 0);
   checkEq(car(c), newNum(3));
   checkEq(car(c)->nrefs, 2);
@@ -169,12 +155,11 @@ void test_build_handles_nested_form() {
   checkEq(cdr(c), nil);
 
   rmref(origc);
-  check(cs.eof());
 }
 
 void test_build_handles_strings() {
-  IndentSensitiveStream cs(stream("(3 7 (33 \"abc\" 23))"));
-  Cell *c=nextRawCell(cs), *origc=c;
+  IndentSensitiveStream in("(3 7 (33 \"abc\" 23))");
+  Cell *c=nextRawCell(in), *origc=c;
   checkEq(c->nrefs, 0);
   checkEq(car(c), newNum(3));
   checkEq(car(c)->nrefs, 2);
@@ -201,12 +186,11 @@ void test_build_handles_strings() {
   checkEq(cdr(c), nil);
 
   rmref(origc);
-  check(cs.eof());
 }
 
 void test_build_handles_syms() {
-  IndentSensitiveStream cs(stream("(3 7 (33 \"abc\" 3de 23))"));
-  Cell *c=nextRawCell(cs), *origc=c;
+  IndentSensitiveStream in("(3 7 (33 \"abc\" 3de 23))");
+  Cell *c=nextRawCell(in), *origc=c;
   checkEq(c->nrefs, 0);
   checkEq(car(c), newNum(3));
   checkEq(car(c)->nrefs, 2);
@@ -236,12 +220,11 @@ void test_build_handles_syms() {
   checkEq(cdr(c), nil);
 
   rmref(origc);
-  check(cs.eof());
 }
 
 void test_build_handles_quotes() {
-  IndentSensitiveStream cs(stream("`(34 ,(35) ,36 ,@37 @,38 @39 ,'(a))"));
-  Cell *c=nextRawCell(cs), *origc=c;
+  IndentSensitiveStream in("`(34 ,(35) ,36 ,@37 @,38 @39 ,'(a))");
+  Cell *c=nextRawCell(in), *origc=c;
   checkEq(c->nrefs, 0);
   checkEq(car(c), newSym("`"));
   checkEq(car(c)->nrefs, 2);
@@ -297,16 +280,15 @@ void test_build_handles_quotes() {
   checkEq(cdr(c), nil);
 
   rmref(origc);
-  check(cs.eof());
 }
 
 void test_build_handles_indented_wrapped_lines() {
-  IndentSensitiveStream cs(stream("a\n  (a b c\n   d e)"));  // d e indented by just one space
-  Cell *c0=nextRawCell(cs);
+  IndentSensitiveStream in("a\n  (a b c\n   d e)");
+  Cell *c0=nextRawCell(in);
   checkEq(c0->nrefs, 1);
   checkEq(c0, newSym("a"));
 
-  Cell *c=nextRawCell(cs), *origc=c;
+  Cell *c=nextRawCell(in), *origc=c;
   checkEq(c->nrefs, 0);
   checkEq(car(c), newSym("a"));
   checkEq(car(c)->nrefs, 2);
@@ -330,5 +312,4 @@ void test_build_handles_indented_wrapped_lines() {
   checkEq(c, nil);
   rmref(origc);
   rmref(c0);
-  check(cs.eof());
 }

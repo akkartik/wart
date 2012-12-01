@@ -90,8 +90,8 @@ COMPILE_FN(read, compiledFn_read, "('$eof)",
 )
 
 Cell* read(istream& in) {
-  IndentSensitiveStream c(in);
-  return read(c);
+  IndentSensitiveStream in2(in);
+  return read(in2);
 }
 
 COMPILE_FN(read_byte, compiledFn_read_byte, "('$eof)",

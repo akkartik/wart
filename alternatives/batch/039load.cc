@@ -1,5 +1,3 @@
-#include<dirent.h>
-
 COMPILE_FN(load, compiledFn_load, "($f)",
   loadFile(toString(lookup("$f")).c_str());
   return nil;
@@ -18,14 +16,15 @@ void loadFiles(const char* ext) {
 void loadFile(const char* filename) {
   ifstream f(filename);
   if (f.fail()) return;
-  IndentSensitiveStream c(f);
-  while (!c.eof()) {
-    Cell* cell = read(c);
+  while (!f.eof()) {
+    Cell* cell = read(f);
 //?     cerr << cell << endl;   // uncomment this to track down errors in wart files
     rmref(eval(cell));
     rmref(cell);
   }
 }
+
+#include<dirent.h>
 
 vector<char*> sortedFiles(const char* dirname, const char* ext) {
   vector<char*> result;
