@@ -1,11 +1,4 @@
-//// construct parse tree out of tokens
-
-// To disable whitespace-sensitivity, replace calls to nextParenInsertedToken
-// with nextNonWhitespaceToken.
-
-// Currently ,@(list x) creates a flat list: ,@ ( list x )
-// Equally valid to have it create a 2 level list: ,@ followed by ( list x )
-// Would require changing build phase appropriately.
+//// construct parse tree out of a list of tokens
 
 struct AstNode {
   Token atom;
@@ -29,21 +22,26 @@ struct AstNode {
 };
 
 AstNode nextAstNode(IndentSensitiveStream& in) {
-  Token curr = nextParenInsertedToken(in);
-  if (curr != "(" && !isQuoteOrUnquote(curr))
-    return AstNode(curr);
+  list<Token> bufferedTokens = nextExpr(in);
+  return nextAstNode(bufferedTokens);
+}
 
+AstNode nextAstNode(list<Token>& buffer) {
   list<AstNode> subform;
-  subform.push_back(AstNode(curr));
-  while (!eof(subform.back()) && isQuoteOrUnquote(subform.back().atom))
-    subform.push_back(AstNode(nextParenInsertedToken(in)));
+  if (buffer.empty()) return AstNode(subform);
+
+  subform.push_back(AstNode(nextToken(buffer)));
+  while (!buffer.empty() && isQuoteOrUnquote(subform.back().atom))
+    subform.push_back(AstNode(nextToken(buffer)));
 
   if (subform.back() == "(") {
-    while (!eof(subform.back()) && subform.back().atom != ")")
-      subform.push_back(nextAstNode(in));
-    if (eof(subform.back())) RAISE << "Unbalanced (" << endl << DIE;
+    while (!buffer.empty() && subform.back() != ")")
+      subform.push_back(nextAstNode(buffer));
+    if (subform.back() != ")") RAISE << "Unbalanced (" << endl << DIE;
   }
 
+  if (subform.size() == 1)
+    return AstNode(subform.back());
   return AstNode(subform);
 }
 
@@ -51,21 +49,8 @@ AstNode nextAstNode(IndentSensitiveStream& in) {
 
 //// internals
 
-Token nextNonWhitespaceToken(IndentSensitiveStream& in) {
-  while (!in.eof()) {
-    Token curr = nextToken(in);
-    if (!isIndent(curr)) return curr;
-  }
-  return eof();
-}
-
-list<Token> bufferedTokens;
-
-Token nextParenInsertedToken(IndentSensitiveStream& in) {
-  if (bufferedTokens.empty()) bufferedTokens = nextExpr(in);
-  if (bufferedTokens.empty()) return eof();
-  Token result = bufferedTokens.front();
-  bufferedTokens.pop_front();
+Token nextToken(list<Token>& buffer) {
+  Token result = buffer.front(); buffer.pop_front();
   return result;
 }
 
@@ -83,10 +68,6 @@ bool isAtom(const AstNode& n) {
 
 bool isQuoteOrUnquote(const AstNode& n) {
   return isAtom(n) && isQuoteOrUnquote(n.atom);
-}
-
-bool eof(AstNode n) {
-  return n.atom.token == "" && n.elems.empty();
 }
 
 ostream& operator<<(ostream& os, AstNode x) {

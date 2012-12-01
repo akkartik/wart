@@ -173,4 +173,3 @@ void test_parse_handles_indented_toplevel_forms() {
   check(p == n.elems.end());
   checkEq(nextAstNode(in), eof());
 }
-
