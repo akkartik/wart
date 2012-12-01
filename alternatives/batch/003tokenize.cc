@@ -25,16 +25,6 @@ struct Token {
   static Token Newline() {
     Token t(0); t.newline = true; return t; }
 
-  Token(const Token& rhs)
-    :token(rhs.token), indentLevel(rhs.indentLevel), newline(rhs.newline) {}
-  Token& operator=(const Token& rhs) {
-    if (this == &rhs) return *this;
-    token = rhs.token;
-    indentLevel = rhs.indentLevel;
-    newline = rhs.newline;
-    return *this;
-  }
-
   bool operator==(const string& x) const {
     return token == x;
   }
