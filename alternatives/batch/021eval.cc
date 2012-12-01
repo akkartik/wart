@@ -11,6 +11,7 @@
 //  varargs functions: ((fn params params) 1 2 3) => (1 2 3)
 //  varargs functions with some named params: ((fn (fmt ... rest) (printf fmt rest)) "%d%d" 34 35) => "3435"
 //  passing in lists to functions: ((fn ((x y)) (+ x y)) '(3 4)) => 7
+//  naming list args and their parts: ((fn (l | (head ... tail)) (prn l " starts with " head)) '(1 2 3))
 //  functions can reorder args using keyords: ((fn (a b c) b) :b 3 1 2) => 3
 //  functions can document keyword args with a different name: ((fn (a b|returning c) b) :returning 3 1 2) => 3
 //  callers can pass in keyword args to nested functions
@@ -117,8 +118,11 @@ void bindParams(Cell* params, Cell* args) {
 }
 
 void bindParamAliases(Cell* aliases, Cell* arg) {
+  if (cdr(aliases) == nil)
+    RAISE << "just one param alias: " << car(aliases) << "; are you sure?\n";
   for (; aliases != nil; aliases=cdr(aliases))
-    addLexicalBinding(car(aliases), arg);
+    if (isSym(car(aliases)) || isCons(arg))
+      bindParams(car(aliases), arg);
 }
 
 
