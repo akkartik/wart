@@ -47,7 +47,7 @@ COMPILE_FN(=, compiledFn_equal, "($x $y)",
   return mkref(result);
 )
 
-// types
+//// types
 
 COMPILE_FN(type, compiledFn_type, "($x)",
   return mkref(type(lookup("$x")));
@@ -57,7 +57,7 @@ COMPILE_FN(coerce_quoted, compiledFn_coerce_quoted, "'($x $dest_type)",
   return coerceQuoted(lookup("$x"), lookup("$dest_type"), lookup(sym_Coercions));  // already mkref'd
 )
 
-// bindings
+//// bindings
 
 COMPILE_FN(<-, compiledFn_assign, "('$var $val)",
   Cell* var = lookup("$var");
@@ -105,7 +105,7 @@ COMPILE_FN(make_unbound, compiledFn_make_unbound, "($var)",
   return nil;
 )
 
-// macros
+//// macros
 
 // eval with extra smarts for handling @args
 COMPILE_FN(mac_eval, compiledFn_mac_eval, "('$x $scope)",

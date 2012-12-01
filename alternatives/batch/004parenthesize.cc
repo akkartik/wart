@@ -60,7 +60,7 @@ list<Token> nextExpr(IndentSensitiveStream& c) {
 
 
 
-// internals
+//// internals
 
 list<Token> nextLine(IndentSensitiveStream& c) {
   list<Token> result;

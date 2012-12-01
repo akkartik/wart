@@ -237,4 +237,3 @@ void test_tokenize_handles_sexpr() {
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "def");           t=nextToken(in);
 }
-

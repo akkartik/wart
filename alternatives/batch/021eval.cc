@@ -95,7 +95,7 @@ Cell* processArgs(Cell* call, Cell* scope, Cell* fn) {
 
 
 
-// bind params to appropriate args -- including param aliases
+//// bind params to appropriate args -- including param aliases
 
 void bindParams(Cell* params, Cell* args) {
   params = stripQuote(params);
@@ -127,7 +127,7 @@ void bindParamAliases(Cell* aliases, Cell* arg) {
 
 
 
-// process :keyword args and reorder args to param order -- respecting param aliases
+//// process :keyword args and reorder args to param order -- respecting param aliases
 
 Cell* reorderKeywordArgs(Cell* args, Cell* params) {
   if (!isCons(stripQuote(params))) return mkref(args);
@@ -253,7 +253,7 @@ bool paramAliasMatch(Cell* aliases, Cell* candidate) {
 
 
 
-// eval args as necessary depending on corresponding params
+//// eval args as necessary depending on corresponding params
 
 Cell* evalArgs(Cell* args, Cell* params, Cell* scope) {
   if (args == nil) return nil;
@@ -273,7 +273,7 @@ Cell* evalArg(Cell* arg, Cell* params, Cell* scope) {
 
 
 
-// eval @exprs and inline them into args
+//// eval @exprs and inline them into args
 // tag them with '' (already eval'd) so they can be used with macros
 
 Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
@@ -337,7 +337,7 @@ Cell* stripAlreadyEvald(Cell* cell) {
 
 
 
-// backquoted exprs
+//// backquoted exprs
 
 // when inMacro did we encounter ''?
 bool skippedAlreadyEvald = false;
@@ -410,7 +410,7 @@ Cell* stripUnquoteSplice(Cell* x) {
 
 
 
-// misc helpers
+//// helpers
 
 bool isQuoted(Cell* cell) {
   return isCons(cell) && car(cell) == sym_quote;

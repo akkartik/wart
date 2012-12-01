@@ -1,6 +1,4 @@
-//// primitive datatypes
-
-// lists
+//// primitive datatypes: lists
 
 Cell* car(Cell* x) {
   if (x->type != CONS) {
@@ -48,7 +46,7 @@ Cell* newCons(Cell* car) {
 
 
 
-// numbers
+//// numbers
 
 unordered_map<long, Cell*> intLiterals;
 
@@ -105,7 +103,7 @@ bool equalFloats(float x, float y) {
 
 
 
-// symbols
+//// symbols
 
 template<class Data>
 struct StringMap :public unordered_map<string, Data>{};
@@ -146,7 +144,7 @@ string toString(Cell* x) {
 
 
 
-// associative arrays
+//// associative arrays
 
 Cell* newTable() {
   Cell* result = newCell();
@@ -220,7 +218,7 @@ Cell* unsafeGet(Cell* t, Cell* key) {
 
 
 
-// misc
+//// internals
 
 void setupCells() {
   setupNil();
@@ -251,7 +249,7 @@ void teardownCells() {
 
 // optimize lookups of common symbols
 Cell *sym_quote, *sym_backquote, *sym_unquote, *sym_splice, *sym_unquoteSplice, *sym_alreadyEvald;
-Cell *sym_list, *sym_number, *sym_symbol, *sym_string, *sym_table;
+Cell *sym_list, *sym_number, *sym_symbol, *sym_string, *sym_table, *sym_List;
 Cell *sym_object, *sym_Coercions;
 Cell *sym_function, *sym_name, *sym_sig, *sym_body, *sym_optimized_body, *sym_env, *sym_compiled, *sym_param_alias;
 Cell *sym_mac_eval, *sym_caller_scope;
@@ -268,6 +266,7 @@ void setupCommonSyms() {
   sym_symbol = newSym("symbol");
   sym_string = newSym("string");
   sym_table = newSym("table");
+  sym_List = newSym("List");
 
   sym_object = newSym("object");
   sym_Coercions = newSym("Coercions");

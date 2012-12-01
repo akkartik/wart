@@ -1,5 +1,5 @@
 // C++ style:
-//  no pointers except Cell*; pass by value where possible
+//  no pointers except Cell*
 //  use long as the default integer type; it's always large enough to hold pointers
 
 #include<cstdio>
