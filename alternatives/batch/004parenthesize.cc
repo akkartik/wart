@@ -13,7 +13,7 @@
 //    so ignore indent inside backquote
 //  performs flow control at the repl, decides when to show the prompt again
 
-list<Token> nextExpr(CodeStream& c) {
+list<Token> nextExpr(IndentSensitiveStream& c) {
   list<Token> result;
   long openExplicitParens = 0;  // parens in the original
   stack<long> implicitParenStack;   // parens we inserted
@@ -62,7 +62,7 @@ list<Token> nextExpr(CodeStream& c) {
 
 // internals
 
-list<Token> nextLine(CodeStream& c) {
+list<Token> nextLine(IndentSensitiveStream& c) {
   list<Token> result;
   if (c.fd.eof()) return result;
 

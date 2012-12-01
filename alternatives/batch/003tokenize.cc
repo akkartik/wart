@@ -60,7 +60,7 @@ struct Token {
   }
 };
 
-Token nextToken(CodeStream& c) {
+Token nextToken(IndentSensitiveStream& c) {
   if (c.atStartOfLine) {
     if (c.fd.peek() == '#')
       skipComment(c.fd);

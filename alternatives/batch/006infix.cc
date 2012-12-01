@@ -157,7 +157,7 @@ AstNode tokenizeInfix(AstNode n) {
     }
     out += var[x];
   }
-  CodeStream cs(stream(out));
+  IndentSensitiveStream cs(stream(out));
   return nextAstNode(cs);
 }
 

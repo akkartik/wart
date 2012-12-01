@@ -1,6 +1,6 @@
 //// construct parse tree out of cells
 
-Cell* nextRawCell(CodeStream c) {
+Cell* nextRawCell(IndentSensitiveStream c) {
   if (bufferedTokens.empty()) {
     c.fd.peek();
     if (c.fd.eof()) return nil;

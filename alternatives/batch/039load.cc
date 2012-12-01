@@ -18,7 +18,7 @@ void loadFiles(const char* ext) {
 void loadFile(const char* filename) {
   ifstream f(filename);
   if (f.fail()) return;
-  CodeStream c(f);
+  IndentSensitiveStream c(f);
   while (!c.eof()) {
     Cell* cell = read(c);
 //?     cerr << cell << endl;   // uncomment this to track down errors in wart files

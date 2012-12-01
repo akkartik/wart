@@ -30,14 +30,15 @@
 // specialized to a specific call-site.
 
 // track indent state when reading code from disk
-struct CodeStream {
+struct IndentSensitiveStream {
   istream& fd;
   long currIndent;
   bool atStartOfLine;
-  CodeStream(istream& in) :fd(in), currIndent(-1), atStartOfLine(true) { fd >> std::noskipws; }
+  explicit IndentSensitiveStream(istream& in) :fd(in), currIndent(-1), atStartOfLine(true) { fd >> std::noskipws; }
+  // leaky version just for convenient tests
+  explicit IndentSensitiveStream(string s) :fd(*new stringstream(s)), currIndent(-1), atStartOfLine(true) { fd >> std::noskipws; }
   bool eof() { return fd.eof(); }
-};
-CodeStream STDIN(cin);
+} STDIN(cin);
 
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
@@ -45,19 +46,19 @@ int main(int argc, unused char* argv[]) {
     return 0;
   }
 
-  // Interpreter loop: read, eval, print
+  //// read, eval, print
   setup();
   loadFiles(".wart");
 }
 
-// read: tokenize, parenthesize, parse, transform infix, build cells, transform $vars
-Cell* read(CodeStream& c) {
-  return mkref(transformDollarVars(nextRawCell(c)));
+//// read: tokenize, parenthesize, parse, transform infix, build cells, transform $vars
+Cell* read(IndentSensitiveStream& in) {
+  return mkref(transformDollarVars(nextRawCell(in)));
 }
 
 
 
-// test harness
+//// test harness
 
 bool runningTests = false;
 

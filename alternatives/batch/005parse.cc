@@ -39,7 +39,7 @@ struct AstNode {
   }
 };
 
-AstNode nextAstNode(CodeStream& c) {
+AstNode nextAstNode(IndentSensitiveStream& c) {
   Token curr = nextParenInsertedToken(c);
   if (curr != "(" && !curr.isQuoteOrUnquote())
     return AstNode(curr);
@@ -62,7 +62,7 @@ AstNode nextAstNode(CodeStream& c) {
 
 // internals
 
-Token nextNonWhitespaceToken(CodeStream& c) {
+Token nextNonWhitespaceToken(IndentSensitiveStream& c) {
   while (!c.eof()) {
     Token curr = nextToken(c);
     if (!curr.isIndent()) return curr;
@@ -72,7 +72,7 @@ Token nextNonWhitespaceToken(CodeStream& c) {
 
 list<Token> bufferedTokens;
 
-Token nextParenInsertedToken(CodeStream& c) {
+Token nextParenInsertedToken(IndentSensitiveStream& c) {
   if (bufferedTokens.empty()) bufferedTokens = nextExpr(c);
   if (bufferedTokens.empty()) return eof();
   Token result = bufferedTokens.front();
