@@ -102,3 +102,12 @@ COMPILE_FN(read_byte, compiledFn_read_byte, "('$eof)",
   f.read(&c, 1);
   return mkref(newNum((long)c));
 )
+
+COMPILE_FN(read_line, compiledFn_read_line, "('$eof)",
+  istream& f = toIstream(STDIN);
+  if (f.eof())
+    return mkref(lookup("$eof"));
+  string result;
+  getline(f, result);
+  return mkref(newString(result));
+)
