@@ -28,19 +28,19 @@ struct AstNode {
   }
 };
 
-AstNode nextAstNode(IndentSensitiveStream& c) {
-  Token curr = nextParenInsertedToken(c);
+AstNode nextAstNode(IndentSensitiveStream& in) {
+  Token curr = nextParenInsertedToken(in);
   if (curr != "(" && !isQuoteOrUnquote(curr))
     return AstNode(curr);
 
   list<AstNode> subform;
   subform.push_back(AstNode(curr));
   while (!eof(subform.back()) && isQuoteOrUnquote(subform.back().atom))
-    subform.push_back(AstNode(nextParenInsertedToken(c)));
+    subform.push_back(AstNode(nextParenInsertedToken(in)));
 
   if (subform.back() == "(") {
     while (!eof(subform.back()) && subform.back().atom != ")")
-      subform.push_back(nextAstNode(c));
+      subform.push_back(nextAstNode(in));
     if (eof(subform.back())) RAISE << "Unbalanced (" << endl << DIE;
   }
 
@@ -49,11 +49,11 @@ AstNode nextAstNode(IndentSensitiveStream& c) {
 
 
 
-// internals
+//// internals
 
-Token nextNonWhitespaceToken(IndentSensitiveStream& c) {
-  while (!c.eof()) {
-    Token curr = nextToken(c);
+Token nextNonWhitespaceToken(IndentSensitiveStream& in) {
+  while (!in.eof()) {
+    Token curr = nextToken(in);
     if (!isIndent(curr)) return curr;
   }
   return eof();
@@ -61,8 +61,8 @@ Token nextNonWhitespaceToken(IndentSensitiveStream& c) {
 
 list<Token> bufferedTokens;
 
-Token nextParenInsertedToken(IndentSensitiveStream& c) {
-  if (bufferedTokens.empty()) bufferedTokens = nextExpr(c);
+Token nextParenInsertedToken(IndentSensitiveStream& in) {
+  if (bufferedTokens.empty()) bufferedTokens = nextExpr(in);
   if (bufferedTokens.empty()) return eof();
   Token result = bufferedTokens.front();
   bufferedTokens.pop_front();
@@ -91,11 +91,12 @@ bool eof(AstNode n) {
 
 ostream& operator<<(ostream& os, AstNode x) {
   if (x.elems.empty()) return os << x.atom;
-  bool prevWasOpen = true;
+  bool skipNextSpace = true;
   for (list<AstNode>::iterator p = x.elems.begin(); p != x.elems.end(); ++p) {
-    if (!(*p == ")" || prevWasOpen)) os << " ";
-    prevWasOpen = (*p == "(" || *p == "'" || *p == "," || *p == ",@" || *p == "@");
+    if (*p != ")" && !skipNextSpace)
+      os << " ";
     os << *p;
+    skipNextSpace = (*p == "(" || isQuoteOrUnquote(*p));
   }
   return os;
 }
