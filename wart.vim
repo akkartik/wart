@@ -23,7 +23,7 @@ highlight link wartComment Comment
 syntax match wartSalientComment /##.*$/
 highlight link wartSalientComment SalientComment
 " I have these in my dark colorscheme across all languages.
-highlight Comment ctermfg=Blue
+highlight Comment ctermfg=DarkBlue
 highlight SalientComment ctermfg=Cyan
 
 syntax region wartString start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=@Spell
