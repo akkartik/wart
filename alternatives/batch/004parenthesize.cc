@@ -54,7 +54,7 @@ list<Token> insertImplicitParens(list<Token> in) {
     }
     else {  //// indent
       emitAll(buffer, result, explicitOpenParens);
-      while (!implicitOpenParens.empty() && curr->indentLevel <= implicitOpenParens.top()) {
+      while (!implicitOpenParens.empty() && curr.indentLevel <= implicitOpenParens.top()) {
         result.push_back(Token(")"));
         implicitOpenParens.pop();
       }
