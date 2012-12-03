@@ -1,0 +1,5 @@
+(test "read_byte works"
+  :valueof (w_instring "ab"
+             (read_byte)
+             (read_byte))
+  :should be 98)
