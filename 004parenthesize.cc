@@ -64,7 +64,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
           break;
       }
     }
-    else if (!isIndent(curr)) { //// 'word' token
+    else if (!isIndent(curr)) {   //// 'word' token
       ++numWordsInLine;
       if (numWordsInLine < 2) {
         buffer.push_back(curr);

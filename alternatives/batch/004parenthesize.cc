@@ -19,36 +19,37 @@ list<Token> insertImplicitParens(list<Token> in) {
   long numWordsInLine = 0;
   bool parenAtStartOfLine = false;
   list<Token> buffer;
-  for (list<Token>::iterator curr = in.begin(); curr != in.end(); ++curr) {
-    if (isQuoteOrUnquote(*curr)) {
+  for (list<Token>::iterator p = in.begin(); p != in.end(); ++p) {
+    Token curr = *p;
+    if (isQuoteOrUnquote(curr)) {
       if (numWordsInLine < 2)
-        buffer.push_back(*curr);
+        buffer.push_back(curr);
       else
-        emit(*curr, result, explicitOpenParens);
+        emit(curr, result, explicitOpenParens);
     }
-    else if (isParen(*curr)) {
+    else if (isParen(curr)) {
       if (!parenAtStartOfLine)
-        parenAtStartOfLine = (*curr == "(" && numWordsInLine == 0);
+        parenAtStartOfLine = (curr == "(" && numWordsInLine == 0);
       if (numWordsInLine < 2 && explicitOpenParens == 0 && !parenAtStartOfLine) {
-        buffer.push_back(*curr);
+        buffer.push_back(curr);
       }
       else {
         emitAll(buffer, result, explicitOpenParens);
-        emit(*curr, result, explicitOpenParens);
+        emit(curr, result, explicitOpenParens);
       }
     }
-    else if (!isIndent(*curr)) {  //// 'word' token
+    else if (!isIndent(curr)) {   //// 'word' token
       ++numWordsInLine;
       if (numWordsInLine < 2) {
-        buffer.push_back(*curr);
+        buffer.push_back(curr);
       }
       else {
         if (numWordsInLine == 2 && explicitOpenParens == 0 && !parenAtStartOfLine) {
           result.push_back(Token("("));
-          implicitOpenParens.push(curr->indentLevel);
+          implicitOpenParens.push(curr.indentLevel);
         }
         emitAll(buffer, result, explicitOpenParens);
-        emit(*curr, result, explicitOpenParens);
+        emit(curr, result, explicitOpenParens);
       }
     }
     else {  //// indent
