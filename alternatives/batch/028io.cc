@@ -83,17 +83,6 @@ void print(Cell* x, ostream& out) {
 
 
 
-COMPILE_FN(read, compiledFn_read, "('$eof)",
-  if (toIstream(STDIN).eof())
-    return mkref(lookup("$eof"));
-  return mkref(read(toIstream(STDIN)));
-)
-
-Cell* read(istream& in) {
-  IndentSensitiveStream in2(in);
-  return read(in2);
-}
-
 COMPILE_FN(read_byte, compiledFn_read_byte, "('$eof)",
   istream& f = toIstream(STDIN);
   if (f.eof())

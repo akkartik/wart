@@ -61,7 +61,7 @@ int main(int argc, unused char* argv[]) {
 
 //// read: tokenize, parenthesize, parse, transform infix, build cells, transform $vars
 Cell* read(IndentSensitiveStream& in) {
-  return mkref(transformDollarVars(nextRawCell(in)));
+  return mkref(transformDollarVars(nextCell(in)));
 }
 
 

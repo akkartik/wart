@@ -22,6 +22,13 @@
 
 const string extraSymChars = "$?!_";  // besides letters and digits
 
+list<AstNode> transformInfix(list<AstNode> in) {
+  list<AstNode> result;
+  for (list<AstNode>::iterator p = in.begin(); p != in.end(); ++p)
+    result.push_back(transformInfix(*p));
+  return result;
+}
+
 AstNode transformInfix(AstNode n) {
   // special-case: ellipses are for dotted lists, not infix
   if (isAtom(n) && n.atom.token == "...")
@@ -157,8 +164,9 @@ AstNode tokenizeInfix(AstNode n) {
     }
     out += var[x];
   }
-  IndentSensitiveStream cs(out);
-  return nextAstNode(cs);
+  stringstream ss(out);
+  list<Token> tokens = insertImplicitParens(tokenize(ss));
+  return nextAstNode(tokens);
 }
 
 

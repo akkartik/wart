@@ -41,14 +41,14 @@ void test_infix_passes_dollar_vars() {
 
 void test_infix_handles_dollar_op() {
   IndentSensitiveStream in("$+");
-  checkEq(transformInfix(nextAstNode(in)), Token("$+"));
+  checkEq(transformInfix(nextAstNode(in)), "$+");
 }
 
 void test_infix_handles_op_without_args() {
   IndentSensitiveStream in("(+)");
   AstNode n = transformInfix(nextAstNode(in));
   check(isAtom(n));
-  checkEq(n.atom, Token("+"));
+  checkEq(n.atom, "+");
 }
 
 void test_infix_handles_op_without_args2() {
@@ -56,11 +56,11 @@ void test_infix_handles_op_without_args2() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("=")); ++p;
-  checkEq(*p, Token("+")); ++p;
-  checkEq(*p, Token("3")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "="); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "3"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -68,7 +68,7 @@ void test_infix_handles_dollar_op_without_args() {
   IndentSensitiveStream in("($+)");
   AstNode n = transformInfix(nextAstNode(in));
   check(isAtom(n));
-  checkEq(n.atom, Token("$+"));
+  checkEq(n.atom, "$+");
 }
 
 void test_infix_handles_quoting() {
@@ -76,9 +76,9 @@ void test_infix_handles_quoting() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("'")); ++p;
-  checkEq(*p, Token(",")); ++p;
-  checkEq(*p, Token("a")); ++p;
+  checkEq(*p, "'"); ++p;
+  checkEq(*p, ","); ++p;
+  checkEq(*p, "a"); ++p;
   check(p == n.elems.end());
 }
 
@@ -87,11 +87,11 @@ void test_infix_handles_simple_lists() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("+")); ++p;
-  checkEq(*p, Token("a")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -100,11 +100,11 @@ void test_infix_passes_wrapped_op() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("a")); ++p;
-  checkEq(*p, Token("+")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -113,11 +113,11 @@ void test_infix_passes_wrapped_op2() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("a")); ++p;
-  checkEq(*p, Token(":")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, ":"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -126,11 +126,11 @@ void test_infix_handles_infix_ops_in_prefix() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("+")); ++p;
-  checkEq(*p, Token("a")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -139,11 +139,11 @@ void test_infix_passes_ellipses_in_infix() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("a")); ++p;
-  checkEq(*p, Token("...")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "..."); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -152,11 +152,11 @@ void test_infix_passes_op_with_ellipses() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("+")); ++p;
-  checkEq(*p, Token("...")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "..."); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -165,10 +165,10 @@ void test_infix_handles_infix_ops_in_unary_prefix() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("+")); ++p;
-  checkEq(*p, Token("a")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -180,11 +180,11 @@ void test_infix_handles_infix_ops_in_nested_lists() {
   AstNode n2 = *++n.elems.begin();
   check(isList(n2));
   list<AstNode>::iterator p = n2.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("+")); ++p;
-  checkEq(*p, Token("a")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n2.elems.end());
 }
 
@@ -193,18 +193,18 @@ void test_infix_handles_infix_ops_in_nested_lists2() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("do")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "do"); ++p;
   AstNode n2 = *p; ++p;
     check(isList(n2));
     list<AstNode>::iterator p2 = n2.elems.begin();
-    checkEq(*p2, Token("(")); ++p2;
-    checkEq(*p2, Token("+")); ++p2;
-    checkEq(*p2, Token("a")); ++p2;
-    checkEq(*p2, Token("b")); ++p2;
-    checkEq(*p2, Token(")")); ++p2;
+    checkEq(*p2, "("); ++p2;
+    checkEq(*p2, "+"); ++p2;
+    checkEq(*p2, "a"); ++p2;
+    checkEq(*p2, "b"); ++p2;
+    checkEq(*p2, ")"); ++p2;
     check(p2 == n2.elems.end());
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -213,19 +213,19 @@ void test_infix_handles_infix_ops_in_nested_lists3() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("=")); ++p;
-  checkEq(*p, Token("a")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "="); ++p;
+  checkEq(*p, "a"); ++p;
   AstNode n2 = *p; ++p;
     check(isList(n2));
     list<AstNode>::iterator p2 = n2.elems.begin();
-    checkEq(*p2, Token("(")); ++p2;
-    checkEq(*p2, Token("+")); ++p2;
-    checkEq(*p2, Token("a")); ++p2;
-    checkEq(*p2, Token("1")); ++p2;
-    checkEq(*p2, Token(")")); ++p2;
+    checkEq(*p2, "("); ++p2;
+    checkEq(*p2, "+"); ++p2;
+    checkEq(*p2, "a"); ++p2;
+    checkEq(*p2, "1"); ++p2;
+    checkEq(*p2, ")"); ++p2;
     check(p2 == n2.elems.end());
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -234,19 +234,19 @@ void test_infix_left_associates() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("+")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
   AstNode n2 = *p; ++p;
     check(isList(n2));
     list<AstNode>::iterator p2 = n2.elems.begin();
-    checkEq(*p2, Token("(")); ++p2;
-    checkEq(*p2, Token("+")); ++p2;
-    checkEq(*p2, Token("a")); ++p2;
-    checkEq(*p2, Token("b")); ++p2;
-    checkEq(*p2, Token(")")); ++p2;
+    checkEq(*p2, "("); ++p2;
+    checkEq(*p2, "+"); ++p2;
+    checkEq(*p2, "a"); ++p2;
+    checkEq(*p2, "b"); ++p2;
+    checkEq(*p2, ")"); ++p2;
     check(p2 == n2.elems.end());
-  checkEq(*p, Token("c")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "c"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -255,11 +255,11 @@ void test_infix_handles_op() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("+")); ++p;
-  checkEq(*p, Token("a")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -268,18 +268,18 @@ void test_infix_always_has_higher_precedence_than_call() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("f")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "f"); ++p;
   AstNode n2 = *p; ++p;
     check(isList(n2));
     list<AstNode>::iterator p2 = n2.elems.begin();
-    checkEq(*p2, Token("(")); ++p2;
-    checkEq(*p2, Token("+")); ++p2;
-    checkEq(*p2, Token("a")); ++p2;
-    checkEq(*p2, Token("b")); ++p2;
-    checkEq(*p2, Token(")")); ++p2;
+    checkEq(*p2, "("); ++p2;
+    checkEq(*p2, "+"); ++p2;
+    checkEq(*p2, "a"); ++p2;
+    checkEq(*p2, "b"); ++p2;
+    checkEq(*p2, ")"); ++p2;
     check(p2 == n2.elems.end());
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -288,18 +288,18 @@ void test_infix_always_has_lower_precedence_than_prefix() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("+")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
   AstNode n2 = *p; ++p;
     check(isList(n2));
     list<AstNode>::iterator p2 = n2.elems.begin();
-    checkEq(*p2, Token("(")); ++p2;
-    checkEq(*p2, Token("-")); ++p2;
-    checkEq(*p2, Token("a")); ++p2;
-    checkEq(*p2, Token(")")); ++p2;
+    checkEq(*p2, "("); ++p2;
+    checkEq(*p2, "-"); ++p2;
+    checkEq(*p2, "a"); ++p2;
+    checkEq(*p2, ")"); ++p2;
     check(p2 == n2.elems.end());
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -308,27 +308,27 @@ void test_infix_handles_multiple_infix_ops() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("f")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "f"); ++p;
   AstNode n2 = *p; ++p;
     check(isList(n2));
     list<AstNode>::iterator p2 = n2.elems.begin();
-    checkEq(*p2, Token("(")); ++p2;
-    checkEq(*p2, Token("+")); ++p2;
-    checkEq(*p2, Token("a")); ++p2;
-    checkEq(*p2, Token("b")); ++p2;
-    checkEq(*p2, Token(")")); ++p2;
+    checkEq(*p2, "("); ++p2;
+    checkEq(*p2, "+"); ++p2;
+    checkEq(*p2, "a"); ++p2;
+    checkEq(*p2, "b"); ++p2;
+    checkEq(*p2, ")"); ++p2;
     check(p2 == n2.elems.end());
   n2 = *p; ++p;
     check(isList(n2));
     p2 = n2.elems.begin();
-    checkEq(*p2, Token("(")); ++p2;
-    checkEq(*p2, Token("+")); ++p2;
-    checkEq(*p2, Token("c")); ++p2;
-    checkEq(*p2, Token("d")); ++p2;
-    checkEq(*p2, Token(")")); ++p2;
+    checkEq(*p2, "("); ++p2;
+    checkEq(*p2, "+"); ++p2;
+    checkEq(*p2, "c"); ++p2;
+    checkEq(*p2, "d"); ++p2;
+    checkEq(*p2, ")"); ++p2;
     check(p2 == n2.elems.end());
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -337,11 +337,11 @@ void test_infix_handles_op_without_spaces() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("+")); ++p;
-  checkEq(*p, Token("a")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -350,11 +350,11 @@ void test_infix_handles_op_without_spaces2() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("+")); ++p;
-  checkEq(*p, Token("$a")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "$a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -363,11 +363,11 @@ void test_infix_handles_op_with_float() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("+")); ++p;
-  checkEq(*p, Token("a")); ++p;
-  checkEq(*p, Token("1.0")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "1.0"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -376,11 +376,11 @@ void test_infix_handles_op_with_float2() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("+")); ++p;
-  checkEq(*p, Token("3.0")); ++p;
-  checkEq(*p, Token("1.0")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "3.0"); ++p;
+  checkEq(*p, "1.0"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -389,11 +389,11 @@ void test_infix_handles_op_with_float3() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token(".")); ++p;
-  checkEq(*p, Token("a3")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "."); ++p;
+  checkEq(*p, "a3"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -402,19 +402,19 @@ void test_infix_gives_ops_without_spaces_precedence() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("*")); ++p;
-  checkEq(*p, Token("n")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "*"); ++p;
+  checkEq(*p, "n"); ++p;
   AstNode n2 = *p; ++p;
     check(isList(n2));
     list<AstNode>::iterator p2 = n2.elems.begin();
-    checkEq(*p2, Token("(")); ++p2;
-    checkEq(*p2, Token("-")); ++p2;
-    checkEq(*p2, Token("n")); ++p2;
-    checkEq(*p2, Token("1")); ++p2;
-    checkEq(*p2, Token(")")); ++p2;
+    checkEq(*p2, "("); ++p2;
+    checkEq(*p2, "-"); ++p2;
+    checkEq(*p2, "n"); ++p2;
+    checkEq(*p2, "1"); ++p2;
+    checkEq(*p2, ")"); ++p2;
     check(p2 == n2.elems.end());
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -430,11 +430,11 @@ void test_infix_passes_keyword_syms2() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("f")); ++p;
-  checkEq(*p, Token(":a")); ++p;
-  checkEq(*p, Token("x")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "f"); ++p;
+  checkEq(*p, ":a"); ++p;
+  checkEq(*p, "x"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -443,18 +443,18 @@ void test_infix_handles_complement_as_usual() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token(".")); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "."); ++p;
   AstNode n2 = *p; ++p;
     check(isList(n2));
     list<AstNode>::iterator p2 = n2.elems.begin();
-    checkEq(*p2, Token("(")); ++p2;
-    checkEq(*p2, Token("~")); ++p2;
-    checkEq(*p2, Token("a")); ++p2;
-    checkEq(*p2, Token(")")); ++p2;
+    checkEq(*p2, "("); ++p2;
+    checkEq(*p2, "~"); ++p2;
+    checkEq(*p2, "a"); ++p2;
+    checkEq(*p2, ")"); ++p2;
     check(p2 == n2.elems.end());
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -463,12 +463,12 @@ void test_infix_handles_backquote() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("`")); ++p;
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("+")); ++p;
-  checkEq(*p, Token("a")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "`"); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -477,12 +477,12 @@ void test_infix_handles_splice() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("@")); ++p;
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("+")); ++p;
-  checkEq(*p, Token("a")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, "@"); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 
@@ -491,12 +491,12 @@ void test_infix_handles_unquote_splice() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token(",@")); ++p;
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("+")); ++p;
-  checkEq(*p, Token("a")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, ",@"); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
 void test_infix_handles_unquote_splice2() {
@@ -504,11 +504,11 @@ void test_infix_handles_unquote_splice2() {
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token(",@")); ++p;
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("+")); ++p;
-  checkEq(*p, Token("a")); ++p;
-  checkEq(*p, Token("b")); ++p;
-  checkEq(*p, Token(")")); ++p;
+  checkEq(*p, ",@"); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }

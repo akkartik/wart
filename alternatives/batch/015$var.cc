@@ -37,6 +37,13 @@
 //          (,x = ,y)
 //          (,y = ,tmp))
 
+list<Cell*> transformDollarVars(list<Cell*> in) {
+  list<Cell*> result;
+  for (list<Cell*>::iterator p = in.begin(); p != in.end(); ++p)
+    result.push_back(transformDollarVars(*p));
+  return result;
+}
+
 Cell* transformDollarVars(Cell* input) {
   Table map;  // transform $vars identically within each top-level expression
   return transformDollarVars(input, map);

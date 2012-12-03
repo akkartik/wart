@@ -64,24 +64,21 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
           break;
       }
     }
-    else if (!isIndent(curr)) { //// curr is a 'word' token
+    else if (!isIndent(curr)) { //// 'word' token
       ++numWordsInLine;
       if (numWordsInLine < 2) {
         buffer.push_back(curr);
       }
-      else if (numWordsInLine == 2) {
-        if (explicitOpenParens == 0 && !parenAtStartOfLine) {
+      else {
+        if (numWordsInLine == 2 && explicitOpenParens == 0 && !parenAtStartOfLine) {
           result.push_back(Token("("));
           implicitOpenParens.push(thisLineIndent);
         }
         emitAll(buffer, result, explicitOpenParens);
         emit(curr, result, explicitOpenParens);
       }
-      else {  //// later words
-        emit(curr, result, explicitOpenParens);
-      }
     }
-    else { //// curr.isIndent()
+    else {  //// indent
       long nextLineIndent = curr.indentLevel;
       emitAll(buffer, result, explicitOpenParens);
       while (!implicitOpenParens.empty() && nextLineIndent <= implicitOpenParens.top()) {

@@ -1,30 +1,35 @@
 void test_parse_handles_empty_stream() {
-  IndentSensitiveStream in("");
-  checkEq(nextAstNode(in), eof());
+  stringstream in("");
+  list<Token> tokens = insertImplicitParens(tokenize(in));
+  checkEq(nextAstNode(tokens), eof());
 }
 
 void test_parse_handles_trailing_comment() {
-  IndentSensitiveStream in("34 # abc");
-  checkEq(nextAstNode(in), Token("34"));
-  checkEq(nextAstNode(in), eof());
+  stringstream in("34 # abc");
+  list<Token> tokens = insertImplicitParens(tokenize(in));
+  checkEq(nextAstNode(tokens), Token("34"));
+  checkEq(nextAstNode(tokens), eof());
 }
 
 void test_parse_handles_atom() {
-  IndentSensitiveStream in("34");
-  checkEq(nextAstNode(in), Token("34"));
+  stringstream in("34");
+  list<Token> tokens = insertImplicitParens(tokenize(in));
+  checkEq(nextAstNode(tokens), Token("34"));
 }
 
 void test_parse_handles_atoms() {
-  IndentSensitiveStream in("34\n\"a b c\"\n3.4");
-  checkEq(nextAstNode(in), Token("34"));
-  checkEq(nextAstNode(in), Token("\"a b c\""));
-  checkEq(nextAstNode(in), Token("3.4"));
-  checkEq(nextAstNode(in), eof());
+  stringstream in("34\n\"a b c\"\n3.4");
+  list<Token> tokens = insertImplicitParens(tokenize(in));
+  checkEq(nextAstNode(tokens), Token("34"));
+  checkEq(nextAstNode(tokens), Token("\"a b c\""));
+  checkEq(nextAstNode(tokens), Token("3.4"));
+  checkEq(nextAstNode(tokens), eof());
 }
 
 void test_parse_handles_forms() {
-  IndentSensitiveStream in("(34 \"a b c\")");
-  AstNode n = nextAstNode(in);
+  stringstream in("(34 \"a b c\")");
+  list<Token> tokens = insertImplicitParens(tokenize(in));
+  AstNode n = nextAstNode(tokens);
   check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("(")); ++p;
@@ -32,12 +37,13 @@ void test_parse_handles_forms() {
   checkEq(*p, Token("\"a b c\"")); ++p;
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
-  checkEq(nextAstNode(in), eof());
+  checkEq(nextAstNode(tokens), eof());
 }
 
 void test_parse_handles_nested_forms() {
-  IndentSensitiveStream in("(34 (2 3) \"a b c\")");
-  AstNode n = nextAstNode(in);
+  stringstream in("(34 (2 3) \"a b c\")");
+  list<Token> tokens = insertImplicitParens(tokenize(in));
+  AstNode n = nextAstNode(tokens);
   check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("(")); ++p;
@@ -54,12 +60,13 @@ void test_parse_handles_nested_forms() {
   checkEq(*p, Token("\"a b c\"")); ++p;
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
-  checkEq(nextAstNode(in), eof());
+  checkEq(nextAstNode(tokens), eof());
 }
 
 void test_parse_handles_nested_forms_with_comments() {
-  IndentSensitiveStream in("(a b (c d #\n))");
-  AstNode n = nextAstNode(in);
+  stringstream in("(a b (c d #\n))");
+  list<Token> tokens = insertImplicitParens(tokenize(in));
+  AstNode n = nextAstNode(tokens);
   check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("(")); ++p;
@@ -76,12 +83,13 @@ void test_parse_handles_nested_forms_with_comments() {
 
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
-  checkEq(nextAstNode(in), eof());
+  checkEq(nextAstNode(tokens), eof());
 }
 
 void test_parse_handles_quotes() {
-  IndentSensitiveStream in("(34 `(2 ,b) ',35 ,',36 ,'a)");
-  AstNode n = nextAstNode(in);
+  stringstream in("(34 `(2 ,b) ',35 ,',36 ,'a)");
+  list<Token> tokens = insertImplicitParens(tokenize(in));
+  AstNode n = nextAstNode(tokens);
   check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("(")); ++p;
@@ -125,12 +133,13 @@ void test_parse_handles_quotes() {
 
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
-  checkEq(nextAstNode(in), eof());
+  checkEq(nextAstNode(tokens), eof());
 }
 
 void test_parse_handles_splice_operators() {
-  IndentSensitiveStream in("`(2 ,@b @,c)");
-  AstNode n = nextAstNode(in);
+  stringstream in("`(2 ,@b @,c)");
+  list<Token> tokens = insertImplicitParens(tokenize(in));
+  AstNode n = nextAstNode(tokens);
   check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, Token("`")); ++p;
@@ -151,16 +160,17 @@ void test_parse_handles_splice_operators() {
     check(q == ast2.end());
   checkEq(*p, Token(")")); ++p;
   check(p == n.elems.end());
-  checkEq(nextAstNode(in), eof());
+  checkEq(nextAstNode(tokens), eof());
 }
 
 void test_parse_handles_indented_toplevel_forms() {
-  IndentSensitiveStream in("a\n  a b c\n    d");
-  AstNode n = nextAstNode(in);
+  stringstream in("a\n  a b c\n    d");
+  list<Token> tokens = insertImplicitParens(tokenize(in));
+  AstNode n = nextAstNode(tokens);
   check(n.elems.empty());
   checkEq(n.atom.token, "a");
 
-  n = nextAstNode(in);
+  n = nextAstNode(tokens);
   check(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
   check(p->elems.empty());
@@ -171,5 +181,5 @@ void test_parse_handles_indented_toplevel_forms() {
   checkEq(p->atom.token, "d"); ++p;
   checkEq(p->atom.token, ")"); ++p;
   check(p == n.elems.end());
-  checkEq(nextAstNode(in), eof());
+  checkEq(nextAstNode(tokens), eof());
 }

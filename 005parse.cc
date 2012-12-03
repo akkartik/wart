@@ -26,17 +26,17 @@ AstNode nextAstNode(IndentSensitiveStream& in) {
   return nextAstNode(bufferedTokens);
 }
 
-AstNode nextAstNode(list<Token>& buffer) {
+AstNode nextAstNode(list<Token>& in) {
   list<AstNode> subform;
-  if (buffer.empty()) return AstNode(subform);
+  if (in.empty()) return AstNode(subform);
 
-  subform.push_back(AstNode(nextToken(buffer)));
-  while (!buffer.empty() && isQuoteOrUnquote(subform.back().atom))
-    subform.push_back(AstNode(nextToken(buffer)));
+  subform.push_back(AstNode(nextToken(in)));
+  while (!in.empty() && isQuoteOrUnquote(subform.back().atom))
+    subform.push_back(AstNode(nextToken(in)));
 
   if (subform.back() == "(") {
-    while (!buffer.empty() && subform.back() != ")")
-      subform.push_back(nextAstNode(buffer));
+    while (!in.empty() && subform.back() != ")")
+      subform.push_back(nextAstNode(in));
     if (subform.back() != ")") RAISE << "Unbalanced (" << endl << DIE;
   }
 
@@ -49,8 +49,8 @@ AstNode nextAstNode(list<Token>& buffer) {
 
 //// internals
 
-Token nextToken(list<Token>& buffer) {
-  Token result = buffer.front(); buffer.pop_front();
+Token nextToken(list<Token>& in) {
+  Token result = in.front(); in.pop_front();
   return result;
 }
 

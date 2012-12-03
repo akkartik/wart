@@ -11,49 +11,61 @@
 //    so lines with one word are never wrapped in parens, like x or ,f.sym
 //  encourage macros to fully parenthesize
 //    so ignore indent inside backquote
-//  performs flow control at the repl, decides when to show the prompt again
 
-list<Token> nextExpr(IndentSensitiveStream& c) {
-  list<Token> result;
-  long openExplicitParens = 0;  // parens in the original
-  stack<long> implicitParenStack;   // parens we inserted
-
-  for (list<Token> line = nextLine(c); !line.empty(); line=nextLine(c)) {
-    long thisLineIndent=line.front().indentLevel, nextLineIndent=line.back().indentLevel;
-
-    // open an implicit paren if necessary
-    if (openExplicitParens == 0 && numWordsInLine(line) > 1 && noParenAtStart(line)) {
-      add(result, Token("("));
-      implicitParenStack.push(thisLineIndent);
+list<Token> insertImplicitParens(list<Token> in) {
+  list<Token> result;   // emit tokens here
+  long explicitOpenParens = 0;  // parens in the original
+  stack<long> implicitOpenParens;   // parens we inserted
+  long numWordsInLine = 0;
+  bool parenAtStartOfLine = false;
+  list<Token> buffer;
+  for (list<Token>::iterator curr = in.begin(); curr != in.end(); ++curr) {
+    if (isQuoteOrUnquote(*curr)) {
+      if (numWordsInLine < 2)
+        buffer.push_back(*curr);
+      else
+        emit(*curr, result, explicitOpenParens);
     }
-
-    // copy line tokens
-    for (list<Token>::iterator q = line.begin(); q != line.end(); ++q) {
-      add(result, *q);
-      if (*q == "(") ++openExplicitParens;
-      if (*q == ")") --openExplicitParens;
-      if (openExplicitParens < 0)
-        RAISE << "Unbalanced )" << endl;
+    else if (isParen(*curr)) {
+      if (!parenAtStartOfLine)
+        parenAtStartOfLine = (*curr == "(" && numWordsInLine == 0);
+      if (numWordsInLine < 2 && explicitOpenParens == 0 && !parenAtStartOfLine) {
+        buffer.push_back(*curr);
+      }
+      else {
+        emitAll(buffer, result, explicitOpenParens);
+        emit(*curr, result, explicitOpenParens);
+      }
     }
-
-    // close all possible implicit parens
-    while (!implicitParenStack.empty() && implicitParenStack.top() >= nextLineIndent) {
-      add(result, Token(")"));
-      implicitParenStack.pop();
+    else if (!isIndent(*curr)) {  //// 'word' token
+      ++numWordsInLine;
+      if (numWordsInLine < 2) {
+        buffer.push_back(*curr);
+      }
+      else {
+        if (numWordsInLine == 2 && explicitOpenParens == 0 && !parenAtStartOfLine) {
+          result.push_back(Token("("));
+          implicitOpenParens.push(curr->indentLevel);
+        }
+        emitAll(buffer, result, explicitOpenParens);
+        emit(*curr, result, explicitOpenParens);
+      }
     }
+    else {  //// indent
+      emitAll(buffer, result, explicitOpenParens);
+      while (!implicitOpenParens.empty() && curr->indentLevel <= implicitOpenParens.top()) {
+        result.push_back(Token(")"));
+        implicitOpenParens.pop();
+      }
 
-    if (c.fd.eof()) break;
-
-    if (implicitParenStack.empty() && openExplicitParens == 0) {
-      if (!c.fd.eof())
-        // clean up indent state for the next call
-        for (int i = 0; i < nextLineIndent; ++i)
-          c.fd.putback(' ');
-      break;
+      //// reset
+      numWordsInLine = 0;
+      parenAtStartOfLine = false;
     }
   }
 
-  for (unsigned long i=0; i < implicitParenStack.size(); ++i)
+  emitAll(buffer, result, explicitOpenParens);
+  for (unsigned long i=0; i < implicitOpenParens.size(); ++i)
     result.push_back(Token(")"));
   return result;
 }
@@ -62,48 +74,21 @@ list<Token> nextExpr(IndentSensitiveStream& c) {
 
 //// internals
 
-list<Token> nextLine(IndentSensitiveStream& c) {
-  list<Token> result;
-  if (c.fd.eof()) return result;
-
-  if (c.currIndent == -1)
-    result.push_back(nextToken(c));
-  else
-    result.push_back(Token(c.currIndent));
-
-  do { result.push_back(nextToken(c)); }
-  while (!c.fd.eof() && !isIndent(result.back()));
-  return result;
+void emit(Token& t, list<Token>& out, long& explicitOpenParens) {
+  out.push_back(t);
+  if (t == "(") ++explicitOpenParens;
+  if (t == ")") --explicitOpenParens;
+  if (explicitOpenParens < 0) RAISE << "Unbalanced )" << endl;
 }
 
-long numWordsInLine(list<Token> line) {
-  long numWords = 0;
-  for (list<Token>::iterator p = line.begin(); p != line.end(); ++p)
-    if (!isIndent(*p) && !p->newline && !isParen(*p) && !isQuoteOrUnquote(*p))
-      ++numWords;
-  return numWords;
-}
-
-void add(list<Token>& l, Token x) {
-  if (!isIndent(x) && !x.newline)
-    l.push_back(x);
-}
-
-list<Token>::iterator firstNonQuote(list<Token>& line) {
-  for (list<Token>::iterator p = line.begin(); p != line.end(); ++p) {
-    if (!isIndent(*p) && !isQuoteOrUnquote(*p))
-      return p;
-  }
-  return line.end();
-}
-
-bool noParenAtStart(list<Token> line) {
-  list<Token>::iterator p = firstNonQuote(line);
-  return p != line.end() && *p != "(";
+void emitAll(list<Token>& buffer, list<Token>& out, long& explicitOpenParens) {
+  for (list<Token>::iterator p = buffer.begin(); p != buffer.end(); ++p)
+    emit(*p, out, explicitOpenParens);
+  buffer.clear();
 }
 
 bool isIndent(const Token& t) {
-  return t.token == "" && !t.newline;
+  return t.token == "";
 }
 
 bool isParen(const Token& t) {

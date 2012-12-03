@@ -1,7 +1,10 @@
 //// construct parse tree out of cells
 
-Cell* nextRawCell(IndentSensitiveStream& in) {
-  return buildCell(transformInfix(nextAstNode(in)));
+list<Cell*> buildCells(list<AstNode> in) {
+  list<Cell*> result;
+  for (list<AstNode>::iterator p = in.begin(); p != in.end(); ++p)
+    result.push_back(buildCell(*p));
+  return result;
 }
 
 Cell* buildCell(AstNode n) {

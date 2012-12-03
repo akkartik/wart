@@ -1,4 +1,4 @@
-//// split input into tokens separated by newlines, indent, and the following boundaries:
+//// split input into tokens separated by indent, and the following boundaries:
 const string punctuationChars = "()#\"";  // the skeleton of a wart program
 const string quoteAndUnquoteChars = ",'`@";   // controlling eval and macros
 
@@ -8,22 +8,21 @@ const string quoteAndUnquoteChars = ",'`@";   // controlling eval and macros
 //    so infix ops are ignored
 //  supporting whitespace sensitivity
 //    preserve indent information because later passes can't recreate it
+//    skip indent in empty lines
 //  avoid modifying strings
 //    so parse them here and make them easy for later passes to detect
 
 // line contains 1 indent and zero or more regular tokens
-// and a newline token at the end
 struct Token {
   string token;
-  long indentLevel;
-  bool newline;
+  long indentLevel;   // all tokens on a line share its indentLevel
 
   explicit Token(string s)
-    :token(s), indentLevel(-1), newline(false) {}
+    :token(s), indentLevel(-1) {}
   explicit Token(long indent)
-    :token(""), indentLevel(indent), newline(false) {}
-  static Token Newline() {
-    Token t(0); t.newline = true; return t; }
+    :token(""), indentLevel(indent) {}
+  explicit Token(string s, long indent)
+    :token(s), indentLevel(indent) {}
 
   bool operator==(const string& x) const {
     return token == x;
@@ -32,53 +31,55 @@ struct Token {
     return !(*this == x);
   }
   bool operator==(const Token& x) const {
-    return token == x.token && indentLevel == x.indentLevel && newline == x.newline;
+    return token == x.token && indentLevel == x.indentLevel;
   }
   bool operator!=(const Token& x) const {
     return !(*this == x);
   }
 };
 
-Token nextToken(IndentSensitiveStream& in) {
-  if (in.atStartOfLine) {
-    if (in.fd.peek() == '#')
-      skipComment(in.fd);
-    if (in.fd.peek() == '\n') {
-      in.fd.get();
-      return Token::Newline();
+list<Token> tokenize(istream& in) {
+  in >> std::noskipws;
+  list<Token> result;
+  bool atStartOfLine = true;
+  long currIndent = 0;
+  while (!in.eof()) {
+    if (atStartOfLine) {
+      Token t(currIndent=indent(in));
+      if (in.peek() == '#' || in.peek() == '\n') {
+        skipComment(in);
+        if (in.peek() == '\n') in.get();   // newline
+        atStartOfLine = true;
+        continue;
+      }
+      result.push_back(t);
+      atStartOfLine = false;
     }
-    Token t = Token(indent(in.fd));
-    if (in.fd.peek() == '#')
-      skipComment(in.fd);
-    if (in.fd.peek() == '\n')
-      return nextToken(in);
-    in.atStartOfLine = false;
-    in.currIndent=t.indentLevel;
-    return t;
+    else {
+      skipWhitespace(in);
+    }
+
+    if (in.peek() == '#' || in.peek() == '\n') {
+      skipComment(in);
+      in.get();   // newline
+      atStartOfLine = true;
+      continue;
+    }
+
+    ostringstream out;
+    if (in.peek() == '"')
+      slurpString(in, out);
+    else if (find(punctuationChars, in.peek()))
+      slurpChar(in, out);
+    else if (in.peek() == ',')
+      slurpUnquote(in, out);
+    else if (find(quoteAndUnquoteChars, in.peek()))
+      slurpChar(in, out);
+    else
+      slurpWord(in, out);
+    result.push_back(Token(out.str(), currIndent));
   }
-
-  skipWhitespace(in.fd);
-  if (in.fd.peek() == '#')
-    skipComment(in.fd);
-  if (in.fd.peek() == '\n') {
-    in.fd.get();
-    in.atStartOfLine = true;
-    return Token::Newline();
-  }
-
-  ostringstream out;
-  if (in.fd.peek() == '"')
-    slurpString(in.fd, out);
-  else if (find(punctuationChars, in.fd.peek()))
-    slurpChar(in.fd, out);
-  else if (in.fd.peek() == ',')
-    slurpUnquote(in.fd, out);
-  else if (find(quoteAndUnquoteChars, in.fd.peek()))
-    slurpChar(in.fd, out);
-  else
-    slurpWord(in.fd, out);
-
-  return Token(out.str());
+  return result;
 }
 
 
@@ -132,6 +133,8 @@ long indent(istream& in) {
 
     else if (c == ' ') ++indent;
     else if (c == '\t') indent+=2;
+    else if (c == '#') skipComment(in);
+    else if (c == '\n') indent=0;
   }
   return indent;
 }
@@ -160,7 +163,6 @@ bool find(string s, char c) {
 }
 
 ostream& operator<<(ostream& os, Token y) {
-  if (y.newline) return os << "\\n";
   if (y == "") return os << ":" << y.indentLevel;
   else return os << y.token;
 }

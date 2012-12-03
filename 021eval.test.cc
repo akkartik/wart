@@ -383,6 +383,7 @@ void test_eval_handles_quoted_atoms() {
   checkEq(result, newSym("a"));
   rmref(result);
   rmref(expr);
+
   expr = read(s);
   result = eval(expr);
   checkEq(result, newNum(34));

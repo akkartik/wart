@@ -29,31 +29,27 @@
 // Read is the time for optimizations, when subsidiary functions can be
 // specialized to a specific call-site.
 
-// track indent state when reading code from disk
-struct IndentSensitiveStream {
-  istream& fd;
-  long currIndent;
-  bool atStartOfLine;
-  explicit IndentSensitiveStream(istream& in) :fd(in), currIndent(-1), atStartOfLine(true) { fd >> std::noskipws; }
-  // leaky version just for convenient tests
-  explicit IndentSensitiveStream(string s) :fd(*new stringstream(s)), currIndent(-1), atStartOfLine(true) { fd >> std::noskipws; }
-  bool eof() { return fd.eof(); }
-} STDIN(cin);
-
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
     runTests();
     return 0;
   }
 
-  //// read, eval, print
   setup();
   loadFiles(".wart");
 }
 
-//// read: tokenize, parenthesize, parse, transform infix, build cells, transform $vars
-Cell* read(IndentSensitiveStream& in) {
-  return mkref(transformDollarVars(nextRawCell(in)));
+void loadFile(const char* filename) {
+  ifstream f(filename);
+  if (f.fail()) return;
+  //// read: tokenize, parenthesize, parse, transform infix, build cells, transform $vars
+  list<Cell*> exprs = transformDollarVars(buildCells(transformInfix(parse(insertImplicitParens(tokenize(f))))));
+  //// eval
+  for (list<Cell*>::iterator p = exprs.begin(); p != exprs.end(); ++p) {
+//?     cerr << *p << endl;   // uncomment this to track down errors in wart files
+    rmref(eval(*p));
+    rmref(*p);
+  }
 }
 
 
@@ -123,7 +119,7 @@ void verify() {
 // helper to read from string
 // leaks memory; just for convenient tests
 Cell* read(string s) {
-  return read(*new stringstream(s));
+  return mkref(transformDollarVars(buildCells(transformInfix(parse(insertImplicitParens(tokenize(*new stringstream(s))))))).front());
 }
 
 

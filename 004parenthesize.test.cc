@@ -545,6 +545,19 @@ void test_parenthesize_errors_on_unbalanced_closed_paren() {
   check(raiseCount > 0);   raiseCount=0;
 }
 
+void test_parenthesize_handles_early_paren() {
+  IndentSensitiveStream in("a (b)");
+  list<Token> tokens = nextExpr(in);
+  list<Token>::iterator p = tokens.begin();
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == tokens.end());
+}
+
 void test_parenthesize_handles_multiple_exprs_on_a_line() {
   IndentSensitiveStream in("() 1 2");
   list<Token> tokens = nextExpr(in);

@@ -13,17 +13,6 @@ void loadFiles(const char* ext) {
 
 //// internals
 
-void loadFile(const char* filename) {
-  ifstream f(filename);
-  if (f.fail()) return;
-  while (!f.eof()) {
-    Cell* cell = read(f);
-//?     cerr << cell << endl;   // uncomment this to track down errors in wart files
-    rmref(eval(cell));
-    rmref(cell);
-  }
-}
-
 #include<dirent.h>
 
 vector<char*> sortedFiles(const char* dirname, const char* ext) {
