@@ -15,14 +15,12 @@ const string quoteAndUnquoteChars = ",'`@";   // controlling eval and macros
 // line contains 1 indent and zero or more regular tokens
 struct Token {
   string token;
-  long indentLevel;   // all tokens on a line share its indentLevel
+  long indentLevel;
 
   explicit Token(string s)
     :token(s), indentLevel(-1) {}
   explicit Token(long indent)
     :token(""), indentLevel(indent) {}
-  explicit Token(string s, long indent)
-    :token(s), indentLevel(indent) {}
 
   bool operator==(const string& x) const {
     return token == x;
@@ -77,7 +75,7 @@ list<Token> tokenize(istream& in) {
       slurpChar(in, out);
     else
       slurpWord(in, out);
-    result.push_back(Token(out.str(), currIndent));
+    result.push_back(Token(out.str()));
   }
   return result;
 }

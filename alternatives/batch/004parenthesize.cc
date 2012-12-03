@@ -18,6 +18,7 @@ list<Token> insertImplicitParens(list<Token> in) {
   stack<long> implicitOpenParens;   // parens we inserted
   long numWordsInLine = 0;
   bool parenAtStartOfLine = false;
+  long thisLineIndent = 0;
   list<Token> buffer;
   for (list<Token>::iterator p = in.begin(); p != in.end(); ++p) {
     Token curr = *p;
@@ -46,20 +47,22 @@ list<Token> insertImplicitParens(list<Token> in) {
       else {
         if (numWordsInLine == 2 && explicitOpenParens == 0 && !parenAtStartOfLine) {
           result.push_back(Token("("));
-          implicitOpenParens.push(curr.indentLevel);
+          implicitOpenParens.push(thisLineIndent);
         }
         emitAll(buffer, result, explicitOpenParens);
         emit(curr, result, explicitOpenParens);
       }
     }
     else {  //// indent
+      long nextLineIndent = curr.indentLevel;
       emitAll(buffer, result, explicitOpenParens);
-      while (!implicitOpenParens.empty() && curr.indentLevel <= implicitOpenParens.top()) {
+      while (!implicitOpenParens.empty() && nextLineIndent <= implicitOpenParens.top()) {
         result.push_back(Token(")"));
         implicitOpenParens.pop();
       }
 
       //// reset
+      thisLineIndent = nextLineIndent;
       numWordsInLine = 0;
       parenAtStartOfLine = false;
     }
