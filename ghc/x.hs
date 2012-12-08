@@ -1,5 +1,7 @@
 -- http://book.realworldhaskell.org/read/using-parsec.html
 import Text.ParserCombinators.Parsec
+import Test.HUnit
+import Test.HUnit.Parsec
 
 -- runhaskell x.hs < x.csv
 main =
@@ -31,3 +33,12 @@ eol =   try (string "\n\r")
 
 parseCSV :: String -> Either ParseError [[String]]
 parseCSV input = parse csvFile "(unknown)" input
+
+test1 = ParsecTest {
+  parser = csvFile,
+  initState = (),
+  positiveCases = [
+    ([["hi"]], ["hi\n"])
+  ],
+  negativeCases = []
+}
