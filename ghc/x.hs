@@ -38,7 +38,11 @@ test1 = ParsecTest {
   parser = csvFile,
   initState = (),
   positiveCases = [
-    ([["hi"]], ["hi\n"])
+    ([["hi"]], ["hi\n"]),
+    ([["hi", "there"]], ["hi,there\n"]),
+    ([["hi"], [""], ["there"]], ["hi\n\nthere\n"]), -- bug?
+    ([["a, b"]], ["\"a, b\"\n"]),
+    ([["a, \"b"]], ["\"a, \"\"b\"\n"])
   ],
   negativeCases = []
 }
