@@ -1,9 +1,27 @@
 -- http://book.realworldhaskell.org/read/using-parsec.html
 import Text.ParserCombinators.Parsec
 
+-- runhaskell x.hs < x.csv
+main =
+    do c <- getContents
+       case parse csvFile "(stdin)" c of
+            Left e -> do putStrLn "Error parsing input:"
+                         print e
+            Right r -> mapM_ print r
+
 csvFile = endBy line eol
 line = sepBy cell (char ',')
-cell = many (noneOf ",\n\r")
+cell = quotedCell <|> many (noneOf ",\n\r")
+
+quotedCell =
+    do char '"'
+       content <- many quotedChar
+       char '"' <?> "quote at end of cell"
+       return content
+
+quotedChar =
+        noneOf "\""
+    <|> try (string "\"\"" >> return '"')
 
 eol =   try (string "\n\r")
     <|> try (string "\r\n")
