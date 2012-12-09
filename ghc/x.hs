@@ -11,7 +11,7 @@ main =
                          print e
             Right r -> mapM_ print r
 
-csvFile = endBy line eol
+csvFile = sepBy line eol
 line = sepBy cell (char ',')
 cell = quotedCell <|> many (noneOf ",\n\r")
 
@@ -38,11 +38,11 @@ test1 = ParsecTest {
   parser = csvFile
 , initState = ()
 , positiveCases = [
-    ([["hi"]], ["hi\n"])
-  , ([["hi", "there"]], ["hi,there\n"])
-  , ([["hi"], [""], ["there"]], ["hi\n\nthere\n"])
-  , ([["a, b"]], ["\"a, b\"\n"])
-  , ([["a, \"b"]], ["\"a, \"\"b\"\n"])
+    ([["hi"]], ["hi"])
+  , ([["hi", "there"]], ["hi,there"])
+  , ([["hi"], [""], ["there"]], ["hi\n\nthere"])
+  , ([["a, b"]], ["\"a, b\""])
+  , ([["a, \"b"]], ["\"a, \"\"b\""])
   ]
 , negativeCases = []
 }
