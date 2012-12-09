@@ -40,7 +40,7 @@ test1 = ParsecTest {
 , positiveCases = [
     ([["hi"]], ["hi\n"])
   , ([["hi", "there"]], ["hi,there\n"])
-  , ([["hi"], [""], ["there"]], ["hi\n\nthere\n"]) -- bug?
+  , ([["hi"], [""], ["there"]], ["hi\n\nthere\n"])
   , ([["a, b"]], ["\"a, b\"\n"])
   , ([["a, \"b"]], ["\"a, \"\"b\"\n"])
   ]
