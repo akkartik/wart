@@ -19,12 +19,55 @@ csvFile =
        eof
        return result
 
+-- Monad operators:
+--   class Monad m where
+--     (>>=) :: m a -> (a -> m b) -> m b  -- bind
+--     (>>) :: m a -> m b -> m b  -- sequence
+--     return :: a -> m a
+--     fail :: String -> m a
+
+-- Monad laws:
+--   return a >>= f ≡ f a
+--   m >>= return ≡ m
+--   (m >>= f) >>= g ≡ m >>= (\x -> (f x >>= g))
+
+-- Monad syntactic sugar:
+--   do {e} ≡ e
+--   do {e;stmts} ≡ e >> do {stmts}
+--   do {p <- e; stmts} ≡ let ok p = do {stmts}
+--                            ok _ = fail "..."
+--                          in e >>= ok
+--   do {p <- e; stmts} ≡ e >>= \p -> do {stmts}
+--   do {let decls; stmts} ≡ let decls in do {stmts}
+
+-- Monad laws with syntactic sugar:
+--   do { a' <- return a; f a' } ≡ do { f a }
+--   do { x <- m; return x } ≡ do { m }
+--   do { y <- do { x <- m; f x }; g y } ≡ do { x <- m; do { y <- f x; g y } } ≡ do { x <- m; y <- f x; g y }
+
 -- Each line contains 1 or more cells, separated by a comma
 line :: GenParser Char st [String]
 line =
-    do result <- cells
-       eol                       -- end of line
-       return result
+-- ?     do result <- cells
+-- ?        eol
+-- ?        return result
+
+-- ?     let ok result = do eol
+-- ?                        return result
+-- ?         ok _ = fail "..."
+-- ?       in cells >>= ok
+
+-- ?     cells >>= \result -> do eol
+-- ?                             return result
+
+-- ?     cells >>= \result -> eol >> do return result
+
+-- ?     cells >>= (\result -> (eol >> (return result)))
+
+        cells
+    >>= \result ->
+              eol
+           >> (return result)
 
 -- Build up a list of cells.  Try to parse the first cell, then figure out
 -- what ends the cell.
