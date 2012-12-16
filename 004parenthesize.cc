@@ -31,11 +31,17 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
   if (in.eof()) return result;
   assert(in.atStartOfLine);
 
-  long explicitOpenParens = 0;  // parens in the original
-  stack<long> implicitOpenParens;   // parens we inserted with their indent levels
-  list<Token> buffer;   // if implicit paren might need to go first
+  //// rule: insert implicit paren before lines that:
+  ////   a) have 2 or more words
+  ////   b) aren't already parenthesized at the front
+  //// both conditions are oblivious of quotes and unquotes
+  list<Token> buffer;
   long numWordsInLine = 0;
   bool parenAtStartOfLine = false;
+  ////   c) aren't inside open parens
+  long explicitOpenParens = 0;  // parens in the original
+  stack<long> implicitOpenParens;   // parens we inserted with their indent levels
+
   long thisLineIndent = skipInitialNewlinesToFirstIndent(in);
   while (!in.eof()) {
     Token curr = nextToken(in);
