@@ -72,3 +72,4 @@ It also implies that backquoted expressions must be fully parenthesized:
   mac (when cond ... body)
     `(if ,cond
        (do ,@body))   # parens before 'do' are required
+This helps make explicit the syntax trees being manipulated.
