@@ -9,12 +9,42 @@ import Test.HUnit.Parsec
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Char
 
+main = do putStrLn "ready! type in an expr all on one line. ctrl-d exits."
+          repl
+
+repl = do line <- getLine
+          putStr "=> "
+          putStrLn $ readExpr line
+          repl
+
+readExpr :: String -> String
+readExpr input =
+  case parse expr "wart" input of
+    Left err -> show err
+    Right val -> showData val
+
 data Data = String String
           | Number Integer
           | Symbol String
           | Operator String
           | List [Data]
           deriving (Show, Eq)
+
+showData :: Data -> String
+showData (String contents) = "\""++contents++"\""
+showData (Number contents) = show contents
+showData (Symbol name) = "sym "++name
+showData (Operator name) = "`"++name++"`"
+showData (List elems) = "["++(foldl (join ", ") "" (map showData elems))++"]"
+
+-- parser
+
+expr :: Parser Data
+expr = string2
+   <|> number
+   <|> symbol
+   <|> operator
+   <|> (try list)
 
 whitespace :: Parser ()
 whitespace = skipMany1 space
@@ -38,6 +68,9 @@ symbolChars = "$?!_"
 symbol :: Parser Data
 symbol = liftM Symbol (many1 $ letter <|> digit <|> oneOf symbolChars)
 
+operator :: Parser Data
+operator = liftM Operator (many1 $ satisfy isOperatorChar)
+
 isOperatorChar :: Char -> Bool
 isOperatorChar x
   | isSpace x = False
@@ -45,21 +78,12 @@ isOperatorChar x
   | elem x punctuationChars = False
   | elem x symbolChars = False
   | otherwise = True
-operator :: Parser Data
-operator = liftM Operator (many1 $ satisfy isOperatorChar)
 
 list :: Parser Data
 list = do char '('
           elems <- sepBy expr whitespace
           char ')'
           return $ List elems
-
-expr :: Parser Data
-expr = string2
-   <|> number
-   <|> symbol
-   <|> operator
-   <|> (try list)
 
 test1 = ParsecTest {
   parser = expr
@@ -76,27 +100,7 @@ test1 = ParsecTest {
 , negativeCases = []
 }
 
+-- misc
+
 join sep "" b = b
 join sep a b = a++sep++b
-
-showVal :: Data -> String
-showVal (String contents) = "\""++contents++"\""
-showVal (Number contents) = show contents
-showVal (Symbol name) = "sym "++name
-showVal (Operator name) = "`"++name++"`"
-showVal (List elems) = "["++(foldl (join ", ") "" (map showVal elems))++"]"
-
-readExpr :: String -> String
-readExpr input =
-  case parse expr "wart" input of
-    Left err -> show err
-    Right val -> showVal val
-
-repl = do line <- getLine
-          putStr "=> "
-          putStrLn $ readExpr line
-          repl
-
-main :: IO ()
-main = do putStrLn "ready! type in an expr all on one line. ctrl-d exits."
-          repl
