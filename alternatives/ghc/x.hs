@@ -39,6 +39,7 @@ csvFile =
 --                          in e >>= ok
 --   do {p <- e; stmts} ≡ e >>= \p -> do {stmts}
 --   do {let decls; stmts} ≡ let decls in do {stmts}
+--   liftM f expr ≡ do { x <- expr; return f x }
 
 -- Monad laws with syntactic sugar:
 --   do { a' <- return a; f a' } ≡ do { f a }
