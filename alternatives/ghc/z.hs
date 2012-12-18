@@ -32,6 +32,8 @@ string2 = do char '"'
 number :: Parser Data
 number = liftM (Number . read) (many1 digit)
 
+punctuationChars = "()\"'`,@"
+
 symbolChars = "$?!_"
 symbol :: Parser Data
 symbol = liftM Symbol (many1 $ letter <|> digit <|> oneOf symbolChars)
@@ -40,6 +42,7 @@ isOperatorChar :: Char -> Bool
 isOperatorChar x
   | isSpace x = False
   | isAlphaNum x = False
+  | elem x punctuationChars = False
   | elem x symbolChars = False
   | otherwise = True
 operator :: Parser Data
@@ -54,9 +57,9 @@ list = do char '('
 expr :: Parser Data
 expr = string2
    <|> number
-   <|> (try list)
    <|> symbol
-   <|> operator   -- wildcard; must come after lists
+   <|> operator
+   <|> (try list)
 
 test1 = ParsecTest {
   parser = expr
@@ -85,12 +88,15 @@ showVal (List elems) = "["++(foldl (join ", ") "" (map showVal elems))++"]"
 
 readExpr :: String -> String
 readExpr input =
-  case parse expr "lisp" input of
+  case parse expr "wart" input of
     Left err -> show err
     Right val -> showVal val
 
-main :: IO ()
-main = do line <- getLine
+repl = do line <- getLine
           putStr "=> "
           putStrLn $ readExpr line
-          main
+          repl
+
+main :: IO ()
+main = do putStrLn "ready! type in an expr all on one line. ctrl-d exits."
+          repl
