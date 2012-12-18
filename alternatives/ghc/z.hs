@@ -1,32 +1,40 @@
 module Main where
-import System.Environment
+import Control.Monad hiding (join)
 import Data.Char
 import Data.List
-import Control.Monad
+import System.IO
+import System.Environment
+import Test.HUnit
+import Test.HUnit.Parsec
 import Text.ParserCombinators.Parsec
+import Text.ParserCombinators.Parsec.Char
 
 data Data = String String
           | Number Integer
           | Symbol String
           | Operator String
           | List [Data]
-          | DottedList [Data] Data
+          deriving (Show, Eq)
 
 whitespace :: Parser ()
 whitespace = skipMany1 space
 
+quotedChar :: Parser Char
+quotedChar = do char '\\'
+                anyChar
+
 string2 :: Parser Data
 string2 = do char '"'
-             x <- many (noneOf "\"")
+             x <- many (quotedChar <|> (noneOf "\""))
              char '"'
              return $ String x
 
 number :: Parser Data
-number = liftM Number (many1 digit)
+number = liftM (Number . read) (many1 digit)
 
 symbolChars = "$?!_"
 symbol :: Parser Data
-symbol = liftM String (many1 $ letter <|> digit <|> oneOf symbolChars)
+symbol = liftM Symbol (many1 $ letter <|> digit <|> oneOf symbolChars)
 
 isOperatorChar :: Char -> Bool
 isOperatorChar x
@@ -37,24 +45,52 @@ isOperatorChar x
 operator :: Parser Data
 operator = liftM Operator (many1 $ satisfy isOperatorChar)
 
+list :: Parser Data
+list = do char '('
+          elems <- sepBy expr whitespace
+          char ')'
+          return $ List elems
+
 expr :: Parser Data
 expr = string2
    <|> number
+   <|> (try list)
    <|> symbol
-   <|> operator
+   <|> operator   -- wildcard; must come after lists
+
+test1 = ParsecTest {
+  parser = expr
+, initState = ()
+, positiveCases = [
+      (String "abc", ["\"abc\""])
+    , (String "abc\"", ["\"abc\\\"\""])
+    , (Number 34, ["34"])
+    , (Symbol "$abc", ["$abc"])
+    , (Operator "+<+", ["+<+"])
+    , (List [(Symbol "a"), (Number 34)], ["(a 34)"])
+    , (List [(Symbol "a"), (Number 34), (Operator "..."), (Symbol "b")], ["(a 34 ... b)"])
+    ]
+, negativeCases = []
+}
+
+join sep "" b = b
+join sep a b = a++sep++b
 
 showVal :: Data -> String
-showVal (String contents) = "\"" ++ contents ++ "\""
+showVal (String contents) = "\""++contents++"\""
 showVal (Number contents) = show contents
-showVal (Symbol name) = name
-showVal (Operator name) = name
+showVal (Symbol name) = "sym "++name
+showVal (Operator name) = "`"++name++"`"
+showVal (List elems) = "["++(foldl (join ", ") "" (map showVal elems))++"]"
 
 readExpr :: String -> String
 readExpr input =
   case parse expr "lisp" input of
     Left err -> show err
-    Right val -> "Found value"
+    Right val -> showVal val
 
 main :: IO ()
-main = do args <- getArgs
-          putStrLn $ readExpr $ args!!0
+main = do line <- getLine
+          putStr "=> "
+          putStrLn $ readExpr line
+          main
