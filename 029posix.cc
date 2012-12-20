@@ -94,8 +94,11 @@ COMPILE_FN(close_socket, compiledFn_close_socket, "($sock)",
 
 struct sigaction originalSignalHandler;
 void interrupt(int s) {
-  evalUnbox(newCons(lookup("on_interrupt")));
-  originalSignalHandler.sa_handler(s);
+  Cell* f = lookupDynamicBinding(newSym("on_interrupt"));
+  if (f)
+    evalUnbox(newCons(f));  // leak
+  if (originalSignalHandler.sa_handler)
+    originalSignalHandler.sa_handler(s);
 }
 
 void catchCtrlC() {
