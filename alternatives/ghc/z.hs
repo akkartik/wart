@@ -21,21 +21,21 @@ readExpr :: String -> String
 readExpr input =
   case parse expr "wart" input of
     Left err -> show err
-    Right val -> showData val
+    Right val -> show val
 
 data Data = String String
           | Number Integer
           | Symbol String
           | Operator String
           | List [Data]
-          deriving (Show, Eq)
+          deriving (Eq)
 
-showData :: Data -> String
-showData (String contents) = "\""++contents++"\""
-showData (Number contents) = show contents
-showData (Symbol name) = "sym "++name
-showData (Operator name) = "`"++name++"`"
-showData (List elems) = "["++(foldl (join ", ") "" (map showData elems))++"]"
+instance Show Data where
+  show (String contents) = "\""++contents++"\""
+  show (Number contents) = show contents
+  show (Symbol name) = "sym "++name
+  show (Operator name) = "`"++name++"`"
+  show (List elems) = "["++(foldl (join ", ") "" (map show elems))++"]"
 
 -- parser
 
