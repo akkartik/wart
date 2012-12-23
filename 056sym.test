@@ -24,36 +24,36 @@
 
 
 
-(test "is_match treats any sym beginning with _ as wildcard"
-  :valueof (is_match '(1 ... _x) '(1 2 3))
+(test "match? treats any sym beginning with _ as wildcard"
+  :valueof (match? '(1 ... _x) '(1 2 3))
   :should ~be nil)
 
-(test "is_match manages _sym identity"
-  :valueof (is_match '(1 _x _x) '(1 2 3))
+(test "match? manages _sym identity"
+  :valueof (match? '(1 _x _x) '(1 2 3))
   :should be nil)
 
-(test "is_match manages _sym identity - 2"
-  :valueof (is_match '(1 _x _x) '(1 2 2))
+(test "match? manages _sym identity - 2"
+  :valueof (match? '(1 _x _x) '(1 2 2))
   :should ~be nil)
 
-(test "is_match matches $vars with their root"
-  :valueof (is_match 'a_ 'a3)
+(test "match? matches $vars with their root"
+  :valueof (match? 'a_ 'a3)
   :should ~be nil)
 
-(test "is_match matches $vars with their root - 2"
-  :valueof (is_match 'a_ 'a)
+(test "match? matches $vars with their root - 2"
+  :valueof (match? 'a_ 'a)
   :should be nil)
 
-(test "is_match manages $var_sym identity"
-  :valueof (is_match '(a_x a_x) '(a3 a3))
+(test "match? manages $var_sym identity"
+  :valueof (match? '(a_x a_x) '(a3 a3))
   :should ~be nil)
 
-(test "is_match manages $var_sym identity - 2"
-  :valueof (is_match '(a_x a_x) '(a2 a3))
+(test "match? manages $var_sym identity - 2"
+  :valueof (match? '(a_x a_x) '(a2 a3))
   :should be nil)
 
-(test "is_match manages $var_sym identity - 3"
-  :valueof (is_match '(a_x a_x) '(a a3))
+(test "match? manages $var_sym identity - 3"
+  :valueof (match? '(a_x a_x) '(a a3))
   :should be nil)
 
 (test "match integrates with test"

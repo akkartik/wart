@@ -33,8 +33,8 @@
   :valueof ((table 'a 1 'b 2) = (table 'b 2 'a 1))
   :should ~be nil)
 
-(test "is_match works on table values"
-  :valueof (is_match (table 'a '_) (table 'a 'x))
+(test "match? works on table values"
+  :valueof (match? (table 'a '_) (table 'a 'x))
   :should ~be nil)
 
 (test "lists coerce to tables"

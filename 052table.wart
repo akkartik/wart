@@ -44,11 +44,11 @@ def (x = y) :case table?.x
               (= y.k v))
             (as list x)))
 
-def (is_match x y) :case table?.x
+def (match? x y) :case table?.x
   (and table?.y
        (len:keys.x = len:keys.y)
        (all (fn((k v))
-              (is_match v y.k))
+              (match? v y.k))
             (as list x)))
 
 mac (w_table h ... body)

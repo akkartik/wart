@@ -12,4 +12,4 @@ alias be (=)
 alias equal (=)
 
 def (match a b)
-  (is_match b a)
+  (match? b a)
