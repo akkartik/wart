@@ -60,6 +60,6 @@
   :valueof (list 'a3 'a3)
   :should match '(a_x a_x))
 
-(test "sym_root works"
-  :valueof (sym_root 'a3)
+(test "root works"
+  :valueof (root 'a3)
   :should be 'a)

@@ -19,7 +19,7 @@ def (match? a b bindings) :case sym?.a
            sym?.b
            (let acore (string.a 0 -1)
              (and (acore ~= string.b)  # ..but not p
-                  (sym.acore = sym_root.b))))
+                  (sym.acore = root.b))))
       (and sym?.b
            (digit? string.b.-1)  # (p_x p_x) matches two of any $p
            (withs (sa   string.a
@@ -27,7 +27,7 @@ def (match? a b bindings) :case sym?.a
                    acore  (if ai (sa 0 ai)))
              (and ai
                   (acore ~= string.b)
-                  (sym.acore = sym_root.b)
+                  (sym.acore = root.b)
                   (default bindings.a :to b)
                   (bindings.a = b)))))
 
@@ -35,8 +35,8 @@ def (match? a b bindings) :case sym?.a
 
 ## internals
 
-# ignore the uniq part of a $sym
-def (sym_root x)
+# ignore the unique numeric suffix in a $sym
+def (root x)
   let name (rev:as list string.x)
     while (and name digit?:car.name)
       (zap cdr name)
