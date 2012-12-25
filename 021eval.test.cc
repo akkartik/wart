@@ -378,6 +378,16 @@ void test_sym_evals_to_value() {
   endDynamicScope("a");
 }
 
+void test_sym_evals_to_itself() {
+  newDynamicScope("a", newSym("a"));
+  Cell* expr = read("a");
+  Cell* result = eval(expr);
+  checkEq(result, expr);
+  rmref(result);
+  rmref(expr);
+  endDynamicScope("a");
+}
+
 void test_object_expr_evals_to_itself() {
   Cell* expr = read("(object foo 4)");
   Cell* result = eval(expr);

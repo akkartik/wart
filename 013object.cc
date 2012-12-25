@@ -14,6 +14,7 @@ bool isObject(Cell* x) {
 }
 
 Cell* rep(Cell* x) {
+  if (!isObject(x)) return x;
   return car(cdr(cdr(x)));
 }
 

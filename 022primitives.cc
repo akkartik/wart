@@ -17,11 +17,11 @@ COMPILE_FN(fn, compiledFn_fn, "'($params ... $body)",
 COMPILE_FN(eval, compiledFn_eval, "($x ... $scope)",
   Cell* scope = lookup("$scope");
   scope = (scope != nil) ? car(scope) : currLexicalScope;
-  return evalUnbox(lookup("$x"), scope);
+  return eval(lookup("$x"), scope);
 )
 
 COMPILE_FN(if, compiledFn_if, "($cond '$then '$else)",
-  return lookup("$cond") != nil ? evalUnbox(lookup("$then")) : evalUnbox(lookup("$else"));
+  return lookup("$cond") != nil ? eval(lookup("$then")) : eval(lookup("$else"));
 )
 
 COMPILE_FN(not, compiledFn_not, "($x)",
@@ -110,8 +110,8 @@ COMPILE_FN(make_unbound, compiledFn_make_unbound, "($var)",
 // eval with extra smarts for handling @args
 COMPILE_FN(mac_eval, compiledFn_mac_eval, "('$x $scope)",
   inMacro.push(true);
-  Cell* x = evalUnbox(lookup("$x"), currLexicalScope);
-  Cell* ans = evalUnbox(x, lookup("$scope"));
+  Cell* x = eval(lookup("$x"), currLexicalScope);
+  Cell* ans = eval(x, lookup("$scope"));
   rmref(x);
   inMacro.pop();
   return ans;

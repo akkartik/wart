@@ -96,7 +96,7 @@ struct sigaction originalSignalHandler;
 void interrupt(int s) {
   Cell* f = lookupDynamicBinding(newSym("on_interrupt"));
   if (f)
-    evalUnbox(newCons(f));  // leak
+    eval(newCons(f));  // leak
   if (originalSignalHandler.sa_handler)
     originalSignalHandler.sa_handler(s);
 }
