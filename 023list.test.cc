@@ -1,9 +1,9 @@
 void test_list_range() {
   Cell* expr = read("(list_range '(3 4 5) 0 2)");
   Cell* result = eval(expr);
-  checkEq(car(rep(result)), newNum(3));
-  checkEq(car(cdr(rep(result))), newNum(4));
-  checkEq(cdr(cdr(rep(result))), nil);
+  checkEq(car(result), newNum(3));
+  checkEq(car(cdr(result)), newNum(4));
+  checkEq(cdr(cdr(result)), nil);
   rmref(result);
   rmref(expr);
 }
@@ -116,7 +116,7 @@ void test_list_splice_returns_list_being_spliced_in() {
   newDynamicScope("a", newCons(newNum(3), newCons(newNum(4), newCons(newNum(5)))));
   Cell* expr = read("(list_splice a 1 2 '(6 7 8))");
   Cell* result = eval(expr);
-  Cell* curr = rep(result);
+  Cell* curr = result;
   checkEq(car(curr), newNum(6)); curr=cdr(curr);
   checkEq(car(curr), newNum(7)); curr=cdr(curr);
   checkEq(car(curr), newNum(8)); curr=cdr(curr);
@@ -138,10 +138,10 @@ void test_contains_handles_circular_lists() {
 void test_list_sort() {
   Cell* expr = read("(sort (fn(a b) (< (len a) (len b))) '(\"abc\" \"d\" \"ef\"))");
   Cell* result = eval(expr);
-  checkEq(toString(car(rep(result))), "d");
-  checkEq(toString(car(cdr(rep(result)))), "ef");
-  checkEq(toString(car(cdr(cdr(rep(result))))), "abc");
-  checkEq(cdr(cdr(cdr(rep(result)))), nil);
+  checkEq(toString(car(result)), "d");
+  checkEq(toString(car(cdr(result))), "ef");
+  checkEq(toString(car(cdr(cdr(result)))), "abc");
+  checkEq(cdr(cdr(cdr(result))), nil);
   rmref(result);
   rmref(expr);
 }

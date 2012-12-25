@@ -17,9 +17,9 @@ void test_string_compare() {
 void test_string_split() {
   Cell* expr = read("(split \"abc abd\")");
   Cell* result = eval(expr);
-  checkEq(toString(car(rep(result))), "abc");
-  checkEq(toString(car(cdr(rep(result)))), "abd");
-  checkEq(cdr(cdr(rep(result))), nil);
+  checkEq(toString(car(result)), "abc");
+  checkEq(toString(car(cdr(result))), "abd");
+  checkEq(cdr(cdr(result)), nil);
   rmref(result);
   rmref(expr);
 }
