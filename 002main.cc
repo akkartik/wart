@@ -113,10 +113,10 @@ void runTests() {
   loadFiles(".test");
 
   cerr << endl;
-  if (numFailures == 0) return;
-  cerr << numFailures << " failure";
-      if (numFailures > 1) cerr << "s";
-      cerr << endl;
+  if (numFailures > 0)
+    cerr << numFailures << " failure"
+         << (numFailures > 1 ? "s" : "")
+         << endl;
 }
 
 void verify() {
