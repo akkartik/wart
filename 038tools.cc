@@ -74,3 +74,11 @@ COMPILE_FN(try_eval, compiledFn_try_eval, "($x ... $scope)",
   rmref(ans);
   return nil;
 )
+
+COMPILE_FN(tmpfile, compiledFn_tmpfile, "()",
+  char tmp[] = "/tmp/wart_XXXXXX";
+  long fd = mkstemp(tmp);
+  if (fd == -1) return nil;
+  close(fd);
+  return mkref(newString(tmp));
+)

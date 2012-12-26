@@ -24,16 +24,18 @@ system "rm _x"
   :should be 98)
 
 (test "w_infile works"
-  :valueof (before (system "rm /tmp/foo")
-             (w_outfile "/tmp/foo"
-               (prn 34))
-             (w_infile "/tmp/foo"
-               (read)))
+  :valueof (let f (tmpfile)
+             (before (system:join "rm " f)
+               (w_outfile f
+                 (prn 34))
+               (w_infile f
+                 (read))))
   :should be 34)
 
 (test "w_ versions clean up after themselves"
-  :valueof (before (system "rm /tmp/foo")
-             (w_outfile "/tmp/foo"
-               (prn 34))
-             (numBindings 'stdin))
+  :valueof (let f (tmpfile)
+             (before (system:join "rm " f)
+               (w_outfile f
+                 (prn 34))
+               (numBindings 'stdin)))
   :should be 1)
