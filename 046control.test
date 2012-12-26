@@ -16,3 +16,8 @@
              (for x 0 (x < 3) (x <- x+1)
                (ans <- (cons x ans))))
   :should be '(2 1 0))
+
+(test "& works with macros"
+  :valueof (ret x 3
+             (wipe&wipe x))
+  :should be nil)

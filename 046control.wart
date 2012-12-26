@@ -97,14 +97,9 @@ mac (repeat n ... body) :case (n = :forever)
 
 
 
+# (f&g x) => (and (f x) (g x))
+# multiply-evals by design to support macros
 def (& ... fs)
-  (fn args
-    (let sub (afn(fs)
-               (if
-                  no.fs
-                    1
-                  ~cdr.fs
-                    (car.fs @args)
-                  :else
-                    (and (car.fs @args) (self cdr.fs))))
-      (sub fs)))
+  (fn 'args
+    (eval `(and ,@(map (fn(f) `(,f ,@args)) fs))
+          caller_scope))
