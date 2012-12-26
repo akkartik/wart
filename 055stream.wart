@@ -1,26 +1,26 @@
 mac (w_infile name ... body)
-  `(between (bind stdin (infile ,name)) :and (do close_infile.stdin unbind.stdin)
+  `(between (bind stdin (infile ,name)) :and (close_infile&unbind stdin)
      ,@body)
 
 mac (w_outfile name ... body)
-  `(between (bind stdout (outfile ,name)) :and (do close_outfile.stdout unbind.stdout)
+  `(between (bind stdout (outfile ,name)) :and (close_outfile&unbind stdout)
      ,@body)
 
 mac (w_instring s ... body)
-  `(between (bind stdin (instring ,s)) :and (do close_infile.stdin unbind.stdin)
+  `(between (bind stdin (instring ,s)) :and (close_infile&unbind stdin)
      ,@body)
 
 mac (w_outstring ... body)
-  `(between (bind stdout (outstring)) :and (do close_outfile.stdout unbind.stdout)
+  `(between (bind stdout (outstring)) :and (close_outfile&unbind stdout)
      ,@body
      outstring_buffer.stdout)
 
 mac (w_stdin fd ... body)
-  `(between (bind stdin ,fd) :and (do unbind.stdin (close ,fd))
+  `(between (bind stdin ,fd) :and (close&unbind stdin)
      ,@body)
 
 mac (w_stdout fd ... body)
-  `(between (bind stdout ,fd) :and (do unbind.stdout (close ,fd))
+  `(between (bind stdout ,fd) :and (close&unbind stdout)
      ,@body)
 
 def (ern ... args)
