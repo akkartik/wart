@@ -89,10 +89,6 @@ def (zipmax a b)
     (cons (list car.a car.b)
           (zipmax cdr.a cdr.b))
 
-def (zip_flat a b)
-  if (and a b)
-    `(,car.a ,car.b ,@(zip_flat cdr.a cdr.b))
-
 def (flatten seq acc)
   (if
     no.seq
