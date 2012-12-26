@@ -24,7 +24,7 @@ system "rm _x"
   :should be 98)
 
 (test "w_infile works"
-  :valueof (do
+  :valueof (before (system "rm /tmp/foo")
              (w_outfile "/tmp/foo"
                (prn 34))
              (w_infile "/tmp/foo"
@@ -32,7 +32,7 @@ system "rm _x"
   :should be 34)
 
 (test "w_ versions clean up after themselves"
-  :valueof (do
+  :valueof (before (system "rm /tmp/foo")
              (w_outfile "/tmp/foo"
                (prn 34))
              (numBindings 'stdin))
