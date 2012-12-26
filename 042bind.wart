@@ -19,9 +19,6 @@ mac (withs bindings ... body)
     `(let ,car.bindings ,cadr.bindings
        (withs ,cddr.bindings ,@body))
 
-mac (w_nils vars ... body)
-  `((fn ,vars ,@body))
-
 
 
 mac (proc name params ... body)
