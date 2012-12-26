@@ -4,3 +4,8 @@ mac (mac2 (name command ... rest) ... body)
 
 mac2 (with :nils vars ... body)
   `((fn ,vars ,@body))
+
+mac2 (with :tmpfile f ... body)
+  `(let ,f (tmpfile)
+     (before (system:join "rm " ,f)
+       ,@body))
