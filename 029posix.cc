@@ -10,7 +10,7 @@ COMPILE_FN(fork, compiledFn_fork, "()",
 
 #include<sys/wait.h>
 
-COMPILE_FN(wait_for_child, compiledFn_wait_for_child, "()",
+COMPILE_FN(waitForChild, compiledFn_waitForChild, "()",
   wait(NULL);
   return nil;
 )
