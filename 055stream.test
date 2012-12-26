@@ -35,5 +35,5 @@ system "rm _x"
   :valueof (do
              (w_outfile "/tmp/foo"
                (prn 34))
-             (prn 35))
-  :should be 35)
+             (numBindings 'stdin))
+  :should be 1)

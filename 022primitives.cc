@@ -92,6 +92,10 @@ COMPILE_FN(bound?, compiledFn_isBound, "($var)",
   return mkref(var);
 )
 
+COMPILE_FN(numBindings, compiledFn_numBindings, "($var)",
+  return mkref(newNum((long)dynamics[lookup("$var")].size()));
+)
+
 //// macros
 
 // eval with extra smarts for handling @args
