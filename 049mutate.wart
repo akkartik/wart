@@ -26,7 +26,7 @@ mac (swap x y)
   `(rotate ,x ,y)
 
 mac (making var val ... body)
-  `(between (dyn_bind ,var ,val) :and (dyn_unbind ,var)
+  `(between (bind ,var ,val) :and (unbind ,var)
      ,@body)
 
 mac (coerce! var type)

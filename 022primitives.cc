@@ -70,12 +70,12 @@ void assign(Cell* var, Cell* val) {
     unsafeSet(scope, var, val, false);
 }
 
-COMPILE_FN(dyn_bind, compiledFn_dyn_bind, "('$var $val)",
+COMPILE_FN(bind, compiledFn_bind, "('$var $val)",
   newDynamicScope(lookup("$var"), lookup("$val"));
   return nil;
 )
 
-COMPILE_FN(dyn_unbind, compiledFn_dyn_unbind, "('$var)",
+COMPILE_FN(unbind, compiledFn_unbind, "('$var)",
   endDynamicScope(lookup("$var"));
   return nil;
 )
@@ -86,17 +86,6 @@ COMPILE_FN(bound?, compiledFn_isBound, "($var)",
   if (!scopeContainingBinding(var, currLexicalScope))
     return nil;
   return mkref(var);
-)
-
-COMPILE_FN(make_unbound, compiledFn_make_unbound, "($var)",
-  Cell* var = lookup("$var");
-  stack<Cell*>& bindings = dynamics[var];   // unbind just in dynamic scopes
-  while (!bindings.empty()) {
-    rmref(var);
-    rmref(bindings.top());
-    bindings.pop();
-  }
-  return nil;
 )
 
 //// macros
