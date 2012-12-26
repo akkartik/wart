@@ -44,7 +44,7 @@ COMPILE_FN(socket_fd, compiledFn_socket_fd, "($sock)",
   return mkref(newNum(toSocket(lookup("$sock"))->fd));
 )
 
-COMPILE_FN(make_socket, compiledFn_socket, "($host $port)",
+COMPILE_FN(socket, compiledFn_socket, "($host $port)",
   Socket* sock = new Socket();
   sock->fd = socket(AF_INET, SOCK_STREAM, 0);
   if (sock->fd < 0) perror("socket() failed");
@@ -57,7 +57,7 @@ COMPILE_FN(make_socket, compiledFn_socket, "($host $port)",
   return mkref(newSocket(sock));
 )
 
-COMPILE_FN(make_server_socket, compiledFn_server_socket, "($port)",
+COMPILE_FN(serverSocket, compiledFn_serverSocket, "($port)",
   Socket* sock = new Socket();
   sock->fd = socket(AF_INET, SOCK_STREAM, 0);
   if (sock->fd < 0) perror("sock() failed");
@@ -71,7 +71,7 @@ COMPILE_FN(make_server_socket, compiledFn_server_socket, "($port)",
   return mkref(newSocket(sock));
 )
 
-COMPILE_FN(socket_accept, compiledFn_socket_accept, "($sock)",
+COMPILE_FN(accept, compiledFn_accept, "($sock)",
   Socket* sock = toSocket(lookup("$sock"));
   Socket* clientsock = new Socket();  socklen_t n = sizeof(clientsock->addr);
   bzero(&clientsock->addr, n);
