@@ -30,3 +30,10 @@ system "rm _x"
              (w_infile "/tmp/foo"
                (read)))
   :should be 34)
+
+(test "w_ versions clean up after themselves"
+  :valueof (do
+             (w_outfile "/tmp/foo"
+               (prn 34))
+             (prn 35))
+  :should be 35)

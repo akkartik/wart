@@ -1,4 +1,8 @@
 //// compiled primitives for files and streams
+//
+// Design considered the following:
+//   permit cascading of close operations
+//     so return non-nil on success
 
 Cell* newIstream(istream* x) {
   return newObject("istream", newNum((long)x));
@@ -48,7 +52,8 @@ COMPILE_FN(close_infile, compiledFn_close_infile, "($stream)",
   ifstream* f = (ifstream*)toInt(rep(lookup("$stream")));
   f->close();
   delete f;
-  return nil;
+  setCar(cdr(cdr(lookup("$stream"))), nil);
+  return mkref(lookup("$stream"));
 )
 
 COMPILE_FN(outfile, compiledFn_outfile, "($name)",
@@ -59,7 +64,8 @@ COMPILE_FN(close_outfile, compiledFn_close_outfile, "($stream)",
   ofstream* f = (ofstream*)toInt(rep(lookup("$stream")));
   f->close();
   delete f;
-  return nil;
+  setCar(cdr(cdr(lookup("$stream"))), nil);
+  return mkref(lookup("$stream"));
 )
 
 COMPILE_FN(instring, compiledFn_instring, "($s)",
@@ -141,5 +147,5 @@ COMPILE_FN(outfd, compiledFn_outfd, "($fd)",
 
 COMPILE_FN(close, compiledFn_close, "($stream)",
   close(toInt(rep(lookup("$stream"))));
-  return nil;
+  return mkref(lookup("$stream"));
 )
