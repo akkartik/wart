@@ -1,22 +1,22 @@
 //// compiled primitives for files and streams
 
 Cell* newIstream(istream* x) {
-  return newObject("stream", newNum((long)x));
+  return newObject("istream", newNum((long)x));
 }
 
 Cell* newOstream(ostream* x) {
-  return newObject("stream", newNum((long)x));
+  return newObject("ostream", newNum((long)x));
 }
 
 istream& toIstream(Cell* x) {
-  if (type(x) != newSym("stream"))
-    RAISE << "not a stream: " << x << endl << DIE;
+  if (type(x) != newSym("istream"))
+    RAISE << "not an istream: " << x << endl << DIE;
   return *(istream*)toInt(car(cdr(cdr(x))));
 }
 
 ostream& toOstream(Cell* x) {
-  if (type(x) != newSym("stream"))
-    RAISE << "not a stream: " << x << endl << DIE;
+  if (type(x) != newSym("ostream"))
+    RAISE << "not an ostream: " << x << endl << DIE;
   return *(ostream*)toInt(car(cdr(cdr(x))));
 }
 
