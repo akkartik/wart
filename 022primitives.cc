@@ -61,6 +61,10 @@ COMPILE_FN(<-, compiledFn_assign, "('$var $val)",
 )
 
 void assign(Cell* var, Cell* val) {
+  if (!isSym(var)) {
+    RAISE << "can't assign to non-sym " << var << endl;
+    return;
+  }
   Cell* scope = scopeContainingBinding(var, currLexicalScope);
   if (!scope)
     newDynamicScope(var, val);

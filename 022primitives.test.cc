@@ -56,6 +56,14 @@ void test_assign_to_fn() {
   rmref(fn);
 }
 
+void test_assign_to_non_sym_warns() {
+  Cell* expr = read("(<- 3 nil)");
+  Cell* result = eval(expr);
+  checkEq(raiseCount, 1);   raiseCount=0;
+  rmref(result);
+  rmref(expr);
+}
+
 void test_assign_lexical_var() {
   Cell* fn = read("((fn(x) (x <- 34) x))");
   Cell* call = eval(fn);
