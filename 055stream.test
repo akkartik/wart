@@ -22,3 +22,11 @@ system "rm _x"
              (read_byte)
              (read_byte))
   :should be 98)
+
+(test "w_infile works"
+  :valueof (do
+             (w_outfile "/tmp/foo"
+               (prn 34))
+             (w_infile "/tmp/foo"
+               (read)))
+  :should be 34)

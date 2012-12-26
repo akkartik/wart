@@ -3,7 +3,7 @@ mac (w_infile name ... body)
      ,@body)
 
 mac (w_outfile name ... body)
-  `(between (bind stdout (outfile ,name)) :and (do close_infile.stdout unbind.stdout)
+  `(between (bind stdout (outfile ,name)) :and (do close_outfile.stdout unbind.stdout)
      ,@body)
 
 mac (w_instring s ... body)
