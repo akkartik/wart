@@ -1,0 +1,3 @@
+(test "w_nils works"
+  :valueof (with nils (x y z) (list x y z))
+  :should be '(nil nil nil))

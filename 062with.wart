@@ -1,0 +1,2 @@
+mac (with nils vars ... body) :case (nils = 'nils)
+  `((fn ,vars ,@body))
