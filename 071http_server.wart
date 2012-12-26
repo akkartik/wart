@@ -9,16 +9,16 @@ mac (accepting client socket|from ... body)
        (before (close_socket ,client)
          ,@body)))  # body must close client socket
 
-def (parse_request client)
+def (parseHeaders client)
   making stdin infd:socket_fd.client
     let (verb url) (split:read_line)
       url
 
-def (http_server port)
+def (server port)
   w_serverSocket socket (or port 4040)
     preforking 6  # handler threads
       accepting client :from socket
-        let url parse_request.client
+        let url parseHeaders.client
           making stdout infd:socket_fd.client
             prn "HTTP/1.0 200 OK"
             prn "Content-type: text/plain"
