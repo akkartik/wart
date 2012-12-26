@@ -45,7 +45,7 @@ COMPILE_FN(infile, compiledFn_infile, "($name)",
 )
 
 COMPILE_FN(close_infile, compiledFn_close_infile, "($stream)",
-  ifstream* f = (ifstream*)toInt(car(cdr(cdr(lookup("$stream")))));
+  ifstream* f = (ifstream*)toInt(rep(lookup("$stream")));
   f->close();
   delete f;
   return nil;
@@ -56,7 +56,7 @@ COMPILE_FN(outfile, compiledFn_outfile, "($name)",
 )
 
 COMPILE_FN(close_outfile, compiledFn_close_outfile, "($stream)",
-  ofstream* f = (ofstream*)toInt(car(cdr(cdr(lookup("$stream")))));
+  ofstream* f = (ofstream*)toInt(rep(lookup("$stream")));
   f->close();
   delete f;
   return nil;
