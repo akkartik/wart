@@ -1,10 +1,10 @@
 <- mac!
    (fn '((name ... params) ... body)
-     (mac_eval `(,name <- (fn ',params
-                            # remember to update isMacro if you change this
-                            (mac_eval ((fn() ,@body))
-                                      caller_scope)))
-               caller_scope))
+     (eval `(,name <- (fn ',params
+                        # remember to update isMacro if you change this
+                        (eval ((fn() ,@body))
+                              caller_scope)))
+           caller_scope))
 
 mac! (def! (name ... params) ... body)
   `(,name <- (fn ,params ,@body))
@@ -48,7 +48,7 @@ let if if   ## ignore later refinements for the rest of this file
 
   def (compose f g)
     fn '$args
-      mac_eval `(,f (,g ,@$args)) caller_scope
+      eval `(,f (,g ,@$args)) caller_scope
 
   alias (:) compose
 

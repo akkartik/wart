@@ -309,7 +309,7 @@ bool isMacro(Cell* fn) {
   Cell* forms = body(fn);
   if (cdr(forms) != nil) return false;
   Cell* form = car(forms);
-  if (car(form) != sym_mac_eval) return false;
+  if (car(form) != sym_eval) return false;
   if (car(cdr(cdr(form))) != sym_caller_scope) return false;
   if (cdr(cdr(cdr(form))) != nil) return false;
   return true;

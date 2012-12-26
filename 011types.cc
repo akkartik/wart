@@ -252,7 +252,7 @@ Cell *sym_quote, *sym_backquote, *sym_unquote, *sym_splice, *sym_unquoteSplice, 
 Cell *sym_list, *sym_number, *sym_symbol, *sym_string, *sym_table, *sym_List;
 Cell *sym_object, *sym_Coercions;
 Cell *sym_function, *sym_name, *sym_sig, *sym_body, *sym_optimized_body, *sym_env, *sym_compiled, *sym_param_alias;
-Cell *sym_mac_eval, *sym_caller_scope;
+Cell *sym_eval, *sym_caller_scope;
 void setupCommonSyms() {
   sym_quote = newSym("'");
   sym_backquote = newSym("`");
@@ -280,6 +280,6 @@ void setupCommonSyms() {
   sym_compiled = newSym("compiled");
   sym_param_alias = newSym("|");
 
-  sym_mac_eval = newSym("mac_eval");
+  sym_eval = newSym("eval");
   sym_caller_scope = newSym("caller_scope");
 }

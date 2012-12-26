@@ -682,7 +682,7 @@ void test_eval_handles_splice6() {
 }
 
 void test_eval_splice_on_macros_warns() {
-  Cell* expr = read("(fn '(x y) (mac_eval (cons 'cons (cons x (cons y nil))) caller_scope))");
+  Cell* expr = read("(fn '(x y) (eval (cons 'cons (cons x (cons y nil))) caller_scope))");
   Cell* fn = eval(expr);
   newDynamicScope("f", fn);
   newDynamicScope("a", newNum(3));
@@ -704,7 +704,7 @@ void test_eval_splice_on_macros_warns() {
 }
 
 void test_eval_splice_on_macros_with_backquote() {
-  Cell* expr = read("(fn '(x y) (mac_eval `(cons ,x ,y) caller_scope))");
+  Cell* expr = read("(fn '(x y) (eval `(cons ,x ,y) caller_scope))");
   Cell* fn = eval(expr);
   newDynamicScope("f", fn);
   newDynamicScope("a", newNum(3));

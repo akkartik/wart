@@ -14,12 +14,6 @@ COMPILE_FN(fn, compiledFn_fn, "'($params ... $body)",
   return mkref(newObject("function", f));
 )
 
-COMPILE_FN(eval, compiledFn_eval, "($x ... $scope)",
-  Cell* scope = lookup("$scope");
-  scope = (scope != nil) ? car(scope) : currLexicalScope;
-  return eval(lookup("$x"), scope);
-)
-
 COMPILE_FN(if, compiledFn_if, "($cond '$then '$else)",
   return lookup("$cond") != nil ? eval(lookup("$then")) : eval(lookup("$else"));
 )
@@ -108,7 +102,7 @@ COMPILE_FN(make_unbound, compiledFn_make_unbound, "($var)",
 //// macros
 
 // eval with extra smarts for handling @args
-COMPILE_FN(mac_eval, compiledFn_mac_eval, "('$x $scope)",
+COMPILE_FN(eval, compiledFn_eval, "('$x $scope)",
   inMacro.push(true);
   Cell* x = eval(lookup("$x"), currLexicalScope);
   Cell* ans = eval(x, lookup("$scope"));

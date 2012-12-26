@@ -22,9 +22,9 @@ mac (def_assign op params ... body)
 
 # special-case: delegate assignments using .
 def_assign (.) '(f x val)
-  (mac_eval `(<- (,f ,x) ,val) caller_scope)
+  (eval `(<- (,f ,x) ,val) caller_scope)
 def_assign (.-) '(f x val)
-  (mac_eval `(<- (,f (- ,x)) ,val) caller_scope)
+  (eval `(<- (,f (- ,x)) ,val) caller_scope)
 
 
 
