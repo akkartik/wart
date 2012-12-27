@@ -22,10 +22,11 @@ defcoerce string symbol
   string_to_sym
 
 def (string ... args)
-  (w_outstring
-    (each arg args
-      (if arg
-        pr.arg)))
+  making stdout (outstring)
+    each arg args
+      if arg
+        pr.arg
+    outstring_buffer.stdout
 
 defcoerce symbol string
   string
