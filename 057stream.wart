@@ -1,28 +1,28 @@
-mac (w_infile name ... body)
+mac2 (with :infile name ... body)
   `(between (bind stdin (infile ,name)) :and (close_infile&unbind stdin)
      ,@body)
 
-mac (w_outfile name ... body)
+mac2 (with :outfile name ... body)
   `(between (bind stdout (outfile ,name)) :and (close_outfile&unbind stdout)
      ,@body)
 
-mac (w_instring s ... body)
+mac2 (with :instring s ... body)
   `(between (bind stdin (instring ,s)) :and (close_infile&unbind stdin)
      ,@body)
 
-mac (w_outstring ... body)
+mac2 (with :outstring ... body)
   `(between (bind stdout (outstring)) :and (close_outfile&unbind stdout)
      ,@body
      outstring_buffer.stdout)
 
-mac (w_stdin fd ... body)
+mac2 (with :stdin fd ... body)
   `(between (bind stdin ,fd) :and (close&unbind stdin)
      ,@body)
 
-mac (w_stdout fd ... body)
+mac2 (with :stdout fd ... body)
   `(between (bind stdout ,fd) :and (close&unbind stdout)
      ,@body)
 
 def (ern ... args)
-  (w_stdout stderr
+  (with stdout stderr
     (prn @args))

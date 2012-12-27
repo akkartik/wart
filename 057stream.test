@@ -18,24 +18,24 @@ system "rm _x"
   :should be 35)
 
 (test "read_byte works"
-  :valueof (w_instring "ab"
+  :valueof (with instring "ab"
              (read_byte)
              (read_byte))
   :should be 98)
 
-(test "w_infile works"
+(test "with infile/outfile works"
   :valueof (let f (tmpfile)
              (before (system:join "rm " f)
-               (w_outfile f
+               (with outfile f
                  (prn 34))
-               (w_infile f
+               (with infile f
                  (read))))
   :should be 34)
 
-(test "w_ versions clean up after themselves"
+(test "with stream macros clean up after themselves"
   :valueof (let f (tmpfile)
              (before (system:join "rm " f)
-               (w_outfile f
+               (with outfile f
                  (prn 34))
                (numBindings 'stdin)))
   :should be 1)
