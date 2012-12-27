@@ -1,12 +1,12 @@
 mac (w_serverSocket socket port ... body)
   `(let ,socket (serverSocket ,port)
-     (before (close_socket ,socket)
+     (before (close ,socket)
        ,@body))
 
 mac (accepting client socket|from ... body)
   `(repeat :forever
      (let ,client (accept ,socket)
-       (before (close_socket ,client)
+       (before (close ,client)
          ,@body)))  # body must close client socket
 
 def (parseHeaders client)
