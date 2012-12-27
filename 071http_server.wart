@@ -19,7 +19,7 @@ def (server port)
     preforking 6  # handler threads
       accepting client :from socket
         let url parseHeaders.client
-          making stdout infd:socket_fd.client
+          making stdout outfd:socket_fd.client
             prn "HTTP/1.0 200 OK"
             prn "Content-type: text/plain"
             prn ""
