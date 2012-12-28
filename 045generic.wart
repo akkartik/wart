@@ -1,10 +1,10 @@
                                   # given params, return code to construct the args
                                   # (mac arg1 arg2 ... body) => `(,mac ,arg1 ,arg2 ,@body)
-                                  def (construct_macro_call args)
-                                    if list?.args
-                                      `(cons ,(construct_macro_call car.args)
-                                             ,(construct_macro_call cdr.args))
-                                      args
+                                  def (construct_macro_call params)
+                                    if list?.params
+                                      `(cons ,(construct_macro_call car.params)
+                                             ,(construct_macro_call cdr.params))
+                                      params
 
 let $mac mac
   mac! (mac (name ... params) ... body)
@@ -28,7 +28,7 @@ mac (def (name ... params) ... body) :case (car.body = :case)
 
 # One additional wrinkle: avoid inserting unnecessary nils in case params are
 # gathered into a rest param later on. See the tests for an example.
-after_calling (construct_macro_call args)
+after_calling (construct_macro_call params)
   result <- (replace result 'cons 'cons_folding_nils)
 
 def (replace l old new)
