@@ -1,14 +1,31 @@
-                                  def (cons_nil a b)
-                                    if (or a b)
-                                      (cons a b)
-
                                   # given params, return code to construct the args
                                   # (mac arg1 arg2 ... body) => `(,mac ,arg1 ,arg2 ,@body)
                                   def (construct_macro_call args)
                                     if list?.args
-                                      `(cons_nil ,(construct_macro_call car.args)
-                                                 ,(construct_macro_call cdr.args))
+                                      `(cons ,(construct_macro_call car.args)
+                                             ,(construct_macro_call cdr.args))
                                       args
+
+                                  # One additional wrinkle: avoid inserting
+                                  # unnecessary nils in case params are
+                                  # gathered into a rest param later on. See
+                                  # the tests for an example.
+                                  def (cons_nil a b)
+                                    if (or a b)
+                                      (cons a b)
+
+                                  def (replace_all l old new)
+                                    if (l = old)
+                                         new
+                                       list?.l
+                                         (cons (replace_all car.l old new)
+                                               (replace_all cdr.l old new))
+                                       :else
+                                         l
+
+                                  after_calling (construct_macro_call args)
+                                    result <- (replace_all result 'cons 'cons_nil)
+
 
 let $mac mac
   mac! (mac (name ... params) ... body)
