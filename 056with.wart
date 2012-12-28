@@ -1,5 +1,5 @@
 mac (mac2 (name command ... rest) ... body)
-  `(mac (,name ,sym.command ,@rest) :case (,sym.command = ',sym.command)
+  `(mac (,name $command ,@rest) :case ((sym $command) = ',sym.command)
      ,@body)
 
 mac2 (with :nils vars ... body)

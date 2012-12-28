@@ -1,3 +1,7 @@
 (test "with nils works"
   :valueof (with nils (x y z) (list x y z))
   :should be '(nil nil nil))
+
+(test "with :nils also works -- but not encouraged"
+  :valueof (with :nils (x y z) (list x y z))
+  :should be '(nil nil nil))
