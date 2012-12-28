@@ -34,12 +34,14 @@ after_calling (construct_macro_call args)
 def (replace_all l old new)
   if (l = old)
        new
+     ~list?.l
+       l
      list?.l
        (cons (replace_all car.l old new)
              (replace_all cdr.l old new))
-     :else
-       l
 
+# Now at runtime any redundant nils added in one :case get folded out before
+# we try the next.
 def (cons_folding_nils a b)   # like cons, but (cons nil nil) => nil
   if (or a b)
     (cons a b)
