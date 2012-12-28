@@ -17,8 +17,8 @@
 
 let foo_calls 0
   def! (foo x) 34
-  after_fn (foo x) (foo_calls <- foo_calls+1)
+  after_calling (foo x) (foo_calls <- foo_calls+1)
   def! (bar) foo_calls
-(test "after_fn works"
+(test "after_calling works"
   :valueof (do (foo 3) (bar))
   :should be 1)

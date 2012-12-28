@@ -39,13 +39,13 @@ mac (rfn name params ... body)
 mac (afn params ... body)
   `(rfn self ,params ,@body)
 
-mac (before_fn (f ... params) ... body)
+mac (before_calling (f ... params) ... body)
   `(let $old ,f
      (def! (,f ,@params)
        ,@body
        ($old ,@params)))
 
-mac (after_fn (f ... params) ... body)
+mac (after_calling (f ... params) ... body)
   `(let $old ,f
      (def! (,f ,@params)
        (ret result ($old ,@params)
