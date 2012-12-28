@@ -43,5 +43,9 @@ def (replace l old new)
 # At runtime, any args we deduced to be nil in one :case get folded out before
 # we try the next.
 def (cons_folding_nils a b)   # like cons, but (cons nil nil) => nil
-  if (or a b)
+  # faster version of
+  # if (or a b) (cons a b)
+  ((table_get compiled 'if) a
     (cons a b)
+    ((table_get compiled 'if) b
+      (cons a b)))
