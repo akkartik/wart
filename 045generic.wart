@@ -40,7 +40,7 @@ def (replace l old new)
        (cons (replace car.l old new)
              (replace cdr.l old new))
 
-# Now at runtime any redundant nils added in one :case get folded out before
+# At runtime, any args we deduced to be nil in one :case get folded out before
 # we try the next.
 def (cons_folding_nils a b)   # like cons, but (cons nil nil) => nil
   if (or a b)
