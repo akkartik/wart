@@ -29,7 +29,7 @@ mac (def (name ... params) ... body) :case (car.body = :case)
 # One additional wrinkle: avoid inserting unnecessary nils in case params are
 # gathered into a rest param later on. See the tests for an example.
 after_calling (construct_macro_call args)
-  result <- (replace_all result 'cons 'cons_nil)
+  result <- (replace_all result 'cons 'cons_folding_nils)
 
 def (replace_all l old new)
   if (l = old)
@@ -40,6 +40,6 @@ def (replace_all l old new)
      :else
        l
 
-def (cons_nil a b)
+def (cons_folding_nils a b)   # like cons, but (cons nil nil) => nil
   if (or a b)
     (cons a b)
