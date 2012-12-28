@@ -10,3 +10,11 @@ def (foogen s ... rest) :case (and no.rest sym?.s)
 (test "def :case can handle rest params - 2"
   :valueof (foogen 'a)
   :should be 'a)
+
+mac (foogen2 ... body)
+  `(list ,@body)
+mac (foogen2 a b ... body) :case (a = 23)
+  34
+(test "cases with more args shouldn't break the base case"
+  :valueof (foogen2 35)
+  :should be (list 35))

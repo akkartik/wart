@@ -1,9 +1,13 @@
+                                  def (cons_nil a b)
+                                    if (or a b)
+                                      (cons a b)
+
                                   # given params, return code to construct the args
                                   # (mac arg1 arg2 ... body) => `(,mac ,arg1 ,arg2 ,@body)
                                   def (construct_macro_call args)
                                     if list?.args
-                                      `(cons ,(construct_macro_call car.args)
-                                             ,(construct_macro_call cdr.args))
+                                      `(cons_nil ,(construct_macro_call car.args)
+                                                 ,(construct_macro_call cdr.args))
                                       args
 
 let $mac mac
