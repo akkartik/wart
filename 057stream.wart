@@ -35,3 +35,8 @@ mac2 (with :stdout fd ... body)
 def (ern ... args)
   (with stdout stderr
     (prn @args))
+
+def (infile fd) :case num?.fd
+  infd.fd
+def (outfile fd) :case num?.fd
+  outfd.fd
