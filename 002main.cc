@@ -49,19 +49,28 @@ int main(int argc, unused char* argv[]) {
   loadFiles(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (true) {
-    Cell* form = read(STDIN);
+    list<Cell*> forms = readAll(STDIN);
     if (STDIN.eof()) return 0;
-    Cell* result = eval(form);
-    cout << "=> " << result << endl;
-
-    rmref(result);
-    rmref(form);
+    for (list<Cell*>::iterator p = forms.begin(); p != forms.end(); ++p) {
+      Cell* result = eval(*p);
+      cout << "=> " << result << endl;
+      rmref(result);
+      rmref(*p);
+    }
   }
 }
 
 //// read: tokenize, parenthesize, parse, transform infix, build cells, transform $vars
 Cell* read(IndentSensitiveStream& in) {
   return mkref(transformDollarVars(nextCell(in)));
+}
+
+list<Cell*> readAll(IndentSensitiveStream& in) {
+  list<Cell*> results;
+  do {
+    results.push_back(read(in));
+  } while (!in.atStartOfLine && in.fd.peek() != '\n' && !in.eof());
+  return results;
 }
 
 
