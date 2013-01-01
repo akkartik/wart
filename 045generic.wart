@@ -21,7 +21,7 @@ mac (def (name ... params) ... body) :case (car.body = :case)
      (def! (,name ... $params)
        (let ,params $params
          (if ,cadr.body
-           (do ,@body)
+           (do ,@cddr.body)
            ($old @$params)))))
 
 
