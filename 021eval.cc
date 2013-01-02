@@ -61,7 +61,11 @@ Cell* eval(Cell* expr, Cell* scope) {
         << "Perhaps you need to split the line in two." << endl;
 
   // eval its args in the caller's lexical environment
-  Cell* evaldArgs = processArgs(expr, scope, fn);
+  Cell* splicedArgs = spliceArgs(cdr(expr), scope, fn);
+  Cell* orderedArgs = reorderKeywordArgs(splicedArgs, sig(fn));
+  Cell* evaldArgs = evalArgs(orderedArgs, sig(fn), scope);
+  dbg << car(expr) << "/" << keepAlreadyEvald() << ": " << evaldArgs << endl;
+
   // swap in the function's lexical environment
   newDynamicScope(CURR_LEXICAL_SCOPE, isCompiledFn(body(fn)) ? scope : env(fn));
   newLexicalScope();
@@ -81,16 +85,10 @@ Cell* eval(Cell* expr, Cell* scope) {
   endLexicalScope();
   endDynamicScope(CURR_LEXICAL_SCOPE);
   rmref(evaldArgs);
+  rmref(orderedArgs);
+  rmref(splicedArgs);
   rmref(fn);
   return result;  // already mkref'd
-}
-
-Cell* processArgs(Cell* call, Cell* scope, Cell* fn) {
-  Cell* splicedArgs = spliceArgs(cdr(call), scope, fn);
-  Cell* orderedArgs = reorderKeywordArgs(splicedArgs, sig(fn));   rmref(splicedArgs);
-  Cell* evaldArgs = evalArgs(orderedArgs, sig(fn), scope);  rmref(orderedArgs);
-  dbg << car(call) << "/" << keepAlreadyEvald() << ": " << evaldArgs << endl;
-  return evaldArgs;   // already mkref'd
 }
 
 
@@ -120,13 +118,13 @@ void bindParams(Cell* params, Cell* args) {
 void bindParamAliases(Cell* aliases, Cell* arg) {
   if (cdr(aliases) == nil)
     RAISE << "just one param alias: " << car(aliases) << "; are you sure?\n";
-  for (; aliases != nil; aliases=cdr(aliases))
-    // bind:
-    //  sym with anything
-    //  alias list with anything
-    //  destructuring list with cons
-    if (isSym(car(aliases)) || car(car(aliases)) == sym_param_alias || isCons(arg))
+  for (; aliases != nil; aliases=cdr(aliases)) {
+    // bind matching aliases to the arg
+    if (isSym(car(aliases))   // sym with anything
+        || car(car(aliases)) == sym_param_alias   // alias list with anything
+        || isCons(arg))   // anything (destructured list) with cons
       bindParams(car(aliases), arg);
+  }
 }
 
 
