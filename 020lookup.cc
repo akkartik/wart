@@ -24,8 +24,11 @@ Cell* lookup(Cell* sym, Cell* scope, bool keepAlreadyEvald) {
   result = lookupDynamicBinding(sym);
   if (result) return maybeStripAlreadyEvald(keepAlreadyEvald, result);
   RAISE << "No binding for " << toString(sym) << endl;
-  if (!pretendRaise)
+
+  static bool helpful_message = false;
+  if (!pretendRaise && !helpful_message)
     cerr << "Was it defined using indentation? Wart ignores indentation inside parens." << endl;
+  helpful_message = true;
   return nil;
 }
 
