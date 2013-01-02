@@ -1,20 +1,12 @@
-                                  # given params, return code to construct the args
-                                  # (mac arg1 arg2 ... body) => `(,mac ,arg1 ,arg2 ,@body)
-                                  def (construct_macro_call params)
-                                    if list?.params
-                                      `(cons ,(construct_macro_call car.params)
-                                             ,(construct_macro_call cdr.params))
-                                      params
-
 let $mac mac
   mac! (mac (name ... params) ... body)
     if (car.body ~= :case)
       `(,$mac (,name ,@params) ,@body)
       `(let $super ,name
-         (mac! (,name ,@params)
+         (mac! (,name ... ($params | ,params))
            (if ,cadr.body
              (do ,@cddr.body)
-             ,(construct_macro_call `($super ,@params)))))  # call super with params
+             (cons $super $params))))
 
 mac (def (name ... params) ... body) :case (car.body = :case)
   `(let $old ,name
@@ -23,29 +15,3 @@ mac (def (name ... params) ... body) :case (car.body = :case)
          (if ,cadr.body
            (do ,@cddr.body)
            ($old @$params)))))
-
-
-
-# One additional wrinkle: avoid inserting unnecessary nils in case params are
-# gathered into a rest param later on. See the tests for an example.
-after_calling (construct_macro_call params)
-  result <- (replace result 'cons 'cons_folding_nils)
-
-def (replace l old new)
-  if (l = old)
-       new
-     ~list?.l
-       l
-     list?.l
-       (cons (replace car.l old new)
-             (replace cdr.l old new))
-
-# At runtime, any args we deduced to be nil in one :case get folded out before
-# we try the next.
-def (cons_folding_nils a b)   # like cons, but (cons nil nil) => nil
-  # faster version of
-  # if (or a b) (cons a b)
-  ((table_get compiled 'if) a
-    (cons a b)
-    ((table_get compiled 'if) b
-      (cons a b)))
