@@ -65,11 +65,12 @@ Cell* eval(Cell* expr, Cell* scope) {
   Cell* orderedArgs = reorderKeywordArgs(splicedArgs, sig(fn));
   Cell* evaldArgs = evalArgs(orderedArgs, sig(fn), scope);
   dbg << car(expr) << "/" << keepAlreadyEvald() << ": " << evaldArgs << endl;
+  Cell* newScope = newTable();
+  bindParams(sig(fn), evaldArgs, newScope);
 
   // swap in the function's lexical environment
   newDynamicScope(CURR_LEXICAL_SCOPE, isCompiledFn(body(fn)) ? scope : env(fn));
-  newLexicalScope();
-  bindParams(sig(fn), evaldArgs);
+  addLexicalScope(newScope);
   addLexicalBinding(sym_caller_scope, scope);
 
   Cell* result = nil;
@@ -95,27 +96,27 @@ Cell* eval(Cell* expr, Cell* scope) {
 
 //// bind params to appropriate args -- including param aliases
 
-void bindParams(Cell* params, Cell* args) {
+void bindParams(Cell* params, Cell* args, Cell* scope) {
   params = stripQuote(params);
   if (params == nil) return;
 
   if (isCons(params) && car(params) == sym_param_alias) {
-    bindParamAliases(cdr(params), args);
+    bindParamAliases(cdr(params), args, scope);
     return;
   }
 
   Cell* orderedArgs = reorderKeywordArgs(args, params);
   if (isSym(params)) {
-    addLexicalBinding(params, orderedArgs);
+    addLexicalBinding(params, orderedArgs, scope);
   }
   else {
-    bindParams(car(params), car(orderedArgs));
-    bindParams(cdr(params), cdr(orderedArgs));
+    bindParams(car(params), car(orderedArgs), scope);
+    bindParams(cdr(params), cdr(orderedArgs), scope);
   }
   rmref(orderedArgs);
 }
 
-void bindParamAliases(Cell* aliases, Cell* arg) {
+void bindParamAliases(Cell* aliases, Cell* arg, Cell* scope) {
   if (cdr(aliases) == nil)
     RAISE << "just one param alias: " << car(aliases) << "; are you sure?\n";
   for (; aliases != nil; aliases=cdr(aliases)) {
@@ -123,7 +124,7 @@ void bindParamAliases(Cell* aliases, Cell* arg) {
     if (isSym(car(aliases))   // sym with anything
         || car(car(aliases)) == sym_param_alias   // alias list with anything
         || isCons(arg))   // anything (destructured list) with cons
-      bindParams(car(aliases), arg);
+      bindParams(car(aliases), arg, scope);
   }
 }
 

@@ -121,10 +121,14 @@ void newLexicalScope() {
 }
 
 void endLexicalScope() {
-  Cell* currScope = currLexicalScope;
-  if (currScope == nil)
+  if (currLexicalScope == nil)
     RAISE << "No lexical scope to end" << endl << DIE;
   endDynamicScope(CURR_LEXICAL_SCOPE);
+}
+
+void addLexicalScope(Cell* newScope) {
+  setCdr(newScope, currLexicalScope);
+  newDynamicScope(CURR_LEXICAL_SCOPE, newScope);
 }
 
 void addLexicalBinding(Cell* sym, Cell* val, Cell* scope) {

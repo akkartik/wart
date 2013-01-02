@@ -217,7 +217,7 @@ void test_bindParams_handles_vararg() {
   Cell* params = read("a");
   Cell* args = read("(1)");
   newLexicalScope();
-  bindParams(params, args);
+  bindParams(params, args, currLexicalScope);
   Cell* result = unsafeGet(currLexicalScope, newSym("a"));
   checkEq(car(result), newNum(1));
   checkEq(cdr(result), nil);
@@ -230,7 +230,7 @@ void test_bindParams_binds_multiple_params() {
   Cell* params = read("(a|b)");
   Cell* args = read("(1)");
   newLexicalScope();
-  bindParams(params, args);
+  bindParams(params, args, currLexicalScope);
   checkEq(unsafeGet(currLexicalScope, newSym("a")), newNum(1));
   checkEq(unsafeGet(currLexicalScope, newSym("b")), newNum(1));
   endLexicalScope();
@@ -242,7 +242,7 @@ void test_bindParams_binds_as_params() {
   Cell* params = read("(a | (b c))");
   Cell* args = read("(1 2)");
   newLexicalScope();
-  bindParams(params, args);
+  bindParams(params, args, currLexicalScope);
   checkEq(car(unsafeGet(currLexicalScope, newSym("a"))), newNum(1));
   checkEq(car(cdr(unsafeGet(currLexicalScope, newSym("a")))), newNum(2));
   checkEq(unsafeGet(currLexicalScope, newSym("b")), newNum(1));
@@ -256,7 +256,7 @@ void test_bindParams_binds_as_params_recursively() {
   Cell* params = read("(a | (b ... (c | (d e))))");
   Cell* args = read("(1 2 3)");
   newLexicalScope();
-  bindParams(params, args);
+  bindParams(params, args, currLexicalScope);
   checkEq(car(unsafeGet(currLexicalScope, newSym("a"))), newNum(1));
   checkEq(car(cdr(unsafeGet(currLexicalScope, newSym("a")))), newNum(2));
   checkEq(unsafeGet(currLexicalScope, newSym("b")), newNum(1));
@@ -273,7 +273,7 @@ void test_bindParams_warns_on_unary_as() {
   Cell* params = read("(| a)");
   Cell* args = read("(1 2)");
   newLexicalScope();
-  bindParams(params, args);
+  bindParams(params, args, currLexicalScope);
   checkEq(raiseCount, 1);   raiseCount=0;
   endLexicalScope();
   rmref(args);
@@ -284,7 +284,7 @@ void test_bindParams_skips_missing_as_params() {
   Cell* params = read("(a | (b c))");
   Cell* args = read("1");
   newLexicalScope();
-  bindParams(params, args);
+  bindParams(params, args, currLexicalScope);
   checkEq(raiseCount, 0);
   checkEq(unsafeGet(currLexicalScope, newSym("a")), newNum(1));
   check(!unsafeGet(currLexicalScope, newSym("b")));
