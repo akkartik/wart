@@ -77,6 +77,18 @@ void test_reorderKeywordArgs_handles_improper_lists() {
   rmref(params);
 }
 
+void test_reorderKeywordArgs_handles_overlong_lists() {
+  Cell* args = newCons(newNum(3), newCons(newNum(4), newCons(newNum(5))));
+  Cell* params = newCons(newSym("a"), newCons(newSym("b")));
+  Cell* orderedArgs = reorderKeywordArgs(args, params);
+  checkEq(car(orderedArgs), car(args));
+  checkEq(car(cdr(orderedArgs)), car(cdr(args)));
+  checkEq(car(cdr(cdr(orderedArgs))), car(cdr(cdr(args))));
+  rmref(orderedArgs);
+  rmref(args);
+  rmref(params);
+}
+
 
 
 Cell* evalArgs(Cell* args, Cell* params) {
@@ -235,6 +247,23 @@ void test_bindParams_binds_as_params() {
   checkEq(car(cdr(unsafeGet(currLexicalScope, newSym("a")))), newNum(2));
   checkEq(unsafeGet(currLexicalScope, newSym("b")), newNum(1));
   checkEq(unsafeGet(currLexicalScope, newSym("c")), newNum(2));
+  endLexicalScope();
+  rmref(args);
+  rmref(params);
+}
+
+void test_bindParams_binds_as_params_recursively() {
+  Cell* params = read("(a | (b ... (c | (d e))))");
+  Cell* args = read("(1 2 3)");
+  newLexicalScope();
+  bindParams(params, args);
+  checkEq(car(unsafeGet(currLexicalScope, newSym("a"))), newNum(1));
+  checkEq(car(cdr(unsafeGet(currLexicalScope, newSym("a")))), newNum(2));
+  checkEq(unsafeGet(currLexicalScope, newSym("b")), newNum(1));
+  checkEq(car(unsafeGet(currLexicalScope, newSym("c"))), newNum(2));
+  checkEq(car(cdr(unsafeGet(currLexicalScope, newSym("c")))), newNum(3));
+  checkEq(unsafeGet(currLexicalScope, newSym("d")), newNum(2));
+  checkEq(unsafeGet(currLexicalScope, newSym("e")), newNum(3));
   endLexicalScope();
   rmref(args);
   rmref(params);

@@ -121,7 +121,7 @@ void bindParamAliases(Cell* aliases, Cell* arg) {
   if (cdr(aliases) == nil)
     RAISE << "just one param alias: " << car(aliases) << "; are you sure?\n";
   for (; aliases != nil; aliases=cdr(aliases))
-    if (isSym(car(aliases)) || isCons(arg))
+    if (isSym(car(aliases)) || car(car(aliases)) == sym_param_alias || isCons(arg))
       bindParams(car(aliases), arg);
 }
 
@@ -210,6 +210,8 @@ Cell* argsInParamOrder(Cell* params, Cell* nonKeywordArgs, CellMap& keywordArgs)
       nonKeywordArgs = cdr(nonKeywordArgs);
     }
   }
+  if (nonKeywordArgs != nil)
+    setCdr(curr, nonKeywordArgs);   // any remaining args
   return dropPtr(pReconstitutedArgs);
 }
 
