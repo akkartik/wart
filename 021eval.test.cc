@@ -226,6 +226,17 @@ void test_bindParams_handles_vararg() {
   rmref(params);
 }
 
+void test_bindParams_warns_on_inner_quoted_param() {
+  Cell* params = read("((x 'y))");
+  Cell* args = read("((a b))");
+  newLexicalScope();
+  bindParams(params, args, currLexicalScope);
+  checkEq(raiseCount, 1);   raiseCount=0;
+  endLexicalScope();
+  rmref(args);
+  rmref(params);
+}
+
 void test_bindParams_binds_multiple_params() {
   Cell* params = read("(a|b)");
   Cell* args = read("(1)");

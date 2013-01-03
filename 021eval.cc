@@ -97,11 +97,17 @@ Cell* eval(Cell* expr, Cell* scope) {
 //// bind params to appropriate args -- including param aliases
 
 void bindParams(Cell* params, Cell* args, Cell* scope) {
+  bindParams(params, args, scope, 0);
+}
+
+void bindParams(Cell* params, Cell* args, Cell* scope, int level) {
+  if (isQuoted(params) && level > 1)
+    RAISE << "quoted params are not meaningful inside destructured lists\n";
   params = stripQuote(params);
   if (params == nil) return;
 
   if (isCons(params) && car(params) == sym_param_alias) {
-    bindParamAliases(cdr(params), args, scope);
+    bindParamAliases(cdr(params), args, scope, level);
     return;
   }
 
@@ -110,13 +116,13 @@ void bindParams(Cell* params, Cell* args, Cell* scope) {
     addLexicalBinding(params, orderedArgs, scope);
   }
   else {
-    bindParams(car(params), car(orderedArgs), scope);
-    bindParams(cdr(params), cdr(orderedArgs), scope);
+    bindParams(car(params), car(orderedArgs), scope, level+1);
+    bindParams(cdr(params), cdr(orderedArgs), scope, level);
   }
   rmref(orderedArgs);
 }
 
-void bindParamAliases(Cell* aliases, Cell* arg, Cell* scope) {
+void bindParamAliases(Cell* aliases, Cell* arg, Cell* scope, int level) {
   if (cdr(aliases) == nil)
     RAISE << "just one param alias: " << car(aliases) << "; are you sure?\n";
   for (; aliases != nil; aliases=cdr(aliases)) {
@@ -124,7 +130,7 @@ void bindParamAliases(Cell* aliases, Cell* arg, Cell* scope) {
     if (isSym(car(aliases))   // sym with anything
         || car(car(aliases)) == sym_param_alias   // alias list with anything
         || isCons(arg))   // anything (destructured list) with cons
-      bindParams(car(aliases), arg, scope);
+      bindParams(car(aliases), arg, scope, level);
   }
 }
 
