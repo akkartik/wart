@@ -216,6 +216,10 @@ Cell* unsafeGet(Cell* t, Cell* key) {
   return table[key];
 }
 
+Cell* unsafeGet(Cell* t, string k) {
+  return unsafeGet(t, newSym(k));
+}
+
 
 
 //// internals
