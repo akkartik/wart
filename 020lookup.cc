@@ -90,7 +90,7 @@ void assignDynamicVar(Cell* sym, Cell* val) {
 
 
 
-//// lexical scope
+//// lexical scope -- a table, except that nils are not deleted
 
 Cell* lookupLexicalBinding(Cell* sym, Cell* scope) {
   Cell* result = NULL;
