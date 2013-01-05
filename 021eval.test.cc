@@ -91,220 +91,237 @@ void test_reorderKeywordArgs_handles_overlong_lists() {
 
 
 
-Cell* evalArgs(Cell* args, Cell* params) {
-  return evalArgs(args, params, currLexicalScope);
-}
-
-void test_evalArgs_handles_unquoted_param() {
-  newDynamicScope("a", newNum(3));
+void test_evalAndBind_handles_unquoted_param() {
   Cell* params = read("(x)");
   Cell* args = read("(a)");
-  Cell* evaldArgs = evalArgs(args, params);
-  checkEq(car(evaldArgs), newNum(3));
-  checkEq(cdr(evaldArgs), nil);
-  rmref(evaldArgs);
+  Cell* scope = newTable();
+  set(scope, "a", newNum(3));
+  Cell* newScope = newTable();
+  evalAndBind(params, args, scope, newScope);
+  checkEq(unsafeGet(newScope, "x"), newNum(3));
+  rmref(scope);
+  rmref(newScope);
   rmref(args);
   rmref(params);
-  endDynamicScope("a");
 }
 
-void test_evalArgs_handles_quoted_param() {
-  newDynamicScope("a", newNum(3));
+void test_evalAndBind_binds_missing_params() {
+  Cell* params = read("(x y)");
+  Cell* args = read("(a)");
+  Cell* scope = newTable();
+  set(scope, "a", newNum(3));
+  Cell* newScope = newTable();
+  evalAndBind(params, args, scope, newScope);
+  checkEq(unsafeGet(newScope, "x"), newNum(3));
+  checkEq(unsafeGet(newScope, newSym("y")), nil);
+  rmref(scope);
+  rmref(newScope);
+  rmref(args);
+  rmref(params);
+}
+
+void test_evalAndBind_handles_quoted_param() {
   Cell* params = read("('x)");
   Cell* args = read("(a)");
-  Cell* evaldArgs = evalArgs(args, params);
-  checkEq(car(evaldArgs), newSym("a"));
-  checkEq(cdr(evaldArgs), nil);
-  rmref(evaldArgs);
+  Cell* newScope = newTable();
+  evalAndBind(params, args, nil, newScope);
+  checkEq(unsafeGet(newScope, "x"), newSym("a"));
+  rmref(newScope);
   rmref(args);
   rmref(params);
-  endDynamicScope("a");
 }
 
-void test_evalArgs_handles_alreadyEvald_arg() {
-  newDynamicScope("a", newNum(3));
+void test_evalAndBind_handles_alreadyEvald_arg() {
   Cell* params = read("(x)");
   Cell* args = newCons(tagAlreadyEvald(newSym("a")));
-  Cell* evaldArgs = evalArgs(args, params);
-  checkEq(car(evaldArgs), newSym("a"));
-  checkEq(cdr(evaldArgs), nil);
-  rmref(evaldArgs);
+  Cell* scope = newTable();
+  set(scope, "a", newNum(3));
+  Cell* newScope = newTable();
+  evalAndBind(params, args, scope, newScope);
+  checkEq(unsafeGet(newScope, "x"), newSym("a"));
+  rmref(newScope);
+  rmref(scope);
   rmref(args);
   rmref(params);
-  endDynamicScope("a");
 }
 
-void test_evalArgs_handles_multiply_alreadyEvald_arg() {
-  newDynamicScope("a", newNum(3));
+void test_evalAndBind_handles_multiply_alreadyEvald_arg() {
   Cell* params = read("(x)");
   Cell* args = newCons(tagAlreadyEvald(tagAlreadyEvald(newSym("a"))));
-  Cell* evaldArgs = evalArgs(args, params);
-  checkEq(car(evaldArgs), newSym("a"));
-  checkEq(cdr(evaldArgs), nil);
-  rmref(evaldArgs);
+  Cell* scope = newTable();
+  set(scope, "a", newNum(3));
+  Cell* newScope = newTable();
+  evalAndBind(params, args, scope, newScope);
+  checkEq(unsafeGet(newScope, "x"), newSym("a"));
+  rmref(newScope);
+  rmref(scope);
   rmref(args);
   rmref(params);
-  endDynamicScope("a");
 }
 
-void test_evalArgs_handles_varargs_param() {
-  newDynamicScope("a", newNum(3));
-  newDynamicScope("b", newNum(4));
+void test_evalAndBind_handles_varargs_param() {
   Cell* params = read("x");
   Cell* args = read("(a b)");
-  Cell* evaldArgs = evalArgs(args, params);
-  checkEq(car(evaldArgs), newNum(3));
-  checkEq(car(cdr(evaldArgs)), newNum(4));
-  checkEq(cdr(cdr(evaldArgs)), nil);
-  rmref(evaldArgs);
+  Cell* scope = newTable();
+  set(scope, "a", newNum(3));
+  set(scope, "b", newNum(4));
+  Cell* newScope = newTable();
+  evalAndBind(params, args, scope, newScope);
+  checkEq(car(unsafeGet(newScope, "x")), newNum(3));
+  checkEq(car(cdr(unsafeGet(newScope, "x"))), newNum(4));
+  checkEq(cdr(cdr(unsafeGet(newScope, "x"))), nil);
+  rmref(newScope);
+  rmref(scope);
   rmref(args);
   rmref(params);
-  endDynamicScope("b");
-  endDynamicScope("a");
 }
 
-void test_evalArgs_handles_quoted_varargs_param() {
-  newDynamicScope("a", newNum(3));
-  newDynamicScope("b", newNum(4));
+void test_evalAndBind_handles_quoted_varargs_param() {
   Cell* params = read("'x");
   Cell* args = read("(a b)");
-  Cell* evaldArgs = evalArgs(args, params);
-  checkEq(car(evaldArgs), newSym("a"));
-  checkEq(car(cdr(evaldArgs)), newSym("b"));
-  checkEq(cdr(cdr(evaldArgs)), nil);
-  rmref(evaldArgs);
+  Cell* scope = newTable();
+  set(scope, "a", newNum(3));
+  set(scope, "b", newNum(4));
+  Cell* newScope = newTable();
+  evalAndBind(params, args, scope, newScope);
+  checkEq(car(unsafeGet(newScope, "x")), newSym("a"));
+  checkEq(car(cdr(unsafeGet(newScope, "x"))), newSym("b"));
+  checkEq(cdr(cdr(unsafeGet(newScope, "x"))), nil);
+  rmref(newScope);
+  rmref(scope);
   rmref(args);
   rmref(params);
-  endDynamicScope("b");
-  endDynamicScope("a");
 }
 
-void test_evalArgs_handles_rest_param() {
-  newDynamicScope("a", newNum(3));
-  newDynamicScope("b", newNum(4));
+void test_evalAndBind_handles_rest_param() {
   Cell* params = read("(x ... y)");
   Cell* args = read("(a b)");
-  Cell* evaldArgs = evalArgs(args, params);
-  checkEq(car(evaldArgs), newNum(3));
-  checkEq(car(cdr(evaldArgs)), newNum(4));
-  checkEq(cdr(cdr(evaldArgs)), nil);
-  rmref(evaldArgs);
+  Cell* scope = newTable();
+  set(scope, "a", newNum(3));
+  set(scope, "b", newNum(4));
+  Cell* newScope = newTable();
+  evalAndBind(params, args, scope, newScope);
+  checkEq(unsafeGet(newScope, "x"), newNum(3));
+  checkEq(car(unsafeGet(newScope, "y")), newNum(4));
+  checkEq(cdr(unsafeGet(newScope, "y")), nil);
+  rmref(newScope);
+  rmref(scope);
   rmref(args);
   rmref(params);
-  endDynamicScope("b");
-  endDynamicScope("a");
 }
 
-void test_evalArgs_handles_quoted_rest_param() {
-  newDynamicScope("a", newNum(3));
-  newDynamicScope("b", newNum(4));
+void test_evalAndBind_handles_quoted_rest_param() {
   Cell* params = read("(x ... 'y)");
   Cell* args = read("(a b)");
-  Cell* evaldArgs = evalArgs(args, params);
-  checkEq(car(evaldArgs), newNum(3));
-  checkEq(car(cdr(evaldArgs)), newSym("b"));
-  checkEq(cdr(cdr(evaldArgs)), nil);
-  rmref(evaldArgs);
-  rmref(args);
-  rmref(params);
-  endDynamicScope("b");
-  endDynamicScope("a");
-}
-
-
-
-void test_bindParams_handles_vararg() {
-  Cell* params = read("a");
-  Cell* args = read("(1)");
-  newLexicalScope();
-  bindParams(params, args, currLexicalScope);
-  Cell* result = unsafeGet(currLexicalScope, "a");
-  checkEq(car(result), newNum(1));
-  checkEq(cdr(result), nil);
-  endLexicalScope();
+  Cell* scope = newTable();
+  set(scope, "a", newNum(3));
+  set(scope, "b", newNum(4));
+  Cell* newScope = newTable();
+  evalAndBind(params, args, scope, newScope);
+  checkEq(unsafeGet(newScope, "x"), newNum(3));
+  checkEq(car(unsafeGet(newScope, "y")), newSym("b"));
+  checkEq(cdr(unsafeGet(newScope, "y")), nil);
+  rmref(newScope);
+  rmref(scope);
   rmref(args);
   rmref(params);
 }
 
-void test_bindParams_warns_on_inner_quoted_param() {
+void test_evalAndBind_handles_destructured_params() {
+  Cell* params = read("((a b))");
+  Cell* args = read("(`(,x ,y))");
+  Cell* scope = newTable();
+  unsafeSet(scope, "x", newNum(3), false);
+  unsafeSet(scope, "y", newNum(4), false);
+  Cell* newScope = newTable();
+  evalAndBind(params, args, scope, newScope);
+  checkEq(unsafeGet(newScope, "a"), newNum(3));
+  checkEq(unsafeGet(newScope, "b"), newNum(4));
+  rmref(newScope);
+  rmref(scope);
+  rmref(args);
+  rmref(params);
+}
+
+void test_evalAndBind_warns_on_inner_quoted_param() {
   Cell* params = read("((x 'y))");
-  Cell* args = read("((a b))");
-  newLexicalScope();
-  bindParams(params, args, currLexicalScope);
+  Cell* args = read("('(1 2))");
+  Cell* newScope = newTable();
+  evalAndBind(params, args, nil, newScope);
   checkEq(raiseCount, 1);   raiseCount=0;
-  endLexicalScope();
+  rmref(newScope);
   rmref(args);
   rmref(params);
 }
 
-void test_bindParams_binds_multiple_params() {
+void test_evalAndBind_handles_param_aliases() {
   Cell* params = read("(a|b)");
-  Cell* args = read("(1)");
-  newLexicalScope();
-  bindParams(params, args, currLexicalScope);
-  checkEq(unsafeGet(currLexicalScope, "a"), newNum(1));
-  checkEq(unsafeGet(currLexicalScope, "b"), newNum(1));
-  endLexicalScope();
+  Cell* args = read("(3)");
+  Cell* newScope = newTable();
+  evalAndBind(params, args, nil, newScope);
+  checkEq(unsafeGet(newScope, "a"), newNum(3));
+  checkEq(unsafeGet(newScope, "b"), newNum(3));
+  rmref(newScope);
   rmref(args);
   rmref(params);
 }
 
-void test_bindParams_binds_as_params() {
+void test_evalAndBind_binds_as_params() {
   Cell* params = read("(a | (b c))");
   Cell* args = read("(1 2)");
-  newLexicalScope();
-  bindParams(params, args, currLexicalScope);
-  checkEq(car(unsafeGet(currLexicalScope, "a")), newNum(1));
-  checkEq(car(cdr(unsafeGet(currLexicalScope, "a"))), newNum(2));
-  checkEq(cdr(cdr(unsafeGet(currLexicalScope, "a"))), nil);
-  checkEq(unsafeGet(currLexicalScope, "b"), newNum(1));
-  checkEq(unsafeGet(currLexicalScope, "c"), newNum(2));
-  endLexicalScope();
+  Cell* newScope = newTable();
+  evalAndBind(params, args, nil, newScope);
+  checkEq(car(unsafeGet(newScope, "a")), newNum(1));
+  checkEq(car(cdr(unsafeGet(newScope, "a"))), newNum(2));
+  checkEq(cdr(cdr(unsafeGet(newScope, "a"))), nil);
+  checkEq(unsafeGet(newScope, "b"), newNum(1));
+  checkEq(unsafeGet(newScope, "c"), newNum(2));
+  rmref(newScope);
   rmref(args);
   rmref(params);
 }
 
-void test_bindParams_binds_as_params_recursively() {
+void test_evalAndBind_binds_as_params_recursively() {
   Cell* params = read("(a | (b ... (c | (d e))))");
   Cell* args = read("(1 2 3)");
-  newLexicalScope();
-  bindParams(params, args, currLexicalScope);
-  checkEq(car(unsafeGet(currLexicalScope, "a")), newNum(1));
-  checkEq(car(cdr(unsafeGet(currLexicalScope, "a"))), newNum(2));
-  checkEq(car(cdr(cdr(unsafeGet(currLexicalScope, "a")))), newNum(3));
-  checkEq(cdr(cdr(cdr(unsafeGet(currLexicalScope, "a")))), nil);
-  checkEq(unsafeGet(currLexicalScope, "b"), newNum(1));
-  checkEq(car(unsafeGet(currLexicalScope, "c")), newNum(2));
-  checkEq(car(cdr(unsafeGet(currLexicalScope, "c"))), newNum(3));
-  checkEq(cdr(cdr(unsafeGet(currLexicalScope, "c"))), nil);
-  checkEq(unsafeGet(currLexicalScope, "d"), newNum(2));
-  checkEq(unsafeGet(currLexicalScope, "e"), newNum(3));
-  endLexicalScope();
+  Cell* newScope = newTable();
+  evalAndBind(params, args, nil, newScope);
+  checkEq(car(unsafeGet(newScope, "a")), newNum(1));
+  checkEq(car(cdr(unsafeGet(newScope, "a"))), newNum(2));
+  checkEq(car(cdr(cdr(unsafeGet(newScope, "a")))), newNum(3));
+  checkEq(cdr(cdr(cdr(unsafeGet(newScope, "a")))), nil);
+  checkEq(unsafeGet(newScope, "b"), newNum(1));
+  checkEq(car(unsafeGet(newScope, "c")), newNum(2));
+  checkEq(car(cdr(unsafeGet(newScope, "c"))), newNum(3));
+  checkEq(cdr(cdr(unsafeGet(newScope, "c"))), nil);
+  checkEq(unsafeGet(newScope, "d"), newNum(2));
+  checkEq(unsafeGet(newScope, "e"), newNum(3));
+  rmref(newScope);
   rmref(args);
   rmref(params);
 }
 
-void test_bindParams_warns_on_unary_as() {
+void test_evalAndBind_warns_on_unary_as() {
   Cell* params = read("(| a)");
   Cell* args = read("(1 2)");
-  newLexicalScope();
-  bindParams(params, args, currLexicalScope);
+  Cell* newScope = newTable();
+  evalAndBind(params, args, nil, newScope);
   checkEq(raiseCount, 1);   raiseCount=0;
-  endLexicalScope();
+  rmref(newScope);
   rmref(args);
   rmref(params);
 }
 
-void test_bindParams_skips_missing_as_params() {
+void test_evalAndBind_skips_missing_as_params() {
   Cell* params = read("(a | (b c))");
   Cell* args = read("1");
-  newLexicalScope();
-  bindParams(params, args, currLexicalScope);
+  Cell* newScope = newTable();
+  evalAndBind(params, args, nil, newScope);
   checkEq(raiseCount, 0);
-  checkEq(unsafeGet(currLexicalScope, "a"), newNum(1));
-  check(!unsafeGet(currLexicalScope, "b"));
-  check(!unsafeGet(currLexicalScope, "c"));
-  endLexicalScope();
+  checkEq(unsafeGet(newScope, "a"), newNum(1));
+  check(!unsafeGet(newScope, "b"));
+  check(!unsafeGet(newScope, "c"));
+  rmref(newScope);
   rmref(args);
   rmref(params);
 }

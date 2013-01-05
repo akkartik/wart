@@ -128,10 +128,26 @@ alias none ~some
 
 
 
-def (map f ... seqs) :case cdr.seqs
-  if (all present? seqs)
-    (cons (f @(map car seqs))
-          (map f @(map cdr seqs)))
+prn "a: " (map (fn(x) x) '(0))
+
+let $old map
+  def! (map ... params)
+    # works
+    ((fn(f ... seqs)
+       ($old @params))
+     params)
+    # TODO: doesn't work
+    let (f ... seqs) params
+      ($old @params)
+
+debug.1
+(map (fn(x) x) '(0))
+exit.0
+
+#? def (map f ... seqs) :case cdr.seqs
+#?   if (all present? seqs)
+#?     (cons (f @(map car seqs))
+#?           (map f @(map cdr seqs)))
 
 def (reduce f seq init)  # f is a binary op
   (if

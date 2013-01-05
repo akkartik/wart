@@ -63,10 +63,9 @@ Cell* eval(Cell* expr, Cell* scope) {
   // eval its args in the caller's lexical environment
   Cell* splicedArgs = spliceArgs(cdr(expr), scope, fn);
   Cell* orderedArgs = reorderKeywordArgs(splicedArgs, sig(fn));
-  Cell* evaldArgs = evalArgs(orderedArgs, sig(fn), scope);
-  dbg << car(expr) << "/" << keepAlreadyEvald() << ": " << evaldArgs << endl;
   Cell* newScope = newTable();
-  bindParams(sig(fn), evaldArgs, newScope);
+  evalAndBind(sig(fn), orderedArgs, scope, newScope);
+  dbg << car(expr) << "/" << keepAlreadyEvald() << ": " << cdr(expr) << endl;
 
   // swap in the function's lexical environment
   newDynamicScope(CURR_LEXICAL_SCOPE, isCompiledFn(body(fn)) ? scope : env(fn));
@@ -83,21 +82,77 @@ Cell* eval(Cell* expr, Cell* scope) {
       result = eval(car(form), currLexicalScope);
     }
 
-  endLexicalScope();
+  endLexicalScope();  // implicitly rmrefs newScope
   endDynamicScope(CURR_LEXICAL_SCOPE);
-  rmref(evaldArgs);
   rmref(orderedArgs);
   rmref(splicedArgs);
   rmref(fn);
   return result;  // already mkref'd
 }
 
-
+Cell* evalArgs(Cell* args, Cell* params, Cell* scope) {
+  if (args == nil) return nil;
+  if (isQuoted(params)) return mkref(args);
 
-//// bind params to appropriate args -- including param aliases
+  Cell* result = newCell();
+  setCar(result, evalArg(car(args), params, scope));  rmref(car(result));
+  setCdr(result, evalArgs(cdr(args), cdr(params), scope));  rmref(cdr(result));
+  return mkref(result);
+}
 
-void bindParams(Cell* params, Cell* args, Cell* scope) {
-  bindParams(params, args, scope, 0);
+Cell* evalArg(Cell* arg, Cell* params, Cell* scope) {
+  if (isAlreadyEvald(arg)) return mkref(stripAlreadyEvald(arg));
+  if (isCons(params) && isQuoted(car(params))) return mkref(arg);
+  return eval(arg, scope);
+}
+
+void evalAndBind(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
+  if (params == nil) return;
+  if (isQuoted(params)) {
+    bindParams(params, args, newScope, 0);
+    return;
+  }
+
+  if (isSym(params)) {
+    Cell* val = evalAll(args, scope);
+    unsafeSet(newScope, params, val, false);
+    rmref(val);
+    return;
+  }
+
+  if (!isCons(params)) return;
+
+  if (car(params) == sym_param_alias) {
+    Cell* val = evalAll(args, scope);
+    bindParamAliases(cdr(params), val, newScope, 0);
+    rmref(val);
+    return;
+  }
+
+  if (isQuoted(car(params))) {
+    bindParams(car(params), car(args), newScope, 1);
+  } else if (isSym(car(params))) {
+    Cell* val = eval(car(args), scope);
+    unsafeSet(newScope, car(params), val, false);
+    rmref(val);
+  } else if (isCons(car(params))) {
+    Cell* val = eval(car(args), scope);
+    bindParams(car(params), val, newScope, 1);
+    rmref(val);
+  }
+  evalAndBind(cdr(params), cdr(args), scope, newScope);
+}
+
+Cell* evalAll(Cell* args, Cell* scope) {
+  if (!isCons(args))
+    return eval(args, scope);
+  Cell* pResult = newCell(), *curr = pResult;
+  for (; args != nil; args=cdr(args)) {
+    addCons(curr, eval(car(args), scope));
+    rmref(car(cdr(curr)));
+    curr=cdr(curr);
+  }
+  return dropPtr(pResult);
 }
 
 void bindParams(Cell* params, Cell* args, Cell* scope, int level) {
@@ -260,26 +315,6 @@ bool paramAliasMatch(Cell* aliases, Cell* candidate) {
       return true;
   }
   return false;
-}
-
-
-
-//// eval args as necessary depending on corresponding params
-
-Cell* evalArgs(Cell* args, Cell* params, Cell* scope) {
-  if (args == nil) return nil;
-  if (isQuoted(params)) return mkref(args);
-
-  Cell* result = newCell();
-  setCar(result, evalArg(car(args), params, scope));  rmref(car(result));
-  setCdr(result, evalArgs(cdr(args), cdr(params), scope));  rmref(cdr(result));
-  return mkref(result);
-}
-
-Cell* evalArg(Cell* arg, Cell* params, Cell* scope) {
-  if (isAlreadyEvald(arg)) return mkref(stripAlreadyEvald(arg));
-  if (isCons(params) && isQuoted(car(params))) return mkref(arg);
-  return eval(arg, scope);
 }
 
 
