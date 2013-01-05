@@ -137,7 +137,9 @@ void test_evalAndBind_handles_alreadyEvald_arg() {
   Cell* scope = newTable();
   set(scope, "a", newNum(3));
   Cell* newScope = newTable();
+  inMacro.push(true);
   evalAndBind(params, args, scope, newScope);
+  inMacro.pop();
   checkEq(unsafeGet(newScope, "x"), newSym("a"));
   rmref(newScope);
   rmref(scope);
@@ -151,7 +153,9 @@ void test_evalAndBind_handles_multiply_alreadyEvald_arg() {
   Cell* scope = newTable();
   set(scope, "a", newNum(3));
   Cell* newScope = newTable();
+  inMacro.push(true);
   evalAndBind(params, args, scope, newScope);
+  inMacro.pop();
   checkEq(unsafeGet(newScope, "x"), newSym("a"));
   rmref(newScope);
   rmref(scope);

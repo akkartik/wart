@@ -100,12 +100,6 @@ Cell* evalArgs(Cell* args, Cell* params, Cell* scope) {
   return mkref(result);
 }
 
-Cell* evalArg(Cell* arg, Cell* params, Cell* scope) {
-  if (isAlreadyEvald(arg)) return mkref(stripAlreadyEvald(arg));
-  if (isCons(params) && isQuoted(car(params))) return mkref(arg);
-  return eval(arg, scope);
-}
-
 void evalAndBind(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
   if (params == nil) return;
   if (isQuoted(params)) {
@@ -129,17 +123,10 @@ void evalAndBind(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
     return;
   }
 
-  if (isQuoted(car(params))) {
-    bindParams(car(params), car(args), newScope, 1);
-  } else if (isSym(car(params))) {
-    Cell* val = eval(car(args), scope);
-    unsafeSet(newScope, car(params), val, false);
-    rmref(val);
-  } else if (isCons(car(params))) {
-    Cell* val = eval(car(args), scope);
-    bindParams(car(params), val, newScope, 1);
-    rmref(val);
-  }
+  Cell* val = evalArg(car(args), car(params), scope);
+  bindParams(car(params), val, newScope, 1);
+  rmref(val);
+
   evalAndBind(cdr(params), cdr(args), scope, newScope);
 }
 
@@ -153,6 +140,12 @@ Cell* evalAll(Cell* args, Cell* scope) {
     curr=cdr(curr);
   }
   return dropPtr(pResult);
+}
+
+Cell* evalArg(Cell* arg, Cell* param, Cell* scope) {
+  if (isAlreadyEvald(arg)) return mkref(stripAlreadyEvald(arg));
+  if (isQuoted(param)) return mkref(arg);
+  return eval(arg, scope);
 }
 
 void bindParams(Cell* params, Cell* args, Cell* scope, int level) {
