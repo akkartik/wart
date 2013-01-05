@@ -91,13 +91,13 @@ void test_reorderKeywordArgs_handles_overlong_lists() {
 
 
 
-void test_evalAndBind_handles_unquoted_param() {
+void test_evalArgsAndBindParams_handles_unquoted_param() {
   Cell* params = read("(x)");
   Cell* args = read("(a)");
   Cell* scope = newTable();
   set(scope, "a", newNum(3));
   Cell* newScope = newTable();
-  evalAndBind(params, args, scope, newScope);
+  evalArgsAndBindParams(params, args, scope, newScope);
   checkEq(unsafeGet(newScope, "x"), newNum(3));
   rmref(scope);
   rmref(newScope);
@@ -105,13 +105,13 @@ void test_evalAndBind_handles_unquoted_param() {
   rmref(params);
 }
 
-void test_evalAndBind_binds_missing_params() {
+void test_evalArgsAndBindParams_binds_missing_params() {
   Cell* params = read("(x y)");
   Cell* args = read("(a)");
   Cell* scope = newTable();
   set(scope, "a", newNum(3));
   Cell* newScope = newTable();
-  evalAndBind(params, args, scope, newScope);
+  evalArgsAndBindParams(params, args, scope, newScope);
   checkEq(unsafeGet(newScope, "x"), newNum(3));
   checkEq(unsafeGet(newScope, newSym("y")), nil);
   rmref(scope);
@@ -120,25 +120,25 @@ void test_evalAndBind_binds_missing_params() {
   rmref(params);
 }
 
-void test_evalAndBind_handles_quoted_param() {
+void test_evalArgsAndBindParams_handles_quoted_param() {
   Cell* params = read("('x)");
   Cell* args = read("(a)");
   Cell* newScope = newTable();
-  evalAndBind(params, args, nil, newScope);
+  evalArgsAndBindParams(params, args, nil, newScope);
   checkEq(unsafeGet(newScope, "x"), newSym("a"));
   rmref(newScope);
   rmref(args);
   rmref(params);
 }
 
-void test_evalAndBind_handles_alreadyEvald_arg() {
+void test_evalArgsAndBindParams_handles_alreadyEvald_arg() {
   Cell* params = read("(x)");
   Cell* args = newCons(tagAlreadyEvald(newSym("a")));
   Cell* scope = newTable();
   set(scope, "a", newNum(3));
   Cell* newScope = newTable();
   inMacro.push(true);
-  evalAndBind(params, args, scope, newScope);
+  evalArgsAndBindParams(params, args, scope, newScope);
   inMacro.pop();
   checkEq(unsafeGet(newScope, "x"), newSym("a"));
   rmref(newScope);
@@ -147,14 +147,14 @@ void test_evalAndBind_handles_alreadyEvald_arg() {
   rmref(params);
 }
 
-void test_evalAndBind_handles_multiply_alreadyEvald_arg() {
+void test_evalArgsAndBindParams_handles_multiply_alreadyEvald_arg() {
   Cell* params = read("(x)");
   Cell* args = newCons(tagAlreadyEvald(tagAlreadyEvald(newSym("a"))));
   Cell* scope = newTable();
   set(scope, "a", newNum(3));
   Cell* newScope = newTable();
   inMacro.push(true);
-  evalAndBind(params, args, scope, newScope);
+  evalArgsAndBindParams(params, args, scope, newScope);
   inMacro.pop();
   checkEq(unsafeGet(newScope, "x"), newSym("a"));
   rmref(newScope);
@@ -163,14 +163,14 @@ void test_evalAndBind_handles_multiply_alreadyEvald_arg() {
   rmref(params);
 }
 
-void test_evalAndBind_handles_alreadyEvald_rest_arg() {
+void test_evalArgsAndBindParams_handles_alreadyEvald_rest_arg() {
   Cell* params = read("x");
   Cell* args = newCons(tagAlreadyEvald(newSym("a")));
   Cell* scope = newTable();
   set(scope, "a", newNum(3));
   Cell* newScope = newTable();
   inMacro.push(true);
-  evalAndBind(params, args, scope, newScope);
+  evalArgsAndBindParams(params, args, scope, newScope);
   inMacro.pop();
   checkEq(car(unsafeGet(newScope, "x")), newSym("a"));
   rmref(newScope);
@@ -179,14 +179,14 @@ void test_evalAndBind_handles_alreadyEvald_rest_arg() {
   rmref(params);
 }
 
-void test_evalAndBind_handles_varargs_param() {
+void test_evalArgsAndBindParams_handles_varargs_param() {
   Cell* params = read("x");
   Cell* args = read("(a b)");
   Cell* scope = newTable();
   set(scope, "a", newNum(3));
   set(scope, "b", newNum(4));
   Cell* newScope = newTable();
-  evalAndBind(params, args, scope, newScope);
+  evalArgsAndBindParams(params, args, scope, newScope);
   checkEq(car(unsafeGet(newScope, "x")), newNum(3));
   checkEq(car(cdr(unsafeGet(newScope, "x"))), newNum(4));
   checkEq(cdr(cdr(unsafeGet(newScope, "x"))), nil);
@@ -196,14 +196,14 @@ void test_evalAndBind_handles_varargs_param() {
   rmref(params);
 }
 
-void test_evalAndBind_handles_quoted_varargs_param() {
+void test_evalArgsAndBindParams_handles_quoted_varargs_param() {
   Cell* params = read("'x");
   Cell* args = read("(a b)");
   Cell* scope = newTable();
   set(scope, "a", newNum(3));
   set(scope, "b", newNum(4));
   Cell* newScope = newTable();
-  evalAndBind(params, args, scope, newScope);
+  evalArgsAndBindParams(params, args, scope, newScope);
   checkEq(car(unsafeGet(newScope, "x")), newSym("a"));
   checkEq(car(cdr(unsafeGet(newScope, "x"))), newSym("b"));
   checkEq(cdr(cdr(unsafeGet(newScope, "x"))), nil);
@@ -213,14 +213,14 @@ void test_evalAndBind_handles_quoted_varargs_param() {
   rmref(params);
 }
 
-void test_evalAndBind_handles_rest_param() {
+void test_evalArgsAndBindParams_handles_rest_param() {
   Cell* params = read("(x ... y)");
   Cell* args = read("(a b)");
   Cell* scope = newTable();
   set(scope, "a", newNum(3));
   set(scope, "b", newNum(4));
   Cell* newScope = newTable();
-  evalAndBind(params, args, scope, newScope);
+  evalArgsAndBindParams(params, args, scope, newScope);
   checkEq(unsafeGet(newScope, "x"), newNum(3));
   checkEq(car(unsafeGet(newScope, "y")), newNum(4));
   checkEq(cdr(unsafeGet(newScope, "y")), nil);
@@ -230,14 +230,14 @@ void test_evalAndBind_handles_rest_param() {
   rmref(params);
 }
 
-void test_evalAndBind_handles_quoted_rest_param() {
+void test_evalArgsAndBindParams_handles_quoted_rest_param() {
   Cell* params = read("(x ... 'y)");
   Cell* args = read("(a b)");
   Cell* scope = newTable();
   set(scope, "a", newNum(3));
   set(scope, "b", newNum(4));
   Cell* newScope = newTable();
-  evalAndBind(params, args, scope, newScope);
+  evalArgsAndBindParams(params, args, scope, newScope);
   checkEq(unsafeGet(newScope, "x"), newNum(3));
   checkEq(car(unsafeGet(newScope, "y")), newSym("b"));
   checkEq(cdr(unsafeGet(newScope, "y")), nil);
@@ -247,14 +247,14 @@ void test_evalAndBind_handles_quoted_rest_param() {
   rmref(params);
 }
 
-void test_evalAndBind_handles_destructured_params() {
+void test_evalArgsAndBindParams_handles_destructured_params() {
   Cell* params = read("((a b))");
   Cell* args = read("(`(,x ,y))");
   Cell* scope = newTable();
   unsafeSet(scope, "x", newNum(3), false);
   unsafeSet(scope, "y", newNum(4), false);
   Cell* newScope = newTable();
-  evalAndBind(params, args, scope, newScope);
+  evalArgsAndBindParams(params, args, scope, newScope);
   checkEq(unsafeGet(newScope, "a"), newNum(3));
   checkEq(unsafeGet(newScope, "b"), newNum(4));
   rmref(newScope);
@@ -263,22 +263,22 @@ void test_evalAndBind_handles_destructured_params() {
   rmref(params);
 }
 
-void test_evalAndBind_warns_on_inner_quoted_param() {
+void test_evalArgsAndBindParams_warns_on_inner_quoted_param() {
   Cell* params = read("((x 'y))");
   Cell* args = read("('(1 2))");
   Cell* newScope = newTable();
-  evalAndBind(params, args, nil, newScope);
+  evalArgsAndBindParams(params, args, nil, newScope);
   checkEq(raiseCount, 1);   raiseCount=0;
   rmref(newScope);
   rmref(args);
   rmref(params);
 }
 
-void test_evalAndBind_handles_param_aliases() {
+void test_evalArgsAndBindParams_handles_param_aliases() {
   Cell* params = read("(a|b)");
   Cell* args = read("(3)");
   Cell* newScope = newTable();
-  evalAndBind(params, args, nil, newScope);
+  evalArgsAndBindParams(params, args, nil, newScope);
   checkEq(unsafeGet(newScope, "a"), newNum(3));
   checkEq(unsafeGet(newScope, "b"), newNum(3));
   rmref(newScope);
@@ -286,11 +286,11 @@ void test_evalAndBind_handles_param_aliases() {
   rmref(params);
 }
 
-void test_evalAndBind_binds_as_params() {
+void test_evalArgsAndBindParams_binds_as_params() {
   Cell* params = read("(a | (b c))");
   Cell* args = read("(1 2)");
   Cell* newScope = newTable();
-  evalAndBind(params, args, nil, newScope);
+  evalArgsAndBindParams(params, args, nil, newScope);
   checkEq(car(unsafeGet(newScope, "a")), newNum(1));
   checkEq(car(cdr(unsafeGet(newScope, "a"))), newNum(2));
   checkEq(cdr(cdr(unsafeGet(newScope, "a"))), nil);
@@ -301,11 +301,11 @@ void test_evalAndBind_binds_as_params() {
   rmref(params);
 }
 
-void test_evalAndBind_binds_as_params_recursively() {
+void test_evalArgsAndBindParams_binds_as_params_recursively() {
   Cell* params = read("(a | (b ... (c | (d e))))");
   Cell* args = read("(1 2 3)");
   Cell* newScope = newTable();
-  evalAndBind(params, args, nil, newScope);
+  evalArgsAndBindParams(params, args, nil, newScope);
   checkEq(car(unsafeGet(newScope, "a")), newNum(1));
   checkEq(car(cdr(unsafeGet(newScope, "a"))), newNum(2));
   checkEq(car(cdr(cdr(unsafeGet(newScope, "a")))), newNum(3));
@@ -321,22 +321,22 @@ void test_evalAndBind_binds_as_params_recursively() {
   rmref(params);
 }
 
-void test_evalAndBind_warns_on_unary_as() {
+void test_evalArgsAndBindParams_warns_on_unary_as() {
   Cell* params = read("(| a)");
   Cell* args = read("(1 2)");
   Cell* newScope = newTable();
-  evalAndBind(params, args, nil, newScope);
+  evalArgsAndBindParams(params, args, nil, newScope);
   checkEq(raiseCount, 1);   raiseCount=0;
   rmref(newScope);
   rmref(args);
   rmref(params);
 }
 
-void test_evalAndBind_skips_missing_as_params() {
+void test_evalArgsAndBindParams_skips_missing_as_params() {
   Cell* params = read("(a | (b c))");
   Cell* args = read("1");
   Cell* newScope = newTable();
-  evalAndBind(params, args, nil, newScope);
+  evalArgsAndBindParams(params, args, nil, newScope);
   checkEq(raiseCount, 0);
   checkEq(unsafeGet(newScope, "a"), newNum(1));
   check(!unsafeGet(newScope, "b"));

@@ -64,7 +64,7 @@ Cell* eval(Cell* expr, Cell* scope) {
   Cell* splicedArgs = spliceArgs(cdr(expr), scope, fn);
   Cell* orderedArgs = reorderKeywordArgs(splicedArgs, sig(fn));
   Cell* newScope = newTable();
-  evalAndBind(sig(fn), orderedArgs, scope, newScope);
+  evalArgsAndBindParams(sig(fn), orderedArgs, scope, newScope);
   dbg << car(expr) << "/" << keepAlreadyEvald() << ": " << cdr(expr) << endl;
 
   // swap in the function's lexical environment
@@ -90,7 +90,7 @@ Cell* eval(Cell* expr, Cell* scope) {
   return result;  // already mkref'd
 }
 
-void evalAndBind(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
+void evalArgsAndBindParams(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
   if (params == nil) return;
   if (isQuoted(params)) {
     bindParams(params, args, newScope, 0);
@@ -98,7 +98,7 @@ void evalAndBind(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
   }
 
   if (isSym(params)) {
-    Cell* val = evalAll(args, scope);
+    Cell* val = evalAllArgs(args, scope);
     unsafeSet(newScope, params, val, false);
     rmref(val);
     return;
@@ -107,7 +107,7 @@ void evalAndBind(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
   if (!isCons(params)) return;
 
   if (car(params) == sym_param_alias) {
-    Cell* val = evalAll(args, scope);
+    Cell* val = evalAllArgs(args, scope);
     bindParamAliases(cdr(params), val, newScope, 0);
     rmref(val);
     return;
@@ -117,10 +117,10 @@ void evalAndBind(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
   bindParams(car(params), val, newScope, 1);
   rmref(val);
 
-  evalAndBind(cdr(params), cdr(args), scope, newScope);
+  evalArgsAndBindParams(cdr(params), cdr(args), scope, newScope);
 }
 
-Cell* evalAll(Cell* args, Cell* scope) {
+Cell* evalAllArgs(Cell* args, Cell* scope) {
   if (!isCons(args))
     return evalArg(args, nil, scope);
   Cell* pResult = newCell(), *curr = pResult;
@@ -132,6 +132,8 @@ Cell* evalAll(Cell* args, Cell* scope) {
   return dropPtr(pResult);
 }
 
+// eval arg unless param is quoted
+// arg eval always strips '' regardless of keepAlreadyEvald()
 Cell* evalArg(Cell* arg, Cell* param, Cell* scope) {
   if (isAlreadyEvald(arg)) return mkref(stripAlreadyEvald(arg));
   if (isQuoted(param)) return mkref(arg);
