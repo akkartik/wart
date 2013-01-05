@@ -90,16 +90,6 @@ Cell* eval(Cell* expr, Cell* scope) {
   return result;  // already mkref'd
 }
 
-Cell* evalArgs(Cell* args, Cell* params, Cell* scope) {
-  if (args == nil) return nil;
-  if (isQuoted(params)) return mkref(args);
-
-  Cell* result = newCell();
-  setCar(result, evalArg(car(args), params, scope));  rmref(car(result));
-  setCdr(result, evalArgs(cdr(args), cdr(params), scope));  rmref(cdr(result));
-  return mkref(result);
-}
-
 void evalAndBind(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
   if (params == nil) return;
   if (isQuoted(params)) {
