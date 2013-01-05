@@ -163,6 +163,22 @@ void test_evalAndBind_handles_multiply_alreadyEvald_arg() {
   rmref(params);
 }
 
+void test_evalAndBind_handles_alreadyEvald_rest_arg() {
+  Cell* params = read("x");
+  Cell* args = newCons(tagAlreadyEvald(newSym("a")));
+  Cell* scope = newTable();
+  set(scope, "a", newNum(3));
+  Cell* newScope = newTable();
+  inMacro.push(true);
+  evalAndBind(params, args, scope, newScope);
+  inMacro.pop();
+  checkEq(car(unsafeGet(newScope, "x")), newSym("a"));
+  rmref(newScope);
+  rmref(scope);
+  rmref(args);
+  rmref(params);
+}
+
 void test_evalAndBind_handles_varargs_param() {
   Cell* params = read("x");
   Cell* args = read("(a b)");

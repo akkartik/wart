@@ -122,10 +122,10 @@ void evalAndBind(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
 
 Cell* evalAll(Cell* args, Cell* scope) {
   if (!isCons(args))
-    return eval(args, scope);
+    return evalArg(args, nil, scope);
   Cell* pResult = newCell(), *curr = pResult;
   for (; args != nil; args=cdr(args)) {
-    addCons(curr, eval(car(args), scope));
+    addCons(curr, evalArg(car(args), nil, scope));
     rmref(car(cdr(curr)));
     curr=cdr(curr);
   }
