@@ -156,7 +156,10 @@ void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, Cell* scope, int le
     addLexicalBinding(params, orderedArgs, scope);
   }
   else {
-    bindParams(car(params), car(orderedArgs), isSym(unevaldArgs) ? unevaldArgs : car(unevaldArgs), scope, level+1);
+    if (isQuoted(car(params)))
+      bindParams(car(params), isSym(unevaldArgs) ? unevaldArgs : car(unevaldArgs), isSym(unevaldArgs) ? unevaldArgs : car(unevaldArgs), scope, level+1);
+    else
+      bindParams(car(params), car(orderedArgs), isSym(unevaldArgs) ? unevaldArgs : car(unevaldArgs), scope, level+1);
     bindParams(cdr(params), cdr(orderedArgs), cdr(unevaldArgs), scope, level);
   }
   rmref(orderedArgs);
@@ -167,12 +170,12 @@ void bindParamAliases(Cell* aliases, Cell* arg, Cell* unevaldArg, Cell* scope, i
     RAISE << "just one param alias: " << car(aliases) << "; are you sure?\n";
   for (; aliases != nil; aliases=cdr(aliases)) {
     // bind matching aliases to the arg
-    if (isSym(car(aliases))   // sym with anything
+    if (isQuoted(car(aliases)))
+      bindParams(car(aliases), unevaldArg, unevaldArg, scope, level);
+    else if (isSym(car(aliases))   // sym with anything
         || car(car(aliases)) == sym_param_alias   // alias list with anything
         || isCons(arg))   // anything (destructured list) with cons
       bindParams(car(aliases), arg, unevaldArg, scope, level);
-    else if (isQuoted(car(aliases)))
-      bindParams(car(aliases), unevaldArg, unevaldArg, scope, level);
     else if (isCons(car(aliases)))
       bindParams(car(aliases), nil, nil, scope, level);
   }
