@@ -321,6 +321,21 @@ void test_evalArgsAndBindParams_binds_as_params_recursively() {
   rmref(params);
 }
 
+void test_evalArgsAndBindParams_handles_quoted_param_aliases() {
+  Cell* params = read("((a | 'b))");
+  Cell* args = read("(x)");
+  Cell* scope = newTable();
+  unsafeSet(scope, "x", newNum(3), false);
+  Cell* newScope = newTable();
+  evalArgsAndBindParams(params, args, scope, newScope);
+  checkEq(unsafeGet(newScope, "a"), newNum(3));
+  checkEq(unsafeGet(newScope, "b"), newSym("x"));
+  rmref(newScope);
+  rmref(scope);
+  rmref(args);
+  rmref(params);
+}
+
 void test_evalArgsAndBindParams_warns_on_unary_as() {
   Cell* params = read("(| a)");
   Cell* args = read("(1 2)");
