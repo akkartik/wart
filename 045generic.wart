@@ -10,8 +10,7 @@ let $mac mac
 
 mac (def (name ... params) ... body) :case (car.body = :case)
   `(let $old ,name
-     (def! (,name ... $params)
-       (let ,params $params
-         (if ,cadr.body
-           (do ,@cddr.body)
-           ($old @$params)))))
+     (def! (,name ... ($params | ,params))
+       (if ,cadr.body
+         (do ,@cddr.body)
+         ($old @$params))))
