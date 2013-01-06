@@ -107,17 +107,32 @@ void evalArgsAndBindParams(Cell* params, Cell* args, Cell* scope, Cell* newScope
   if (!isCons(params)) return;
 
   if (car(params) == sym_param_alias) {
-    Cell* val = evalAllArgs(args, scope);
-    bindParamAliases(cdr(params), val, args, newScope, 0);
-    rmref(val);
+    if (!allQuoted(cdr(params))) {
+      Cell* val = evalAllArgs(args, scope);
+      bindParamAliases(cdr(params), val, args, newScope, 0);
+      rmref(val);
+    } else {
+      bindParamAliases(cdr(params), nil, args, newScope, 0);
+    }
     return;
   }
 
-  Cell* val = evalArg(car(args), car(params), scope);
-  bindParams(car(params), val, car(args), newScope, 1);
-  rmref(val);
+  if (isCons(car(params)) && car(car(params)) == sym_param_alias && allQuoted(cdr(car(params))))
+    bindParams(car(params), nil, car(args), newScope, 1);
+  else {
+    Cell* val = evalArg(car(args), car(params), scope);
+    bindParams(car(params), val, car(args), newScope, 1);
+    rmref(val);
+  }
 
   evalArgsAndBindParams(cdr(params), cdr(args), scope, newScope);
+}
+
+bool allQuoted(Cell* l) {
+  for (; l != nil; l=cdr(l))
+    if (!isQuoted(car(l)))
+      return false;
+  return true;
 }
 
 Cell* evalAllArgs(Cell* args, Cell* scope) {
