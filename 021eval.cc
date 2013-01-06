@@ -171,6 +171,8 @@ void bindParamAliases(Cell* aliases, Cell* arg, Cell* unevaldArg, Cell* scope, i
         || car(car(aliases)) == sym_param_alias   // alias list with anything
         || isCons(arg))   // anything (destructured list) with cons
       bindParams(car(aliases), arg, unevaldArg, scope, level);
+    else if (isCons(car(aliases)))
+      bindParams(car(aliases), nil, nil, scope, level);
   }
 }
 

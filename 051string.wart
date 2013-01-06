@@ -31,10 +31,10 @@ def (string ... args)
 defcoerce symbol string
   string
 
-def (join ... (params | (head ... tail))) :case (and params (or string?.head sym?.head))
+def (join head ... tail) :case (or string?.head sym?.head)
   (string head @tail)
 
-def (+ ... (params | (head ... tail))) :case (and params (or string?.head sym?.head))
+def (+ head ... tail) :case (or string?.head sym?.head)
   (string head @tail)
 
 def (empty? s) :case string?.s

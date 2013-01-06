@@ -332,15 +332,15 @@ void test_evalArgsAndBindParams_warns_on_unary_as() {
   rmref(params);
 }
 
-void test_evalArgsAndBindParams_skips_missing_as_params() {
+void test_evalArgsAndBindParams_binds_missing_as_params_to_nil() {
   Cell* params = read("(a | (b c))");
   Cell* args = read("1");
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, nil, newScope);
   checkEq(raiseCount, 0);
   checkEq(unsafeGet(newScope, "a"), newNum(1));
-  check(!unsafeGet(newScope, "b"));
-  check(!unsafeGet(newScope, "c"));
+  checkEq(unsafeGet(newScope, "b"), nil);
+  checkEq(unsafeGet(newScope, "c"), nil);
   rmref(newScope);
   rmref(args);
   rmref(params);
