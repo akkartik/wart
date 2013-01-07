@@ -99,7 +99,7 @@ void evalArgsAndBindParams(Cell* params, Cell* args, Cell* scope, Cell* newScope
 
   if (isSym(params)) {
     Cell* val = evalAllArgs(args, scope);
-    unsafeSet(newScope, params, val, false);
+    addLexicalBinding(params, val, newScope);
     rmref(val);
     return;
   }
