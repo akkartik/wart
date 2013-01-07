@@ -112,7 +112,7 @@ void evalArgsAndBindParams(Cell* params, Cell* args, Cell* scope, Cell* newScope
       bindParamAliases(cdr(params), val, args, newScope, 0);
       rmref(val);
     } else {
-      bindParamAliases(cdr(params), nil, args, newScope, 0);
+      bindParamAliases(cdr(params), args, args, newScope, 0);
     }
     return;
   }
@@ -130,7 +130,7 @@ void evalArgsAndBindParams(Cell* params, Cell* args, Cell* scope, Cell* newScope
 
 bool allQuoted(Cell* l) {
   for (; l != nil; l=cdr(l))
-    if (!isQuoted(car(l)))
+    if (!isQuoted(car(l)) && (!isCons(car(l)) || !allQuoted(car(l))))
       return false;
   return true;
 }
