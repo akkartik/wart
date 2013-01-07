@@ -10,7 +10,9 @@ let $mac mac
 
 mac (def (name ... params) ... body) :case (car.body = :case)
   `(let $old ,name
-     (def! (,name ... ($params | ,params))
-       (if ,cadr.body
-         (do ,@cddr.body)
-         ($old @$params))))
+     # keep $params uneval'd in case any params are quoted
+     (def! (,name ... ('$params | ,params))
+       (let $caller_scope caller_scope
+         (if ,cadr.body
+           (do ,@cddr.body)
+           (eval `(,$old ,@$params) $caller_scope)))))
