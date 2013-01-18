@@ -1,0 +1,42 @@
+def (close f) :case (isa f infile)
+  close_infile.f
+
+def (close f) :case (isa f outfile)
+  close_outfile.f
+
+def (close f) :case (isa f socket)
+  close_socket.f
+
+mac2 (with :infile name ... body)
+  `(between (bind stdin (infile ,name)) :and (close&unbind stdin)
+     ,@body)
+
+mac2 (with :outfile name ... body)
+  `(between (bind stdout (outfile ,name)) :and (close&unbind stdout)
+     ,@body)
+
+mac2 (with :instring s ... body)
+  `(between (bind stdin (instring ,s)) :and (close&unbind stdin)
+     ,@body)
+
+mac2 (with :outstring ... body)
+  `(between (bind stdout (outstring)) :and (close&unbind stdout)
+     ,@body
+     outstring_buffer.stdout)
+
+mac2 (with :stdin fd ... body)
+  `(between (bind stdin ,fd) :and (close&unbind stdin)
+     ,@body)
+
+mac2 (with :stdout fd ... body)
+  `(between (bind stdout ,fd) :and (close&unbind stdout)
+     ,@body)
+
+def (ern ... args)
+  (with stdout stderr
+    (prn @args))
+
+def (infile fd) :case num?.fd
+  infd.fd
+def (outfile fd) :case num?.fd
+  outfd.fd

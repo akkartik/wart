@@ -1,0 +1,65 @@
+defcall string (s idx ... ends)
+  withs (idx (range_start s idx)
+         end (if
+               no.ends
+                 (+ idx 1)
+               ~car.ends
+                 len.s
+               :else
+                 (range_bounce s car.ends)))
+    (string_range s idx end)
+
+defset string ((s idx ... ends) val)
+  `(withs ($idx (range_start ,s ,idx)
+           $end ,(if2 no.ends
+                   `(+ $idx 1)
+                   `(if2 (not ,car.ends)
+                      (len ,s)
+                      (range_bounce ,s ,car.ends))))
+      (string_splice ,s $idx $end (or ,val "")))
+
+defcoerce string symbol
+  string_to_sym
+
+def (string ... args)
+  making stdout (outstring)
+    each arg args
+      if2 arg
+        pr.arg
+    outstring_buffer.stdout
+
+defcoerce symbol string
+  string
+
+def (join head ... tail) :case (or string?.head sym?.head)
+  (string head @tail)
+
+def (+ head ... tail) :case (or string?.head sym?.head)
+  (string head @tail)
+
+def (empty? s) :case string?.s
+  (s = "")
+
+defcoerce string list
+  string_to_list
+
+defcoerce list string
+  (fn(_)
+    (string @_))
+
+defcoerce nil string
+  (fn() "")
+
+def (a < b) :case string?.a
+  (string_lesser a b)
+
+def (digit? c)
+  (and string?.c
+       (len.c = 1)
+       ("0" <= c <= "9"))
+
+def (letter? c)
+  (and string?.c
+       (len.c = 1)
+       (or ("A" <= c <= "Z")
+           ("a" <= c <= "z")))
