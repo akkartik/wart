@@ -392,6 +392,25 @@ void test_evalArgsAndBindParams_evals_aliases_only_when_necessary2() {
   rmref(params);
 }
 
+void test_evalArgsAndBindParams_evals_aliases_only_when_necessary3() {
+  Cell* params = read("(| 'a ('b c))");
+  Cell* args = read("(x y)");
+  Cell* scope = newTable();
+  unsafeSet(scope, "y", newNum(3), false);
+  Cell* newScope = newTable();
+  evalArgsAndBindParams(params, args, scope, newScope);
+  checkEq(raiseCount, 0);
+  checkEq(car(unsafeGet(newScope, "a")), newSym("x"));
+  checkEq(car(cdr(unsafeGet(newScope, "a"))), newSym("y"));
+  checkEq(cdr(cdr(unsafeGet(newScope, "a"))), nil);
+  checkEq(unsafeGet(newScope, "b"), newSym("x"));
+  checkEq(unsafeGet(newScope, "c"), newNum(3));
+  rmref(newScope);
+  rmref(scope);
+  rmref(args);
+  rmref(params);
+}
+
 void test_evalArgsAndBindParams_warns_on_unary_as() {
   Cell* params = read("(| a)");
   Cell* args = read("(1 2)");
