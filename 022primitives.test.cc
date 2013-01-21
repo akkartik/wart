@@ -1,28 +1,3 @@
-void test_eval_handles_eval() {
-  newDynamicScope("a", newNum(34));
-  newDynamicScope("x", newSym("a"));
-  Cell* call = read("(eval x)");
-  Cell* result = eval(call);
-  checkEq(result, newNum(34));
-  rmref(result);
-  rmref(call);
-  endDynamicScope("x");
-  endDynamicScope("a");
-}
-
-void test_eval_handles_nil_scope() {
-  newLexicalScope();
-  addLexicalBinding("x", newNum(34));
-  addLexicalBinding("caller_scope", nil);
-  Cell* call = read("(eval 'x caller_scope)");
-  Cell* result = eval(call);
-  checkEq(result, nil);
-  checkEq(raiseCount, 1);   raiseCount=0;
-  rmref(result);
-  rmref(call);
-  endLexicalScope();
-}
-
 void test_if_sees_args_in_then_and_else() {
   Cell* fn = read("(fn(x) (if 34 x))");
   Cell* f = eval(fn);
@@ -128,7 +103,7 @@ void test_bound_works() {
   rmref(call);
 }
 
-void test_equality_handls_nil() {
+void test_equal_handles_nil() {
   Cell* call = read("(nil = nil)");
   Cell* result = eval(call);
   check(result);
@@ -137,7 +112,7 @@ void test_equality_handls_nil() {
   rmref(call);
 }
 
-void test_equality_handles_floats() {
+void test_equal_handles_floats() {
   Cell* call = read("((/ 3.0 2) = 1.5)");
   Cell* result = eval(call);
   check(result);
@@ -146,9 +121,36 @@ void test_equality_handles_floats() {
   rmref(call);
 }
 
-void test_equality_handles_float_vs_nil() {
+void test_equal_handles_float_vs_nil() {
   Cell* call = read("(nil = 1.5)");
   eval(call);
   checkEq(raiseCount, 0);
   rmref(call);
+}
+
+
+
+void test_eval_handles_eval() {
+  newDynamicScope("a", newNum(34));
+  newDynamicScope("x", newSym("a"));
+  Cell* call = read("(eval x)");
+  Cell* result = eval(call);
+  checkEq(result, newNum(34));
+  rmref(result);
+  rmref(call);
+  endDynamicScope("x");
+  endDynamicScope("a");
+}
+
+void test_eval_handles_nil_scope() {
+  newLexicalScope();
+  addLexicalBinding("x", newNum(34));
+  addLexicalBinding("caller_scope", nil);
+  Cell* call = read("(eval 'x caller_scope)");
+  Cell* result = eval(call);
+  checkEq(result, nil);
+  checkEq(raiseCount, 1);   raiseCount=0;
+  rmref(result);
+  rmref(call);
+  endLexicalScope();
 }
