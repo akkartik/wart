@@ -120,8 +120,31 @@ void evalArgsAndBindParams(Cell* params, Cell* args, Cell* scope, Cell* newScope
   evalArgsAndBindParams(cdr(params), cdr(args), scope, newScope);
 }
 
+// applies only to outermost level, not nested destructurings
 bool shouldEval(Cell* param) {
   if (isQuoted(param)) return false;
+  if (!isCons(param)) return true;
+  if (car(param) != sym_param_alias) return true;
+  for (param=cdr(param); param != nil; param=cdr(param)) {
+    if (shouldEval(param))
+    if (isQuoted(car(param)))
+      continue;
+    if (isCons(car(param)) && car(car(param)) == sym_param_alias)
+      if (allQuoted(cdr(car(param))))
+        continue;
+    if (isCons(car(param)))
+      // recurse exactly one level of destructured params
+      if (allQuoted(car(param)))
+        continue;
+    return true;
+  }
+  return false;
+}
+
+bool allQuoted(Cell* s) {
+  for (; s != nil; s=cdr(s))
+    if (!isQuoted(car(s)))
+      return false;
   return true;
 }
 
