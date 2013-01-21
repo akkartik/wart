@@ -6,9 +6,9 @@ void test_spliceArgs_works() {
   Cell* fn = eval(f);
   Cell* splicedArgs = spliceArgs(args, nil, fn);
   checkEq(car(splicedArgs), newSym("a"));
-  checkEq(car(car(cdr(splicedArgs))), newSym("''"));
+  checkEq(car(car(cdr(splicedArgs))), sym_alreadyEvald);
   checkEq(cdr(car(cdr(splicedArgs))), newNum(4));
-  checkEq(car(car(cdr(cdr(splicedArgs)))), newSym("''"));
+  checkEq(car(car(cdr(cdr(splicedArgs)))), sym_alreadyEvald);
   checkEq(cdr(car(cdr(cdr(splicedArgs)))), newNum(5));
   checkEq(car(cdr(cdr(cdr(splicedArgs)))), newSym("a"));
   checkEq(cdr(cdr(cdr(cdr(splicedArgs)))), nil);
@@ -46,7 +46,7 @@ void test_spliceArgs_works_with_keywords() {
   Cell* fn = eval(f);
   Cell* splicedArgs = spliceArgs(args, nil, fn);
   checkEq(car(splicedArgs), newSym("a"));
-  checkEq(car(car(cdr(splicedArgs))), newSym("''"));
+  checkEq(car(car(cdr(splicedArgs))), sym_alreadyEvald);
   checkEq(cdr(car(cdr(splicedArgs))), newNum(4));
   checkEq(car(cdr(cdr(splicedArgs))), newSym(":x"));
   checkEq(car(cdr(cdr(cdr(splicedArgs)))), newSym("a"));
@@ -61,7 +61,7 @@ void test_spliceArgs_works_with_keywords() {
 
 void test_reorderKeywordArgs_keeps_nil_rest_args() {
   checkEq(reorderKeywordArgs(nil, newSym("a")), nil);
-  Cell* params = newCons(newSym("'"), newSym("a"));
+  Cell* params = newCons(sym_quote, newSym("a"));
   checkEq(reorderKeywordArgs(nil, params), nil);
   rmref(params);
 }
