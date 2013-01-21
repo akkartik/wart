@@ -1,3 +1,19 @@
+void test_fn_works() {
+  Cell* fn = read("(fn(x) x)");
+  Cell* result = eval(fn);
+  check(isObject(result));
+  checkEq(type(result), sym_function);
+  Cell* t = rep(result);
+  checkEq(car(get(t, sym_sig)), newSym("x"));
+  checkEq(cdr(get(t, sym_sig)), nil);
+  checkEq(car(get(t, sym_body)), newSym("x"));
+  checkEq(cdr(get(t, sym_body)), nil);
+  rmref(result);
+  rmref(fn);
+}
+
+
+
 void test_if_sees_args_in_then_and_else() {
   Cell* fn = read("(fn(x) (if 34 x))");
   Cell* f = eval(fn);
