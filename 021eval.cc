@@ -369,7 +369,7 @@ stack<bool> inMacro;
 // keep sync'd with mac
 bool isMacro(Cell* fn) {
   if (!isObject(fn)) return false;
-  if (get(rep(fn), sym_all_quoted) == nil) return false;
+  if (!isQuoted(sig(fn))) return false;
   Cell* forms = body(fn);
   if (cdr(forms) != nil) return false;
   Cell* form = car(forms);

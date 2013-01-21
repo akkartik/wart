@@ -255,7 +255,7 @@ void teardownCells() {
 Cell *sym_quote, *sym_backquote, *sym_unquote, *sym_splice, *sym_unquoteSplice, *sym_alreadyEvald;
 Cell *sym_list, *sym_number, *sym_symbol, *sym_string, *sym_table, *sym_List;
 Cell *sym_object, *sym_Coercions;
-Cell *sym_function, *sym_name, *sym_sig, *sym_body, *sym_optimized_body, *sym_env, *sym_compiled, *sym_param_alias, *sym_all_quoted;
+Cell *sym_function, *sym_name, *sym_sig, *sym_body, *sym_optimized_body, *sym_env, *sym_compiled, *sym_param_alias;
 Cell *sym_eval, *sym_caller_scope;
 void setupCommonSyms() {
   sym_quote = newSym("'");
@@ -283,7 +283,6 @@ void setupCommonSyms() {
   sym_env = newSym("env");
   sym_compiled = newSym("compiled");
   sym_param_alias = newSym("|");
-  sym_all_quoted = newSym("all_quoted");
 
   sym_eval = newSym("eval");
   sym_caller_scope = newSym("caller_scope");
