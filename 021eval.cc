@@ -93,7 +93,7 @@ Cell* eval(Cell* expr, Cell* scope) {
 void evalArgsAndBindParams(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
   if (params == nil) return;
   if (isQuoted(params)) {
-    bindParams(params, args, args, newScope, 0);
+    bindParams(params, nil, args, newScope, 0);
     return;
   }
 
@@ -143,23 +143,21 @@ Cell* evalArg(Cell* arg, Cell* param, Cell* scope) {
 void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, Cell* scope, int level) {
   if (isQuoted(params) && level > 1)
     RAISE << "quoted params are not meaningful inside destructured lists\n";
+  Cell* val = isQuoted(params) ? unevaldArgs : args;
   params = stripQuote(params);
   if (params == nil) return;
 
   if (isCons(params) && car(params) == sym_param_alias) {
-    bindParamAliases(cdr(params), args, unevaldArgs, scope, level);
+    bindParamAliases(cdr(params), val, unevaldArgs, scope, level);
     return;
   }
 
-  Cell* orderedArgs = reorderKeywordArgs(args, params);
+  Cell* orderedArgs = reorderKeywordArgs(val, params);
   if (isSym(params)) {
     addLexicalBinding(params, orderedArgs, scope);
   }
   else {
-    if (isQuoted(car(params)))
-      bindParams(car(params), isSym(unevaldArgs) ? unevaldArgs : car(unevaldArgs), isSym(unevaldArgs) ? unevaldArgs : car(unevaldArgs), scope, level+1);
-    else
-      bindParams(car(params), car(orderedArgs), isSym(unevaldArgs) ? unevaldArgs : car(unevaldArgs), scope, level+1);
+    bindParams(car(params), car(orderedArgs), isSym(unevaldArgs) ? unevaldArgs : car(unevaldArgs), scope, level+1);
     bindParams(cdr(params), cdr(orderedArgs), cdr(unevaldArgs), scope, level);
   }
   rmref(orderedArgs);
@@ -171,7 +169,7 @@ void bindParamAliases(Cell* aliases, Cell* arg, Cell* unevaldArg, Cell* scope, i
   for (; aliases != nil; aliases=cdr(aliases)) {
     // bind matching aliases to the arg
     if (isQuoted(car(aliases)))
-      bindParams(car(aliases), unevaldArg, unevaldArg, scope, level);
+      bindParams(car(aliases), arg, unevaldArg, scope, level);
     else if (isSym(car(aliases))   // sym with anything
         || car(car(aliases)) == sym_param_alias   // alias list with anything
         || isCons(arg))   // anything (destructured list) with cons
