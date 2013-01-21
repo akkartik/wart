@@ -1,10 +1,11 @@
 void test_spliceArgs_works() {
   newDynamicScope("a", newNum(3));
-  newDynamicScope("b", newCons(newNum(4), newCons(newNum(5))));
+  newDynamicScope("b", newCons(newNum(4), newCons(newNum(5))));   // (4 5)
   Cell* args = read("(a @b a)");
   Cell* f = read("(fn nil 3)");
   Cell* fn = eval(f);
   Cell* splicedArgs = spliceArgs(args, nil, fn);
+  // (a ''4 ''5 a)
   checkEq(car(splicedArgs), newSym("a"));
   checkEq(car(car(cdr(splicedArgs))), sym_alreadyEvald);
   checkEq(cdr(car(cdr(splicedArgs))), newNum(4));
@@ -27,6 +28,7 @@ void test_spliceArgs_works_with_nil() {
   Cell* f = read("(fn nil 3)");
   Cell* fn = eval(f);
   Cell* splicedArgs = spliceArgs(args, nil, fn);
+  // (a a)
   checkEq(car(splicedArgs), newSym("a"));
   checkEq(car(cdr(splicedArgs)), newSym("a"));
   checkEq(cdr(cdr(splicedArgs)), nil);
@@ -40,11 +42,12 @@ void test_spliceArgs_works_with_nil() {
 
 void test_spliceArgs_works_with_keywords() {
   newDynamicScope("a", newNum(3));
-  newDynamicScope("b", newCons(newNum(4), newCons(newSym(":x"))));
+  newDynamicScope("b", newCons(newNum(4), newCons(newSym(":x"))));  // (4 :x)
   Cell* args = read("(a @b a)");
   Cell* f = read("(fn nil 3)");
   Cell* fn = eval(f);
   Cell* splicedArgs = spliceArgs(args, nil, fn);
+  // (a ''4 :x a)
   checkEq(car(splicedArgs), newSym("a"));
   checkEq(car(car(cdr(splicedArgs))), sym_alreadyEvald);
   checkEq(cdr(car(cdr(splicedArgs))), newNum(4));
@@ -70,6 +73,7 @@ void test_reorderKeywordArgs_handles_improper_lists() {
   Cell* args = newCons(newNum(3), newNum(4));
   Cell* params = newCons(newSym("a"), newSym("b"));
   Cell* orderedArgs = reorderKeywordArgs(args, params);
+  // args == orderedArgs
   checkEq(car(orderedArgs), car(args));
   checkEq(cdr(orderedArgs), cdr(args));
   rmref(orderedArgs);
@@ -78,9 +82,10 @@ void test_reorderKeywordArgs_handles_improper_lists() {
 }
 
 void test_reorderKeywordArgs_handles_overlong_lists() {
-  Cell* args = newCons(newNum(3), newCons(newNum(4), newCons(newNum(5))));
-  Cell* params = newCons(newSym("a"), newCons(newSym("b")));
+  Cell* args = newCons(newNum(3), newCons(newNum(4), newCons(newNum(5))));  // (3 4 5)
+  Cell* params = newCons(newSym("a"), newCons(newSym("b")));  // (a b)
   Cell* orderedArgs = reorderKeywordArgs(args, params);
+  // args == orderedArgs
   checkEq(car(orderedArgs), car(args));
   checkEq(car(cdr(orderedArgs)), car(cdr(args)));
   checkEq(car(cdr(cdr(orderedArgs))), car(cdr(cdr(args))));
@@ -133,7 +138,7 @@ void test_evalArgsAndBindParams_handles_quoted_param() {
 
 void test_evalArgsAndBindParams_handles_alreadyEvald_arg() {
   Cell* params = read("(x)");
-  Cell* args = newCons(tagAlreadyEvald(newSym("a")));
+  Cell* args = newCons(tagAlreadyEvald(newSym("a")));   // (''a)
   Cell* scope = newTable();
   set(scope, "a", newNum(3));
   Cell* newScope = newTable();
@@ -149,7 +154,7 @@ void test_evalArgsAndBindParams_handles_alreadyEvald_arg() {
 
 void test_evalArgsAndBindParams_handles_multiply_alreadyEvald_arg() {
   Cell* params = read("(x)");
-  Cell* args = newCons(tagAlreadyEvald(tagAlreadyEvald(newSym("a"))));
+  Cell* args = newCons(tagAlreadyEvald(tagAlreadyEvald(newSym("a"))));  // (''''a)
   Cell* scope = newTable();
   set(scope, "a", newNum(3));
   Cell* newScope = newTable();
@@ -187,6 +192,7 @@ void test_evalArgsAndBindParams_handles_varargs_param() {
   set(scope, "b", newNum(4));
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, scope, newScope);
+  // {x: (3 4)}
   checkEq(car(unsafeGet(newScope, "x")), newNum(3));
   checkEq(car(cdr(unsafeGet(newScope, "x"))), newNum(4));
   checkEq(cdr(cdr(unsafeGet(newScope, "x"))), nil);
@@ -204,6 +210,7 @@ void test_evalArgsAndBindParams_handles_quoted_varargs_param() {
   set(scope, "b", newNum(4));
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, scope, newScope);
+  // {x: (a b)}
   checkEq(car(unsafeGet(newScope, "x")), newSym("a"));
   checkEq(car(cdr(unsafeGet(newScope, "x"))), newSym("b"));
   checkEq(cdr(cdr(unsafeGet(newScope, "x"))), nil);
@@ -221,6 +228,7 @@ void test_evalArgsAndBindParams_handles_rest_param() {
   set(scope, "b", newNum(4));
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, scope, newScope);
+  // {x: 3, y: (4)}
   checkEq(unsafeGet(newScope, "x"), newNum(3));
   checkEq(car(unsafeGet(newScope, "y")), newNum(4));
   checkEq(cdr(unsafeGet(newScope, "y")), nil);
@@ -238,6 +246,7 @@ void test_evalArgsAndBindParams_handles_quoted_rest_param() {
   set(scope, "b", newNum(4));
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, scope, newScope);
+  // {x: 3, y: (b)}
   checkEq(unsafeGet(newScope, "x"), newNum(3));
   checkEq(car(unsafeGet(newScope, "y")), newSym("b"));
   checkEq(cdr(unsafeGet(newScope, "y")), nil);
@@ -255,6 +264,7 @@ void test_evalArgsAndBindParams_handles_destructured_params() {
   unsafeSet(scope, "y", newNum(4), false);
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, scope, newScope);
+  // {a: 3, b: 4}
   checkEq(unsafeGet(newScope, "a"), newNum(3));
   checkEq(unsafeGet(newScope, "b"), newNum(4));
   rmref(newScope);
@@ -279,6 +289,7 @@ void test_evalArgsAndBindParams_handles_param_aliases() {
   Cell* args = read("(3)");
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, nil, newScope);
+  // {a: 3, b: 3}
   checkEq(unsafeGet(newScope, "a"), newNum(3));
   checkEq(unsafeGet(newScope, "b"), newNum(3));
   rmref(newScope);
@@ -291,6 +302,7 @@ void test_evalArgsAndBindParams_binds_as_params() {
   Cell* args = read("(1 2)");
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, nil, newScope);
+  // {a: (1 2), b: 1, c: 2}
   checkEq(car(unsafeGet(newScope, "a")), newNum(1));
   checkEq(car(cdr(unsafeGet(newScope, "a"))), newNum(2));
   checkEq(cdr(cdr(unsafeGet(newScope, "a"))), nil);
@@ -306,6 +318,7 @@ void test_evalArgsAndBindParams_binds_as_params_recursively() {
   Cell* args = read("(1 2 3)");
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, nil, newScope);
+  // {a: (1 2 3), b: 1, c: (2 3), d: 2, e: 3}
   checkEq(car(unsafeGet(newScope, "a")), newNum(1));
   checkEq(car(cdr(unsafeGet(newScope, "a"))), newNum(2));
   checkEq(car(cdr(cdr(unsafeGet(newScope, "a")))), newNum(3));
@@ -328,6 +341,7 @@ void test_evalArgsAndBindParams_handles_quoted_param_aliases() {
   unsafeSet(scope, "x", newNum(3), false);
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, scope, newScope);
+  // {a: 3, b: x}
   checkEq(unsafeGet(newScope, "a"), newNum(3));
   checkEq(unsafeGet(newScope, "b"), newSym("x"));
   rmref(newScope);
@@ -343,6 +357,7 @@ void test_evalArgsAndBindParams_handles_quoted_rest_param_aliases() {
   unsafeSet(scope, "x", newNum(3), false);
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, scope, newScope);
+  // {a: (3), b: (x)}
   checkEq(car(unsafeGet(newScope, "a")), newNum(3));
   checkEq(car(unsafeGet(newScope, "b")), newSym("x"));
   rmref(newScope);
@@ -358,6 +373,7 @@ void test_evalArgsAndBindParams_handles_quoted_destructured_rest_param_aliases()
   unsafeSet(scope, "x", newNum(3), false);
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, scope, newScope);
+  // {a: (3), b: x}
   checkEq(car(unsafeGet(newScope, "a")), newNum(3));
   checkEq(unsafeGet(newScope, "b"), newSym("x"));
   rmref(newScope);
@@ -372,6 +388,7 @@ void test_evalArgsAndBindParams_evals_aliases_only_when_necessary() {
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, nil, newScope);
   checkEq(raiseCount, 0);
+  // {a: x, b: x}
   checkEq(unsafeGet(newScope, "a"), newSym("x"));
   checkEq(unsafeGet(newScope, "b"), newSym("x"));
   rmref(newScope);
@@ -385,6 +402,7 @@ void test_evalArgsAndBindParams_evals_aliases_only_when_necessary2() {
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, nil, newScope);
   checkEq(raiseCount, 0);
+  // {a: (x), b: x}
   checkEq(car(unsafeGet(newScope, "a")), newSym("x"));
   checkEq(unsafeGet(newScope, "b"), newSym("x"));
   rmref(newScope);
@@ -400,6 +418,7 @@ void test_evalArgsAndBindParams_evals_aliases_only_when_necessary3() {
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, scope, newScope);
   checkEq(raiseCount, 0);
+  // {a: (x y), b: x, c: 3}
   checkEq(car(unsafeGet(newScope, "a")), newSym("x"));
   checkEq(car(cdr(unsafeGet(newScope, "a"))), newSym("y"));
   checkEq(cdr(cdr(unsafeGet(newScope, "a"))), nil);
@@ -419,6 +438,7 @@ void test_evalArgsAndBindParams_evals_aliases_only_when_necessary4() {
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, scope, newScope);
   checkEq(raiseCount, 0);
+  // {a: x, b: x, c: 3}
   checkEq(unsafeGet(newScope, "a"), newSym("x"));
   checkEq(unsafeGet(newScope, "b"), newSym("x"));
   checkEq(unsafeGet(newScope, "c"), newNum(3));
@@ -434,6 +454,7 @@ void test_evalArgsAndBindParams_evals_aliases_only_when_necessary5() {
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, nil, newScope);
   checkEq(raiseCount, 0);
+  // {a: x, b: x, c: x}
   checkEq(unsafeGet(newScope, "a"), newSym("x"));
   checkEq(unsafeGet(newScope, "b"), newSym("x"));
   checkEq(unsafeGet(newScope, "c"), newSym("x"));
@@ -459,6 +480,7 @@ void test_evalArgsAndBindParams_binds_missing_as_params_to_nil() {
   Cell* newScope = newTable();
   evalArgsAndBindParams(params, args, nil, newScope);
   checkEq(raiseCount, 0);
+  // {a: x}
   checkEq(unsafeGet(newScope, "a"), newNum(1));
   checkEq(unsafeGet(newScope, "b"), nil);
   checkEq(unsafeGet(newScope, "c"), nil);
@@ -478,6 +500,7 @@ void test_processUnquotes_handles_unquote() {
   Cell* expr = read("(,a)");
   Cell* result = processUnquotes(expr, 1);
   check(isCons(result));
+  // (3)
   checkEq(car(result), newNum(3));
   checkEq(cdr(result), nil);
   rmref(result);
@@ -490,6 +513,7 @@ void test_processUnquotes_handles_unquote_splice() {
   Cell* expr = read("(,@a)");
   Cell* result = processUnquotes(expr, 1);
   check(isCons(result));
+  // (3)
   checkEq(car(result), newNum(3));
   checkEq(cdr(result), nil);
   rmref(result);
@@ -502,6 +526,7 @@ void test_processUnquotes_handles_unquote_splice_and_unquote() {
   newDynamicScope("b", newCons(newNum(4)));
   Cell* expr = read("(,@a ,b)");
   Cell* result = processUnquotes(expr, 1);
+  // (3 (4))
   check(isCons(result));
   checkEq(car(result), newNum(3));
   check(isCons(car(cdr(result))));
@@ -616,6 +641,7 @@ void test_eval_handles_quoted_atoms() {
 void test_eval_handles_quoted_lists() {
   Cell* expr = read("'(a b)");
   Cell* result = eval(expr);
+  // (a b)
   checkEq(car(result), newSym("a"));
   checkEq(car(cdr(result)), newSym("b"));
   checkEq(cdr(cdr(result)), nil);
@@ -626,6 +652,7 @@ void test_eval_handles_quoted_lists() {
 void test_eval_handles_backquoted_lists() {
   Cell* expr = read("`(a b)");
   Cell* result = eval(expr);
+  // (a b)
   checkEq(car(result), newSym("a"));
   checkEq(car(cdr(result)), newSym("b"));
   checkEq(cdr(cdr(result)), nil);
@@ -637,6 +664,7 @@ void test_eval_handles_unquote() {
   Cell* expr = read("`(a ,b)");
   newDynamicScope("b", newNum(34));
   Cell* result = eval(expr);
+  // (a 34)
   checkEq(car(result), newSym("a"));
   checkEq(car(cdr(result)), newNum(34));
   checkEq(cdr(cdr(result)), nil);
@@ -650,6 +678,7 @@ void test_eval_handles_unquote_splice() {
   Cell* val = read("(34 35)");
   newDynamicScope("b", val);
   Cell* result = eval(expr);
+  // (a 34 35)
   checkEq(car(result), newSym("a"));
   checkEq(car(cdr(result)), newNum(34));
   checkEq(car(cdr(cdr(result))), newNum(35));
@@ -665,6 +694,7 @@ void test_eval_handles_unquote_splice_of_nil() {
   newDynamicScope("b", nil);
   Cell* result = eval(expr);
   checkEq(cdr(nil), nil);
+  // (a 3)
   checkEq(car(result), newSym("a"));
   checkEq(car(cdr(result)), newNum(3));
   checkEq(cdr(cdr(result)), nil);
@@ -677,6 +707,7 @@ void test_eval_quotes_quote_comma() {
   Cell* expr = read("`(a ',b)");
   newDynamicScope("b", newSym("x"));
   Cell* result = eval(expr);
+  // (a 'x)
   checkEq(car(result), newSym("a"));
   check(isCons(car(cdr(result))));
   checkEq(car(car(cdr(result))), newSym("'"));
@@ -691,6 +722,7 @@ void test_eval_evals_comma_quote() {
   Cell* expr = read("`(a ,'b)");
   newDynamicScope("b", newSym("x"));
   Cell* result = eval(expr);
+  // (a b)
   checkEq(car(result), newSym("a"));
   checkEq(car(cdr(result)), newSym("b"));
   checkEq(cdr(cdr(result)), nil);
@@ -702,8 +734,9 @@ void test_eval_evals_comma_quote() {
 void test_eval_handles_nested_quotes() {
   Cell* expr = read("`(,a `(,a ,,a ,,@b))");
   newDynamicScope("a", newSym("x"));
-  newDynamicScope("b", newCons(newSym("x"), newCons(newSym("y"), nil)));
+  newDynamicScope("b", newCons(newSym("x"), newCons(newSym("y"))));  // (x y)
   Cell* result = eval(expr);
+  // (x `(,a x x y))
   checkEq(car(result), newSym("x"));
   Cell* nestedExpr = car(cdr(result));
   check(isCons(nestedExpr));
@@ -739,6 +772,7 @@ void test_eval_handles_rest_params() {
   Cell* result = eval(call);
   check(isCons(result));
   check(isNum(car(result)));
+  // (3 4 5)
   checkEq(toInt(car(result)), 3);
   check(isNum(car(cdr(result))));
   checkEq(toInt(car(cdr(result))), 4);
@@ -753,6 +787,7 @@ void test_eval_handles_splice() {
   Cell* val = read("(3 4)");
   newDynamicScope("b", val);
   Cell* result = eval(expr);
+  // (3 ... 4)
   check(isCons(result));
   checkEq(car(result), newNum(3));
   checkEq(cdr(result), newNum(4));
@@ -768,6 +803,7 @@ void test_eval_handles_splice2() {
   newDynamicScope("f", def);
   Cell* call1 = read("(f 1 2)");
   Cell* result = eval(call1);
+  // (1 ... 2)
   check(isCons(result));
   checkEq(car(result), newNum(1));
   checkEq(cdr(result), newNum(2));
@@ -775,6 +811,7 @@ void test_eval_handles_splice2() {
 
   Cell* call2 = read("(f 3 4)");
   result = eval(call2);
+  // (3 ... 4)
   check(isCons(result));
   checkEq(car(result), newNum(3));
   checkEq(cdr(result), newNum(4));
@@ -797,6 +834,7 @@ void test_eval_handles_splice3() {
   newDynamicScope("args", argval);
   Cell* call = read("(f @args)");
   Cell* result = eval(call);
+  // (a ... b)
   check(isCons(result));
   checkEq(car(result), newSym("a"));
   checkEq(cdr(result), newSym("b"));
@@ -821,6 +859,7 @@ void test_eval_handles_splice4() {
   newDynamicScope("args", argval);
   Cell* call = read("(f a @args)");
   Cell* result = eval(call);
+  // (a ... b)
   check(isCons(result));
   checkEq(car(result), newSym("a"));
   checkEq(cdr(result), newSym("b"));
@@ -845,6 +884,7 @@ void test_eval_handles_splice5() {
   newDynamicScope("args", argval);
   Cell* call = read("(f a @args)");
   Cell* result = eval(call);
+  // (3 ... b)
   check(isCons(result));
   checkEq(car(result), newNum(3));
   checkEq(cdr(result), newSym("b"));
@@ -869,6 +909,7 @@ void test_eval_handles_splice6() {
   newDynamicScope("args", argval);
   Cell* call = read("(f @args)");
   Cell* result = eval(call);
+  // (a ... b)
   check(isCons(result));
   checkEq(car(result), newSym("a"));
   checkEq(cdr(result), newSym("b"));
@@ -1002,6 +1043,7 @@ void test_eval_doesnt_modify_fn4() {
 void test_eval_handles_simple_fn() {
   Cell* expr = read("(fn () 34)");
   Cell* fn = eval(expr);
+  // (object function {sig: nil, body: (34), env: nil})
   checkEq(type(fn), newSym("function"));
   checkEq(sig(fn), nil);
   check(isCons(body(fn)));
@@ -1015,6 +1057,7 @@ void test_eval_on_fn_is_idempotent() {
   Cell* expr = read("(fn () 34)");
   Cell* fn = eval(expr);
   Cell* fn2 = eval(fn);
+  // fn == fn2
   checkEq(type(fn2), newSym("function"));
   checkEq(sig(fn2), nil);
   check(isCons(body(fn2)));
@@ -1034,6 +1077,7 @@ void test_eval_handles_closure() {
     checkEq(newLexicalScope->nrefs, 2);
   endLexicalScope();
   checkEq(newLexicalScope->nrefs, 1);
+  // (object function {sig: nil, body: (34), env: {}})
   checkEq(type(result), newSym("function"));
   checkEq(sig(result), nil);
   checkEq(car(body(result)), newNum(34));
@@ -1288,6 +1332,7 @@ void test_eval_handles_rest_keyword_arg_at_end() {
   newDynamicScope("f", f);
   Cell* call = read("(f 2 :b 1 3)");
   Cell* result = eval(call);
+  // (1 3)
   checkEq(car(result), newNum(1));
   checkEq(car(cdr(result)), newNum(3));
   checkEq(cdr(cdr(result)), nil);
@@ -1304,6 +1349,7 @@ void test_eval_handles_rest_keyword_arg_at_end2() {
   newDynamicScope("f", f);
   Cell* call = read("(f :b 1 2 3)");
   Cell* result = eval(call);
+  // (1 2 3)
   checkEq(car(result), newNum(1));
   checkEq(car(cdr(result)), newNum(2));
   checkEq(car(cdr(cdr(result))), newNum(3));
@@ -1321,6 +1367,7 @@ void test_eval_handles_quoted_rest_keyword_arg() {
   newDynamicScope("f", f);
   Cell* call = read("(f :b 1 2 3)");
   Cell* result = eval(call);
+  // (1 2 3)
   checkEq(car(result), newNum(1));
   checkEq(car(cdr(result)), newNum(2));
   checkEq(car(cdr(cdr(result))), newNum(3));
@@ -1352,6 +1399,7 @@ void test_eval_handles_body_keyword_synonym() {
   newDynamicScope("f", f);
   Cell* call = read("(f 2 :do 1 3)");
   Cell* result = eval(call);
+  // (1 3)
   checkEq(car(result), newNum(1));
   checkEq(car(cdr(result)), newNum(3));
   checkEq(cdr(cdr(result)), nil);
@@ -1368,6 +1416,7 @@ void test_eval_handles_body_keyword_synonym2() {
   newDynamicScope("f", f);
   Cell* call = read("(f 2 :do 1 3)");
   Cell* result = eval(call);
+  // (2 nil (1 3))
   check(isCons(result));
   checkEq(car(result), newNum(2));
   checkEq(car(cdr(result)), nil);
