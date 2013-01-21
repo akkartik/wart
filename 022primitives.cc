@@ -11,6 +11,8 @@ COMPILE_FN(fn, compiledFn_fn, "'($params ... $body)",
   set(f, sym_sig, lookup("$params"));
   set(f, sym_body, lookup("$body"));
   set(f, sym_env, cdr(currLexicalScope));
+  if (isQuoted(lookup("$params")))
+    set(f, sym_all_quoted, newNum(1));
   return mkref(newObject("function", f));
 )
 

@@ -13,6 +13,14 @@ void test_fn_works() {
   rmref(fn);
 }
 
+void test_fn_sets_all_quoted() {
+  Cell* fn = read("(fn '((| x (y z))) x)");
+  Cell* result = eval(fn);
+  check(get(rep(result), sym_all_quoted) != nil);
+  rmref(result);
+  rmref(fn);
+}
+
 
 
 void test_if_sees_args_in_then_and_else() {
