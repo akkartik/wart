@@ -13,6 +13,79 @@ void test_fn_works() {
   rmref(fn);
 }
 
+void test_fn_distributes_quote_over_params() {
+  Cell* fn = read("(fn '(x) x)");
+  Cell* result = eval(fn);
+  Cell* sig = get(rep(result), sym_sig);
+  // ('x)
+  check(!isQuoted(sig));
+  check(isCons(sig));
+  check(isQuoted(car(sig)));
+  rmref(result);
+  rmref(fn);
+}
+
+void test_fn_distributes_quote_over_params2() {
+  Cell* fn = read("(fn '(x y) x)");
+  Cell* result = eval(fn);
+  Cell* sig = get(rep(result), sym_sig);
+  // ('x 'y)
+  check(!isQuoted(sig));
+  check(isCons(sig));
+  check(isQuoted(car(sig)));
+  checkEq(stripQuote(car(sig)), newSym("x"));
+  check(isQuoted(car(cdr(sig))));
+  checkEq(stripQuote(car(cdr(sig))), newSym("y"));
+  rmref(result);
+  rmref(fn);
+}
+
+void test_fn_distributes_quote_over_params3() {
+  Cell* fn = read("(fn '() x)");
+  Cell* result = eval(fn);
+  checkEq(get(rep(result), sym_sig), nil);
+  rmref(result);
+  rmref(fn);
+}
+
+void test_fn_distributes_quote_over_params4() {
+  Cell* fn = read("(fn '(| x y) x)");
+  Cell* result = eval(fn);
+  Cell* sig = get(rep(result), sym_sig);
+  // (| 'x 'y)
+  check(!isQuoted(sig));
+  checkEq(car(sig), sym_param_alias);
+  Cell* alts = cdr(sig);
+  check(isQuoted(car(alts)));
+  checkEq(stripQuote(car(alts)), newSym("x"));
+  check(isQuoted(car(cdr(alts))));
+  checkEq(stripQuote(car(cdr(alts))), newSym("y"));
+  rmref(result);
+  rmref(fn);
+}
+
+void test_fn_distributes_quote_over_params5() {
+  Cell* fn = read("(fn '((| x (y z))) x)");
+  Cell* result = eval(fn);
+  Cell* sig = get(rep(result), sym_sig);
+  // ((| 'x ('y 'z)))
+  check(!isQuoted(sig));
+  checkEq(cdr(sig), nil);
+  Cell* arg1 = car(sig);
+  checkEq(car(arg1), sym_param_alias);
+  Cell* alts = cdr(arg1);
+  check(isQuoted(car(alts)));
+  checkEq(stripQuote(car(alts)), newSym("x"));
+  Cell* alt2 = car(cdr(alts));
+  check(!isQuoted(alt2));
+  check(isQuoted(car(alt2)));
+  checkEq(stripQuote(car(alt2)), newSym("y"));
+  check(isQuoted(car(cdr(alt2))));
+  checkEq(stripQuote(car(cdr(alt2))), newSym("z"));
+  rmref(result);
+  rmref(fn);
+}
+
 void test_fn_sets_all_quoted() {
   Cell* fn = read("(fn '((| x (y z))) x)");
   Cell* result = eval(fn);
@@ -21,9 +94,26 @@ void test_fn_sets_all_quoted() {
   rmref(fn);
 }
 
+void test_fn_sets_all_quoted2() {
+  Cell* fn = read("(fn ((| 'x ('y 'z))) x)");
+  Cell* result = eval(fn);
+  check(get(rep(result), sym_all_quoted) != nil);
+  rmref(result);
+  rmref(fn);
+}
+
+void test_fn_sets_all_quoted3() {
+  Cell* fn = read("(fn ((| 'x ('y z))) x)");
+  Cell* result = eval(fn);
+  check(get(rep(result), sym_all_quoted) == nil);
+  rmref(result);
+  rmref(fn);
+}
+
 
 
 void test_if_sees_args_in_then_and_else() {
+  exit(0);
   Cell* fn = read("(fn(x) (if 34 x))");
   Cell* f = eval(fn);
   newDynamicScope("f", f);

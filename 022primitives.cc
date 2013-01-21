@@ -8,13 +8,50 @@
 
 COMPILE_FN(fn, compiledFn_fn, "'($params ... $body)",
   Cell* f = newTable();
-  set(f, sym_sig, lookup("$params"));
+  set(f, sym_sig, distributeQuotes(lookup("$params")));
   set(f, sym_body, lookup("$body"));
   set(f, sym_env, cdr(currLexicalScope));
-  if (isQuoted(lookup("$params")))
+  if (allQuoted2(lookup("$params")))
     set(f, sym_all_quoted, newNum(1));
   return mkref(newObject("function", f));
 )
+
+Cell* distributeQuotes(Cell* l) {
+  if (!isQuoted(l)) return l;
+  if (stripQuote(l) == nil) return nil;
+  if (!isCons(stripQuote(l))) return l;
+
+  Cell* pResult = newCell(), *curr = pResult;
+  for (l=stripQuote(l); l != nil; l=cdr(l), curr=cdr(curr)) {
+    if (car(l) == nil) {
+      addCons(curr, nil);
+      continue;
+    }
+
+    if (car(l) == sym_param_alias) {
+      Cell* temp = mkref(newCons(sym_quote, cdr(l)));
+      setCdr(curr, newCons(car(l), distributeQuotes(temp)));
+      rmref(temp);
+      break;
+    }
+
+    Cell* temp = mkref(newCons(sym_quote, car(l)));
+    addCons(curr, distributeQuotes(temp));
+    rmref(temp);
+  }
+  return dropPtr(pResult);
+}
+
+bool allQuoted2(Cell* sig) {
+  if (isQuoted(sig)) return true;
+  for (; sig != nil; sig=cdr(sig)) {
+    if (isQuoted(car(sig))) continue;
+    if (isCons(car(sig)) && (car(car(sig)) == sym_param_alias))
+      if (allQuoted(cdr(car(sig)))) continue;
+    return false;
+  }
+  return true;
+}
 
 COMPILE_FN(if, compiledFn_if, "($cond '$then '$else)",
   return lookup("$cond") != nil ? eval(lookup("$then")) : eval(lookup("$else"));
