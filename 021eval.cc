@@ -99,8 +99,10 @@ void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
   if (params == nil)
     ;
 
-  else if (isSym(stripQuote(params)))
-    evalBindRest(params, args, scope, newScope);
+  else if (isSym(stripQuote(params))) {
+    Cell* dummy = NULL;
+    evalBindRest(params, args, &dummy, scope, newScope);
+  }
 
   else if (!isCons(stripQuote(params)))
     ;
@@ -118,7 +120,7 @@ void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
   }
 }
 
-void evalBindRest(Cell* param, Cell* args, Cell* scope, Cell* newScope) {
+void evalBindRest(Cell* param, Cell* args, Cell** cachedVal, Cell* scope, Cell* newScope) {
   dbg << "evalbindrest: " << param << " " << args << endl;
   if (isQuoted(param))
     bindParams(stripQuote(param), args, NULL, newScope);
@@ -130,9 +132,9 @@ void evalBindRest(Cell* param, Cell* args, Cell* scope, Cell* newScope) {
     evalBindAll(param, args, scope, newScope);
 
   else {
-    Cell* val = evalAll(args, scope);
-    bindParams(param, val, args, newScope);
-    rmref(val);
+    *cachedVal = evalAll(args, scope);
+    bindParams(param, *cachedVal, args, newScope);
+    rmref(*cachedVal);
   }
 }
 
@@ -178,7 +180,7 @@ void evalBindRestAlias(Cell* alias, Cell* args, Cell** cachedVal, Cell* scope, C
     bindParams(alias, *cachedVal, args, newScope);
 
   else
-    evalBindRest(alias, args, scope, newScope); // TODO: multiple-eval
+    evalBindRest(alias, args, cachedVal, scope, newScope);
 }
 
 void evalBindAliases(Cell* params /* (| ...) */, Cell* arg, Cell* scope, Cell* newScope) {

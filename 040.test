@@ -83,3 +83,9 @@ err "wart tests: "
 (test "map works"
   :valueof (map (++) '(1 2 3))
   :should be '(2 3 4))
+
+
+
+(test "fn evals rest arg aliases only once"
+  :valueof (ret x 0 ((fn (| a b) a) ++x))
+  :should be 1)
