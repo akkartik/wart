@@ -273,17 +273,6 @@ void test_evalBindAll_handles_destructured_params() {
   rmref(params);
 }
 
-void test_evalBindAll_warns_on_inner_quoted_param() {
-  Cell* params = read("((x 'y))");
-  Cell* args = read("('(1 2))");
-  Cell* newScope = newTable();
-  evalBindAll(params, args, nil, newScope);
-  checkEq(raiseCount, 1);   raiseCount=0;
-  rmref(newScope);
-  rmref(args);
-  rmref(params);
-}
-
 void test_evalBindAll_handles_param_aliases() {
   Cell* params = read("(a|b)");
   Cell* args = read("(3)");
@@ -372,7 +361,6 @@ void test_evalBindAll_handles_quoted_destructured_rest_param_aliases0() {
   Cell* scope = newTable();
   unsafeSet(scope, "x", newNum(3), false);
   Cell* newScope = newTable();
-  debug = 1;
   evalBindAll(params, args, scope, newScope);
   // {a: (x), b: x}
   checkEq(car(unsafeGet(newScope, "a")), newSym("x"));
@@ -389,7 +377,6 @@ void test_evalBindAll_handles_quoted_destructured_rest_param_aliases() {
   Cell* scope = newTable();
   unsafeSet(scope, "x", newNum(3), false);
   Cell* newScope = newTable();
-  debug = 1;
   evalBindAll(params, args, scope, newScope);
   // {a: (3), b: x}
   checkEq(car(unsafeGet(newScope, "a")), newNum(3));
@@ -401,7 +388,6 @@ void test_evalBindAll_handles_quoted_destructured_rest_param_aliases() {
 }
 
 void test_evalBindAll_evals_aliases_only_when_necessary() {
-  exit(0);
   Cell* params = read("(('a | 'b))");
   Cell* args = read("(x)");
   Cell* newScope = newTable();
