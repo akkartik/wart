@@ -7,28 +7,28 @@ def (close f) :case (isa f outfile)
 def (close f) :case (isa f socket)
   close_socket.f
 
-mac (with 'infile name ... body)
+mac (with `infile name ... body)
   `(between (bind stdin (infile ,name)) :and (close&unbind stdin)
      ,@body)
 
-mac (with 'outfile name ... body)
+mac (with `outfile name ... body)
   `(between (bind stdout (outfile ,name)) :and (close&unbind stdout)
      ,@body)
 
-mac (with 'instring s ... body)
+mac (with `instring s ... body)
   `(between (bind stdin (instring ,s)) :and (close&unbind stdin)
      ,@body)
 
-mac (with 'outstring ... body)
+mac (with `outstring ... body)
   `(between (bind stdout (outstring)) :and (close&unbind stdout)
      ,@body
      outstring_buffer.stdout)
 
-mac (with 'stdin fd ... body)
+mac (with `stdin fd ... body)
   `(between (bind stdin ,fd) :and (close&unbind stdin)
      ,@body)
 
-mac (with 'stdout fd ... body)
+mac (with `stdout fd ... body)
   `(between (bind stdout ,fd) :and (close&unbind stdout)
      ,@body)
 

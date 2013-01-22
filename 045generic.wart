@@ -43,36 +43,35 @@ mac (def (name ... params) ... body) :case (and (car.body = :case)
 
 
 ## rudimentary pattern matching for symbol constants
-# should we get rid of the :case comparison and stop supporting quoted params
-# above?
 
-mac (def (name ... params) ... body) :case (and (car.body ~= :case)
-                                                (mem? quote params))
-  `(def (,name ,@params) :case (and ,@(map (fn(_)
-                                             `(,_ = ',_))
-                                           quoted.params))
+<- backquote (car '`(1))
+alias backquote? predicate.backquote
+alias backquoted? (cons? & backquote?:car)
+
+mac (def (name ... params) ... body) :case (mem? backquote params)
+  `(def (,name ,@unqq.params) :case (and ,@(map (fn(_)
+                                                  `(,_ = ',_))
+                                                backquoted.params))
      ,@body)
 
-mac (mac (name ... params) ... body) :case (and (car.body ~= :case)
-                                                (mem? quote params))
-  `(mac (,name ,@params) :case (and ,@(map (fn(_)
-                                             `(,_ = ',_))
-                                           quoted.params))
+mac (mac (name ... params) ... body) :case (mem? backquote params)
+  `(mac (,name ,@unqq.params) :case (and ,@(map (fn(_)
+                                                  `(,_ = ',_))
+                                                backquoted.params))
      ,@body)
 
-alias quote? predicate.quote
-alias quoted? (cons? & quote?:car)
-
-def (any_quoted? tree)
-  if quoted?.tree
-       1
-     cons?.tree
-       (or (any_quoted? car.tree)
-           (any_quoted? cdr.tree))
-
-def (quoted tree)
-  if quoted?.tree
+def (backquoted tree)
+  if backquoted?.tree
        (list cdr.tree)
      cons?.tree
-       (join (quoted car.tree)
-             (quoted cdr.tree))
+       (join (backquoted car.tree)
+             (backquoted cdr.tree))
+
+def (unqq tree)
+  if backquoted?.tree
+       (cons quote cdr.tree)
+     ~cons?.tree
+       tree
+     :else
+       (cons (unqq car.tree)
+             (unqq cdr.tree))

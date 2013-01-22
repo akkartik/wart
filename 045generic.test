@@ -19,25 +19,36 @@ mac (foogen2 a b ... body) :case (a = 'random_sym)
   :valueof (foogen2 35)
   :should be (list 35))   # shouldn't insert a nil for b in the :case
 
-def (foogen3 a)
+def (foogen3 'a)
   a
-def (foogen3 'z)
+def (foogen3 'a) :case (a = 'z)
   'went_through_case
 (test "def :case can handle quoted params"
-  :valueof (foogen3 'a)
+  :valueof (foogen3 a)
   :should be 'a)
 (test "def :case can handle quoted params - 2"
   :valueof (foogen3 z)
   :should be 'went_through_case)
 
-def (foogen4 a b)
-  (list a b)
 def (foogen4 'a b)
+  (list a b)
+def (foogen4 'a b) :case (a = 'z)
   'went_through_case
 let x 3
   (test "def :case can handle selective param quoting"
-    :valueof (foogen4 2 3)
-    :should be '(2 3))
-  (test "def :case can handle selective param quoting - 2"
     :valueof (foogen4 a x)
+    :should be '(a 3))
+  (test "def :case can handle selective param quoting - 2"
+    :valueof (foogen4 z x)
     :should be 'went_through_case)
+
+def (foogen5 a)
+  a
+def (foogen5 `z)
+  'went_through_case
+(test "def :case pattern-matches on backquoted params"
+  :valueof (foogen5 'a)
+  :should be 'a)
+(test "def :case can handle quoted params - 2"
+  :valueof (foogen5 z)
+  :should be 'went_through_case)
