@@ -212,20 +212,28 @@ void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, Cell* newScope) {
     }
     return;
   }
-  else if (params == nil)
+
+  if (params == nil)
     return;
+
+  if (isSym(params)) {
+    addLexicalBinding(params, args, newScope);
+    return;
+  }
+
+  if (!isCons(params))
+    return;
+
+  if (!isAlias(params) && args != nil && !isCons(args)) {
+    bindParams(params, nil, nil, newScope);
+    return;
+  }
 
   Cell* orderedArgs = reorderKeywordArgs(args, params);
 
-  if (isSym(params))
-    addLexicalBinding(params, orderedArgs, newScope);
-
-  else if (!isCons(params))
-    ;
-
-  else if (isAlias(params))
+  if (isAlias(params)) {
     bindAliases(cdr(params), orderedArgs, unevaldArgs, newScope);
-
+  }
   else {
     bindParams(car(params), car(orderedArgs), unevaldArgs ? car(unevaldArgs) : NULL, newScope);
     bindParams(cdr(params), cdr(orderedArgs), unevaldArgs ? cdr(unevaldArgs) : NULL, newScope);
@@ -235,6 +243,7 @@ void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, Cell* newScope) {
 }
 
 void bindAliases(Cell* aliases, Cell* arg, Cell* unevaldArg, Cell* newScope) {
+  dbg << "aliases: " << aliases << " " << arg << endl;
   for (; aliases != nil; aliases=cdr(aliases))
     bindParams(car(aliases), arg, unevaldArg, newScope);
 }

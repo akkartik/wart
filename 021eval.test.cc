@@ -468,6 +468,7 @@ void test_evalBindAll_evals_aliases_only_when_necessary5() {
   rmref(params);
 }
 
+// gotcha: a|(b c) won't work
 void test_evalBindAll_warns_on_unary_as() {
   Cell* params = read("(| a)");
   Cell* args = read("(1 2)");
@@ -489,6 +490,22 @@ void test_evalBindAll_binds_missing_as_params_to_nil() {
   checkEq(unsafeGet(newScope, "a"), newNum(1));
   checkEq(unsafeGet(newScope, "b"), nil);
   checkEq(unsafeGet(newScope, "c"), nil);
+  rmref(newScope);
+  rmref(args);
+  rmref(params);
+}
+
+void test_evalBindAll_binds_alternatives_to_non_cons() {
+  Cell* params = read("(a b|c)");
+  Cell* args = read("(1 2)");
+  Cell* newScope = newTable();
+  evalBindAll(params, args, nil, newScope);
+  checkEq(raiseCount, 0);
+  cerr << newScope << endl;
+  // {a: 1, b: 2, c: 2}
+  checkEq(unsafeGet(newScope, "a"), newNum(1));
+  checkEq(unsafeGet(newScope, "b"), newNum(2));
+  checkEq(unsafeGet(newScope, "c"), newNum(2));
   rmref(newScope);
   rmref(args);
   rmref(params);

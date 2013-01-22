@@ -39,6 +39,11 @@ mac (default var val|to)
   `(or ,var
        (,var <- ,val))
 
+#? x <- nil
+#? debug.1
+#? (default x 3)
+#? exit.0
+
 def (match? a b bindings)
   default bindings :to (table)  # used in later refinements
   (or (a = b)
