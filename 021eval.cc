@@ -64,8 +64,8 @@ Cell* eval(Cell* expr, Cell* scope) {
   Cell* splicedArgs = spliceArgs(cdr(expr), scope, fn);
   Cell* orderedArgs = reorderKeywordArgs(splicedArgs, sig(fn));
   Cell* newScope = newTable();
-  evalArgsAndBindParams(sig(fn), orderedArgs, scope, newScope);
-  dbg << car(expr) << "/" << keepAlreadyEvald() << ": " << cdr(expr) << endl;
+  evalBindAll(sig(fn), orderedArgs, scope, newScope);
+//?   dbg << car(expr) << "/" << keepAlreadyEvald() << ": " << cdr(expr) << endl;
 
   // swap in the function's lexical environment
   newDynamicScope(CURR_LEXICAL_SCOPE, isCompiledFn(body(fn)) ? scope : env(fn));
@@ -90,121 +90,155 @@ Cell* eval(Cell* expr, Cell* scope) {
   return result;  // already mkref'd
 }
 
-void evalArgsAndBindParams(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
-  if (params == nil) return;
-  if (isQuoted(params)) {
-    bindParams(params, nil, args, newScope, 0);
+// bind params to args in newScope, taking into account:
+//  quoted params (eval'ing args as necessary)
+//  destructured params
+//  aliased params
+void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
+  dbg << "=- " << params << " " << args << endl;
+  if (params == nil)
     return;
-  }
 
-  if (isSym(params)) {
-    Cell* val = evalAllArgs(args, scope);
-    addLexicalBinding(params, val, newScope);
+  else if (isSym(stripQuote(params)))
+    evalBindRest(params, args, scope, newScope);
+
+  else if (!isCons(stripQuote(params)))
+    return;
+
+  else if (isAlias(stripQuote(params)))
+    evalBindRestAliases(params, args, scope, newScope);
+
+  else if (isQuoted(params))
+    bindParams(params, args, newScope);
+
+  else {
+    evalBindParam(car(params), car(args), scope, newScope);
+    evalBindAll(cdr(params), cdr(args), scope, newScope);
+  }
+}
+
+void evalBindRest(Cell* param, Cell* args, Cell* scope, Cell* newScope) {
+  if (isQuoted(param))
+    bindParams(stripQuote(param), args, newScope);
+
+  else {
+    Cell* val = evalAll(args, scope);
+    bindParams(param, val, newScope);
     rmref(val);
-    return;
   }
+}
 
-  if (!isCons(params)) return;
+void evalBindParam(Cell* param, Cell* arg, Cell* scope, Cell* newScope) {
+  dbg << "evalbind: " << param << " " << arg << endl;
+  if (isQuoted(param))
+    bindParams(stripQuote(param), arg, newScope);
 
-  if (isAlias(params)) {
-    Cell* val = shouldEval(params) ? evalAllArgs(args, scope) : nil;
-    bindParamAliases(cdr(params), val, args, newScope, 0);
+  else if (isAlias(param))
+    evalBindAliases(param, arg, scope, newScope);
+
+  else {
+    Cell* val = evalArg(arg, scope);
+    dbg << "  eval: " << val << endl;
+    bindParams(param, val, newScope);
     rmref(val);
+  }
+}
+
+void evalBindRestAliases(Cell* params /* (| ...) */, Cell* args, Cell* scope, Cell* newScope) {
+  dbg << "evalbindrestaliases: " << params << " " << args << endl;
+  if (isQuoted(params))
+    bindAliases(stripQuote(params), args, newScope);
+
+  else {
+    Cell* cachedVal = NULL;   // to ensure we don't multiply-eval
+    for (Cell* aliases = cdr(params); aliases != nil; aliases=cdr(aliases))
+      evalBindRestAlias(car(aliases), args, &cachedVal, scope, newScope);
+  }
+}
+
+void evalBindRestAlias(Cell* alias, Cell* args, Cell** cachedVal, Cell* scope, Cell* newScope) {
+  dbg << "evalbindrestalias: " << alias << " " << args << endl;
+  if (isQuoted(alias))
+    bindParams(stripQuote(alias), args, newScope);
+
+  else if (*cachedVal)
+    bindParams(alias, *cachedVal, newScope);
+
+  else {
+    *cachedVal = evalAll(args, scope);
+    bindParams(alias, *cachedVal, newScope);
+    rmref(*cachedVal);
+  }
+}
+
+void evalBindAliases(Cell* params /* (| ...) */, Cell* arg, Cell* scope, Cell* newScope) {
+  dbg << "evalbindaliases: " << params << " " << arg << endl;
+  if (isQuoted(params))
+    bindAliases(stripQuote(params), arg, newScope);
+
+  else {
+    Cell* cachedVal = NULL;   // to ensure we don't multiply-eval
+    for (Cell* aliases = cdr(params); aliases != nil; aliases=cdr(aliases))
+      evalBindAlias(car(aliases), arg, &cachedVal, scope, newScope);
+  }
+}
+
+void evalBindAlias(Cell* alias, Cell* arg, Cell** cachedVal, Cell* scope, Cell* newScope) {
+  if (isQuoted(alias))
+    bindParams(stripQuote(alias), arg, newScope);
+
+  else if (*cachedVal)
+    bindParams(alias, *cachedVal, newScope);
+
+  else {
+    *cachedVal = eval(arg, scope);
+    bindParams(alias, *cachedVal, newScope);
+    rmref(*cachedVal);
+  }
+}
+
+void bindParams(Cell* params, Cell* args, Cell* newScope) {
+  dbg << "bind: " << params << " " << args << endl;
+  params = stripQuote(params);
+  if (params == nil)
     return;
+
+  else if (isSym(params))
+    addLexicalBinding(params, args, newScope);
+
+  else if (!isCons(params))
+    return;
+
+  else if (isAlias(params))
+    bindAliases(cdr(params), args, newScope);
+
+  else {
+    bindParams(car(params), car(args), newScope);
+    bindParams(cdr(params), cdr(args), newScope);
   }
-
-  Cell* val = shouldEval(car(params)) ? evalArg(car(args), car(params), scope) : nil;
-  bindParams(car(params), val, car(args), newScope, 1);
-  rmref(val);
-
-  evalArgsAndBindParams(cdr(params), cdr(args), scope, newScope);
 }
 
-// applies only to outermost level, not nested destructurings
-bool shouldEval(Cell* param) {
-  if (isQuoted(param)) return false;
-  if (!isCons(param)) return true;
-  if (!isAlias(param)) return true;
-  for (param=cdr(param); param != nil; param=cdr(param)) {
-    if (shouldEval(param))
-    if (isQuoted(car(param)))
-      continue;
-    if (isAlias(car(param)))
-      if (allQuoted(cdr(car(param))))
-        continue;
-    if (isCons(car(param)))
-      // recurse exactly one level of destructured params
-      if (allQuoted(car(param)))
-        continue;
-    return true;
-  }
-  return false;
+void bindAliases(Cell* aliases, Cell* arg, Cell* newScope) {
+  for (; aliases != nil; aliases=cdr(aliases))
+    bindParams(car(aliases), arg, newScope);
 }
 
-bool allQuoted(Cell* s) {
-  for (; s != nil; s=cdr(s))
-    if (!isQuoted(car(s)))
-      return false;
-  return true;
-}
-
-Cell* evalAllArgs(Cell* args, Cell* scope) {
+Cell* evalAll(Cell* args, Cell* scope) {
   if (!isCons(args))
-    return evalArg(args, nil, scope);
+    return evalArg(args, scope);
   Cell* pResult = newCell(), *curr = pResult;
-  for (; args != nil; args=cdr(args)) {
-    addCons(curr, evalArg(car(args), nil, scope));
-    rmref(car(cdr(curr)));
-    curr=cdr(curr);
+  for (; args != nil; args=cdr(args), curr=cdr(curr)) {
+    Cell* val = evalArg(car(args), scope);
+    addCons(curr, val);
+    rmref(val);
   }
   return dropPtr(pResult);
 }
 
-// eval arg unless param is quoted
-// arg eval always strips '' regardless of keepAlreadyEvald()
-Cell* evalArg(Cell* arg, Cell* param, Cell* scope) {
+// eval, but always strip '' regardless of keepAlreadyEvald()
+Cell* evalArg(Cell* arg, Cell* scope) {
   if (isAlreadyEvald(arg)) return mkref(stripAlreadyEvald(arg));
-  if (isQuoted(param)) return mkref(arg);
   return eval(arg, scope);
-}
-
-void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, Cell* scope, int level) {
-  if (isQuoted(params) && level > 1)
-    RAISE << "quoted params are not meaningful inside destructured lists\n";
-  Cell* val = isQuoted(params) ? unevaldArgs : args;
-  params = stripQuote(params);
-  if (params == nil) return;
-
-  if (isAlias(params)) {
-    bindParamAliases(cdr(params), val, unevaldArgs, scope, level);
-    return;
-  }
-
-  Cell* orderedArgs = reorderKeywordArgs(val, params);
-  if (isSym(params)) {
-    addLexicalBinding(params, orderedArgs, scope);
-  }
-  else {
-    bindParams(car(params), car(orderedArgs), isSym(unevaldArgs) ? unevaldArgs : car(unevaldArgs), scope, level+1);
-    bindParams(cdr(params), cdr(orderedArgs), cdr(unevaldArgs), scope, level);
-  }
-  rmref(orderedArgs);
-}
-
-void bindParamAliases(Cell* aliases, Cell* arg, Cell* unevaldArg, Cell* scope, int level) {
-  if (cdr(aliases) == nil)
-    RAISE << "just one param alias: " << car(aliases) << "; are you sure?\n";
-  for (; aliases != nil; aliases=cdr(aliases)) {
-    // bind matching aliases to the arg
-    if (isQuoted(car(aliases)))
-      bindParams(car(aliases), arg, unevaldArg, scope, level);
-    else if (isSym(car(aliases))  // sym with anything
-        || isAlias(car(aliases))  // alias list with anything
-        || isCons(arg))   // anything (destructured list) with cons
-      bindParams(car(aliases), arg, unevaldArg, scope, level);
-    else if (isCons(car(aliases)))
-      bindParams(car(aliases), nil, nil, scope, level);
-  }
 }
 
 
