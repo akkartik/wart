@@ -193,11 +193,15 @@ void evalBindAliases(Cell* params /* (| ...) */, Cell* arg, Cell* scope, Cell* n
 }
 
 void evalBindAlias(Cell* alias, Cell* arg, Cell** cachedVal, Cell* scope, Cell* newScope) {
+  dbg << "evalbindalias: " << alias << " " << arg << endl;
   if (isQuoted(alias))
     bindParams(stripQuote(alias), arg, NULL, newScope);
 
   else if (*cachedVal)
     bindParams(alias, *cachedVal, arg, newScope);
+
+  else if (isAlias(alias))
+    evalBindAliases(alias, arg, scope, newScope);
 
   else {
     *cachedVal = eval(arg, scope);
