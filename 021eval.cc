@@ -158,6 +158,8 @@ void evalBindRestAliases(Cell* params /* (| ...) */, Cell* args, Cell* scope, Ce
     bindAliases(stripQuote(params), args, NULL, newScope);
 
   else {
+    if (len(params) <= 2)
+      RAISE << "just one param alias: " << params << ". Are you sure?\n";
     Cell* cachedVal = NULL;   // to ensure we don't multiply-eval
     for (Cell* aliases = cdr(params); aliases != nil; aliases=cdr(aliases))
       evalBindRestAlias(car(aliases), args, &cachedVal, scope, newScope);
@@ -182,6 +184,8 @@ void evalBindAliases(Cell* params /* (| ...) */, Cell* arg, Cell* scope, Cell* n
     bindAliases(stripQuote(params), arg, NULL, newScope);
 
   else {
+    if (len(params) <= 2)
+      RAISE << "just one param alias: " << params << ". Are you sure?\n";
     Cell* cachedVal = NULL;   // to ensure we don't multiply-eval
     for (Cell* aliases = cdr(params); aliases != nil; aliases=cdr(aliases))
       evalBindAlias(car(aliases), arg, &cachedVal, scope, newScope);
@@ -235,7 +239,7 @@ void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, Cell* newScope) {
   Cell* orderedArgs = reorderKeywordArgs(args, params);
 
   if (isAlias(params)) {
-    bindAliases(cdr(params), orderedArgs, unevaldArgs, newScope);
+    bindAliases(params, orderedArgs, unevaldArgs, newScope);
   }
   else {
     bindParams(car(params), car(orderedArgs), unevaldArgs && isCons(unevaldArgs) ? car(unevaldArgs) : unevaldArgs, newScope);
@@ -247,7 +251,9 @@ void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, Cell* newScope) {
 
 void bindAliases(Cell* aliases, Cell* arg, Cell* unevaldArg, Cell* newScope) {
   dbg << "aliases: " << aliases << " " << arg << endl;
-  for (; aliases != nil; aliases=cdr(aliases))
+  if (len(aliases) <= 2)
+    RAISE << "just one param alias: " << aliases << ". Are you sure?\n";
+  for (aliases=cdr(aliases); aliases != nil; aliases=cdr(aliases))
     bindParams(car(aliases), arg, unevaldArg, newScope);
 }
 

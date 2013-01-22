@@ -29,15 +29,17 @@ COMPILE_FN(set_cdr, compiledFn_set_cdr, "($cons $val)",
 )
 
 COMPILE_FN(len, compiledFn_len, "($x)",
-  Cell* x = lookup("$x");
-  if (isString(x))
-    return mkref(newNum((long)toString(x).length()));
-
-  long ans = 0;
-  for (; x != nil; x=cdr(x))
-    ++ans;
-  return mkref(newNum(ans));
+  return mkref(newNum(len(lookup("$x"))));
 )
+
+long len(Cell* l) {
+  if (isString(l))
+    return toString(l).length();
+  long ans = 0;
+  for (; l != nil; l=cdr(l))
+    ++ans;
+  return ans;
+}
 
 COMPILE_FN(list_range, compiledFn_list_range, "($list $index $end)",
   Cell* list = lookup("$list");
