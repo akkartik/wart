@@ -123,6 +123,9 @@ void evalBindRest(Cell* param, Cell* args, Cell* scope, Cell* newScope) {
   if (isQuoted(param))
     bindParams(stripQuote(param), args, NULL, newScope);
 
+  else if (isCons(param) && !isCons(args))
+    bindParams(param, nil, args, newScope);
+
   else if (isCons(param))
     evalBindAll(param, args, scope, newScope);
 
