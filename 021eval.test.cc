@@ -501,7 +501,6 @@ void test_evalBindAll_binds_alternatives_to_non_cons() {
   Cell* newScope = newTable();
   evalBindAll(params, args, nil, newScope);
   checkEq(raiseCount, 0);
-  cerr << newScope << endl;
   // {a: 1, b: 2, c: 2}
   checkEq(unsafeGet(newScope, "a"), newNum(1));
   checkEq(unsafeGet(newScope, "b"), newNum(2));

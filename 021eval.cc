@@ -235,8 +235,8 @@ void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, Cell* newScope) {
     bindAliases(cdr(params), orderedArgs, unevaldArgs, newScope);
   }
   else {
-    bindParams(car(params), car(orderedArgs), unevaldArgs ? car(unevaldArgs) : NULL, newScope);
-    bindParams(cdr(params), cdr(orderedArgs), unevaldArgs ? cdr(unevaldArgs) : NULL, newScope);
+    bindParams(car(params), car(orderedArgs), unevaldArgs && isCons(unevaldArgs) ? car(unevaldArgs) : unevaldArgs, newScope);
+    bindParams(cdr(params), cdr(orderedArgs), unevaldArgs && isCons(unevaldArgs) ? cdr(unevaldArgs) : unevaldArgs, newScope);
   }
 
   rmref(orderedArgs);
