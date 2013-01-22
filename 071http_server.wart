@@ -1,4 +1,4 @@
-mac2 (with :serverSocket socket port ... body)
+mac (with 'serverSocket socket port ... body)
   `(let ,socket (serverSocket ,port)
      (before (close ,socket)
        ,@body))

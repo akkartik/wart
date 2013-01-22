@@ -212,10 +212,8 @@ void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, Cell* newScope) {
   if (isQuoted(params)) {
     if (unevaldArgs)
       bindParams(stripQuote(params), unevaldArgs, NULL, newScope);
-    else {
-      RAISE << "quoted params are not meaningful inside quoted lists\n";
+    else
       bindParams(stripQuote(params), args, NULL, newScope);
-    }
     return;
   }
 

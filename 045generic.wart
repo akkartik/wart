@@ -17,7 +17,7 @@ mac (def (name ... params) ... body) :case (car.body = :case)
 
 
 
-## support quoted params in def
+## def with selectively quoted params
 # We could just always use this, but it's faster to avoid the extra eval if
 # possible.
 
@@ -39,3 +39,40 @@ mac (def (name ... params) ... body) :case (and (car.body = :case)
          (if ,cadr.body
            (do ,@cddr.body)
            (eval `(,$old ,@$params) $caller_scope)))))
+
+
+
+## rudimentary pattern matching for symbol constants
+# should we get rid of the :case comparison and stop supporting quoted params
+# above?
+
+mac (def (name ... params) ... body) :case (and (car.body ~= :case)
+                                                (mem? quote params))
+  `(def (,name ,@params) :case (and ,@(map (fn(_)
+                                             `(,_ = ',_))
+                                           quoted.params))
+     ,@body)
+
+mac (mac (name ... params) ... body) :case (and (car.body ~= :case)
+                                                (mem? quote params))
+  `(mac (,name ,@params) :case (and ,@(map (fn(_)
+                                             `(,_ = ',_))
+                                           quoted.params))
+     ,@body)
+
+alias quote? predicate.quote
+alias quoted? (cons? & quote?:car)
+
+def (any_quoted? tree)
+  if quoted?.tree
+       1
+     cons?.tree
+       (or (any_quoted? car.tree)
+           (any_quoted? cdr.tree))
+
+def (quoted tree)
+  if quoted?.tree
+       (list cdr.tree)
+     cons?.tree
+       (join (quoted car.tree)
+             (quoted cdr.tree))

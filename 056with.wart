@@ -1,11 +1,7 @@
-mac (mac2 (name command ... rest) ... body)
-  `(mac (,name $command ,@rest) :case (sym.$command = ',sym.command)
-     ,@body)
-
-mac2 (with :nils vars ... body)
+mac (with 'nils vars ... body)
   `((fn ,vars ,@body))
 
-mac2 (with :tmpfile f ... body)
+mac (with 'tmpfile f ... body)
   `(let ,f (tmpfile)
      (before (system:join "rm " ,f)
        ,@body))
