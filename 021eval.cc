@@ -106,7 +106,7 @@ void evalArgsAndBindParams(Cell* params, Cell* args, Cell* scope, Cell* newScope
 
   if (!isCons(params)) return;
 
-  if (car(params) == sym_param_alias) {
+  if (isAlias(params)) {
     Cell* val = shouldEval(params) ? evalAllArgs(args, scope) : nil;
     bindParamAliases(cdr(params), val, args, newScope, 0);
     rmref(val);
@@ -124,12 +124,12 @@ void evalArgsAndBindParams(Cell* params, Cell* args, Cell* scope, Cell* newScope
 bool shouldEval(Cell* param) {
   if (isQuoted(param)) return false;
   if (!isCons(param)) return true;
-  if (car(param) != sym_param_alias) return true;
+  if (!isAlias(param)) return true;
   for (param=cdr(param); param != nil; param=cdr(param)) {
     if (shouldEval(param))
     if (isQuoted(car(param)))
       continue;
-    if (isCons(car(param)) && car(car(param)) == sym_param_alias)
+    if (isAlias(car(param)))
       if (allQuoted(cdr(car(param))))
         continue;
     if (isCons(car(param)))
@@ -175,7 +175,7 @@ void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, Cell* scope, int le
   params = stripQuote(params);
   if (params == nil) return;
 
-  if (isCons(params) && car(params) == sym_param_alias) {
+  if (isAlias(params)) {
     bindParamAliases(cdr(params), val, unevaldArgs, scope, level);
     return;
   }
@@ -198,8 +198,8 @@ void bindParamAliases(Cell* aliases, Cell* arg, Cell* unevaldArg, Cell* scope, i
     // bind matching aliases to the arg
     if (isQuoted(car(aliases)))
       bindParams(car(aliases), arg, unevaldArg, scope, level);
-    else if (isSym(car(aliases))   // sym with anything
-        || car(car(aliases)) == sym_param_alias   // alias list with anything
+    else if (isSym(car(aliases))  // sym with anything
+        || isAlias(car(aliases))  // alias list with anything
         || isCons(arg))   // anything (destructured list) with cons
       bindParams(car(aliases), arg, unevaldArg, scope, level);
     else if (isCons(car(aliases)))
@@ -231,7 +231,7 @@ Cell* extractKeywordArgs(Cell* params, Cell* args, CellMap& keywordArgs) {
     }
     // keyword arg for rest param alias
     else if (isCons(keywordParam) && cdr(keywordParam) == nil
-             && isCons(car(keywordParam)) && car(car(keywordParam)) == sym_param_alias) {
+             && isAlias(car(keywordParam))) {
       args = cdr(args);   // skip keyword arg
       for (Cell* p = cdr(car(keywordParam)); p != nil; p=cdr(p))
         keywordArgs[car(p)] = args;
@@ -239,7 +239,7 @@ Cell* extractKeywordArgs(Cell* params, Cell* args, CellMap& keywordArgs) {
       args = nil;
     }
     // keyword arg for param alias
-    else if (isCons(keywordParam) && (car(keywordParam) == sym_param_alias)) {
+    else if (isAlias(keywordParam)) {
       args = cdr(args);   // skip keyword arg
       for (Cell* p = cdr(keywordParam); p != nil; p=cdr(p))
         keywordArgs[car(p)] = car(args);
@@ -269,7 +269,7 @@ Cell* argsInParamOrder(Cell* params, Cell* nonKeywordArgs, CellMap& keywordArgs)
       break;
     }
 
-    if (isCons(params) && car(params) == sym_param_alias) {
+    if (isAlias(params)) {
       if (keywordArgs[car(cdr(params))]) {
         setCdr(curr, keywordArgs[car(cdr(params))]);
         break;
@@ -281,7 +281,7 @@ Cell* argsInParamOrder(Cell* params, Cell* nonKeywordArgs, CellMap& keywordArgs)
     }
 
     Cell* param = stripQuote(car(params));
-    if (isCons(param) && car(param) == sym_param_alias)
+    if (isAlias(param))
       param = car(cdr(param));
 
     if (keywordArgs[param]) {
@@ -310,13 +310,12 @@ Cell* keywordArg(Cell* arg, Cell* params) {
       if (params == candidate)
         return newCons(candidate);
     }
-    else if (car(params) == sym_param_alias) { // rest param aliases
+    else if (isAlias(params)) {   // rest param aliases
       if (paramAliasMatch(cdr(params), candidate))
         return newCons(params);
     }
     // ignore destructuring except param aliases
-    else if (isCons(stripQuote(car(params)))
-             && car(stripQuote(car(params))) == sym_param_alias) {
+    else if (isAlias(stripQuote(car(params)))) {
       if (paramAliasMatch(cdr(stripQuote(car(params))), candidate))
         return stripQuote(car(params));
     }
@@ -535,4 +534,8 @@ Cell* impl(Cell* fn) {
 
 Cell* env(Cell* fn) {
   return get(rep(fn), sym_env);
+}
+
+bool isAlias(Cell* l) {
+  return isCons(l) && car(l) == sym_param_alias;
 }
