@@ -200,7 +200,7 @@ void evalBindAlias(Cell* alias, Cell* arg, Cell** cachedVal, Cell* scope, Cell* 
     evalBindAliases(alias, arg, scope, newScope);
 
   else {
-    *cachedVal = eval(arg, scope);
+    *cachedVal = evalArg(arg, scope);
     bindParams(alias, *cachedVal, arg, newScope);
     rmref(*cachedVal);
   }
