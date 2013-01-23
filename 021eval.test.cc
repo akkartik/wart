@@ -168,7 +168,7 @@ void test_evalBindAll_handles_multiply_alreadyEvald_arg() {
   rmref(params);
 }
 
-void test_evalBindAll_handles_multiply_alreadyEvald_aliased_arg() {
+void test_evalBindAll_handles_alreadyEvald_aliased_arg() {
   Cell* params = read("(x|y)");
   Cell* args = newCons(tagAlreadyEvald(newSym("a")));   // (''a)
   Cell* scope = newTable();
