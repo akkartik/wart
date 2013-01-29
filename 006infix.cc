@@ -2,11 +2,12 @@
 
 // Design considered the following:
 //  intuitive arithmetic: a + b
-//  user-defined infix operators
+//  user-defined ops
 //  parsing in macros: `(,a + ,b) => `(+ ,a ,b)
 //    so no precedence
-//  compounding operations: a*b + c, n * n-1
-//    so no-whitespace takes precedence over whitespace
+//  easy combination
+//    so permit infix without whitespace: a*b, n+1
+//    so no-whitespace takes precedence over whitespace: a*b + c, n * n-1
 //    so symbols can't include operator chars
 //  easy to explain
 //    so ops are always left-associative: a+b+c
@@ -17,8 +18,10 @@
 //    so comparers should return last arg on success: (1 < 3) => 3
 //    so comparers should return any nil passed in (1 < nil) => nil; (nil < 1) => nil
 //  interaction with paren insertion
-//  use ':' for compose, but ':sym' for keyword args
-//  rely on user to support a.-b, l.-1 by defining .- op
+//  use ':sym' for keyword args
+//    so ':' op is lower precedence
+//  support a.-b, l.-1
+//    rely on user to define .- op
 
 const string extraSymChars = "$?!_";  // besides letters and digits
 
