@@ -19,9 +19,8 @@
 //    so comparers should return any nil passed in (1 < nil) => nil; (nil < 1) => nil
 //  interaction with paren insertion
 //  use ':sym' for keyword args
-//    so ':' op is lower precedence
 //  support a.-b, l.-1
-//    rely on user to define .- op
+//    rely on separate def for .- op
 
 const string extraSymChars = "$?!_";  // besides letters and digits
 
