@@ -45,6 +45,11 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
   long thisLineIndent = skipInitialNewlinesToFirstIndent(in);
   while (!in.eof()) {
     Token curr = nextToken(in);
+    if (isIndent(curr))
+      numWordsInLine = 0;
+    else if (!curr.newline && !isQuoteOrUnquote(curr) && !isParen(curr))
+      ++numWordsInLine;
+
     if (curr.newline) {
       if (explicitOpenParens == 0 && implicitOpenParens.empty())
         break;
@@ -71,7 +76,6 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
       }
     }
     else if (!isIndent(curr)) {   //// 'word' token
-      ++numWordsInLine;
       if (numWordsInLine < 2) {
         buffer.push_back(curr);
       }
@@ -99,7 +103,6 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
 
       //// reset
       thisLineIndent = nextLineIndent;
-      numWordsInLine = 0;
       parenAtStartOfLine = false;
     }
   }
