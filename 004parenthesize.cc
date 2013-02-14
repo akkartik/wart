@@ -50,6 +50,14 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
     else if (!curr.newline && !isQuoteOrUnquote(curr) && !isParen(curr))
       ++numWordsInLine;
 
+    if (isIndent(curr))
+      parenAtStartOfLine = false;
+    else if (curr == "(" && numWordsInLine == 0)
+      parenAtStartOfLine = true;
+
+    if (isIndent(curr))
+      thisLineIndent = curr.indentLevel;
+
     if (curr.newline) {
       if (explicitOpenParens == 0 && implicitOpenParens.empty())
         break;
@@ -63,8 +71,6 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
         emit(curr, result, explicitOpenParens);
     }
     else if (isParen(curr)) {
-      if (!parenAtStartOfLine)
-        parenAtStartOfLine = (curr == "(" && numWordsInLine == 0);
       if (numWordsInLine < 2 && explicitOpenParens == 0 && !parenAtStartOfLine) {
         buffer.push_back(curr);
       }
@@ -89,21 +95,16 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
       }
     }
     else {  //// indent
-      long nextLineIndent = curr.indentLevel;
       emitAll(buffer, result, explicitOpenParens);
-      while (!implicitOpenParens.empty() && nextLineIndent <= implicitOpenParens.top()) {
+      while (!implicitOpenParens.empty() && thisLineIndent <= implicitOpenParens.top()) {
         result.push_back(Token(")"));
         implicitOpenParens.pop();
       }
 
       if (implicitOpenParens.empty() && explicitOpenParens == 0) {
-        restoreIndent(nextLineIndent, in);
+        restoreIndent(thisLineIndent, in);
         break;
       }
-
-      //// reset
-      thisLineIndent = nextLineIndent;
-      parenAtStartOfLine = false;
     }
   }
 
