@@ -108,7 +108,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
     }
     else if (isParen(curr)) {
       if (explicitOpenParens == 0 && implicitOpenParens.empty()
-          && (numWordsInLine >= 2 || parenAtStartOfLine))
+          && curr == ")")
         break;
     }
     else if (isIndent(curr)) {

@@ -142,6 +142,21 @@ void test_parenthesize_groups_words_on_single_line2() {
   check(p == tokens.end());
 }
 
+void test_parenthesize_groups_words_on_single_line4() {
+  IndentSensitiveStream in("a (b c) d");
+  list<Token> tokens = nextExpr(in);
+  list<Token>::iterator p = tokens.begin();
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, "c"); ++p;
+  checkEq(*p, ")"); ++p;
+  checkEq(*p, "d"); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == tokens.end());
+}
+
 void test_parenthesize_groups_words_on_single_line3() {
   IndentSensitiveStream in("a `(b c)");
   list<Token> tokens = nextExpr(in);
