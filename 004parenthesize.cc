@@ -76,7 +76,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
         emit(curr, result, explicitOpenParens);
       }
     }
-    else if (!isIndent(curr) && !curr.newline) {
+    else if (isWord(curr)) {
       if (numWordsInLine < 2) {
         buffer.push_back(curr);
       }
@@ -89,7 +89,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
         result.push_back(curr);
       }
     }
-    else if (!curr.newline) {
+    else if (isIndent(curr)) {
       emitAll(buffer, result, explicitOpenParens);
       while (!implicitOpenParens.empty() && thisLineIndent <= implicitOpenParens.top()) {
         result.push_back(Token(")"));
@@ -186,4 +186,8 @@ bool isParen(const Token& t) {
 bool isQuoteOrUnquote(const Token& t) {
   return t == "'" || t == "`"
       || t == "," || t == ",@" || t == "@";
+}
+
+bool isWord(const Token& t) {
+  return !t.newline && !isIndent(t) && !isParen(t) && !isQuoteOrUnquote(t);
 }
