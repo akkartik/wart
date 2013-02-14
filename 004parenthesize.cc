@@ -104,7 +104,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
 
 //// internals
 
-void emit(Token& t, list<Token>& out, long& explicitOpenParens) {
+void emit(const Token& t, list<Token>& out, long& explicitOpenParens) {
   if (t.newline || isIndent(t)) return;
   out.push_back(t);
   if (t == "(") ++explicitOpenParens;
