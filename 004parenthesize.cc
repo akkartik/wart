@@ -68,7 +68,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
       if (numWordsInLine < 2)
         buffer.push_back(curr);
       else
-        emit(curr, result, explicitOpenParens);
+        result.push_back(curr);
     }
     else if (isParen(curr)) {
       if (numWordsInLine < 2 && explicitOpenParens == 0 && !parenAtStartOfLine) {
@@ -91,7 +91,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
           implicitOpenParens.push(thisLineIndent);
         }
         emitAll(buffer, result, explicitOpenParens);
-        emit(curr, result, explicitOpenParens);
+        result.push_back(curr);
       }
     }
     else {  //// indent
