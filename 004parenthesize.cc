@@ -75,7 +75,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
 
     if (isIndent(curr)) {
       emitAll(buffer, curr, result, explicitOpenParens);
-      while (!implicitOpenParens.empty() && thisLineIndent <= implicitOpenParens.top()) {
+      while (!implicitOpenParens.empty() && implicitOpenParens.top() >= thisLineIndent) {
         result.push_back(Token(")"));
         implicitOpenParens.pop();
       }
