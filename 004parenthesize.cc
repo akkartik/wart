@@ -49,7 +49,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
     //// various book-keeping based on curr token
     if (isIndent(curr))
       numWordsInLine = 0;
-    else if (!curr.newline && !isQuoteOrUnquote(curr) && !isParen(curr))
+    else if (isWord(curr))
       ++numWordsInLine;
 
     if (isIndent(curr))
@@ -61,36 +61,22 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
       thisLineIndent = curr.indentLevel;
 
     //// decide what to emit, tracking (implicit/explicit) open parens
-    if (isQuoteOrUnquote(curr)) {
-      if (numWordsInLine < 2)
-        buffer.push_back(curr);
-      else
-        result.push_back(curr);
+    if (numWordsInLine < 2
+        && (isQuoteOrUnquote(curr)
+            || isWord(curr)
+            || (isParen(curr) && explicitOpenParens == 0 && !parenAtStartOfLine))) {
+      buffer.push_back(curr);
     }
-    else if (isParen(curr)) {
-      if (numWordsInLine < 2 && explicitOpenParens == 0 && !parenAtStartOfLine) {
-        buffer.push_back(curr);
+    else {
+      if (numWordsInLine == 2 && isWord(curr) && explicitOpenParens == 0 && !parenAtStartOfLine) {
+        result.push_back(Token("("));
+        implicitOpenParens.push(thisLineIndent);
       }
-      else {
-        emitAll(buffer, result, explicitOpenParens);
-        emit(curr, result, explicitOpenParens);
-      }
-    }
-    else if (isWord(curr)) {
-      if (numWordsInLine < 2) {
-        buffer.push_back(curr);
-      }
-      else {
-        if (numWordsInLine == 2 && explicitOpenParens == 0 && !parenAtStartOfLine) {
-          result.push_back(Token("("));
-          implicitOpenParens.push(thisLineIndent);
-        }
-        emitAll(buffer, result, explicitOpenParens);
-        result.push_back(curr);
-      }
-    }
-    else if (isIndent(curr)) {
       emitAll(buffer, result, explicitOpenParens);
+      emit(curr, result, explicitOpenParens);
+    }
+
+    if (isIndent(curr)) {
       while (!implicitOpenParens.empty() && thisLineIndent <= implicitOpenParens.top()) {
         result.push_back(Token(")"));
         implicitOpenParens.pop();
@@ -117,6 +103,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
 //// internals
 
 void emit(Token& t, list<Token>& out, long& explicitOpenParens) {
+  if (t.newline || isIndent(t)) return;
   out.push_back(t);
   if (t == "(") ++explicitOpenParens;
   if (t == ")") --explicitOpenParens;
