@@ -45,6 +45,8 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
   long thisLineIndent = skipInitialNewlinesToFirstIndent(in);
   while (!in.eof()) {
     Token curr = nextToken(in);
+
+    //// various book-keeping based on curr token
     if (isIndent(curr))
       numWordsInLine = 0;
     else if (!curr.newline && !isQuoteOrUnquote(curr) && !isParen(curr))
@@ -58,11 +60,8 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
     if (isIndent(curr))
       thisLineIndent = curr.indentLevel;
 
+    //// decide what to emit, tracking (implicit/explicit) open parens
     if (curr.newline) {
-      if (explicitOpenParens == 0 && implicitOpenParens.empty())
-        break;
-      if (explicitOpenParens == 0 && interactive && in.fd.peek() == '\n')
-        break;
     }
     else if (isQuoteOrUnquote(curr)) {
       if (numWordsInLine < 2)
@@ -77,11 +76,9 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
       else {
         emitAll(buffer, result, explicitOpenParens);
         emit(curr, result, explicitOpenParens);
-        if (explicitOpenParens == 0 && implicitOpenParens.empty())
-          break;
       }
     }
-    else if (!isIndent(curr)) {   //// 'word' token
+    else if (!isIndent(curr)) {
       if (numWordsInLine < 2) {
         buffer.push_back(curr);
       }
@@ -94,14 +91,28 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
         result.push_back(curr);
       }
     }
-    else {  //// indent
+    else {
       emitAll(buffer, result, explicitOpenParens);
       while (!implicitOpenParens.empty() && thisLineIndent <= implicitOpenParens.top()) {
         result.push_back(Token(")"));
         implicitOpenParens.pop();
       }
+    }
 
-      if (implicitOpenParens.empty() && explicitOpenParens == 0) {
+    //// we done?
+    if (curr.newline) {
+      if (explicitOpenParens == 0 && implicitOpenParens.empty())
+        break;
+      if (explicitOpenParens == 0 && interactive && in.fd.peek() == '\n')
+        break;
+    }
+    else if (isParen(curr)) {
+      if (explicitOpenParens == 0 && implicitOpenParens.empty()
+          && (numWordsInLine >= 2 || parenAtStartOfLine))
+        break;
+    }
+    else if (isIndent(curr)) {
+      if (explicitOpenParens == 0 && implicitOpenParens.empty()) {
         restoreIndent(thisLineIndent, in);
         break;
       }
