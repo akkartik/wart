@@ -100,23 +100,12 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
     }
 
     //// we done?
-    if (curr.newline) {
-      if (explicitOpenParens == 0 && implicitOpenParens.empty())
-        break;
-      if (explicitOpenParens == 0 && interactive && in.fd.peek() == '\n')
-        break;
+    if (explicitOpenParens == 0 && implicitOpenParens.empty()) {
+      if (isIndent(curr)) restoreIndent(thisLineIndent, in);
+      if (curr.newline || curr == ")" || isIndent(curr)) break;
     }
-    else if (isParen(curr)) {
-      if (explicitOpenParens == 0 && implicitOpenParens.empty()
-          && curr == ")")
-        break;
-    }
-    else if (isIndent(curr)) {
-      if (explicitOpenParens == 0 && implicitOpenParens.empty()) {
-        restoreIndent(thisLineIndent, in);
-        break;
-      }
-    }
+    if (interactive && curr.newline && explicitOpenParens == 0 && in.fd.peek() == '\n')
+      break;
   }
 
   emitAll(buffer, result, explicitOpenParens);
