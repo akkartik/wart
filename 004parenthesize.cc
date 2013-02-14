@@ -53,12 +53,12 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
       ++numWordsInLine;
 
     if (isIndent(curr))
+      thisLineIndent = curr.indentLevel;
+
+    if (isIndent(curr))
       parenAtStartOfLine = false;
     else if (curr == "(" && numWordsInLine == 0)
       parenAtStartOfLine = true;
-
-    if (isIndent(curr))
-      thisLineIndent = curr.indentLevel;
 
     //// decide what to emit, tracking (implicit/explicit) open parens
     if (parenAtStartOfLine) {
