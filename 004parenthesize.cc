@@ -62,8 +62,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
 
     //// decide what to emit, tracking (implicit/explicit) open parens
     if (parenAtStartOfLine) {
-      emitAll(buffer, result, explicitOpenParens);  // any quotes
-      emit(curr, result, explicitOpenParens);   // numWordsInLine is irrelevant
+      emitAll(buffer, curr, result, explicitOpenParens);
     }
     else if (numWordsInLine < 2) {
       buffer.push_back(curr);
@@ -73,12 +72,11 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
         result.push_back(Token("("));
         implicitOpenParens.push(thisLineIndent);
       }
-      emitAll(buffer, result, explicitOpenParens);
-      emit(curr, result, explicitOpenParens);
+      emitAll(buffer, curr, result, explicitOpenParens);
     }
 
     if (isIndent(curr)) {
-      emitAll(buffer, result, explicitOpenParens);
+      emitAll(buffer, curr, result, explicitOpenParens);
       while (!implicitOpenParens.empty() && thisLineIndent <= implicitOpenParens.top()) {
         result.push_back(Token(")"));
         implicitOpenParens.pop();
@@ -94,7 +92,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
       break;
   }
 
-  emitAll(buffer, result, explicitOpenParens);
+  emitAll(buffer, /*dummy*/Token::Newline(), result, explicitOpenParens);
   for (unsigned long i=0; i < implicitOpenParens.size(); ++i)
     result.push_back(Token(")"));
   return result;
@@ -112,10 +110,11 @@ void emit(const Token& t, list<Token>& out, long& explicitOpenParens) {
   if (explicitOpenParens < 0) RAISE << "Unbalanced )" << endl;
 }
 
-void emitAll(list<Token>& buffer, list<Token>& out, long& explicitOpenParens) {
-  for (list<Token>::iterator p = buffer.begin(); p != buffer.end(); ++p)
+void emitAll(list<Token>& buffer, const Token& curr, list<Token>& out, long& explicitOpenParens) {
+  for (list<Token>::const_iterator p = buffer.begin(); p != buffer.end(); ++p)
     emit(*p, out, explicitOpenParens);
   buffer.clear();
+  emit(curr, out, explicitOpenParens);
 }
 
 void restoreIndent(long indent, IndentSensitiveStream& in) {
