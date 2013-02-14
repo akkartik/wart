@@ -61,9 +61,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
       thisLineIndent = curr.indentLevel;
 
     //// decide what to emit, tracking (implicit/explicit) open parens
-    if (curr.newline) {
-    }
-    else if (isQuoteOrUnquote(curr)) {
+    if (isQuoteOrUnquote(curr)) {
       if (numWordsInLine < 2)
         buffer.push_back(curr);
       else
@@ -78,7 +76,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
         emit(curr, result, explicitOpenParens);
       }
     }
-    else if (!isIndent(curr)) {
+    else if (!isIndent(curr) && !curr.newline) {
       if (numWordsInLine < 2) {
         buffer.push_back(curr);
       }
@@ -91,7 +89,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
         result.push_back(curr);
       }
     }
-    else {
+    else if (!curr.newline) {
       emitAll(buffer, result, explicitOpenParens);
       while (!implicitOpenParens.empty() && thisLineIndent <= implicitOpenParens.top()) {
         result.push_back(Token(")"));
