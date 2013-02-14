@@ -69,7 +69,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
       buffer.push_back(curr);
     }
     else {
-      if (numWordsInLine == 2 && isWord(curr) && explicitOpenParens == 0 && !parenAtStartOfLine) {
+      if (numWordsInLine == 2 && isWord(curr) && explicitOpenParens == 0) {
         result.push_back(Token("("));
         implicitOpenParens.push(thisLineIndent);
       }
