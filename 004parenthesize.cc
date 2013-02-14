@@ -100,7 +100,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
     //// we done?
     if (explicitOpenParens == 0 && implicitOpenParens.empty()) {
       if (isIndent(curr)) restoreIndent(thisLineIndent, in);
-      if (curr.newline || curr == ")" || isIndent(curr)) break;
+      if (isIndent(curr) || curr.newline || curr == ")") break;
     }
     if (interactive && curr.newline && explicitOpenParens == 0 && in.fd.peek() == '\n')
       break;
