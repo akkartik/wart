@@ -62,8 +62,8 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
 
     //// decide what to emit, tracking (implicit/explicit) open parens
     if (parenAtStartOfLine) {
-      emitAll(buffer, result, explicitOpenParens);
-      emit(curr, result, explicitOpenParens);
+      emitAll(buffer, result, explicitOpenParens);  // any quotes
+      emit(curr, result, explicitOpenParens);   // numWordsInLine is irrelevant
     }
     else if (numWordsInLine < 2) {
       buffer.push_back(curr);
