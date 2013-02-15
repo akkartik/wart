@@ -1,0 +1,13 @@
+(test "read_byte works"
+  :valueof (with instring "ab"
+             (read_byte)
+             (read_byte))
+  :should be 98)
+
+(test "with stream macros clean up after themselves"
+  :valueof (let f (tmpfile)
+             (before (system:join "rm " f)
+               (with outfile f
+                 (prn 34))
+               (numBindings 'stdin)))
+  :should be 1)
