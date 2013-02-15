@@ -677,14 +677,13 @@ void test_object_expr_evals_to_itself() {
 }
 
 void test_eval_handles_quoted_atoms() {
-  stringstream s("'a\n'34");
-  Cell* expr = read(s);
+  Cell* expr = read("'a");
   Cell* result = eval(expr);
   checkEq(result, newSym("a"));
   rmref(result);
   rmref(expr);
 
-  expr = read(s);
+  expr = read("'34");
   result = eval(expr);
   checkEq(result, newNum(34));
   rmref(result);
