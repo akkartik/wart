@@ -51,6 +51,6 @@ def (match? x y) :case table?.x
               (match? v y.k))
             (as list x)))
 
-mac (w_table h ... body)
+mac (with `table h ... body)
   `(ret ,h (table)
      ,@body)
