@@ -30,8 +30,8 @@ def (- n ... rest) :case no.rest
 
 
 let ($<) (<)
-  def! (< ... args)
-    (and (all (fn((x y)) ($< x y))
+  def (< ... args) :case ($< 2 len.args)
+    (and (all (fn((x y)) (x < y))
               pairwise.args)
          last.args)
 

@@ -111,6 +111,22 @@
   :valueof ("a" < "a")
   :should be nil)
 
+(test "< works on strings - 4"
+  :valueof (< "a" "b" "c")
+  :should ~be nil)
+
+(test "< works on strings - 5"
+  :valueof (< "a" "b" "a")
+  :should be nil)
+
+(test "< works on strings - 6"
+  :valueof ("a" < "b" < "c")
+  :should ~be nil)
+
+(test "< works on strings - 7"
+  :valueof ("a" < "b" < "a")
+  :should be nil)
+
 (test "> works on strings"
   :valueof ("a" > "b")
   :should be nil)
@@ -131,8 +147,24 @@
   :valueof (> "a" "b" "a")
   :should be nil)
 
-(test "> works on strings - 3"
+(test "> works on strings - 6"
   :valueof ("a" > "a")
+  :should be nil)
+
+(test "> works on strings - 7"
+  :valueof (> "c" "b" "a")
+  :should ~be nil)
+
+(test "> works on strings - 8"
+  :valueof (> "c" "b" "c")
+  :should be nil)
+
+(test "> works on strings - 9"
+  :valueof ("c" > "b" > "a")
+  :should ~be nil)
+
+(test "> works on strings - 7"
+  :valueof ("c" > "b" > "c")
   :should be nil)
 
 (test "<= works on strings"

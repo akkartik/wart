@@ -50,8 +50,9 @@ defcoerce list string
 defcoerce nil string
   (fn() "")
 
-def (a < b) :case string?.a
-  (string_lesser a b)
+def (< a b ... rest) :case (and string?.a no.rest)
+  if (string_lesser a b)
+    b
 
 def (digit? c)
   (and string?.c
