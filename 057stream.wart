@@ -40,3 +40,7 @@ def (infile fd) :case num?.fd
   infd.fd
 def (outfile fd) :case num?.fd
   outfd.fd
+
+mac (drain expr eof)
+  `(collect:awhile ,expr
+     yield.it)

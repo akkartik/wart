@@ -39,3 +39,10 @@ system "rm _x"
                  (prn 34))
                (numBindings 'stdin)))
   :should be 1)
+
+(test "drain works"
+  :valueof (with instring "a b
+c d
+e"
+              (drain:read))
+  :should be '((a b) (c d) e))
