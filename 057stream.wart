@@ -44,3 +44,7 @@ def (outfile fd) :case num?.fd
 mac (drain expr eof)
   `(collect:awhile ,expr
      yield.it)
+
+def (pr ... args) :case ~single?.args
+  (map pr args)
+  car.args
