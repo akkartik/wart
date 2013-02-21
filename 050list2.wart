@@ -107,6 +107,9 @@ def (join ... args)
             (join cdr+car.args @cdr.args))
       (join @cdr.args)
 
+def (+ ... args) :case (all list? args)   # ensure there's no functions
+  (join @args)
+
 def (keep f seq)
   if seq
     if f+car.seq

@@ -6,7 +6,7 @@ mac (zap f x)
 <- cdr.nils nils
 
 mac (wipe ... places)
-  `(<- ,@(join @(zip places nils)))
+  `(<- ,@(+ @(zip places nils)))
 
 mac (push x seq)
   `(<- ,seq (cons ,x ,seq))
@@ -16,7 +16,7 @@ mac (pop seq)
      (zap cdr ,seq))
 
 mac (shift ... places)  # multiple-eval to maintain places
-  `(<- ,@(join @(zip places cdr.places)))
+  `(<- ,@(+ @(zip places cdr.places)))
 
 mac (rotate ... places)
   `(let $tmp ,car.places
