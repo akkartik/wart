@@ -64,8 +64,8 @@ def (backquoted tree)
   if backquoted?.tree
        (list cdr.tree)
      cons?.tree
-       (join (backquoted car.tree)
-             (backquoted cdr.tree))
+       (join backquoted+car.tree
+             backquoted+cdr.tree)
 
 def (unqq tree)
   if backquoted?.tree
@@ -73,5 +73,5 @@ def (unqq tree)
      ~cons?.tree
        tree
      :else
-       (cons (unqq car.tree)
-             (unqq cdr.tree))
+       (cons unqq+car.tree
+             unqq+cdr.tree)
