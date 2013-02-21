@@ -12,63 +12,61 @@ mac! (def! (name ... params) ... body)
 mac! (let var val ... body)
   `((fn(,var) ,@body) ,val)
 
-let if if   ## ignore later refinements for the rest of this file
+mac! (do ... body)
+  `((fn() ,@body))
 
-  mac! (do ... body)
-    `((fn() ,@body))
+mac! f.x
+  `(,f ,x)
 
-  mac! f.x
-    `(,f ,x)
+mac! f.-x
+  `(,f (- ,x))
 
-  mac! f.-x
-    `(,f (- ,x))
-
-  def! (prn ... args)
-    (if args
-      (do
-        (pr car.args)
-        (prn @cdr.args)
-        car.args)
-      (pr "
+def! (prn ... args)
+  (if args
+    (do
+      (pr car.args)
+      (prn @cdr.args)
+      car.args)
+    (pr "
 "))
 
-  mac! (def (name ... params) ... body)
-    if bound?.name
-      (prn "redef: " name)
-    `(def! (,name ,@params) ,@body)
+mac! (def (name ... params) ... body)
+  if bound?.name
+    (prn "redef: " name)
+  `(def! (,name ,@params) ,@body)
 
-  mac! (mac (name ... params) ... body)
-    if bound?.name
-      (prn "redef: " name)
-    `(mac! (,name ,@params) ,@body)
+mac! (mac (name ... params) ... body)
+  if bound?.name
+    (prn "redef: " name)
+  `(mac! (,name ,@params) ,@body)
 
-  mac (alias new old)  ## include later refinements
-    `(mac (,new ... $args)
-       `(,,old ,@$args))
+mac (alias new old)  ## include later refinements
+  `(mac (,new ... $args)
+     `(,,old ,@$args))
 
-  def (compose f g)
-    fn '$args
-      eval `(,f (,g ,@$args)) caller_scope
+def (compose f g)
+  fn '$args
+    eval `(,f (,g ,@$args)) caller_scope
 
-  alias (:) compose
+alias (:) compose
 
-  def (complement f)
-    (compose not f)
+def (complement f)
+  (compose not f)
 
-  alias (~) complement
+alias (~) complement
 
-  def (list ... args)
-    args
+def (list ... args)
+  args
 
-  def (map f seq)
-    if seq
-      (cons (f car.seq)
-            (map f cdr.seq))
+def (map f seq)
+  if seq
+    (cons (f car.seq)
+          (map f cdr.seq))
 
-  alias cadr car:cdr
-  alias cddr cdr:cdr
+alias cadr car:cdr
+alias cddr cdr:cdr
 
-  def (id _)
-    _
-  alias present? id
-  alias no not
+def (id _)
+  _
+alias present? id
+alias no not
