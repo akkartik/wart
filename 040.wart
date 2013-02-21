@@ -9,18 +9,6 @@
 mac! (def! (name ... params) ... body)
   `(,name <- (fn ,params ,@body))
 
-mac! (let var val ... body)
-  `((fn(,var) ,@body) ,val)
-
-mac! (do ... body)
-  `((fn() ,@body))
-
-mac! f.x
-  `(,f ,x)
-
-mac! f.-x
-  `(,f (- ,x))
-
 def! (prn ... args)
   (if args
     (do
@@ -31,29 +19,18 @@ def! (prn ... args)
 "))
 
 mac! (def (name ... params) ... body)
-  if bound?.name
+  if (bound? name)
     (prn "redef: " name)
   `(def! (,name ,@params) ,@body)
 
 mac! (mac (name ... params) ... body)
-  if bound?.name
+  if (bound? name)
     (prn "redef: " name)
   `(mac! (,name ,@params) ,@body)
 
 mac (alias new old)  ## include later refinements
   `(mac (,new ... $args)
      `(,,old ,@$args))
-
-def (compose f g)
-  fn '$args
-    eval `(,f (,g ,@$args)) caller_scope
-
-alias (:) compose
-
-def (complement f)
-  (compose not f)
-
-alias (~) complement
 
 def (list ... args)
   args
@@ -70,3 +47,9 @@ def (id _)
   _
 alias present? id
 alias no not
+
+mac! (let var val ... body)
+  `((fn(,var) ,@body) ,val)
+
+mac! (do ... body)
+  `((fn() ,@body))
