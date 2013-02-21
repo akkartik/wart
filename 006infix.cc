@@ -18,11 +18,10 @@
 //    so comparers should return last arg on success: (1 < 3) => 3
 //    so comparers should return any nil passed in (1 < nil) => nil; (nil < 1) => nil
 //  interaction with paren insertion
-//  use ':sym' for keyword args
 //  support a.-b, l.-1
 //    rely on separate def for .- op
 
-const string extraSymChars = "$?!_";  // besides letters and digits
+const string extraSymChars = "$?!_:";  // besides letters and digits
 
 AstNode transformInfix(AstNode n) {
   // special-case: ellipses are for dotted lists, not infix
@@ -133,9 +132,6 @@ AstNode transformInfix(AstNode n) {
 
 AstNode tokenizeInfix(AstNode n) {
   const char* var = n.atom.token.c_str();
-
-  // special-case: :sym is never infix
-  if (var[0] == ':') return n;
 
   string out;
   for (size_t x=0; var[x] != '\0'; ++x) {

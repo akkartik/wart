@@ -109,13 +109,13 @@ void test_infix_passes_wrapped_op() {
 }
 
 void test_infix_passes_wrapped_op2() {
-  IndentSensitiveStream in("(a (:) b)");
+  IndentSensitiveStream in("(a (+) b)");
   AstNode n = transformInfix(nextAstNode(in));
   check(isList(n));
   list<AstNode>::iterator p = n.elems.begin();
   checkEq(*p, "("); ++p;
   checkEq(*p, "a"); ++p;
-  checkEq(*p, ":"); ++p;
+  checkEq(*p, "+"); ++p;
   checkEq(*p, "b"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
@@ -414,26 +414,6 @@ void test_infix_gives_ops_without_spaces_precedence() {
     checkEq(*p2, "1"); ++p2;
     checkEq(*p2, ")"); ++p2;
     check(p2 == n2.elems.end());
-  checkEq(*p, ")"); ++p;
-  check(p == n.elems.end());
-}
-
-void test_infix_passes_keyword_syms() {
-  IndentSensitiveStream in(":a");
-  AstNode n = nextAstNode(in);
-  check(isAtom(n));
-  checkEq(transformInfix(n), n.atom);
-}
-
-void test_infix_passes_keyword_syms2() {
-  IndentSensitiveStream in("(f :a x)");
-  AstNode n = transformInfix(nextAstNode(in));
-  check(isList(n));
-  list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, "("); ++p;
-  checkEq(*p, "f"); ++p;
-  checkEq(*p, ":a"); ++p;
-  checkEq(*p, "x"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == n.elems.end());
 }
