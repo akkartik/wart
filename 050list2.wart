@@ -2,7 +2,7 @@ defcall list (seq idx ... ends)
   withs (idx    (range_start seq idx)
          end    (if
                   no.ends
-                    (+ idx 1)
+                    idx+1
                   ~car.ends
                     len.seq
                   :else
@@ -15,7 +15,7 @@ defcall list (seq idx ... ends)
 defset list ((seq idx ... ends) val)
   `(withs ($idx (range_start ,seq ,idx)
            $end ,(if no.ends
-                   `(+ $idx 1)
+                   `($idx + 1)
                    `(if (not ,car.ends)
                       (len ,seq)
                       (range_bounce ,seq ,car.ends))))
