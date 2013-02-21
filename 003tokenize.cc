@@ -74,6 +74,8 @@ Token nextToken(IndentSensitiveStream& in) {
   else
     slurpWord(in.fd, out);
 
+  if (out.str() == ":") return nextToken(in);
+
   return Token(out.str());
 }
 

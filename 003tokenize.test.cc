@@ -120,7 +120,7 @@ void test_tokenize_suppresses_comments() {
 }
 
 void test_tokenize_suppresses_comments2() {
-  IndentSensitiveStream in("a b\n  c\n#abc\ndef\n  ghi\n\njkl");
+  IndentSensitiveStream in("a : b\n  : c\n#abc\ndef :\n  ghi\n\njkl");
   Token t = nextToken(in);
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "a");             t=nextToken(in);
