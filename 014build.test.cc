@@ -115,7 +115,7 @@ void test_build_handles_form() {
   rmref(origc);
 }
 
-void test_build_handles_dot() {
+void test_build_handles_dotted_list() {
   IndentSensitiveStream in("(34 ... 35)");
   Cell *c=nextCell(in), *origc=c;
   checkEq(c->nrefs, 0);
@@ -127,6 +127,16 @@ void test_build_handles_dot() {
   checkEq(c->nrefs, 2);
 
   rmref(origc);
+}
+
+void test_build_handles_literal_ellipses() {
+  IndentSensitiveStream in("'...");
+  Cell *c=nextCell(in);
+  checkEq(c->nrefs, 0);
+  checkEq(car(c), newSym("'"));
+  checkEq(cdr(c), newSym("..."));
+  checkEq(cdr(c)->nrefs, 2);
+  rmref(c);
 }
 
 void test_build_handles_nested_form() {

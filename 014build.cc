@@ -49,8 +49,10 @@ Cell* buildCell(AstNode n) {
 
   list<AstNode>::iterator next = first; ++next;
   if (*next == "...") {
-    if (n.elems.size() == 2) RAISE << "Syntax error: ... can't terminate expr" << endl << DIE;
-    setCdr(newForm, buildCell(*++next));  // dotted pair
+    if (next != --n.elems.end())
+      setCdr(newForm, buildCell(*++next));  // dotted pair
+    else
+      setCdr(newForm, buildCell(*next));
   }
   else if (isQuoteOrUnquote(*first) && n.elems.size() == 2) {
     setCdr(newForm, buildCell(*next));  // dotted pair
