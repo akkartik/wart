@@ -32,17 +32,6 @@ mac (alias new old)  ## include later refinements
   `(mac (,new ... $args)
      `(,,old ,@$args))
 
-def (list ... args)
-  args
-
-def (map f seq)
-  if seq
-    (cons (f car.seq)
-          (map f cdr.seq))
-
-alias cadr car:cdr
-alias cddr cdr:cdr
-
 def (id _)
   _
 alias present? id

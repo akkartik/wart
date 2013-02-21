@@ -1,13 +1,3 @@
-def (pair seq)
-  (if
-    no.seq
-      nil
-    ~cdr.seq
-      (list:list car.seq)
-    :else
-      (cons (list car.seq cadr.seq)
-            (pair cddr.seq)))
-
 mac (with bindings ... body)
   `((fn ,(map car pair.bindings)
      ,@body)

@@ -51,6 +51,10 @@ err "wart tests: "
     :should be '(1 3))
 (show_warnings)
 
+(test "fn evals rest arg aliases only once"
+  :valueof (ret x 0 ((fn (| a b) a) ++x))
+  :should be 1)
+
 
 
 (test "do returns last expr"
@@ -62,15 +66,3 @@ err "wart tests: "
                        (a <- a+1)))
                2)
   :should be 4)
-
-
-
-(test "map works"
-  :valueof (map (++) '(1 2 3))
-  :should be '(2 3 4))
-
-
-
-(test "fn evals rest arg aliases only once"
-  :valueof (ret x 0 ((fn (| a b) a) ++x))
-  :should be 1)
