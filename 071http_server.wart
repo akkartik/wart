@@ -10,8 +10,8 @@ mac (accepting client socket|from ... body)
          ,@body)))  # body must close client socket
 
 def (parseHeaders client)
-  making stdin infile:fd.client
-    let (verb url) (split:read_line)
+  making stdin infile+fd.client
+    let (verb url) (split+read_line)
       url
 
 def (server port)
@@ -19,7 +19,7 @@ def (server port)
     preforking 6  # handler threads
       accepting client :from socket
         let url parseHeaders.client
-          making stdout outfile:fd.client
+          making stdout outfile+fd.client
             prn "HTTP/1.0 200 OK"
             prn "Content-type: text/plain"
             prn ""

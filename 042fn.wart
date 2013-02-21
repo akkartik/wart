@@ -8,7 +8,13 @@ def (compose f g)
   fn '$args
     eval `(,f (,g ,@$args)) caller_scope
 
-alias (:) compose
+let ($+ $if ($=)) `(,+ ,if ,=)
+  def! f+g
+    $if ((type f) $= 'function)
+      (compose f g)
+      $if ((type g) $= 'function)
+        (compose f g)
+        ($+ f g)
 
 def (complement f)
   (compose not f)

@@ -46,7 +46,7 @@ mac (def (name ... params) ... body) :case (and (car.body = :case)
 
 <- backquote (car '`(1))
 alias backquote? predicate.backquote
-alias backquoted? (cons? & backquote?:car)
+alias backquoted? (cons? & backquote?+car)
 
 mac (def (name ... params) ... body) :case (mem? backquote params)
   `(def (,name ,@unqq.params) :case (and ,@(map (fn(_)

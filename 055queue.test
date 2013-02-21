@@ -10,7 +10,7 @@
   :should be 3)
 
 (test "len works on queues"
-  :valueof (len:queue '(1 2 3 4))
+  :valueof (len+queue '(1 2 3 4))
   :should be 4)
 
 (test "deq works"

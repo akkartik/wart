@@ -5,7 +5,7 @@
 
 system "echo abc > _x"
 (test "read works on fd"
-  :valueof (making stdin (infd:input_fd "_x")
+  :valueof (making stdin (infd+input_fd "_x")
              (read))
   :should be 'abc)
 system "rm _x"
@@ -25,7 +25,7 @@ system "rm _x"
 
 (test "with infile/outfile works"
   :valueof (let f (tmpfile)
-             (before (system:join "rm " f)
+             (before (system+join "rm " f)
                (with outfile f
                  (prn 34))
                (with infile f
@@ -34,7 +34,7 @@ system "rm _x"
 
 (test "with stream macros clean up after themselves"
   :valueof (let f (tmpfile)
-             (before (system:join "rm " f)
+             (before (system+join "rm " f)
                (with outfile f
                  (prn 34))
                (numBindings 'stdin)))
@@ -44,7 +44,7 @@ system "rm _x"
   :valueof (with instring "a b
 c d
 e"
-              (drain:read))
+              (drain+read))
   :should be '((a b) (c d) e))
 
 (test "pr can print multiple args"

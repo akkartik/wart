@@ -40,7 +40,7 @@ def (match? a b bindings) :case sym?.a
 
 # ignore the unique numeric suffix in a $sym
 def (root x)
-  let name (rev:as list string.x)
-    while (and name digit?:car.name)
+  let name (rev+as list string.x)
+    while (and name digit?+car.name)
       (zap cdr name)
     (sym @rev.name)

@@ -39,14 +39,14 @@ def (vals h)
 
 def (x = y) :case table?.x
   (and table?.y
-       (len:keys.x = len:keys.y)
+       (len+keys.x = len+keys.y)
        (all (fn((k v))
               (y.k = v))
             (as list x)))
 
 def (match? x y) :case table?.x
   (and table?.y
-       (len:keys.x = len:keys.y)
+       (len+keys.x = len+keys.y)
        (all (fn((k v))
               (match? v y.k))
             (as list x)))
