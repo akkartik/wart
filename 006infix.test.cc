@@ -82,6 +82,47 @@ void test_infix_handles_quoting() {
   check(p == n.elems.end());
 }
 
+void test_infix_handles_quoting2() {
+  IndentSensitiveStream in("',a+b");
+  AstNode n = transformInfix(nextAstNode(in));
+  check(isList(n));
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, "'"); ++p;
+  checkEq(*p, ","); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == n.elems.end());
+}
+
+void test_infix_handles_quoting3() {
+  IndentSensitiveStream in("',(a + b)");
+  AstNode n = transformInfix(nextAstNode(in));
+  check(isList(n));
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, "'"); ++p;
+  checkEq(*p, ","); ++p;
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "+"); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == n.elems.end());
+}
+
+void test_infix_handles_quoting4() {
+  IndentSensitiveStream in("',(+)");
+  AstNode n = transformInfix(nextAstNode(in));
+  check(isList(n));
+  list<AstNode>::iterator p = n.elems.begin();
+  checkEq(*p, "'"); ++p;
+  checkEq(*p, ","); ++p;
+  checkEq(*p, "+"); ++p;
+  check(p == n.elems.end());
+}
+
 void test_infix_handles_simple_lists() {
   IndentSensitiveStream in("(a + b)");
   AstNode n = transformInfix(nextAstNode(in));

@@ -52,7 +52,7 @@ AstNode transformInfix(AstNode n) {
         ? transformInfix(*p)
         : transformInfix(AstNode(list<AstNode>(p, n.elems.end())));
     if (isAtom(result)) {
-      n.elems.pop_back();
+      n.elems.erase(p, n.elems.end());
       n.elems.push_back(result);
       return n;
     }
