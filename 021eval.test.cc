@@ -542,6 +542,23 @@ void test_evalBindAll_binds_alternatives_to_non_cons() {
   rmref(params);
 }
 
+void test_evalBindAll_handles_duplicate_destructured_aliases() {
+  Cell* params = read("((a b|x) (c d|x))");
+  Cell* args = read("('(1 :x 2) '(3 :x 4))");
+  Cell* newScope = newTable();
+  evalBindAll(params, args, nil, newScope);
+  // {a: 1, b: 2, c: 3, d: 4, x: 2 or 4}
+  checkEq(unsafeGet(newScope, "a"), newNum(1));
+  checkEq(unsafeGet(newScope, "b"), newNum(2));
+  checkEq(unsafeGet(newScope, "c"), newNum(3));
+  checkEq(unsafeGet(newScope, "d"), newNum(4));
+  Cell* x = unsafeGet(newScope, "x");
+  check(x == newNum(2) || x == newNum(4));
+  rmref(newScope);
+  rmref(args);
+  rmref(params);
+}
+
 
 
 Cell* processUnquotes(Cell* x, long depth) {

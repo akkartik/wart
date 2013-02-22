@@ -250,7 +250,8 @@ void bindAliases(Cell* aliases, Cell* arg, Cell* unevaldArg, Cell* newScope) {
   if (len(aliases) <= 2)
     RAISE << "just one param alias: " << aliases << ". Are you sure?\n";
   for (aliases=cdr(aliases); aliases != nil; aliases=cdr(aliases))
-    bindParams(car(aliases), arg, unevaldArg, newScope);
+    if (!unsafeGet(newScope, car(aliases))) // skip duplicate destructured aliases
+      bindParams(car(aliases), arg, unevaldArg, newScope);
 }
 
 Cell* evalAll(Cell* args, Cell* scope) {
