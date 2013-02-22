@@ -77,6 +77,12 @@ def (lastcons seq)
 def (last seq)
   car+lastcons.seq
 
+def_assign last (seq x)
+  <- (car lastcons.seq) x
+
+def_assign lastcdr (seq x)
+  <- (cdr lastcons.seq) x
+
 
 
 def (zip a b)
