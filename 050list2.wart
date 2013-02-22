@@ -162,6 +162,13 @@ def (best f seq)
         if (f elem winner)
           winner <- elem
 
+def (firstn n x)
+  if ~list?.x
+       x
+     (n > 0)
+       (cons (firstn n-1 car.x)
+             (firstn n-1 cdr.x))
+
 
 
 ## internals
