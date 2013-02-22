@@ -303,6 +303,26 @@ void test_evalBindAll_handles_param_aliases() {
   rmref(params);
 }
 
+void test_evalBindAll_only_reorders_when_necessary() {
+  Cell* params = read("((a|b))");
+  Cell* x = read("(3)");
+  setCdr(x, x);   // cycle
+  Cell* scope = mkref(newTable());
+  set(scope, newSym("x"), x);
+  Cell* arg = read("((fn args args) x)");   // (list x)
+  Cell* args = mkref(newCons(arg));
+  Cell* newScope = mkref(newTable());
+  evalBindAll(params, args, scope, newScope);
+  // should terminate
+  setCdr(x, nil);
+  rmref(newScope);
+  rmref(args);
+  rmref(arg);
+  rmref(scope);
+  rmref(x);
+  rmref(params);
+}
+
 void test_evalBindAll_binds_as_params() {
   Cell* params = read("(a | (b c))");
   Cell* args = read("(1 2)");

@@ -232,17 +232,15 @@ void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, Cell* newScope) {
     return;
   }
 
-  Cell* orderedArgs = reorderKeywordArgs(args, params);
-
   if (isAlias(params)) {
-    bindAliases(params, orderedArgs, unevaldArgs, newScope);
+    bindAliases(params, args, unevaldArgs, newScope);
   }
   else {
+    Cell* orderedArgs = reorderKeywordArgs(args, params);
     bindParams(car(params), car(orderedArgs), unevaldArgs && isCons(unevaldArgs) ? car(unevaldArgs) : unevaldArgs, newScope);
     bindParams(cdr(params), cdr(orderedArgs), unevaldArgs && isCons(unevaldArgs) ? cdr(unevaldArgs) : unevaldArgs, newScope);
+    rmref(orderedArgs);
   }
-
-  rmref(orderedArgs);
 }
 
 void bindAliases(Cell* aliases, Cell* arg, Cell* unevaldArg, Cell* newScope) {
