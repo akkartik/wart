@@ -208,7 +208,6 @@ void evalBindAlias(Cell* alias, Cell* arg, Cell** cachedVal, Cell* scope, Cell* 
 
 // NULL unevaldArgs => args are already quoted
 void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, Cell* newScope) {
-
   if (isQuoted(params)) {
     if (unevaldArgs)
       bindParams(stripQuote(params), unevaldArgs, NULL, newScope);
