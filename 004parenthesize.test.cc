@@ -620,7 +620,8 @@ void test_parenthesize_handles_multiple_exprs_on_a_line() {
 }
 
 void test_parenthesize_breaks_at_empty_lines_when_interactive() {
-  list<Token> tokens = nextExpr(*new IndentSensitiveStream("34 35\n\n  36"));
+  IndentSensitiveStream in("34 35\n\n  36");
+  list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
   checkEq(*p, "34"); ++p;
@@ -630,7 +631,8 @@ void test_parenthesize_breaks_at_empty_lines_when_interactive() {
   check(p == tokens.end());
 
   interactive = true;
-  tokens = nextExpr(*new IndentSensitiveStream("34 35\n\n  36"));
+  rewind(in);
+  tokens = nextExpr(in);
     p = tokens.begin();
     checkEq(*p, "("); ++p;
     checkEq(*p, "34"); ++p;
@@ -641,7 +643,8 @@ void test_parenthesize_breaks_at_empty_lines_when_interactive() {
 }
 
 void test_parenthesize_breaks_indent_at_empty_lines_when_interactive() {
-  list<Token> tokens = nextExpr(*new IndentSensitiveStream("a b\n  c\n\n  d"));
+  IndentSensitiveStream in("a b\n  c\n\n  d");
+  list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   checkEq(*p, "("); ++p;
   checkEq(*p, "a"); ++p;
@@ -652,7 +655,8 @@ void test_parenthesize_breaks_indent_at_empty_lines_when_interactive() {
   check(p == tokens.end());
 
   interactive = true;
-  tokens = nextExpr(*new IndentSensitiveStream("a b\n  c\n\n  d"));
+  rewind(in);
+  tokens = nextExpr(in);
     p = tokens.begin();
     checkEq(*p, "("); ++p;
     checkEq(*p, "a"); ++p;
@@ -683,4 +687,10 @@ void test_parenthesize_resets_stream_after_multiple_exprs_in_a_line() {
   checkEq(*p, "d"); ++p;
   checkEq(*p, ")"); ++p;
   check(p == tokens.end());
+}
+
+void rewind(IndentSensitiveStream& in) {
+  in.fd.clear();
+  in.fd.seekg(0);
+  in.atStartOfLine = true;
 }
