@@ -52,7 +52,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
     else if (isWord(curr))
       ++numWordsInLine;
 
-    if (isIndent(curr) || curr.newline)
+    if (isIndent(curr))
       thisLineIndent = curr.indentLevel;
 
     if (isIndent(curr) || curr.newline)
