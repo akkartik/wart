@@ -68,13 +68,12 @@ mac (in x ... choices)
                 choices)))
 
 def (predicate x)
-  (if
-    (isa x function)
-      x
-    (x = :else)
-      (fn() 1)
-    :else
-      (fn(_) (x = _)))
+  if (isa x function)
+       x
+     (x = :else)
+       (fn() 1)
+     :else
+       (fn(_) (x = _))
 
 mac (caselet var expr ... branches)
   let expand (afn(branches)

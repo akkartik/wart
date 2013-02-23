@@ -42,14 +42,13 @@ mac (awhen test ... body)
       ,@body)
 
 mac (aand ... args)
-  (if
-    no.args
-      1
-    ~cdr.args
-      car.args
-    :else
-      `(aif ,car.args
-         (aand ,@cdr.args)))
+  if no.args
+       1
+     ~cdr.args
+       car.args
+     :else
+       `(aif ,car.args
+          (aand ,@cdr.args))
 
 
 

@@ -5,14 +5,13 @@ cadr <- car+cdr # alias causes infinite loop via if
 cddr <- cdr+cdr
 
 def (pair seq)
-  (if
-    no.seq
-      nil
-    ~cdr.seq
-      (list+list car.seq)
-    :else
-      (cons (list car.seq cadr.seq)
-            (pair cddr.seq)))
+  if no.seq
+       nil
+     ~cdr.seq
+       (list+list car.seq)
+     :else
+       (cons (list car.seq cadr.seq)
+             (pair cddr.seq))
 
 def (map f seq)
   if seq

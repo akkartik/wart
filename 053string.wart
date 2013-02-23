@@ -1,12 +1,11 @@
 defcall string (s idx ... ends)
   withs (idx (range_start s idx)
-         end (if
-               no.ends
-                 (idx + 1)
-               ~car.ends
-                 len.s
-               :else
-                 (range_bounce s car.ends)))
+         end (if no.ends
+                   (idx + 1)
+                 ~car.ends
+                   len.s
+                 :else
+                   (range_bounce s car.ends)))
     (string_range s idx end)
 
 defset string ((s idx ... ends) val)

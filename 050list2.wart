@@ -1,12 +1,11 @@
 defcall list (seq idx ... ends)
   withs (idx    (range_start seq idx)
-         end    (if
-                  no.ends
-                    idx+1
-                  ~car.ends
-                    len.seq
-                  :else
-                    (range_bounce seq car.ends))
+         end    (if no.ends
+                      idx+1
+                    ~car.ends
+                      len.seq
+                    :else
+                      (range_bounce seq car.ends))
          slice  (list_range seq idx end))
     if ends
       slice
@@ -96,13 +95,12 @@ def (zipmax a b)
           (zipmax cdr.a cdr.b))
 
 def (flatten seq acc)
-  (if
-    no.seq
-      acc
-    ~list?.seq
-      (cons seq acc)
-    :else
-      (flatten car.seq (flatten cdr.seq acc)))
+  if no.seq
+       acc
+     ~list?.seq
+       (cons seq acc)
+     :else
+       (flatten car.seq (flatten cdr.seq acc))
 
 
 
@@ -143,14 +141,13 @@ def (map f ... seqs) :case cdr.seqs
           (map f @(map cdr seqs)))
 
 def (reduce f seq init)  # f is a binary op
-  (if
-    no.seq
-      init
-    ~cdr.seq
-      car.seq   # f on one op is the identity function
-    :else
-      (reduce f (cons (f car.seq cadr.seq)
-                      cddr.seq)))
+  if no.seq
+       init
+     ~cdr.seq
+       car.seq   # f on one op is the identity function
+     :else
+       (reduce f (cons (f car.seq cadr.seq)
+                       cddr.seq))
 
 def (pairwise seq)
   (zip seq cdr.seq)
