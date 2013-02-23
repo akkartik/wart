@@ -689,6 +689,29 @@ void test_parenthesize_resets_stream_after_multiple_exprs_in_a_line() {
   check(p == tokens.end());
 }
 
+void test_parenthesize_handles_multiline_parenthesized_exprs_when_interactive() {
+  IndentSensitiveStream in("(a b\n)\n");
+  list<Token> tokens = nextExpr(in);
+  list<Token>::iterator p = tokens.begin();
+  checkEq(*p, "("); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == tokens.end());
+
+  interactive = true;
+  rewind(in);
+  tokens = nextExpr(in);
+    p = tokens.begin();
+    checkEq(*p, "("); ++p;
+    checkEq(*p, "a"); ++p;
+    checkEq(*p, "b"); ++p;
+    checkEq(*p, ")"); ++p;
+    check(p == tokens.end());
+  check(!in.eof());  // no eof at the interactive prompt
+  interactive = false;
+}
+
 void rewind(IndentSensitiveStream& in) {
   in.fd.clear();
   in.fd.seekg(0);

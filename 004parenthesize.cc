@@ -47,21 +47,21 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
     Token curr = nextToken(in);
 
     //// various book-keeping based on curr token
-    if (isIndent(curr))
+    if (isIndent(curr) || curr.newline)
       numWordsInLine = 0;
     else if (isWord(curr))
       ++numWordsInLine;
 
-    if (isIndent(curr))
+    if (isIndent(curr) || curr.newline)
       thisLineIndent = curr.indentLevel;
 
-    if (isIndent(curr))
+    if (isIndent(curr) || curr.newline)
       parenAtStartOfLine = false;
     else if (curr == "(" && numWordsInLine == 0)
       parenAtStartOfLine = true;
 
     //// decide what to emit, tracking (implicit/explicit) open parens
-    if (parenAtStartOfLine)
+    if (parenAtStartOfLine || curr.newline)
       emitAll(buffer, curr, result, explicitOpenParens);
     else if (numWordsInLine < 2)
       buffer.push_back(curr);
