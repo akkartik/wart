@@ -1,10 +1,10 @@
-def (close f) :case (isa f infile)
+def (close f) :case (isa infile f)
   close_infile.f
 
-def (close f) :case (isa f outfile)
+def (close f) :case (isa outfile f)
   close_outfile.f
 
-def (close f) :case (isa f socket)
+def (close f) :case (isa socket f)
   close_socket.f
 
 mac (with `infile name ... body)

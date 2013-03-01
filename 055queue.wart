@@ -19,5 +19,5 @@ def (deq q)
 defcoerce queue list
   (fn(_) rep._.0)
 
-def (len q) :case (isa q queue)
+def (len q) :case (isa queue q)
   rep.q.2

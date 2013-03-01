@@ -22,7 +22,7 @@ mac (and ... args)
          (and ,@cdr.args))
 
 let ($=) (=) # ignore later refinements
-  def (isa x 'Type)
+  def (isa 'Type x)
     ($= type.x Type)
 
   def! (a = b)
@@ -68,7 +68,7 @@ mac (in x ... choices)
                 choices)))
 
 def (predicate x)
-  if (isa x function)
+  if (isa function x)
        x
      (x = :else)
        (fn() 1)
