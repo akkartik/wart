@@ -135,7 +135,7 @@ alias none ~some
 
 
 
-def (map f|with ... seqs) :case cdr.seqs
+def (map f|with ... seqs|over) :case cdr.seqs
   if (all present? seqs)
     (cons (f @(map car seqs))
           (map f @(map cdr seqs)))

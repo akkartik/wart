@@ -276,13 +276,17 @@ Cell* evalArg(Cell* arg, Cell* scope) {
 Cell* reorderKeywordArgs(Cell* args, Cell* params) {
   if (!isCons(stripQuote(params))) return mkref(args);
 
-  CellMap keywordArgs;
+  CellMap keywordArgs;  // all values will be refcounted.
   Cell* nonKeywordArgs = extractKeywordArgs(params, args, keywordArgs);
   Cell* result = argsInParamOrder(params, nonKeywordArgs, keywordArgs);   rmref(nonKeywordArgs);
+
+  for (CellMap::iterator p = keywordArgs.begin(); p != keywordArgs.end(); ++p)
+    if (p->second) rmref(p->second);
   return result;  // already mkref'd
 }
 
 // extract keyword args into the CellMap provided; return non-keyword args
+// always mkref what you insert into the CellMap
 Cell* extractKeywordArgs(Cell* params, Cell* args, CellMap& keywordArgs) {
   Cell *pNonKeywordArgs = newCell(), *curr = pNonKeywordArgs;
   for (; isCons(args); args=cdr(args)) {
@@ -295,32 +299,53 @@ Cell* extractKeywordArgs(Cell* params, Cell* args, CellMap& keywordArgs) {
     else if (isCons(keywordParam) && cdr(keywordParam) == nil
              && isAlias(car(keywordParam))) {
       args = cdr(args);   // skip keyword arg
+      Cell* endRest = nextKeyword(args, params);
+      Cell* restArgs = snip(args, endRest);
       for (Cell* p = cdr(car(keywordParam)); p != nil; p=cdr(p))
-        keywordArgs[car(p)] = args;
+        keywordArgs[car(p)] = mkref(restArgs);
+      rmref(restArgs);
       rmref(keywordParam);
-      args = nil;
+      args = endRest;
     }
     // keyword arg for param alias
     else if (isAlias(keywordParam)) {
       args = cdr(args);   // skip keyword arg
       for (Cell* p = cdr(keywordParam); p != nil; p=cdr(p))
-        keywordArgs[car(p)] = car(args);
+        keywordArgs[car(p)] = mkref(car(args));
     }
     // simple rest keyword arg
     else if (isCons(keywordParam)) {   // rest keyword arg
-      keywordArgs[car(keywordParam)] = cdr(args);  // ..must be final keyword arg
+      args = cdr(args);
+      Cell* endRest = nextKeyword(args, params);
+      keywordArgs[car(keywordParam)] = snip(args, endRest);  // already mkref'd
       rmref(keywordParam);
-      args = nil;
+      args = endRest;
     }
     // simple keyword arg
     else {
       args = cdr(args);   // skip keyword arg
-      keywordArgs[keywordParam] = car(args);
+      keywordArgs[keywordParam] = mkref(car(args));
     }
   }
   if (!isCons(args))  // improper list
     setCdr(curr, args);
   return dropPtr(pNonKeywordArgs);
+}
+
+Cell* nextKeyword(Cell* args, Cell* params) {
+  for (args=cdr(args); args != nil; args=cdr(args)) {
+    if (keywordArg(car(args), params) != nil)
+      return args;
+  }
+  return nil;
+}
+
+Cell* snip(Cell* x, Cell* next) {
+  if (next == nil) return mkref(x);
+  Cell* pResult = newCell();
+  for (Cell* curr = pResult; x != next; x=cdr(x),curr=cdr(curr))
+    addCons(curr, car(x));
+  return dropPtr(pResult);
 }
 
 Cell* argsInParamOrder(Cell* params, Cell* nonKeywordArgs, CellMap& keywordArgs) {

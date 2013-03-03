@@ -1450,6 +1450,23 @@ void test_eval_handles_rest_keyword_arg_at_end2() {
   endDynamicScope("f");
 }
 
+void test_eval_handles_args_after_rest_keyword() {
+  Cell* fn = read("(fn (a|with ... b|over) b)");
+  Cell* f = eval(fn);
+  newDynamicScope("f", f);
+  Cell* call = read("(f :over 1 2 :with 3)");
+  Cell* result = eval(call);
+  // (1 2)
+  checkEq(car(result), newNum(1));
+  checkEq(car(cdr(result)), newNum(2));
+  checkEq(cdr(cdr(result)), nil);
+  rmref(result);
+  rmref(call);
+  rmref(f);
+  rmref(fn);
+  endDynamicScope("f");
+}
+
 void test_eval_handles_quoted_rest_keyword_arg() {
   Cell* fn = read("(fn (a ... 'b) b)");
   Cell* f = eval(fn);

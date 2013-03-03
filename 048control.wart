@@ -100,6 +100,6 @@ mac (repeat n ... body) :case (n = :forever)
 # multiply-evals by design to support macros
 def (& ... fs)
   (fn 'args
-    (eval `(and ,@(map fs
+    (eval `(and ,@(map :over fs
                        :with (fn(f) `(,f ,@args))))
           caller_scope))

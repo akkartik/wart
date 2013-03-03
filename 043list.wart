@@ -13,7 +13,7 @@ def (pair seq)
        (cons (list car.seq cadr.seq)
              (pair cddr.seq))
 
-def (map f|with seq)
+def (map f|with seq|over)
   if seq
     (cons (f car.seq)
           (map f cdr.seq))
