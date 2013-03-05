@@ -35,58 +35,14 @@ make rewrites easier and less risky. An easy-to-rewrite codebase can respond
 to new requirements with radical reorganizations. And it allows newcomers to
 test their knowledge by attempting lots of reorganizations in sandboxes.
 
-But how can we make rewrite-friendly codebases? Some parts of the answer are
-easier to state:
-
-a) High-level features keep codebases small and increase their chances of
-fitting in a programmer's head. Programmers can only rewrite what fits in
-their heads.
-
-b) Comprehensive tests reduce rewrite risk by providing feedback. They also
-allow programmers to offload state about lots of different corner cases and
-reimport them as needed.
-
-c) Rewrite-friendly codebases must be reorganization-friendly. This implies
-smarter compilers that don't impose constraints on code ordering, and that
-permit lots of ways of dividing up behavior into subsystems, files and
-declarations. Contrast say C++'s constraints on declarations before use, which
-make file reorganization -- especially header file reorganization -- so
-onerous as to doom projects from the start.
-
-Other parts are harder. Radical reorganizations might shift subsystem
-boundaries, which can break lots of tests. How to rewrite with confidence when
-we need to change tests as well? I have a few ideas:
-
-d) Tier tests into levels, and make each level coherent and self-contained.
-This creates redundancy between tests at different levels, so that we can
-throw out sub-components and all their tests. But surely this isn't always
-practical. The reason we unit-test heavily at the finest possible granularity
-is to avoid the combinatorial explosion of codepaths that comes with
-hooking up subsystems together.
-
-e) Documentation. Documentation is deeply unsatisfying because it's hard to
-police it for staleness or comprehensiveness. I've been experimenting with
-extremely concise statements of scenarios considered and situations to avoid
-(e.g. http://github.com/akkartik/wart/blob/master/006infix.cc). They aren't
-comprehensive (that's what tests are for), but they highlight what's
-important, help newcomers glimpse the history and the 'theory' of the
-codebase, and can trigger conversations with veterans. They also help
-outsiders gauge the quality of a codebase. What scenarios did the programmers
-consider? Do they seem comprehensive?
-
-f) Minimize constraints on the end product to maximize programmers' sense of
-ownership. In particular, make backwards-compatibility guarantees only in the
-UX, not at the level of code. If a codebase is consumed by other programmers
-(if it provides an API, for example), force them to write unit tests for
-*their* apps. Most significant upgrades are non-trivial in the real-world; all
-we are doing is admitting this in advance.
-
-These ideas are more speculative and almost certainly not a complete answer.
-This project is an ongoing experiment in maintaining a rewrite-friendly
-codebase. My plan is to build something I enjoy working on and something I
-enjoy using. If I can pile on features without letting the design settle into
-a local optimum, that would be some measure of success. What techniques and
-tools will I need to keep up redesign in the presence of constant change?
+This project is an ongoing experiment in maintaining a rewrite-friendly stack
+without letting the architecture settle into a local optimum. So far I rely
+on: an extremely concise, high-level, late bound language to keep the codebase
+approachable to newcomers; minimal dependencies and zero compatibility
+guarantees to create and foster a sense of ownership; concise lists of
+scenarios considered in the design to record lessons learned and encourage
+rewrite attempts; thorough tests throughout the stack to supplant
+compatibility guarantees and avoid regressions during rewrites.
 
 Next: 001organization (http://github.com/akkartik/wart/blob/master/001organization)
 
