@@ -41,8 +41,9 @@ on: an extremely concise, high-level, late bound language to keep the codebase
 approachable to newcomers; minimal dependencies and zero compatibility
 guarantees to create and foster a sense of ownership; concise lists of
 scenarios considered in the design to record lessons learned and encourage
-rewrite attempts; thorough tests throughout the stack to supplant
-compatibility guarantees and avoid regressions during rewrites.
+rewrite attempts (e.g. https://github.com/akkartik/wart/blob/master/006infix.cc);
+and thorough tests throughout the stack to supplant compatibility guarantees
+and avoid regressions during rewrites.
 
 Next: 001organization (http://github.com/akkartik/wart/blob/master/001organization)
 
