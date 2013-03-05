@@ -52,3 +52,14 @@ def (foogen5 `z)
 (test "def :case pattern-matches on backquoted params - 2"
   :valueof (foogen5 z)
   :should be 'went_through_case)
+
+def (foogen6 a)
+  a
+def (foogen6 `0)
+  'went_through_case
+(test "def :case pattern-matches on backquoted literals"
+  :valueof (foogen6 'a)
+  :should be 'a)
+(test "def :case pattern-matches on backquoted literals - 2"
+  :valueof (foogen6 0)
+  :should be 'went_through_case)

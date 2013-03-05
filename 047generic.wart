@@ -49,16 +49,25 @@ alias backquote? predicate.backquote
 alias backquoted? (cons? & backquote?+car)
 
 mac (def (name ... params) ... body) :case (mem? backquote params)
-  `(def (,name ,@unqq.params) :case (and ,@(map (fn(_)
-                                                  `(,_ = ',_))
-                                                backquoted.params))
-     ,@body)
+  withs (bqvars   backquoted.params
+         bindings attach_gensyms.bqvars)
+    `(def (,name ,@(unqq params bindings)) :case (and ,@(map (fn((val gsym))
+                                                               `(,gsym = ',val))
+                                                             bindings))
+       ,@body)
 
 mac (mac (name ... params) ... body) :case (mem? backquote params)
-  `(mac (,name ,@unqq.params) :case (and ,@(map (fn(_)
-                                                  `(,_ = ',_))
-                                                backquoted.params))
-     ,@body)
+  withs (bqvars   backquoted.params
+         bindings attach_gensyms.bqvars)
+    `(mac (,name ,@(unqq params bindings)) :case (and ,@(map (fn((val gsym))
+                                                               `(,gsym = ',val))
+                                                             bindings))
+       ,@body)
+
+def (attach_gensyms syms)
+  if syms
+    (cons (list car.syms (uniq))
+          (attach_gensyms cdr.syms))
 
 def (backquoted tree)
   if backquoted?.tree
@@ -67,11 +76,21 @@ def (backquoted tree)
        (join backquoted+car.tree
              backquoted+cdr.tree)
 
-def (unqq tree)
+def (assoc l k)
+  if l
+    if (car+car.l = k)
+      car.l
+      (assoc cdr.l k)
+
+def (unqq tree bindings)
   if backquoted?.tree
-       (cons quote cdr.tree)
+       with (var (car+assoc bindings cdr.tree)
+             binding (cadr+assoc bindings cdr.tree))
+         if sym?.var
+           (cons quote binding)
+           binding
      ~cons?.tree
        tree
      :else
-       (cons unqq+car.tree
-             unqq+cdr.tree)
+       (cons (unqq car.tree bindings)
+             (unqq cdr.tree bindings))
