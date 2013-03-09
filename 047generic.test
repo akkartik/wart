@@ -63,3 +63,15 @@ def (foogen6 `0)
 (test "def :case pattern-matches on backquoted literals - 2"
   :valueof (foogen6 0)
   :should be 'went_through_case)
+
+def (foogen7 a)
+  a
+def (foogen7 0)
+  'went_through_case
+(test "def :case pattern-matches on naked literals"
+  :valueof (foogen7 'a)
+  :should be 'a)
+(x <- 0)
+(test "def :case pattern-matches on naked literals - 2"
+  :valueof (foogen7 x)
+  :should be 'went_through_case)

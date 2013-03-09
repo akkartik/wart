@@ -19,7 +19,7 @@ Here's another way to define factorial:
   def (fact n)
     (n * (fact n-1))
 
-  def (fact n) :case (n = 0)
+  def (fact 0)
     1
 
 All functions are generic and can be extended or overridden at any time. The

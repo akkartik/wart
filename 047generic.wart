@@ -23,12 +23,12 @@ mac (def (name ... params) ... body) :case (car.body = :case)
 
 quote <- (car ''1)
 
-def (mem? atom tree)
-  if (= atom tree)
+def (mem? x tree)
+  if (predicate.x tree)
        1
      cons?.tree
-       (or (mem? atom car.tree)
-           (mem? atom cdr.tree))
+       (or (mem? x car.tree)
+           (mem? x cdr.tree))
 
 mac (def (name ... params) ... body) :case (and (car.body = :case)
                                                 (mem? quote params))
@@ -48,16 +48,21 @@ mac (def (name ... params) ... body) :case (and (car.body = :case)
 alias backquote? predicate.backquote
 alias backquoted? (cons? & backquote?+car)
 
-mac (def (name ... params) ... body) :case (mem? backquote params)
-  withs (bqvars   backquoted.params
+def (literal? x)
+  (or backquote?.x
+      num?.x
+      string?.x)
+
+mac (def (name ... params) ... body) :case (mem? literal? params)
+  withs (bqvars   literal.params
          bindings attach_gensyms.bqvars)
     `(def (,name ,@(unqq params bindings)) :case (and ,@(map (fn((val gsym))
                                                                `(,gsym = ',val))
                                                              bindings))
        ,@body)
 
-mac (mac (name ... params) ... body) :case (mem? backquote params)
-  withs (bqvars   backquoted.params
+mac (mac (name ... params) ... body) :case (mem? literal? params)
+  withs (bqvars   literal.params
          bindings attach_gensyms.bqvars)
     `(mac (,name ,@(unqq params bindings)) :case (and ,@(map (fn((val gsym))
                                                                `(,gsym = ',val))
@@ -69,12 +74,14 @@ def (attach_gensyms syms)
     (cons (list car.syms (uniq))
           (attach_gensyms cdr.syms))
 
-def (backquoted tree)
+def (literal tree)
   if backquoted?.tree
        (list cdr.tree)
+     (or num?.tree string?.tree)
+       (list tree)
      cons?.tree
-       (join backquoted+car.tree
-             backquoted+cdr.tree)
+       (join literal+car.tree
+             literal+cdr.tree)
 
 def (assoc l k)
   if l
@@ -89,6 +96,8 @@ def (unqq tree bindings)
          if sym?.var
            (cons quote binding)
            binding
+     literal?.tree
+      (cadr+assoc bindings tree)
      ~cons?.tree
        tree
      :else
