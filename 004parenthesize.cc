@@ -61,7 +61,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
       parenAtStartOfLine = true;
 
     //// decide what to emit, tracking (implicit/explicit) open parens
-    if (parenAtStartOfLine || curr.newline)
+    if (parenAtStartOfLine || isIndent(curr) || curr.newline)
       emitAll(buffer, curr, result, explicitOpenParens);
     else if (numWordsInLine < 2)
       buffer.push_back(curr);
@@ -74,7 +74,6 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
     }
 
     if (isIndent(curr)) {
-      emitAll(buffer, curr, result, explicitOpenParens);
       while (!implicitOpenParens.empty() && implicitOpenParens.top() >= thisLineIndent) {
         result.push_back(Token(")"));
         implicitOpenParens.pop();
