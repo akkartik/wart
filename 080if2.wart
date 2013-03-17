@@ -1,9 +1,4 @@
 # Replace 'if with compiled if to speed things up.
-
-# concerns:
-#   handle dotted lists
-#   skip quotes and spliced args
-
 def (replace_ifs form if2)
   default if2 :to compiled_fns.if.0
   if ~cons?.form
