@@ -19,12 +19,12 @@ def! (prn ... args)
 "))
 
 mac! (def (name ... params) ... body)
-  if (bound? name)
+  if (bound? name nil) # globals only
     (prn "redef: " name)
   `(def! (,name ,@params) ,@body)
 
 mac! (mac (name ... params) ... body)
-  if (bound? name)
+  if (bound? name nil)  # globals only
     (prn "redef: " name)
   `(mac! (,name ,@params) ,@body)
 

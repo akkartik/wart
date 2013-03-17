@@ -121,6 +121,20 @@ void test_bound_works() {
   rmref(call);
 }
 
+void test_bound_checks_only_dynamic_scope_on_nil() {
+  Cell* call = read("(bound? 'a nil)");
+  Cell* result1 = eval(call);
+  checkEq(result1, nil);
+  newLexicalScope();
+  addLexicalBinding("a", newNum(3));
+  Cell* result2 = eval(call);
+  checkEq(result2, nil);
+  rmref(result2);
+  endLexicalScope();
+  rmref(result1);
+  rmref(call);
+}
+
 void test_equal_handles_nil() {
   Cell* call = read("(nil = nil)");
   Cell* result = eval(call);
