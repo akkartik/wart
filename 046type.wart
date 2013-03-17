@@ -62,3 +62,25 @@ def! (body f)
 
 def (env f)
   rep.f'env
+
+
+
+<- quote (car ''1)
+alias quote? predicate.quote
+alias quoted? (cons? & quote?+car)
+
+<- backquote (car '`(1))
+alias backquote? predicate.backquote
+alias backquoted? (cons? & backquote?+car)
+
+<- unquote (car+cadr '`(,1))
+alias unquote? predicate.unquote
+alias unquoted? (cons? & unquote?+car)
+
+<- unquote_splice (car+cadr '`(,@1))
+alias unquote_splice? predicate.unquote_splice
+alias unquote_spliced? (cons? & unquote_splice?+car)
+
+<- splice (car '@1)
+alias splice? predicate.splice
+alias spliced? (cons? & splice?+car)

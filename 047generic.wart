@@ -21,8 +21,6 @@ mac (def (name ... params) ... body) :case (car.body = :case)
 # We could just always use this, but it's faster to avoid the extra eval if
 # possible.
 
-quote <- (car ''1)
-
 def (mem? x tree)
   if (predicate.x tree)
        1
@@ -43,10 +41,6 @@ mac (def (name ... params) ... body) :case (and (car.body = :case)
 
 
 ## rudimentary pattern matching for symbol constants
-
-<- backquote (car '`(1))
-alias backquote? predicate.backquote
-alias backquoted? (cons? & backquote?+car)
 
 def (literal? x)
   (or backquote?.x
