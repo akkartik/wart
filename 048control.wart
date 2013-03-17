@@ -103,3 +103,9 @@ def (& ... fs)
     (eval `(and ,@(map :over fs
                        :with (fn(f) `(,f ,@args))))
           caller_scope))
+
+def (| ... fs)
+  (fn 'args
+    (eval `(or ,@(map :over fs
+                      :with (fn(f) `(,f ,@args))))
+          caller_scope))
