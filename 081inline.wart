@@ -1,0 +1,9 @@
+def (freeze tree)
+  if (bound? tree nil)  # just dynamic bindings
+       (eval tree nil)
+     ~cons?.tree
+       tree
+     quoted?.tree
+       tree
+     :else
+       (map freeze tree)

@@ -1,0 +1,7 @@
+(test "freeze replaces syms with their global bindings where possible"
+  :valueof (freeze '(if a b))
+  :should be `(,if a b))
+
+(test "freeze skips quoted parts"
+  :valueof (freeze ''(if a b))
+  :should be ''(if a b))
