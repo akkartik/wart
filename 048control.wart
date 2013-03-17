@@ -30,6 +30,11 @@ mac (iflet var expr ... branches)
          ,(if cdr.branches
             `(iflet ,var ,@cdr.branches))))
 
+mac (iflet var x op test ... branches) :case (op = :satisfies)
+  `(let ,var ,x
+     (if (,test ,var)
+       ,@branches))
+
 mac (aif expr ... branches)
   `(iflet it ,expr ,@branches)
 

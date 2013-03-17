@@ -1,3 +1,8 @@
+(test "iflet works with :satisfies"
+  :valueof (iflet x (+ 2 3) :satisfies odd?
+             x+1)
+  :should be 6)
+
 (test "aand works"
   :valueof (let x list.3
              (aand x (car.it < 4)))
