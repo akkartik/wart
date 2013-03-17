@@ -84,10 +84,12 @@ COMPILE_FN(unbind, compiledFn_unbind, "('$var)",
   return nil;
 )
 
-COMPILE_FN(bound?, compiledFn_isBound, "($var)",
+COMPILE_FN(bound?, compiledFn_isBound, "($var $scope)",
   Cell* var = lookup("$var");
   if (var == nil) return mkref(newNum(1));
-  if (!scopeContainingBinding(var, currLexicalScope))
+  Cell* scope = lookup("$scope");
+  if (scope == nil) scope = currLexicalScope;
+  if (!scopeContainingBinding(var, scope))
     return nil;
   return mkref(var);
 )
