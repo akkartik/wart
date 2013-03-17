@@ -4,6 +4,8 @@ mac! f.x
 mac! f.-x
   `(,f (- ,x))
 
+<- zero 0   # x.0.1 gets parsed as (x 0.1); use x.zero.1 for '((x 0) 1)
+
 def (compose f g)
   fn '$args
     eval `(,f (,g ,@$args)) caller_scope
