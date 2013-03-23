@@ -1,6 +1,9 @@
 def (l f)
   load (f + ".wart")
 
+def (tests f)
+  load (f + ".test")
+
 def (die ... args)
   prn @args
   exit.1
