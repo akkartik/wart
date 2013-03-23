@@ -5,3 +5,8 @@
 (test "freeze skips quoted parts"
   :valueof (freeze ''(if a b))
   :should be ''(if a b))
+
+(test "inline works on fn objects"
+  :valueof (inline `(,(tag 'function (table 'sig '(a b) 'body '((cons a b))))
+                     x y))
+  :should be '((cons x y)))

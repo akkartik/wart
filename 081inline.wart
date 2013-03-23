@@ -7,3 +7,16 @@ def (freeze tree)
        tree
      :else
        (map freeze tree)
+
+def (inline (tree | (f ... args)))
+  awhen f :satisfies fn?
+    (replace_all (as table (zip sig.f args)) :in body.f)
+
+def (replace_all bindings tree|in)
+  (aif tree :satisfies ~cons?
+         (or bindings.it it)
+       tree :satisfies quoted?
+         it
+       :else
+         (map (fn(_) (replace_all bindings _))
+              tree))
