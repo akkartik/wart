@@ -10,7 +10,7 @@ def (freeze tree)
 
 def (inline (tree | (f ... args)))
   awhen f :satisfies fn?
-    (replace_all (as table (zip sig.f args)) :in body.f)
+    (replace_all (as table (bindings sig.f args)) :in body.f)
 
 def (replace_all bindings tree|in)
   (aif tree :satisfies ~cons?
@@ -20,3 +20,48 @@ def (replace_all bindings tree|in)
        :else
          (map (fn(_) (replace_all bindings _))
               tree))
+
+def (bindings params args)
+  aif ~cons?.params
+        (list+list params args)
+      quoted?.params
+        (bindings cdr.params (cons quote args))
+      (quoted? car.params)
+        (cons (list cdr+car.params
+                    (cons quote car.args))
+              (bindings cdr.params cdr.args))
+      (has_keyword? args car.params)
+        (cons (list car.params it)
+              (bindings cdr.params (strip_keyword car.params args)))
+      :else
+        (cons (list car.params car.args)
+              (bindings cdr.params cdr.args))
+
+def (has_keyword? args param)
+  if no.args
+       nil
+     ~cons.args
+       nil  # keyword arg can never be last
+     (~keyword? car.args)
+       (has_keyword? cdr.args param)
+     (keyword_match? param car.args)
+       cadr.args
+     :else
+       (has_keyword? cddr.args param)
+
+def (strip_keyword param args)
+  if no.args
+       nil
+     ~cons.args
+       args
+     (keyword_match? param car.args)
+       cddr.args
+     :else
+       (cons car.args (strip_keyword param cdr.args))
+
+def (keyword_match? param keyword)
+  (and keyword?.keyword
+       (param = strip_colon.keyword))
+
+def (strip_colon keyword)
+  (sym (string.keyword 1 nil))
