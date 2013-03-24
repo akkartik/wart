@@ -65,3 +65,16 @@ def (keyword_match? param keyword)
 
 def (strip_colon keyword)
   (sym (string.keyword 1 nil))
+
+def (scope bindings)
+  with table ans
+    aif (try_eval `(withs ,bindings (curr_scope)) caller_scope)
+      for curr it
+               cdr.curr   # HACK: ignore the scope with the 'bindings' binding
+               (zap cdr curr)
+        each k keys.curr
+          if (k ~= 'caller_scope)
+            default ans.k :to curr.k
+
+def (curr_scope)
+  caller_scope

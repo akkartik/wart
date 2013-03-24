@@ -263,11 +263,19 @@ Cell* evalAll(Cell* args, Cell* scope) {
   return dropPtr(pResult);
 }
 
+bool symbolicEval = false;
+
 // eval, but always strip '' regardless of keepAlreadyEvald()
 Cell* evalArg(Cell* arg, Cell* scope) {
   if (isAlreadyEvald(arg)) return mkref(stripAlreadyEvald(arg));
+  if (symbolicEval) return mkref(arg);
   return eval(arg, scope);
 }
+
+COMPILE_FN(foofoo, compiledFn_foofoo, "()",
+  symbolicEval = !symbolicEval;
+  return nil;
+)
 
 
 
