@@ -263,18 +263,34 @@ Cell* evalAll(Cell* args, Cell* scope) {
   return dropPtr(pResult);
 }
 
-bool symbolicEval = false;
+stack<bool> symbolicEval;
 
 // eval, but always strip '' regardless of keepAlreadyEvald()
 Cell* evalArg(Cell* arg, Cell* scope) {
   if (isAlreadyEvald(arg)) return mkref(stripAlreadyEvald(arg));
-  if (symbolicEval) return mkref(arg);
+  if (symbolicEval.empty()) symbolicEval.push(false);
+  if (symbolicEval.top()) return mkref(arg);
   return eval(arg, scope);
 }
 
-COMPILE_FN(foofoo, compiledFn_foofoo, "()",
-  symbolicEval = !symbolicEval;
-  return nil;
+COMPILE_FN(symbolicEvalArgs, compiledFn_symbolicEvalArgs, "($expr)",
+  Cell* expr = lookup("$expr");
+  Cell* fn = toFn(eval(car(expr), currLexicalScope));
+  if (!isFn(fn)) {
+    RAISE << "Not a call: " << expr << endl;
+    rmref(fn);
+    return nil;
+  }
+  Cell* splicedArgs = spliceArgs(cdr(expr), currLexicalScope, fn);
+  Cell* orderedArgs = reorderKeywordArgs(splicedArgs, sig(fn));
+  symbolicEval.push(true);
+    Cell* bindings = newTable();
+    evalBindAll(sig(fn), orderedArgs, currLexicalScope, bindings);
+  symbolicEval.pop();
+  rmref(orderedArgs);
+  rmref(splicedArgs);
+  rmref(fn);
+  return mkref(bindings);
 )
 
 
