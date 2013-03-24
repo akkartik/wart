@@ -275,10 +275,9 @@ Cell* evalArg(Cell* arg, Cell* scope) {
 
 COMPILE_FN(symbolicEvalArgs, compiledFn_symbolicEvalArgs, "($expr)",
   Cell* expr = lookup("$expr");
-  Cell* fn = toFn(eval(car(expr), currLexicalScope));
+  Cell* fn = car(expr);
   if (!isFn(fn)) {
     RAISE << "Not a call: " << expr << endl;
-    rmref(fn);
     return nil;
   }
   Cell* splicedArgs = spliceArgs(cdr(expr), currLexicalScope, fn);
@@ -289,7 +288,6 @@ COMPILE_FN(symbolicEvalArgs, compiledFn_symbolicEvalArgs, "($expr)",
   symbolicEval.pop();
   rmref(orderedArgs);
   rmref(splicedArgs);
-  rmref(fn);
   return mkref(bindings);
 )
 
