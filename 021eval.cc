@@ -90,7 +90,7 @@ Cell* eval(Cell* expr, Cell* scope) {
 }
 
 // bind params to args in newScope, taking into account:
-//  quoted params (eval'ing args as necessary)
+//  quoted params (eval'ing args as necessary; args is never quoted, though)
 //  destructured params
 //  aliased params
 void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
