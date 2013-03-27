@@ -104,15 +104,16 @@ def (flatten seq acc)
 
 
 
+def (+ ... args) :case (all list? args)   # ensure there's no functions
+  (join @args)
+
+# a non-op to enable compose: system+join, etc.
 def (join ... args)
   if args
     if car.args
       (cons car+car.args
             (join cdr+car.args @cdr.args))
       (join @cdr.args)
-
-def (+ ... args) :case (all list? args)   # ensure there's no functions
-  (join @args)
 
 def (keep f seq)
   if seq
