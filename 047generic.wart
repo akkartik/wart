@@ -21,13 +21,6 @@ mac (def (name ... params) ... body) :case (car.body = :case)
 # We could just always use this, but it's faster to avoid the extra eval if
 # possible.
 
-def (mem? x tree)
-  if (predicate.x tree)
-       1
-     cons?.tree
-       (or (mem? x car.tree)
-           (mem? x cdr.tree))
-
 mac (def (name ... params) ... body) :case (and (car.body = :case)
                                                 (mem? quote params))
   `(let $old ,name
@@ -37,6 +30,13 @@ mac (def (name ... params) ... body) :case (and (car.body = :case)
          (if ,cadr.body
            (do ,@cddr.body)
            (eval `(,$old ,@$params) $caller_scope)))))
+
+def (mem? x tree)
+  if (predicate.x tree)
+       1
+     cons?.tree
+       (or (mem? x car.tree)
+           (mem? x cdr.tree))
 
 
 
