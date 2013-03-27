@@ -180,8 +180,7 @@ void test_eval_handles_nil_scope() {
   addLexicalBinding("caller_scope", nil);
   Cell* call = read("(eval 'x caller_scope)");
   Cell* result = eval(call);
-  checkEq(result, nil);
-  checkEq(raiseCount, 1);   raiseCount=0;
+  // No errors.
   rmref(result);
   rmref(call);
   endLexicalScope();
