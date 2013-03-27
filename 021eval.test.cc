@@ -1578,3 +1578,72 @@ void test_eval_handles_keyword_args_inside_destructured_params() {
   rmref(fn);
   endDynamicScope("f");
 }
+
+void test_eval_handles_unknown_function_in_call() {
+  Cell* expr = read("(f 3)");
+  Cell* attempt1 = eval(expr);
+  check(isIncompleteEval(attempt1));
+  rmref(attempt1);
+  rmref(expr);
+}
+
+void test_eval_handles_unknown_arg_in_call() {
+  Cell* fn = read("(fn (a) a)");
+  Cell* f = eval(fn);
+  newDynamicScope("f", f);
+  Cell* call = read("(f a)");
+  Cell* attempt1 = eval(call);
+  // `(object incomplete_eval (,f a))
+  check(isIncompleteEval(attempt1));
+  check(isCons(rep(attempt1)));
+  checkEq(car(rep(attempt1)), f);
+  checkEq(car(cdr(rep(attempt1))), newSym("a"));
+  checkEq(cdr(cdr(rep(attempt1))), nil);
+  rmref(attempt1);
+  rmref(call);
+  endDynamicScope("f");
+  rmref(f);
+  rmref(fn);
+}
+
+void test_eval_handles_known_and_unknown_args_in_call() {
+  Cell* fn = read("(fn (a b) b)");
+  Cell* f = eval(fn);
+  newDynamicScope("f", f);
+  newDynamicScope("a", newNum(3));
+  Cell* call = read("(f a b)");
+  Cell* attempt1 = eval(call);
+  // `(object incomplete_eval (,f 3 b))
+  check(isIncompleteEval(attempt1));
+  check(isCons(rep(attempt1)));
+  checkEq(car(rep(attempt1)), f);
+  checkEq(car(cdr(rep(attempt1))), newNum(3));
+  checkEq(car(cdr(cdr(rep(attempt1)))), newSym("b"));
+  checkEq(cdr(cdr(cdr(rep(attempt1)))), nil);
+  rmref(attempt1);
+  rmref(call);
+  endDynamicScope("a");
+  endDynamicScope("f");
+  rmref(f);
+  rmref(fn);
+}
+
+void test_eval_handles_quoted_and_unknown_args_in_call() {
+  Cell* fn = read("(fn ('a b) b)");
+  Cell* f = eval(fn);
+  newDynamicScope("f", f);
+  Cell* call = read("(f a b)");
+  Cell* attempt1 = eval(call);
+  // `(object incomplete_eval (,f a b))
+  check(isIncompleteEval(attempt1));
+  check(isCons(rep(attempt1)));
+  checkEq(car(rep(attempt1)), f);
+  checkEq(car(cdr(rep(attempt1))), newSym("a"));
+  checkEq(car(cdr(cdr(rep(attempt1)))), newSym("b"));
+  checkEq(cdr(cdr(cdr(rep(attempt1)))), nil);
+  rmref(attempt1);
+  rmref(call);
+  endDynamicScope("f");
+  rmref(f);
+  rmref(fn);
+}

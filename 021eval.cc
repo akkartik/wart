@@ -42,7 +42,7 @@ Cell* eval(Cell* expr, Cell* scope) {
   if (isAtom(expr))
     return mkref(expr);
 
-  if (type(expr) == sym_incomplete_eval)
+  if (isIncompleteEval(expr))
     return eval(rep(expr), scope);
 
   if (isObject(expr))
@@ -59,6 +59,11 @@ Cell* eval(Cell* expr, Cell* scope) {
 
   // expr is a call
   Cell* fn = toFn(eval(car(expr), scope));
+  if (isIncompleteEval(fn)) {
+    Cell* result = newObject("incomplete_eval", newCons(rep(fn), cdr(expr)));
+    rmref(fn);
+    return mkref(result);
+  }
   if (!isFn(fn))
     RAISE << "Not a call: " << expr << endl
         << "Perhaps you need to split the line in two." << endl;
@@ -68,6 +73,15 @@ Cell* eval(Cell* expr, Cell* scope) {
   Cell* orderedArgs = reorderKeywordArgs(splicedArgs, sig(fn));
   Cell* newScope = newTable();
   evalBindAll(sig(fn), orderedArgs, scope, newScope);
+
+  if (anyIncompleteEval(newScope)) {
+    Cell* result = rippleIncompleteEval(fn, newScope);
+    rmref(newScope);
+    rmref(orderedArgs);
+    rmref(splicedArgs);
+    rmref(fn);
+    return mkref(result);
+  }
 
   // swap in the function's lexical environment
   newDynamicScope(CURR_LEXICAL_SCOPE, isCompiledFn(body(fn)) ? scope : env(fn));
@@ -567,6 +581,40 @@ Cell* stripUnquoteSplice(Cell* x) {
 
 
 
+//// support for partial-eval
+
+bool isIncompleteEval(Cell* x) {
+  return type(x) == sym_incomplete_eval;
+}
+
+bool anyIncompleteEval(Cell* scope) {
+  CellMap table = toTable(scope)->table;
+  for (CellMap::iterator p = table.begin(); p != table.end(); ++p)
+    if (p->second && isIncompleteEval(p->second))
+      return true;
+  return false;
+}
+
+Cell* rippleIncompleteEval(Cell* f, Cell* scope) {
+  Cell *args=newCell(), *curr=args;
+  CellMap table = toTable(scope)->table;
+  for (Cell* params = stripQuote(sig(f)); params != nil && (!isCons(params) || !isObject(params)); params=cdr(params), curr=cdr(curr)) {
+    Cell* param = car(params);
+    if (isQuoted(param))
+      param = stripQuote(param);
+    if (isIncompleteEval(table[param]))
+      addCons(curr, rep(table[param]));
+    else
+      addCons(curr, table[param]);
+  }
+  Cell* result = newCons(f, dropPtr(args));
+  rmref(cdr(result));
+  result = newObject("incomplete_eval", result);
+  return result;
+}
+
+
+
 //// helpers
 
 bool isQuoted(Cell* cell) {
@@ -607,6 +655,7 @@ bool isFn(Cell* x) {
 
 Cell* toFn(Cell* x) {
   if (x == nil || isFn(x)) return x;
+  if (isIncompleteEval(x)) return x;
   if (!lookupDynamicBinding(sym_Coercions))
     RAISE << "tried to call " << x << endl << DIE;
   Cell* result = coerceQuoted(x, sym_function, lookup(sym_Coercions));   rmref(x);
