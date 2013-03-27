@@ -280,24 +280,6 @@ Cell* evalArg(Cell* arg, Cell* scope) {
   return eval(arg, scope);
 }
 
-COMPILE_FN(symbolicEvalArgs, compiledFn_symbolicEvalArgs, "($expr)",
-  Cell* expr = lookup("$expr");
-  Cell* fn = car(expr);
-  if (!isFn(fn)) {
-    RAISE << "Not a call: " << expr << endl;
-    return nil;
-  }
-  Cell* splicedArgs = spliceArgs(cdr(expr), currLexicalScope, fn);
-  Cell* orderedArgs = reorderKeywordArgs(splicedArgs, sig(fn));
-  symbolicEval.push(true);
-    Cell* bindings = newTable();
-    evalBindAll(sig(fn), orderedArgs, currLexicalScope, bindings);
-  symbolicEval.pop();
-  rmref(orderedArgs);
-  rmref(splicedArgs);
-  return mkref(bindings);
-)
-
 
 
 //// process :keyword args and reorder args to param order -- respecting param aliases
