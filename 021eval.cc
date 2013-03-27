@@ -164,7 +164,10 @@ void evalBindParam(Cell* param, Cell* arg, Cell** cachedVal, Cell* scope, Cell* 
 
   else {
     *cachedVal = evalArg(arg, scope);
-    bindParams(param, *cachedVal, arg, newScope);
+    if (isIncompleteEval(*cachedVal) && isCons(param))
+      addLexicalBinding(param, *cachedVal, newScope);
+    else
+      bindParams(param, *cachedVal, arg, newScope);
     rmref(*cachedVal);
   }
 }

@@ -1647,3 +1647,22 @@ void test_eval_handles_quoted_and_unknown_args_in_call() {
   rmref(f);
   rmref(fn);
 }
+
+void test_eval_handles_destructured_args_in_call() {
+  Cell* fn = read("(fn ((a b)) b)");
+  Cell* f = eval(fn);
+  newDynamicScope("f", f);
+  Cell* call = read("(f args)");
+  Cell* attempt1 = eval(call);
+  // `(object incomplete_eval (,f args))
+  check(isIncompleteEval(attempt1));
+  check(isCons(rep(attempt1)));
+  checkEq(car(rep(attempt1)), f);
+  checkEq(car(cdr(rep(attempt1))), newSym("args"));
+  checkEq(cdr(cdr(rep(attempt1))), nil);
+  rmref(attempt1);
+  rmref(call);
+  endDynamicScope("f");
+  rmref(f);
+  rmref(fn);
+}
