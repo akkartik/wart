@@ -254,7 +254,7 @@ void teardownCells() {
 // optimize lookups of common symbols
 Cell *sym_quote, *sym_backquote, *sym_unquote, *sym_splice, *sym_unquoteSplice, *sym_alreadyEvald;
 Cell *sym_list, *sym_number, *sym_symbol, *sym_string, *sym_table, *sym_List;
-Cell *sym_object, *sym_Coercions;
+Cell *sym_object, *sym_Coercions, *sym_incomplete_eval;
 Cell *sym_function, *sym_name, *sym_sig, *sym_body, *sym_optimized_body, *sym_env, *sym_compiled, *sym_param_alias;
 Cell *sym_eval, *sym_caller_scope;
 void setupCommonSyms() {
@@ -274,6 +274,7 @@ void setupCommonSyms() {
 
   sym_object = newSym("object");
   sym_Coercions = newSym("Coercions");
+  sym_incomplete_eval = newSym("incomplete_eval");
 
   sym_function = newSym("function");
   sym_name = newSym("name");

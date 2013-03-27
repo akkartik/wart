@@ -42,6 +42,9 @@ Cell* eval(Cell* expr, Cell* scope) {
   if (isAtom(expr))
     return mkref(expr);
 
+  if (type(expr) == sym_incomplete_eval)
+    return eval(rep(expr), scope);
+
   if (isObject(expr))
     return mkref(expr);
 

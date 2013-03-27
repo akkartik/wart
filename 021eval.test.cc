@@ -705,6 +705,20 @@ void test_sym_evals_to_itself() {
   endDynamicScope("a");
 }
 
+void test_eval_on_incompleteEval_retries() {
+  Cell* expr = read("a");
+  Cell* incompleteResult = eval(expr);
+  check(isObject(incompleteResult));
+  checkEq(type(incompleteResult), sym_incomplete_eval);
+  newDynamicScope("a", newNum(34));
+  Cell* doublyEvaldResult = eval(incompleteResult);
+  checkEq(doublyEvaldResult, newNum(34));
+  rmref(doublyEvaldResult);
+  endDynamicScope("a");
+  rmref(incompleteResult);
+  rmref(expr);
+}
+
 void test_object_expr_evals_to_itself() {
   Cell* expr = read("(object foo 4)");
   Cell* result = eval(expr);
