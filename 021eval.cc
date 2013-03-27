@@ -95,34 +95,27 @@ Cell* eval(Cell* expr, Cell* scope) {
 //  aliased params
 void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
   if (params == nil)
-    return;
-
-  Cell* args2 = NULL;
-  if (isQuoted(params)) {
-    params = stripQuote(params);
-    args2 = quoteAll(args);
-  }
-  else {
-    args2 = mkref(args);
-  }
-
-  if (isSym(params)) {
-    Cell* dummy = NULL;
-    evalBindRest(params, args2, &dummy, scope, newScope);
-  }
-
-  else if (!isCons(params))
     ;
 
-  else if (isAlias(params))
-    evalBindRestAliases(params, args2, scope, newScope);
+  else if (isSym(stripQuote(params))) {
+    Cell* dummy = NULL;
+    evalBindRest(params, args, &dummy, scope, newScope);
+  }
+
+  else if (!isCons(stripQuote(params)))
+    ;
+
+  else if (isAlias(stripQuote(params)))
+    evalBindRestAliases(params, args, scope, newScope);
+
+  else if (isQuoted(params))
+    bindParams(stripQuote(params), args, NULL, newScope);
 
   else {
     Cell* dummy = NULL;
-    evalBindParam(car(params), car(args2), &dummy, scope, newScope);
-    evalBindAll(cdr(params), cdr(args2), scope, newScope);
+    evalBindParam(car(params), car(args), &dummy, scope, newScope);
+    evalBindAll(cdr(params), cdr(args), scope, newScope);
   }
-  rmref(args2);
 }
 
 void evalBindRest(Cell* param, Cell* args, Cell** cachedVal, Cell* scope, Cell* newScope) {
@@ -636,12 +629,4 @@ Cell* env(Cell* fn) {
 
 bool isAlias(Cell* l) {
   return isCons(l) && car(l) == sym_param_alias;
-}
-
-Cell* quoteAll(Cell* x) {
-  Cell* result = newCell(), *curr = result;
-  for (Cell* iter = x; iter != nil; iter=cdr(iter), curr=cdr(curr))
-    addCons(curr, newCons(sym_quote, car(iter)));
-  result = dropPtr(result);
-  return result;
 }
