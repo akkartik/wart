@@ -611,7 +611,7 @@ Cell* rippleIncompleteEval(Cell* f, Cell* scope) {
     if (isIncompleteEval(table[param]))
       addCons(curr, rep(table[param]));
     else
-      addCons(curr, table[param]);
+      addCons(curr, tagAlreadyEvald(table[param]));
   }
   Cell* result = newCons(f, dropPtr(args));
   rmref(cdr(result));
