@@ -1579,7 +1579,7 @@ void test_eval_handles_keyword_args_inside_destructured_params() {
   endDynamicScope("f");
 }
 
-void test_eval_handles_unknown_function_in_call() {
+void test_eval_handles_unknown_call() {
   Cell* expr = read("(f 3)");
   Cell* attempt1 = eval(expr);
   check(isIncompleteEval(attempt1));
@@ -1587,7 +1587,7 @@ void test_eval_handles_unknown_function_in_call() {
   rmref(expr);
 }
 
-void test_eval_handles_unknown_arg_in_call() {
+void test_eval_handles_unknown_arg() {
   Cell* fn = read("(fn (a) a)");
   Cell* f = eval(fn);
   newDynamicScope("f", f);
@@ -1606,7 +1606,7 @@ void test_eval_handles_unknown_arg_in_call() {
   rmref(fn);
 }
 
-void test_eval_handles_known_and_unknown_args_in_call() {
+void test_eval_handles_known_and_unknown_args() {
   Cell* fn = read("(fn (a b) b)");
   Cell* f = eval(fn);
   newDynamicScope("f", f);
@@ -1630,7 +1630,7 @@ void test_eval_handles_known_and_unknown_args_in_call() {
   rmref(fn);
 }
 
-void test_eval_handles_quoted_and_unknown_args_in_call() {
+void test_eval_handles_quoted_and_unknown_args() {
   Cell* fn = read("(fn ('a b) b)");
   Cell* f = eval(fn);
   newDynamicScope("f", f);
@@ -1652,7 +1652,7 @@ void test_eval_handles_quoted_and_unknown_args_in_call() {
   rmref(fn);
 }
 
-void test_eval_handles_destructured_args_in_call() {
+void test_eval_handles_unknown_destructured_args() {
   Cell* fn = read("(fn ((a b)) b)");
   Cell* f = eval(fn);
   newDynamicScope("f", f);
@@ -1671,7 +1671,7 @@ void test_eval_handles_destructured_args_in_call() {
   rmref(fn);
 }
 
-void test_eval_handles_spliced_args_in_call() {
+void test_eval_handles_unknown_spliced_args() {
   Cell* fn = read("(fn ((a b)) b)");
   Cell* f = eval(fn);
   newDynamicScope("f", f);
