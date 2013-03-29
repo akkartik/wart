@@ -5,7 +5,7 @@ ostream& operator<<(ostream& os, Cell* c) {
   if (c == nil) return os << "nil";
   switch(c->type) {
   case CONS:
-    if (car(c) == sym_quote || car(c) == sym_backquote || car(c) == sym_unquote || car(c) == sym_splice || car(c) == sym_unquoteSplice)
+    if (car(c) == sym_quote || car(c) == sym_backquote || car(c) == sym_unquote || car(c) == sym_splice || car(c) == sym_unquoteSplice || car(c) == sym_alreadyEvald)
       return os << car(c) << cdr(c);
     os << "(" << car(c);
     for (Cell* curr = cdr(c); curr != nil; curr = cdr(curr)) {
