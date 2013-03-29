@@ -1,3 +1,12 @@
+(unbind x)
+(test "all operations on unbound vars within 'incomplete? get postponed"
+  :valueof (wrap_if_incomplete (if 34 (cons x 3)))
+  :should be (tag 'incomplete_eval_data `(,cons x 3)))
+
+(test "speculatively_eval postpones all operations on unbound vars"
+  :valueof (speculatively_eval '(if 34 (cons x 3)))
+  :should be (tag 'incomplete_eval_data `(,if 34 (,cons x 3))))
+
 (test "freeze replaces syms with their global bindings where possible"
   :valueof (freeze '(if a b))
   :should be `(,if a b))
@@ -30,12 +39,3 @@
   :valueof (inline `(,(tag 'function (table 'sig '(a b) 'body '((cons a b))))
                      x :a y))
   :should be '((cons y x)))
-
-(unbind x)
-(test "all operations on unbound vars within 'incomplete? get postponed"
-  :valueof (wrap_if_incomplete (if 34 (cons x 3)))
-  :should be (tag 'incomplete_eval_data `(,cons x 3)))
-
-(test "speculatively_eval postpones all operations on unbound vars"
-  :valueof (speculatively_eval '(if 34 (cons x 3)))
-  :should be (tag 'incomplete_eval_data `(,if 34 (,cons x 3))))
