@@ -30,3 +30,8 @@
   :valueof (inline `(,(tag 'function (table 'sig '(a b) 'body '((cons a b))))
                      x :a y))
   :should be '((cons y x)))
+
+(unbind x)
+(test "all operations on unbound vars within 'incomplete? get postponed"
+  :valueof (incomplete? (if 34 (cons x 3)))
+  :should be (tag 'incomplete_eval_data `(,cons x 3)))

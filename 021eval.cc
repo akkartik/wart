@@ -616,6 +616,9 @@ Cell* rippleIncompleteEval(Cell* f, Cell* scope) {
     Cell* param = car(params);
     if (isQuoted(param))
       param = stripQuote(param);
+    if (isAlias(param))
+      param = car(cdr(param));
+    if (!table[param]) continue;
     if (isIncompleteEval(table[param]))
       addCons(curr, rep(table[param]));
     else
