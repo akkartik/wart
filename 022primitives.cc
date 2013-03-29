@@ -98,9 +98,9 @@ COMPILE_FN(numBindings, compiledFn_numBindings, "($var)",
 
 //// macros
 
-// eval with extra smarts for handling @args
 COMPILE_FN(eval, compiledFn_eval, "('$x $scope)",
   inMacro.push(true);
+  // sidestep evalArgs for x to handle @args
   Cell* x = eval(lookup("$x"), currLexicalScope);
   Cell* ans = eval(x, lookup("$scope"));
   rmref(x);
