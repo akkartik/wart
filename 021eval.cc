@@ -21,6 +21,13 @@
 //  ability to splice multiple elements into lists: ,@vars inside backquote, @vars otherwise
 //  macros need to access caller environment
 //  @splicing args into macro calls just like regular functions
+//
+//  do as much work as possible even if all vars aren't correctly setup
+//    eval returns a special _incomplete_ object on unbound vars
+//    operations on incomplete_eval objects are rippled into their boundaries
+//      (cons (object incomplete_eval x) 3) => (object incomplete_eval (cons x 3))
+//    incomplete? turns incomplete objects non-rippling _incomplete data_ objects
+//    eval turns incomplete_eval_data objects back into incompletes, so eval can be retried
 
 Cell* eval(Cell* expr) {
   return eval(expr, currLexicalScope);
@@ -74,7 +81,8 @@ Cell* eval(Cell* expr, Cell* scope) {
   Cell* newScope = newTable();
   evalBindAll(sig(fn), orderedArgs, scope, newScope);
 
-  if (anyIncompleteEval(newScope)) {
+  if (car(expr) != newSym("incomplete?")
+      && anyIncompleteEval(newScope)) {
     Cell* result = rippleIncompleteEval(fn, newScope);
     rmref(newScope);
     rmref(orderedArgs);
@@ -618,6 +626,12 @@ Cell* rippleIncompleteEval(Cell* f, Cell* scope) {
   result = newObject("incomplete_eval", result);
   return result;
 }
+
+COMPILE_FN(incomplete?, compiledFn_wrap_if_incomplete, "($x)",
+  Cell* x = lookup("$x");
+  if (!isIncompleteEval(x)) return nil;
+  return mkref(newObject("incomplete_eval_data", rep(x)));
+)
 
 
 
