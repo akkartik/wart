@@ -1583,6 +1583,15 @@ void test_eval_handles_unknown_call() {
   Cell* expr = read("(f 3)");
   Cell* attempt1 = eval(expr);
   check(isIncompleteEval(attempt1));
+  Cell* fn = read("(fn (a) a)");
+  Cell* f = eval(fn);
+  newDynamicScope("f", f);
+  Cell* attempt2 = eval(attempt1);
+  checkEq(attempt2, newNum(3));
+  rmref(attempt2);
+  endDynamicScope("f");
+  rmref(f);
+  rmref(fn);
   rmref(attempt1);
   rmref(expr);
 }
