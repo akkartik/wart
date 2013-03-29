@@ -26,7 +26,7 @@
 //    eval returns a special _incomplete_ object on unbound vars
 //    operations on incomplete_eval objects are rippled into their boundaries
 //      (cons (object incomplete_eval x) 3) => (object incomplete_eval (cons x 3))
-//    incomplete? turns incomplete objects non-rippling _incomplete data_ objects
+//    wrap_if_incomplete turns incomplete objects non-rippling _incomplete data_ objects
 //    eval turns incomplete_eval_data objects back into incompletes, so eval can be retried
 
 Cell* eval(Cell* expr) {
@@ -630,9 +630,9 @@ Cell* rippleIncompleteEval(Cell* f, Cell* scope) {
   return result;
 }
 
-COMPILE_FN(incomplete?, compiledFn_wrap_if_incomplete, "($x)",
+COMPILE_FN(wrap_if_incomplete, compiledFn_wrap_if_incomplete, "($x)",
   Cell* x = lookup("$x");
-  if (!isIncompleteEval(x)) return nil;
+  if (!isIncompleteEval(x)) return mkref(x);
   return mkref(newObject("incomplete_eval_data", rep(x)));
 )
 
