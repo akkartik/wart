@@ -1690,3 +1690,17 @@ void test_eval_handles_unknown_spliced_args() {
   rmref(f);
   rmref(fn);
 }
+
+void test_eval_handles_literal_incomplete_args() {
+  Cell* fn = read("(fn (x) x)");
+  Cell* f = eval(fn);
+  newDynamicScope("f", f);
+  Cell* call = read("(f (object incomplete_eval 34))");
+  Cell* attempt1 = eval(call);
+  checkEq(attempt1, newNum(34));
+  rmref(attempt1);
+  rmref(call);
+  endDynamicScope("f");
+  rmref(f);
+  rmref(fn);
+}
