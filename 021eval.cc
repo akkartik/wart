@@ -153,10 +153,7 @@ void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
 }
 
 void evalBindRest(Cell* param, Cell* args, Cell** cachedVal, Cell* scope, Cell* newScope) {
-  if (isQuoted(param))
-    bindParams(stripQuote(param), args, NULL, newScope);
-
-  else if (isCons(param) && !isCons(args))
+  if (isCons(param) && !isCons(args))
     bindParams(param, nil, args, newScope);
 
   else if (isCons(param))
@@ -196,47 +193,30 @@ void evalBindParam(Cell* param, Cell* arg, Cell** cachedVal, Cell* scope, Cell* 
 }
 
 void evalBindRestAliases(Cell* params /* (| ...) */, Cell* args, Cell* scope, Cell* newScope) {
-  if (isQuoted(params))
-    bindAliases(stripQuote(params), args, NULL, newScope);
-
-  else {
-    if (len(params) <= 2)
-      RAISE << "just one param alias: " << params << ". Are you sure?\n";
-    Cell* cachedVal = NULL;   // to ensure we don't multiply-eval
-    for (Cell* aliases = cdr(params); aliases != nil; aliases=cdr(aliases))
-      evalBindRestAlias(car(aliases), args, &cachedVal, scope, newScope);
-  }
+  if (len(params) <= 2)
+    RAISE << "just one param alias: " << params << ". Are you sure?\n";
+  Cell* cachedVal = NULL;   // to ensure we don't multiply-eval
+  for (Cell* aliases = cdr(params); aliases != nil; aliases=cdr(aliases))
+    evalBindRestAlias(car(aliases), args, &cachedVal, scope, newScope);
 }
 
 void evalBindRestAlias(Cell* alias, Cell* args, Cell** cachedVal, Cell* scope, Cell* newScope) {
-  if (isQuoted(alias))
-    bindParams(stripQuote(alias), args, NULL, newScope);
-
-  else if (*cachedVal)
+  if (*cachedVal)
     bindParams(alias, *cachedVal, args, newScope);
-
   else
     evalBindRest(alias, args, cachedVal, scope, newScope);
 }
 
 void evalBindAliases(Cell* params /* (| ...) */, Cell* arg, Cell* scope, Cell* newScope) {
-  if (isQuoted(params))
-    bindAliases(stripQuote(params), arg, NULL, newScope);
-
-  else {
-    if (len(params) <= 2)
-      RAISE << "just one param alias: " << params << ". Are you sure?\n";
-    Cell* cachedVal = NULL;   // to ensure we don't multiply-eval
-    for (Cell* aliases = cdr(params); aliases != nil; aliases=cdr(aliases))
-      evalBindAlias(car(aliases), arg, &cachedVal, scope, newScope);
-  }
+  if (len(params) <= 2)
+    RAISE << "just one param alias: " << params << ". Are you sure?\n";
+  Cell* cachedVal = NULL;   // to ensure we don't multiply-eval
+  for (Cell* aliases = cdr(params); aliases != nil; aliases=cdr(aliases))
+    evalBindAlias(car(aliases), arg, &cachedVal, scope, newScope);
 }
 
 void evalBindAlias(Cell* alias, Cell* arg, Cell** cachedVal, Cell* scope, Cell* newScope) {
-  if (isQuoted(alias))
-    bindParams(stripQuote(alias), arg, NULL, newScope);
-
-  else if (*cachedVal)
+  if (*cachedVal)
     bindParams(alias, *cachedVal, arg, newScope);
 
   else if (isAlias(alias))
