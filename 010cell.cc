@@ -110,7 +110,7 @@ struct Table {
   ~Table() {
     for (CellMap::iterator p = table.begin(); p != table.end(); ++p) {
       if (!p->second) continue;
-      rmref((Cell*)p->first);
+      rmref(p->first);
       rmref(p->second);
     }
   }
@@ -205,7 +205,7 @@ void markAllCells(Cell* x, unordered_map<Cell*, int>& mark) {
     Table* t = (Table*)x->car;
     for (CellMap::iterator p = t->table.begin(); p != t->table.end(); ++p) {
       if (!p->second) continue;
-      markAllCells((Cell*)p->first, mark);
+      markAllCells(p->first, mark);
       markAllCells(p->second, mark);
     }
     break;

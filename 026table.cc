@@ -27,7 +27,7 @@ COMPILE_FN(table_to_list, compiledFn_table_to_list, "($table)",
   Cell* curr = result;
   for (CellMap::iterator p = table.begin(); p != table.end(); ++p) {
     if (!p->second) continue;
-    addCons(curr, newCons((Cell*)p->first, newCons((Cell*)p->second)));
+    addCons(curr, newCons(p->first, newCons(p->second)));
     curr=cdr(curr);
   }
   return dropPtr(result);
