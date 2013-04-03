@@ -114,33 +114,42 @@ Cell* eval(Cell* expr, Cell* scope) {
   return result;  // already mkref'd
 }
 
+stack<bool> symbolicEval;
+
 // bind params to args in newScope, taking into account:
 //  quoted params (eval'ing args as necessary; args is never quoted, though)
 //  destructured params
 //  aliased params
 void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
   if (params == nil)
-    ;
+    return ;
 
-  else if (isSym(stripQuote(params))) {
-    Cell* dummy = NULL;
-    evalBindRest(params, args, &dummy, scope, newScope);
+  Cell* args2 = NULL;
+  if (isQuoted(params)) {
+    params = stripQuote(params);
+    args2 = quoteAll(args);
+  }
+  else {
+    args2 = mkref(args);
   }
 
-  else if (!isCons(stripQuote(params)))
+  if (isSym(params)) {
+    Cell* dummy = NULL;
+    evalBindRest(params, args2, &dummy, scope, newScope);
+  }
+
+  else if (!isCons(params))
     ;
 
-  else if (isAlias(stripQuote(params)))
-    evalBindRestAliases(params, args, scope, newScope);
-
-  else if (isQuoted(params))
-    bindParams(stripQuote(params), args, NULL, newScope);
+  else if (isAlias(params))
+    evalBindRestAliases(params, args2, scope, newScope);
 
   else {
     Cell* dummy = NULL;
-    evalBindParam(car(params), car(args), &dummy, scope, newScope);
-    evalBindAll(cdr(params), cdr(args), scope, newScope);
+    evalBindParam(car(params), car(args2), &dummy, scope, newScope);
+    evalBindAll(cdr(params), cdr(args2), scope, newScope);
   }
+  rmref(args2);
 }
 
 void evalBindRest(Cell* param, Cell* args, Cell** cachedVal, Cell* scope, Cell* newScope) {
@@ -161,23 +170,29 @@ void evalBindRest(Cell* param, Cell* args, Cell** cachedVal, Cell* scope, Cell* 
 }
 
 void evalBindParam(Cell* param, Cell* arg, Cell** cachedVal, Cell* scope, Cell* newScope) {
-  if (isQuoted(param))
-    bindParams(stripQuote(param), arg, NULL, newScope);
+  Cell* arg2 = NULL;
+  if (isQuoted(param)) {
+    param = stripQuote(param);
+    arg2 = mkref(newCons(sym_quote, arg));
+  }
+  else
+    arg2 = mkref(arg);
 
-  else if (isAlias(param))
-    evalBindAliases(param, arg, scope, newScope);
+  if (isAlias(param))
+    evalBindAliases(param, arg2, scope, newScope);
 
   else if (*cachedVal)
-    bindParams(param, *cachedVal, arg, newScope);
+    bindParams(param, *cachedVal, arg2, newScope);
 
   else {
-    *cachedVal = evalArg(arg, scope);
+    *cachedVal = evalArg(arg2, scope);
     if (isIncompleteEval(*cachedVal) && isCons(param))
       addLexicalBinding(param, *cachedVal, newScope);
     else
-      bindParams(param, *cachedVal, arg, newScope);
+      bindParams(param, *cachedVal, arg2, newScope);
     rmref(*cachedVal);
   }
+  rmref(arg2);
 }
 
 void evalBindRestAliases(Cell* params /* (| ...) */, Cell* args, Cell* scope, Cell* newScope) {
@@ -291,8 +306,6 @@ Cell* evalAll(Cell* args, Cell* scope) {
   return dropPtr(pResult);
 }
 
-stack<bool> symbolicEval;
-
 // eval, but always strip '' regardless of keepAlreadyEvald()
 Cell* evalArg(Cell* arg, Cell* scope) {
   if (isAlreadyEvald(arg)) return mkref(stripAlreadyEvald(arg));
@@ -300,6 +313,24 @@ Cell* evalArg(Cell* arg, Cell* scope) {
   if (symbolicEval.top()) return mkref(arg);
   return eval(arg, scope);
 }
+
+COMPILE_FN(symbolicEvalArgs, compiledFn_symbolicEvalArgs, "($expr)",
+  Cell* expr = lookup("$expr");
+  Cell* fn = car(expr);
+  if (!isFn(fn)) {
+    RAISE << "Not a call: " << expr << endl;
+    return nil;
+  }
+  Cell* splicedArgs = spliceArgs(cdr(expr), currLexicalScope, fn);
+  Cell* orderedArgs = reorderKeywordArgs(splicedArgs, sig(fn));
+  symbolicEval.push(true);
+    Cell* bindings = mkref(newTable());
+    evalBindAll(sig(fn), orderedArgs, currLexicalScope, bindings);
+  symbolicEval.pop();
+  rmref(orderedArgs);
+  rmref(splicedArgs);
+  return bindings;
+)
 
 
 
@@ -704,4 +735,15 @@ Cell* env(Cell* fn) {
 
 bool isAlias(Cell* l) {
   return isCons(l) && car(l) == sym_param_alias;
+}
+
+Cell* quote(Cell* x) {
+  return newCons(sym_quote, x);
+}
+
+Cell* quoteAll(Cell* x) {
+  Cell* result = newCell(), *curr = result;
+  for (Cell* iter = x; iter != nil; iter=cdr(iter), curr=cdr(curr))
+    addCons(curr, newCons(sym_quote, car(iter)));
+  return dropPtr(result);
 }
