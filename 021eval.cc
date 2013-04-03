@@ -153,10 +153,7 @@ void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
 }
 
 void evalBindRest(Cell* param, Cell* args, Cell** cachedVal, Cell* scope, Cell* newScope) {
-  if (isCons(param) && !isCons(args))
-    bindParams(param, nil, args, newScope);
-
-  else if (isCons(param))
+  if (isCons(param))
     evalBindAll(param, args, scope, newScope);
 
   else {
@@ -236,28 +233,23 @@ void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, Cell* newScope) {
       bindParams(stripQuote(params), unevaldArgs, NULL, newScope);
     else
       bindParams(stripQuote(params), args, NULL, newScope);
-    return;
   }
 
-  if (params == nil)
-    return;
+  else if (params == nil)
+    ;
 
-  if (isSym(params)) {
+  else if (isSym(params))
     addLexicalBinding(params, args, newScope);
-    return;
-  }
 
-  if (!isCons(params))
-    return;
+  else if (!isCons(params))
+    ;
 
-  if (!isAlias(params) && args != nil && !isCons(args)) {
+  else if (!isAlias(params) && args != nil && !isCons(args))
     bindParams(params, nil, nil, newScope);
-    return;
-  }
 
-  if (isAlias(params)) {
+  else if (isAlias(params))
     bindAliases(params, args, unevaldArgs, newScope);
-  }
+
   else {
     Cell* orderedArgs = reorderKeywordArgs(args, params);
     bindParams(car(params), car(orderedArgs), unevaldArgs && isCons(unevaldArgs) ? car(unevaldArgs) : unevaldArgs, newScope);
