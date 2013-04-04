@@ -189,36 +189,28 @@ void evalBindRestAliases(Cell* params /* (| ...) */, Cell* args, Cell* scope, Ce
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
   Cell* cachedVal = NULL;   // to ensure we don't multiply-eval
-  for (Cell* aliases = cdr(params); aliases != nil; aliases=cdr(aliases))
-    evalBindRestAlias(car(aliases), args, &cachedVal, scope, newScope);
-}
-
-void evalBindRestAlias(Cell* alias, Cell* args, Cell** cachedVal, Cell* scope, Cell* newScope) {
-  if (*cachedVal)
-    bindParams(alias, *cachedVal, args, newScope);
-  else
-    evalBindRest(alias, args, cachedVal, scope, newScope);
+  for (Cell* aliases = cdr(params); aliases != nil; aliases=cdr(aliases)) {
+    if (cachedVal)
+      bindParams(car(aliases), cachedVal, args, newScope);
+    else
+      evalBindRest(car(aliases), args, &cachedVal, scope, newScope);
+  }
 }
 
 void evalBindAliases(Cell* params /* (| ...) */, Cell* arg, Cell* scope, Cell* newScope) {
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
   Cell* cachedVal = NULL;   // to ensure we don't multiply-eval
-  for (Cell* aliases = cdr(params); aliases != nil; aliases=cdr(aliases))
-    evalBindAlias(car(aliases), arg, &cachedVal, scope, newScope);
-}
-
-void evalBindAlias(Cell* alias, Cell* arg, Cell** cachedVal, Cell* scope, Cell* newScope) {
-  if (*cachedVal)
-    bindParams(alias, *cachedVal, arg, newScope);
-
-  else if (isAlias(alias))
-    evalBindAliases(alias, arg, scope, newScope);
-
-  else {
-    *cachedVal = evalArg(arg, scope);
-    bindParams(alias, *cachedVal, arg, newScope);
-    rmref(*cachedVal);
+  for (Cell *aliases=cdr(params), *alias=car(aliases); aliases != nil; aliases=cdr(aliases),alias=car(aliases)) {
+    if (cachedVal)
+      bindParams(alias, cachedVal, arg, newScope);
+    else if (isAlias(alias))
+      evalBindAliases(alias, arg, scope, newScope);
+    else {
+      cachedVal = evalArg(arg, scope);
+      bindParams(alias, cachedVal, arg, newScope);
+      rmref(cachedVal);
+    }
   }
 }
 
