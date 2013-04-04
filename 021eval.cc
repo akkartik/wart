@@ -106,6 +106,7 @@ Cell* eval(Cell* expr, Cell* scope) {
       result = eval(car(form), currLexicalScope);
     }
 
+  dbg << expr << " => " << result << " (" << result->nrefs << ")" << endl;
   endLexicalScope();  // implicitly rmrefs newScope
   endDynamicScope(CURR_LEXICAL_SCOPE);
   rmref(orderedArgs);
@@ -121,6 +122,7 @@ stack<bool> symbolicEval;
 //  destructured params
 //  aliased params
 void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
+  dbg << "evalBindAll: " << params << " " << args << endl;
   if (params == nil)
     return ;
 
@@ -128,6 +130,7 @@ void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
   if (isQuoted(params)) {
     params = stripQuote(params);
     args2 = quoteAll(args);
+    dbg << "transfer quote: " << args2 << endl;
   }
   else {
     args2 = mkref(args);
@@ -163,10 +166,12 @@ void evalBindRest(Cell* param, Cell* args, Cell** cachedVal, Cell* scope, Cell* 
 }
 
 void evalBindParam(Cell* param, Cell* arg, Cell* scope, Cell* newScope) {
+  dbg << "evalBindParam: " << param << " " << arg << endl;
   Cell* arg2 = NULL;
   if (isQuoted(param)) {
     param = stripQuote(param);
     arg2 = mkref(newCons(sym_quote, arg));
+    dbg << "quote: " << param << " " << arg2 << endl;
   }
   else
     arg2 = mkref(arg);
@@ -176,6 +181,7 @@ void evalBindParam(Cell* param, Cell* arg, Cell* scope, Cell* newScope) {
 
   else {
     Cell* val = evalArg(arg2, scope);
+    dbg << "compute: " << val << endl;
     if (isIncompleteEval(val) && isCons(param))
       addLexicalBinding(param, val, newScope);
     else
@@ -216,6 +222,7 @@ void evalBindAliases(Cell* params /* (| ...) */, Cell* arg, Cell* scope, Cell* n
 
 // NULL unevaldArgs => args are already quoted
 void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, Cell* newScope) {
+  dbg << "bind: " << params << " " << args << "(" << args->nrefs << ")" << endl;
   if (isQuoted(params)) {
     if (unevaldArgs)
       bindParams(stripQuote(params), unevaldArgs, NULL, newScope);
