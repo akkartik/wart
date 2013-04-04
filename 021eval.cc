@@ -145,8 +145,7 @@ void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
     evalBindRestAliases(params, args2, scope, newScope);
 
   else {
-    Cell* dummy = NULL;
-    evalBindParam(car(params), car(args2), &dummy, scope, newScope);
+    evalBindParam(car(params), car(args2), scope, newScope);
     evalBindAll(cdr(params), cdr(args2), scope, newScope);
   }
   rmref(args2);
@@ -163,7 +162,7 @@ void evalBindRest(Cell* param, Cell* args, Cell** cachedVal, Cell* scope, Cell* 
   }
 }
 
-void evalBindParam(Cell* param, Cell* arg, Cell** cachedVal, Cell* scope, Cell* newScope) {
+void evalBindParam(Cell* param, Cell* arg, Cell* scope, Cell* newScope) {
   Cell* arg2 = NULL;
   if (isQuoted(param)) {
     param = stripQuote(param);
@@ -175,16 +174,13 @@ void evalBindParam(Cell* param, Cell* arg, Cell** cachedVal, Cell* scope, Cell* 
   if (isAlias(param))
     evalBindAliases(param, arg2, scope, newScope);
 
-  else if (*cachedVal)
-    bindParams(param, *cachedVal, arg2, newScope);
-
   else {
-    *cachedVal = evalArg(arg2, scope);
-    if (isIncompleteEval(*cachedVal) && isCons(param))
-      addLexicalBinding(param, *cachedVal, newScope);
+    Cell* val = evalArg(arg2, scope);
+    if (isIncompleteEval(val) && isCons(param))
+      addLexicalBinding(param, val, newScope);
     else
-      bindParams(param, *cachedVal, arg2, newScope);
-    rmref(*cachedVal);
+      bindParams(param, val, arg2, newScope);
+    rmref(val);
   }
   rmref(arg2);
 }
