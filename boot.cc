@@ -42,9 +42,9 @@ using std::ofstream;
 
 
 
-long debug = 0;
-#define dbg if(debug >= 1) cerr
-#define dbg2 if(debug >= 2) cerr
+long debug = 999;
+#define dbg if(debug <= 1) cerr
+#define dbg2 if(debug <= 2) cerr
 
 #define unused __attribute__((unused))
 
