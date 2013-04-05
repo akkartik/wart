@@ -186,6 +186,9 @@ void unsafeSet(Cell* t, Cell* key, Cell* val, bool deleteNils) {
     return;
   }
 
+  if (isCons(key) || isTable(key) || isString(key))
+    RAISE << "table key " << key << " is mutable. If you modify it all bets are off.\n";
+
   Table& table = *(Table*)(t->car);
   if (val == nil && deleteNils) {
     if (table[key]) {
