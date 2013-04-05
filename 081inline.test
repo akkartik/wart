@@ -33,7 +33,7 @@
 (test "inline works with quoted rest params"
   :valueof (inline `(,(tag 'function (table 'sig ''a 'body '(a)))
                      x))
-  :should be '('(x)))
+  :should be '(('x)))
 
 (test "inline works with keyword args"
   :valueof (inline `(,(tag 'function (table 'sig '(a b) 'body '((cons a b))))

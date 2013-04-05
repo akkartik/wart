@@ -28,6 +28,9 @@
 //      (cons (object incomplete_eval x) 3) => (object incomplete_eval (cons x 3))
 //    wrap_if_incomplete turns incomplete objects non-rippling _incomplete data_ objects
 //    eval turns incomplete_eval_data objects back into incompletes, so eval can be retried
+//
+//  support symbolicEval mode as a primitive for optimizations
+//    symbolicEvalArgs returns bindings for a call without actually evaluating args
 
 Cell* eval(Cell* expr) {
   return eval(expr, currLexicalScope);
@@ -114,8 +117,6 @@ Cell* eval(Cell* expr, Cell* scope) {
   rmref(fn);
   return result;  // already mkref'd
 }
-
-stack<bool> symbolicEval;
 
 // bind params to args in newScope, taking into account:
 //  quoted params (eval'ing args as necessary; args is never quoted, though)
@@ -265,6 +266,8 @@ void bindAliases(Cell* params /* (| ...) */, Cell* arg, Cell* unevaldArg, Cell* 
       bindParams(car(aliases), arg, unevaldArg, newScope);
 }
 
+//// eval args - while respecting alreadyEvald and symbolicEval
+
 Cell* evalAll(Cell* args, Cell* scope) {
   if (!isCons(args))
     return evalArg(args, scope);
@@ -276,6 +279,8 @@ Cell* evalAll(Cell* args, Cell* scope) {
   }
   return dropPtr(pResult);
 }
+
+stack<bool> symbolicEval;
 
 // eval, but always strip '' regardless of keepAlreadyEvald()
 Cell* evalArg(Cell* arg, Cell* scope) {
