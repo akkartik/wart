@@ -256,11 +256,11 @@ void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, Cell* newScope) {
   }
 }
 
-void bindAliases(Cell* aliases, Cell* arg, Cell* unevaldArg, Cell* newScope) {
-  dbg << "bindAliases: " << aliases << " " << arg << endl;
-  if (len(aliases) <= 2)
-    RAISE << "just one param alias: " << aliases << ". Are you sure?\n";
-  for (aliases=cdr(aliases); aliases != nil; aliases=cdr(aliases))
+void bindAliases(Cell* params /* (| ...) */, Cell* arg, Cell* unevaldArg, Cell* newScope) {
+  dbg << "bindAliases: " << params << " " << arg << endl;
+  if (len(params) <= 2)
+    RAISE << "just one param alias: " << params << ". Are you sure?\n";
+  for (Cell* aliases=cdr(params); aliases != nil; aliases=cdr(aliases))
     if (!unsafeGet(newScope, car(aliases))) // skip duplicate destructured aliases
       bindParams(car(aliases), arg, unevaldArg, newScope);
 }
