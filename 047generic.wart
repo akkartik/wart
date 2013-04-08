@@ -85,8 +85,7 @@ def (assoc l k)
 
 def (unqq tree bindings)
   if backquoted?.tree
-       with (var (car+assoc bindings cdr.tree)
-             binding (cadr+assoc bindings cdr.tree))
+       let (var binding) (assoc bindings cdr.tree)
          if sym?.var
            (cons quote binding)
            binding
@@ -101,9 +100,7 @@ def (unqq tree bindings)
 # like unqq, but bindings are already quoted
 def (unqm tree bindings)
   if backquoted?.tree
-       with (var (car+assoc bindings cdr.tree)
-             binding (cadr+assoc bindings cdr.tree))
-         binding
+       (cadr+assoc bindings cdr.tree)
      literal?.tree
       (cadr+assoc bindings tree)
      ~cons?.tree
