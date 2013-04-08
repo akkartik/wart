@@ -1,13 +1,8 @@
 mac (with bindings ... body)
-  `((fn ,(map car pair.bindings)
-     ,@body)
-    ,@(map cadr pair.bindings))
-
-mac (withs bindings ... body)
   if no.bindings
     `(do ,@body)
     `(let ,car.bindings ,cadr.bindings
-       (withs ,cddr.bindings ,@body))
+       (with ,cddr.bindings ,@body))
 
 
 

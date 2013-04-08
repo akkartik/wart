@@ -11,8 +11,8 @@
   :should be 2)
 
 (test "lists in function position don't leak memory"
-  :valueof (withs (l '(1 2 3)
-                   n0 nrefs.l)
+  :valueof (with (l '(1 2 3)
+                  n0 nrefs.l)
              l.1   # do the lookup
              (- nrefs.l n0))
   :should be 0)

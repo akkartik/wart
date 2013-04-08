@@ -25,9 +25,9 @@ def (match? a b bindings) :case sym?.a
                   (sym.acore = root.b))))
       (and sym?.b
            (digit? string.b.-1)  # (p_x p_x) matches two of any $p
-           (withs (sa   string.a
-                   ai   (pos "_" (as list sa))
-                   acore  (if ai (sa 0 ai)))
+           (with (sa   string.a
+                  ai   (pos "_" (as list sa))
+                  acore  (if ai (sa 0 ai)))
              (and ai
                   (acore ~= string.b)
                   (sym.acore = root.b)

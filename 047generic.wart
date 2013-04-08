@@ -48,16 +48,16 @@ def (literal? x)
       string?.x)
 
 mac (def (name ... params) ... body) :case (mem? literal? params)
-  withs (bqvars   literal.params
-         bindings attach_gensyms.bqvars)
+  with (bqvars   literal.params
+        bindings attach_gensyms.bqvars)
     `(def (,name ,@(unqq params bindings)) :case (and ,@(map (fn((val gsym))
                                                                `(,gsym = ',val))
                                                              bindings))
        ,@body)
 
 mac (mac (name ... params) ... body) :case (mem? literal? params)
-  withs (bqvars   literal.params
-         bindings attach_gensyms.bqvars)
+  with (bqvars   literal.params
+        bindings attach_gensyms.bqvars)
     `(mac (,name ,@(unqm params bindings)) :case (and ,@(map (fn((val gsym))
                                                                `(,gsym = ',val))
                                                              bindings))

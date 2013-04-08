@@ -1,23 +1,23 @@
 defcall list (seq idx ... ends)
-  withs (idx    (range_start seq idx)
-         end    (if no.ends
-                      idx+1
-                    ~car.ends
-                      len.seq
-                    :else
-                      (range_bounce seq car.ends))
-         slice  (list_range seq idx end))
+  with (idx    (range_start seq idx)
+        end    (if no.ends
+                     idx+1
+                   ~car.ends
+                     len.seq
+                   :else
+                     (range_bounce seq car.ends))
+        slice  (list_range seq idx end))
     if ends
       slice
       car.slice
 
 defset list ((seq idx ... ends) val)
-  `(withs ($idx (range_start ,seq ,idx)
-           $end ,(if no.ends
-                   `($idx + 1)
-                   `(if (not ,car.ends)
-                      (len ,seq)
-                      (range_bounce ,seq ,car.ends))))
+  `(with ($idx (range_start ,seq ,idx)
+          $end ,(if no.ends
+                  `($idx + 1)
+                  `(if (not ,car.ends)
+                     (len ,seq)
+                     (range_bounce ,seq ,car.ends))))
      ,(if ends
         `(list_splice ,seq $idx $end ,val)
         `(car+list_splice ,seq $idx $end (list ,val))))
