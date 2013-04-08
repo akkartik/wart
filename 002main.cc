@@ -29,15 +29,6 @@
 // Read is the time for optimizations, when subsidiary functions can be
 // specialized to a specific call-site.
 
-struct IndentSensitiveStream {
-  istream& fd;
-  bool atStartOfLine;
-  explicit IndentSensitiveStream(istream& in) :fd(in), atStartOfLine(true) { fd >> std::noskipws; }
-  // leaky version just for convenient tests
-  explicit IndentSensitiveStream(string s) :fd(*new stringstream(s)), atStartOfLine(true) { fd >> std::noskipws; }
-  bool eof() { return fd.eof(); }
-} STDIN(cin);
-
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
     runTests();
@@ -49,8 +40,8 @@ int main(int argc, unused char* argv[]) {
   loadFiles(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (true) {
-    list<Cell*> forms = readAll(STDIN);
-    if (STDIN.eof()) return 0;
+    list<Cell*> forms = readAll(cin);
+    if (cin.eof()) return 0;
     for (list<Cell*>::iterator p = forms.begin(); p != forms.end(); ++p) {
       Cell* result = eval(*p);
       cout << "=> " << result << endl;
@@ -65,11 +56,22 @@ Cell* read(IndentSensitiveStream& in) {
   return mkref(transformDollarVars(nextCell(in)));
 }
 
-list<Cell*> readAll(IndentSensitiveStream& in) {
+// wart does paren-insertion, which requires some extra state.
+struct IndentSensitiveStream {
+  istream& fd;
+  bool atStartOfLine;
+  explicit IndentSensitiveStream(istream& in) :fd(in), atStartOfLine(true) { fd >> std::noskipws; }
+  // leaky version just for convenient tests
+  explicit IndentSensitiveStream(string s) :fd(*new stringstream(s)), atStartOfLine(true) { fd >> std::noskipws; }
+  bool eof() { return fd.eof(); }
+} STDIN(cin);
+
+list<Cell*> readAll(istream& fd) {
+  IndentSensitiveStream in(fd);
   list<Cell*> results;
   do {
     results.push_back(read(in));
-  } while (!in.atStartOfLine && in.fd.peek() != '\n' && !in.eof());
+  } while (!in.atStartOfLine && fd.peek() != '\n' && !fd.eof());
   return results;
 }
 
