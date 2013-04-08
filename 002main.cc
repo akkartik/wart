@@ -15,27 +15,13 @@
 // These weren't the reasons lisp was created; they're the reasons I attribute
 // to its power.
 
-// To satisfy these properties, lisp is designed around function invocation as
-// the core activity of the language; features in other languages are
-// definable as functions. Even large programs are structured as a single
-// function that performs all the work when invoked.
-//
-// Setting up such a function involves two stages:
-//  - setting up the data for it from disk to memory, including subsidiary functions (read)
-//  - invoking this function by repeatedly invoking its subsidiary functions (eval)
-// A function can be read once into memory, and eval'd any number of times
-// once read.
-//
-// Read is the time for optimizations, when subsidiary functions can be
-// specialized to a specific call-site.
-
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
     runTests();
     return 0;
   }
 
-  //// Interpreter loop: read, eval, print
+  //// Interactive loop: parse commands from user, evaluate them, print the results
   interactive_setup();
   loadFiles(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
