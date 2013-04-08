@@ -6,10 +6,10 @@
 //        (,x = ,y)
 //        (,y = tmp))
 //
-//   (with (a 3 b 4)    (bad-swap a b)    (list a b))
+//   (withs (a 3 b 4)    (bad-swap a b)    (list a b))
 //   => (4 3)   # seems ok
 //
-//   (with (a 3 tmp 4)  (bad-swap a tmp)  (list a tmp))
+//   (withs (a 3 tmp 4)  (bad-swap a tmp)  (list a tmp))
 //   => (3 4)   # oops
 //
 // To avoid such bugs, use an implicit gensym:

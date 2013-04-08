@@ -1,20 +1,20 @@
 defcall string (s idx ... ends)
-  with (idx (range_start s idx)
-        end (if no.ends
-                  (idx + 1)
-                ~car.ends
-                  len.s
-                :else
-                  (range_bounce s car.ends)))
+  withs (idx (range_start s idx)
+         end (if no.ends
+                   (idx + 1)
+                 ~car.ends
+                   len.s
+                 :else
+                   (range_bounce s car.ends)))
     (string_range s idx end)
 
 defset string ((s idx ... ends) val)
-  `(with ($idx (range_start ,s ,idx)
-          $end ,(if no.ends
-                  `($idx + 1)
-                  `(if (not ,car.ends)
-                     (len ,s)
-                     (range_bounce ,s ,car.ends))))
+  `(withs ($idx (range_start ,s ,idx)
+           $end ,(if no.ends
+                   `($idx + 1)
+                   `(if (not ,car.ends)
+                      (len ,s)
+                      (range_bounce ,s ,car.ends))))
       (string_splice ,s $idx $end (or ,val "")))
 
 defcoerce string symbol
