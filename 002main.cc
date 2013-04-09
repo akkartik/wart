@@ -52,6 +52,7 @@ struct IndentSensitiveStream {
   bool eof() { return fd.eof(); }
 } STDIN(cin);
 
+// parse a paragraph of expressions until empty line
 list<Cell*> readAll(istream& fd) {
   IndentSensitiveStream in(fd);
   list<Cell*> results;
