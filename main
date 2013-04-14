@@ -1,0 +1,126 @@
+=== Wart: trying not to make a mess of it
+
+Every codebase starts out clean but gradually gets messy. The original
+architecture is stretched to unanticipated uses, squeezed into new
+constraints. It receives contributions from newcomers who only partially
+understand the original design and rationale.
+
+Wart explores various mechanisms for making the over-arching design ('what'
+and 'how') more apparent, and at recording the reasons for this design
+('why'). In the process it hopes to make the original design process more
+accessible to newcomers, and the codebase more amenable to reorganization in
+response to new features and constraints.
+
+Wart provides three views of any program (including itself): a high-level view
+of the various requirements and code fragments that implement them, an
+intermediate view with all the fragments 'entangled', and a low-level view of
+the program as it runs for a given input. Most programming tools directly
+support only the second view, leaving the programmer to construct the other
+views inside his own head. Wart provides all three with as little code as
+possible.
+
+This is a hard problem. To help focus on it, wart ignores everything else. In
+particular:
+
+  a) It promises no compatibility. Every release of wart will pass its own
+  tests and internal constraints. If you want to be able to upgrade (not
+  essential but nice to have), write thorough tests for your own code.
+
+  b) It does not care about safety. Wart supplies mechanisms, and hopes to
+  illustrate good taste by its own example. It does not try quixotically to
+  police taste. It does provide mechanisms (tests, static analysis) for each
+  codebase to define its own safety checks.
+
+  c) It is not concerned with being easy to learn or familiar at first glance.
+
+== Getting started
+
+You'll need Linux and gcc. To install wart:
+
+  $ git clone http://github.com/akkartik/wart.git
+  $ cd wart
+  $ ./wart test
+  $               # all tests passed
+
+  :(name "main")
+  int main(int argc) {
+    if (argc > 1) {
+      runTests();   // see [Test harness]
+      return 0;
+    }
+
+    :(inline "main loop")
+  }
+
+You type in _expressions_, and wart _evaluates_ them to return _values_.
+
+  $ ./wart
+  ready! type in an expression, then hit enter twice. ctrl-d exits.
+  1+1
+  => 2
+
+  :(name "main loop")
+  while (!cin.eof()) {
+    list<Cell*> forms = readLine(cin);  // see [Cell]
+    for (list<Cell*>::iterator p = forms.begin(); p != forms.end(); ++p) {
+      Cell* result = eval(*p);
+      cout << "=> " << result << endl;
+      rmref(result);    // see [Memory management] for rmref
+      rmref(*p);
+    }
+  }
+
+More examples (explained later):
+
+  # assignment
+  x <- 3
+  => 3
+  x
+  => 3
+
+  # arithmetic
+  x+1
+  => 4
+
+  # literal lists
+  '(1 2 3)
+  => (1 2 3)
+  (len '(1 2 3))
+  => 3
+  (car '(1 2 3))
+  => 1      # the first element of the list
+  (cdr '(1 2 3))
+  => (2 3)  # all but the first element
+
+  # new types
+  x <- (tag 'lists '((1 2) (3) (4 5 6)))
+  => (object lists ((1 2) (3) (4 5 6)))
+  type.x    # same as (type x)
+  => lists
+  rep.x     # read as 'representation of x'
+  => ((1 2) (3) (4 5 6))
+
+  # defining new functions
+  def (factorial n)
+    if (n = 0)
+      1
+      (n * (fact n-1))
+  => (object function ...)
+  (factorial 3)
+  => 6
+
+  # extending functions
+  def (len x) :case (isa x lists)
+    (len (flatten rep.x))   # total length of its members
+  (len x)
+  => 6
+
+  # keyword arguments -- like python, but better
+  def (subtract a|from b)
+    a-b
+  (subtract 4 3)
+  => 1
+  (subtract :b 3 :a 4)
+  => 1
+  subtract 3 :from 4
+  => 1

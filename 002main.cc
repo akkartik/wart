@@ -25,9 +25,8 @@ int main(int argc, unused char* argv[]) {
   interactive_setup();
   loadFiles(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
-  while (true) {
+  while (!cin.eof()) {
     list<Cell*> forms = readAll(cin);
-    if (cin.eof()) return 0;
     for (list<Cell*>::iterator p = forms.begin(); p != forms.end(); ++p) {
       Cell* result = eval(*p);
       cout << "=> " << result << endl;
