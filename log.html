@@ -1,38 +1,38 @@
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js">
 </script>
 <script>
-  var level = 3;
+  var level = 2;
   $(document).ready(function() {
-    $('.2').hide();
+    collapseLowerThan(level);
     $('.level').click(function() {
-      alert($(this).children().css('display'));
-      $(this).children().show();
+      toggleIndentedSiblings($(this));
     });
-    $('.level').css('padding-left', '2em');
+    for (x = 1; x <= 9; ++x) {
+      $('[level_index='+x+']').css('padding-left', (x*2)+'em');
+    }
   });
+
+  function collapseLowerThan(n) {
+    for (x = 1; x < n; ++x) {
+      $('.'+x).hide();
+    }
+  }
+
+  function toggleIndentedSiblings(elem) {
+    var level = parseInt(elem.attr('level_index'));
+    var toggle = (elem.next().css('display') == 'none') ? function(curr) { curr.show(); }
+                                                        : function(curr) { curr.hide(); };
+    for (curr=elem.next(); parseInt(curr.attr('level_index')) > level; curr=curr.next()) {
+      toggle(curr);
+    }
+  }
 </script>
 
-<div class='level 1'>
-  abc
-  <div class='level 2'>
-    def
-  </div>
-  <div class='level 2'>
-    ghi
-    <div class='level 3'>
-      jkl
-    </div>
-  </div>
-</div>
-<div class='level 1'>
-  abc
-  <div class='level 2'>
-    def
-  </div>
-  <div class='level 2'>
-    ghi
-    <div class='level 3'>
-      jkl
-    </div>
-  </div>
-</div>
+<div class='level' level_index='1'>abc</div>
+<div class='level' level_index='2'>def</div>
+<div class='level' level_index='2'>ghi</div>
+<div class='level' level_index='3'>jkl</div>
+<div class='level' level_index='1'>abc</div>
+<div class='level' level_index='2'>def</div>
+<div class='level' level_index='2'>ghi</div>
+<div class='level' level_index='3'>jkl</div>
