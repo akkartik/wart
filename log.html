@@ -5,7 +5,7 @@
   $(document).ready(function() {
     collapseLowerThan(level);
     $('.level').click(function() {
-      toggleIndentedSiblings($(this));
+      toggleNextIndentedSiblings($(this));
     });
     for (x = 1; x <= 9; ++x) {
       $('[level_index='+x+']').css('padding-left', (x*2)+'em');
@@ -26,6 +26,29 @@
       toggle(curr);
     }
   }
+
+  function toggleNextIndentedSiblings(elem) {
+    var level = parseInt(elem.attr('level_index'));
+    var next = nextLevel(elem).toString();
+    var toggle = (elem.next().css('display') == 'none') ? function(curr) { if (curr.attr('level_index') == next) curr.show(); }
+                                                        : function(curr) { curr.hide(); };
+    for (var curr=elem.next(); (currLevel = parseInt(curr.attr('level_index'))) > level; curr=curr.next()) {
+      toggle(curr);
+    }
+  }
+
+  function nextLevel(elem) {
+    var level = parseInt(elem.attr('level_index'));
+    var next = level;
+    var currLevel = -1;
+    for (var curr=elem.next(); (currLevel = parseInt(curr.attr('level_index'))) > level; curr=curr.next()) {
+      if (next <= level || currLevel < next) {
+        next = currLevel;
+      }
+      if (next == level+1) break;
+    }
+    return next;
+  }
 </script>
 
 <div class='level' level_index='1'>abc</div>
@@ -33,6 +56,6 @@
 <div class='level' level_index='2'>ghi</div>
 <div class='level' level_index='3'>jkl</div>
 <div class='level' level_index='1'>abc</div>
-<div class='level' level_index='2'>def</div>
-<div class='level' level_index='2'>ghi</div>
-<div class='level' level_index='3'>jkl</div>
+<div class='level' level_index='3'>def</div>
+<div class='level' level_index='3'>ghi</div>
+<div class='level' level_index='4'>jkl</div>
