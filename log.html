@@ -1,0 +1,38 @@
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js">
+</script>
+<script>
+  var level = 3;
+  $(document).ready(function() {
+    $('.2').hide();
+    $('.level').click(function() {
+      alert($(this).children().css('display'));
+      $(this).children().show();
+    });
+    $('.level').css('padding-left', '2em');
+  });
+</script>
+
+<div class='level 1'>
+  abc
+  <div class='level 2'>
+    def
+  </div>
+  <div class='level 2'>
+    ghi
+    <div class='level 3'>
+      jkl
+    </div>
+  </div>
+</div>
+<div class='level 1'>
+  abc
+  <div class='level 2'>
+    def
+  </div>
+  <div class='level 2'>
+    ghi
+    <div class='level 3'>
+      jkl
+    </div>
+  </div>
+</div>
