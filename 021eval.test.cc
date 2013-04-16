@@ -582,7 +582,7 @@ void test_evalBindAll_handles_duplicate_destructured_aliases() {
 
 
 Cell* processUnquotes(Cell* x, long depth) {
-  return processUnquotes(x, depth, currLexicalScope);
+  return processUnquotes(x, depth, currLexicalScope, 0);
 }
 
 void test_processUnquotes_handles_unquote() {
