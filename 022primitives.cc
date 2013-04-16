@@ -101,11 +101,10 @@ COMPILE_FN(numBindings, compiledFn_numBindings, "($var)",
 COMPILE_FN(eval, compiledFn_eval, "('$x $scope)",
   inMacro.push(true);
   // sidestep evalArgs for x to handle @args
-  Cell* x = eval(lookup("$x"), currLexicalScope, 0);
+  Cell* x = eval(lookup("$x"), currLexicalScope);
   Cell* ans = eval(
     (type(x) == newSym("incomplete_eval_data")) ? rep(x) : x,
-    lookup("$scope"),
-    0);
+    lookup("$scope"));
   rmref(x);
   inMacro.pop();
   return ans;

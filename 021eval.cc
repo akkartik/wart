@@ -33,11 +33,10 @@
 //    symbolicEvalArgs returns bindings for a call without actually evaluating args
 
 Cell* eval(Cell* expr) {
-  return eval(expr, currLexicalScope, 0);
+  return eval(expr, currLexicalScope);
 }
 
-Cell* eval(Cell* expr, Cell* scope, int level) {
-  if (debug < 999) log(level) << expr << endl;
+Cell* eval(Cell* expr, Cell* scope) {
   if (!expr)
     RAISE << "eval: cell should never be NULL" << endl << DIE;
 
@@ -54,7 +53,7 @@ Cell* eval(Cell* expr, Cell* scope, int level) {
     return mkref(expr);
 
   if (isIncompleteEval(expr))
-    return eval(rep(expr), scope, level+1);
+    return eval(rep(expr), scope);
 
   if (isObject(expr))
     return mkref(expr);
@@ -63,13 +62,13 @@ Cell* eval(Cell* expr, Cell* scope, int level) {
     return mkref(cdr(expr));
 
   if (isBackQuoted(expr))
-    return processUnquotes(cdr(expr), 1, scope, level+1);  // already mkref'd
+    return processUnquotes(cdr(expr), 1, scope);  // already mkref'd
 
   if (isAlreadyEvald(expr))
     return mkref(keepAlreadyEvald() ? expr : stripAlreadyEvald(expr));
 
   // expr is a call
-  Cell* fn = toFn(eval(car(expr), scope, level+1));
+  Cell* fn = toFn(eval(car(expr), scope));
   if (isIncompleteEval(fn)) {
     Cell* result = newObject("incomplete_eval", newCons(rep(fn), cdr(expr)));
     rmref(fn);
@@ -80,10 +79,10 @@ Cell* eval(Cell* expr, Cell* scope, int level) {
         << "Perhaps you need to split the line in two." << endl;
 
   // eval its args in the caller's lexical environment
-  Cell* splicedArgs = spliceArgs(cdr(expr), scope, fn, level+1);
+  Cell* splicedArgs = spliceArgs(cdr(expr), scope, fn);
   Cell* orderedArgs = reorderKeywordArgs(splicedArgs, sig(fn));
   Cell* newScope = newTable();
-  evalBindAll(sig(fn), orderedArgs, scope, newScope, level+1);
+  evalBindAll(sig(fn), orderedArgs, scope, newScope);
 
   if (car(expr) != newSym("incomplete?")
       && anyIncompleteEval(newScope)) {
@@ -107,7 +106,7 @@ Cell* eval(Cell* expr, Cell* scope, int level) {
     // eval all forms in body, save result of final form
     for (Cell* form = impl(fn); form != nil; form=cdr(form)) {
       rmref(result);
-      result = eval(car(form), currLexicalScope, level+1);
+      result = eval(car(form), currLexicalScope);
     }
 
   dbg << expr << " => " << result << endl;
@@ -124,9 +123,6 @@ Cell* eval(Cell* expr, Cell* scope, int level) {
 //  destructured params
 //  aliased params
 void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
-  evalBindAll(params, args, scope, newScope, 0);
-}
-void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope, int level) {
   dbg << "evalBindAll: " << params << " " << args << endl;
   if (params == nil)
     return ;
@@ -143,35 +139,35 @@ void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope, int leve
 
   if (isSym(params)) {
     Cell* dummy = NULL;
-    evalBindRest(params, args2, &dummy, scope, newScope, level);
+    evalBindRest(params, args2, &dummy, scope, newScope);
   }
 
   else if (!isCons(params))
     ;
 
   else if (isAlias(params))
-    evalBindRestAliases(params, args2, scope, newScope, level);
+    evalBindRestAliases(params, args2, scope, newScope);
 
   else {
-    evalBindParam(car(params), car(args2), scope, newScope, level);
-    evalBindAll(cdr(params), cdr(args2), scope, newScope, level);
+    evalBindParam(car(params), car(args2), scope, newScope);
+    evalBindAll(cdr(params), cdr(args2), scope, newScope);
   }
   rmref(args2);
 }
 
-void evalBindRest(Cell* param, Cell* args, Cell** cachedVal, Cell* scope, Cell* newScope, int level) {
+void evalBindRest(Cell* param, Cell* args, Cell** cachedVal, Cell* scope, Cell* newScope) {
   dbg << "evalBindRest: " << param << " " << args << endl;
   if (isCons(param))
-    evalBindAll(param, args, scope, newScope, level);
+    evalBindAll(param, args, scope, newScope);
 
   else {
-    *cachedVal = evalAll(args, scope, level);
+    *cachedVal = evalAll(args, scope);
     bindParams(param, *cachedVal, args, newScope);
     rmref(*cachedVal);
   }
 }
 
-void evalBindParam(Cell* param, Cell* arg, Cell* scope, Cell* newScope, int level) {
+void evalBindParam(Cell* param, Cell* arg, Cell* scope, Cell* newScope) {
   dbg << "evalBind: " << param << " " << arg << endl;
   Cell* arg2 = NULL;
   if (isQuoted(param)) {
@@ -183,10 +179,10 @@ void evalBindParam(Cell* param, Cell* arg, Cell* scope, Cell* newScope, int leve
     arg2 = mkref(arg);
 
   if (isAlias(param))
-    evalBindAliases(param, arg2, scope, newScope, level);
+    evalBindAliases(param, arg2, scope, newScope);
 
   else {
-    Cell* val = evalArg(arg2, scope, level);
+    Cell* val = evalArg(arg2, scope);
     dbg << "compute: " << val << endl;
     if (isIncompleteEval(val) && isCons(param))
       addLexicalBinding(param, val, newScope);
@@ -197,7 +193,7 @@ void evalBindParam(Cell* param, Cell* arg, Cell* scope, Cell* newScope, int leve
   rmref(arg2);
 }
 
-void evalBindRestAliases(Cell* params /* (| ...) */, Cell* args, Cell* scope, Cell* newScope, int level) {
+void evalBindRestAliases(Cell* params /* (| ...) */, Cell* args, Cell* scope, Cell* newScope) {
   dbg << "evalBindRestAliases: " << params << " " << args << endl;
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
@@ -206,11 +202,11 @@ void evalBindRestAliases(Cell* params /* (| ...) */, Cell* args, Cell* scope, Ce
     if (cachedVal)
       bindParams(car(aliases), cachedVal, args, newScope);
     else
-      evalBindRest(car(aliases), args, &cachedVal, scope, newScope, level);
+      evalBindRest(car(aliases), args, &cachedVal, scope, newScope);
   }
 }
 
-void evalBindAliases(Cell* params /* (| ...) */, Cell* arg, Cell* scope, Cell* newScope, int level) {
+void evalBindAliases(Cell* params /* (| ...) */, Cell* arg, Cell* scope, Cell* newScope) {
   dbg << "evalBindRestAliases: " << params << " " << arg << endl;
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
@@ -219,9 +215,9 @@ void evalBindAliases(Cell* params /* (| ...) */, Cell* arg, Cell* scope, Cell* n
     if (cachedVal)
       bindParams(alias, cachedVal, arg, newScope);
     else if (isAlias(alias))
-      evalBindAliases(alias, arg, scope, newScope, level);
+      evalBindAliases(alias, arg, scope, newScope);
     else {
-      cachedVal = evalArg(arg, scope, level);
+      cachedVal = evalArg(arg, scope);
       bindParams(alias, cachedVal, arg, newScope);
       rmref(cachedVal);
     }
@@ -272,12 +268,12 @@ void bindAliases(Cell* params /* (| ...) */, Cell* arg, Cell* unevaldArg, Cell* 
 
 //// eval args - while respecting alreadyEvald and symbolicEval
 
-Cell* evalAll(Cell* args, Cell* scope, int level) {
+Cell* evalAll(Cell* args, Cell* scope) {
   if (!isCons(args))
-    return evalArg(args, scope, level);
+    return evalArg(args, scope);
   Cell* pResult = newCell(), *curr = pResult;
   for (; args != nil; args=cdr(args), curr=cdr(curr)) {
-    Cell* val = evalArg(car(args), scope, level);
+    Cell* val = evalArg(car(args), scope);
     addCons(curr, val);
     rmref(val);
   }
@@ -287,11 +283,11 @@ Cell* evalAll(Cell* args, Cell* scope, int level) {
 stack<bool> symbolicEval;
 
 // eval, but always strip '' regardless of keepAlreadyEvald()
-Cell* evalArg(Cell* arg, Cell* scope, int level) {
+Cell* evalArg(Cell* arg, Cell* scope) {
   if (isAlreadyEvald(arg)) return mkref(stripAlreadyEvald(arg));
   if (symbolicEval.empty()) symbolicEval.push(false);
   if (symbolicEval.top()) return mkref(arg);
-  return eval(arg, scope, level);
+  return eval(arg, scope);
 }
 
 COMPILE_FN(symbolicEvalArgs, compiledFn_symbolicEvalArgs, "($expr)",
@@ -301,11 +297,11 @@ COMPILE_FN(symbolicEvalArgs, compiledFn_symbolicEvalArgs, "($expr)",
     RAISE << "Not a call: " << expr << endl;
     return nil;
   }
-  Cell* splicedArgs = spliceArgs(cdr(expr), currLexicalScope, fn, 0);
+  Cell* splicedArgs = spliceArgs(cdr(expr), currLexicalScope, fn);
   Cell* orderedArgs = reorderKeywordArgs(splicedArgs, sig(fn));
   symbolicEval.push(true);
     Cell* bindings = mkref(newTable());
-    evalBindAll(sig(fn), orderedArgs, currLexicalScope, bindings, 0);
+    evalBindAll(sig(fn), orderedArgs, currLexicalScope, bindings);
   symbolicEval.pop();
   rmref(orderedArgs);
   rmref(splicedArgs);
@@ -470,10 +466,6 @@ bool paramAliasMatch(Cell* aliases, Cell* candidate) {
 // tag them with '' (already eval'd) so they can be used with macros
 
 Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
-  return spliceArgs(args, scope, fn, 0);
-}
-
-Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn, int level) {
   Cell *pResult = newCell(), *tip = pResult;
   for (Cell* curr = args; curr != nil; curr=cdr(curr)) {
     if (!isSpliced(car(curr))) {
@@ -484,7 +476,7 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn, int level) {
 
     if (isMacro(fn) && !contains(body(fn), sym_backquote))
       RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
-    Cell* x = unsplice(car(curr), scope, level);
+    Cell* x = unsplice(car(curr), scope);
     if (isIncompleteEval(x))
       addCons(tip, newCons(sym_splice, rep(x)));
     else
@@ -495,8 +487,8 @@ Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn, int level) {
   return dropPtr(pResult);
 }
 
-Cell* unsplice(Cell* arg, Cell* scope, int level) {
-  return eval(cdr(arg), scope, level);
+Cell* unsplice(Cell* arg, Cell* scope) {
+  return eval(cdr(arg), scope);
 }
 
 // supporting @ in macro calls
@@ -542,17 +534,17 @@ Cell* stripAlreadyEvald(Cell* cell) {
 // when inMacro did we encounter ''?
 bool skippedAlreadyEvald = false;
 
-Cell* processUnquotes(Cell* x, long depth, Cell* scope, int level) {
+Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
   if (!isCons(x)) return mkref(x);
 
   if (unquoteDepth(x) == depth) {
     skippedAlreadyEvald = false;
-    Cell* result = eval(stripUnquote(x), scope, level);
+    Cell* result = eval(stripUnquote(x), scope);
     return skippedAlreadyEvald ? pushCons(sym_alreadyEvald, result) : result;
   }
   else if (unquoteSpliceDepth(car(x)) == depth) {
-    Cell* result = eval(stripUnquoteSplice(car(x)), scope, level);
-    Cell* splice = processUnquotes(cdr(x), depth, scope, level);
+    Cell* result = eval(stripUnquoteSplice(car(x)), scope);
+    Cell* splice = processUnquotes(cdr(x), depth, scope);
     if (result == nil) return splice;
 
     // always splice in a copy
@@ -567,13 +559,13 @@ Cell* processUnquotes(Cell* x, long depth, Cell* scope, int level) {
   }
 
   if (isBackQuoted(x)) {
-    Cell* result = newCons(car(x), processUnquotes(cdr(x), depth+1, scope, level));
+    Cell* result = newCons(car(x), processUnquotes(cdr(x), depth+1, scope));
     rmref(cdr(result));
     return mkref(result);
   }
 
-  Cell* result = newCons(processUnquotes(car(x), depth, scope, level),
-                         processUnquotes(cdr(x), depth, scope, level));
+  Cell* result = newCons(processUnquotes(car(x), depth, scope),
+                         processUnquotes(cdr(x), depth, scope));
   rmref(car(result));
   rmref(cdr(result));
   return mkref(result);
