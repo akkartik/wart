@@ -41,12 +41,17 @@ stack<int> log_levels;
 Cell* eval(Cell* expr, Cell* scope) {
   if (log_levels.empty()) log_levels.push(0);
   log_levels.push(log_levels.top()+1);
-  int level = log_levels.top();
-  if (doLog) log(level) << level << ". " << expr << endl;
+  if (doLog) log() << log_levels.top() << ". " << expr << endl;
   Cell* result = eval2(expr, scope);
-  if (doLog) log(level) << level << ". => " << result << endl;
+  if (doLog) log() << log_levels.top() << ". => " << result << endl;
   log_levels.pop();
   return result;
+}
+
+ofstream& log() {
+  static ofstream log("log");
+  log << "</div><div class='level' level_index='" << log_levels.top() << "'>";
+  return log;
 }
 
 COMPILE_FN(trace, compiledFn_trace, "'($form)",
@@ -87,6 +92,8 @@ Cell* eval2(Cell* expr, Cell* scope) {
   if (isAlreadyEvald(expr))
     return mkref(keepAlreadyEvald() ? expr : stripAlreadyEvald(expr));
 
+  if (doLog) log() << log_levels.top() << ". eval'ing args\n";
+
   // expr is a call
   Cell* fn = toFn(eval(car(expr), scope));
   if (isIncompleteEval(fn)) {
@@ -120,14 +127,18 @@ Cell* eval2(Cell* expr, Cell* scope) {
   addLexicalBinding(sym_caller_scope, scope);
 
   Cell* result = nil;
-  if (isCompiledFn(body(fn)))
+  if (isCompiledFn(body(fn))) {
+    if (doLog) log() << log_levels.top() << ". executing primitive\n";
     result = toCompiledFn(body(fn))();  // all compiledFns must mkref result
-  else
+  }
+  else {
+    if (doLog) log() << log_levels.top() << ". eval'ing body\n";
     // eval all forms in body, save result of final form
     for (Cell* form = impl(fn); form != nil; form=cdr(form)) {
       rmref(result);
       result = eval(car(form), currLexicalScope);
     }
+  }
 
   endLexicalScope();  // implicitly rmrefs newScope
   endDynamicScope(CURR_LEXICAL_SCOPE);

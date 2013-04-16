@@ -42,12 +42,6 @@ using std::ofstream;
 
 
 
-ofstream& log(int level) {
-  static ofstream log("log");
-  log << "</div><div class='level' level_index='" << level << "'>";
-  return log;
-}
-
 #define unused __attribute__((unused))
 
 bool pretendRaise = false;
