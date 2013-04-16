@@ -38,19 +38,36 @@ Cell* eval(Cell* expr) {
 
 bool doLog = false;
 stack<int> log_levels;
+void new_level() {
+  if (log_levels.empty()) log_levels.push(0);   // initialization
+  if (doLog)
+    log_levels.push(log_levels.top()+1);
+}
+
+void end_level() {
+  if (doLog)
+    log_levels.pop();
+}
+
 Cell* eval(Cell* expr, Cell* scope) {
-  if (log_levels.empty()) log_levels.push(0);
-  log_levels.push(log_levels.top()+1);
-  if (doLog) log() << log_levels.top() << ". " << expr << endl;
+  if (!doLog) return eval2(expr, scope);
+  new_level();
+  log() << expr << endl;
   Cell* result = eval2(expr, scope);
-  if (doLog) log() << log_levels.top() << ". => " << result << endl;
-  log_levels.pop();
+  log() << " &rArr; " << result << endl;
+  end_level();
   return result;
 }
 
 ofstream& log() {
+  return log(log_levels.top());
+}
+
+ofstream& log(int n) {
   static ofstream log("log");
-  log << "</div><div class='level' level_index='" << log_levels.top() << "'>";
+  log << "</div><div class='level";
+  if (n > 1) log << " hidden";
+  log << "' level_index='" << n << "'>";
   return log;
 }
 
@@ -92,7 +109,7 @@ Cell* eval2(Cell* expr, Cell* scope) {
   if (isAlreadyEvald(expr))
     return mkref(keepAlreadyEvald() ? expr : stripAlreadyEvald(expr));
 
-  if (doLog) log() << log_levels.top() << ". eval'ing args\n";
+  if (doLog) log(log_levels.top()+1) << "eval'ing args\n";
 
   // expr is a call
   Cell* fn = toFn(eval(car(expr), scope));
@@ -128,11 +145,11 @@ Cell* eval2(Cell* expr, Cell* scope) {
 
   Cell* result = nil;
   if (isCompiledFn(body(fn))) {
-    if (doLog) log() << log_levels.top() << ". executing primitive\n";
+    if (doLog) log(log_levels.top()+1) << "executing primitive " << car(expr) << endl;
     result = toCompiledFn(body(fn))();  // all compiledFns must mkref result
   }
   else {
-    if (doLog) log() << log_levels.top() << ". eval'ing body\n";
+    if (doLog) log(log_levels.top()+1) << "eval'ing body\n";
     // eval all forms in body, save result of final form
     for (Cell* form = impl(fn); form != nil; form=cdr(form)) {
       rmref(result);

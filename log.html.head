@@ -1,20 +1,16 @@
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js">
 </script>
 <script>
-  var level = 2;
   $(document).ready(function() {
-    collapseLowerThan(level);
+    $('.level').map(function() {
+      addExpandHint($(this));
+    })
     $('.level').click(function() {
       toggleNextIndentedSiblings($(this));
     });
     for (x = 1; x <= 9; ++x)
       $('[level_index='+x+']').css('padding-left', (x*2)+'em');
   });
-
-  function collapseLowerThan(n) {
-    for (x = 1; x < n; ++x)
-      $('.'+x).hide();
-  }
 
   function toggleIndentedSiblings(elem) {
     var level = parseInt(elem.attr('level_index'));
@@ -44,5 +40,18 @@
     }
     return next;
   }
+
+  function addExpandHint(elem) {
+    if (parseInt(elem.next().attr('level_index')) > parseInt(elem.attr('level_index'))) {
+      //elem.append(' &#9166;');
+      elem.append(' &#8629;');
+      elem.addClass('clickable');
+    }
+  }
 </script>
+
+<style>
+  .hidden{ display:none; }
+  .clickable{ cursor:pointer; }
+</style>
 
