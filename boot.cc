@@ -42,10 +42,6 @@ using std::ofstream;
 
 
 
-long debug = 999;
-#define dbg if(debug <= 1) cerr
-#define dbg2 if(debug <= 2) cerr
-
 ofstream& log(int level) {
   static ofstream log("log");
   log << "</div><div class='level' level_index='" << level << "'>";

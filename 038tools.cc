@@ -4,11 +4,6 @@ COMPILE_FN(addr, compiledFn_addr, "($x)",
   return mkref(newNum((long)lookup("$x")));
 )
 
-COMPILE_FN(debug, compiledFn_debug, "($x)",
-  debug = toInt(lookup("$x"));
-  return nil;
-)
-
 COMPILE_FN(register_failed_test, compiledFn_incTests, "($msg $expr)",
   ++numFailures;
   cout << endl << "F "; print(lookup("$msg"), cout);

@@ -55,11 +55,6 @@ COMPILE_FN(pr, compiledFn_pr, "($x)",
   return mkref(x);
 )
 
-COMPILE_FN(dbg, compiledFn_dbg, "($x)",
-  dbg << lookup("$x") << endl;
-  return nil;
-)
-
 COMPILE_FN(write, compiledFn_write, "($x)",
   Cell* x = lookup("$x");
   ostream& out = toOstream(STDOUT);
