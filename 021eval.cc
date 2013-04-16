@@ -36,7 +36,27 @@ Cell* eval(Cell* expr) {
   return eval(expr, currLexicalScope);
 }
 
+bool doLog = false;
+stack<int> log_levels;
 Cell* eval(Cell* expr, Cell* scope) {
+  if (log_levels.empty()) log_levels.push(0);
+  log_levels.push(log_levels.top()+1);
+  int level = log_levels.top();
+  if (doLog) log(level) << level << ". " << expr << endl;
+  Cell* result = eval2(expr, scope);
+  if (doLog) log(level) << level << ". => " << result << endl;
+  log_levels.pop();
+  return result;
+}
+
+COMPILE_FN(trace, compiledFn_trace, "'($form)",
+  doLog = true;
+  Cell* result = eval(lookup("$form"), currLexicalScope);
+  doLog = false;
+  return result;
+)
+
+Cell* eval2(Cell* expr, Cell* scope) {
   if (!expr)
     RAISE << "eval: cell should never be NULL" << endl << DIE;
 
