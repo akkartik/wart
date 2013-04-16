@@ -1,0 +1,48 @@
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js">
+</script>
+<script>
+  var level = 2;
+  $(document).ready(function() {
+    collapseLowerThan(level);
+    $('.level').click(function() {
+      toggleNextIndentedSiblings($(this));
+    });
+    for (x = 1; x <= 9; ++x)
+      $('[level_index='+x+']').css('padding-left', (x*2)+'em');
+  });
+
+  function collapseLowerThan(n) {
+    for (x = 1; x < n; ++x)
+      $('.'+x).hide();
+  }
+
+  function toggleIndentedSiblings(elem) {
+    var level = parseInt(elem.attr('level_index'));
+    var toggle = (elem.next().css('display') == 'none') ? function(curr) { curr.show(); }
+                                                        : function(curr) { curr.hide(); };
+    for (curr=elem.next(); parseInt(curr.attr('level_index')) > level; curr=curr.next())
+      toggle(curr);
+  }
+
+  function toggleNextIndentedSiblings(elem) {
+    var level = parseInt(elem.attr('level_index'));
+    var next = nextLevel(elem).toString();
+    var toggle = (elem.next().css('display') == 'none') ? function(curr) { if (curr.attr('level_index') == next) curr.show(); }
+                                                        : function(curr) { curr.hide(); };
+    for (var curr=elem.next(); (currLevel = parseInt(curr.attr('level_index'))) > level; curr=curr.next())
+      toggle(curr);
+  }
+
+  function nextLevel(elem) {
+    var level = parseInt(elem.attr('level_index'));
+    var next = level;
+    var currLevel = -1;
+    for (var curr=elem.next(); (currLevel = parseInt(curr.attr('level_index'))) > level; curr=curr.next()) {
+      if (next <= level || currLevel < next)
+        next = currLevel;
+      if (next == level+1) break;
+    }
+    return next;
+  }
+</script>
+
