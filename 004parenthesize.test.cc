@@ -717,3 +717,14 @@ void rewind(IndentSensitiveStream& in) {
   in.fd.seekg(0);
   in.atStartOfLine = true;
 }
+
+void test_parenthesize_handles_metadata() {
+  IndentSensitiveStream in(":(a b)");
+  list<Token> tokens = nextExpr(in);
+  list<Token>::iterator p = tokens.begin();
+  checkEq(*p, ":("); ++p;
+  checkEq(*p, "a"); ++p;
+  checkEq(*p, "b"); ++p;
+  checkEq(*p, ")"); ++p;
+  check(p == tokens.end());
+}

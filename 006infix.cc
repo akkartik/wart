@@ -62,7 +62,7 @@ AstNode transformInfix(AstNode n) {
     }
   }
 
-  if (n.elems.front() != Token("("))
+  if (!isOpenParen(n.elems.front()))
     return n;
 
   if (n.elems.size() == 2)  //// ()
@@ -198,7 +198,7 @@ bool isRegularChar(char c) {
 bool infixOpCalledWithoutArgs(AstNode n) {
   if (!isList(n) || n.elems.size() != 3) return false;
   list<AstNode>::iterator p = n.elems.begin();
-  if (*p != Token("(")) return false;
+  if (!isOpenParen(*p)) return false;
   ++p;
   return isInfixOp(*p);
 }

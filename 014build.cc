@@ -45,7 +45,10 @@ Cell* buildCell(AstNode n) {
   }
 
   Cell* newForm = newCell();
-  setCar(newForm, buildCell(n.elems.front()));
+  if (*first == ":(")
+    setCar(newForm, newSym(":"));
+  else
+    setCar(newForm, buildCell(n.elems.front()));
 
   list<AstNode>::iterator next = first; ++next;
   if (*next == "...") {

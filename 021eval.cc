@@ -685,7 +685,8 @@ COMPILE_FN(wrap_if_incomplete, compiledFn_wrap_if_incomplete, "($x)",
 //// helpers
 
 bool isQuoted(Cell* cell) {
-  return isCons(cell) && car(cell) == sym_quote;
+  return isCons(cell)
+      && (car(cell) == sym_quote || car(cell) == newSym(":"));
 }
 
 bool isBackQuoted(Cell* cell) {

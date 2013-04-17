@@ -2,10 +2,10 @@
 
 ostream& operator<<(ostream& os, Cell* c) {
   if (c == NULL) return os << "NULLNULLNULL";
-  if (c == nil) return os << "nil";
+  if (c == nil) return os << "()";  // can't be 'nil' because :() can't be :nil
   switch(c->type) {
   case CONS:
-    if (car(c) == sym_quote || car(c) == sym_backquote || car(c) == sym_unquote || car(c) == sym_splice || car(c) == sym_unquoteSplice || car(c) == sym_alreadyEvald)
+    if (car(c) == sym_quote || car(c) == sym_backquote || car(c) == sym_unquote || car(c) == sym_splice || car(c) == sym_unquoteSplice || car(c) == sym_alreadyEvald || car(c) == newSym(":"))
       return os << car(c) << cdr(c);
     os << "(" << car(c);
     for (Cell* curr = cdr(c); curr != nil; curr = cdr(curr)) {
