@@ -125,6 +125,23 @@ void test_assign_overrides_lexical_var() {
   rmref(fn);
 }
 
+void test_unbind_works() {
+  newDynamicScope("x", newNum(3));
+  checkEq(dynamics[newSym("x")].size(), 1);
+  Cell* expr = read("unbind x");
+  eval(expr);   // always returns nil
+  checkEq(dynamics[newSym("x")].size(), 0);
+  rmref(expr);
+}
+
+void test_unbind_handles_unbound_vars() {
+  checkEq(dynamics[newSym("x")].size(), 0);
+  Cell* expr = read("unbind x");
+  eval(expr);   // always returns nil
+  checkEq(dynamics[newSym("x")].size(), 0);
+  rmref(expr);
+}
+
 void test_bound_works() {
   Cell* call = read("(bound? 'a)");
   Cell* result1 = eval(call);

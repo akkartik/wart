@@ -85,8 +85,9 @@ COMPILE_FN(bind, compiledFn_bind, "('$var $val)",
 )
 
 COMPILE_FN(unbind, compiledFn_unbind, "('$var)",
-  if (lookup("$var") == nil)
-    endDynamicScope(lookup("$var"));
+  Cell* var = lookup("$var");
+  if (!dynamics[var].empty())
+    endDynamicScope(var);
   return nil;
 )
 
