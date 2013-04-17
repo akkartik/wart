@@ -57,7 +57,7 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
 
     if (isIndent(curr) || curr.newline)
       parenAtStartOfLine = false;
-    else if (curr == "(" && numWordsInLine == 0)
+    else if (isOpenParen(curr) && numWordsInLine == 0)
       parenAtStartOfLine = true;
 
     //// decide what to emit, tracking (implicit/explicit) open parens
@@ -102,8 +102,8 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
 void emit(const Token& t, list<Token>& out, long& explicitOpenParens) {
   if (t.newline || isIndent(t)) return;
   out.push_back(t);
-  if (t == "(") ++explicitOpenParens;
-  if (t == ")") --explicitOpenParens;
+  if (isOpenParen(t)) ++explicitOpenParens;
+  if (isCloseParen(t)) --explicitOpenParens;
   if (explicitOpenParens < 0) RAISE << "Unbalanced )" << endl;
 }
 
@@ -135,11 +135,11 @@ list<Token> indentInsensitiveExpr(IndentSensitiveStream& in) {
     else if (isQuoteOrUnquote(curr)) {
       result.push_back(curr);
     }
-    else if (curr == "(") {
+    else if (isOpenParen(curr)) {
       result.push_back(curr);
       ++explicitOpenParens;
     }
-    else if (curr == ")") {
+    else if (isCloseParen(curr)) {
       result.push_back(curr);
       --explicitOpenParens;
       if (explicitOpenParens == 0) break;
@@ -165,7 +165,14 @@ bool isIndent(const Token& t) {
 }
 
 bool isParen(const Token& t) {
-  return t == "(" || t == ")";
+  return isOpenParen(t) || isCloseParen(t);
+}
+
+bool isOpenParen(const Token& t) {
+  return t == "(";
+}
+bool isCloseParen(const Token& t) {
+  return t == ")";
 }
 
 bool isQuoteOrUnquote(const Token& t) {

@@ -34,10 +34,10 @@ AstNode nextAstNode(list<Token>& in) {
   while (!in.empty() && isQuoteOrUnquote(subform.back().atom))
     subform.push_back(AstNode(nextToken(in)));
 
-  if (subform.back() == "(") {
+  if (isOpenParen(subform.back())) {
     while (!in.empty() && subform.back() != ")")
       subform.push_back(nextAstNode(in));
-    if (subform.back() != ")") RAISE << "Unbalanced (" << endl << DIE;
+    if (!isCloseParen(subform.back())) RAISE << "Unbalanced (" << endl << DIE;
   }
 
   if (subform.size() == 1)
@@ -70,14 +70,21 @@ bool isQuoteOrUnquote(const AstNode& n) {
   return isAtom(n) && isQuoteOrUnquote(n.atom);
 }
 
+bool isOpenParen(const AstNode& n) {
+  return n == "(";
+}
+bool isCloseParen(const AstNode& n) {
+  return n == ")";
+}
+
 ostream& operator<<(ostream& os, AstNode x) {
   if (x.elems.empty()) return os << x.atom;
   bool skipNextSpace = true;
   for (list<AstNode>::iterator p = x.elems.begin(); p != x.elems.end(); ++p) {
-    if (*p != ")" && !skipNextSpace)
+    if (!isCloseParen(*p) && !skipNextSpace)
       os << " ";
     os << *p;
-    skipNextSpace = (*p == "(" || isQuoteOrUnquote(*p));
+    skipNextSpace = (isOpenParen(*p) || isQuoteOrUnquote(*p));
   }
   return os;
 }
