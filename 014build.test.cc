@@ -119,7 +119,7 @@ void test_build_handles_metadata() {
   IndentSensitiveStream in(":(34 35)");
   Cell *c=nextCell(in), *origc=c;
   checkEq(c->nrefs, 0);
-  checkEq(car(c), newSym(":"));
+  checkEq(car(c), sym_metadata);
 
   c = cdr(c);
   checkEq(c->nrefs, 1);

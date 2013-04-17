@@ -253,7 +253,7 @@ void teardownCells() {
 
 // optimize lookups of common symbols
 Cell *sym_quote, *sym_backquote, *sym_unquote, *sym_splice, *sym_unquoteSplice;
-Cell *sym_alreadyEvald;
+Cell *sym_alreadyEvald, *sym_metadata;
 Cell *sym_list, *sym_number, *sym_symbol, *sym_string, *sym_table, *sym_List;
 Cell *sym_object, *sym_Coercions, *sym_incomplete_eval;
 Cell *sym_function, *sym_name, *sym_sig, *sym_body, *sym_optimized_body, *sym_env, *sym_compiled, *sym_param_alias;
@@ -266,6 +266,7 @@ void setupCommonSyms() {
   sym_unquoteSplice = newSym(",@");
 
   sym_alreadyEvald = newSym("''");
+  sym_metadata = newSym(":");
 
   sym_list = newSym("list");
   sym_number = newSym("number");

@@ -46,7 +46,7 @@ Cell* buildCell(AstNode n) {
 
   Cell* newForm = newCell();
   if (*first == ":(")
-    setCar(newForm, newSym(":"));
+    setCar(newForm, sym_metadata);
   else
     setCar(newForm, buildCell(n.elems.front()));
 
