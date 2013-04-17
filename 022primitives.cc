@@ -85,7 +85,8 @@ COMPILE_FN(bind, compiledFn_bind, "('$var $val)",
 )
 
 COMPILE_FN(unbind, compiledFn_unbind, "('$var)",
-  endDynamicScope(lookup("$var"));
+  if (lookup("$var") == nil)
+    endDynamicScope(lookup("$var"));
   return nil;
 )
 
