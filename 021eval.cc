@@ -128,7 +128,7 @@ Cell* eval2(Cell* expr, Cell* scope) {
   Cell* newScope = newTable();
   evalBindAll(sig(fn), orderedArgs, scope, newScope);
 
-  if (car(expr) != newSym("incomplete?")
+  if (car(expr) != newSym("speculatively_eval")
       && anyIncompleteEval(newScope)) {
     Cell* result = rippleIncompleteEval(fn, newScope);
     rmref(newScope);
@@ -674,7 +674,7 @@ Cell* rippleIncompleteEval(Cell* f, Cell* scope) {
   return result;
 }
 
-COMPILE_FN(wrap_if_incomplete, compiledFn_wrap_if_incomplete, "($x)",
+COMPILE_FN(speculatively_eval, compiledFn_wrap_if_incomplete, "($x)",
   Cell* x = lookup("$x");
   if (!isIncompleteEval(x)) return mkref(x);
   return mkref(newObject("incomplete_eval_data", rep(x)));
