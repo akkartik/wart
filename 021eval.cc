@@ -23,10 +23,11 @@
 //  @splicing args into macro calls just like regular functions
 //
 //  do as much work as possible even if all vars aren't correctly setup
-//    eval returns a special _incomplete_ object on unbound vars
-//    operations on incomplete_eval objects are rippled into their boundaries
+//    eval returns a special incomplete_eval object on unbound vars
+//    expressions on incomplete_eval objects become incomplete_eval themselves, the boundary rippling outward
 //      (cons (object incomplete_eval x) 3) => (object incomplete_eval (cons x 3))
-//    wrap_if_incomplete turns incomplete objects non-rippling _incomplete data_ objects
+//    'speculatively turns incomplete objects into non-rippling incomplete_eval_data objects
+//      beware function wrappers around 'speculatively; arg eval can get subtle
 //    eval turns incomplete_eval_data objects back into incompletes, so eval can be retried
 //
 //  support symbolicEval mode as a primitive for optimizations
@@ -128,7 +129,7 @@ Cell* eval2(Cell* expr, Cell* scope) {
   Cell* newScope = newTable();
   evalBindAll(sig(fn), orderedArgs, scope, newScope);
 
-  if (car(expr) != newSym("speculatively_eval")
+  if (car(expr) != newSym("speculatively")
       && anyIncompleteEval(newScope)) {
     Cell* result = rippleIncompleteEval(fn, newScope);
     rmref(newScope);
@@ -674,7 +675,7 @@ Cell* rippleIncompleteEval(Cell* f, Cell* scope) {
   return result;
 }
 
-COMPILE_FN(speculatively_eval, compiledFn_wrap_if_incomplete, "($x)",
+COMPILE_FN(speculatively, compiledFn_speculatively, "($x)",
   Cell* x = lookup("$x");
   if (!isIncompleteEval(x)) return mkref(x);
   return mkref(newObject("incomplete_eval_data", rep(x)));
