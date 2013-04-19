@@ -686,8 +686,7 @@ COMPILE_FN(speculatively, compiledFn_speculatively, "($x)",
 //// helpers
 
 bool isQuoted(Cell* cell) {
-  return isCons(cell)
-      && (car(cell) == sym_quote || car(cell) == sym_metadata);
+  return isCons(cell) && car(cell) == sym_quote;
 }
 
 bool isBackQuoted(Cell* cell) {

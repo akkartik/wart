@@ -752,17 +752,6 @@ void test_eval_handles_quoted_lists() {
   rmref(expr);
 }
 
-void test_eval_considers_metadata_quoted() {
-  Cell* expr = read(":(a b)");
-  Cell* result = eval(expr);
-  // (a b)
-  checkEq(car(result), newSym("a"));
-  checkEq(car(cdr(result)), newSym("b"));
-  checkEq(cdr(cdr(result)), nil);
-  rmref(result);
-  rmref(expr);
-}
-
 void test_eval_handles_backquoted_lists() {
   Cell* expr = read("`(a b)");
   Cell* result = eval(expr);

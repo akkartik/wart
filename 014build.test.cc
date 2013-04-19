@@ -115,26 +115,6 @@ void test_build_handles_form() {
   rmref(origc);
 }
 
-void test_build_handles_metadata() {
-  IndentSensitiveStream in(":(34 35)");
-  Cell *c=nextCell(in), *origc=c;
-  checkEq(c->nrefs, 0);
-  checkEq(car(c), sym_metadata);
-
-  c = cdr(c);
-  checkEq(c->nrefs, 1);
-  checkEq(car(c), newNum(34));
-  checkEq(car(c)->nrefs, 2);
-
-  c = cdr(c);
-  checkEq(c->nrefs, 1);
-  checkEq(car(c), newNum(35));
-  checkEq(car(c)->nrefs, 2);
-
-  checkEq(cdr(c), nil);
-  rmref(origc);
-}
-
 void test_build_handles_dotted_list() {
   IndentSensitiveStream in("(34 ... 35)");
   Cell *c=nextCell(in), *origc=c;

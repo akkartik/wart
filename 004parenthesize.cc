@@ -169,7 +169,7 @@ bool isParen(const Token& t) {
 }
 
 bool isOpenParen(const Token& t) {
-  return t == "(" || t == ":(";
+  return t == "(";
 }
 bool isCloseParen(const Token& t) {
   return t == ")";

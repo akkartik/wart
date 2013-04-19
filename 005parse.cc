@@ -71,7 +71,7 @@ bool isQuoteOrUnquote(const AstNode& n) {
 }
 
 bool isOpenParen(const AstNode& n) {
-  return n == "(" || n == ":(";
+  return n == "(";
 }
 bool isCloseParen(const AstNode& n) {
   return n == ")";

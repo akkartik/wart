@@ -71,12 +71,10 @@ Token nextToken(IndentSensitiveStream& in) {
     slurpUnquote(in.fd, out);
   else if (find(quoteAndUnquoteChars, in.fd.peek()))
     slurpChar(in.fd, out);
-  else if (in.fd.peek() == ':')
-    slurpColonToken(in.fd, out);
   else
     slurpWord(in.fd, out);
 
-  if (out.str() == ":") return nextToken(in);   // skip comment token
+  if (out.str() == ":") return nextToken(in);
 
   return Token(out.str());
 }
@@ -117,16 +115,6 @@ void slurpUnquote(istream& in, ostream& out) {
   slurpChar(in, out);   // comma
   if (in.peek() == '@')
     slurpChar(in, out); // ..and maybe splice
-}
-
-void slurpColonToken(istream& in, ostream& out) {
-  slurpChar(in, out);
-  // :() delimits metadata, structured comments for other tools
-  if (in.peek() == '(')
-    slurpChar(in, out);
-  // otherwise try to read a keyword symbol
-  else
-    slurpWord(in, out);
 }
 
 

@@ -13,23 +13,6 @@ void test_fn_works() {
   rmref(fn);
 }
 
-void test_fn_takes_metadata() {
-  Cell* fn = read("(fn(x) :(level 34) x)");
-  Cell* result = eval(fn);
-  // (object function {sig: (x), body: (x), metadata: {level: 34}})
-  check(isObject(result));
-  checkEq(type(result), sym_function);
-  Cell* t = rep(result);
-  checkEq(car(get(t, sym_sig)), newSym("x"));
-  checkEq(cdr(get(t, sym_sig)), nil);
-  checkEq(car(get(t, sym_body)), newSym("x"));
-  checkEq(cdr(get(t, sym_body)), nil);
-  check(isTable(get(t, sym_metadata)));
-  checkEq(get(get(t, sym_metadata), newSym("level")), newNum(34));
-  rmref(result);
-  rmref(fn);
-}
-
 
 
 void test_if_sees_args_in_then_and_else() {

@@ -147,13 +147,6 @@ bool contains(Cell* tree, Cell* a) {
   return contains(tree, a, done);
 }
 
-Cell* asTable(Cell* list) {
-  Cell* result = newTable();
-  for (; list != nil; list = cdr(cdr(list)))
-    set(result, car(list), car(cdr(list)));
-  return result;
-}
-
 
 
 struct CellLt :public std::binary_function<Cell*, Cell*, bool> {

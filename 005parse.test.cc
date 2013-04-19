@@ -173,36 +173,3 @@ void test_parse_handles_indented_toplevel_forms() {
   check(p == n.elems.end());
   checkEq(nextAstNode(in), eof());
 }
-
-void test_parse_handles_metadata() {
-  IndentSensitiveStream in(":(2 3)");
-  AstNode n = nextAstNode(in);
-  check(!n.elems.empty());
-  list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token(":(")); ++p;
-  checkEq(*p, Token("2")); ++p;
-  checkEq(*p, Token("3")); ++p;
-  checkEq(*p, Token(")")); ++p;
-  check(p == n.elems.end());
-  checkEq(nextAstNode(in), eof());
-}
-
-void test_parse_handles_metadata2() {
-  IndentSensitiveStream in("(34 :(2 3))");
-  AstNode n = nextAstNode(in);
-  check(!n.elems.empty());
-  list<AstNode>::iterator p = n.elems.begin();
-  checkEq(*p, Token("(")); ++p;
-  checkEq(*p, Token("34")); ++p;
-  check(!p->elems.empty());
-    list<AstNode> ast2 = p->elems; ++p;
-    list<AstNode>::iterator q = ast2.begin();
-    checkEq(*q, Token(":(")); ++q;
-    checkEq(*q, Token("2")); ++q;
-    checkEq(*q, Token("3")); ++q;
-    checkEq(*q, Token(")")); ++q;
-    check(q == ast2.end());
-  checkEq(*p, Token(")")); ++p;
-  check(p == n.elems.end());
-  checkEq(nextAstNode(in), eof());
-}

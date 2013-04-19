@@ -237,13 +237,3 @@ void test_tokenize_handles_sexpr() {
   checkEq(t, indent(0));       t=nextToken(in);
   checkEq(t, "def");           t=nextToken(in);
 }
-
-void test_tokenize_handles_metadata() {
-  IndentSensitiveStream in(":(a b)");
-  Token t = nextToken(in);
-  checkEq(t, indent(0));       t=nextToken(in);
-  checkEq(t, ":(");            t=nextToken(in);
-  checkEq(t, "a");             t=nextToken(in);
-  checkEq(t, "b");           t=nextToken(in);
-  checkEq(t, ")");             t=nextToken(in);
-}

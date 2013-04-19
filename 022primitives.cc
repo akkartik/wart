@@ -9,12 +9,7 @@
 COMPILE_FN(fn, compiledFn_fn, "'($params ... $body)",
   Cell* f = newTable();
   set(f, sym_sig, lookup("$params"));
-  Cell* body = lookup("$body");
-  if (isCons(car(body)) && car(car(body)) == sym_metadata) {
-    set(f, sym_metadata, asTable(cdr(car(body))));
-    body = cdr(body);
-  }
-  set(f, sym_body, body);
+  set(f, sym_body, lookup("$body"));
   set(f, sym_env, cdr(currLexicalScope));
   return mkref(newObject("function", f));
 )
