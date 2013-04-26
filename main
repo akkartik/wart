@@ -66,7 +66,7 @@ Wart would be impossible without the work of many many others. [Credits].
 
 == Getting started
 
-You'll need Linux and gcc. To install wart:
+You'll need Linux and gcc. To install wart and run its tests:
 
   $ git clone http://github.com/akkartik/wart.git
   $ cd wart
@@ -82,7 +82,8 @@ You'll need Linux and gcc. To install wart:
     :(inline "main loop")
   }
 
-You type in _expressions_, and wart _evaluates_ them to return _values_.
+Usually you type in expressions, and wart evaluates them and prints the
+results.
 
   $ ./wart
   ready! type in an expression, then hit enter twice. ctrl-d exits.
@@ -201,7 +202,7 @@ Now everything we type in returns 0.
 == Credits
 
 Wart is an experiment in designing software. Major inspirations:
-  The Lisp programming language, especially the Arc dialect (http://www.paulgraham.com/arc.html)
+  The Lisp programming language, especially its Arc dialect (http://www.paulgraham.com/arc.html)
   Christopher Alexander (http://www.amazon.com/Notes-Synthesis-Form-Harvard-Paperbacks/dp/0674627512)
   David Parnas (http://www.cs.umd.edu/class/spring2003/cmsc838p/Design/criteria.pdf)
   Peter Naur (http://alistair.cockburn.us/ASD+book+extract%3A+%22Naur,+Ehn,+Musashi%22)
