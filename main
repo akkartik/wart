@@ -200,8 +200,8 @@ Now everything we type in returns 0.
 
 == Credits
 
-Wart is an experiment in designing software. Inspirations:
-  The Lisp programming language, in particular the Arc dialect: http://www.paulgraham.com/arc.html
+Wart is an experiment in designing software. Major inspirations:
+  The Lisp programming language, especially the Arc dialect (http://www.paulgraham.com/arc.html)
   Christopher Alexander (http://www.amazon.com/Notes-Synthesis-Form-Harvard-Paperbacks/dp/0674627512)
   David Parnas (http://www.cs.umd.edu/class/spring2003/cmsc838p/Design/criteria.pdf)
   Peter Naur (http://alistair.cockburn.us/ASD+book+extract%3A+%22Naur,+Ehn,+Musashi%22)
