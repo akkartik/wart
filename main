@@ -70,7 +70,7 @@ You'll need Linux and gcc. To install wart:
   $ cd wart
   $ ./wart test
 
-  :(name "main")
+  :(code "main")
   int main(int argc) {
     if (argc > 1) {
       runTests();   // see [Test harness]
@@ -89,6 +89,7 @@ You type in _expressions_, and wart _evaluates_ them to return _values_.
 
 More examples (explained later):
 
+  :(run)
   # assignment
   x <- 3
   => 3
@@ -146,7 +147,7 @@ More examples (explained later):
 
 Everything is a Cell.
 
-  :(name "cell")
+  :(code)
   struct Cell {
     union {
       Cell* car;
@@ -162,7 +163,7 @@ executes those Cells to generate behavior. If you did it right, the result
 will be the behaviors you intended :) But don't worry, this is a risk-free
 sandbox where you can break things without consequence.
 
-  :(name "main loop")
+  :(code "main loop")
   while (!cin.eof()) {
     Cell* form = Read(cin);
     cout << "=> " << Eval(form) << endl;
@@ -170,6 +171,7 @@ sandbox where you can break things without consequence.
 
 Degenerate definitions for Read and Eval for starters. We'll add to these.
 
+  :(code)
   Cell nil;
 
   Cell* Read(istream& in) {
@@ -184,6 +186,7 @@ Degenerate definitions for Read and Eval for starters. We'll add to these.
 
 Now everything we type in returns 0.
 
+  :(run; works just for now!)
   0
   => 0
   1
