@@ -62,6 +62,8 @@ particular:
   they get bogged down by complexity) an order of magnitude longer. That
   payoff should make it worth your while to unlearn old habits.
 
+Wart would be impossible without the work of many many others. [Credits].
+
 == Getting started
 
 You'll need Linux and gcc. To install wart:
@@ -195,3 +197,25 @@ Now everything we type in returns 0.
 == Turning code into Cells: Read
 
 == Turning Cells into behavior: Eval
+
+== Credits
+
+Wart is an experiment in designing software. Inspirations:
+  The Lisp programming language, in particular the Arc dialect: http://www.paulgraham.com/arc.html
+  Christopher Alexander (http://www.amazon.com/Notes-Synthesis-Form-Harvard-Paperbacks/dp/0674627512)
+  David Parnas (http://www.cs.umd.edu/class/spring2003/cmsc838p/Design/criteria.pdf)
+  Peter Naur (http://alistair.cockburn.us/ASD+book+extract%3A+%22Naur,+Ehn,+Musashi%22)
+
+Discussions on the arc forum helped develop many of its features:
+  "The wart atop the mountain": http://arclanguage.org/item?id=12814
+  Generic functions: http://arclanguage.org/item?id=11779, http://arclanguage.org/item?id=13790
+  Python-style keyword args: http://arclanguage.org/item?id=12657
+  Why wart has no modules: http://arclanguage.org/item?id=12777
+  Why wart has just one kind of equality: http://arclanguage.org/item?id=13690
+  In praise of late binding: http://arclanguage.org/item?id=15655
+  Libraries suck: http://www.arclanguage.org/item?id=13283
+  Making macros even more first-class: http://arclanguage.org/item?id=16378
+  Infix: http://arclanguage.org/item?id=16775
+
+Wart is distributed under the Perl Foundation's artistic license 2.0:
+  http://dev.perl.org/licenses/artistic.html
