@@ -1,5 +1,7 @@
 === Wart: trying not to make a mess of it
 
+img:http://www.bonkersworld.net/images/2011.11.15_life_of_a_swe.png
+
 Every codebase starts out clean but gradually gets messy. The original
 architecture is stretched to unanticipated uses, squeezed into new
 constraints. It receives contributions from newcomers who only partially
@@ -19,19 +21,46 @@ support only the second view, leaving the programmer to construct the other
 views inside his own head. Wart provides all three with as little code as
 possible.
 
-This is a hard problem. To help focus on it, wart ignores everything else. In
+In essence, we want to record an ever-growing number of design decisions with
+their rationales, to connect them to the code implementing them in a
+verifiable way, and to organize them so they're always a joy to browse.
+
+This is a hard problem. To keep any chance of success, we will creatively
+sidestep constraints, constantly looking for solutions that handle multiple
+constraints at once. We will ruthlessly keep things as simple as possible,
+relying on our system of rationales to keep things from getting too simple. In
 particular:
 
-  a) It promises no compatibility. Every release of wart will pass its own
-  tests and internal constraints. If you want to be able to upgrade (not
-  essential but nice to have), write thorough tests for your own code.
+  a) Wart promises no compatibility. Every release of wart will pass its own
+  tests and chosen constraints. If you want to be able to upgrade (not
+  essential but nice to have), write thorough tests for your own code so you
+  at least know when I break you. In exchange, you too can change wart in
+  arbitrary ways to fit your own needs.
 
-  b) It does not care about safety. Wart supplies mechanisms, and hopes to
+  Breaking compatibility doesn't have to break sharing; if your changes
+  decompose well and record their reasons it'll be easy (but not trivial or
+  automatic) for others to pick and choose from them. Wart's example will
+  hopefully teach how to make changes in layers, and to record the reasons for
+  each layer.
+
+  b) Wart does not care about safety. Wart supplies mechanisms, and hopes to
   illustrate good taste by its own example. It does not try quixotically to
-  police taste. It does provide mechanisms (tests, static analysis) for each
-  codebase to define its own safety checks.
+  police taste; humans are smart enough to subvert any rule.
 
-  c) It is not concerned with being easy to learn or familiar at first glance.
+  Wart does provide mechanisms (tests, static analysis) for defining safety
+  checks. But hopefully you'll learn from its example that you need fewer
+  rules and checks than you think. It won't police your policing.
+
+  c) Wart assumes rationales are generated and managed by programmers. If you
+  want to create 'stories' that someone else 'implements', this is not the tool
+  for you. But if you're curious about programming, wart will try to reward
+  your curiosity.
+
+  d) Wart is not concerned with being easy to learn or familiar at first
+  glance. If all goes well, this new way of programming will make programs an
+  order of magnitude shorter and preserve the velocity of projects (before
+  they get bogged down by complexity) an order of magnitude longer. That
+  payoff should make it worth your while to unlearn old habits.
 
 == Getting started
 
@@ -40,7 +69,6 @@ You'll need Linux and gcc. To install wart:
   $ git clone http://github.com/akkartik/wart.git
   $ cd wart
   $ ./wart test
-  $               # all tests passed
 
   :(name "main")
   int main(int argc) {
@@ -58,17 +86,6 @@ You type in _expressions_, and wart _evaluates_ them to return _values_.
   ready! type in an expression, then hit enter twice. ctrl-d exits.
   1+1
   => 2
-
-  :(name "main loop")
-  while (!cin.eof()) {
-    list<Cell*> forms = readLine(cin);  // see [Cell]
-    for (list<Cell*>::iterator p = forms.begin(); p != forms.end(); ++p) {
-      Cell* result = eval(*p);
-      cout << "=> " << result << endl;
-      rmref(result);    // see [Memory management] for rmref
-      rmref(*p);
-    }
-  }
 
 More examples (explained later):
 
@@ -124,3 +141,54 @@ More examples (explained later):
   => 1
   subtract 3 :from 4
   => 1
+
+== The core data structure: Cell
+
+Everything is a Cell.
+
+  :(name "cell")
+  struct Cell {
+    union {
+      Cell* car;
+      long num;
+    }
+    Cell* next;
+    enum { CONS, INTEGER } type;
+    Cell() :car(NULL), cdr(NULL), type(CONS);
+  }
+
+Wart turns the programs you write into configurations of Cells, and then
+executes those Cells to generate behavior. If you did it right, the result
+will be the behaviors you intended :) But don't worry, this is a risk-free
+sandbox where you can break things without consequence.
+
+  :(name "main loop")
+  while (!cin.eof()) {
+    Cell* form = Read(cin);
+    cout << "=> " << Eval(form) << endl;
+  }
+
+Degenerate definitions for Read and Eval for starters. We'll add to these.
+
+  Cell nil;
+
+  Cell* Read(istream& in) {
+    int dummy = 0;
+    cin >> in;
+    return nil;
+  }
+
+  Cell* Eval(Cell* expr) {
+    return expr;
+  }
+
+Now everything we type in returns 0.
+
+  0
+  => 0
+  1
+  => 0
+
+== Turning code into Cells: Read
+
+== Turning Cells into behavior: Eval
