@@ -79,7 +79,7 @@ You'll need Linux and gcc. To install wart and run its tests:
       return 0;
     }
 
-    :(inline "main loop")
+    :(more..)
   }
 
 Usually you type in expressions, and wart evaluates them and prints the
@@ -166,7 +166,7 @@ executes those Cells to generate behavior. If you did it right, the result
 will be the behaviors you intended :) But don't worry, this is a risk-free
 sandbox where you can break things without consequence.
 
-  :(code "main loop")
+  :(code "main loop" in "main")
   while (!cin.eof()) {
     Cell* form = Read(cin);
     cout << "=> " << Eval(form) << endl;
