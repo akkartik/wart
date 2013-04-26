@@ -1,0 +1,21 @@
+It's useful for variables to have scope so calling a function doesn't create
+weird effects:
+
+  def (f x)
+    x <- 3
+    ...
+
+  def (g x y)
+    (f y)
+    x
+
+  (g 1 2)
+  => 3
+
+To avoid this, functions create new bindings for their arguments:
+
+  :(after "scope")
+  (g 1 2)
+  => 1
+
+  :(name "scope")
