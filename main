@@ -172,51 +172,37 @@ sandbox where you can break things without consequence.
     cout << "=> " << Eval(form) << endl;
   }
 
-Degenerate definitions for Read and Eval for starters. We'll add to these.
-
-  :(code)
-  Cell nil;
-
-  Cell* Read(istream& in) {
-    int dummy = 0;
-    cin >> in;
-    return nil;
-  }
-
-  Cell* Eval(Cell* expr) {
-    return expr;
-  }
-
-Now everything we type in returns 0.
-
-  :(run; works just for now!)
-  0
-  => 0
-  1
-  => 0
-
 == Turning code into Cells: Read
 
 == Turning Cells into behavior: Eval
 
 == Credits
 
-Wart is an experiment in designing software. Major inspirations:
-  The Lisp programming language, especially its Arc dialect (http://www.paulgraham.com/arc.html)
-  Christopher Alexander (http://www.amazon.com/Notes-Synthesis-Form-Harvard-Paperbacks/dp/0674627512)
-  David Parnas (http://www.cs.umd.edu/class/spring2003/cmsc838p/Design/criteria.pdf)
-  Peter Naur (http://alistair.cockburn.us/ASD+book+extract%3A+%22Naur,+Ehn,+Musashi%22)
-
-Discussions on the arc forum helped develop many of its features:
-  "The wart atop the mountain": http://arclanguage.org/item?id=12814
-  Generic functions: http://arclanguage.org/item?id=11779, http://arclanguage.org/item?id=13790
-  Python-style keyword args: http://arclanguage.org/item?id=12657
-  Why wart has no modules: http://arclanguage.org/item?id=12777
-  Why wart has just one kind of equality: http://arclanguage.org/item?id=13690
-  In praise of late binding: http://arclanguage.org/item?id=15655
-  Libraries suck: http://www.arclanguage.org/item?id=13283
-  Making macros even more first-class: http://arclanguage.org/item?id=16378
-  Infix: http://arclanguage.org/item?id=16775
+Wart builds on many ideas that have come before, especially:
+- <a href='http://alistair.cockburn.us/ASD+book+extract%3A+%22Naur,+Ehn,+Musashi%22'>Peter Naur</a>
+  for articulating the paramount problem of programming: communicating a codebase to others;
+- <a href='http://www.amazon.com/Notes-Synthesis-Form-Harvard-Paperbacks/dp/0674627512'>Christopher Alexander</a>
+  and <a href='http://dreamsongs.net/Files/PatternsOfSoftware.pdf'>Richard Gabriel</a>
+  for the intellectual tools for reasoning about the higher order design of a codebase;
+- <a href='http://www.literateprogramming.com/knuthweb.pdf'>Donald Knuth's literate programming</a>
+  for liberating "code for humans to read" from the tyranny of compiler order;
+- <a href='http://www.cs.umd.edu/class/spring2003/cmsc838p/Design/criteria.pdf'>David Parnas</a>
+  and others for highlighting the value of separating concerns and stepwise refinement;
+- <a href='http://www.paulgraham.com/rootsoflisp.html'>Lisp</a> for showing the
+  power of dynamic languages, late binding and providing the right primitives
+  <em>a la carte</em>;
+- <a href='http://golang.org'>Go's docs</a> for exemplifying interactive
+  documentation that doubles as tests;
+- <a href='https://en.wikipedia.org/wiki/ReStructuredText'>ReStructuredText</a>
+  and <a href='https://en.wikipedia.org/wiki/Setext'>its antecedents</a> for
+  showing that markup can be clean;
+- The folklore of debugging by print and the trace facility in many lisp
+  systems;
+- Automated tests for showing the value of building programs inside an
+  elaborate harness;
+- BDD for challenging us all to write tests at a higher level;
+- JavaScript and CSS for demonstrating the power of a DOM for complex
+  structured documents.
 
 Wart is distributed under the Perl Foundation's artistic license 2.0:
   http://dev.perl.org/licenses/artistic.html
