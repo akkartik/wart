@@ -758,6 +758,6 @@ Cell* quote(Cell* x) {
 Cell* quoteAll(Cell* x) {
   Cell* result = newCell(), *curr = result;
   for (Cell* iter = x; iter != nil; iter=cdr(iter), curr=cdr(curr))
-    addCons(curr, newCons(sym_quote, car(iter)));
+    addCons(curr, quote(car(iter)));
   return dropPtr(result);
 }
