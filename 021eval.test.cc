@@ -308,7 +308,7 @@ void test_evalBindAll_only_reorders_when_necessary() {
   Cell* x = read("(3)");
   setCdr(x, x);   // cycle
   Cell* scope = mkref(newTable());
-  set(scope, newSym("x"), x);
+  set(scope, "x", x);
   Cell* arg = read("((fn args args) x)");   // (list x)
   Cell* args = mkref(newCons(arg));
   Cell* newScope = mkref(newTable());
