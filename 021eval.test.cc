@@ -428,8 +428,9 @@ void test_evalBindAll_evals_aliases_only_when_necessary() {
   Cell* params = read("(('a | 'b))");
   Cell* args = read("(x)");
   Cell* newScope = mkref(newTable());
+  long oldEvalCount = evalCount;
   evalBindAll(params, args, nil, newScope);
-  checkEq(raiseCount, 0);
+  checkEq(evalCount-oldEvalCount, 0);
   // {a: x, b: x}
   checkEq(unsafeGet(newScope, "a"), newSym("x"));
   checkEq(unsafeGet(newScope, "b"), newSym("x"));
@@ -442,8 +443,9 @@ void test_evalBindAll_evals_aliases_only_when_necessary2() {
   Cell* params = read("('a | ('b))");
   Cell* args = read("(x)");
   Cell* newScope = mkref(newTable());
+  long oldEvalCount = evalCount;
   evalBindAll(params, args, nil, newScope);
-  checkEq(raiseCount, 0);
+  check(evalCount-oldEvalCount > 0);
   // {a: (x), b: x}
   checkEq(car(unsafeGet(newScope, "a")), newSym("x"));
   checkEq(unsafeGet(newScope, "b"), newSym("x"));
@@ -458,8 +460,9 @@ void test_evalBindAll_evals_aliases_only_when_necessary3() {
   Cell* scope = mkref(newTable());
   unsafeSet(scope, "y", newNum(3), false);
   Cell* newScope = mkref(newTable());
+  long oldEvalCount = evalCount;
   evalBindAll(params, args, scope, newScope);
-  checkEq(raiseCount, 0);
+  check(evalCount-oldEvalCount > 0);
   // {a: (x y), b: x, c: 3}
   checkEq(car(unsafeGet(newScope, "a")), newSym("x"));
   checkEq(car(cdr(unsafeGet(newScope, "a"))), newSym("y"));
@@ -478,8 +481,9 @@ void test_evalBindAll_evals_aliases_only_when_necessary4() {
   Cell* scope = mkref(newTable());
   unsafeSet(scope, "x", newNum(3), false);
   Cell* newScope = mkref(newTable());
+  long oldEvalCount = evalCount;
   evalBindAll(params, args, scope, newScope);
-  checkEq(raiseCount, 0);
+  check(evalCount-oldEvalCount > 0);
   // {a: x, b: x, c: 3}
   checkEq(unsafeGet(newScope, "a"), newSym("x"));
   checkEq(unsafeGet(newScope, "b"), newSym("x"));
@@ -494,8 +498,9 @@ void test_evalBindAll_evals_aliases_only_when_necessary5() {
   Cell* params = read("((| 'a (| 'b 'c)))");
   Cell* args = read("(x)");
   Cell* newScope = mkref(newTable());
+  long oldEvalCount = evalCount;
   evalBindAll(params, args, nil, newScope);
-  checkEq(raiseCount, 0);
+  checkEq(evalCount-oldEvalCount, 0);
   // {a: x, b: x, c: x}
   checkEq(unsafeGet(newScope, "a"), newSym("x"));
   checkEq(unsafeGet(newScope, "b"), newSym("x"));

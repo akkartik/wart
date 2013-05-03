@@ -79,7 +79,10 @@ COMPILE_FN(trace, compiledFn_trace, "'($form)",
   return result;
 )
 
+long evalCount = 0;
+
 Cell* eval2(Cell* expr, Cell* scope) {
+  ++evalCount;
   if (!expr)
     RAISE << "eval: cell should never be NULL" << endl << DIE;
 
@@ -252,7 +255,9 @@ void evalBindAliases(Cell* params /* (| ...) */, Cell* arg, Cell* scope, Cell* n
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
   Cell* cachedVal = NULL;   // to ensure we don't multiply-eval
   for (Cell *aliases=cdr(params), *alias=car(aliases); aliases != nil; aliases=cdr(aliases),alias=car(aliases)) {
-    if (cachedVal)
+    if (isQuoted(alias))
+      bindParams(alias, arg, NULL, newScope);
+    else if (cachedVal)
       bindParams(alias, cachedVal, arg, newScope);
     else if (isAlias(alias))
       evalBindAliases(alias, arg, scope, newScope);
