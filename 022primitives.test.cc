@@ -197,7 +197,9 @@ void test_eval_handles_nil_scope() {
   addLexicalBinding("caller_scope", nil);
   Cell* call = read("(eval 'x caller_scope)");
   Cell* result = eval(call);
-  // No errors.
+  check(isObject(result));
+  checkEq(type(result), sym_incomplete_eval);
+  checkEq(rep(result), newSym("x"));
   rmref(result);
   rmref(call);
   endLexicalScope();
