@@ -17,24 +17,13 @@ Cell* lookup(string s) {
   return lookup(newSym(s));
 }
 
-bool foofoo = true;
-
 // keepAlreadyEvald is for supporting @args in macro calls
 Cell* lookup(Cell* sym, Cell* scope, bool keepAlreadyEvald) {
   Cell* result = lookupLexicalBinding(sym, scope);
   if (result) return maybeStripAlreadyEvald(keepAlreadyEvald, result);
   result = lookupDynamicBinding(sym);
   if (result) return maybeStripAlreadyEvald(keepAlreadyEvald, result);
-  if (foofoo)
-    RAISE << "AAA\n";
   return newObject("incomplete_eval", sym);
-}
-
-Cell* tryEval(Cell* x) {
-  foofoo = false;
-  Cell* result = eval(x);
-  foofoo = true;
-  return result;
 }
 
 Cell* lookup(Cell* sym) {

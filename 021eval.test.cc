@@ -712,11 +712,11 @@ void test_sym_evals_to_itself() {
 
 void test_eval_on_incompleteEval_retries() {
   Cell* expr = read("a");
-  Cell* incompleteResult = tryEval(expr);
+  Cell* incompleteResult = eval(expr);
   check(isObject(incompleteResult));
   checkEq(type(incompleteResult), sym_incomplete_eval);
   newDynamicScope("a", newNum(34));
-  Cell* doublyEvaldResult = tryEval(incompleteResult);
+  Cell* doublyEvaldResult = eval(incompleteResult);
   checkEq(doublyEvaldResult, newNum(34));
   rmref(doublyEvaldResult);
   endDynamicScope("a");
@@ -1586,12 +1586,12 @@ void test_eval_handles_keyword_args_inside_destructured_params() {
 
 void test_eval_handles_unknown_call() {
   Cell* expr = read("(f 3)");
-  Cell* attempt1 = tryEval(expr);
+  Cell* attempt1 = eval(expr);
   check(isIncompleteEval(attempt1));
   Cell* fn = read("(fn (a) a)");
-  Cell* f = tryEval(fn);
+  Cell* f = eval(fn);
   newDynamicScope("f", f);
-  Cell* attempt2 = tryEval(attempt1);
+  Cell* attempt2 = eval(attempt1);
   checkEq(attempt2, newNum(3));
   rmref(attempt2);
   endDynamicScope("f");
@@ -1603,10 +1603,10 @@ void test_eval_handles_unknown_call() {
 
 void test_eval_handles_unknown_arg() {
   Cell* fn = read("(fn (a) a)");
-  Cell* f = tryEval(fn);
+  Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read("(f a)");
-  Cell* attempt1 = tryEval(call);
+  Cell* attempt1 = eval(call);
   // `(object incomplete_eval (,f a))
   check(isIncompleteEval(attempt1));
   check(isCons(rep(attempt1)));
@@ -1622,11 +1622,11 @@ void test_eval_handles_unknown_arg() {
 
 void test_eval_handles_known_and_unknown_args() {
   Cell* fn = read("(fn (a b) b)");
-  Cell* f = tryEval(fn);
+  Cell* f = eval(fn);
   newDynamicScope("f", f);
   newDynamicScope("a", newNum(3));
   Cell* call = read("(f a b)");
-  Cell* attempt1 = tryEval(call);
+  Cell* attempt1 = eval(call);
   // `(object incomplete_eval (,f ''3 b))
   check(isIncompleteEval(attempt1));
   check(isCons(rep(attempt1)));
@@ -1646,10 +1646,10 @@ void test_eval_handles_known_and_unknown_args() {
 
 void test_eval_handles_quoted_and_unknown_args() {
   Cell* fn = read("(fn ('a b) b)");
-  Cell* f = tryEval(fn);
+  Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read("(f a b)");
-  Cell* attempt1 = tryEval(call);
+  Cell* attempt1 = eval(call);
   // `(object incomplete_eval (,f ''a b))
   check(isIncompleteEval(attempt1));
   check(isCons(rep(attempt1)));
@@ -1668,10 +1668,10 @@ void test_eval_handles_quoted_and_unknown_args() {
 
 void test_eval_handles_unknown_destructured_args() {
   Cell* fn = read("(fn ((a b)) b)");
-  Cell* f = tryEval(fn);
+  Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read("(f args)");
-  Cell* attempt1 = tryEval(call);
+  Cell* attempt1 = eval(call);
   // `(object incomplete_eval (,f args))
   check(isIncompleteEval(attempt1));
   check(isCons(rep(attempt1)));
@@ -1687,10 +1687,10 @@ void test_eval_handles_unknown_destructured_args() {
 
 void test_eval_handles_unknown_spliced_args() {
   Cell* fn = read("(fn ((a b)) b)");
-  Cell* f = tryEval(fn);
+  Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read("(f @args)");
-  Cell* attempt1 = tryEval(call);
+  Cell* attempt1 = eval(call);
   // `(object incomplete_eval (,f @args))
   check(isIncompleteEval(attempt1));
   check(isCons(rep(attempt1)));
@@ -1707,10 +1707,10 @@ void test_eval_handles_unknown_spliced_args() {
 
 void test_eval_handles_literal_incomplete_args() {
   Cell* fn = read("(fn (x) x)");
-  Cell* f = tryEval(fn);
+  Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read("(f (object incomplete_eval 34))");
-  Cell* attempt1 = tryEval(call);
+  Cell* attempt1 = eval(call);
   checkEq(attempt1, newNum(34));
   rmref(attempt1);
   rmref(call);
@@ -1721,10 +1721,10 @@ void test_eval_handles_literal_incomplete_args() {
 
 void test_eval_handles_incomplete_args_for_aliased_params() {
   Cell* fn = read("(fn (x|y) x)");
-  Cell* f = tryEval(fn);
+  Cell* f = eval(fn);
   newDynamicScope("f", f);
   Cell* call = read("(f a)");
-  Cell* attempt1 = tryEval(call);
+  Cell* attempt1 = eval(call);
   // `(object incomplete_eval (,f a))
   check(isIncompleteEval(attempt1));
   check(isCons(rep(attempt1)));
