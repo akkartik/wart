@@ -247,66 +247,6 @@ void test_eval_handles_rest_params() {
   rmref(call);
 }
 
-void test_eval_doesnt_modify_fn() {
-  Cell* fn = read("(fn(x) (eval x))");
-  Cell* f = eval(fn);
-  newDynamicScope("f", f);
-  Cell* oldf = copyList(f);
-  Cell* call = read("(f 34)");
-  Cell* result = eval(call);
-  check(equalList(f, oldf));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(oldf);
-  rmref(fn);
-  endDynamicScope("f");
-}
-
-void test_eval_doesnt_modify_fn2() {
-  Cell* fn = read("(fn(x) (eval x))");
-  Cell* f = eval(fn);
-  newDynamicScope("f", f);
-  Cell* oldf = copyList(f);
-  Cell* call = read("(f '(cons 3 4))");
-  Cell* result = eval(call);
-  check(equalList(f, oldf));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(oldf);
-  rmref(fn);
-  endDynamicScope("f");
-}
-
-void test_eval_handles_simple_fn() {
-  Cell* expr = read("(fn () 34)");
-  Cell* fn = eval(expr);
-  // (object function {sig: nil, body: (34), env: nil})
-  checkEq(type(fn), newSym("function"));
-  checkEq(sig(fn), nil);
-  check(isCons(body(fn)));
-  checkEq(car(body(fn)), newNum(34));
-  checkEq(env(fn), nil);
-  rmref(fn);
-  rmref(expr);
-}
-
-void test_eval_on_fn_is_idempotent() {
-  Cell* expr = read("(fn () 34)");
-  Cell* fn = eval(expr);
-  Cell* fn2 = eval(fn);
-  // fn == fn2
-  checkEq(type(fn2), newSym("function"));
-  checkEq(sig(fn2), nil);
-  check(isCons(body(fn2)));
-  checkEq(car(body(fn2)), newNum(34));
-  checkEq(env(fn2), nil);
-  rmref(fn2);
-  rmref(fn);
-  rmref(expr);
-}
-
 void test_eval_handles_closure() {
   Cell* expr = read("(fn () 34)");
   newLexicalScope();
