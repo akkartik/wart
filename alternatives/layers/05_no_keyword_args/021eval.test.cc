@@ -228,8 +228,8 @@ void test_evalBindAll_handles_destructured_params() {
   Cell* params = read("((a b))");
   Cell* args = read("(`(,x ,y))");
   Cell* scope = mkref(newTable());
-  unsafeSet(scope, "x", newNum(3), false);
-  unsafeSet(scope, "y", newNum(4), false);
+  set(scope, "x", newNum(3));
+  set(scope, "y", newNum(4));
   Cell* newScope = mkref(newTable());
   evalBindAll(params, args, scope, newScope);
   // {a: 3, b: 4}
