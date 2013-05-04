@@ -39,7 +39,7 @@ Cell* eval(Cell* expr) {
         << "Perhaps you need to split the line in two." << endl;
 
   // eval its args, create new bindings
-  vector<Cell*> varsBound;
+  list<Cell*> varsBound;
   evalBindAll(sig(fn), cdr(expr), varsBound);
 
   Cell* result = nil;
@@ -54,8 +54,8 @@ Cell* eval(Cell* expr) {
     }
   }
 
-  for (unsigned long i = 0; i < varsBound.size(); ++i)
-    endDynamicScope(varsBound[i]);
+  for (list<Cell*>::iterator p = varsBound.begin(); p != varsBound.end(); ++p)
+    endDynamicScope(*p);
   rmref(fn);
   return result;  // already mkref'd
 }
@@ -63,7 +63,7 @@ Cell* eval(Cell* expr) {
 // bind params to args in newScope, taking into account:
 //  quoted params (eval'ing args as necessary; args is never quoted, though)
 //  destructured params
-void evalBindAll(Cell* params, Cell* args, vector<Cell*>& varsBound) {
+void evalBindAll(Cell* params, Cell* args, list<Cell*>& varsBound) {
   if (params == nil)
     return ;
 
@@ -91,7 +91,7 @@ void evalBindAll(Cell* params, Cell* args, vector<Cell*>& varsBound) {
   rmref(args2);
 }
 
-void evalBindRest(Cell* param, Cell* args, Cell** cachedVal, vector<Cell*>& varsBound) {
+void evalBindRest(Cell* param, Cell* args, Cell** cachedVal, list<Cell*>& varsBound) {
   if (isCons(param))
     evalBindAll(param, args, varsBound);
 
@@ -102,7 +102,7 @@ void evalBindRest(Cell* param, Cell* args, Cell** cachedVal, vector<Cell*>& vars
   }
 }
 
-void evalBindParam(Cell* param, Cell* arg, vector<Cell*>& varsBound) {
+void evalBindParam(Cell* param, Cell* arg, list<Cell*>& varsBound) {
   Cell* arg2 = NULL;
   if (isQuoted(param)) {
     param = stripQuote(param);
@@ -118,7 +118,7 @@ void evalBindParam(Cell* param, Cell* arg, vector<Cell*>& varsBound) {
 }
 
 // NULL unevaldArgs => args are already quoted
-void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, vector<Cell*>& varsBound) {
+void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, list<Cell*>& varsBound) {
   if (isQuoted(params)) {
     if (unevaldArgs)
       bindParams(stripQuote(params), unevaldArgs, NULL, varsBound);

@@ -1,4 +1,4 @@
-bool contains(const vector<Cell*>& v, string sym) {
+bool contains(const list<Cell*>& v, string sym) {
   return find(v.begin(), v.end(), newSym(sym)) != v.end();
 }
 
@@ -6,7 +6,7 @@ void test_evalBindAll_handles_unquoted_param() {
   Cell* params = read("(x)");
   Cell* args = read("(a)");
   newDynamicScope("a", newNum(3));
-  vector<Cell*> varsBound;
+  list<Cell*> varsBound;
   evalBindAll(params, args, varsBound);
   checkEq(varsBound.size(), 1);
   check(contains(varsBound, "x"));
@@ -21,7 +21,7 @@ void test_evalBindAll_binds_missing_params() {
   Cell* params = read("(x y)");
   Cell* args = read("(a)");
   newDynamicScope("a", newNum(3));
-  vector<Cell*> varsBound;
+  list<Cell*> varsBound;
   evalBindAll(params, args, varsBound);
   checkEq(lookup("x"), newNum(3));
   checkEq(lookup("y"), nil);
@@ -38,7 +38,7 @@ void test_evalBindAll_binds_missing_params() {
 void test_evalBindAll_handles_quoted_param() {
   Cell* params = read("('x)");
   Cell* args = read("(a)");
-  vector<Cell*> varsBound;
+  list<Cell*> varsBound;
   evalBindAll(params, args, varsBound);
   checkEq(varsBound.size(), 1);
   check(contains(varsBound, "x"));
@@ -53,7 +53,7 @@ void test_evalBindAll_handles_varargs_param() {
   Cell* args = read("(a b)");
   newDynamicScope("a", newNum(3));
   newDynamicScope("b", newNum(4));
-  vector<Cell*> varsBound;
+  list<Cell*> varsBound;
   evalBindAll(params, args, varsBound);
   checkEq(varsBound.size(), 1);
   check(contains(varsBound, "x"));
@@ -73,7 +73,7 @@ void test_evalBindAll_handles_quoted_varargs_param() {
   Cell* args = read("(a b)");
   newDynamicScope("a", newNum(3));
   newDynamicScope("b", newNum(4));
-  vector<Cell*> varsBound;
+  list<Cell*> varsBound;
   evalBindAll(params, args, varsBound);
   checkEq(varsBound.size(), 1);
   check(contains(varsBound, "x"));
@@ -93,7 +93,7 @@ void test_evalBindAll_handles_rest_param() {
   Cell* args = read("(a b)");
   newDynamicScope("a", newNum(3));
   newDynamicScope("b", newNum(4));
-  vector<Cell*> varsBound;
+  list<Cell*> varsBound;
   evalBindAll(params, args, varsBound);
   // {x: 3, y: (4)}
   checkEq(lookup("x"), newNum(3));
@@ -112,7 +112,7 @@ void test_evalBindAll_handles_quoted_rest_param() {
   Cell* args = read("(a b)");
   newDynamicScope("a", newNum(3));
   newDynamicScope("b", newNum(4));
-  vector<Cell*> varsBound;
+  list<Cell*> varsBound;
   evalBindAll(params, args, varsBound);
   // {x: 3, y: (b)}
   checkEq(lookup("x"), newNum(3));
@@ -131,7 +131,7 @@ void test_evalBindAll_handles_destructured_params() {
   Cell* args = read("((cons x (cons y)))");
   newDynamicScope("x", newNum(3));
   newDynamicScope("y", newNum(4));
-  vector<Cell*> varsBound;
+  list<Cell*> varsBound;
   evalBindAll(params, args, varsBound);
   // {a: 3, b: 4}
   checkEq(lookup("a"), newNum(3));
