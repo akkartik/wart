@@ -139,6 +139,14 @@ void test_list_splice_returns_list_being_spliced_in() {
   endDynamicScope("a");
 }
 
+void test_nthCdr() {
+  Cell* x = newCons(newNum(3), newCons(newNum(4)));
+  checkEq(nthCdr(x, 0), x);
+  checkEq(car(nthCdr(x, 1)), newNum(4));
+  checkEq(nthCdr(x, 2), nil);
+  rmref(x);
+}
+
 void test_contains_handles_circular_lists() {
   unordered_set<Cell*> done;
   Cell* x = newCons(newNum(1));

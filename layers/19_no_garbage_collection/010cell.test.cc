@@ -9,13 +9,6 @@ void test_newCell_has_nil_car_and_cdr() {
   checkEq(x->cdr, nil);
 }
 
-void test_nthCdr() {
-  Cell* x = newCons(newNum(3), newCons(newNum(4)));
-  checkEq(nthCdr(x, 0), x);
-  checkEq(car(nthCdr(x, 1)), newNum(4));
-  checkEq(nthCdr(x, 2), nil);
-}
-
 void test_Cell_layout_constraints() {
   Cell cell;
   check((sizeof(cell.car)%4) == 0);

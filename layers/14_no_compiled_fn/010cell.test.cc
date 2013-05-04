@@ -26,14 +26,6 @@ void test_rmref_handles_nums() {
   checkEq(freelist, c);
 }
 
-void test_nthCdr() {
-  Cell* x = newCons(newNum(3), newCons(newNum(4)));
-  checkEq(nthCdr(x, 0), x);
-  checkEq(car(nthCdr(x, 1)), newNum(4));
-  checkEq(nthCdr(x, 2), nil);
-  rmref(x);
-}
-
 void test_Cell_layout_constraints() {
   Cell cell;
   check((sizeof(cell.car)%4) == 0);
