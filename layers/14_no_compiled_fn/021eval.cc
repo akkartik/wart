@@ -333,7 +333,7 @@ bool isColonSym(Cell* x) {
   return name[0] == ':';
 }
 
-// fn = (object function {sig => .., body => .., env => ..})
+// fn = (object function {sig => .., body => ..})
 bool isFn(Cell* x) {
   return isCons(x) && type(x) == sym_function;
 }
@@ -349,10 +349,6 @@ Cell* body(Cell* fn) {
 Cell* impl(Cell* fn) {
   Cell* impl = get(rep(fn), sym_optimized_body);
   return (impl != nil) ? impl : body(fn);
-}
-
-Cell* env(Cell* fn) {
-  return get(rep(fn), sym_env);
 }
 
 Cell* quote(Cell* x) {

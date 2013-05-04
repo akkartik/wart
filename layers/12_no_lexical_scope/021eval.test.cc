@@ -299,12 +299,11 @@ void test_eval_doesnt_modify_fn2() {
 void test_eval_handles_simple_fn() {
   Cell* expr = read("(fn () 34)");
   Cell* fn = eval(expr);
-  // (object function {sig: nil, body: (34), env: nil})
+  // (object function {sig: nil, body: (34)})
   checkEq(type(fn), newSym("function"));
   checkEq(sig(fn), nil);
   check(isCons(body(fn)));
   checkEq(car(body(fn)), newNum(34));
-  checkEq(env(fn), nil);
   rmref(fn);
   rmref(expr);
 }
@@ -318,7 +317,6 @@ void test_eval_on_fn_is_idempotent() {
   checkEq(sig(fn2), nil);
   check(isCons(body(fn2)));
   checkEq(car(body(fn2)), newNum(34));
-  checkEq(env(fn2), nil);
   rmref(fn2);
   rmref(fn);
   rmref(expr);
