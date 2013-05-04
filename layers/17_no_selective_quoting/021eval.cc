@@ -220,10 +220,8 @@ void evalBindAll(Cell* params, Cell* args, list<Cell*>& varsBound) {
   if (params == nil)
     return ;
 
-  if (isSym(params)) {
-    Cell* dummy = NULL;
-    evalBindRest(params, args, &dummy, varsBound);
-  }
+  if (isSym(params))
+    evalBindRest(params, args, varsBound);
 
   else if (!isCons(params))
     ;
@@ -234,14 +232,14 @@ void evalBindAll(Cell* params, Cell* args, list<Cell*>& varsBound) {
   }
 }
 
-void evalBindRest(Cell* param, Cell* args, Cell** cachedVal, list<Cell*>& varsBound) {
+void evalBindRest(Cell* param, Cell* args, list<Cell*>& varsBound) {
   if (isCons(param))
     evalBindAll(param, args, varsBound);
 
   else {
-    *cachedVal = evalAll(args);
-    bindParams(param, *cachedVal, varsBound);
-    rmref(*cachedVal);
+    Cell* val = evalAll(args);
+    bindParams(param, val, varsBound);
+    rmref(val);
   }
 }
 
@@ -251,7 +249,6 @@ void evalBindParam(Cell* param, Cell* arg, list<Cell*>& varsBound) {
   rmref(val);
 }
 
-// NULL unevaldArgs => args are already quoted
 void bindParams(Cell* params, Cell* args, list<Cell*>& varsBound) {
   if (params == nil)
     ;

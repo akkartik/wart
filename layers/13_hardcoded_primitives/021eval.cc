@@ -237,10 +237,8 @@ void evalBindAll(Cell* params, Cell* args, list<Cell*>& varsBound) {
     args2 = mkref(args);
   }
 
-  if (isSym(params)) {
-    Cell* dummy = NULL;
-    evalBindRest(params, args2, &dummy, varsBound);
-  }
+  if (isSym(params))
+    evalBindRest(params, args2, varsBound);
 
   else if (!isCons(params))
     ;
@@ -252,14 +250,14 @@ void evalBindAll(Cell* params, Cell* args, list<Cell*>& varsBound) {
   rmref(args2);
 }
 
-void evalBindRest(Cell* param, Cell* args, Cell** cachedVal, list<Cell*>& varsBound) {
+void evalBindRest(Cell* param, Cell* args, list<Cell*>& varsBound) {
   if (isCons(param))
     evalBindAll(param, args, varsBound);
 
   else {
-    *cachedVal = evalAll(args);
-    bindParams(param, *cachedVal, args, varsBound);
-    rmref(*cachedVal);
+    Cell* val = evalAll(args);
+    bindParams(param, val, varsBound);
+    rmref(val);
   }
 }
 
@@ -273,19 +271,14 @@ void evalBindParam(Cell* param, Cell* arg, list<Cell*>& varsBound) {
     arg2 = mkref(arg);
 
   Cell* val = eval(arg2);
-  bindParams(param, val, arg2, varsBound);
+  bindParams(param, val, varsBound);
   rmref(val);
   rmref(arg2);
 }
 
-// NULL unevaldArgs => args are already quoted
-void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, list<Cell*>& varsBound) {
-  if (isQuoted(params)) {
-    if (unevaldArgs)
-      bindParams(stripQuote(params), unevaldArgs, NULL, varsBound);
-    else
-      bindParams(stripQuote(params), args, NULL, varsBound);
-  }
+void bindParams(Cell* params, Cell* args, list<Cell*>& varsBound) {
+  if (isQuoted(params))
+    bindParams(stripQuote(params), args, varsBound);
 
   else if (params == nil)
     ;
@@ -299,11 +292,11 @@ void bindParams(Cell* params, Cell* args, Cell* unevaldArgs, list<Cell*>& varsBo
     ;
 
   else if (args != nil && !isCons(args))
-    bindParams(params, nil, nil, varsBound);
+    bindParams(params, nil, varsBound);
 
   else {
-    bindParams(car(params), car(args), unevaldArgs && isCons(unevaldArgs) ? car(unevaldArgs) : unevaldArgs, varsBound);
-    bindParams(cdr(params), cdr(args), unevaldArgs && isCons(unevaldArgs) ? cdr(unevaldArgs) : unevaldArgs, varsBound);
+    bindParams(car(params), car(args), varsBound);
+    bindParams(cdr(params), cdr(args), varsBound);
   }
 }
 
