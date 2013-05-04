@@ -1,1 +1,0 @@
-../../024string.test.cc

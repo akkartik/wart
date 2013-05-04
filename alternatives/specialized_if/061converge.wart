@@ -1,5 +1,0 @@
-def (converge f x)
-  let y f.x
-    if2 (x = y)
-      x
-      (converge f y)

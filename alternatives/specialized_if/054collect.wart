@@ -1,6 +1,0 @@
-mac (collect ... body)
-  `(withs ($acc   (queue)
-           yield  (fn(_)
-                    (enq _ $acc)))
-     ,@body
-     (as list $acc))

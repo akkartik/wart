@@ -1,1 +1,0 @@
-../../006infix.test.cc
