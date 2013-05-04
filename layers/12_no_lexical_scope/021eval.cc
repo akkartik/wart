@@ -33,7 +33,7 @@ Cell* eval(Cell* expr) {
     return mkref(cdr(expr));
 
   // expr is a call
-  Cell* fn = toFn(eval(car(expr)));
+  Cell* fn = eval(car(expr));
   if (!isFn(fn))
     RAISE << "Not a call: " << expr << endl
         << "Perhaps you need to split the line in two." << endl;
@@ -180,10 +180,6 @@ bool isColonSym(Cell* x) {
 // fn = (object function {sig => .., body => .., env => ..})
 bool isFn(Cell* x) {
   return isCons(x) && type(x) == sym_function;
-}
-
-Cell* toFn(Cell* x) {
-  return x;
 }
 
 Cell* sig(Cell* fn) {
