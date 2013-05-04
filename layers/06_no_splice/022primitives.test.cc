@@ -39,16 +39,6 @@ void test_cons_works() {
   rmref(call);
 }
 
-void test_assign_to_fn() {
-  Cell* fn = read("(<- foo (fn() 34))");
-  Cell* def = eval(fn);
-  Cell* scope = env(lookup("foo"));
-  checkEq(scope, nil);
-  endDynamicScope("foo");
-  rmref(def);
-  rmref(fn);
-}
-
 void test_assign_to_non_sym_warns() {
   Cell* expr = read("(<- 3 nil)");
   Cell* result = eval(expr);
