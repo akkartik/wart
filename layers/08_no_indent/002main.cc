@@ -46,7 +46,7 @@ list<Cell*> readAll(istream& in) {
   list<Cell*> results;
   do {
     results.push_back(read(in));
-  } while (in.peek() != '\n');
+  } while (!in.eof() && in.peek() != '\n');
   return results;
 }
 
