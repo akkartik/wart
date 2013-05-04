@@ -232,8 +232,11 @@ void evalBindAll(Cell* params, Cell* args, list<Cell*>& varsBound) {
     args2 = mkref(args);
   }
 
-  if (isSym(params))
-    evalBindRest(params, args2, varsBound);
+  if (isSym(params)) {
+    Cell* val = evalAll(args2);
+    bindParams(params, val, varsBound);
+    rmref(val);
+  }
 
   else if (!isCons(params))
     ;
@@ -243,17 +246,6 @@ void evalBindAll(Cell* params, Cell* args, list<Cell*>& varsBound) {
     evalBindAll(cdr(params), cdr(args2), varsBound);
   }
   rmref(args2);
-}
-
-void evalBindRest(Cell* param, Cell* args, list<Cell*>& varsBound) {
-  if (isCons(param))
-    evalBindAll(param, args, varsBound);
-
-  else {
-    Cell* val = evalAll(args);
-    bindParams(param, val, varsBound);
-    rmref(val);
-  }
 }
 
 void evalBindParam(Cell* param, Cell* arg, list<Cell*>& varsBound) {

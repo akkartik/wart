@@ -220,8 +220,11 @@ void evalBindAll(Cell* params, Cell* args, list<Cell*>& varsBound) {
   if (params == nil)
     return ;
 
-  if (isSym(params))
-    evalBindRest(params, args, varsBound);
+  if (isSym(params)) {
+    Cell* val = evalAll(args);
+    bindParams(params, val, varsBound);
+    rmref(val);
+  }
 
   else if (!isCons(params))
     ;
@@ -229,17 +232,6 @@ void evalBindAll(Cell* params, Cell* args, list<Cell*>& varsBound) {
   else {
     evalBindParam(car(params), car(args), varsBound);
     evalBindAll(cdr(params), cdr(args), varsBound);
-  }
-}
-
-void evalBindRest(Cell* param, Cell* args, list<Cell*>& varsBound) {
-  if (isCons(param))
-    evalBindAll(param, args, varsBound);
-
-  else {
-    Cell* val = evalAll(args);
-    bindParams(param, val, varsBound);
-    rmref(val);
   }
 }
 

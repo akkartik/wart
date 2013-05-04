@@ -100,8 +100,11 @@ void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
     args2 = mkref(args);
   }
 
-  if (isSym(params))
-    evalBindRest(params, args2, scope, newScope);
+  if (isSym(params)) {
+    Cell* val = evalAll(args2, scope);
+    bindParams(params, val, newScope);
+    rmref(val);
+  }
 
   else if (!isCons(params))
     ;
@@ -111,17 +114,6 @@ void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
     evalBindAll(cdr(params), cdr(args2), scope, newScope);
   }
   rmref(args2);
-}
-
-void evalBindRest(Cell* param, Cell* args, Cell* scope, Cell* newScope) {
-  if (isCons(param))
-    evalBindAll(param, args, scope, newScope);
-
-  else {
-    Cell* val = evalAll(args, scope);
-    bindParams(param, val, newScope);
-    rmref(val);
-  }
 }
 
 void evalBindParam(Cell* param, Cell* arg, Cell* scope, Cell* newScope) {
