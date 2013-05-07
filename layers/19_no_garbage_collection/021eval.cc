@@ -168,9 +168,9 @@ Cell* evalPrimitive(Cell* f, Cell* args) {
 //  destructured params
 void evalBindAll(Cell* params, Cell* args) {
   if (params == nil)
-    return ;
+    ;
 
-  if (isSym(params))
+  else if (isSym(params))
     bindParams(params, evalAll(args));
 
   else if (!isCons(params))

@@ -212,9 +212,9 @@ Cell* evalPrimitive(Cell* f, Cell* args) {
 //  destructured params
 void evalBindAll(Cell* params, Cell* args) {
   if (params == nil)
-    return ;
+    ;
 
-  if (isSym(params)) {
+  else if (isSym(params)) {
     Cell* val = evalAll(args);
     bindParams(params, val);
     rmref(val);

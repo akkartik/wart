@@ -65,7 +65,7 @@ Cell* eval(Cell* expr) {
 //  destructured params
 void evalBindAll(Cell* params, Cell* args, list<Cell*>& varsBound) {
   if (params == nil)
-    return ;
+    return;
 
   Cell* args2 = NULL;
   if (isQuoted(params)) {

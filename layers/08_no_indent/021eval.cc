@@ -83,7 +83,7 @@ Cell* eval(Cell* expr, Cell* scope) {
 //  destructured params
 void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
   if (params == nil)
-    return ;
+    return;
 
   Cell* args2 = NULL;
   if (isQuoted(params)) {

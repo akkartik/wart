@@ -221,7 +221,7 @@ Cell* evalPrimitive(Cell* f, Cell* args) {
 //  destructured params
 void evalBindAll(Cell* params, Cell* args, list<Cell*>& varsBound) {
   if (params == nil)
-    return ;
+    return;
 
   Cell* args2 = NULL;
   if (isQuoted(params)) {
