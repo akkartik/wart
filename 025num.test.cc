@@ -37,3 +37,11 @@ void test_lesser_always_passes_nil() {
   checkEq(eval(call), nil);
   rmref(call);
 }
+
+void test_num_converts_from_string() {
+  Cell* call = read("(num \"3\")");
+  Cell* result = eval(call);
+  checkEq(toInt(result), 3);
+  rmref(result);
+  rmref(call);
+}

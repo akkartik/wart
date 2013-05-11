@@ -42,3 +42,7 @@ COMPILE_FN(<, compiledFn_lesser, "($x $y)",
 COMPILE_FN(int, compiledFn_integer, "($x)",
   return mkref(newNum(toInt(lookup("$x"))));
 )
+
+COMPILE_FN(num, compiledFn_num, "($x)",
+  return mkref(newNum(atof(toString(lookup("$x")).c_str())));
+)
