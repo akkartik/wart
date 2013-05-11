@@ -36,6 +36,13 @@ def (join head ... tail) :case (or string?.head sym?.head)
 def (+ head ... tail) :case (or string?.head sym?.head)
   (string head @tail)
 
+def (pos fragment str n) :case string?.str
+  default n :to 0
+  if (len.str - n >= len.fragment)
+    if (fragment = (str n (n + len.fragment)))
+      n
+      (pos fragment str n+1)
+
 def (empty? s) :case string?.s
   (s = "")
 

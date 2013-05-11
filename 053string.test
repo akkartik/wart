@@ -91,6 +91,8 @@
   :valueof (as list "abc")
   :should be '("a" "b" "c"))
 
+
+
 (test "list coerces to string"
   :valueof (as string '("a" "b" "c"))
   :should be "abc")
@@ -98,6 +100,20 @@
 (test "join works on strings"
   :valueof (join "a" 'b nil)
   :should be "ab")
+
+(test "pos works on strings"
+  :valueof (pos "ab" "abc")
+  :should be 0)
+
+(test "pos works on strings - 2"
+  :valueof (pos "b" "abc")
+  :should be 1)
+
+(test "pos works on strings - 3"
+  :valueof (pos "ba" "abc")
+  :should be nil)
+
+
 
 (test "< works on strings"
   :valueof ("a" < "b")
