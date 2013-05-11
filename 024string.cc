@@ -79,3 +79,15 @@ COMPILE_FN(split, compiledFn_split, "($s $delim)",
   }
   return dropPtr(pResult);
 )
+
+COMPILE_FN(upcase, compiledFn_upcase, "($s)",
+  string s = toString(lookup("$s"));
+  std::transform(s.begin(), s.end(), s.begin(), toupper);
+  return mkref(newString(s));
+)
+
+COMPILE_FN(downcase, compiledFn_downcase, "($s)",
+  string s = toString(lookup("$s"));
+  std::transform(s.begin(), s.end(), s.begin(), tolower);
+  return mkref(newString(s));
+)

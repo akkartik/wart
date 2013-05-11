@@ -23,3 +23,19 @@ void test_string_split() {
   rmref(result);
   rmref(expr);
 }
+
+void test_upcase() {
+  Cell* expr = read("(upcase \"Abc aBd?\")");
+  Cell* result = eval(expr);
+  checkEq(toString(result), "ABC ABD?");
+  rmref(result);
+  rmref(expr);
+}
+
+void test_downcase() {
+  Cell* expr = read("(downcase \"Abc aBd?\")");
+  Cell* result = eval(expr);
+  checkEq(toString(result), "abc abd?");
+  rmref(result);
+  rmref(expr);
+}
