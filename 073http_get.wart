@@ -7,5 +7,4 @@ def (http_get url)
         prn "Connection: close"
         prn ""
       with stdin infile.sock
-        let (protocol status ... reason)   (split+read_line)
-          drain (prn+read_line)
+        drain (prn+read_line)
