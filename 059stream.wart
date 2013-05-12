@@ -41,6 +41,11 @@ def (infile fd) :case num?.fd
 def (outfile fd) :case num?.fd
   outfd.fd
 
+def (infile s) :case (isa socket s)
+  infd+fd.s
+def (outfile s) :case (isa socket s)
+  outfd+fd.s
+
 mac (drain expr eof)
   `(collect+awhile ,expr
      yield.it)

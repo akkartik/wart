@@ -25,5 +25,12 @@ def (server port)
             prn ""
             prn url
 
+mac (with `socket socket host port ... body)
+  default host :to "127.0.0.1"
+  default port :to 80
+  `(let ,socket (socket ,host ,port)
+     (before (close ,socket)
+       ,@body))
+
 def (fd socket)
   socket_fd.socket
