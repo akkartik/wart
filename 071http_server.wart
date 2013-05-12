@@ -1,5 +1,5 @@
-mac (with `serverSocket socket port ... body)
-  `(let ,socket (serverSocket ,port)
+mac (with `server_socket socket port ... body)
+  `(let ,socket (server_socket ,port)
      (before (close ,socket)
        ,@body))
 
@@ -15,7 +15,7 @@ def (parseHeaders client)
       url
 
 def (server port)
-  with serverSocket socket (or port 4040)
+  with server_socket socket (or port 4040)
     preforking 6  # handler threads
       accepting client :from socket
         let url parseHeaders.client

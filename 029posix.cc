@@ -57,7 +57,7 @@ COMPILE_FN(socket, compiledFn_socket, "($host $port)",
   return mkref(newSocket(sock));
 )
 
-COMPILE_FN(serverSocket, compiledFn_serverSocket, "($port)",
+COMPILE_FN(server_socket, compiledFn_serverSocket, "($port)",
   Socket* sock = new Socket();
   sock->fd = socket(AF_INET, SOCK_STREAM, 0);
   if (sock->fd < 0) perror("sock() failed");
