@@ -48,9 +48,9 @@ COMPILE_FN(socket, compiledFn_socket, "($host $port)",
   Socket* sock = new Socket();
   sock->fd = socket(AF_INET, SOCK_STREAM, 0);
   if (sock->fd < 0) perror("socket() failed");
-  hostent *host = gethostbyname(toString(lookup("$host")).c_str());
   bzero(&sock->addr, sizeof(sock->addr));
   sock->addr.sin_family = AF_INET;
+  hostent* host = gethostbyname(toString(lookup("$host")).c_str());
   bcopy((char*)host->h_addr, (char*)&sock->addr.sin_addr.s_addr, host->h_length);
   sock->addr.sin_port = htons(toInt(lookup("$port")));
   PERR(connect(sock->fd, (sockaddr*)&sock->addr, sizeof(sock->addr)));
