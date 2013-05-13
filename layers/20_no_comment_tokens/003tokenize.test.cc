@@ -1,3 +1,10 @@
+void test_tracing_tokenize_handles_multiple_atoms() {
+  stringstream in("34 abc 3.4");
+  START_TRACING;
+  readAll(in);
+  checkEq(TRACE_CONTENTS, "34\nabc\n3.4\n");
+}
+
 void test_tokenize_handles_multiple_atoms() {
   stringstream in("34 abc 3.4");
   Token t = nextToken(in);
