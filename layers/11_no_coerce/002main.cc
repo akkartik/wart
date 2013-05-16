@@ -65,7 +65,7 @@ const TestFn tests[] = {
 long numFailures = 0;
 bool passed = true;
 
-#define check(X) if (!(X)) { \
+#define CHECK(X) if (!(X)) { \
     ++numFailures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
     passed = false; \
@@ -73,7 +73,7 @@ bool passed = true;
   } \
   else { cerr << "."; fflush(stderr); }
 
-#define checkEq(X, Y) if ((X) != (Y)) { \
+#define CHECK_EQ(X, Y) if ((X) != (Y)) { \
     ++numFailures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
     cerr << "  got " << (X) << endl;  /* BEWARE: multiple eval */ \
