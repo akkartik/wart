@@ -52,8 +52,10 @@ void runTests() {
   pretendRaise = true;  // for death tests
   time_t t; time(&t);
   cerr << "C tests: " << ctime(&t);
-  for (unsigned long i=0; i < sizeof(tests)/sizeof(tests[0]); ++i)
+  for (unsigned long i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
+    START_TRACING_UNTIL_END_OF_SCOPE;
     (*tests[i])();
+  }
 
   cerr << endl;
   if (numFailures > 0)

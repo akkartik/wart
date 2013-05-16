@@ -7,7 +7,7 @@ struct LeaseTracer {
   LeaseTracer() { tr = new ostringstream; }
   ~LeaseTracer() { delete tr, tr = NULL; }
 };
-#define START_TRACING LeaseTracer lease_tracer;
+#define START_TRACING_UNTIL_END_OF_SCOPE LeaseTracer lease_tracer;
 
 long numFailures = 0;
 
