@@ -2,21 +2,21 @@ void test_tracing_tokenize_handles_multiple_atoms() {
   stringstream in("34 abc 3.4");
   START_TRACING;
   readAll(in);
-  CHECK_EQ(TRACE_CONTENTS, "34\nabc\n3.4\n");
+  checkTraceContents("34\nabc\n3.4\n");
 }
 
 void test_tokenize_handles_string_literal() {
   stringstream in("34 \"abc\"");
   START_TRACING;
   readAll(in);
-  CHECK_EQ(TRACE_CONTENTS, "34\n\"abc\"\n");
+  checkTraceContents("34\n\"abc\"\n");
 }
 
 void test_tokenize_handles_multiple_lines() {
   stringstream in("34\n\"abc\"");
   START_TRACING;
   readAll(in);
-  CHECK_EQ(TRACE_CONTENTS, "34\n\"abc\"\n");
+  checkTraceContents("34\n\"abc\"\n");
 }
 
 void test_tokenize_handles_string_with_space() {
