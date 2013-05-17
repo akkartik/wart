@@ -17,8 +17,8 @@ struct LeaseTracer {
 };
 #define START_TRACING_UNTIL_END_OF_SCOPE LeaseTracer lease_tracer;
 
+// TODO: logically belongs in main.cc with the rest of the test harness
 long numFailures = 0;
-
 #define CHECK_EQ(X, Y) if ((X) != (Y)) { \
     ++numFailures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
