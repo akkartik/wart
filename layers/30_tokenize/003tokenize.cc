@@ -30,7 +30,7 @@ Token nextToken(istream& in) {
   else
     slurpWord(in, out);
 
-  trace << out.str() << endl;
+  trace("tokenize") << out.str() << endl;
   return Token(out.str());
 }
 

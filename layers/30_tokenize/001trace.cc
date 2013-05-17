@@ -1,10 +1,18 @@
-ostream* tr = NULL;
+struct TraceStream {
+  unordered_map<string, ostringstream*> layer;
+  ostringstream& stream(string l) {
+    if (!layer[l]) layer[l] = new ostringstream;
+    return *layer[l];
+  }
+};
 
-#define trace if (tr) (*tr)
+TraceStream* tr = NULL;
+
+#define trace(layer) if (tr) tr->stream(layer)
 
 // tr is a resource, LeaseTracer uses RAII to manage it.
 struct LeaseTracer {
-  LeaseTracer() { tr = new ostringstream; }
+  LeaseTracer() { tr = new TraceStream; }
   ~LeaseTracer() { delete tr, tr = NULL; }
 };
 #define START_TRACING_UNTIL_END_OF_SCOPE LeaseTracer lease_tracer;
@@ -19,6 +27,6 @@ long numFailures = 0;
   } \
   else { cerr << "."; fflush(stderr); }
 
-void checkTraceContents(string expected) {
-  CHECK_EQ(((ostringstream*)tr)->str(), expected);
+void checkTraceContents(string layer, string expected) {
+  CHECK_EQ(tr->stream(layer).str(), expected);
 }
