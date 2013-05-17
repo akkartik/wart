@@ -1,25 +1,25 @@
 void test_parse_handles_empty_stream() {
   stringstream in("");
-  CHECK_EQ(nextAstNode(in), "");
+  readAll(in);
+  checkTraceContents("parse", "\n");  // extra newline artifact
 }
 
 void test_parse_handles_trailing_comment() {
   stringstream in("34 # abc");
-  CHECK_EQ(nextAstNode(in), Token("34"));
-  CHECK_EQ(nextAstNode(in), "");
+  readAll(in);
+  checkTraceContents("parse", "34\n\n");  // extra newline artifact
 }
 
 void test_parse_handles_atom() {
   stringstream in("34");
-  CHECK_EQ(nextAstNode(in), Token("34"));
+  readAll(in);
+  checkTraceContents("parse", "34\n");
 }
 
 void test_parse_handles_atoms() {
   stringstream in("34\n\"a b c\"\n3.4");
-  CHECK_EQ(nextAstNode(in), Token("34"));
-  CHECK_EQ(nextAstNode(in), Token("\"a b c\""));
-  CHECK_EQ(nextAstNode(in), Token("3.4"));
-  CHECK_EQ(nextAstNode(in), "");
+  readAll(in);
+  checkTraceContents("parse", "34\n\"a b c\"\n3.4\n");
 }
 
 void test_parse_handles_forms() {

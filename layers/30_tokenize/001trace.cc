@@ -34,7 +34,7 @@ struct TraceStream {
 
 TraceStream* global_trace_stream = NULL;
 
-#define trace(layer) if (global_trace_stream) global_trace_stream->stream(layer)
+#define trace(layer) !global_trace_stream ? cerr : global_trace_stream->stream(layer)
 
 // global_trace_stream is a resource, LeaseTracer uses RAII to manage it.
 struct LeaseTracer {

@@ -7,7 +7,7 @@ AstNode nextAstNode(istream& in) {
 
 AstNode nextAstNode(list<Token>& in) {
   list<AstNode> subform;
-  if (in.empty()) return AstNode(subform);
+  if (in.empty()) TRACE_AND_RETURN("parse", AstNode(subform));
 
   subform.push_back(AstNode(nextToken(in)));
   while (!in.empty() && isQuoteOrUnquote(subform.back().atom))
@@ -20,8 +20,8 @@ AstNode nextAstNode(list<Token>& in) {
   }
 
   if (subform.size() == 1)
-    return AstNode(subform.back());
-  return AstNode(subform);
+    TRACE_AND_RETURN("parse", AstNode(subform.back()));
+  TRACE_AND_RETURN("parse", AstNode(subform));
 }
 
 
