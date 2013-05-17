@@ -1,8 +1,34 @@
+using std::pair;
+
 struct TraceStream {
-  unordered_map<string, ostringstream*> layer;
-  ostringstream& stream(string l) {
-    if (!layer[l]) layer[l] = new ostringstream;
-    return *layer[l];
+  vector<pair<string, string> > past_lines;   // [(layer label, line)]
+  // accumulator for current line
+  ostringstream* curr_stream;
+  string curr_layer;
+  TraceStream() :curr_stream(NULL) {}
+  ~TraceStream() { if (curr_stream) delete curr_stream; }
+
+  ostringstream& stream(string layer) {
+    reset();
+    curr_stream = new ostringstream;
+    curr_layer = layer;
+    return *curr_stream;
+  }
+
+  string contents(string layer) {
+    reset();
+    ostringstream output;
+    for (vector<pair<string, string> >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
+      if (layer.empty() || p->first == layer)
+        output << p->second;
+    return output.str();
+  }
+
+  void reset() {
+    if (!curr_stream) return;
+    past_lines.push_back(pair<string, string>(curr_layer, curr_stream->str()));
+    delete curr_stream;
+    curr_stream = NULL;
   }
 };
 
@@ -28,5 +54,5 @@ long numFailures = 0;
   else { cerr << "."; fflush(stderr); }
 
 void checkTraceContents(string layer, string expected) {
-  CHECK_EQ(global_trace_stream->stream(layer).str(), expected);
+  CHECK_EQ(global_trace_stream->contents(layer), expected);
 }
