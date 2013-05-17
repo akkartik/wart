@@ -53,6 +53,5 @@ long numFailures = 0;
   } \
   else { cerr << "."; fflush(stderr); }
 
-void checkTraceContents(string layer, string expected) {
+#define checkTraceContents(layer, expected) \
   CHECK_EQ(global_trace_stream->contents(layer), expected);
-}
