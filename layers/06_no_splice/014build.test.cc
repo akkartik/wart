@@ -233,7 +233,7 @@ void test_build_handles_syms() {
 }
 
 void test_build_handles_quotes() {
-  IndentSensitiveStream in("`(34 ,(35) ,36 ,@37 @,38 @39 ,'(a))");
+  IndentSensitiveStream in("`(34 ,(35) ,36 ,@37 ,'(a))");
   Cell *c=nextCell(in), *origc=c;
   CHECK_EQ(c->nrefs, 0);
   CHECK_EQ(car(c), newSym("`"));
@@ -262,19 +262,6 @@ void test_build_handles_quotes() {
     CHECK_EQ(c2->nrefs, 1);
     CHECK_EQ(car(c2), newSym(",@"));
     CHECK_EQ(cdr(c2), newNum(37));
-    CHECK_EQ(cdr(c2)->nrefs, 2);
-  c = cdr(c);
-    c2 = car(c);
-    CHECK_EQ(c2->nrefs, 1);
-    CHECK_EQ(car(c2), newSym("@"));
-    CHECK_EQ(car(cdr(c2)), newSym(","));
-    CHECK_EQ(cdr(cdr(c2)), newNum(38));
-    CHECK_EQ(cdr(cdr(c2))->nrefs, 2);
-  c = cdr(c);
-    c2 = car(c);
-    CHECK_EQ(c2->nrefs, 1);
-    CHECK_EQ(car(c2), newSym("@"));
-    CHECK_EQ(cdr(c2), newNum(39));
     CHECK_EQ(cdr(c2)->nrefs, 2);
   c = cdr(c);
     c2 = car(c);

@@ -129,7 +129,7 @@ void test_parse_handles_quotes() {
 }
 
 void test_parse_handles_splice_operators() {
-  stringstream in("`(2 ,@b @,c)");
+  stringstream in("`(2 ,@b)");
   AstNode n = nextAstNode(in);
   CHECK(!n.elems.empty());
   list<AstNode>::iterator p = n.elems.begin();
@@ -141,13 +141,6 @@ void test_parse_handles_splice_operators() {
     list<AstNode>::iterator q = ast2.begin();
     CHECK_EQ(*q, Token(",@")); ++q;
     CHECK_EQ(*q, Token("b")); ++q;
-    CHECK(q == ast2.end());
-  CHECK(!p->elems.empty());
-    ast2 = p->elems; ++p;
-    q = ast2.begin();
-    CHECK_EQ(*q, Token("@")); ++q;
-    CHECK_EQ(*q, Token(",")); ++q;
-    CHECK_EQ(*q, Token("c")); ++q;
     CHECK(q == ast2.end());
   CHECK_EQ(*p, Token(")")); ++p;
   CHECK(p == n.elems.end());

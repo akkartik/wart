@@ -493,20 +493,6 @@ void test_infix_handles_backquote() {
   CHECK(p == n.elems.end());
 }
 
-void test_infix_handles_splice() {
-  IndentSensitiveStream in("@a+b");
-  AstNode n = transformInfix(nextAstNode(in));
-  CHECK(isList(n));
-  list<AstNode>::iterator p = n.elems.begin();
-  CHECK_EQ(*p, "@"); ++p;
-  CHECK_EQ(*p, "("); ++p;
-  CHECK_EQ(*p, "+"); ++p;
-  CHECK_EQ(*p, "a"); ++p;
-  CHECK_EQ(*p, "b"); ++p;
-  CHECK_EQ(*p, ")"); ++p;
-  CHECK(p == n.elems.end());
-}
-
 void test_infix_handles_unquote_splice() {
   IndentSensitiveStream in(",@a+b");
   AstNode n = transformInfix(nextAstNode(in));

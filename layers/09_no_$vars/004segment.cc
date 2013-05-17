@@ -25,5 +25,5 @@ bool isParen(const Token& t) {
 
 bool isQuoteOrUnquote(const Token& t) {
   return t == "'" || t == "`"
-      || t == "," || t == ",@" || t == "@";
+      || t == "," || t == ",@";
 }

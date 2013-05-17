@@ -237,7 +237,7 @@ void test_parenthesize_groups_quoted_words3() {
 }
 
 void test_parenthesize_passes_through_nested_quoted_words() {
-  IndentSensitiveStream in("a b\n  'c\n  ,d\n  @e");
+  IndentSensitiveStream in("a b\n  'c\n  ,d\n  e");
   list<Token> tokens = nextExpr(in);
   list<Token>::iterator p = tokens.begin();
   CHECK_EQ(*p, "("); ++p;
@@ -247,7 +247,6 @@ void test_parenthesize_passes_through_nested_quoted_words() {
   CHECK_EQ(*p, "c"); ++p;
   CHECK_EQ(*p, ","); ++p;
   CHECK_EQ(*p, "d"); ++p;
-  CHECK_EQ(*p, "@"); ++p;
   CHECK_EQ(*p, "e"); ++p;
   CHECK_EQ(*p, ")"); ++p;
   CHECK(p == tokens.end());

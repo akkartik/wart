@@ -177,7 +177,7 @@ bool isCloseParen(const Token& t) {
 
 bool isQuoteOrUnquote(const Token& t) {
   return t == "'" || t == "`"
-      || t == "," || t == ",@" || t == "@";
+      || t == "," || t == ",@";
 }
 
 bool isWord(const Token& t) {
