@@ -1,4 +1,4 @@
-// CHECK all nrefs except quotes/unquotes
+// CHECK all nrefs except quotes
 
 void test_build_handles_nil() {
   stringstream in("()");
@@ -73,16 +73,6 @@ void test_build_handles_quoted_sym() {
   CHECK_EQ(car(c), newSym("'"));
   CHECK_EQ(cdr(c), newSym("a"));
   CHECK_EQ(cdr(c)->nrefs, 2);
-  rmref(c);
-}
-
-void test_build_handles_nested_quote() {
-  stringstream in("',a");
-  Cell* c = nextCell(in);
-  CHECK_EQ(car(c), newSym("'"));
-  CHECK_EQ(car(cdr(c)), newSym(","));
-  CHECK_EQ(cdr(cdr(c)), newSym("a"));
-  CHECK_EQ(cdr(cdr(c))->nrefs, 2);
   rmref(c);
 }
 

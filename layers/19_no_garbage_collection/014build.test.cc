@@ -60,14 +60,6 @@ void test_build_handles_quoted_sym() {
   CHECK_EQ(cdr(c), newSym("a"));
 }
 
-void test_build_handles_nested_quote() {
-  stringstream in("',a");
-  Cell* c = nextCell(in);
-  CHECK_EQ(car(c), newSym("'"));
-  CHECK_EQ(car(cdr(c)), newSym(","));
-  CHECK_EQ(cdr(cdr(c)), newSym("a"));
-}
-
 void test_build_handles_multiple_atoms() {
   stringstream in("34\n35");
   Cell* c = nextCell(in);

@@ -21,8 +21,6 @@ Token nextToken(istream& in) {
     slurpString(in, out);
   else if (find(punctuationChars, in.peek()))
     slurpChar(in, out);
-  else if (in.peek() == ',')
-    slurpUnquote(in, out);
   else if (find(quoteAndUnquoteChars, in.peek()))
     slurpChar(in, out);
   else
@@ -63,12 +61,6 @@ void slurpString(istream& in, ostream& out) {
     else if (c == '"')
       break;
   }
-}
-
-void slurpUnquote(istream& in, ostream& out) {
-  slurpChar(in, out);   // comma
-  if (in.peek() == '@')
-    slurpChar(in, out); // ..and maybe splice
 }
 
 

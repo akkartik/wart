@@ -41,23 +41,6 @@ void test_tokenize_handles_string_with_escape() {
   CHECK_EQ(t, "\"abc \\\"quote def\"");
 }
 
-void test_tokenize_handles_quote_comma() {
-  stringstream in("',35");
-  Token t = nextToken(in);
-  CHECK_EQ(t, "'");             t=nextToken(in);
-  CHECK_EQ(t, ",");             t=nextToken(in);
-  CHECK_EQ(t, "35");            t=nextToken(in);
-}
-
-void test_tokenize_handles_quote_comma_paren() {
-  stringstream in("(',)");
-  Token t = nextToken(in);
-  CHECK_EQ(t, "(");             t=nextToken(in);
-  CHECK_EQ(t, "'");             t=nextToken(in);
-  CHECK_EQ(t, ",");             t=nextToken(in);
-  CHECK_EQ(t, ")");             t=nextToken(in);
-}
-
 void test_tokenize_handles_comment() {
   stringstream in("()'a #abc def ghi");
   Token t = nextToken(in);
