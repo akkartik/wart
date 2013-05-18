@@ -47,12 +47,19 @@ TraceStream* global_trace_stream = NULL;
 
 #define trace(layer) !global_trace_stream ? cerr : global_trace_stream->stream(layer)
 
+#define TRACE_AND_RETURN(layer, X) \
+  return (trace(layer) << X << '\n'), X;
+
+
+
 // global_trace_stream is a resource, LeaseTracer uses RAII to manage it.
 struct LeaseTracer {
   LeaseTracer() { global_trace_stream = new TraceStream; }
   ~LeaseTracer() { delete global_trace_stream, global_trace_stream = NULL; }
 };
 #define START_TRACING_UNTIL_END_OF_SCOPE LeaseTracer lease_tracer;
+
+
 
 // TODO: logically belongs in main.cc with the rest of the test harness
 long numFailures = 0;
@@ -67,8 +74,7 @@ long numFailures = 0;
 #define checkTraceContents(layer, expected) \
   CHECK_EQ(global_trace_stream->contents(layer), expected);
 
-#define TRACE_AND_RETURN(layer, X) \
-  return (trace(layer) << X << '\n'), X;
+
 
 // manage layer counts in global_trace_stream using RAII
 struct LeaseTraceLevel {
