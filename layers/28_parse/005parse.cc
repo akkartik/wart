@@ -7,6 +7,7 @@ AstNode nextAstNode(istream& in) {
 
 AstNode nextAstNode(list<Token>& in) {
   list<AstNode> subform;
+  incTraceForRestOfScope("parse");
   if (in.empty()) TRACE_AND_RETURN("parse", AstNode(subform));
 
   subform.push_back(AstNode(nextToken(in)));

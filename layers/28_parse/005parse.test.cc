@@ -24,15 +24,8 @@ void test_parse_handles_atoms() {
 
 void test_parse_handles_forms() {
   stringstream in("(34 \"a b c\")");
-  AstNode n = nextAstNode(in);
-  CHECK(!n.elems.empty());
-  list<AstNode>::iterator p = n.elems.begin();
-  CHECK_EQ(*p, Token("(")); ++p;
-  CHECK_EQ(*p, Token("34")); ++p;
-  CHECK_EQ(*p, Token("\"a b c\"")); ++p;
-  CHECK_EQ(*p, Token(")")); ++p;
-  CHECK(p == n.elems.end());
-  CHECK_EQ(nextAstNode(in), "");
+  readAll(in);
+  checkTraceContents2("parse", 0, "(34 \"a b c\")\n");
 }
 
 void test_parse_handles_nested_forms() {

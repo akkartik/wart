@@ -18,3 +18,13 @@ void test_trace_orders_across_layers() {
   trace("test layer 1") << "qux\n";
   checkTraceContents("", "foo\nbar\nqux\n");
 }
+
+void test_trace_segments_within_layers() {
+  checkTraceContents("test layer", "");
+  trace("test layer 1") << "foo\n";
+  trace("test layer 2") << "bar\n";
+  incTraceForRestOfScope("test layer 1");
+  trace("test layer 1") << "qux\n";
+  checkTraceContents("test layer 1", "foo\nqux\n");
+  checkTraceContents2("test layer 1", 0, "foo\n");
+}
