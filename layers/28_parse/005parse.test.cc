@@ -25,7 +25,7 @@ void test_parse_handles_atoms() {
 void test_parse_handles_forms() {
   stringstream in("(34 \"a b c\")");
   readAll(in);
-  checkTraceContents2("parse", 0, "(34 \"a b c\")\n");
+  checkTraceContents2("parse", 1, "(34 \"a b c\")\n");
 }
 
 void test_parse_handles_nested_forms() {

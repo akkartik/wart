@@ -28,3 +28,17 @@ void test_trace_segments_within_layers() {
   checkTraceContents("test layer 1", "foo\nqux\n");
   checkTraceContents2("test layer 1", 0, "foo\n");
 }
+
+void trace_test_fn(int n) {
+  if (n == 0) return;
+  incTraceForRestOfScope("foo");
+  trace("foo") << "before: " << n << "\n";
+  trace_test_fn(n-1);
+  trace("foo") << "after: " << n << "\n";
+}
+
+void test_trace_keeps_level_together() {
+  checkTraceContents("foo", "");
+  trace_test_fn(4);
+  checkTraceContents2("foo", 2, "before: 3\nafter: 3\n");
+}

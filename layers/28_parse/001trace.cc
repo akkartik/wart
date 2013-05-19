@@ -35,6 +35,7 @@ struct TraceStream {
     return output.str();
   }
 
+  // be sure to call this before messing with curr_stream or curr_layer or level
   void reset() {
     if (!curr_stream) return;
     past_lines.push_back(pair<string, pair<int, string> >(curr_layer, pair<int, string>(level[curr_layer], curr_stream->str())));
@@ -80,9 +81,11 @@ long numFailures = 0;
 struct LeaseTraceLevel {
   string layer;
   LeaseTraceLevel(string l) :layer(l) {
+    global_trace_stream->reset();
     ++global_trace_stream->level[layer];
   }
   ~LeaseTraceLevel() {
+    global_trace_stream->reset();
     --global_trace_stream->level[layer];
   }
 };
