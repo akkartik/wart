@@ -79,8 +79,12 @@ long numFailures = 0;
 // manage layer counts in global_trace_stream using RAII
 struct LeaseTraceLevel {
   string layer;
-  LeaseTraceLevel(string l) :layer(l) { ++global_trace_stream->level[layer]; }
-  ~LeaseTraceLevel() { --global_trace_stream->level[layer]; }
+  LeaseTraceLevel(string l) :layer(l) {
+    ++global_trace_stream->level[layer];
+  }
+  ~LeaseTraceLevel() {
+    --global_trace_stream->level[layer];
+  }
 };
 #define incTraceForRestOfScope(layer) LeaseTraceLevel lease_trace_level(layer);
 
