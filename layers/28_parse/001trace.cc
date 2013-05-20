@@ -35,6 +35,15 @@ struct TraceStream {
     return output.str();
   }
 
+  string readable_contents(string layer) {
+    reset();
+    ostringstream output;
+    for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
+      if (layer.empty() || p->first == layer)
+        output << p->second.first << ": " << p->second.second;
+    return output.str();
+  }
+
   // be sure to call this before messing with curr_stream or curr_layer or level
   void reset() {
     if (!curr_stream) return;
