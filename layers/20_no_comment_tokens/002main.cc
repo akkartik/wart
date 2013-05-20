@@ -15,6 +15,8 @@
 // These weren't the reasons lisp was created; they're the reasons I attribute
 // to its power.
 
+bool interactive = false;
+
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
     runTests();
@@ -22,7 +24,8 @@ int main(int argc, unused char* argv[]) {
   }
 
   //// Interactive loop: parse commands from user, evaluate them, print the results
-  interactive_setup();
+  interactive = true;
+  setup();
   loadFiles(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (!cin.eof()) {
@@ -42,7 +45,7 @@ list<Cell*> readAll(istream& in) {
   list<Cell*> results;
   do {
     results.push_back(read(in));
-  } while (!in.eof() && in.peek() != '\n');
+  } while (!in.eof() && (!interactive || in.peek() != '\n'));
   return results;
 }
 
@@ -58,21 +61,11 @@ const TestFn tests[] = {
   #include "test_list"
 };
 
-long numFailures = 0;
 bool passed = true;
 
 #define CHECK(X) if (!(X)) { \
     ++numFailures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
-    passed = false; \
-    return; \
-  } \
-  else { cerr << "."; fflush(stderr); }
-
-#define CHECK_EQ(X, Y) if ((X) != (Y)) { \
-    ++numFailures; \
-    cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
-    cerr << "  got " << (X) << endl;  /* BEWARE: multiple eval */ \
     passed = false; \
     return; \
   } \
@@ -84,6 +77,7 @@ void runTests() {
   time_t t; time(&t);
   cerr << "C tests: " << ctime(&t);
   for (unsigned long i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
+    START_TRACING_UNTIL_END_OF_SCOPE;
     setup();
     (*tests[i])();
     verify();
@@ -120,10 +114,4 @@ void setup() {
   setupCommonSyms();
   raiseCount = 0;
   passed = true;
-}
-
-bool interactive = false;
-void interactive_setup() {
-  setup();
-  interactive = true;
 }
