@@ -19,7 +19,6 @@ void newBinding(string sym, Cell* val) {
 }
 
 void newBinding(Cell* sym, Cell* val) {
-  if (bindings[sym] == val) return;
   bindings[sym] = val;
 }
 
