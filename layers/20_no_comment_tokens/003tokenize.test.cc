@@ -7,25 +7,25 @@ void test_tokenize_handles_multiple_atoms() {
 void test_tokenize_handles_string_literal() {
   stringstream in("34 \"abc\"");
   readAll(in);
-  checkTraceContents("tokenize", "34\n\"abc\"\n\n");
+  checkTraceContents("tokenize", "34\n\"abc\"\n");
 }
 
 void test_tokenize_handles_multiple_lines() {
   stringstream in("34\n\"abc\"");
   readAll(in);
-  checkTraceContents("tokenize", "34\n\"abc\"\n\n");
+  checkTraceContents("tokenize", "34\n\"abc\"\n");
 }
 
 void test_tokenize_handles_string_with_space() {
   stringstream in("34\n\"abc def\"");
   readAll(in);
-  checkTraceContents("tokenize", "34\n\"abc def\"\n\n");
+  checkTraceContents("tokenize", "34\n\"abc def\"\n");
 }
 
 void test_tokenize_handles_string_with_escape() {
   stringstream in("34\n\"abc \\\"quote def\"");
   readAll(in);
-  checkTraceContents("tokenize", "34\n\"abc \\\"quote def\"\n\n");
+  checkTraceContents("tokenize", "34\n\"abc \\\"quote def\"\n");
 }
 
 void test_tokenize_handles_comment() {
@@ -61,7 +61,7 @@ void test_tokenize_suppresses_trailing_whitespace() {
 void test_tokenize_suppresses_repeated_newline() {
   stringstream in("34\n\n\"abc \\\"quote def\"");
   readAll(in);
-  checkTraceContents("tokenize", "34\n\"abc \\\"quote def\"\n\n");
+  checkTraceContents("tokenize", "34\n\"abc \\\"quote def\"\n");
 }
 
 void test_tokenize_suppresses_whitespace_lines() {
