@@ -23,6 +23,10 @@ Cell* lookup(Cell* sym, Cell* scope, bool keepAlreadyEvald) {
   if (result) return maybeStripAlreadyEvald(keepAlreadyEvald, result);
   result = lookupDynamicBinding(sym);
   if (result) return maybeStripAlreadyEvald(keepAlreadyEvald, result);
+  if (warn_on_unknown_var) {
+    RAISE << "no binding for " << sym << endl;
+    return nil;
+  }
   return newObject("incomplete_eval", sym);
 }
 

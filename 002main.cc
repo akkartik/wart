@@ -15,6 +15,8 @@
 // These weren't the reasons lisp was created; they're the reasons I attribute
 // to its power.
 
+bool warn_on_unknown_var = false;
+
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
     runTests();
@@ -24,6 +26,7 @@ int main(int argc, unused char* argv[]) {
   //// Interactive loop: parse commands from user, evaluate them, print the results
   interactive_setup();
   loadFiles(".wart");
+  warn_on_unknown_var = true;
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (!cin.eof()) {
     list<Cell*> forms = readAll(cin);
