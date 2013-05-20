@@ -5,10 +5,13 @@ Cell* nextCell(istream& in) {
 }
 
 Cell* buildCell(AstNode n) {
+  incTraceForRestOfScope("cell");
   if (n == "") return nil;  // void
 
-  if (isNil(n))
+  if (isNil(n)) {
+    trace("cell") << "nil\n";
     return nil;
+  }
   if (isList(n) && n.elems.front() == ")") {
     if (n.elems.size() > 1) RAISE << "Syntax error: ) not at end of expr" << endl << DIE;
     return nil;
@@ -18,30 +21,38 @@ Cell* buildCell(AstNode n) {
     errno = 0;
     char* end;
     long v = strtol(n.atom.c_str(), &end, 0);
-    if (*end == '\0' && errno == 0)
+    if (*end == '\0' && errno == 0) {
+      trace("cell") << "num: " << v << '\n';
       return newNum(v);
+    }
 
     if (errno == ERANGE || errno == EOVERFLOW)
       RAISE << "dropping precision for bignum " << n.atom << endl;
 
     float f = strtof(n.atom.c_str(), &end);
     if (*end == '\0') {
+      trace("cell") << "float: " << f << '\n';
       if (n.atom.substr(0, 2) == "-.")
         RAISE << "assuming '" << n.atom << "' is a float; to remove this warning say '-0" << n.atom.substr(1) << "'.\n"
             << "If you mean to negate an int, skip the ssyntax: '-" << n.atom.substr(2) << "'.\n";
       return newNum(f);
     }
 
-    if (n.atom.c_str()[0] == '"')
+    if (n.atom.c_str()[0] == '"') {
+      trace("cell") << "string: " << n.atom << '\n';
       return newString(n.atom.substr(1, n.atom.length()-2));
+    }
 
+    trace("cell") << "sym: " << n.atom << '\n';
     return newSym(n.atom);
   }
 
   list<AstNode>::iterator first = n.elems.begin();
   if (*first == "(") {
     n.elems.pop_front();
-    return buildCell(n);
+    Cell* result = buildCell(n);
+    trace("cell") << result << '\n';
+    return result;
   }
 
   Cell* newForm = newCell();
@@ -64,6 +75,7 @@ Cell* buildCell(AstNode n) {
     setCdr(newForm, buildCell(n));
   }
 
+  trace("cell") << newForm << '\n';
   return newForm;
 }
 
