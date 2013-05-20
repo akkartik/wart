@@ -187,13 +187,6 @@ void test_eval_evals_args() {
   CHECK_EQ(toInt(result), 34);
 }
 
-void test_eval_doesnt_leak_body_evals() {
-  Cell* call = read("((fn (f) (f) (f)) (fn () 34))");
-  Cell* result = eval(call);
-  CHECK(isNum(result));
-  CHECK_EQ(toInt(result), 34);
-}
-
 void test_eval_handles_destructured_params() {
   Cell* call = read("((fn ((a b)) b) '(1 2))");
   Cell* result = eval(call);
