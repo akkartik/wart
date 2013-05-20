@@ -117,90 +117,73 @@ void test_eval_handles_quoted_atoms() {
 
 void test_eval_handles_quoted_lists() {
   Cell* expr = read("'(a b)");
-  Cell* result = eval(expr);
-  // (a b)
-  CHECK_EQ(car(result), newSym("a"));
-  CHECK_EQ(car(cdr(result)), newSym("b"));
-  CHECK_EQ(cdr(cdr(result)), nil);
+  eval(expr);
+  checkTraceContents("eval", "'(a b)\nquote: (a b)\n");
 }
 
 void test_eval_handles_rest_params() {
   Cell* call = read("((fn (a b ... c) c) 1 2 3 4 5)");
-  Cell* result = eval(call);
-  CHECK(isCons(result));
-  CHECK(isNum(car(result)));
-  // (3 4 5)
-  CHECK_EQ(toInt(car(result)), 3);
-  CHECK(isNum(car(cdr(result))));
-  CHECK_EQ(toInt(car(cdr(result))), 4);
-  CHECK_EQ(toInt(car(cdr(cdr(result)))), 5);
-  CHECK_EQ(cdr(cdr(cdr(result))), nil);
+  eval(call);
+  checkTraceContents2("eval", 1, "((fn (a b ... c) c) 1 2 3 4 5)\n=> (3 4 5)\n");
 }
 
 void test_eval_handles_fn_calls() {
   Cell* call = read("((fn () 34))");
-  Cell* result = eval(call);
-  CHECK_EQ(result, newNum(34));
+  eval(call);
+  checkTraceContents2("eval", 1, "((fn nil 34))\n=> 34\n");
 }
 
 void test_eval_expands_syms_in_fn_bodies() {
-  Cell* fn = read("((fn () a))");
+  Cell* call = read("((fn () a))");
   newBinding("a", newNum(34));
-  Cell* result = eval(fn);
-  CHECK_EQ(result, newNum(34));
+  eval(call);
+  checkTraceContents2("eval", 1, "((fn nil a))\n=> 34\n");
 }
 
 void test_eval_handles_assigned_fn_calls() {
   Cell* fn = read("(fn () 34)");
   Cell* f = eval(fn);
   newBinding("f", f);
+  delete global_trace_stream, global_trace_stream = new TraceStream;
     Cell* call = read("(f)");
-    Cell* result = eval(call);
-    CHECK_EQ(result, newNum(34));
+    eval(call);
+    checkTraceContents2("eval", 1, "(f)\n=> 34\n");
 }
 
 void test_eval_handles_multiple_args() {
   Cell* fn = read("(fn (a b) b)");
   Cell* f = eval(fn);
   newBinding("f", f);
+  delete global_trace_stream, global_trace_stream = new TraceStream;
   Cell* call = read("(f 1 2)");
-  Cell* result = eval(call);
-  CHECK_EQ(result, newNum(2));
+  eval(call);
+  checkTraceContents2("eval", 1, "(f 1 2)\n=> 2\n");
 }
 
 void test_eval_handles_multiple_body_exprs() {
   Cell* fn = read("(fn () 1 2)");
   Cell* f = eval(fn);
   newBinding("f", f);
+  delete global_trace_stream, global_trace_stream = new TraceStream;
   Cell* call = read("(f)");
-  Cell* result = eval(call);
-  CHECK_EQ(result, newNum(2));
+  eval(call);
+  checkTraceContents2("eval", 1, "(f)\n=> 2\n");
 }
 
 void test_eval_handles_vararg_param() {
   Cell* call = read("((fn args args) 1)");
-  Cell* result = eval(call);
-  CHECK(isCons(result));
-  CHECK_EQ(car(result), newNum(1));
+  eval(call);
+  checkTraceContents2("eval", 1, "((fn args args) 1)\n=> (1)\n");
 }
 
 void test_eval_evals_args() {
   Cell* call = read("((fn (f) (f)) (fn () 34))");
-  Cell* result = eval(call);
-  CHECK(isNum(result));
-  CHECK_EQ(toInt(result), 34);
-}
-
-void test_eval_doesnt_leak_body_evals() {
-  Cell* call = read("((fn (f) (f) (f)) (fn () 34))");
-  Cell* result = eval(call);
-  CHECK(isNum(result));
-  CHECK_EQ(toInt(result), 34);
+  eval(call);
+  checkTraceContents2("eval", 1, "((fn (f) (f)) (fn nil 34))\n=> 34\n");
 }
 
 void test_eval_handles_destructured_params() {
   Cell* call = read("((fn ((a b)) b) '(1 2))");
-  Cell* result = eval(call);
-  CHECK(isNum(result));
-  CHECK_EQ(toInt(result), 2);
+  eval(call);
+  checkTraceContents2("eval", 1, "((fn ((a b)) b) '(1 2))\n=> 2\n");
 }
