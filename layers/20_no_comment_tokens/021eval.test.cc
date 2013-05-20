@@ -60,31 +60,36 @@ void test_nil_evals_to_itself() {
   Cell* expr = read("()");
   Cell* result = eval(expr);
   CHECK_EQ(result, nil);
+  checkTraceContents("eval", "nil\n=> nil\n");
 }
 
 void test_num_evals_to_itself() {
   Cell* expr = read("34");
   Cell* result = eval(expr);
   CHECK_EQ(result, expr);
+  checkTraceContents("eval", "34\nliteral: 34\n");
 }
 
 void test_colonsym_evals_to_itself() {
   Cell* expr = read(":abc");
   Cell* result = eval(expr);
   CHECK_EQ(result, expr);
+  checkTraceContents("eval", ":abc\nkeyword sym: :abc\n");
 }
 
 void test_colon_evals() {
   Cell* expr = read(":");
-  newBinding(":", nil);
+  newBinding(":", newNum(34));
   Cell* result = eval(expr);
-  CHECK_EQ(result, nil);
+  CHECK_EQ(result, newNum(34));
+  checkTraceContents("eval", ":\nsym: 34\n");
 }
 
 void test_string_evals_to_itself() {
   Cell* expr = read("\"ac bd\"");
   Cell* result = eval(expr);
   CHECK_EQ(result, expr);
+  checkTraceContents("eval", "\"ac bd\"\nliteral: \"ac bd\"\n");
 }
 
 void test_sym_evals_to_value() {
@@ -92,6 +97,7 @@ void test_sym_evals_to_value() {
   Cell* expr = read("a");
   Cell* result = eval(expr);
   CHECK_EQ(result, newNum(34));
+  checkTraceContents("eval", "a\nsym: 34\n");
 }
 
 void test_sym_evals_to_itself() {
@@ -99,16 +105,14 @@ void test_sym_evals_to_itself() {
   Cell* expr = read("a");
   Cell* result = eval(expr);
   CHECK_EQ(result, expr);
+  checkTraceContents("eval", "a\nsym: a\n");
 }
 
 void test_eval_handles_quoted_atoms() {
-  Cell* expr = read("'a");
-  Cell* result = eval(expr);
-  CHECK_EQ(result, newSym("a"));
-
-  expr = read("'34");
-  result = eval(expr);
-  CHECK_EQ(result, newNum(34));
+  stringstream in("'a '34");
+  while (!eof(in))
+    eval(read(in));
+  checkTraceContents("eval", "'a\nquote: a\n'34\nquote: 34\n");
 }
 
 void test_eval_handles_quoted_lists() {
