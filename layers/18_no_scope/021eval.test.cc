@@ -1,7 +1,3 @@
-bool contains(const list<Cell*>& v, string sym) {
-  return find(v.begin(), v.end(), newSym(sym)) != v.end();
-}
-
 void test_evalBindAll_handles_unquoted_param() {
   Cell* params = read("(x)");
   Cell* args = read("(a)");
