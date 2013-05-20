@@ -1,4 +1,4 @@
-void test_tracing_tokenize_handles_multiple_atoms() {
+void test_tokenize_handles_multiple_atoms() {
   stringstream in("34 abc 3.4");
   readAll(in);
   checkTraceContents("tokenize", "34\nabc\n3.4\n");
