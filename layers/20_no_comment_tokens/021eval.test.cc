@@ -23,6 +23,7 @@ void test_evalBindAll_handles_varargs_param() {
   newBinding("b", newNum(4));
   delete global_trace_stream, global_trace_stream = new TraceStream;
   evalBindAll(params, args);
+  checkTraceContents("eval", "a\nsym: 3\nb\nsym: 4\n");
   checkTraceContents("lookup", "x: (3 4)\n");
 }
 
