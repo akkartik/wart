@@ -2,17 +2,18 @@ void test_evalBindAll_handles_unquoted_param() {
   Cell* params = read("(x)");
   Cell* args = read("(a)");
   newBinding("a", newNum(3));
+  delete global_trace_stream, global_trace_stream = new TraceStream;
   evalBindAll(params, args);
-  CHECK_EQ(lookup("x"), newNum(3));
+  checkTraceContents("lookup", "x: 3\n");
 }
 
 void test_evalBindAll_binds_missing_params() {
   Cell* params = read("(x y)");
   Cell* args = read("(a)");
   newBinding("a", newNum(3));
+  delete global_trace_stream, global_trace_stream = new TraceStream;
   evalBindAll(params, args);
-  CHECK_EQ(lookup("x"), newNum(3));
-  CHECK_EQ(lookup("y"), nil);
+  checkTraceContents("lookup", "x: 3\ny: nil\n");
 }
 
 void test_evalBindAll_handles_varargs_param() {
@@ -20,11 +21,9 @@ void test_evalBindAll_handles_varargs_param() {
   Cell* args = read("(a b)");
   newBinding("a", newNum(3));
   newBinding("b", newNum(4));
+  delete global_trace_stream, global_trace_stream = new TraceStream;
   evalBindAll(params, args);
-  // {x: (3 4)}
-  CHECK_EQ(car(lookup("x")), newNum(3));
-  CHECK_EQ(car(cdr(lookup("x"))), newNum(4));
-  CHECK_EQ(cdr(cdr(lookup("x"))), nil);
+  checkTraceContents("lookup", "x: (3 4)\n");
 }
 
 void test_evalBindAll_handles_rest_param() {
@@ -32,11 +31,9 @@ void test_evalBindAll_handles_rest_param() {
   Cell* args = read("(a b)");
   newBinding("a", newNum(3));
   newBinding("b", newNum(4));
+  delete global_trace_stream, global_trace_stream = new TraceStream;
   evalBindAll(params, args);
-  // {x: 3, y: (4)}
-  CHECK_EQ(lookup("x"), newNum(3));
-  CHECK_EQ(car(lookup("y")), newNum(4));
-  CHECK_EQ(cdr(lookup("y")), nil);
+  checkTraceContents("lookup", "x: 3\ny: (4)\n");
 }
 
 void test_evalBindAll_handles_destructured_params() {
@@ -44,10 +41,9 @@ void test_evalBindAll_handles_destructured_params() {
   Cell* args = read("((cons x (cons y)))");
   newBinding("x", newNum(3));
   newBinding("y", newNum(4));
+  delete global_trace_stream, global_trace_stream = new TraceStream;
   evalBindAll(params, args);
-  // {a: 3, b: 4}
-  CHECK_EQ(lookup("a"), newNum(3));
-  CHECK_EQ(lookup("b"), newNum(4));
+  checkTraceContents("lookup", "a: 3\nb: 4\n");
 }
 
 

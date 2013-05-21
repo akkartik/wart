@@ -19,6 +19,7 @@ void newBinding(string sym, Cell* val) {
 }
 
 void newBinding(Cell* sym, Cell* val) {
+  trace("lookup") << sym << ": " << val << '\n';
   bindings[sym] = val;
 }
 
