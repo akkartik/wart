@@ -63,7 +63,7 @@ struct TraceStream {
   void reset() {
     if (!curr_stream) return;
     past_lines.push_back(pair<string, pair<int, string> >(curr_layer, pair<int, string>(level[curr_layer], curr_stream->str())));
-    if (curr_layer == dump_layer) cerr << curr_stream->str();
+    if (curr_layer == dump_layer || curr_layer == "dump") cerr << curr_stream->str();
     delete curr_stream;
     curr_stream = NULL;
   }
