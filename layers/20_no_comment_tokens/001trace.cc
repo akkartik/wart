@@ -30,14 +30,14 @@ struct TraceStream {
   void dump_browseable_contents(string layer) {
     ofstream dump("dump");
     dump << "<div class='level' level_index='1'>start</div>\n";
-    for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
-      if (p->first == layer) {
-        dump << "<div class='level";
-        if (p->second.first > 1) dump << " hidden";
-        dump << "' level_index='" << p->second.first << "'>";
-        dump << p->second.second;
-        dump << "</div>\n";
-      }
+    for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p) {
+      if (p->first != layer) continue;
+      dump << "<div class='level";
+      if (p->second.first > 1) dump << " hidden";
+      dump << "' level_index='" << p->second.first << "'>";
+      dump << p->second.second;
+      dump << "</div>\n";
+    }
     dump.close();
   }
 
