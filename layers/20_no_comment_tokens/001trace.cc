@@ -46,7 +46,7 @@ struct TraceStream {
     ostringstream output;
     vector<string> layers = split(layer);
     for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
-      if (find(layers.begin(), layers.end(), p->first) != layers.end())
+      if (any_prefix_match(layers, p->first))
         output << p->second.second;
     return output.str();
   }
@@ -135,4 +135,20 @@ vector<string> split(string s) {
     end = s.find(',', begin);
   }
   return result;
+}
+
+bool any_prefix_match(const vector<string>& pats, const string& needle) {
+  if (pats.empty()) return false;
+  if (*pats[0].rbegin() != '/')
+    // prefix match not requested
+    return find(pats.begin(), pats.end(), needle) != pats.end();
+  // first pat ends in a '/'; assume all pats do.
+  for (vector<string>::const_iterator p = pats.begin(); p != pats.end(); ++p)
+    if (headmatch(needle, *p)) return true;
+  return false;
+}
+
+bool headmatch(const string& s, const string& pat) {
+  if (pat.size() > s.size()) return false;
+  return std::mismatch(pat.begin(), pat.end(), s.begin()).first == pat.end();
 }

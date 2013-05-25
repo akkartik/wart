@@ -42,3 +42,11 @@ void test_trace_keeps_level_together() {
   trace_test_fn(4);
   checkTraceContents2("foo", 2, "before: 3\nafter: 3\n");
 }
+
+void test_trace_supports_hierarchical_layers() {
+  checkTraceContents("test layer", "");
+  trace("test layer/a") << "foo\n";
+  trace("different layer/c") << "foo 2\n";
+  trace("test layer/b") << "bar\n";
+  checkTraceContents("test layer/", "foo\nbar\n");
+}
