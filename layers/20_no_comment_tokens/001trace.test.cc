@@ -16,7 +16,7 @@ void test_trace_orders_across_layers() {
   trace("test layer 1") << "foo\n";
   trace("test layer 2") << "bar\n";
   trace("test layer 1") << "qux\n";
-  checkTraceContents("", "foo\nbar\nqux\n");
+  checkTraceContents("test layer 1,test layer 2", "foo\nbar\nqux\n");
 }
 
 void test_trace_segments_within_layers() {

@@ -44,8 +44,9 @@ struct TraceStream {
   string contents(string layer) {
     reset();
     ostringstream output;
+    unordered_set<string> layers = split(layer);
     for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
-      if (layer.empty() || p->first == layer)
+      if (layer.empty() || layers.find(p->first) != layers.end())
         output << p->second.second;
     return output.str();
   }
@@ -118,3 +119,20 @@ struct LeaseTraceLevel {
 
 #define checkTraceContents2(layer, level, expected) \
   CHECK_EQ(global_trace_stream->contents(layer, level), expected);
+
+
+
+const size_t NOT_FOUND = string::npos;
+
+unordered_set<string> split(string s) {
+  unordered_set<string> result;
+  string::size_type begin=0, end=s.find(',');
+  while (true) {
+    trace("string split") << begin << '-' << end << '\n';
+    result.insert(string(s, begin, end));
+    if (end == NOT_FOUND) break;
+    begin = end+1;
+    end = s.find(',', begin);
+  }
+  return result;
+}

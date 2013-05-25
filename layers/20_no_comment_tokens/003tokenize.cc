@@ -85,7 +85,6 @@ void skipWhitespace(istream& in) {
 
 
 
-const size_t NOT_FOUND = string::npos;
 bool find(string s, char c) {
   return s.find(c) != NOT_FOUND;
 }
