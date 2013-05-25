@@ -46,7 +46,7 @@ struct TraceStream {
     ostringstream output;
     unordered_set<string> layers = split(layer);
     for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
-      if (layer.empty() || layers.find(p->first) != layers.end())
+      if (layers.find(p->first) != layers.end())
         output << p->second.second;
     return output.str();
   }
