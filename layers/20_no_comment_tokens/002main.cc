@@ -29,15 +29,24 @@ int main(int argc, unused char* argv[]) {
   loadFiles(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (!cin.eof()) {
-    list<Cell*> forms = readAll(cin);
-    for (list<Cell*>::iterator p = forms.begin(); p != forms.end(); ++p)
-      cout << "=> " << eval(*p) << endl;
+    cout << "=> " << run(cin) << '\n';
   }
 }
 
 //// read: tokenize, segment, parse, build cells
 Cell* read(istream& in) {
   return nextCell(in);
+}
+
+// In batch mode, evaluate all exprs in input.
+// In interactive mode, evaluate all exprs until empty line.
+// Return value of last expr.
+Cell* run(istream& in) {
+  Cell* result = NULL;
+  do {
+    result = eval(read(in));
+  } while (!eof(in) && (!interactive || in.peek() != '\n'));
+  return result;
 }
 
 // parse a paragraph of expressions until empty line
