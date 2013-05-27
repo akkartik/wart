@@ -177,6 +177,8 @@ bool checkTraceContents(string FUNCTION, string layer, int level, string expecte
   return false;
 }
 
+#define CHECK_TRACE_TOP(layer, expected) CHECK_TRACE_CONTENTS(layer, 1, expected)
+
 
 
 const size_t NOT_FOUND = string::npos;

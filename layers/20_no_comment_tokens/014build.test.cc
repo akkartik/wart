@@ -61,7 +61,7 @@ void test_build_handles_multiple_atoms() {
 
 void test_build_handles_form() {
   list<Cell*> result = readAll("(34 35)");
-  CHECK_TRACE_CONTENTS("cell", 1, "(34 35)\n");
+  CHECK_TRACE_TOP("cell", "(34 35)\n");
   Cell* c = result.front();
   CHECK_EQ(car(c), newNum(34));
   c = cdr(c);
@@ -71,7 +71,7 @@ void test_build_handles_form() {
 
 void test_build_handles_dotted_list() {
   list<Cell*> result = readAll("(34 ... 35)");
-  CHECK_TRACE_CONTENTS("cell", 1, "(34 ... 35)\n");
+  CHECK_TRACE_TOP("cell", "(34 ... 35)\n");
   Cell* c = result.front();
   CHECK_EQ(car(c), newNum(34));
   c = cdr(c);
@@ -80,7 +80,7 @@ void test_build_handles_dotted_list() {
 
 void test_build_handles_literal_ellipses() {
   list<Cell*> result = readAll("'...");
-  CHECK_TRACE_CONTENTS("cell", 1, "'...\n");
+  CHECK_TRACE_TOP("cell", "'...\n");
   Cell *c = result.front();
   CHECK_EQ(car(c), newSym("'"));
   CHECK_EQ(cdr(c), newSym("..."));
@@ -88,7 +88,7 @@ void test_build_handles_literal_ellipses() {
 
 void test_build_handles_nested_form() {
   list<Cell*> result = readAll("(3 7 (33 23))");
-  CHECK_TRACE_CONTENTS("cell", 1, "(3 7 (33 23))\n");
+  CHECK_TRACE_TOP("cell", "(3 7 (33 23))\n");
   Cell* c = result.front();
   CHECK_EQ(car(c), newNum(3));
   c = cdr(c);
@@ -104,7 +104,7 @@ void test_build_handles_nested_form() {
 
 void test_build_handles_strings() {
   list<Cell*> result = readAll("(3 7 (33 \"abc\" 23))");
-  CHECK_TRACE_CONTENTS("cell", 1, "(3 7 (33 \"abc\" 23))\n");
+  CHECK_TRACE_TOP("cell", "(3 7 (33 \"abc\" 23))\n");
   Cell* c = result.front();
   CHECK_EQ(car(c), newNum(3));
   c = cdr(c);
@@ -123,7 +123,7 @@ void test_build_handles_strings() {
 
 void test_build_handles_syms() {
   list<Cell*> result = readAll("(3 7 (33 \"abc\" 3de 23))");
-  CHECK_TRACE_CONTENTS("cell", 1, "(3 7 (33 \"abc\" 3de 23))\n");
+  CHECK_TRACE_TOP("cell", "(3 7 (33 \"abc\" 3de 23))\n");
   Cell* c = result.front();
   CHECK_EQ(car(c), newNum(3));
   c = cdr(c);
@@ -144,7 +144,7 @@ void test_build_handles_syms() {
 
 void test_build_handles_indented_wrapped_lines() {
   list<Cell*> result = readAll("a\n  (a b c\n   d e)");
-  CHECK_TRACE_CONTENTS("cell", 1, "sym: a\n(a b c d e)\n");
+  CHECK_TRACE_TOP("cell", "sym: a\n(a b c d e)\n");
   Cell* c0 = result.front();  result.pop_front();
   CHECK_EQ(c0, newSym("a"));
 

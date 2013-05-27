@@ -20,7 +20,7 @@ void test_parse_handles_atoms() {
 
 void test_parse_handles_forms() {
   readAll("(34 \"a b c\")");
-  CHECK_TRACE_CONTENTS("parse", 1, "(34 \"a b c\")\n");
+  CHECK_TRACE_TOP("parse", "(34 \"a b c\")\n");
 }
 
 void test_parse_handles_nested_forms() {
