@@ -4,7 +4,7 @@ void test_evalBindAll_handles_unquoted_param() {
   newBinding("a", newNum(3));
   CLEAR_TRACE;
   evalBindAll(params, args);
-  checkTraceContents("lookup", "x: 3\n");
+  checkTraceContents("bind", "x: 3\n");
 }
 
 void test_evalBindAll_binds_missing_params() {
@@ -13,7 +13,7 @@ void test_evalBindAll_binds_missing_params() {
   newBinding("a", newNum(3));
   CLEAR_TRACE;
   evalBindAll(params, args);
-  checkTraceContents("lookup", "x: 3\ny: nil\n");
+  checkTraceContents("bind", "x: 3\ny: nil\n");
 }
 
 void test_evalBindAll_handles_varargs_param() {
@@ -24,7 +24,7 @@ void test_evalBindAll_handles_varargs_param() {
   CLEAR_TRACE;
   evalBindAll(params, args);
   checkTraceContents("eval", "a\n=> sym: 3\nb\n=> sym: 4\n");
-  checkTraceContents("lookup", "x: (3 4)\n");
+  checkTraceContents("bind", "x: (3 4)\n");
 }
 
 void test_evalBindAll_handles_rest_param() {
@@ -34,7 +34,7 @@ void test_evalBindAll_handles_rest_param() {
   newBinding("b", newNum(4));
   CLEAR_TRACE;
   evalBindAll(params, args);
-  checkTraceContents("lookup", "x: 3\ny: (4)\n");
+  checkTraceContents("bind", "x: 3\ny: (4)\n");
 }
 
 void test_evalBindAll_handles_destructured_params() {
@@ -44,7 +44,7 @@ void test_evalBindAll_handles_destructured_params() {
   newBinding("y", newNum(4));
   CLEAR_TRACE;
   evalBindAll(params, args);
-  checkTraceContents("lookup", "a: 3\nb: 4\n");
+  checkTraceContents("bind", "a: 3\nb: 4\n");
 }
 
 
