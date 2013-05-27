@@ -15,36 +15,36 @@ Cell* eval(Cell* expr) {
   if (!expr)
     RAISE << "eval: cell should never be NULL" << endl << DIE;
 
-  trace("eval") << expr << '\n';
+  trace("eval") << expr;
   if (expr == nil) {
-    trace("eval") << "=> nil\n";
+    trace("eval") << "=> nil";
     return nil;
   }
 
   if (isColonSym(expr)) {
-    trace("eval") << "=> keyword sym: " << expr << '\n';
+    trace("eval") << "=> keyword sym: " << expr;
     return expr;
   }
 
   if (isSym(expr)) {
     Cell* result = lookup(expr);
-    trace("eval") << "=> sym: " << result << '\n';
+    trace("eval") << "=> sym: " << result;
     return result;
   }
 
   if (isAtom(expr)) {
-    trace("eval") << "=> literal: " << expr << '\n';
+    trace("eval") << "=> literal: " << expr;
     return expr;
   }
 
   if (isQuoted(expr)) {
-    trace("eval") << "=> quote: " << cdr(expr) << '\n';
+    trace("eval") << "=> quote: " << cdr(expr);
     return cdr(expr);
   }
 
   Cell* result = evalPrimitive(car(expr), cdr(expr));
   if (result) {
-    trace("eval") << "=> compiled fn: " << result << '\n';
+    trace("eval") << "=> compiled fn: " << result;
     return result;
   }
 
@@ -60,7 +60,7 @@ Cell* eval(Cell* expr) {
   // eval all forms in body, save result of final form
   for (Cell* form = body(fn); form != nil; form=cdr(form))
     result = eval(car(form));
-  trace("eval") << "=> " << result << '\n';
+  trace("eval") << "=> " << result;
   return result;
 }
 

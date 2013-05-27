@@ -23,7 +23,10 @@ AstNode nextAstNode(istream& in) {
 AstNode nextAstNode(list<Token>& in) {
   list<AstNode> subform;
   incTraceForRestOfScope("parse");
-  if (in.empty()) TRACE_AND_RETURN("parse", AstNode(subform));
+  if (in.empty()) {
+    trace("parse") << AstNode(subform);
+    return AstNode(subform);
+  }
 
   subform.push_back(AstNode(nextToken(in)));
   while (!in.empty() && isQuoteOrUnquote(subform.back().atom))
@@ -35,9 +38,13 @@ AstNode nextAstNode(list<Token>& in) {
     if (!isCloseParen(subform.back())) RAISE << "Unbalanced (" << endl << DIE;
   }
 
-  if (subform.size() == 1)
-    TRACE_AND_RETURN("parse", AstNode(subform.back()));
-  TRACE_AND_RETURN("parse", AstNode(subform));
+  if (subform.size() == 1) {
+    trace("parse") << AstNode(subform.back());
+    return AstNode(subform.back());
+  }
+
+  trace("parse") << AstNode(subform);
+  return AstNode(subform);
 }
 
 

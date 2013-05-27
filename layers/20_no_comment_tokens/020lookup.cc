@@ -19,7 +19,7 @@ void newBinding(string sym, Cell* val) {
 }
 
 void newBinding(Cell* sym, Cell* val) {
-  trace("bind") << sym << ": " << val << '\n';
+  trace("bind") << sym << ": " << val;
   bindings[sym] = val;
 }
 

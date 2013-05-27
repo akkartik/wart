@@ -25,7 +25,7 @@ void test_tokenize_handles_string_with_escape() {
 
 void test_tokenize_handles_comment() {
   readAll("()'a #abc def ghi");
-  checkTraceContents("tokenize", "(\n)\n'\na\n\n");   // extra newline just an artifact
+  checkTraceContents("tokenize", "(\n)\n'\na\n");
 }
 
 void test_tokenize_ends_comment_at_newline() {

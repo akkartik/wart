@@ -9,7 +9,7 @@ Cell* buildCell(AstNode n) {
   if (n == "") return nil;  // void
 
   if (isNil(n)) {
-    trace("cell") << "nil\n";
+    trace("cell") << "nil";
     return nil;
   }
   if (isList(n) && n.elems.front() == ")") {
@@ -22,7 +22,7 @@ Cell* buildCell(AstNode n) {
     char* end;
     long v = strtol(n.atom.c_str(), &end, 0);
     if (*end == '\0' && errno == 0) {
-      trace("cell") << "num: " << v << '\n';
+      trace("cell") << "num: " << v;
       return newNum(v);
     }
 
@@ -31,7 +31,7 @@ Cell* buildCell(AstNode n) {
 
     float f = strtof(n.atom.c_str(), &end);
     if (*end == '\0') {
-      trace("cell") << "float: " << f << '\n';
+      trace("cell") << "float: " << f;
       if (n.atom.substr(0, 2) == "-.")
         RAISE << "assuming '" << n.atom << "' is a float; to remove this warning say '-0" << n.atom.substr(1) << "'.\n"
             << "If you mean to negate an int, skip the ssyntax: '-" << n.atom.substr(2) << "'.\n";
@@ -39,11 +39,11 @@ Cell* buildCell(AstNode n) {
     }
 
     if (n.atom.c_str()[0] == '"') {
-      trace("cell") << "string: " << n.atom << '\n';
+      trace("cell") << "string: " << n.atom;
       return newString(n.atom.substr(1, n.atom.length()-2));
     }
 
-    trace("cell") << "sym: " << n.atom << '\n';
+    trace("cell") << "sym: " << n.atom;
     return newSym(n.atom);
   }
 
@@ -51,7 +51,7 @@ Cell* buildCell(AstNode n) {
   if (*first == "(") {
     n.elems.pop_front();
     Cell* result = buildCell(n);
-    trace("cell") << result << '\n';
+    trace("cell") << result;
     return result;
   }
 
@@ -75,7 +75,7 @@ Cell* buildCell(AstNode n) {
     setCdr(newForm, buildCell(n));
   }
 
-  trace("cell") << newForm << '\n';
+  trace("cell") << newForm;
   return newForm;
 }
 

@@ -1,30 +1,30 @@
 void test_trace_check_compares() {
   checkTraceContents("test layer", "");
-  trace("test layer") << "foo\n";
+  trace("test layer") << "foo";
   checkTraceContents("test layer", "foo\n");
 }
 
 void test_trace_check_filters_layers() {
   checkTraceContents("test layer", "");
-  trace("test layer 1") << "foo\n";
-  trace("test layer 2") << "bar\n";
+  trace("test layer 1") << "foo";
+  trace("test layer 2") << "bar";
   checkTraceContents("test layer 1", "foo\n");
 }
 
 void test_trace_orders_across_layers() {
   checkTraceContents("test layer", "");
-  trace("test layer 1") << "foo\n";
-  trace("test layer 2") << "bar\n";
-  trace("test layer 1") << "qux\n";
+  trace("test layer 1") << "foo";
+  trace("test layer 2") << "bar";
+  trace("test layer 1") << "qux";
   checkTraceContents("test layer 1,test layer 2", "foo\nbar\nqux\n");
 }
 
 void test_trace_segments_within_layers() {
   checkTraceContents("test layer", "");
-  trace("test layer 1") << "foo\n";
-  trace("test layer 2") << "bar\n";
+  trace("test layer 1") << "foo";
+  trace("test layer 2") << "bar";
   incTraceForRestOfScope("test layer 1");
-  trace("test layer 1") << "qux\n";
+  trace("test layer 1") << "qux";
   checkTraceContents("test layer 1", "foo\nqux\n");
   checkTraceContents2("test layer 1", 0, "foo\n");
 }
@@ -32,9 +32,9 @@ void test_trace_segments_within_layers() {
 void trace_test_fn(int n) {
   if (n == 0) return;
   incTraceForRestOfScope("foo");
-  trace("foo") << "before: " << n << "\n";
+  trace("foo") << "before: " << n;
   trace_test_fn(n-1);
-  trace("foo") << "after: " << n << "\n";
+  trace("foo") << "after: " << n;
 }
 
 void test_trace_keeps_level_together() {
@@ -45,17 +45,17 @@ void test_trace_keeps_level_together() {
 
 void test_trace_supports_multiple_layers() {
   checkTraceContents("test layer", "");
-  trace("test layer 1") << "foo\n";
-  trace("test layer 2") << "bar\n";
-  trace("test layer 1") << "qux\n";
+  trace("test layer 1") << "foo";
+  trace("test layer 2") << "bar";
+  trace("test layer 1") << "qux";
   checkTraceContents("test layer 1,test layer 2", "foo\nbar\nqux\n");
 }
 
 void test_trace_supports_hierarchical_layers() {
   checkTraceContents("test layer", "");
-  trace("test layer/a") << "foo\n";
-  trace("different layer/c") << "foo 2\n";
-  trace("test layer/b") << "bar\n";
+  trace("test layer/a") << "foo";
+  trace("different layer/c") << "foo 2";
+  trace("test layer/b") << "bar";
   checkTraceContents("test layer/", "foo\nbar\n");
 }
 

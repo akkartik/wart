@@ -9,7 +9,7 @@ const string quoteAndUnquoteChars = "'";  // controlling eval
 typedef string Token;
 
 Token nextToken(istream& in) {
-  trace("tokenize 2") << "eof: " << in.eof() << '\n';
+  trace("tokenize 2") << "eof: " << in.eof();
   in >> std::noskipws;
   while (in.peek() == '#' || isspace(in.peek())) {
     skipWhitespace(in);
@@ -17,7 +17,7 @@ Token nextToken(istream& in) {
       skipComment(in);
   }
 
-  trace("tokenize 2") << "eof2: " << in.eof() << '\n';
+  trace("tokenize 2") << "eof2: " << in.eof();
   ostringstream out;
   if (in.peek() == '"')
     slurpString(in, out);
@@ -28,7 +28,7 @@ Token nextToken(istream& in) {
   else
     slurpWord(in, out);
 
-  trace("tokenize") << out.str() << '\n';
+  trace("tokenize") << out.str();
   return Token(out.str());
 }
 
@@ -43,7 +43,6 @@ void slurpChar(istream& in, ostream& out) {
 
 void slurpWord(istream& in, ostream& out) {
   char c;
-//?   trace << "slurpWord\n";
   while (in >> c) {
     if (isspace(c) || find(punctuationChars, c) || find(quoteAndUnquoteChars, c)) {
       in.putback(c);

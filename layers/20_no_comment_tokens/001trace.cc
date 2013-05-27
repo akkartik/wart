@@ -11,19 +11,20 @@ struct TraceStream {
   ~TraceStream() { if (curr_stream) delete curr_stream; }
 
   ostringstream& stream(string layer) {
-    reset();
+    newline();
     curr_stream = new ostringstream;
     curr_layer = layer;
     return *curr_stream;
   }
 
   string contents(string layer, int level) {
-    reset();
+    newline();
     if (layer.empty()) return "";
     ostringstream output;
     for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
       if (p->first == layer && p->second.first == level)
-        output << p->second.second;
+        if (!p->second.second.empty())
+          output << p->second.second << '\n';
     return output.str();
   }
 
@@ -42,17 +43,18 @@ struct TraceStream {
   }
 
   string contents(string layer) {
-    reset();
+    newline();
     ostringstream output;
     vector<string> layers = split(layer, ',');
     for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
       if (any_prefix_match(layers, p->first))
-        output << p->second.second;
+        if (!p->second.second.empty())
+          output << p->second.second << '\n';
     return output.str();
   }
 
   string readable_contents(string layer) {
-    reset();
+    newline();
     ostringstream output;
     for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
       if (layer.empty() || p->first == layer)
@@ -61,7 +63,7 @@ struct TraceStream {
   }
 
   // be sure to call this before messing with curr_stream or curr_layer or level
-  void reset() {
+  void newline() {
     if (!curr_stream) return;
     past_lines.push_back(pair<string, pair<int, string> >(curr_layer, pair<int, string>(level[curr_layer], curr_stream->str())));
     if (curr_layer == dump_layer || curr_layer == "dump") cerr << curr_stream->str();
@@ -85,10 +87,9 @@ struct LeaseTracer {
 
 
 
+// Main entrypoint.
+// never write explicit newlines into trace
 #define trace(layer) !global_trace_stream ? cerr /*print nothing*/ : global_trace_stream->stream(layer)
-
-#define TRACE_AND_RETURN(layer, X) \
-  return (trace(layer) << X << '\n'), X;
 
 #define checkTraceContents(layer, expected) \
   CHECK_EQ(global_trace_stream->contents(layer), expected);
@@ -99,11 +100,11 @@ struct LeaseTracer {
 struct LeaseTraceLevel {
   string layer;
   LeaseTraceLevel(string l) :layer(l) {
-    global_trace_stream->reset();
+    global_trace_stream->newline();
     ++global_trace_stream->level[layer];
   }
   ~LeaseTraceLevel() {
-    global_trace_stream->reset();
+    global_trace_stream->newline();
     --global_trace_stream->level[layer];
   }
 };

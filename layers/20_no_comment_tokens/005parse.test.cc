@@ -1,11 +1,11 @@
 void test_parse_handles_empty_stream() {
   readAll("");
-  checkTraceContents("parse", "\n");  // extra newline artifact
+  checkTraceContents("parse", "");
 }
 
 void test_parse_handles_trailing_comment() {
   readAll("34 # abc");
-  checkTraceContents("parse", "34\n\n");  // extra newline artifact
+  checkTraceContents("parse", "34\n");
 }
 
 void test_parse_handles_atom() {
