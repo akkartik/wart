@@ -17,17 +17,6 @@ struct TraceStream {
     return *curr_stream;
   }
 
-  string contents(string layer, int level) {
-    newline();
-    if (layer.empty()) return "";
-    ostringstream output;
-    for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
-      if (p->first == layer && p->second.first == level)
-        if (!p->second.second.empty())
-          output << p->second.second << '\n';
-    return output.str();
-  }
-
   void dump_browseable_contents(string layer) {
     ofstream dump("dump");
     dump << "<div class='level' level_index='1'>start</div>\n";
@@ -40,17 +29,6 @@ struct TraceStream {
       dump << "</div>\n";
     }
     dump.close();
-  }
-
-  string contents(string layer) {
-    newline();
-    ostringstream output;
-    vector<string> layers = split(layer, ',');
-    for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
-      if (any_prefix_match(layers, p->first))
-        if (!p->second.second.empty())
-          output << p->second.second << '\n';
-    return output.str();
   }
 
   string readable_contents(string layer) {
