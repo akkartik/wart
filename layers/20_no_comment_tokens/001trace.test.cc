@@ -96,6 +96,8 @@ void test_trace_supports_count2() {
 
 
 
+// Can't test on traces here because trace methods call trace.
+
 void test_split_returns_at_least_one_elem() {
   vector<string> result = split("", ',');
   CHECK_EQ(result.size(), 1);
