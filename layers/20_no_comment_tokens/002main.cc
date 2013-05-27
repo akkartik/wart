@@ -108,11 +108,6 @@ void setup() {
 
 //// helpers for tests
 
-Cell* read(string s) {
-  stringstream in(s);
-  return read(in);
-}
-
 list<Cell*> readAll(string s) {
   stringstream in(s);
   return readAll(in);
