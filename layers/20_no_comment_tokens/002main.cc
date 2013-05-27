@@ -97,6 +97,15 @@ void verify() {
   if (raiseCount != 0) cerr << raiseCount << " errors encountered" << endl;
 }
 
+void setup() {
+  setupCells();
+  setupCommonSyms();
+  raiseCount = 0;
+  passed = true;
+}
+
+
+
 // helper to read from string
 // leaks memory; just for convenient tests
 Cell* read(string s) {
@@ -111,13 +120,4 @@ list<Cell*> readAll(string s) {
 Cell* run(string s) {
   stringstream in(s);
   return run(in);
-}
-
-
-
-void setup() {
-  setupCells();
-  setupCommonSyms();
-  raiseCount = 0;
-  passed = true;
 }
