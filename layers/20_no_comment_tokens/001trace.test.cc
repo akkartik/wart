@@ -80,6 +80,13 @@ void test_trace_supports_hierarchical_layers() {
   CHECK_TRACE_CONTENTS("test layer/", "foo\nbar\n");
 }
 
+void test_trace_supports_count() {
+  CHECK_TRACE_CONTENTS("test layer", "");
+  trace("test layer 1") << "foo";
+  trace("test layer 1") << "foo";
+  CHECK_EQ(traceCount("test layer 1", "foo"), 2);
+}
+
 
 
 void test_split_returns_at_least_one_elem() {
