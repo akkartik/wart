@@ -1,49 +1,39 @@
 void test_evalBindAll_handles_unquoted_param() {
-  Cell* params = read("(x)");
-  Cell* args = read("(a)");
   newBinding("a", newNum(3));
   CLEAR_TRACE;
-  evalBindAll(params, args);
+  run("((fn (x)) a)");
   checkTraceContents("bind", "x: 3\n");
 }
 
 void test_evalBindAll_binds_missing_params() {
-  Cell* params = read("(x y)");
-  Cell* args = read("(a)");
   newBinding("a", newNum(3));
   CLEAR_TRACE;
-  evalBindAll(params, args);
+  run("((fn (x y)) a)");
   checkTraceContents("bind", "x: 3\ny: nil\n");
 }
 
 void test_evalBindAll_handles_varargs_param() {
-  Cell* params = read("x");
-  Cell* args = read("(a b)");
   newBinding("a", newNum(3));
   newBinding("b", newNum(4));
   CLEAR_TRACE;
-  evalBindAll(params, args);
+  run("((fn x) a b)");
   checkTraceContents("eval", "a\n=> sym: 3\nb\n=> sym: 4\n");
   checkTraceContents("bind", "x: (3 4)\n");
 }
 
 void test_evalBindAll_handles_rest_param() {
-  Cell* params = read("(x ... y)");
-  Cell* args = read("(a b)");
   newBinding("a", newNum(3));
   newBinding("b", newNum(4));
   CLEAR_TRACE;
-  evalBindAll(params, args);
+  run("((fn (x ... y)) a b)");
   checkTraceContents("bind", "x: 3\ny: (4)\n");
 }
 
 void test_evalBindAll_handles_destructured_params() {
-  Cell* params = read("((a b))");
-  Cell* args = read("((cons x (cons y)))");
   newBinding("x", newNum(3));
   newBinding("y", newNum(4));
   CLEAR_TRACE;
-  evalBindAll(params, args);
+  run("((fn ((a b)) (cons x (cons y))))");
   checkTraceContents("bind", "a: 3\nb: 4\n");
 }
 

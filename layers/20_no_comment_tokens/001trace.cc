@@ -44,7 +44,7 @@ struct TraceStream {
   string contents(string layer) {
     reset();
     ostringstream output;
-    vector<string> layers = split(layer);
+    vector<string> layers = split(layer, ',');
     for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
       if (any_prefix_match(layers, p->first))
         output << p->second.second;
@@ -90,8 +90,40 @@ struct LeaseTracer {
 #define TRACE_AND_RETURN(layer, X) \
   return (trace(layer) << X << '\n'), X;
 
-#define checkTraceContents(layer, expected) \
-  CHECK_EQ(global_trace_stream->contents(layer), expected);
+bool checkTraceContents_sub(string FUNCTION, string layer, string expected) {
+  vector<string> expected_lines = split(expected, '\n');
+  cerr << expected << ": " << expected_lines.size() << endl;
+  if (expected_lines.back() == "") expected_lines.pop_back();
+  cerr << expected << ": " << expected_lines.size() << endl;
+  if (expected_lines.empty()) return true;
+  size_t curr_expected_line = 0;
+  global_trace_stream->reset();
+  ostringstream output;
+  vector<string> layers = split(layer, ',');
+  for (vector<pair<string, pair<int, string> > >::iterator p = global_trace_stream->past_lines.begin(); p != global_trace_stream->past_lines.end(); ++p) {
+    if (*p->second.second.rbegin() == '\n')
+      p->second.second.erase(p->second.second.size()-1);
+    cerr << "AA: " << p->second.second << " vs " << expected_lines[curr_expected_line] << "$\n";
+    if (layer.empty() || any_prefix_match(layers, p->first)) {
+      cerr << p->second.second << " vs " << expected_lines[curr_expected_line] << "$\n";
+      if (p->second.second == expected_lines[curr_expected_line]) {
+        cerr << "incrementing\n";
+        ++curr_expected_line;
+        if (curr_expected_line == expected_lines.size()) {
+          cerr << ".", cerr.flush();
+          return true;
+        }
+      }
+    }
+  }
+
+  cerr << "\nF " << FUNCTION << ": trace didn't contain " << expected_lines[curr_expected_line] << '\n';
+  passed = false;
+  exit(0);
+  return false;
+}
+
+#define checkTraceContents(X, Y) checkTraceContents_sub(__FUNCTION__, X, Y)
 
 
 
@@ -116,15 +148,15 @@ struct LeaseTraceLevel {
 
 const size_t NOT_FOUND = string::npos;
 
-vector<string> split(string s) {
+vector<string> split(string s, char delim) {
   vector<string> result;
-  string::size_type begin=0, end=s.find(',');
+  string::size_type begin=0, end=s.find(delim);
   while (true) {
     trace("string split") << begin << '-' << end << '\n';
     result.push_back(string(s, begin, end));
     if (end == NOT_FOUND) break;
     begin = end+1;
-    end = s.find(',', begin);
+    end = s.find(delim, begin);
   }
   return result;
 }
