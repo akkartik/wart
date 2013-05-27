@@ -106,10 +106,11 @@ void setup() {
 
 
 
-// helper to read from string
-// leaks memory; just for convenient tests
+//// helpers for tests
+
 Cell* read(string s) {
-  return read(*new stringstream(s));
+  stringstream in(s);
+  return read(in);
 }
 
 list<Cell*> readAll(string s) {
