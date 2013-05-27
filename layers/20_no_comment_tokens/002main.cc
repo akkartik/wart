@@ -67,24 +67,6 @@ bool eof(istream& in) {
 
 //// test harness
 
-bool runningTests = false;
-
-typedef void (*TestFn)(void);
-
-const TestFn tests[] = {
-  #include "test_list"
-};
-
-bool passed = true;
-
-#define CHECK(X) if (!(X)) { \
-    ++numFailures; \
-    cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
-    passed = false; \
-    return; \
-  } \
-  else { cerr << "."; fflush(stderr); }
-
 void runTests() {
   runningTests = true;
   pretendRaise = true;  // for death tests

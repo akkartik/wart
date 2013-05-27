@@ -90,16 +90,6 @@ struct LeaseTracer {
 
 
 
-// TODO: logically belongs in main.cc with the rest of the test harness
-long numFailures = 0;
-#define CHECK_EQ(X, Y) if ((X) != (Y)) { \
-    ++numFailures; \
-    cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
-    cerr << "  got " << (X) << endl;  /* BEWARE: multiple eval */ \
-    return; \
-  } \
-  else { cerr << "."; fflush(stderr); }
-
 #define checkTraceContents(layer, expected) \
   CHECK_EQ(global_trace_stream->contents(layer), expected);
 
