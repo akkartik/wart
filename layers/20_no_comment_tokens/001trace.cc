@@ -153,7 +153,8 @@ vector<string> split(string s, char delim) {
   string::size_type begin=0, end=s.find(delim);
   while (true) {
     trace("string split") << begin << '-' << end << '\n';
-    result.push_back(string(s, begin, end));
+    trace("string split: inserting") << string(s, begin, end-begin) << '\n';
+    result.push_back(string(s, begin, end-begin));
     if (end == NOT_FOUND) break;
     begin = end+1;
     end = s.find(delim, begin);
