@@ -118,6 +118,17 @@ int traceCount(string layer, string line) {
   return result;
 }
 
+int traceCount(string layer, int level, string line) {
+  long result = 0;
+  vector<string> layers = split(layer, ',');
+  for (vector<pair<string, pair<int, string> > >::iterator p = global_trace_stream->past_lines.begin(); p != global_trace_stream->past_lines.end(); ++p) {
+    if (any_prefix_match(layers, p->first) && p->second.first == level)
+      if (line == "" || p->second.second == line)
+        ++result;
+  }
+  return result;
+}
+
 
 
 // manage layer counts in global_trace_stream using RAII

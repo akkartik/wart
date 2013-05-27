@@ -71,12 +71,12 @@ void test_assign_overrides_lexical_var() {
 
 void test_equal_handles_nil() {
   run("(= nil nil)");
-  CHECK_TRACE_CONTENTS("eval", "=> compiled fn: 1\n");
+  CHECK_EQ(traceCount("eval", 1, "=> compiled fn: nil\n"), 0);
 }
 
 void test_equal_handles_floats() {
   run("(= (/ 3.0 2) 1.5)");
-  CHECK_TRACE_CONTENTS("eval", "=> compiled fn: 1.5\n");
+  CHECK_EQ(traceCount("eval", 1, "=> compiled fn: nil\n"), 0);
 }
 
 void test_equal_handles_float_vs_nil() {
