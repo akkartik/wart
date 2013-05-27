@@ -135,10 +135,12 @@ int traceCount(string layer, int level, string line) {
 struct LeaseTraceLevel {
   string layer;
   LeaseTraceLevel(string l) :layer(l) {
+    if (!global_trace_stream) return;
     global_trace_stream->newline();
     ++global_trace_stream->level[layer];
   }
   ~LeaseTraceLevel() {
+    if (!global_trace_stream) return;
     global_trace_stream->newline();
     --global_trace_stream->level[layer];
   }
