@@ -101,12 +101,16 @@ bool checkTraceContents(string FUNCTION, string layer, string expected) {
 
 #define CHECK_TRACE_CONTENTS(...) checkTraceContents(__FUNCTION__, __VA_ARGS__)
 
+int traceCount(string layer) {
+  return traceCount(layer, "");
+}
+
 int traceCount(string layer, string line) {
   long result = 0;
   vector<string> layers = split(layer, ',');
   for (vector<pair<string, pair<int, string> > >::iterator p = global_trace_stream->past_lines.begin(); p != global_trace_stream->past_lines.end(); ++p) {
     if (any_prefix_match(layers, p->first))
-      if (p->second.second == line)
+      if (line == "" || p->second.second == line)
         ++result;
   }
   return result;

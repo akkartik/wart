@@ -87,6 +87,13 @@ void test_trace_supports_count() {
   CHECK_EQ(traceCount("test layer 1", "foo"), 2);
 }
 
+void test_trace_supports_count2() {
+  CHECK_TRACE_CONTENTS("test layer", "");
+  trace("test layer 1") << "foo";
+  trace("test layer 1") << "bar";
+  CHECK_EQ(traceCount("test layer 1"), 2);
+}
+
 
 
 void test_split_returns_at_least_one_elem() {
