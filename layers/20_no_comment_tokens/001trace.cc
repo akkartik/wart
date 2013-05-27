@@ -21,7 +21,7 @@ struct TraceStream {
   void newline() {
     if (!curr_stream) return;
     past_lines.push_back(pair<string, pair<int, string> >(curr_layer, pair<int, string>(level[curr_layer], curr_stream->str())));
-    if (curr_layer == dump_layer || curr_layer == "dump") cerr << curr_stream->str();
+    if (curr_layer == dump_layer || curr_layer == "dump") cerr << curr_stream->str() << '\n';
     delete curr_stream;
     curr_stream = NULL;
   }
@@ -170,13 +170,13 @@ vector<string> split(string s, char delim) {
   vector<string> result;
   string::size_type begin=0, end=s.find(delim);
   while (true) {
-    trace("string split") << begin << '-' << end << '\n';
+    trace("string split") << begin << '-' << end;
     if (end == NOT_FOUND) {
-      trace("string split: inserting") << string(s, begin, end) << '\n';
+      trace("string split: inserting") << string(s, begin, end);
       result.push_back(string(s, begin, NOT_FOUND));
       break;
     }
-    trace("string split: inserting") << string(s, begin, end-begin) << '\n';
+    trace("string split: inserting") << string(s, begin, end-begin);
     result.push_back(string(s, begin, end-begin));
     begin = end+1;
     end = s.find(delim, begin);
