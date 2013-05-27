@@ -86,6 +86,8 @@ struct LeaseTracer {
 };
 #define START_TRACING_UNTIL_END_OF_SCOPE LeaseTracer lease_tracer;
 
+#define CLEAR_TRACE delete global_trace_stream, global_trace_stream = new TraceStream;
+
 
 
 // TODO: logically belongs in main.cc with the rest of the test harness

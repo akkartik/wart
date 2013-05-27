@@ -2,7 +2,7 @@ void test_evalBindAll_handles_unquoted_param() {
   Cell* params = read("(x)");
   Cell* args = read("(a)");
   newBinding("a", newNum(3));
-  delete global_trace_stream, global_trace_stream = new TraceStream;
+  CLEAR_TRACE;
   evalBindAll(params, args);
   checkTraceContents("lookup", "x: 3\n");
 }
@@ -11,7 +11,7 @@ void test_evalBindAll_binds_missing_params() {
   Cell* params = read("(x y)");
   Cell* args = read("(a)");
   newBinding("a", newNum(3));
-  delete global_trace_stream, global_trace_stream = new TraceStream;
+  CLEAR_TRACE;
   evalBindAll(params, args);
   checkTraceContents("lookup", "x: 3\ny: nil\n");
 }
@@ -21,7 +21,7 @@ void test_evalBindAll_handles_varargs_param() {
   Cell* args = read("(a b)");
   newBinding("a", newNum(3));
   newBinding("b", newNum(4));
-  delete global_trace_stream, global_trace_stream = new TraceStream;
+  CLEAR_TRACE;
   evalBindAll(params, args);
   checkTraceContents("eval", "a\n=> sym: 3\nb\n=> sym: 4\n");
   checkTraceContents("lookup", "x: (3 4)\n");
@@ -32,7 +32,7 @@ void test_evalBindAll_handles_rest_param() {
   Cell* args = read("(a b)");
   newBinding("a", newNum(3));
   newBinding("b", newNum(4));
-  delete global_trace_stream, global_trace_stream = new TraceStream;
+  CLEAR_TRACE;
   evalBindAll(params, args);
   checkTraceContents("lookup", "x: 3\ny: (4)\n");
 }
@@ -42,7 +42,7 @@ void test_evalBindAll_handles_destructured_params() {
   Cell* args = read("((cons x (cons y)))");
   newBinding("x", newNum(3));
   newBinding("y", newNum(4));
-  delete global_trace_stream, global_trace_stream = new TraceStream;
+  CLEAR_TRACE;
   evalBindAll(params, args);
   checkTraceContents("lookup", "a: 3\nb: 4\n");
 }
@@ -114,28 +114,22 @@ void test_eval_expands_syms_in_fn_bodies() {
 }
 
 void test_eval_handles_assigned_fn_calls() {
-  {
-    run("(<- f (fn () 34))");
-    delete global_trace_stream, global_trace_stream = new TraceStream;
-  }
+  run("(<- f (fn () 34))");
+  CLEAR_TRACE;
   run("(f)");
   checkTraceContents2("eval", 1, "(f)\n=> 34\n");
 }
 
 void test_eval_handles_multiple_args() {
-  {
-    run("(<- f (fn (a b) b))");
-    delete global_trace_stream, global_trace_stream = new TraceStream;
-  }
+  run("(<- f (fn (a b) b))");
+  CLEAR_TRACE;
   run("(f 1 2)");
   checkTraceContents2("eval", 1, "(f 1 2)\n=> 2\n");
 }
 
 void test_eval_handles_multiple_body_exprs() {
-  {
-    run("(<- f (fn () 1 2))");
-    delete global_trace_stream, global_trace_stream = new TraceStream;
-  }
+  run("(<- f (fn () 1 2))");
+  CLEAR_TRACE;
   run("(f)");
   checkTraceContents2("eval", 1, "(f)\n=> 2\n");
 }
