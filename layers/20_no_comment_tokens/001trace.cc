@@ -58,7 +58,7 @@ struct TraceStream {
     ostringstream output;
     for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
       if (layer.empty() || p->first == layer)
-        output << p->second.first << ": " << p->second.second;
+        output << p->second.first << ": " << p->second.second << '\n';
     return output.str();
   }
 
