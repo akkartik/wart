@@ -26,7 +26,7 @@ struct TraceStream {
     curr_stream = NULL;
   }
 
-  string readable_contents(string layer) {
+  string readable_contents(string layer) {  // empty layer = everything
     newline();
     ostringstream output;
     for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
@@ -71,7 +71,7 @@ struct LeaseTracer {
 // never write explicit newlines into trace
 #define trace(layer) !global_trace_stream ? cerr /*print nothing*/ : global_trace_stream->stream(layer)
 
-bool checkTraceContents(string FUNCTION, string layer, string expected) {
+bool checkTraceContents(string FUNCTION, string layer, string expected) {   // empty layer == everything, multiple layers, hierarchical layers
   vector<string> expected_lines = split(expected, '\n');
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
@@ -132,7 +132,7 @@ struct LeaseTraceLevel {
 };
 #define incTraceForRestOfScope(layer) LeaseTraceLevel lease_trace_level(layer);
 
-bool checkTraceContents(string FUNCTION, string layer, int level, string expected) {
+bool checkTraceContents(string FUNCTION, string layer, int level, string expected) {  // multiple layers, hierarchical layers
   vector<string> expected_lines = split(expected, '\n');
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())

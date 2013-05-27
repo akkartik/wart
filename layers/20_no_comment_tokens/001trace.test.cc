@@ -25,6 +25,13 @@ void test_trace_check_always_finds_empty_lines() {
   CHECK_TRACE_CONTENTS("test layer 1", "");
 }
 
+void test_trace_check_treats_empty_layers_as_wildcards() {
+  CHECK_TRACE_CONTENTS("test layer", "");
+  trace("test layer 1") << "foo";
+  trace("test layer 2") << "bar";
+  CHECK_TRACE_CONTENTS("", "foo\nbar\n");
+}
+
 void test_trace_check_always_finds_empty_lines2() {
   CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
@@ -37,7 +44,7 @@ void test_trace_orders_across_layers() {
   trace("test layer 1") << "foo";
   trace("test layer 2") << "bar";
   trace("test layer 1") << "qux";
-  CHECK_TRACE_CONTENTS("test layer 1,test layer 2", "foo\nbar\nqux\n");
+  CHECK_TRACE_CONTENTS("", "foo\nbar\nqux\n");
 }
 
 void test_trace_segments_within_layers() {
