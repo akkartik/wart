@@ -11,6 +11,27 @@ void test_trace_check_filters_layers() {
   checkTraceContents("test layer 1", "foo\n");
 }
 
+void test_trace_check_ignores_other_lines() {
+  checkTraceContents("test layer", "");
+  trace("test layer 1") << "foo";
+  trace("test layer 1") << "bar";
+  checkTraceContents("test layer 1", "foo\n");
+}
+
+void test_trace_check_always_finds_empty_lines() {
+  checkTraceContents("test layer", "");
+  trace("test layer 1") << "foo";
+  trace("test layer 1") << "bar";
+  checkTraceContents("test layer 1", "");
+}
+
+void test_trace_check_always_finds_empty_lines2() {
+  checkTraceContents("test layer", "");
+  trace("test layer 1") << "foo";
+  trace("test layer 1") << "bar";
+  checkTraceContents("test layer 1", "\n\n\n");
+}
+
 void test_trace_orders_across_layers() {
   checkTraceContents("test layer", "");
   trace("test layer 1") << "foo";

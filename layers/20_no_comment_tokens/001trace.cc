@@ -91,8 +91,35 @@ struct LeaseTracer {
 // never write explicit newlines into trace
 #define trace(layer) !global_trace_stream ? cerr /*print nothing*/ : global_trace_stream->stream(layer)
 
-#define checkTraceContents(layer, expected) \
-  CHECK_EQ(global_trace_stream->contents(layer), expected);
+bool checkTraceContents_sub(string FUNCTION, string layer, string expected) {
+  vector<string> expected_lines = split(expected, '\n');
+  size_t curr_expected_line = 0;
+  while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
+    ++curr_expected_line;
+  if (curr_expected_line == expected_lines.size()) return true;
+  global_trace_stream->newline();
+  ostringstream output;
+  vector<string> layers = split(layer, ',');
+  for (vector<pair<string, pair<int, string> > >::iterator p = global_trace_stream->past_lines.begin(); p != global_trace_stream->past_lines.end(); ++p) {
+    if (!layer.empty() && !any_prefix_match(layers, p->first))
+      continue;
+    if (p->second.second != expected_lines[curr_expected_line])
+      continue;
+    ++curr_expected_line;
+    while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
+      ++curr_expected_line;
+    if (curr_expected_line == expected_lines.size()) {
+      cerr << ".", cerr.flush();
+      return true;
+    }
+  }
+
+  cerr << "\nF " << FUNCTION << ": trace didn't contain " << expected_lines[curr_expected_line] << '\n';
+  passed = false;
+  return false;
+}
+
+#define checkTraceContents(X, Y) checkTraceContents_sub(__FUNCTION__, X, Y)
 
 
 
