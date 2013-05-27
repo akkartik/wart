@@ -17,7 +17,7 @@ void test_evalBindAll_handles_varargs_param() {
   newBinding("b", newNum(4));
   CLEAR_TRACE;
   run("((fn x) a b)");
-  CHECK_TRACE_CONTENTS("eval", "a\n=> sym: 3\nb\n=> sym: 4\n");
+  CHECK_TRACE_CONTENTS("eval", "a\nsym\n=> 3\nb\nsym\n=> 4\n");
   CHECK_TRACE_CONTENTS("bind", "x: (3 4)\n");
 }
 
@@ -41,50 +41,50 @@ void test_evalBindAll_handles_destructured_params() {
 
 void test_nil_evals_to_itself() {
   run("()");
-  CHECK_TRACE_CONTENTS("eval", 1, "=> nil\n");
+  CHECK_TRACE_CONTENTS("eval", 1, "nil branch\n=> nil");
 }
 
 void test_num_evals_to_itself() {
   run("34");
-  CHECK_TRACE_CONTENTS("eval", 1, "=> literal: 34\n");
+  CHECK_TRACE_CONTENTS("eval", 1, "literal\n=> 34\n");
 }
 
 void test_colonsym_evals_to_itself() {
   run(":abc");
-  CHECK_TRACE_CONTENTS("eval", 1, "=> keyword sym: :abc\n");
+  CHECK_TRACE_CONTENTS("eval", 1, "keyword sym\n=> :abc\n");
 }
 
 void test_colon_evals() {
   newBinding(":", newNum(34));
   run(":");
-  CHECK_TRACE_CONTENTS("eval", 1, "=> sym: 34\n");
+  CHECK_TRACE_CONTENTS("eval", 1, "sym\n=> 34\n");
 }
 
 void test_string_evals_to_itself() {
   run("\"ac bd\"");
-  CHECK_TRACE_CONTENTS("eval", 1, "=> literal: \"ac bd\"\n");
+  CHECK_TRACE_CONTENTS("eval", 1, "literal\n=> \"ac bd\"\n");
 }
 
 void test_sym_evals_to_value() {
   newBinding("a", newNum(34));
   run("a");
-  CHECK_TRACE_CONTENTS("eval", 1, "=> sym: 34\n");
+  CHECK_TRACE_CONTENTS("eval", 1, "sym\n=> 34\n");
 }
 
 void test_sym_evals_to_itself() {
   newBinding("a", newSym("a"));
   run("a");
-  CHECK_TRACE_CONTENTS("eval", 1, "=> sym: a\n");
+  CHECK_TRACE_CONTENTS("eval", 1, "sym\n=> a\n");
 }
 
 void test_eval_handles_quoted_atoms() {
   run("'a '34");
-  CHECK_TRACE_CONTENTS("eval", "'a\n=> quote: a\n'34\n=> quote: 34\n");
+  CHECK_TRACE_CONTENTS("eval", "'a\nquote\n=> a\n'34\nquote\n=> 34\n");
 }
 
 void test_eval_handles_quoted_lists() {
   run("'(a b)");
-  CHECK_TRACE_CONTENTS("eval", 1, "=> quote: (a b)\n");
+  CHECK_TRACE_CONTENTS("eval", 1, "quote\n=> (a b)\n");
 }
 
 void test_eval_handles_rest_params() {

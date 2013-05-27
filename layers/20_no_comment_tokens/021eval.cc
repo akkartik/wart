@@ -17,34 +17,40 @@ Cell* eval(Cell* expr) {
 
   trace("eval") << expr;
   if (expr == nil) {
+    trace("eval") << "nil branch";
     trace("eval") << "=> nil";
     return nil;
   }
 
   if (isColonSym(expr)) {
-    trace("eval") << "=> keyword sym: " << expr;
+    trace("eval") << "keyword sym";
+    trace("eval") << "=> " << expr;
     return expr;
   }
 
   if (isSym(expr)) {
+    trace("eval") << "sym";
     Cell* result = lookup(expr);
-    trace("eval") << "=> sym: " << result;
+    trace("eval") << "=> " << result;
     return result;
   }
 
   if (isAtom(expr)) {
-    trace("eval") << "=> literal: " << expr;
+    trace("eval") << "literal";
+    trace("eval") << "=> " << expr;
     return expr;
   }
 
   if (isQuoted(expr)) {
-    trace("eval") << "=> quote: " << cdr(expr);
+    trace("eval") << "quote";
+    trace("eval") << "=> " << cdr(expr);
     return cdr(expr);
   }
 
   Cell* result = evalPrimitive(car(expr), cdr(expr));
   if (result) {
-    trace("eval") << "=> compiled fn: " << result;
+    trace("eval") << "compiled fn";
+    trace("eval") << "=> " << result;
     return result;
   }
 
