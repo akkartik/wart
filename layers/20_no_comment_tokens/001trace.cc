@@ -85,7 +85,7 @@ struct LeaseTracer {
 
 
 
-#define trace(layer) !global_trace_stream ? cerr : global_trace_stream->stream(layer)
+#define trace(layer) !global_trace_stream ? cerr /*print nothing*/ : global_trace_stream->stream(layer)
 
 #define TRACE_AND_RETURN(layer, X) \
   return (trace(layer) << X << '\n'), X;
