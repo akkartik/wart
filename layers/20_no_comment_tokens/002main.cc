@@ -121,6 +121,16 @@ Cell* read(string s) {
   return read(*new stringstream(s));
 }
 
+list<Cell*> readAll(string s) {
+  stringstream in(s);
+  return readAll(in);
+}
+
+Cell* run(string s) {
+  stringstream in(s);
+  return run(in);
+}
+
 
 
 void setup() {

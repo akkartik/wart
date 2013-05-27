@@ -1,50 +1,42 @@
 void test_build_handles_nil() {
-  stringstream in("()");
-  readAll(in);
+  readAll("()");
   checkTraceContents("cell", "nil\n");
 }
 
 void test_build_handles_nil2() {
-  stringstream in("nil");
-  readAll(in);
+  readAll("nil");
   checkTraceContents("cell", "nil\n");
 }
 
 void test_build_handles_integer() {
-  stringstream in("34");
-  readAll(in);
+  readAll("34");
   checkTraceContents("cell", "num: 34\n");
 }
 
 void test_build_handles_float() {
-  stringstream in("3.4");
-  readAll(in);
+  readAll("3.4");
   checkTraceContents("cell", "float: 3.4\n");
 }
 
 void test_build_warns_on_ambiguous_float() {
-  stringstream in("-.4");
-  readAll(in);
+  readAll("-.4");
   CHECK_EQ(raiseCount, 1); raiseCount=0;
   checkTraceContents("cell", "float: -0.4\n");
 }
 
 void test_build_creates_floats_on_overflow() {
-  stringstream in("100000000000000000000");
-  readAll(in);
+  readAll("100000000000000000000");
   CHECK_EQ(raiseCount, 1); raiseCount=0;
   checkTraceContents("cell", "float: 1e+20\n");
 }
 
 void test_build_handles_sym() {
-  stringstream in("a");
-  readAll(in);
+  readAll("a");
   checkTraceContents("cell", "sym: a\n");
 }
 
 void test_build_handles_string() {
-  stringstream in("\"a\"");
-  readAll(in);
+  readAll("\"a\"");
   checkTraceContents("cell", "string: \"a\"\n");
 }
 
@@ -54,8 +46,7 @@ void test_build_doesnt_mix_syms_and_strings() {
 }
 
 void test_build_handles_quoted_sym() {
-  stringstream in("'a");
-  list<Cell*> result = readAll(in);
+  list<Cell*> result = readAll("'a");
   checkTraceContents2("cell", 1, "'a\n");
   checkTraceContents2("cell", 2, "sym: '\nsym: a\n");
   Cell* c = result.front();
@@ -64,14 +55,12 @@ void test_build_handles_quoted_sym() {
 }
 
 void test_build_handles_multiple_atoms() {
-  stringstream in("34\n35");
-  readAll(in);
+  list<Cell*> result = readAll("34\n35");
   checkTraceContents("cell", "num: 34\nnum: 35\n");
 }
 
 void test_build_handles_form() {
-  stringstream in("(34 35)");
-  list<Cell*> result = readAll(in);
+  list<Cell*> result = readAll("(34 35)");
   checkTraceContents2("cell", 1, "(34 35)\n");
   Cell* c = result.front();
   CHECK_EQ(car(c), newNum(34));
@@ -81,8 +70,7 @@ void test_build_handles_form() {
 }
 
 void test_build_handles_dotted_list() {
-  stringstream in("(34 ... 35)");
-  list<Cell*> result = readAll(in);
+  list<Cell*> result = readAll("(34 ... 35)");
   checkTraceContents2("cell", 1, "(34 ... 35)\n");
   Cell* c = result.front();
   CHECK_EQ(car(c), newNum(34));
@@ -91,8 +79,7 @@ void test_build_handles_dotted_list() {
 }
 
 void test_build_handles_literal_ellipses() {
-  stringstream in("'...");
-  list<Cell*> result = readAll(in);
+  list<Cell*> result = readAll("'...");
   checkTraceContents2("cell", 1, "'...\n");
   Cell *c = result.front();
   CHECK_EQ(car(c), newSym("'"));
@@ -100,8 +87,7 @@ void test_build_handles_literal_ellipses() {
 }
 
 void test_build_handles_nested_form() {
-  stringstream in("(3 7 (33 23))");
-  list<Cell*> result = readAll(in);
+  list<Cell*> result = readAll("(3 7 (33 23))");
   checkTraceContents2("cell", 1, "(3 7 (33 23))\n");
   Cell* c = result.front();
   CHECK_EQ(car(c), newNum(3));
@@ -117,8 +103,7 @@ void test_build_handles_nested_form() {
 }
 
 void test_build_handles_strings() {
-  stringstream in("(3 7 (33 \"abc\" 23))");
-  list<Cell*> result = readAll(in);
+  list<Cell*> result = readAll("(3 7 (33 \"abc\" 23))");
   checkTraceContents2("cell", 1, "(3 7 (33 \"abc\" 23))\n");
   Cell* c = result.front();
   CHECK_EQ(car(c), newNum(3));
@@ -137,8 +122,7 @@ void test_build_handles_strings() {
 }
 
 void test_build_handles_syms() {
-  stringstream in("(3 7 (33 \"abc\" 3de 23))");
-  list<Cell*> result = readAll(in);
+  list<Cell*> result = readAll("(3 7 (33 \"abc\" 3de 23))");
   checkTraceContents2("cell", 1, "(3 7 (33 \"abc\" 3de 23))\n");
   Cell* c = result.front();
   CHECK_EQ(car(c), newNum(3));
@@ -159,8 +143,7 @@ void test_build_handles_syms() {
 }
 
 void test_build_handles_indented_wrapped_lines() {
-  stringstream in("a\n  (a b c\n   d e)");
-  list<Cell*> result = readAll(in);
+  list<Cell*> result = readAll("a\n  (a b c\n   d e)");
   checkTraceContents2("cell", 1, "sym: a\n(a b c d e)\n");
   Cell* c0 = result.front();  result.pop_front();
   CHECK_EQ(c0, newSym("a"));
