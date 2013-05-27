@@ -70,14 +70,9 @@ struct TraceStream {
   }
 };
 
-TraceStream* global_trace_stream = NULL;
-
-#define trace(layer) !global_trace_stream ? cerr : global_trace_stream->stream(layer)
-
-#define TRACE_AND_RETURN(layer, X) \
-  return (trace(layer) << X << '\n'), X;
-
 
+
+TraceStream* global_trace_stream = NULL;
 
 // global_trace_stream is a resource, LeaseTracer uses RAII to manage it.
 struct LeaseTracer {
@@ -89,6 +84,11 @@ struct LeaseTracer {
 #define CLEAR_TRACE delete global_trace_stream, global_trace_stream = new TraceStream;
 
 
+
+#define trace(layer) !global_trace_stream ? cerr : global_trace_stream->stream(layer)
+
+#define TRACE_AND_RETURN(layer, X) \
+  return (trace(layer) << X << '\n'), X;
 
 #define checkTraceContents(layer, expected) \
   CHECK_EQ(global_trace_stream->contents(layer), expected);
