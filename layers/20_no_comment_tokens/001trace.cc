@@ -17,18 +17,13 @@ struct TraceStream {
     return *curr_stream;
   }
 
-  void dump_browseable_contents(string layer) {
-    ofstream dump("dump");
-    dump << "<div class='level' level_index='1'>start</div>\n";
-    for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p) {
-      if (p->first != layer) continue;
-      dump << "<div class='level";
-      if (p->second.first > 1) dump << " hidden";
-      dump << "' level_index='" << p->second.first << "'>";
-      dump << p->second.second;
-      dump << "</div>\n";
-    }
-    dump.close();
+  // be sure to call this before messing with curr_stream or curr_layer or level
+  void newline() {
+    if (!curr_stream) return;
+    past_lines.push_back(pair<string, pair<int, string> >(curr_layer, pair<int, string>(level[curr_layer], curr_stream->str())));
+    if (curr_layer == dump_layer || curr_layer == "dump") cerr << curr_stream->str();
+    delete curr_stream;
+    curr_stream = NULL;
   }
 
   string readable_contents(string layer) {
@@ -42,13 +37,18 @@ struct TraceStream {
     return output.str();
   }
 
-  // be sure to call this before messing with curr_stream or curr_layer or level
-  void newline() {
-    if (!curr_stream) return;
-    past_lines.push_back(pair<string, pair<int, string> >(curr_layer, pair<int, string>(level[curr_layer], curr_stream->str())));
-    if (curr_layer == dump_layer || curr_layer == "dump") cerr << curr_stream->str();
-    delete curr_stream;
-    curr_stream = NULL;
+  void dump_browseable_contents(string layer) {
+    ofstream dump("dump");
+    dump << "<div class='level' level_index='1'>start</div>\n";
+    for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p) {
+      if (p->first != layer) continue;
+      dump << "<div class='level";
+      if (p->second.first > 1) dump << " hidden";
+      dump << "' level_index='" << p->second.first << "'>";
+      dump << p->second.second;
+      dump << "</div>\n";
+    }
+    dump.close();
   }
 };
 
