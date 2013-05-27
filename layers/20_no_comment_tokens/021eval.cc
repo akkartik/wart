@@ -22,29 +22,29 @@ Cell* eval(Cell* expr) {
   }
 
   if (isColonSym(expr)) {
-    trace("eval") << "keyword sym: " << expr << '\n';
+    trace("eval") << "=> keyword sym: " << expr << '\n';
     return expr;
   }
 
   if (isSym(expr)) {
     Cell* result = lookup(expr);
-    trace("eval") << "sym: " << result << '\n';
+    trace("eval") << "=> sym: " << result << '\n';
     return result;
   }
 
   if (isAtom(expr)) {
-    trace("eval") << "literal: " << expr << '\n';
+    trace("eval") << "=> literal: " << expr << '\n';
     return expr;
   }
 
   if (isQuoted(expr)) {
-    trace("eval") << "quote: " << cdr(expr) << '\n';
+    trace("eval") << "=> quote: " << cdr(expr) << '\n';
     return cdr(expr);
   }
 
   Cell* result = evalPrimitive(car(expr), cdr(expr));
   if (result) {
-    trace("eval") << "compiled fn: " << result << '\n';
+    trace("eval") << "=> compiled fn: " << result << '\n';
     return result;
   }
 

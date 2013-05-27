@@ -23,7 +23,7 @@ void test_evalBindAll_handles_varargs_param() {
   newBinding("b", newNum(4));
   delete global_trace_stream, global_trace_stream = new TraceStream;
   evalBindAll(params, args);
-  checkTraceContents("eval", "a\nsym: 3\nb\nsym: 4\n");
+  checkTraceContents("eval", "a\n=> sym: 3\nb\n=> sym: 4\n");
   checkTraceContents("lookup", "x: (3 4)\n");
 }
 
@@ -58,52 +58,52 @@ void test_nil_evals_to_itself() {
 void test_num_evals_to_itself() {
   stringstream in("34");
   run(in);
-  checkTraceContents("eval", "34\nliteral: 34\n");
+  checkTraceContents("eval", "34\n=> literal: 34\n");
 }
 
 void test_colonsym_evals_to_itself() {
   stringstream in(":abc");
   run(in);
-  checkTraceContents("eval", ":abc\nkeyword sym: :abc\n");
+  checkTraceContents("eval", ":abc\n=> keyword sym: :abc\n");
 }
 
 void test_colon_evals() {
   stringstream in(":");
   newBinding(":", newNum(34));
   run(in);
-  checkTraceContents("eval", ":\nsym: 34\n");
+  checkTraceContents("eval", ":\n=> sym: 34\n");
 }
 
 void test_string_evals_to_itself() {
   stringstream in("\"ac bd\"");
   run(in);
-  checkTraceContents("eval", "\"ac bd\"\nliteral: \"ac bd\"\n");
+  checkTraceContents("eval", "\"ac bd\"\n=> literal: \"ac bd\"\n");
 }
 
 void test_sym_evals_to_value() {
   newBinding("a", newNum(34));
   stringstream in("a");
   run(in);
-  checkTraceContents("eval", "a\nsym: 34\n");
+  checkTraceContents("eval", "a\n=> sym: 34\n");
 }
 
 void test_sym_evals_to_itself() {
   newBinding("a", newSym("a"));
   stringstream in("a");
   run(in);
-  checkTraceContents("eval", "a\nsym: a\n");
+  checkTraceContents("eval", "a\n=> sym: a\n");
 }
 
 void test_eval_handles_quoted_atoms() {
   stringstream in("'a '34");
   run(in);
-  checkTraceContents("eval", "'a\nquote: a\n'34\nquote: 34\n");
+  checkTraceContents("eval", "'a\n=> quote: a\n'34\n=> quote: 34\n");
 }
 
 void test_eval_handles_quoted_lists() {
   stringstream in("'(a b)");
   run(in);
-  checkTraceContents("eval", "'(a b)\nquote: (a b)\n");
+  checkTraceContents("eval", "'(a b)\n=> quote: (a b)\n");
 }
 
 void test_eval_handles_rest_params() {
