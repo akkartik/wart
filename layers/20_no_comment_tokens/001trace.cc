@@ -65,6 +65,8 @@ struct LeaseTracer {
 
 #define CLEAR_TRACE delete global_trace_stream, global_trace_stream = new TraceStream;
 
+#define DUMP cerr << global_trace_stream->readable_contents("");
+
 
 
 // Main entrypoint.
