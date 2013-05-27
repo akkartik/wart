@@ -91,7 +91,7 @@ struct LeaseTracer {
 // never write explicit newlines into trace
 #define trace(layer) !global_trace_stream ? cerr /*print nothing*/ : global_trace_stream->stream(layer)
 
-bool checkTraceContents_sub(string FUNCTION, string layer, string expected) {
+bool checkTraceContents(string FUNCTION, string layer, string expected) {
   vector<string> expected_lines = split(expected, '\n');
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
@@ -119,7 +119,7 @@ bool checkTraceContents_sub(string FUNCTION, string layer, string expected) {
   return false;
 }
 
-#define checkTraceContents(...) checkTraceContents_sub(__FUNCTION__, __VA_ARGS__)
+#define CHECK_TRACE_CONTENTS(...) checkTraceContents(__FUNCTION__, __VA_ARGS__)
 
 
 
@@ -137,7 +137,7 @@ struct LeaseTraceLevel {
 };
 #define incTraceForRestOfScope(layer) LeaseTraceLevel lease_trace_level(layer);
 
-bool checkTraceContents_sub(string FUNCTION, string layer, int level, string expected) {
+bool checkTraceContents(string FUNCTION, string layer, int level, string expected) {
   vector<string> expected_lines = split(expected, '\n');
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
