@@ -90,40 +90,8 @@ struct LeaseTracer {
 #define TRACE_AND_RETURN(layer, X) \
   return (trace(layer) << X << '\n'), X;
 
-bool checkTraceContents_sub(string FUNCTION, string layer, string expected) {
-  vector<string> expected_lines = split(expected, '\n');
-  cerr << expected << ": " << expected_lines.size() << endl;
-  if (expected_lines.back() == "") expected_lines.pop_back();
-  cerr << expected << ": " << expected_lines.size() << endl;
-  if (expected_lines.empty()) return true;
-  size_t curr_expected_line = 0;
-  global_trace_stream->reset();
-  ostringstream output;
-  vector<string> layers = split(layer, ',');
-  for (vector<pair<string, pair<int, string> > >::iterator p = global_trace_stream->past_lines.begin(); p != global_trace_stream->past_lines.end(); ++p) {
-    if (*p->second.second.rbegin() == '\n')
-      p->second.second.erase(p->second.second.size()-1);
-    cerr << "AA: " << p->second.second << " vs " << expected_lines[curr_expected_line] << "$\n";
-    if (layer.empty() || any_prefix_match(layers, p->first)) {
-      cerr << p->second.second << " vs " << expected_lines[curr_expected_line] << "$\n";
-      if (p->second.second == expected_lines[curr_expected_line]) {
-        cerr << "incrementing\n";
-        ++curr_expected_line;
-        if (curr_expected_line == expected_lines.size()) {
-          cerr << ".", cerr.flush();
-          return true;
-        }
-      }
-    }
-  }
-
-  cerr << "\nF " << FUNCTION << ": trace didn't contain " << expected_lines[curr_expected_line] << '\n';
-  passed = false;
-  exit(0);
-  return false;
-}
-
-#define checkTraceContents(X, Y) checkTraceContents_sub(__FUNCTION__, X, Y)
+#define checkTraceContents(layer, expected) \
+  CHECK_EQ(global_trace_stream->contents(layer), expected);
 
 
 
