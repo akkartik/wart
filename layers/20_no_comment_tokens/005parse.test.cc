@@ -20,18 +20,18 @@ void test_parse_handles_atoms() {
 
 void test_parse_handles_forms() {
   readAll("(34 \"a b c\")");
-  checkTraceContents2("parse", 1, "(34 \"a b c\")\n");
+  checkTraceContents("parse", 1, "(34 \"a b c\")\n");
 }
 
 void test_parse_handles_nested_forms() {
   readAll("(34 (2 3) \"a b c\")");
-  checkTraceContents2("parse", 1, "(34 (2 3) \"a b c\")\n");
-  checkTraceContents2("parse", 2, "34\n(2 3)\n\"a b c\"\n)\n");
-  checkTraceContents2("parse", 3, "2\n3\n)\n");
+  checkTraceContents("parse", 1, "(34 (2 3) \"a b c\")\n");
+  checkTraceContents("parse", 2, "34\n(2 3)\n\"a b c\"\n)\n");
+  checkTraceContents("parse", 3, "2\n3\n)\n");
 }
 
 void test_parse_handles_nested_forms_with_comments() {
   readAll("(a b (c d #\n))");
-  checkTraceContents2("parse", 1, "(a b (c d))\n");
-  checkTraceContents2("parse", 2, "a\nb\n(c d)\n)\n");
+  checkTraceContents("parse", 1, "(a b (c d))\n");
+  checkTraceContents("parse", 2, "a\nb\n(c d)\n)\n");
 }

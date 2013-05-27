@@ -99,52 +99,52 @@ void test_eval_handles_quoted_lists() {
 
 void test_eval_handles_rest_params() {
   run("((fn (a b ... c) c) 1 2 3 4 5)");
-  checkTraceContents2("eval", 1, "((fn (a b ... c) c) 1 2 3 4 5)\n=> (3 4 5)\n");
+  checkTraceContents("eval", 1, "((fn (a b ... c) c) 1 2 3 4 5)\n=> (3 4 5)\n");
 }
 
 void test_eval_handles_fn_calls() {
   run("((fn () 34))");
-  checkTraceContents2("eval", 1, "((fn nil 34))\n=> 34\n");
+  checkTraceContents("eval", 1, "((fn nil 34))\n=> 34\n");
 }
 
 void test_eval_expands_syms_in_fn_bodies() {
   newBinding("a", newNum(34));
   run("((fn () a))");
-  checkTraceContents2("eval", 1, "((fn nil a))\n=> 34\n");
+  checkTraceContents("eval", 1, "((fn nil a))\n=> 34\n");
 }
 
 void test_eval_handles_assigned_fn_calls() {
   run("(<- f (fn () 34))");
   CLEAR_TRACE;
   run("(f)");
-  checkTraceContents2("eval", 1, "(f)\n=> 34\n");
+  checkTraceContents("eval", 1, "(f)\n=> 34\n");
 }
 
 void test_eval_handles_multiple_args() {
   run("(<- f (fn (a b) b))");
   CLEAR_TRACE;
   run("(f 1 2)");
-  checkTraceContents2("eval", 1, "(f 1 2)\n=> 2\n");
+  checkTraceContents("eval", 1, "(f 1 2)\n=> 2\n");
 }
 
 void test_eval_handles_multiple_body_exprs() {
   run("(<- f (fn () 1 2))");
   CLEAR_TRACE;
   run("(f)");
-  checkTraceContents2("eval", 1, "(f)\n=> 2\n");
+  checkTraceContents("eval", 1, "(f)\n=> 2\n");
 }
 
 void test_eval_handles_vararg_param() {
   run("((fn args args) 1)");
-  checkTraceContents2("eval", 1, "((fn args args) 1)\n=> (1)\n");
+  checkTraceContents("eval", 1, "((fn args args) 1)\n=> (1)\n");
 }
 
 void test_eval_evals_args() {
   run("((fn (f) (f)) (fn () 34))");
-  checkTraceContents2("eval", 1, "((fn (f) (f)) (fn nil 34))\n=> 34\n");
+  checkTraceContents("eval", 1, "((fn (f) (f)) (fn nil 34))\n=> 34\n");
 }
 
 void test_eval_handles_destructured_params() {
   run("((fn ((a b)) b) '(1 2))");
-  checkTraceContents2("eval", 1, "((fn ((a b)) b) '(1 2))\n=> 2\n");
+  checkTraceContents("eval", 1, "((fn ((a b)) b) '(1 2))\n=> 2\n");
 }

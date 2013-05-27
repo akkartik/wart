@@ -47,7 +47,7 @@ void test_trace_segments_within_layers() {
   incTraceForRestOfScope("test layer 1");
   trace("test layer 1") << "qux";
   checkTraceContents("test layer 1", "foo\nqux\n");
-  checkTraceContents2("test layer 1", 0, "foo\n");
+  checkTraceContents("test layer 1", 0, "foo\n");
 }
 
 void trace_test_fn(int n) {
@@ -61,7 +61,7 @@ void trace_test_fn(int n) {
 void test_trace_keeps_level_together() {
   checkTraceContents("foo", "");
   trace_test_fn(4);
-  checkTraceContents2("foo", 2, "before: 3\nafter: 3\n");
+  checkTraceContents("foo", 2, "before: 3\nafter: 3\n");
 }
 
 void test_trace_supports_multiple_layers() {
