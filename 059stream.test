@@ -37,7 +37,7 @@ system "rm _x"
              (before (system+join "rm " f)
                (with outfile f
                  (prn 34))
-               (numBindings 'stdin)))
+               (num_bindings 'stdin)))
   :should be 1)
 
 (test "drain works"

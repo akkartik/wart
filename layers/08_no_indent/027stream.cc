@@ -4,81 +4,81 @@
 //   permit cascading of close operations
 //     so return non-nil on success
 
-Cell* newIstream(istream* x) {
-  return newObject("istream", newNum((long)x));
+cell* new_istream(istream* x) {
+  return new_object("istream", new_num((long)x));
 }
 
-Cell* newOstream(ostream* x) {
-  return newObject("ostream", newNum((long)x));
+cell* new_ostream(ostream* x) {
+  return new_object("ostream", new_num((long)x));
 }
 
-istream& toIstream(Cell* x) {
-  if (type(x) != newSym("istream"))
-    RAISE << "not an istream: " << x << endl << DIE;
-  return *(istream*)toInt(car(cdr(cdr(x))));
+istream& to_istream(cell* x) {
+  if (type(x) != new_sym("istream"))
+    RAISE << "not an istream: " << x << endl << die();
+  return *(istream*)to_int(car(cdr(cdr(x))));
 }
 
-ostream& toOstream(Cell* x) {
-  if (type(x) != newSym("ostream"))
-    RAISE << "not an ostream: " << x << endl << DIE;
-  return *(ostream*)toInt(car(cdr(cdr(x))));
-}
-
-
-
-#define STDIN dynamics[newSym("stdin")].top()
-#define STDOUT dynamics[newSym("stdout")].top()
-#define STDERR dynamics[newSym("stderr")].top()
-
-void setupStreams() {
-  newDynamicScope(newSym("stdin"), newIstream(&cin));
-  newDynamicScope(newSym("stdout"), newOstream(&cout));
-  newDynamicScope(newSym("stderr"), newOstream(&cerr));
-}
-
-void teardownStreams() {
-  endDynamicScope(newSym("stdin"));
-  endDynamicScope(newSym("stdout"));
-  endDynamicScope(newSym("stderr"));
+ostream& to_ostream(cell* x) {
+  if (type(x) != new_sym("ostream"))
+    RAISE << "not an ostream: " << x << endl << die();
+  return *(ostream*)to_int(car(cdr(cdr(x))));
 }
 
 
 
-COMPILE_FN(infile, compiledFn_infile, "($name)",
-  return mkref(newIstream(new ifstream(toString(lookup("$name")).c_str(), std::ios::binary)));
+#define STDIN Dynamics[new_sym("stdin")].top()
+#define STDOUT Dynamics[new_sym("stdout")].top()
+#define STDERR Dynamics[new_sym("stderr")].top()
+
+void setup_streams() {
+  new_dynamic_scope(new_sym("stdin"), new_istream(&cin));
+  new_dynamic_scope(new_sym("stdout"), new_ostream(&cout));
+  new_dynamic_scope(new_sym("stderr"), new_ostream(&cerr));
+}
+
+void teardown_streams() {
+  end_dynamic_scope(new_sym("stdin"));
+  end_dynamic_scope(new_sym("stdout"));
+  end_dynamic_scope(new_sym("stderr"));
+}
+
+
+
+COMPILE_FN(infile, compiledfn_infile, "($name)",
+  return mkref(new_istream(new ifstream(to_string(lookup("$name")).c_str(), std::ios::binary)));
 )
 
-COMPILE_FN(close_infile, compiledFn_close_infile, "($stream)",
-  ifstream* f = (ifstream*)toInt(rep(lookup("$stream")));
+COMPILE_FN(close_infile, compiledfn_close_infile, "($stream)",
+  ifstream* f = (ifstream*)to_int(rep(lookup("$stream")));
   f->close();
   delete f;
-  setCar(cdr(cdr(lookup("$stream"))), nil);
+  set_car(cdr(cdr(lookup("$stream"))), nil);
   return mkref(lookup("$stream"));
 )
 
-COMPILE_FN(outfile, compiledFn_outfile, "($name)",
-  return mkref(newOstream(new ofstream(toString(lookup("$name")).c_str(), std::ios::binary)));
+COMPILE_FN(outfile, compiledfn_outfile, "($name)",
+  return mkref(new_ostream(new ofstream(to_string(lookup("$name")).c_str(), std::ios::binary)));
 )
 
-COMPILE_FN(close_outfile, compiledFn_close_outfile, "($stream)",
-  ofstream* f = (ofstream*)toInt(rep(lookup("$stream")));
+COMPILE_FN(close_outfile, compiledfn_close_outfile, "($stream)",
+  ofstream* f = (ofstream*)to_int(rep(lookup("$stream")));
   f->close();
   delete f;
-  setCar(cdr(cdr(lookup("$stream"))), nil);
+  set_car(cdr(cdr(lookup("$stream"))), nil);
   return mkref(lookup("$stream"));
 )
 
-COMPILE_FN(instring, compiledFn_instring, "($s)",
-  return mkref(newIstream(new stringstream(toString(lookup("$s")))));
+COMPILE_FN(instring, compiledfn_instring, "($s)",
+  return mkref(new_istream(new stringstream(to_string(lookup("$s")))));
 )
 
-COMPILE_FN(outstring, compiledFn_outstring, "()",
-  return mkref(newOstream(new ostringstream()));
+COMPILE_FN(outstring, compiledfn_outstring, "()",
+  return mkref(new_ostream(new ostringstream()));
 )
 
-COMPILE_FN(outstring_buffer, compiledFn_outstring_buffer, "($stream)",
-  ostringstream* s = (ostringstream*)toInt(car(cdr(cdr(lookup("$stream")))));
-  return mkref(newString(s->str()));
+COMPILE_FN(outstring_buffer, compiledfn_outstring_buffer, "($stream)",
+  ostringstream* s = (ostringstream*)to_int(car(cdr(cdr(lookup("$stream")))));
+  return mkref(new_string(s->str()));
 )
 
 
@@ -86,27 +86,27 @@ COMPILE_FN(outstring_buffer, compiledFn_outstring_buffer, "($stream)",
 #include<fcntl.h>
 #include<unistd.h>
 
-COMPILE_FN(input_fd, compiledFn_input_fd, "($name)",
-  return mkref(newNum(open(toString(lookup("$name")).c_str(), O_RDONLY)));
+COMPILE_FN(input_fd, compiledfn_input_fd, "($name)",
+  return mkref(new_num(open(to_string(lookup("$name")).c_str(), O_RDONLY)));
 )
 
-COMPILE_FN(output_fd, compiledFn_output_fd, "($name)",
-  return mkref(newNum(open(toString(lookup("$name")).c_str(), O_WRONLY)));
+COMPILE_FN(output_fd, compiledfn_output_fd, "($name)",
+  return mkref(new_num(open(to_string(lookup("$name")).c_str(), O_WRONLY)));
 )
 
 // buffer a file descriptor
-struct FdStreamBuf :public std::streambuf {
+struct fd_streambuf :public std::streambuf {
 public:
    int fd;
-   char inBuffer[BUFSIZ];
-   char outBuffer[BUFSIZ];
+   char in_buffer[BUFSIZ];
+   char out_buffer[BUFSIZ];
 
-   FdStreamBuf(int f) {
+   fd_streambuf(int f) {
       fd = f;
-      setg(inBuffer, inBuffer, inBuffer);
-      setp(outBuffer, outBuffer+BUFSIZ);
+      setg(in_buffer, in_buffer, in_buffer);
+      setp(out_buffer, out_buffer+BUFSIZ);
    }
-   ~FdStreamBuf() {
+   ~fd_streambuf() {
      close(fd);
    }
 
@@ -114,10 +114,10 @@ public:
       if (gptr() < egptr())
         return *(unsigned char*)gptr();
 
-      int n = read(fd, inBuffer, BUFSIZ);
+      int n = read(fd, in_buffer, BUFSIZ);
       if (n <= 0) return EOF;
 
-      setg(inBuffer, inBuffer, inBuffer+n);
+      setg(in_buffer, in_buffer, in_buffer+n);
       return *(unsigned char*)gptr();
    }
 
@@ -132,20 +132,20 @@ public:
       int n = write(fd, pbase(), pptr()-pbase());
       if (n < 0) return n;
 
-      setp(outBuffer, outBuffer+BUFSIZ);
+      setp(out_buffer, out_buffer+BUFSIZ);
       return 0;
    }
 };
 
-COMPILE_FN(infd, compiledFn_infd, "($fd)",
-  return mkref(newIstream(new iostream(new FdStreamBuf(toInt(lookup("$fd"))))));  // leak
+COMPILE_FN(infd, compiledfn_infd, "($fd)",
+  return mkref(new_istream(new iostream(new fd_streambuf(to_int(lookup("$fd"))))));  // leak
 )
 
-COMPILE_FN(outfd, compiledFn_outfd, "($fd)",
-  return mkref(newOstream(new iostream(new FdStreamBuf(toInt(lookup("$fd"))))));  // leak
+COMPILE_FN(outfd, compiledfn_outfd, "($fd)",
+  return mkref(new_ostream(new iostream(new fd_streambuf(to_int(lookup("$fd"))))));  // leak
 )
 
-COMPILE_FN(close, compiledFn_close, "($stream)",
-  close(toInt(rep(lookup("$stream"))));
+COMPILE_FN(close, compiledfn_close, "($stream)",
+  close(to_int(rep(lookup("$stream"))));
   return mkref(lookup("$stream"));
 )

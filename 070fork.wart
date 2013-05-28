@@ -9,6 +9,6 @@ mac (preforking n ... body)
      (repeat ,n
        (fork ,@body))
      (repeat :forever
-       (waitForChild)
+       (wait_for_child)
        (prn "restart")
        (fork ,@body)))

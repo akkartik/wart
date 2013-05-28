@@ -1,6 +1,6 @@
 //// primitive datatypes: lists
 
-Cell* car(Cell* x) {
+cell* car(cell* x) {
   if (x->type != CONS) {
     RAISE << "car of non-cons: " << x << endl;
     return nil;
@@ -8,24 +8,24 @@ Cell* car(Cell* x) {
   return x->car;
 }
 
-Cell* cdr(Cell* x) {
+cell* cdr(cell* x) {
   return x->cdr;
 }
 
-void setCar(Cell* x, Cell* y) {
+void set_car(cell* x, cell* y) {
   if (x == nil) {
-    RAISE << "setCar on nil" << endl;
+    RAISE << "set_car on nil" << endl;
     return;
   }
   mkref(y);
-  if (isCons(x))
+  if (is_cons(x))
     rmref(car(x));
   x->car = y;
 }
 
-void setCdr(Cell* x, Cell* y) {
+void set_cdr(cell* x, cell* y) {
   if (x == nil) {
-    RAISE << "setCdr on nil" << endl;
+    RAISE << "set_cdr on nil" << endl;
     return;
   }
   mkref(y);
@@ -33,53 +33,53 @@ void setCdr(Cell* x, Cell* y) {
   x->cdr = y;
 }
 
-Cell* newCons(Cell* car, Cell* cdr) {
-  Cell* ans = newCell();
-  setCar(ans, car);
-  setCdr(ans, cdr);
+cell* new_cons(cell* car, cell* cdr) {
+  cell* ans = new_cell();
+  set_car(ans, car);
+  set_cdr(ans, cdr);
   return ans;
 }
 
-Cell* newCons(Cell* car) {
-  return newCons(car, nil);
+cell* new_cons(cell* car) {
+  return new_cons(car, nil);
 }
 
 
 
 //// numbers
 
-unordered_map<long, Cell*> intLiterals;
+unordered_map<long, cell*> Int_literals;
 
-Cell* newNum(long x) {
-  if (intLiterals[x])
-    return intLiterals[x];
-  intLiterals[x] = newCell();
-  intLiterals[x]->car = (Cell*)x;
-  intLiterals[x]->type = INTEGER;
-  return mkref(intLiterals[x]);
+cell* new_num(long x) {
+  if (Int_literals[x])
+    return Int_literals[x];
+  Int_literals[x] = new_cell();
+  Int_literals[x]->car = (cell*)x;
+  Int_literals[x]->type = INTEGER;
+  return mkref(Int_literals[x]);
 }
 
-Cell* newNum(int x) {   // just for integer literals
-  return newNum((long)x);
+cell* new_num(int x) {   // just for integer literals
+  return new_num((long)x);
 }
 
-Cell* newNum(float x) {   // don't intern floats
-  Cell* result = newCell();
-  result->car = *(Cell**)&x;
+cell* new_num(float x) {   // don't intern floats
+  cell* result = new_cell();
+  result->car = *(cell**)&x;
   result->type = FLOAT;
   return result;
 }
 
-Cell* newNum(double x) {
-  return newNum((float)x);
+cell* new_num(double x) {
+  return new_num((float)x);
 }
 
-bool isNum(Cell* x) {
+bool is_num(cell* x) {
   return x->type == INTEGER || x->type == FLOAT;
 }
 
-long toInt(Cell* x) {
-  // ignore endianness; Cells are never persisted
+long to_int(cell* x) {
+  // ignore endianness; cells are never persisted
   if (x->type == INTEGER)
     return (long)x->car;
   if (x->type == FLOAT)
@@ -88,7 +88,7 @@ long toInt(Cell* x) {
   return 0;
 }
 
-float toFloat(Cell* x) {
+float to_float(cell* x) {
   if (x->type == INTEGER)
     return (long)x->car;
   if (x->type == FLOAT)
@@ -97,7 +97,7 @@ float toFloat(Cell* x) {
   return 0;
 }
 
-bool equalFloats(float x, float y) {
+bool equal_floats(float x, float y) {
   return fabs(x-y) < 1e-6;
 }
 
@@ -105,37 +105,34 @@ bool equalFloats(float x, float y) {
 
 //// symbols
 
-template<class Data>
-struct StringMap :public unordered_map<string, Data>{};
+unordered_map<string, cell*> Sym_literals;
 
-StringMap<Cell*> symLiterals;
-
-Cell* newSym(string x) {
-  if (symLiterals[x])
-    return symLiterals[x];
-  symLiterals[x] = newCell();
-  symLiterals[x]->car = (Cell*)new string(x);   // not aligned like cells; can fragment memory
-  symLiterals[x]->type = SYMBOL;
-  return mkref(symLiterals[x]);
+cell* new_sym(string x) {
+  if (Sym_literals[x])
+    return Sym_literals[x];
+  Sym_literals[x] = new_cell();
+  Sym_literals[x]->car = (cell*)new string(x);   // not aligned like cells; can fragment memory
+  Sym_literals[x]->type = SYMBOL;
+  return mkref(Sym_literals[x]);
 }
 
-bool isSym(Cell* x) {
+bool is_sym(cell* x) {
   return x->type == SYMBOL;
 }
 
-Cell* newString(string x) {   // don't intern strings
-  Cell* result = newCell();
-  result->car = (Cell*)new string(x);
+cell* new_string(string x) {   // don't intern strings
+  cell* result = new_cell();
+  result->car = (cell*)new string(x);
   result->type = STRING;
   return result;
 }
 
-bool isString(Cell* x) {
+bool is_string(cell* x) {
   return x->type == STRING;
 }
 
-string toString(Cell* x) {
-  if (!isString(x) && !isSym(x)) {
+string to_string(cell* x) {
+  if (!is_string(x) && !is_sym(x)) {
     RAISE << "can't convert to string: " << x << endl;
     return "";
   }
@@ -146,104 +143,104 @@ string toString(Cell* x) {
 
 //// associative arrays
 
-Cell* newTable() {
-  Cell* result = newCell();
+cell* new_table() {
+  cell* result = new_cell();
   result->type = TABLE;
-  result->car = (Cell*)new Table();
+  result->car = (cell*)new table();
   return result;
 }
 
-bool isTable(Cell* x) {
+bool is_table(cell* x) {
   return x->type == TABLE;
 }
 
-Table* toTable(Cell* x) {
-  if (!isTable(x)) return NULL;
-  return (Table*)x->car;
+table* to_table(cell* x) {
+  if (!is_table(x)) return NULL;
+  return (table*)x->car;
 }
 
-void set(Cell* t, string k, Cell* val) {
-  unsafeSet(t, newSym(k), val, true);
+void set(cell* t, string k, cell* val) {
+  unsafe_set(t, new_sym(k), val, true);
 }
 
-void set(Cell* t, Cell* k, Cell* val) {
-  unsafeSet(t, k, val, true);
+void set(cell* t, cell* k, cell* val) {
+  unsafe_set(t, k, val, true);
 }
 
-Cell* get(Cell* t, Cell* k) {
-  Cell* result = unsafeGet(t, k);
+cell* get(cell* t, cell* k) {
+  cell* result = unsafe_get(t, k);
   if (!result) return nil;
   return result;
 }
 
-Cell* get(Cell* t, string k) {
-  return get(t, newSym(k));
+cell* get(cell* t, string k) {
+  return get(t, new_sym(k));
 }
 
-void unsafeSet(Cell* t, Cell* key, Cell* val, bool deleteNils) {
-  if (!isTable(t)) {
+void unsafe_set(cell* t, cell* key, cell* val, bool delete_nils) {
+  if (!is_table(t)) {
     RAISE << "set on a non-table: " << t << endl;
     return;
   }
 
-  Table& table = *(Table*)(t->car);
-  if (val == nil && deleteNils) {
-    if (table[key]) {
-      rmref(table[key]);
-      table[key] = NULL;
+  table& t2 = *(table*)(t->car);
+  if (val == nil && delete_nils) {
+    if (t2[key]) {
+      rmref(t2[key]);
+      t2[key] = NULL;
       rmref(key);
     }
     return;
   }
 
-  if (val == table[key]) return;
+  if (val == t2[key]) return;
 
-  if (!table[key]) mkref(key);
-  else rmref(table[key]);
-  table[key] = mkref(val);
+  if (!t2[key]) mkref(key);
+  else rmref(t2[key]);
+  t2[key] = mkref(val);
 }
 
-void unsafeSet(Cell* t, string k, Cell* val, bool deleteNils) {
-  unsafeSet(t, newSym(k), val, deleteNils);
+void unsafe_set(cell* t, string k, cell* val, bool delete_nils) {
+  unsafe_set(t, new_sym(k), val, delete_nils);
 }
 
-Cell* unsafeGet(Cell* t, Cell* key) {
-  if (!isTable(t)) {
+cell* unsafe_get(cell* t, cell* key) {
+  if (!is_table(t)) {
     RAISE << "get on a non-table" << endl;
     return nil;
   }
-  Table& table = *(Table*)(t->car);
-  return table[key];
+  table& t2 = *(table*)(t->car);
+  return t2[key];
 }
 
-Cell* unsafeGet(Cell* t, string k) {
-  return unsafeGet(t, newSym(k));
+cell* unsafe_get(cell* t, string k) {
+  return unsafe_get(t, new_sym(k));
 }
 
 
 
 //// internals
 
-void setupCells() {
-  setupNil();
-  intLiterals.clear();
-  symLiterals.clear();
-  resetHeap(firstHeap);
+void setup_cells() {
+  setup_nil();
+  Int_literals.clear();
+  Sym_literals.clear();
+  reset_heap(First_heap);
 }
 
-void teardownCells() {
+void teardown_cells() {
   if (nil->car != nil || nil->cdr != nil)
     RAISE << "nil was corrupted" << endl;
 
-  for (unordered_map<long, Cell*>::iterator p = intLiterals.begin(); p != intLiterals.end(); ++p) {
+  for (unordered_map<long, cell*>::iterator p = Int_literals.begin(); p != Int_literals.end(); ++p) {
     if (p->second->nrefs > 1)
       RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
     if (p->second->nrefs > 0)
       rmref(p->second);
   }
 
-  for (StringMap<Cell*>::iterator p = symLiterals.begin(); p != symLiterals.end(); ++p) {
-    if (initialSyms.find(p->second) != initialSyms.end()) continue;
+  for (unordered_map<string, cell*>::iterator p = Sym_literals.begin(); p != Sym_literals.end(); ++p) {
+    if (Initial_syms.find(p->second) != Initial_syms.end()) continue;
     if (p->second->nrefs > 1)
       RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
     if (p->second->nrefs > 0)
@@ -252,39 +249,38 @@ void teardownCells() {
 }
 
 // optimize lookups of common symbols
-Cell *sym_quote, *sym_backquote, *sym_unquote, *sym_splice, *sym_unquoteSplice, *sym_alreadyEvald;
-Cell *sym_list, *sym_number, *sym_symbol, *sym_string, *sym_table, *sym_List;
-Cell *sym_object, *sym_Coercions, *sym_incomplete_eval;
-Cell *sym_function, *sym_name, *sym_sig, *sym_body, *sym_optimized_body, *sym_env, *sym_compiled, *sym_param_alias;
-Cell *sym_eval, *sym_caller_scope;
-void setupCommonSyms() {
-  sym_quote = newSym("'");
-  sym_backquote = newSym("`");
-  sym_unquote = newSym(",");
-  sym_splice = newSym("@");
-  sym_unquoteSplice = newSym(",@");
-  sym_alreadyEvald = newSym("''");
+cell *sym_quote, *sym_backquote, *sym_unquote, *sym_splice, *sym_unquote_splice, *sym_already_evald;
+cell *sym_list, *sym_number, *sym_symbol, *sym_string, *sym_table;
+cell *sym_object, *sym_Coercions, *sym_incomplete_eval;
+cell *sym_function, *sym_name, *sym_sig, *sym_body, *sym_optimized_body, *sym_env, *sym_compiled, *sym_param_alias;
+cell *sym_eval, *sym_caller_scope;
+void setup_common_syms() {
+  sym_quote = new_sym("'");
+  sym_backquote = new_sym("`");
+  sym_unquote = new_sym(",");
+  sym_splice = new_sym("@");
+  sym_unquote_splice = new_sym(",@");
+  sym_already_evald = new_sym("''");
 
-  sym_list = newSym("list");
-  sym_number = newSym("number");
-  sym_symbol = newSym("symbol");
-  sym_string = newSym("string");
-  sym_table = newSym("table");
-  sym_List = newSym("List");
+  sym_list = new_sym("list");
+  sym_number = new_sym("number");
+  sym_symbol = new_sym("symbol");
+  sym_string = new_sym("string");
+  sym_table = new_sym("table");
 
-  sym_object = newSym("object");
-  sym_Coercions = newSym("Coercions");
-  sym_incomplete_eval = newSym("incomplete_eval");
+  sym_object = new_sym("object");
+  sym_Coercions = new_sym("Coercions");
+  sym_incomplete_eval = new_sym("incomplete_eval");
 
-  sym_function = newSym("function");
-  sym_name = newSym("name");
-  sym_sig = newSym("sig");
-  sym_body = newSym("body");
-  sym_optimized_body = newSym("optimized_body");
-  sym_env = newSym("env");
-  sym_compiled = newSym("compiled");
-  sym_param_alias = newSym("|");
+  sym_function = new_sym("function");
+  sym_name = new_sym("name");
+  sym_sig = new_sym("sig");
+  sym_body = new_sym("body");
+  sym_optimized_body = new_sym("optimized_body");
+  sym_env = new_sym("env");
+  sym_compiled = new_sym("compiled");
+  sym_param_alias = new_sym("|");
 
-  sym_eval = newSym("eval");
-  sym_caller_scope = newSym("caller_scope");
+  sym_eval = new_sym("eval");
+  sym_caller_scope = new_sym("caller_scope");
 }

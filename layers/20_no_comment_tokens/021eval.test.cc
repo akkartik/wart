@@ -1,37 +1,37 @@
-void test_evalBindAll_handles_unquoted_param() {
-  newBinding("a", newNum(3));
+void test_eval_bind_all_handles_unquoted_param() {
+  newBinding("a", new_num(3));
   CLEAR_TRACE;
   run("((fn (x)) a)");
   CHECK_TRACE_CONTENTS("bind", "x: 3\n");
 }
 
-void test_evalBindAll_binds_missing_params() {
-  newBinding("a", newNum(3));
+void test_eval_bind_all_binds_missing_params() {
+  newBinding("a", new_num(3));
   CLEAR_TRACE;
   run("((fn (x y)) a)");
   CHECK_TRACE_CONTENTS("bind", "x: 3\ny: nil\n");
 }
 
-void test_evalBindAll_handles_varargs_param() {
-  newBinding("a", newNum(3));
-  newBinding("b", newNum(4));
+void test_eval_bind_all_handles_varargs_param() {
+  newBinding("a", new_num(3));
+  newBinding("b", new_num(4));
   CLEAR_TRACE;
   run("((fn x) a b)");
   CHECK_TRACE_CONTENTS("eval", "a\nsym\n=> 3\nb\nsym\n=> 4\n");
   CHECK_TRACE_CONTENTS("bind", "x: (3 4)\n");
 }
 
-void test_evalBindAll_handles_rest_param() {
-  newBinding("a", newNum(3));
-  newBinding("b", newNum(4));
+void test_eval_bind_all_handles_rest_param() {
+  newBinding("a", new_num(3));
+  newBinding("b", new_num(4));
   CLEAR_TRACE;
   run("((fn (x ... y)) a b)");
   CHECK_TRACE_CONTENTS("bind", "x: 3\ny: (4)\n");
 }
 
-void test_evalBindAll_handles_destructured_params() {
-  newBinding("x", newNum(3));
-  newBinding("y", newNum(4));
+void test_eval_bind_all_handles_destructured_params() {
+  newBinding("x", new_num(3));
+  newBinding("y", new_num(4));
   CLEAR_TRACE;
   run("((fn ((a b))) (cons x (cons y)))");
   CHECK_TRACE_CONTENTS("bind", "a: 3\nb: 4\n");
@@ -55,7 +55,7 @@ void test_colonsym_evals_to_itself() {
 }
 
 void test_colon_evals() {
-  newBinding(":", newNum(34));
+  newBinding(":", new_num(34));
   run(":");
   CHECK_TRACE_TOP("eval", "sym\n=> 34\n");
 }
@@ -66,13 +66,13 @@ void test_string_evals_to_itself() {
 }
 
 void test_sym_evals_to_value() {
-  newBinding("a", newNum(34));
+  newBinding("a", new_num(34));
   run("a");
   CHECK_TRACE_TOP("eval", "sym\n=> 34\n");
 }
 
 void test_sym_evals_to_itself() {
-  newBinding("a", newSym("a"));
+  newBinding("a", new_sym("a"));
   run("a");
   CHECK_TRACE_TOP("eval", "sym\n=> a\n");
 }
@@ -98,7 +98,7 @@ void test_eval_handles_fn_calls() {
 }
 
 void test_eval_expands_syms_in_fn_bodies() {
-  newBinding("a", newNum(34));
+  newBinding("a", new_num(34));
   run("((fn () a))");
   CHECK_TRACE_TOP("eval", "=> 34\n");
 }

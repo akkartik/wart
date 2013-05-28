@@ -1,24 +1,24 @@
 //// symbol bindings
 
-unordered_map<Cell*, Cell*> bindings;
+unordered_map<cell*, cell*> bindings;
 
-Cell* lookup(string s) {
-  return lookup(newSym(s));
+cell* lookup(string s) {
+  return lookup(new_sym(s));
 }
 
-Cell* lookup(Cell* sym) {
+cell* lookup(cell* sym) {
   if (!bindings[sym]) {
-    RAISE << "No binding for " << toString(sym) << endl;
+    RAISE << "No binding for " << to_string(sym) << endl;
     return nil;
   }
   return bindings[sym];
 }
 
-void newBinding(string sym, Cell* val) {
-  newBinding(newSym(sym), val);
+void newBinding(string sym, cell* val) {
+  newBinding(new_sym(sym), val);
 }
 
-void newBinding(Cell* sym, Cell* val) {
+void newBinding(cell* sym, cell* val) {
   if (bindings[sym] == val) return;
   if (!bindings[sym]) mkref(sym);
   if (bindings[sym]) rmref(bindings[sym]);
@@ -27,7 +27,7 @@ void newBinding(Cell* sym, Cell* val) {
 }
 
 void teardownBindings() {
-  for (unordered_map<Cell*, Cell*>::iterator p = bindings.begin(); p != bindings.end(); ++p) {
+  for (unordered_map<cell*, cell*>::iterator p = bindings.begin(); p != bindings.end(); ++p) {
     if (!p->second) continue;
     rmref(p->first);
     rmref(p->second);

@@ -17,29 +17,29 @@
 
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
-    runTests();
+    run_tests();
     return 0;
   }
 
   //// Interactive loop: parse commands from user, evaluate them, print the results
   interactive_setup();
-  loadFiles(".wart");
+  load_files(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (!cin.eof()) {
-    list<Cell*> forms = readAll(cin);
-    for (list<Cell*>::iterator p = forms.begin(); p != forms.end(); ++p)
+    list<cell*> forms = read_all(cin);
+    for (list<cell*>::iterator p = forms.begin(); p != forms.end(); ++p)
       cout << "=> " << eval(*p) << endl;
   }
 }
 
 //// read: tokenize, segment, parse, build cells
-Cell* read(istream& in) {
-  return nextCell(in);
+cell* read(istream& in) {
+  return next_cell(in);
 }
 
 // parse a paragraph of expressions until empty line
-list<Cell*> readAll(istream& in) {
-  list<Cell*> results;
+list<cell*> read_all(istream& in) {
+  list<cell*> results;
   do {
     results.push_back(read(in));
   } while (!in.eof() && in.peek() != '\n');
@@ -50,80 +50,80 @@ list<Cell*> readAll(istream& in) {
 
 //// test harness
 
-bool runningTests = false;
+bool Running_tests = false;
 
-typedef void (*TestFn)(void);
+typedef void (*test_fn)(void);
 
-const TestFn tests[] = {
+const test_fn Tests[] = {
   #include "test_list"
 };
 
-long numFailures = 0;
-bool passed = true;
+long Num_failures = 0;
+bool Passed = true;
 
 #define CHECK(X) if (!(X)) { \
-    ++numFailures; \
+    ++Num_failures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
-    passed = false; \
+    Passed = false; \
     return; \
   } \
   else { cerr << "."; fflush(stderr); }
 
 #define CHECK_EQ(X, Y) if ((X) != (Y)) { \
-    ++numFailures; \
+    ++Num_failures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
     cerr << "  got " << (X) << endl;  /* BEWARE: multiple eval */ \
-    passed = false; \
+    Passed = false; \
     return; \
   } \
   else { cerr << "."; fflush(stderr); }
 
-void runTests() {
-  runningTests = true;
-  pretendRaise = true;  // for death tests
+void run_tests() {
+  Running_tests = true;
+  Pretend_raise = true;  // for death tests
   time_t t; time(&t);
   cerr << "C tests: " << ctime(&t);
-  for (unsigned long i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
+  for (unsigned long i=0; i < sizeof(Tests)/sizeof(Tests[0]); ++i) {
     setup();
-    (*tests[i])();
+    (*Tests[i])();
     verify();
   }
 
-  pretendRaise = false;
+  Pretend_raise = false;
   setup();
-  loadFiles(".wart");   // after GC tests
-  loadFiles(".test");
+  load_files(".wart");   // after GC tests
+  load_files(".test");
 
   cerr << endl;
-  if (numFailures > 0)
-    cerr << numFailures << " failure"
-         << (numFailures > 1 ? "s" : "")
+  if (Num_failures > 0)
+    cerr << Num_failures << " failure"
+         << (Num_failures > 1 ? "s" : "")
          << endl;
 }
 
 void verify() {
   teardownBindings();
-  if (!passed) return;
-  if (raiseCount != 0) cerr << raiseCount << " errors encountered" << endl;
+  if (!Passed) return;
+  if (Raise_count != 0) cerr << Raise_count << " errors encountered" << endl;
 }
 
 // helper to read from string
 // leaks memory; just for convenient tests
-Cell* read(string s) {
+cell* read(string s) {
   return read(*new stringstream(s));
 }
 
 
 
 void setup() {
-  setupCells();
-  setupCommonSyms();
-  raiseCount = 0;
-  passed = true;
+  setup_cells();
+  setup_common_syms();
+  Raise_count = 0;
+  Passed = true;
 }
 
-bool interactive = false;
+bool Interactive = false;
 void interactive_setup() {
   setup();
-  interactive = true;
+  Interactive = true;
 }

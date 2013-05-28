@@ -20,163 +20,163 @@
 //  macros need to access caller environment
 //  @splicing args into macro calls just like regular functions
 
-Cell* eval(Cell* expr) {
-  return eval(expr, currLexicalScope);
+cell* eval(cell* expr) {
+  return eval(expr, Curr_lexical_scope);
 }
 
-Cell* eval(Cell* expr, Cell* scope) {
+cell* eval(cell* expr, cell* scope) {
   if (!expr)
-    RAISE << "eval: cell should never be NULL" << endl << DIE;
+    RAISE << "eval: cell should never be NULL" << endl << die();
 
   if (expr == nil)
     return nil;
 
-  if (isColonSym(expr))
+  if (is_keyword_sym(expr))
     return mkref(expr);
 
-  if (isSym(expr))
-    return mkref(lookup(expr, scope, keepAlreadyEvald()));
+  if (is_sym(expr))
+    return mkref(lookup(expr, scope, keep_already_evald()));
 
-  if (isAtom(expr))
+  if (is_atom(expr))
     return mkref(expr);
 
-  if (isObject(expr))
+  if (is_object(expr))
     return mkref(expr);
 
-  if (isQuoted(expr))
+  if (is_quoted(expr))
     return mkref(cdr(expr));
 
-  if (isBackQuoted(expr))
-    return processUnquotes(cdr(expr), 1, scope);  // already mkref'd
+  if (is_backquoted(expr))
+    return process_unquotes(cdr(expr), 1, scope);  // already mkref'd
 
-  if (isAlreadyEvald(expr))
-    return mkref(keepAlreadyEvald() ? expr : stripAlreadyEvald(expr));
+  if (is_already_evald(expr))
+    return mkref(keep_already_evald() ? expr : strip_already_evald(expr));
 
   // expr is a call
-  Cell* fn = toFn(eval(car(expr), scope));
-  if (!isFn(fn))
+  cell* fn = to_fn(eval(car(expr), scope));
+  if (!is_fn(fn))
     RAISE << "Not a call: " << expr << endl
         << "Perhaps you need to split the line in two." << endl;
 
   // eval its args in the caller's lexical environment
-  Cell* splicedArgs = spliceArgs(cdr(expr), scope, fn);
-  Cell* orderedArgs = reorderKeywordArgs(splicedArgs, sig(fn));
-  Cell* newScope = newTable();
-  evalBindAll(sig(fn), orderedArgs, scope, newScope);
+  cell* spliced_args = splice_args(cdr(expr), scope, fn);
+  cell* ordered_args = reorder_keyword_args(spliced_args, sig(fn));
+  cell* new_scope = new_table();
+  eval_bind_all(sig(fn), ordered_args, scope, new_scope);
 
   // swap in the function's lexical environment
-  newDynamicScope(CURR_LEXICAL_SCOPE, isCompiledFn(body(fn)) ? scope : env(fn));
-  addLexicalScope(newScope);
-  addLexicalBinding(sym_caller_scope, scope);
+  new_dynamic_scope(CURR_LEXICAL_SCOPE, is_compiledfn(body(fn)) ? scope : env(fn));
+  add_lexical_scope(new_scope);
+  add_lexical_binding(sym_caller_scope, scope);
 
-  Cell* result = nil;
-  if (isCompiledFn(body(fn))) {
-    result = toCompiledFn(body(fn))();  // all compiledFns must mkref result
+  cell* result = nil;
+  if (is_compiledfn(body(fn))) {
+    result = to_compiledfn(body(fn))();  // all Compiledfns must mkref result
   }
   else {
     // eval all forms in body, save result of final form
-    for (Cell* form = impl(fn); form != nil; form=cdr(form)) {
+    for (cell* form = impl(fn); form != nil; form=cdr(form)) {
       rmref(result);
-      result = eval(car(form), currLexicalScope);
+      result = eval(car(form), Curr_lexical_scope);
     }
   }
 
-  endLexicalScope();  // implicitly rmrefs newScope
-  endDynamicScope(CURR_LEXICAL_SCOPE);
-  rmref(orderedArgs);
-  rmref(splicedArgs);
+  end_lexical_scope();  // implicitly rmrefs new_scope
+  end_dynamic_scope(CURR_LEXICAL_SCOPE);
+  rmref(ordered_args);
+  rmref(spliced_args);
   rmref(fn);
   return result;  // already mkref'd
 }
 
-// bind params to args in newScope, taking into account:
+// bind params to args in new_scope, taking into account:
 //  quoted params (eval'ing args as necessary; args is never quoted, though)
 //  destructured params
-void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
+void eval_bind_all(cell* params, cell* args, cell* scope, cell* new_scope) {
   if (params == nil)
     return;
 
-  Cell* args2 = NULL;
-  if (isQuoted(params)) {
-    params = stripQuote(params);
-    args2 = quoteAll(args);
+  cell* args2 = NULL;
+  if (is_quoted(params)) {
+    params = strip_quote(params);
+    args2 = quote_all(args);
   }
   else {
     args2 = mkref(args);
   }
 
-  if (isSym(params)) {
-    Cell* val = evalAll(args2, scope);
-    bindParams(params, val, newScope);
+  if (is_sym(params)) {
+    cell* val = eval_all(args2, scope);
+    bind_params(params, val, new_scope);
     rmref(val);
   }
 
-  else if (!isCons(params))
+  else if (!is_cons(params))
     ;
 
   else {
-    evalBindParam(car(params), car(args2), scope, newScope);
-    evalBindAll(cdr(params), cdr(args2), scope, newScope);
+    eval_bind_param(car(params), car(args2), scope, new_scope);
+    eval_bind_all(cdr(params), cdr(args2), scope, new_scope);
   }
   rmref(args2);
 }
 
-void evalBindParam(Cell* param, Cell* arg, Cell* scope, Cell* newScope) {
-  Cell* arg2 = NULL;
-  if (isQuoted(param)) {
-    param = stripQuote(param);
-    arg2 = mkref(newCons(sym_quote, arg));
+void eval_bind_param(cell* param, cell* arg, cell* scope, cell* new_scope) {
+  cell* arg2 = NULL;
+  if (is_quoted(param)) {
+    param = strip_quote(param);
+    arg2 = mkref(new_cons(sym_quote, arg));
   }
   else
     arg2 = mkref(arg);
 
-  Cell* val = evalArg(arg2, scope);
-  bindParams(param, val, newScope);
+  cell* val = eval_arg(arg2, scope);
+  bind_params(param, val, new_scope);
   rmref(val);
   rmref(arg2);
 }
 
-void bindParams(Cell* params, Cell* args, Cell* newScope) {
-  if (isQuoted(params))
-    bindParams(stripQuote(params), args, newScope);
+void bind_params(cell* params, cell* args, cell* new_scope) {
+  if (is_quoted(params))
+    bind_params(strip_quote(params), args, new_scope);
 
   else if (params == nil)
     ;
 
-  else if (isSym(params))
-    addLexicalBinding(params, args, newScope);
+  else if (is_sym(params))
+    add_lexical_binding(params, args, new_scope);
 
-  else if (!isCons(params))
+  else if (!is_cons(params))
     ;
 
-  else if (args != nil && !isCons(args))
-    bindParams(params, nil, newScope);
+  else if (args != nil && !is_cons(args))
+    bind_params(params, nil, new_scope);
 
   else {
-    Cell* orderedArgs = reorderKeywordArgs(args, params);
-    bindParams(car(params), car(orderedArgs), newScope);
-    bindParams(cdr(params), cdr(orderedArgs), newScope);
-    rmref(orderedArgs);
+    cell* ordered_args = reorder_keyword_args(args, params);
+    bind_params(car(params), car(ordered_args), new_scope);
+    bind_params(cdr(params), cdr(ordered_args), new_scope);
+    rmref(ordered_args);
   }
 }
 
-//// eval args - while respecting alreadyEvald
+//// eval args - while respecting already_evald
 
-Cell* evalAll(Cell* args, Cell* scope) {
-  if (!isCons(args))
-    return evalArg(args, scope);
-  Cell* pResult = newCell(), *curr = pResult;
+cell* eval_all(cell* args, cell* scope) {
+  if (!is_cons(args))
+    return eval_arg(args, scope);
+  cell* p_result = new_cell(), *curr = p_result;
   for (; args != nil; args=cdr(args), curr=cdr(curr)) {
-    Cell* val = evalArg(car(args), scope);
-    addCons(curr, val);
+    cell* val = eval_arg(car(args), scope);
+    add_cons(curr, val);
     rmref(val);
   }
-  return dropPtr(pResult);
+  return drop_ptr(p_result);
 }
 
-// eval, but always strip '' regardless of keepAlreadyEvald()
-Cell* evalArg(Cell* arg, Cell* scope) {
-  if (isAlreadyEvald(arg)) return mkref(stripAlreadyEvald(arg));
+// eval, but always strip '' regardless of keep_already_evald()
+cell* eval_arg(cell* arg, cell* scope) {
+  if (is_already_evald(arg)) return mkref(strip_already_evald(arg));
   return eval(arg, scope);
 }
 
@@ -184,97 +184,97 @@ Cell* evalArg(Cell* arg, Cell* scope) {
 
 //// process :keyword args and reorder args to param order
 
-Cell* reorderKeywordArgs(Cell* args, Cell* params) {
-  if (!isCons(stripQuote(params))) return mkref(args);
+cell* reorder_keyword_args(cell* args, cell* params) {
+  if (!is_cons(strip_quote(params))) return mkref(args);
 
-  CellMap keywordArgs;  // all values will be refcounted.
-  Cell* nonKeywordArgs = extractKeywordArgs(params, args, keywordArgs);
-  Cell* result = argsInParamOrder(params, nonKeywordArgs, keywordArgs);   rmref(nonKeywordArgs);
+  cell_map keyword_args;  // all values will be refcounted.
+  cell* non_keyword_args = extract_keyword_args(params, args, keyword_args);
+  cell* result = args_in_param_order(params, non_keyword_args, keyword_args);   rmref(non_keyword_args);
 
-  for (CellMap::iterator p = keywordArgs.begin(); p != keywordArgs.end(); ++p)
+  for (cell_map::iterator p = keyword_args.begin(); p != keyword_args.end(); ++p)
     if (p->second) rmref(p->second);
   return result;  // already mkref'd
 }
 
-// extract keyword args into the CellMap provided; return non-keyword args
-// always mkref what you insert into the CellMap
-Cell* extractKeywordArgs(Cell* params, Cell* args, CellMap& keywordArgs) {
-  Cell *pNonKeywordArgs = newCell(), *curr = pNonKeywordArgs;
-  for (; isCons(args); args=cdr(args)) {
-    Cell* keywordParam = keywordArg(car(args), params);
-    if (keywordParam == nil) {
-      addCons(curr, car(args));
+// extract keyword args into the cell_map provided; return non-keyword args
+// always mkref what you insert into the cell_map
+cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
+  cell *p_non_keyword_args = new_cell(), *curr = p_non_keyword_args;
+  for (; is_cons(args); args=cdr(args)) {
+    cell* kparam = keyword_param(car(args), params);
+    if (kparam == nil) {
+      add_cons(curr, car(args));
       curr=cdr(curr);
     }
     // simple rest keyword arg
-    else if (isCons(keywordParam)) {   // rest keyword arg
+    else if (is_cons(kparam)) {   // rest keyword arg
       args = cdr(args);
-      Cell* endRest = nextKeyword(args, params);
-      keywordArgs[car(keywordParam)] = snip(args, endRest);  // already mkref'd
-      rmref(keywordParam);
-      args = endRest;
+      cell* end_rest = next_keyword(args, params);
+      keyword_args[car(kparam)] = snip(args, end_rest);  // already mkref'd
+      rmref(kparam);
+      args = end_rest;
     }
     // simple keyword arg
     else {
       args = cdr(args);   // skip keyword arg
-      keywordArgs[keywordParam] = mkref(car(args));
+      keyword_args[kparam] = mkref(car(args));
     }
   }
-  if (!isCons(args))  // improper list
-    setCdr(curr, args);
-  return dropPtr(pNonKeywordArgs);
+  if (!is_cons(args))  // improper list
+    set_cdr(curr, args);
+  return drop_ptr(p_non_keyword_args);
 }
 
-Cell* nextKeyword(Cell* args, Cell* params) {
+cell* next_keyword(cell* args, cell* params) {
   for (args=cdr(args); args != nil; args=cdr(args)) {
-    if (keywordArg(car(args), params) != nil)
+    if (keyword_param(car(args), params) != nil)
       return args;
   }
   return nil;
 }
 
-Cell* snip(Cell* x, Cell* next) {
+cell* snip(cell* x, cell* next) {
   if (next == nil) return mkref(x);
-  Cell* pResult = newCell();
-  for (Cell* curr = pResult; x != next; x=cdr(x),curr=cdr(curr))
-    addCons(curr, car(x));
-  return dropPtr(pResult);
+  cell* p_result = new_cell();
+  for (cell* curr = p_result; x != next; x=cdr(x),curr=cdr(curr))
+    add_cons(curr, car(x));
+  return drop_ptr(p_result);
 }
 
-Cell* argsInParamOrder(Cell* params, Cell* nonKeywordArgs, CellMap& keywordArgs) {
-  Cell *pReconstitutedArgs = newCell(), *curr = pReconstitutedArgs;
-  for (params=stripQuote(params); params != nil; curr=cdr(curr), params=stripQuote(cdr(params))) {
-    if (!isCons(params)) {
-      setCdr(curr, keywordArgs[params] ? keywordArgs[params] : nonKeywordArgs);
+cell* args_in_param_order(cell* params, cell* non_keyword_args, cell_map& keyword_args) {
+  cell *p_reconstituted_args = new_cell(), *curr = p_reconstituted_args;
+  for (params=strip_quote(params); params != nil; curr=cdr(curr), params=strip_quote(cdr(params))) {
+    if (!is_cons(params)) {
+      set_cdr(curr, keyword_args[params] ? keyword_args[params] : non_keyword_args);
       break;
     }
 
-    Cell* param = stripQuote(car(params));
-    if (keywordArgs[param]) {
-      addCons(curr, keywordArgs[param]);
+    cell* param = strip_quote(car(params));
+    if (keyword_args[param]) {
+      add_cons(curr, keyword_args[param]);
     }
     else {
-      addCons(curr, car(nonKeywordArgs));
-      nonKeywordArgs = cdr(nonKeywordArgs);
+      add_cons(curr, car(non_keyword_args));
+      non_keyword_args = cdr(non_keyword_args);
     }
   }
-  if (nonKeywordArgs != nil)
-    setCdr(curr, nonKeywordArgs);   // any remaining args
-  return dropPtr(pReconstitutedArgs);
+  if (non_keyword_args != nil)
+    set_cdr(curr, non_keyword_args);   // any remaining args
+  return drop_ptr(p_reconstituted_args);
 }
 
 // return the appropriate param if arg is a valid keyword arg
 // respond to rest keyword args with (rest-param)
 // doesn't look inside destructured params
-Cell* keywordArg(Cell* arg, Cell* params) {
-  if (!isColonSym(arg)) return nil;
-  Cell* candidate = newSym(toString(arg).substr(1));
-  for (params=stripQuote(params); params != nil; params=stripQuote(cdr(params))) {
-    if (!isCons(params)) { // rest param
+cell* keyword_param(cell* arg, cell* params) {
+  if (!is_keyword_sym(arg)) return nil;
+  cell* candidate = new_sym(to_string(arg).substr(1));
+  for (params=strip_quote(params); params != nil; params=strip_quote(cdr(params))) {
+    if (!is_cons(params)) { // rest param
       if (params == candidate)
-        return newCons(candidate);
+        return new_cons(candidate);
     }
-    else if (stripQuote(car(params)) == candidate) {
+    else if (strip_quote(car(params)) == candidate) {
       return candidate;
     }
   }
@@ -286,61 +286,61 @@ Cell* keywordArg(Cell* arg, Cell* params) {
 //// eval @exprs and inline them into args
 // tag them with '' (already eval'd) so they can be used with macros
 
-Cell* spliceArgs(Cell* args, Cell* scope, Cell* fn) {
-  Cell *pResult = newCell(), *tip = pResult;
-  for (Cell* curr = args; curr != nil; curr=cdr(curr)) {
-    if (!isSpliced(car(curr))) {
-      addCons(tip, car(curr));
+cell* splice_args(cell* args, cell* scope, cell* fn) {
+  cell *p_result = new_cell(), *tip = p_result;
+  for (cell* curr = args; curr != nil; curr=cdr(curr)) {
+    if (!is_spliced(car(curr))) {
+      add_cons(tip, car(curr));
       tip=cdr(tip);
       continue;
     }
 
-    if (isMacro(fn) && !contains(body(fn), sym_backquote))
+    if (is_macro(fn) && !contains(body(fn), sym_backquote))
       RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
-    Cell* x = unsplice(car(curr), scope);
-    for (Cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
-      addCons(tip, tagAlreadyEvald(car(curr2)));
+    cell* x = unsplice(car(curr), scope);
+    for (cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
+      add_cons(tip, tag_already_evald(car(curr2)));
     rmref(x);
   }
-  return dropPtr(pResult);
+  return drop_ptr(p_result);
 }
 
-Cell* unsplice(Cell* arg, Cell* scope) {
+cell* unsplice(cell* arg, cell* scope) {
   return eval(cdr(arg), scope);
 }
 
 // supporting @ in macro calls
-stack<bool> inMacro;
+stack<bool> In_macro;
 
 // keep sync'd with mac
-bool isMacro(Cell* fn) {
-  if (!isObject(fn)) return false;
-  if (!isQuoted(sig(fn))) return false;
-  Cell* forms = body(fn);
+bool is_macro(cell* fn) {
+  if (!is_object(fn)) return false;
+  if (!is_quoted(sig(fn))) return false;
+  cell* forms = body(fn);
   if (cdr(forms) != nil) return false;
-  Cell* form = car(forms);
+  cell* form = car(forms);
   if (car(form) != sym_eval) return false;
   if (car(cdr(cdr(form))) != sym_caller_scope) return false;
   if (cdr(cdr(cdr(form))) != nil) return false;
   return true;
 }
 
-bool keepAlreadyEvald() {
-  if (inMacro.empty()) inMacro.push(false);
-  return inMacro.top();
+bool keep_already_evald() {
+  if (In_macro.empty()) In_macro.push(false);
+  return In_macro.top();
 }
 
-Cell* tagAlreadyEvald(Cell* cell) {
-  if (isColonSym(cell)) return cell;
-  return newCons(sym_alreadyEvald, cell);
+cell* tag_already_evald(cell* cell) {
+  if (is_keyword_sym(cell)) return cell;
+  return new_cons(sym_already_evald, cell);
 }
 
-bool isAlreadyEvald(Cell* cell) {
-  return isCons(cell) && car(cell) == sym_alreadyEvald;
+bool is_already_evald(cell* cell) {
+  return is_cons(cell) && car(cell) == sym_already_evald;
 }
 
-Cell* stripAlreadyEvald(Cell* cell) {
-  while (isAlreadyEvald(cell))
+cell* strip_already_evald(cell* cell) {
+  while (is_already_evald(cell))
     cell = cdr(cell);
   return cell;
 }
@@ -349,147 +349,147 @@ Cell* stripAlreadyEvald(Cell* cell) {
 
 //// backquoted exprs
 
-// when inMacro did we encounter ''?
-bool skippedAlreadyEvald = false;
+// when In_macro did we encounter ''?
+bool Skipped_already_evald = false;
 
-Cell* processUnquotes(Cell* x, long depth, Cell* scope) {
-  if (!isCons(x)) return mkref(x);
+cell* process_unquotes(cell* x, long depth, cell* scope) {
+  if (!is_cons(x)) return mkref(x);
 
-  if (unquoteDepth(x) == depth) {
-    skippedAlreadyEvald = false;
-    Cell* result = eval(stripUnquote(x), scope);
-    return skippedAlreadyEvald ? pushCons(sym_alreadyEvald, result) : result;
+  if (unquote_depth(x) == depth) {
+    Skipped_already_evald = false;
+    cell* result = eval(strip_unquote(x), scope);
+    return Skipped_already_evald ? push_cons(sym_already_evald, result) : result;
   }
-  else if (unquoteSpliceDepth(car(x)) == depth) {
-    Cell* result = eval(stripUnquoteSplice(car(x)), scope);
-    Cell* splice = processUnquotes(cdr(x), depth, scope);
+  else if (unquote_splice_depth(car(x)) == depth) {
+    cell* result = eval(strip_unquote_splice(car(x)), scope);
+    cell* splice = process_unquotes(cdr(x), depth, scope);
     if (result == nil) return splice;
 
     // always splice in a copy
-    Cell* resultcopy = copyList(result);
+    cell* resultcopy = copy_list(result);
     rmref(result);
     append(resultcopy, splice);
     rmref(splice);
     return mkref(resultcopy);
   }
-  else if (unquoteDepth(x) > 0) {
+  else if (unquote_depth(x) > 0) {
     return mkref(x);
   }
 
-  if (isBackQuoted(x)) {
-    Cell* result = newCons(car(x), processUnquotes(cdr(x), depth+1, scope));
+  if (is_backquoted(x)) {
+    cell* result = new_cons(car(x), process_unquotes(cdr(x), depth+1, scope));
     rmref(cdr(result));
     return mkref(result);
   }
 
-  Cell* result = newCons(processUnquotes(car(x), depth, scope),
-                         processUnquotes(cdr(x), depth, scope));
+  cell* result = new_cons(process_unquotes(car(x), depth, scope),
+                         process_unquotes(cdr(x), depth, scope));
   rmref(car(result));
   rmref(cdr(result));
   return mkref(result);
 }
 
-Cell* maybeStripAlreadyEvald(bool keepAlreadyEvald, Cell* x) {
-  skippedAlreadyEvald = isAlreadyEvald(x);
-  return keepAlreadyEvald ? x : stripAlreadyEvald(x);
+cell* maybe_strip_already_evald(bool keep_already_evald, cell* x) {
+  Skipped_already_evald = is_already_evald(x);
+  return keep_already_evald ? x : strip_already_evald(x);
 }
 
-long unquoteDepth(Cell* x) {
-  if (isUnquoted(x))
-    return unquoteDepth(cdr(x))+1;
+long unquote_depth(cell* x) {
+  if (is_unquoted(x))
+    return unquote_depth(cdr(x))+1;
   return 0;
 }
 
-Cell* stripUnquote(Cell* x) {
-  if (isUnquoted(x))
-    return stripUnquote(cdr(x));
+cell* strip_unquote(cell* x) {
+  if (is_unquoted(x))
+    return strip_unquote(cdr(x));
   return x;
 }
 
-long unquoteSpliceDepth(Cell* x) {
-  if (isUnquoteSpliced(x))
+long unquote_splice_depth(cell* x) {
+  if (is_unquote_spliced(x))
     return 1;
-  if (isUnquoted(x))
-    return unquoteSpliceDepth(cdr(x))+1;
+  if (is_unquoted(x))
+    return unquote_splice_depth(cdr(x))+1;
   return 1000;  // never try to splice
 }
 
-Cell* stripUnquoteSplice(Cell* x) {
-  return cdr(stripUnquote(x));
+cell* strip_unquote_splice(cell* x) {
+  return cdr(strip_unquote(x));
 }
 
 
 
 //// helpers
 
-bool isQuoted(Cell* cell) {
-  return isCons(cell) && car(cell) == sym_quote;
+bool is_quoted(cell* cell) {
+  return is_cons(cell) && car(cell) == sym_quote;
 }
 
-bool isBackQuoted(Cell* cell) {
-  return isCons(cell) && car(cell) == sym_backquote;
+bool is_backquoted(cell* cell) {
+  return is_cons(cell) && car(cell) == sym_backquote;
 }
 
-Cell* stripQuote(Cell* cell) {
-  return isQuoted(cell) ? cdr(cell) : cell;
+cell* strip_quote(cell* cell) {
+  return is_quoted(cell) ? cdr(cell) : cell;
 }
 
-bool isUnquoted(Cell* arg) {
-  return isCons(arg) && car(arg) == sym_unquote;
+bool is_unquoted(cell* arg) {
+  return is_cons(arg) && car(arg) == sym_unquote;
 }
 
-bool isSpliced(Cell* arg) {
-  return isCons(arg) && car(arg) == sym_splice;
+bool is_spliced(cell* arg) {
+  return is_cons(arg) && car(arg) == sym_splice;
 }
 
-bool isUnquoteSpliced(Cell* arg) {
-  return isCons(arg) && car(arg) == sym_unquoteSplice;
+bool is_unquote_spliced(cell* arg) {
+  return is_cons(arg) && car(arg) == sym_unquote_splice;
 }
 
-bool isColonSym(Cell* x) {
-  if (!isSym(x)) return false;
-  string name = toString(x);
+bool is_keyword_sym(cell* x) {
+  if (!is_sym(x)) return false;
+  string name = to_string(x);
   if (name == ":") return false;
   return name[0] == ':';
 }
 
 // fn = (object function {sig => .., body => .., env => ..})
-bool isFn(Cell* x) {
-  return isCons(x) && type(x) == sym_function;
+bool is_fn(cell* x) {
+  return is_cons(x) && type(x) == sym_function;
 }
 
-Cell* toFn(Cell* x) {
-  if (x == nil || isFn(x)) return x;
-  if (!lookupDynamicBinding(sym_Coercions))
-    RAISE << "tried to call " << x << endl << DIE;
-  Cell* result = coerceQuoted(x, sym_function, lookup(sym_Coercions));   rmref(x);
+cell* to_fn(cell* x) {
+  if (x == nil || is_fn(x)) return x;
+  if (!lookup_dynamic_binding(sym_Coercions))
+    RAISE << "tried to call " << x << endl << die();
+  cell* result = coerce_quoted(x, sym_function, lookup(sym_Coercions));   rmref(x);
   return result;
 }
 
-Cell* sig(Cell* fn) {
+cell* sig(cell* fn) {
   return get(rep(fn), sym_sig);
 }
 
-Cell* body(Cell* fn) {
+cell* body(cell* fn) {
   return get(rep(fn), sym_body);
 }
 
-Cell* impl(Cell* fn) {
-  Cell* impl = get(rep(fn), sym_optimized_body);
+cell* impl(cell* fn) {
+  cell* impl = get(rep(fn), sym_optimized_body);
   return (impl != nil) ? impl : body(fn);
 }
 
-Cell* env(Cell* fn) {
+cell* env(cell* fn) {
   return get(rep(fn), sym_env);
 }
 
-Cell* quote(Cell* x) {
-  return newCons(sym_quote, x);
+cell* quote(cell* x) {
+  return new_cons(sym_quote, x);
 }
 
-Cell* quoteAll(Cell* x) {
-  Cell* result = newCell(), *curr = result;
-  for (Cell* iter = x; iter != nil; iter=cdr(iter), curr=cdr(curr))
-    addCons(curr, quote(car(iter)));
-  return dropPtr(result);
+cell* quote_all(cell* x) {
+  cell* result = new_cell(), *curr = result;
+  for (cell* iter = x; iter != nil; iter=cdr(iter), curr=cdr(curr))
+    add_cons(curr, quote(car(iter)));
+  return drop_ptr(result);
 }

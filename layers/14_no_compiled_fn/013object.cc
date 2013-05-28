@@ -5,20 +5,20 @@
 //  extensible coercion between arbitrary types
 //  arbitrary types in function position
 
-Cell* newObject(string type, Cell* rep) {
-  return newCons(sym_object, newCons(newSym(type), newCons(rep)));
+cell* new_object(string type, cell* rep) {
+  return new_cons(sym_object, new_cons(new_sym(type), new_cons(rep)));
 }
 
-bool isObject(Cell* x) {
+bool is_object(cell* x) {
   return car(x) == sym_object;
 }
 
-Cell* rep(Cell* x) {
-  if (!isObject(x)) return x;
+cell* rep(cell* x) {
+  if (!is_object(x)) return x;
   return car(cdr(cdr(x)));
 }
 
-Cell* type(Cell* x) {
+cell* type(cell* x) {
   if (x == nil) return nil;
   switch(x->type) {
   case INTEGER:
@@ -31,11 +31,11 @@ Cell* type(Cell* x) {
   case TABLE:
     return sym_table;
   case CONS:
-    if (isObject(x))
+    if (is_object(x))
       return car(cdr(x));
     return sym_list;
   default:
-    RAISE << "Undefined type: " << x->type << endl << DIE;
+    RAISE << "Undefined type: " << x->type << endl << die();
     return nil;   // never reached
   }
 }

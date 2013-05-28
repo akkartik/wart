@@ -15,18 +15,18 @@
 // These weren't the reasons lisp was created; they're the reasons I attribute
 // to its power.
 
-bool interactive = false;
+bool Interactive = false;
 
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
-    runTests();
+    run_tests();
     return 0;
   }
 
   //// Interactive loop: parse commands from user, evaluate them, print the results
-  interactive = true;
+  Interactive = true;
   setup();
-  loadFiles(".wart");
+  load_files(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (!cin.eof()) {
     cout << "=> " << run(cin) << '\n';
@@ -34,27 +34,27 @@ int main(int argc, unused char* argv[]) {
 }
 
 //// read: tokenize, segment, parse, build cells
-Cell* read(istream& in) {
-  return nextCell(in);
+cell* read(istream& in) {
+  return next_cell(in);
 }
 
 // In batch mode, evaluate all exprs in input.
 // In interactive mode, evaluate all exprs until empty line.
 // Return value of last expr.
-Cell* run(istream& in) {
-  Cell* result = NULL;
+cell* run(istream& in) {
+  cell* result = NULL;
   do {
     result = eval(read(in));
-  } while (!eof(in) && (!interactive || in.peek() != '\n'));
+  } while (!eof(in) && (!Interactive || in.peek() != '\n'));
   return result;
 }
 
 // parse a paragraph of expressions until empty line
-list<Cell*> readAll(istream& in) {
-  list<Cell*> results;
+list<cell*> read_all(istream& in) {
+  list<cell*> results;
   do {
     results.push_back(read(in));
-  } while (!eof(in) && (!interactive || in.peek() != '\n'));
+  } while (!eof(in) && (!Interactive || in.peek() != '\n'));
   return results;
 }
 
@@ -67,53 +67,53 @@ bool eof(istream& in) {
 
 //// test harness
 
-void runTests() {
-  runningTests = true;
-  pretendRaise = true;  // for death tests
+void run_tests() {
+  Running_tests = true;
+  Pretend_raise = true;  // for death tests
   time_t t; time(&t);
   cerr << "C tests: " << ctime(&t);
-  for (unsigned long i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
+  for (unsigned long i=0; i < sizeof(Tests)/sizeof(Tests[0]); ++i) {
     START_TRACING_UNTIL_END_OF_SCOPE;
     setup();
-    (*tests[i])();
+    (*Tests[i])();
     verify();
   }
 
-  pretendRaise = false;
+  Pretend_raise = false;
   setup();
-  loadFiles(".wart");   // after GC tests
-  loadFiles(".test");
+  load_files(".wart");   // after GC tests
+  load_files(".test");
 
   cerr << endl;
-  if (numFailures > 0)
-    cerr << numFailures << " failure"
-         << (numFailures > 1 ? "s" : "")
+  if (Num_failures > 0)
+    cerr << Num_failures << " failure"
+         << (Num_failures > 1 ? "s" : "")
          << endl;
 }
 
 void verify() {
   teardownBindings();
-  if (!passed) return;
-  if (raiseCount != 0) cerr << raiseCount << " errors encountered" << endl;
+  if (!Passed) return;
+  if (Raise_count != 0) cerr << Raise_count << " errors encountered" << endl;
 }
 
 void setup() {
-  setupCells();
-  setupCommonSyms();
-  raiseCount = 0;
-  passed = true;
+  setup_cells();
+  setup_common_syms();
+  Raise_count = 0;
+  Passed = true;
 }
 
 
 
 //// helpers for tests
 
-list<Cell*> readAll(string s) {
+list<cell*> read_all(string s) {
   stringstream in(s);
-  return readAll(in);
+  return read_all(in);
 }
 
-Cell* run(string s) {
+cell* run(string s) {
   stringstream in(s);
   return run(in);
 }

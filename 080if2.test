@@ -8,7 +8,7 @@
 
 (test "replace_ifs replaces lists with 2 branches"
   :valueof (replace_ifs '(if cond1 branch1 branch2))
-  :should be `(,compiled_fns.if.0 cond1 branch1 branch2))
+  :should be `(,compiledfns.if.0 cond1 branch1 branch2))
 
 (test "replace_ifs skips quoted lists"
   :valueof (replace_ifs '(list '(if abc)))

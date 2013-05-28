@@ -1,6 +1,6 @@
 //// split input into tokens separated by newlines, indent, and the following boundaries:
-const string punctuationChars = "()#\"";  // the skeleton of a wart program
-const string quoteAndUnquoteChars = ",'`@";   // controlling eval and macros
+const string Punctuation_chars = "()#\"";  // the skeleton of a wart program
+const string Quote_and_unquote_chars = ",'`@";   // controlling eval and macros
 
 // Design considered the following:
 //  doing the minimum necessary to support macros later
@@ -14,69 +14,69 @@ const string quoteAndUnquoteChars = ",'`@";   // controlling eval and macros
 
 // line contains 1 indent and zero or more regular tokens
 // and a newline token at the end
-struct Token {
-  string token;
-  long indentLevel;
+struct token {
+  string value;
+  long indent_level;
   bool newline;
 
-  explicit Token(string s)
-    :token(s), indentLevel(-1), newline(false) {}
-  explicit Token(long indent)
-    :token(""), indentLevel(indent), newline(false) {}
-  static Token Newline() {
-    Token t(0); t.newline = true; return t; }
+  explicit token(string s)
+    :value(s), indent_level(-1), newline(false) {}
+  explicit token(long indent)
+    :value(""), indent_level(indent), newline(false) {}
+  static token Newline() {
+    token t(0); t.newline = true; return t; }
 
   bool operator==(const string& x) const {
-    return token == x;
+    return value == x;
   }
   bool operator!=(const string& x) const {
     return !(*this == x);
   }
-  bool operator==(const Token& x) const {
-    return token == x.token && indentLevel == x.indentLevel && newline == x.newline;
+  bool operator==(const token& x) const {
+    return value == x.value && indent_level == x.indent_level && newline == x.newline;
   }
-  bool operator!=(const Token& x) const {
+  bool operator!=(const token& x) const {
     return !(*this == x);
   }
 };
 
-Token nextToken(IndentSensitiveStream& in) {
-  if (!in.atStartOfLine)
-    skipWhitespace(in.fd);
+token next_token(indent_sensitive_stream& in) {
+  if (!in.at_start_of_line)
+    skip_whitespace(in.fd);
 
-  Token maybeIndent("");
-  if (in.atStartOfLine)
-    maybeIndent = Token(indent(in.fd));
+  token maybe_indent("");
+  if (in.at_start_of_line)
+    maybe_indent = token(indent(in.fd));
 
   if (in.fd.peek() == '#')
-    skipComment(in.fd);
+    skip_comment(in.fd);
   if (in.fd.peek() == '\n') {
     in.fd.get();
-    in.atStartOfLine = true;
-    return Token::Newline();
+    in.at_start_of_line = true;
+    return token::Newline();
   }
 
-  if (in.atStartOfLine) {
+  if (in.at_start_of_line) {
     // still here? no comment or newline?
-    in.atStartOfLine = false;
-    return maybeIndent;
+    in.at_start_of_line = false;
+    return maybe_indent;
   }
 
   ostringstream out;
   if (in.fd.peek() == '"')
-    slurpString(in.fd, out);
-  else if (find(punctuationChars, in.fd.peek()))
-    slurpChar(in.fd, out);
+    slurp_string(in.fd, out);
+  else if (find(Punctuation_chars, in.fd.peek()))
+    slurp_char(in.fd, out);
   else if (in.fd.peek() == ',')
-    slurpUnquote(in.fd, out);
-  else if (find(quoteAndUnquoteChars, in.fd.peek()))
-    slurpChar(in.fd, out);
+    slurp_unquote(in.fd, out);
+  else if (find(Quote_and_unquote_chars, in.fd.peek()))
+    slurp_char(in.fd, out);
   else
-    slurpWord(in.fd, out);
+    slurp_word(in.fd, out);
 
-  if (out.str() == ":") return nextToken(in);
+  if (out.str() == ":") return next_token(in);
 
-  return Token(out.str());
+  return token(out.str());
 }
 
 
@@ -84,14 +84,14 @@ Token nextToken(IndentSensitiveStream& in) {
 //// internals
 
 // slurp functions read a token when you're sure to be at it
-void slurpChar(istream& in, ostream& out) {
+void slurp_char(istream& in, ostream& out) {
   out << (char)in.get();
 }
 
-void slurpWord(istream& in, ostream& out) {
+void slurp_word(istream& in, ostream& out) {
   char c;
   while (in >> c) {
-    if (isspace(c) || find(punctuationChars, c) || find(quoteAndUnquoteChars, c)) {
+    if (isspace(c) || find(Punctuation_chars, c) || find(Quote_and_unquote_chars, c)) {
       in.putback(c);
       break;
     }
@@ -99,22 +99,22 @@ void slurpWord(istream& in, ostream& out) {
   }
 }
 
-void slurpString(istream& in, ostream& out) {
-  slurpChar(in, out);   // initial quote
+void slurp_string(istream& in, ostream& out) {
+  slurp_char(in, out);   // initial quote
   char c;
   while (in >> c) {
     out << c;
     if (c == '\\')
-      slurpChar(in, out);   // blindly read next
+      slurp_char(in, out);   // blindly read next
     else if (c == '"')
       break;
   }
 }
 
-void slurpUnquote(istream& in, ostream& out) {
-  slurpChar(in, out);   // comma
+void slurp_unquote(istream& in, ostream& out) {
+  slurp_char(in, out);   // comma
   if (in.peek() == '@')
-    slurpChar(in, out); // ..and maybe splice
+    slurp_char(in, out); // ..and maybe splice
 }
 
 
@@ -134,7 +134,7 @@ long indent(istream& in) {
   return indent;
 }
 
-void skipComment(istream& in) {
+void skip_comment(istream& in) {
   char c;
   while (in >> c) {
     if (c == '\n') {
@@ -145,7 +145,7 @@ void skipComment(istream& in) {
 }
 
 
-void skipWhitespace(istream& in) {
+void skip_whitespace(istream& in) {
   while (isspace(in.peek()) && in.peek() != '\n')
     in.get();
 }
@@ -157,8 +157,8 @@ bool find(string s, char c) {
   return s.find(c) != NOT_FOUND;
 }
 
-ostream& operator<<(ostream& os, Token y) {
+ostream& operator<<(ostream& os, token y) {
   if (y.newline) return os << "\\n";
-  if (y == "") return os << ":" << y.indentLevel;
-  else return os << y.token;
+  if (y == "") return os << ":" << y.indent_level;
+  else return os << y.value;
 }

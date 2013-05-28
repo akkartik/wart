@@ -1,25 +1,25 @@
 //// construct parse tree out of cells
 
-Cell* nextCell(istream& in) {
-  return buildCell(nextAstNode(in));
+cell* next_cell(istream& in) {
+  return build_cell(next_ast_node(in));
 }
 
-Cell* buildCell(AstNode n) {
+cell* build_cell(ast_node n) {
   if (n == "") return nil;  // void
 
-  if (isNil(n))
+  if (is_nil(n))
     return nil;
-  if (isList(n) && n.elems.front() == ")") {
-    if (n.elems.size() > 1) RAISE << "Syntax error: ) not at end of expr" << endl << DIE;
+  if (is_list(n) && n.elems.front() == ")") {
+    if (n.elems.size() > 1) RAISE << "Syntax error: ) not at end of expr" << endl << die();
     return nil;
   }
 
-  if (isAtom(n)) {
+  if (is_atom(n)) {
     errno = 0;
     char* end;
     long v = strtol(n.atom.c_str(), &end, 0);
     if (*end == '\0' && errno == 0)
-      return newNum(v);
+      return new_num(v);
 
     if (errno == ERANGE || errno == EOVERFLOW)
       RAISE << "dropping precision for bignum " << n.atom << endl;
@@ -29,45 +29,45 @@ Cell* buildCell(AstNode n) {
       if (n.atom.substr(0, 2) == "-.")
         RAISE << "assuming '" << n.atom << "' is a float; to remove this warning say '-0" << n.atom.substr(1) << "'.\n"
             << "If you mean to negate an int, skip the ssyntax: '-" << n.atom.substr(2) << "'.\n";
-      return newNum(f);
+      return new_num(f);
     }
 
     if (n.atom.c_str()[0] == '"')
-      return newString(n.atom.substr(1, n.atom.length()-2));
+      return new_string(n.atom.substr(1, n.atom.length()-2));
 
-    return newSym(n.atom);
+    return new_sym(n.atom);
   }
 
-  list<AstNode>::iterator first = n.elems.begin();
+  list<ast_node>::iterator first = n.elems.begin();
   if (*first == "(") {
     n.elems.pop_front();
-    return buildCell(n);
+    return build_cell(n);
   }
 
-  Cell* newForm = newCell();
-  setCar(newForm, buildCell(n.elems.front()));
+  cell* new_form = new_cell();
+  set_car(new_form, build_cell(n.elems.front()));
 
-  list<AstNode>::iterator next = first; ++next;
+  list<ast_node>::iterator next = first; ++next;
   if (*next == "...") {
     if (next != --n.elems.end())
-      setCdr(newForm, buildCell(*++next));  // dotted pair
+      set_cdr(new_form, build_cell(*++next));  // dotted pair
     else
-      setCdr(newForm, buildCell(*next));
+      set_cdr(new_form, build_cell(*next));
   }
-  else if (isQuoteOrUnquote(*first) && n.elems.size() == 2) {
-    setCdr(newForm, buildCell(*next));  // dotted pair
+  else if (is_quote_or_unquote(*first) && n.elems.size() == 2) {
+    set_cdr(new_form, build_cell(*next));  // dotted pair
   }
   else {
     n.elems.pop_front();
     if (n.elems.empty())
-      RAISE << "Error in parsing " << n << endl << DIE;
-    setCdr(newForm, buildCell(n));
+      RAISE << "Error in parsing " << n << endl << die();
+    set_cdr(new_form, build_cell(n));
   }
 
-  return newForm;
+  return new_form;
 }
 
-bool isNil(const AstNode& n) {
+bool is_nil(const ast_node& n) {
   return n.atom == "nil"
       || (n.elems.size() == 2 && n.elems.front() == "(" && n.elems.back() == ")");
 }

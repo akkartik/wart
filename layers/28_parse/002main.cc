@@ -17,20 +17,20 @@
 
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
-    runTests();
+    run_tests();
     return 0;
   }
 
-  readAll(cin);
+  read_all(cin);
 }
 
 // TODO: logically belongs in parse.cc
-struct AstNode {
-  Token atom;
-  list<AstNode> elems;
+struct ast_node {
+  token atom;
+  list<ast_node> elems;
 
-  explicit AstNode(Token t) :atom(t) {}
-  explicit AstNode(list<AstNode> l) :elems(l) {}
+  explicit ast_node(token t) :atom(t) {}
+  explicit ast_node(list<ast_node> l) :elems(l) {}
 
   bool operator==(const string& x) const {
     return elems.empty() && atom == x;
@@ -40,9 +40,9 @@ struct AstNode {
   }
 };
 
-void readAll(istream& in) {
+void read_all(istream& in) {
   do {
-    nextAstNode(in);
+    next_ast_node(in);
   } while (!eof(in));
 }
 
@@ -55,31 +55,31 @@ bool eof(istream& in) {
 
 //// test harness
 
-typedef void (*TestFn)(void);
+typedef void (*test_fn)(void);
 
-const TestFn tests[] = {
+const test_fn Tests[] = {
   #include "test_list"
 };
 
 #define CHECK(X) if (!(X)) { \
-    ++numFailures; \
+    ++Num_failures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
     return; \
   } \
   else { cerr << "."; fflush(stderr); }
 
-void runTests() {
-  pretendRaise = true;  // for death tests
+void run_tests() {
+  Pretend_raise = true;  // for death tests
   time_t t; time(&t);
   cerr << "C tests: " << ctime(&t);
-  for (unsigned long i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
+  for (unsigned long i=0; i < sizeof(Tests)/sizeof(Tests[0]); ++i) {
     START_TRACING_UNTIL_END_OF_SCOPE;
-    (*tests[i])();
+    (*Tests[i])();
   }
 
   cerr << endl;
-  if (numFailures > 0)
-    cerr << numFailures << " failure"
-         << (numFailures > 1 ? "s" : "")
+  if (Num_failures > 0)
+    cerr << Num_failures << " failure"
+         << (Num_failures > 1 ? "s" : "")
          << endl;
 }

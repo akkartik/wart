@@ -5,20 +5,20 @@
 //  extensible coercion between arbitrary types
 //  arbitrary types in function position
 
-Cell* newObject(string type, Cell* rep) {
-  return newCons(sym_object, newCons(newSym(type), newCons(rep)));
+cell* new_object(string type, cell* rep) {
+  return new_cons(sym_object, new_cons(new_sym(type), new_cons(rep)));
 }
 
-bool isObject(Cell* x) {
+bool is_object(cell* x) {
   return car(x) == sym_object;
 }
 
-Cell* rep(Cell* x) {
-  if (!isObject(x)) return x;
+cell* rep(cell* x) {
+  if (!is_object(x)) return x;
   return car(cdr(cdr(x)));
 }
 
-Cell* type(Cell* x) {
+cell* type(cell* x) {
   if (x == nil) return nil;
   switch(x->type) {
   case INTEGER:
@@ -33,34 +33,34 @@ Cell* type(Cell* x) {
   case COMPILED_FN:
     return sym_function;
   case CONS:
-    if (isObject(x))
+    if (is_object(x))
       return car(cdr(x));
     return sym_list;
   default:
-    RAISE << "Undefined type: " << x->type << endl << DIE;
+    RAISE << "Undefined type: " << x->type << endl << die();
     return nil;   // never reached
   }
 }
 
 // extensible coerce based on Coercions table
 // always mkrefs its result
-Cell* coerceQuoted(Cell* x, Cell* destType, Cell* coercions) {
-  Cell* typ = type(x);
-  if (typ == destType)
+cell* coerce_quoted(cell* x, cell* dest_type, cell* coercions) {
+  cell* typ = type(x);
+  if (typ == dest_type)
     return mkref(x);
 
   if (coercions == nil) RAISE << "Coercions not initialized yet\n";
-  if (!isTable(coercions)) RAISE << "Coercions not a table\n";
-  Cell* tmp = get(coercions, destType);
-  if (tmp == nil) RAISE << "Coercions for " << destType << " not initialized when eval'ing " << x << endl;
-  if (!isTable(coercions)) RAISE << "Coercions for " << destType << " not a table\n";
-  Cell* coercer = get(tmp, typ);
+  if (!is_table(coercions)) RAISE << "Coercions not a table\n";
+  cell* tmp = get(coercions, dest_type);
+  if (tmp == nil) RAISE << "Coercions for " << dest_type << " not initialized when eval'ing " << x << endl;
+  if (!is_table(coercions)) RAISE << "Coercions for " << dest_type << " not a table\n";
+  cell* coercer = get(tmp, typ);
   if (coercer == nil) {
-    RAISE << "can't coerce " << typ << " " << x << " to " << destType << endl;
+    RAISE << "can't coerce " << typ << " " << x << " to " << dest_type << endl;
     return nil;
   }
-  Cell* expr = newCons(coercer, newCons(newCons(sym_quote, x)));
-  Cell* result = eval(expr);
+  cell* expr = new_cons(coercer, new_cons(new_cons(sym_quote, x)));
+  cell* result = eval(expr);
   rmref(expr);
   return result;  // already mkref'd
 }

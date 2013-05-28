@@ -1,38 +1,38 @@
-COMPILE_FN(load, compiledFn_load, "($f)",
-  loadFile(toString(lookup("$f")).c_str());
+COMPILE_FN(load, compiledfn_load, "($f)",
+  load_file(to_string(lookup("$f")).c_str());
   return nil;
 )
 
-void loadFiles(const char* ext) {
-  vector<char*> files = sortedFiles(".", ext);
+void load_files(const char* ext) {
+  vector<char*> files = sorted_files(".", ext);
   for (vector<char*>::iterator p = files.begin(); p != files.end(); ++p)
-    loadFile(*p);
+    load_file(*p);
 }
 
 
 
 //// internals
 
-void loadFile(const char* filename) {
-  bool old_interactive = interactive; interactive = false;
+void load_file(const char* filename) {
+  bool old_interactive = Interactive; Interactive = false;
   ifstream f(filename);
   if (f.fail()) return;
   while (!f.eof()) {
-    Cell* cell = read(f);
+    cell* cell = read(f);
 //?     cerr << cell << endl;   // uncomment this to track down errors in wart files
     rmref(eval(cell));
     rmref(cell);
   }
-  interactive = old_interactive;
+  Interactive = old_interactive;
 }
 
 #include<dirent.h>
 
-vector<char*> sortedFiles(const char* dirname, const char* ext) {
+vector<char*> sorted_files(const char* dirname, const char* ext) {
   vector<char*> result;
   dirent** files;
-  int numFiles = scandir(dirname, &files, NULL, alphasort);
-  for (int i = 0; i < numFiles; ++i) {
+  int num_files = scandir(dirname, &files, NULL, alphasort);
+  for (int i = 0; i < num_files; ++i) {
     unsigned int n = strlen(files[i]->d_name), extn = strlen(ext);
     if (n < extn) continue;
     if (strncmp(&files[i]->d_name[n-extn], ext, extn)) continue;

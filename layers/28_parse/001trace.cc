@@ -72,9 +72,9 @@ struct LeaseTracer {
 
 
 // TODO: logically belongs in main.cc with the rest of the test harness
-long numFailures = 0;
+long Num_failures = 0;
 #define CHECK_EQ(X, Y) if ((X) != (Y)) { \
-    ++numFailures; \
+    ++Num_failures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
     cerr << "  got " << (X) << endl;  /* BEWARE: multiple eval */ \
     return; \

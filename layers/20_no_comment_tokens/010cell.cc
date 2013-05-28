@@ -3,11 +3,11 @@
 // Design considered the following:
 //  represent numbers, strings, symbols, lists, and hash-tables
 
-extern Cell* nil;
+extern cell* nil;
 
-struct Cell {
-  Cell* car;  // aliased to long or float
-  Cell* cdr;
+struct cell {
+  cell* car;  // aliased to long or float
+  cell* cdr;
 
   // ints save space on 64-bit platforms
   int type;
@@ -18,71 +18,71 @@ struct Cell {
     #define STRING 4
     #define TABLE 5
 
-  Cell() :car(NULL), cdr(NULL), type(CONS) {}
+  cell() :car(NULL), cdr(NULL), type(CONS) {}
   void init() {
     car=cdr=nil, type=CONS;
   }
 };
 
-Cell* nil = new Cell;
-void setupNil() {
+cell* nil = new cell;
+void setup_nil() {
   nil->car = nil->cdr = nil;
 }
 
-bool isCons(Cell* x) {
+bool is_cons(cell* x) {
   return x != nil && x->type == CONS;
 }
 
-bool isAtom(Cell* x) {
+bool is_atom(cell* x) {
   return x == nil || x->type == INTEGER || x->type == FLOAT || x->type == STRING || x->type == SYMBOL;
 }
 
 
 
-#define HEAPCELLS (1024*1024/sizeof(Cell))  // 1MB
-struct Heap {
-  Cell cells[HEAPCELLS];
-  Heap *next;
-  Heap() :next(NULL) {}
+#define HEAPCELLS (1024*1024/sizeof(cell))  // 1MB
+struct heap {
+  cell cells[HEAPCELLS];
+  heap *next;
+  heap() :next(NULL) {}
 };
 
-Heap* firstHeap = new Heap();
-Heap* currHeap = firstHeap;
-long currCell = 0;
-Cell* freelist = NULL;
+heap* First_heap = new heap();
+heap* Curr_heap = First_heap;
+long Curr_cell = 0;
+cell* Free_cells = NULL;
 
-void growHeap() {
-  currHeap = currHeap->next = new Heap();
-  if (!currHeap) RAISE << "Out of memory" << endl << DIE;
-  currCell = 0;
+void grow_heap() {
+  Curr_heap = Curr_heap->next = new heap();
+  if (!Curr_heap) RAISE << "Out of memory" << endl << die();
+  Curr_cell = 0;
 }
 
-void resetHeap(Heap* h) {
+void reset_heap(heap* h) {
   if (h->next)
-    resetHeap(h->next);
+    reset_heap(h->next);
   delete h;
-  if (h == firstHeap) {
-    firstHeap = new Heap();
-    currHeap = firstHeap;
-    currCell = 0;
-    freelist = NULL;
+  if (h == First_heap) {
+    First_heap = new heap();
+    Curr_heap = First_heap;
+    Curr_cell = 0;
+    Free_cells = NULL;
   }
 }
 
-Cell* newCell() {
-  Cell* result = NULL;
-  if (freelist) {
-    result = freelist;
-    freelist = freelist->cdr;
+cell* new_cell() {
+  cell* result = NULL;
+  if (Free_cells) {
+    result = Free_cells;
+    Free_cells = Free_cells->cdr;
     result->init();
     return result;
   }
 
-  if (currCell == HEAPCELLS)
-    growHeap();
+  if (Curr_cell == HEAPCELLS)
+    grow_heap();
 
-  result = &currHeap->cells[currCell];
-  ++currCell;
+  result = &Curr_heap->cells[Curr_cell];
+  ++Curr_cell;
   result->init();
   return result;
 }

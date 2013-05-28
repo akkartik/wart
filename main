@@ -75,7 +75,7 @@ You'll need Linux and gcc. To install wart and run its tests:
   :(code "main")
   int main(int argc) {
     if (argc > 1) {
-      runTests();   // see [Test harness]
+      run_tests();   // see [Test harness]
       return 0;
     }
 
@@ -146,19 +146,19 @@ More examples (explained later):
   subtract 3 :from 4
   => 1
 
-== The core data structure: Cell
+== The core data structure: cell
 
-Everything is a Cell.
+Everything is a cell.
 
   :(code)
-  struct Cell {
+  struct cell {
     union {
-      Cell* car;
+      cell* car;
       long num;
     }
-    Cell* next;
+    cell* next;
     enum { CONS, INTEGER } type;
-    Cell() :car(NULL), cdr(NULL), type(CONS);
+    cell() :car(NULL), cdr(NULL), type(CONS);
   }
 
 Wart turns the programs you write into configurations of Cells, and then
@@ -168,11 +168,11 @@ sandbox where you can break things without consequence.
 
   :(code "main loop" in "main")
   while (!cin.eof()) {
-    Cell* form = Read(cin);
+    cell* form = Read(cin);
     cout << "=> " << Eval(form) << endl;
   }
 
-== Turning code into Cells: Read
+== Turning code into cells: Read
 
 == Turning Cells into behavior: Eval
 

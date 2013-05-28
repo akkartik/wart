@@ -1,5 +1,5 @@
 // C++ style:
-//  no pointers except Cell*
+//  no pointers except cell*
 //  use long as the default integer type; it's always large enough to hold pointers
 
 #include<cstdio>
@@ -44,19 +44,18 @@ using std::ofstream;
 
 #define unused __attribute__((unused))
 
-bool pretendRaise = false;
-long raiseCount = 0;
+bool Pretend_raise = false;
+long Raise_count = 0;
 
                            // ?: to avoid dangling-else warnings
-#define RAISE pretendRaise ? ++raiseCount,cerr /* print nothing */ \
+#define RAISE Pretend_raise ? ++Raise_count,cerr /* print nothing */ \
                            : cerr << __FILE__ << ":" << __LINE__ << " "
 
-struct Die {};
-ostream& operator<<(ostream& os, unused Die die) {
+struct die {};
+ostream& operator<<(ostream& os, unused die) {
   os << "dying";
   exit(1);
 }
-Die DIE;
 
 
 

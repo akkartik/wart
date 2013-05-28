@@ -1,66 +1,66 @@
 //// construct parse tree out of a list of tokens
 
-AstNode nextAstNode(istream& in) {
-  list<Token> bufferedTokens = nextExpr(in);
-  return nextAstNode(bufferedTokens);
+ast_node next_ast_node(istream& in) {
+  list<token> buffered_tokens = next_expr(in);
+  return next_ast_node(buffered_tokens);
 }
 
-AstNode nextAstNode(list<Token>& in) {
-  list<AstNode> subform;
+ast_node next_ast_node(list<token>& in) {
+  list<ast_node> subform;
   incTraceForRestOfScope("parse");
-  if (in.empty()) TRACE_AND_RETURN("parse", AstNode(subform));
+  if (in.empty()) TRACE_AND_RETURN("parse", ast_node(subform));
 
-  subform.push_back(AstNode(nextToken(in)));
-  while (!in.empty() && isQuoteOrUnquote(subform.back().atom))
-    subform.push_back(AstNode(nextToken(in)));
+  subform.push_back(ast_node(next_token(in)));
+  while (!in.empty() && is_quote_or_unquote(subform.back().atom))
+    subform.push_back(ast_node(next_token(in)));
 
-  if (isOpenParen(subform.back())) {
+  if (is_open_paren(subform.back())) {
     while (!in.empty() && subform.back() != ")")
-      subform.push_back(nextAstNode(in));
-    if (!isCloseParen(subform.back())) RAISE << "Unbalanced (" << endl << DIE;
+      subform.push_back(next_ast_node(in));
+    if (!is_close_paren(subform.back())) RAISE << "Unbalanced (" << endl << die();
   }
 
   if (subform.size() == 1)
-    TRACE_AND_RETURN("parse", AstNode(subform.back()));
-  TRACE_AND_RETURN("parse", AstNode(subform));
+    TRACE_AND_RETURN("parse", ast_node(subform.back()));
+  TRACE_AND_RETURN("parse", ast_node(subform));
 }
 
 
 
 //// internals
 
-Token nextToken(list<Token>& in) {
-  Token result = in.front(); in.pop_front();
+token next_token(list<token>& in) {
+  token result = in.front(); in.pop_front();
   return result;
 }
 
-bool isList(const AstNode& n) {
+bool is_list(const ast_node& n) {
   return !n.elems.empty();
 }
 
-bool isAtom(const AstNode& n) {
+bool is_atom(const ast_node& n) {
   return n.elems.empty();
 }
 
-bool isQuoteOrUnquote(const AstNode& n) {
-  return isAtom(n) && isQuoteOrUnquote(n.atom);
+bool is_quote_or_unquote(const ast_node& n) {
+  return is_atom(n) && is_quote_or_unquote(n.atom);
 }
 
-bool isOpenParen(const AstNode& n) {
+bool is_open_paren(const ast_node& n) {
   return n == "(";
 }
-bool isCloseParen(const AstNode& n) {
+bool is_close_paren(const ast_node& n) {
   return n == ")";
 }
 
-ostream& operator<<(ostream& os, AstNode x) {
+ostream& operator<<(ostream& os, ast_node x) {
   if (x.elems.empty()) return os << x.atom;
-  bool skipNextSpace = true;
-  for (list<AstNode>::iterator p = x.elems.begin(); p != x.elems.end(); ++p) {
-    if (!isCloseParen(*p) && !skipNextSpace)
+  bool skip_next_space = true;
+  for (list<ast_node>::iterator p = x.elems.begin(); p != x.elems.end(); ++p) {
+    if (!is_close_paren(*p) && !skip_next_space)
       os << " ";
     os << *p;
-    skipNextSpace = (isOpenParen(*p) || isQuoteOrUnquote(*p));
+    skip_next_space = (is_open_paren(*p) || is_quote_or_unquote(*p));
   }
   return os;
 }

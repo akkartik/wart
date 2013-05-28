@@ -12,201 +12,201 @@
 //  varargs functions with some named params: ((fn (fmt ... rest) (printf fmt rest)) "%d%d" 34 35) => "3435"
 //  passing in lists to functions: ((fn ((x y)) (+ x y)) '(3 4)) => 7
 
-Cell* eval(Cell* expr) {
-  return eval(expr, currLexicalScope);
+cell* eval(cell* expr) {
+  return eval(expr, Curr_lexical_scope);
 }
 
-Cell* eval(Cell* expr, Cell* scope) {
+cell* eval(cell* expr, cell* scope) {
   if (!expr)
-    RAISE << "eval: cell should never be NULL" << endl << DIE;
+    RAISE << "eval: cell should never be NULL" << endl << die();
 
   if (expr == nil)
     return nil;
 
-  if (isColonSym(expr))
+  if (is_keyword_sym(expr))
     return mkref(expr);
 
-  if (isSym(expr))
+  if (is_sym(expr))
     return mkref(lookup(expr, scope));
 
-  if (isAtom(expr))
+  if (is_atom(expr))
     return mkref(expr);
 
-  if (isObject(expr))
+  if (is_object(expr))
     return mkref(expr);
 
-  if (isQuoted(expr))
+  if (is_quoted(expr))
     return mkref(cdr(expr));
 
   // expr is a call
-  Cell* fn = toFn(eval(car(expr), scope));
-  if (!isFn(fn))
+  cell* fn = to_fn(eval(car(expr), scope));
+  if (!is_fn(fn))
     RAISE << "Not a call: " << expr << endl
         << "Perhaps you need to split the line in two." << endl;
 
   // eval its args in the caller's lexical environment
-  Cell* newScope = newTable();
-  evalBindAll(sig(fn), cdr(expr), scope, newScope);
+  cell* new_scope = new_table();
+  eval_bind_all(sig(fn), cdr(expr), scope, new_scope);
 
   // swap in the function's lexical environment
-  newDynamicScope(CURR_LEXICAL_SCOPE, isCompiledFn(body(fn)) ? scope : env(fn));
-  addLexicalScope(newScope);
+  new_dynamic_scope(CURR_LEXICAL_SCOPE, is_compiledfn(body(fn)) ? scope : env(fn));
+  add_lexical_scope(new_scope);
 
-  Cell* result = nil;
-  if (isCompiledFn(body(fn))) {
-    result = toCompiledFn(body(fn))();  // all compiledFns must mkref result
+  cell* result = nil;
+  if (is_compiledfn(body(fn))) {
+    result = to_compiledfn(body(fn))();  // all Compiledfns must mkref result
   }
   else {
     // eval all forms in body, save result of final form
-    for (Cell* form = impl(fn); form != nil; form=cdr(form)) {
+    for (cell* form = impl(fn); form != nil; form=cdr(form)) {
       rmref(result);
-      result = eval(car(form), currLexicalScope);
+      result = eval(car(form), Curr_lexical_scope);
     }
   }
 
-  endLexicalScope();  // implicitly rmrefs newScope
-  endDynamicScope(CURR_LEXICAL_SCOPE);
+  end_lexical_scope();  // implicitly rmrefs new_scope
+  end_dynamic_scope(CURR_LEXICAL_SCOPE);
   rmref(fn);
   return result;  // already mkref'd
 }
 
-// bind params to args in newScope, taking into account:
+// bind params to args in new_scope, taking into account:
 //  quoted params (eval'ing args as necessary; args is never quoted, though)
 //  destructured params
-void evalBindAll(Cell* params, Cell* args, Cell* scope, Cell* newScope) {
+void eval_bind_all(cell* params, cell* args, cell* scope, cell* new_scope) {
   if (params == nil)
     return;
 
-  Cell* args2 = NULL;
-  if (isQuoted(params)) {
-    params = stripQuote(params);
-    args2 = quoteAll(args);
+  cell* args2 = NULL;
+  if (is_quoted(params)) {
+    params = strip_quote(params);
+    args2 = quote_all(args);
   }
   else {
     args2 = mkref(args);
   }
 
-  if (isSym(params)) {
-    Cell* val = evalAll(args2, scope);
-    bindParams(params, val, newScope);
+  if (is_sym(params)) {
+    cell* val = eval_all(args2, scope);
+    bind_params(params, val, new_scope);
     rmref(val);
   }
 
-  else if (!isCons(params))
+  else if (!is_cons(params))
     ;
 
   else {
-    evalBindParam(car(params), car(args2), scope, newScope);
-    evalBindAll(cdr(params), cdr(args2), scope, newScope);
+    eval_bind_param(car(params), car(args2), scope, new_scope);
+    eval_bind_all(cdr(params), cdr(args2), scope, new_scope);
   }
   rmref(args2);
 }
 
-void evalBindParam(Cell* param, Cell* arg, Cell* scope, Cell* newScope) {
-  Cell* arg2 = NULL;
-  if (isQuoted(param)) {
-    param = stripQuote(param);
-    arg2 = mkref(newCons(sym_quote, arg));
+void eval_bind_param(cell* param, cell* arg, cell* scope, cell* new_scope) {
+  cell* arg2 = NULL;
+  if (is_quoted(param)) {
+    param = strip_quote(param);
+    arg2 = mkref(new_cons(sym_quote, arg));
   }
   else
     arg2 = mkref(arg);
 
-  Cell* val = eval(arg2, scope);
-  bindParams(param, val, newScope);
+  cell* val = eval(arg2, scope);
+  bind_params(param, val, new_scope);
   rmref(val);
   rmref(arg2);
 }
 
-void bindParams(Cell* params, Cell* args, Cell* newScope) {
-  if (isQuoted(params))
-    bindParams(stripQuote(params), args, newScope);
+void bind_params(cell* params, cell* args, cell* new_scope) {
+  if (is_quoted(params))
+    bind_params(strip_quote(params), args, new_scope);
 
   else if (params == nil)
     ;
 
-  else if (isSym(params))
-    addLexicalBinding(params, args, newScope);
+  else if (is_sym(params))
+    add_lexical_binding(params, args, new_scope);
 
-  else if (!isCons(params))
+  else if (!is_cons(params))
     ;
 
-  else if (args != nil && !isCons(args))
-    bindParams(params, nil, newScope);
+  else if (args != nil && !is_cons(args))
+    bind_params(params, nil, new_scope);
 
   else {
-    bindParams(car(params), car(args), newScope);
-    bindParams(cdr(params), cdr(args), newScope);
+    bind_params(car(params), car(args), new_scope);
+    bind_params(cdr(params), cdr(args), new_scope);
   }
 }
 
-Cell* evalAll(Cell* args, Cell* scope) {
-  if (!isCons(args))
+cell* eval_all(cell* args, cell* scope) {
+  if (!is_cons(args))
     return eval(args, scope);
-  Cell* pResult = newCell(), *curr = pResult;
+  cell* p_result = new_cell(), *curr = p_result;
   for (; args != nil; args=cdr(args), curr=cdr(curr)) {
-    Cell* val = eval(car(args), scope);
-    addCons(curr, val);
+    cell* val = eval(car(args), scope);
+    add_cons(curr, val);
     rmref(val);
   }
-  return dropPtr(pResult);
+  return drop_ptr(p_result);
 }
 
 
 
 //// helpers
 
-bool isQuoted(Cell* cell) {
-  return isCons(cell) && car(cell) == sym_quote;
+bool is_quoted(cell* cell) {
+  return is_cons(cell) && car(cell) == sym_quote;
 }
 
-Cell* stripQuote(Cell* cell) {
-  return isQuoted(cell) ? cdr(cell) : cell;
+cell* strip_quote(cell* cell) {
+  return is_quoted(cell) ? cdr(cell) : cell;
 }
 
-bool isColonSym(Cell* x) {
-  if (!isSym(x)) return false;
-  string name = toString(x);
+bool is_keyword_sym(cell* x) {
+  if (!is_sym(x)) return false;
+  string name = to_string(x);
   if (name == ":") return false;
   return name[0] == ':';
 }
 
 // fn = (object function {sig => .., body => .., env => ..})
-bool isFn(Cell* x) {
-  return isCons(x) && type(x) == sym_function;
+bool is_fn(cell* x) {
+  return is_cons(x) && type(x) == sym_function;
 }
 
-Cell* toFn(Cell* x) {
-  if (x == nil || isFn(x)) return x;
-  if (!lookupDynamicBinding(sym_Coercions))
-    RAISE << "tried to call " << x << endl << DIE;
-  Cell* result = coerceQuoted(x, sym_function, lookup(sym_Coercions));   rmref(x);
+cell* to_fn(cell* x) {
+  if (x == nil || is_fn(x)) return x;
+  if (!lookup_dynamic_binding(sym_Coercions))
+    RAISE << "tried to call " << x << endl << die();
+  cell* result = coerce_quoted(x, sym_function, lookup(sym_Coercions));   rmref(x);
   return result;
 }
 
-Cell* sig(Cell* fn) {
+cell* sig(cell* fn) {
   return get(rep(fn), sym_sig);
 }
 
-Cell* body(Cell* fn) {
+cell* body(cell* fn) {
   return get(rep(fn), sym_body);
 }
 
-Cell* impl(Cell* fn) {
-  Cell* impl = get(rep(fn), sym_optimized_body);
+cell* impl(cell* fn) {
+  cell* impl = get(rep(fn), sym_optimized_body);
   return (impl != nil) ? impl : body(fn);
 }
 
-Cell* env(Cell* fn) {
+cell* env(cell* fn) {
   return get(rep(fn), sym_env);
 }
 
-Cell* quote(Cell* x) {
-  return newCons(sym_quote, x);
+cell* quote(cell* x) {
+  return new_cons(sym_quote, x);
 }
 
-Cell* quoteAll(Cell* x) {
-  Cell* result = newCell(), *curr = result;
-  for (Cell* iter = x; iter != nil; iter=cdr(iter), curr=cdr(curr))
-    addCons(curr, quote(car(iter)));
-  return dropPtr(result);
+cell* quote_all(cell* x) {
+  cell* result = new_cell(), *curr = result;
+  for (cell* iter = x; iter != nil; iter=cdr(iter), curr=cdr(curr))
+    add_cons(curr, quote(car(iter)));
+  return drop_ptr(result);
 }

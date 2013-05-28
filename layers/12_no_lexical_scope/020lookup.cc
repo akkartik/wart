@@ -1,33 +1,33 @@
 //// symbol bindings
 
 // Dynamic scopes are for rebinding global variables, and for undoing bindings.
-unordered_map<Cell*, stack<Cell*> > dynamics;
+unordered_map<cell*, stack<cell*> > Dynamics;
 
-Cell* lookup(string s) {
-  return lookup(newSym(s));
+cell* lookup(string s) {
+  return lookup(new_sym(s));
 }
 
-Cell* lookup(Cell* sym) {
-  stack<Cell*>& bindings = dynamics[sym];
+cell* lookup(cell* sym) {
+  stack<cell*>& bindings = Dynamics[sym];
   if (bindings.empty()) {
-    RAISE << "No binding for " << toString(sym) << endl;
+    RAISE << "No binding for " << to_string(sym) << endl;
     return nil;
   }
   return bindings.top();
 }
 
-void newDynamicScope(Cell* sym, Cell* val) {
+void new_dynamic_scope(cell* sym, cell* val) {
   mkref(sym);
   mkref(val);
-  dynamics[sym].push(val);
+  Dynamics[sym].push(val);
 }
 
-void newDynamicScope(string s, Cell* val) {
-  newDynamicScope(newSym(s), val);
+void new_dynamic_scope(string s, cell* val) {
+  new_dynamic_scope(new_sym(s), val);
 }
 
-void endDynamicScope(Cell* sym) {
-  stack<Cell*>& bindings = dynamics[sym];
+void end_dynamic_scope(cell* sym) {
+  stack<cell*>& bindings = Dynamics[sym];
   if (bindings.empty()) {
     RAISE << "No dynamic binding for " << sym << endl;
     return;
@@ -37,15 +37,15 @@ void endDynamicScope(Cell* sym) {
   bindings.pop();
 }
 
-void endDynamicScope(string s) {
-  endDynamicScope(newSym(s));
+void end_dynamic_scope(string s) {
+  end_dynamic_scope(new_sym(s));
 }
 
-void assignDynamicVar(Cell* sym, Cell* val) {
-  stack<Cell*>& bindings = dynamics[sym];
+void assign_dynamic_var(cell* sym, cell* val) {
+  stack<cell*>& bindings = Dynamics[sym];
   if (bindings.empty()) {
     RAISE << "No dynamic binding to assign for " << sym << endl;
-    newDynamicScope(sym, val);
+    new_dynamic_scope(sym, val);
     return;
   }
   rmref(bindings.top());

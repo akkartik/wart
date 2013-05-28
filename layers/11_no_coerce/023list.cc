@@ -1,22 +1,22 @@
-COMPILE_FN(cons, compiledFn_cons, "($x $y)",
-  return mkref(newCons(lookup("$x"), lookup("$y")));
+COMPILE_FN(cons, compiledfn_cons, "($x $y)",
+  return mkref(new_cons(lookup("$x"), lookup("$y")));
 )
 
-// useful idiom: create a dummy cell p, keep appending to it using addCons,
-// then return dropPtr(p) which GC's the dummy but mkrefs the rest.
-Cell* dropPtr(Cell* p) {
-  Cell* x = mkref(cdr(p));
+// useful idiom: create a dummy cell p, keep appending to it using add_cons,
+// then return drop_ptr(p) which GC's the dummy but mkrefs the rest.
+cell* drop_ptr(cell* p) {
+  cell* x = mkref(cdr(p));
   rmref(p);
   return x;
 }
 
-void addCons(Cell* p, Cell* x) {
-  setCdr(p, newCons(x));
+void add_cons(cell* p, cell* x) {
+  set_cdr(p, new_cons(x));
 }
 
 // push p onto l and move one refcount to new head
-Cell* pushCons(Cell* p, Cell* l) {
-  Cell* result = newCons(p, l);
+cell* push_cons(cell* p, cell* l) {
+  cell* result = new_cons(p, l);
   rmref(cdr(result));
   return mkref(result);
 }

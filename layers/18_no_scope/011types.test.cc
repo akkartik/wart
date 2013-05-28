@@ -1,62 +1,62 @@
-void test_toFloat_works() {
-  Cell* num1 = newNum(3);
-  CHECK(equalFloats(toFloat(num1), 3.0));
-  Cell* num2 = newNum(1.5);
-  CHECK(equalFloats(toFloat(num2), 1.5));
+void test_to_float_works() {
+  cell* num1 = new_num(3);
+  CHECK(equal_floats(to_float(num1), 3.0));
+  cell* num2 = new_num(1.5);
+  CHECK(equal_floats(to_float(num2), 1.5));
   rmref(num2);
   rmref(num1);
 }
 
-void test_setCar_decrements_nrefs() {
-  Cell* cons = newCell();
-  Cell* car = newCell();
+void test_set_car_decrements_nrefs() {
+  cell* cons = new_cell();
+  cell* car = new_cell();
   CHECK_EQ(car->nrefs, 0);
-  Cell* newCar = newCell();
-  CHECK_EQ(newCar->nrefs, 0);
-  setCar(cons, car);
+  cell* new_car = new_cell();
+  CHECK_EQ(new_car->nrefs, 0);
+  set_car(cons, car);
   CHECK_EQ(car->nrefs, 1);
-  CHECK_EQ(newCar->nrefs, 0);
-  setCar(cons, newCar);
+  CHECK_EQ(new_car->nrefs, 0);
+  set_car(cons, new_car);
   CHECK_EQ(car->nrefs, 0);
-  CHECK_EQ(newCar->nrefs, 1);
+  CHECK_EQ(new_car->nrefs, 1);
   rmref(cons);
 }
 
-void test_setCar_decrements_nrefs_for_non_cons() {
-  Cell* cons = newCell();
-  Cell* num = newNum(23);
+void test_set_car_decrements_nrefs_for_non_cons() {
+  cell* cons = new_cell();
+  cell* num = new_num(23);
   CHECK_EQ(num->nrefs, 1);
-  Cell* newCar = newCell();
-  CHECK_EQ(newCar->nrefs, 0);
-  setCar(cons, num);
+  cell* new_car = new_cell();
+  CHECK_EQ(new_car->nrefs, 0);
+  set_car(cons, num);
   CHECK_EQ(num->nrefs, 2);
-  CHECK_EQ(newCar->nrefs, 0);
-  setCar(cons, newCar);
+  CHECK_EQ(new_car->nrefs, 0);
+  set_car(cons, new_car);
   CHECK_EQ(num->nrefs, 1);
-  CHECK_EQ(newCar->nrefs, 1);
+  CHECK_EQ(new_car->nrefs, 1);
   rmref(cons);
 }
 
-void test_setCar_is_idempotent() {
-  Cell* cons = newCell();
-  Cell* x = newCell();
+void test_set_car_is_idempotent() {
+  cell* cons = new_cell();
+  cell* x = new_cell();
   CHECK_EQ(x->nrefs, 0);
-  setCar(cons, x);
+  set_car(cons, x);
   CHECK_EQ(x->nrefs, 1);
-  setCar(cons, x);
+  set_car(cons, x);
   CHECK_EQ(x->nrefs, 1);
   CHECK(car(x));
   CHECK(cdr(x));
   rmref(cons);
 }
 
-void test_setCdr_is_idempotent() {
-  Cell* cons = newCell();
-  Cell* x = newCell();
+void test_set_cdr_is_idempotent() {
+  cell* cons = new_cell();
+  cell* x = new_cell();
   CHECK_EQ(x->nrefs, 0);
-  setCdr(cons, x);
+  set_cdr(cons, x);
   CHECK_EQ(x->nrefs, 1);
-  setCdr(cons, x);
+  set_cdr(cons, x);
   CHECK_EQ(x->nrefs, 1);
   CHECK(car(x));
   CHECK(cdr(x));
@@ -64,8 +64,8 @@ void test_setCdr_is_idempotent() {
 }
 
 void test_set_deletes_nonexistent_key() {
-  Cell* t = newTable();
-  Cell* k = newSym("nonexistent key test");
+  cell* t = new_table();
+  cell* k = new_sym("nonexistent key test");
   CHECK_EQ(k->nrefs, 1);
   set(t, k, nil);
   CHECK_EQ(k->nrefs, 1);

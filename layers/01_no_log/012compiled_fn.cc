@@ -1,54 +1,54 @@
 //// compiled primitives
 
-typedef Cell* (*CompiledFn)();
+typedef cell* (*compiledfn)();
 
 #define COMPILE_FN(op, name, params, body) \
-  Cell* name() { body }   // op and params extracted into compiled_fn_list below
+  cell* name() { body }   // op and params extracted into compiledfn_list below
 
-struct CompiledFnMetadata {
+struct compiledfn_metadata {
   string name;
   string params;
-  CompiledFn impl;
+  compiledfn impl;
 };
 
-const CompiledFnMetadata compiledFns[] = {
-  #include "compiled_fn_list"
+const compiledfn_metadata Compiledfns[] = {
+  #include "compiledfn_list"
 };
 
-void setupCompiledFns() {
-  newDynamicScope(sym_compiled, newTable());
-  for (unsigned long i=0; i < sizeof(compiledFns)/sizeof(compiledFns[0]); ++i) {
-    Cell* f = newTable();
-    set(f, sym_name, newSym(compiledFns[i].name));
-    IndentSensitiveStream ss(compiledFns[i].params);
-    set(f, sym_sig, nextCell(ss));
-    set(f, sym_body, newCompiledFn(compiledFns[i].impl));
-    Cell* obj = newObject("function", f);
-    newDynamicScope(compiledFns[i].name, obj);
+void setup_compiledfns() {
+  new_dynamic_scope(sym_compiled, new_table());
+  for (unsigned long i=0; i < sizeof(Compiledfns)/sizeof(Compiledfns[0]); ++i) {
+    cell* f = new_table();
+    set(f, sym_name, new_sym(Compiledfns[i].name));
+    indent_sensitive_stream ss(Compiledfns[i].params);
+    set(f, sym_sig, next_cell(ss));
+    set(f, sym_body, new_compiledfn(Compiledfns[i].impl));
+    cell* obj = new_object("function", f);
+    new_dynamic_scope(Compiledfns[i].name, obj);
     // save to a second, immutable place
-    set(lookup(sym_compiled), compiledFns[i].name, obj);
+    set(lookup(sym_compiled), Compiledfns[i].name, obj);
   }
 }
 
-void teardownCompiledFns() {
-  for (unsigned long i=0; i < sizeof(compiledFns)/sizeof(compiledFns[0]); ++i)
-    endDynamicScope(compiledFns[i].name);
-  endDynamicScope(sym_compiled);
+void teardown_compiledfns() {
+  for (unsigned long i=0; i < sizeof(Compiledfns)/sizeof(Compiledfns[0]); ++i)
+    end_dynamic_scope(Compiledfns[i].name);
+  end_dynamic_scope(sym_compiled);
 }
 
-Cell* newCompiledFn(CompiledFn f) {
-  Cell* result = newCell();
+cell* new_compiledfn(compiledfn f) {
+  cell* result = new_cell();
   result->type = COMPILED_FN;
-  result->car = (Cell*)f;
+  result->car = (cell*)f;
   return result;
 }
 
-bool isCompiledFn(Cell* x) {
+bool is_compiledfn(cell* x) {
   return x->type == COMPILED_FN;
 }
 
-CompiledFn toCompiledFn(Cell* x) {
-  if (!isCompiledFn(x))
-    RAISE << "Not a compiled function" << endl << DIE;
-  return (CompiledFn)x->car;
+compiledfn to_compiledfn(cell* x) {
+  if (!is_compiledfn(x))
+    RAISE << "Not a compiled function" << endl << die();
+  return (compiledfn)x->car;
 }

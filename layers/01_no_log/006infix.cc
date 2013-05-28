@@ -21,37 +21,37 @@
 //  support a.-b, l.-1
 //    rely on separate def for .- op
 
-const string extraSymChars = "$?!_:";  // besides letters and digits
+const string Extra_sym_chars = "$?!_:";  // besides letters and digits
 
-AstNode transformInfix(AstNode n) {
+ast_node transform_infix(ast_node n) {
   // special-case: ellipses are for dotted lists, not infix
-  if (isAtom(n) && n.atom.token == "...")
+  if (is_atom(n) && n.atom.value == "...")
     return n;
 
-  if (isAtom(n) && n.atom.token[0] == '\"')
+  if (is_atom(n) && n.atom.value[0] == '\"')
     return n;
 
-  if (isAtom(n) && parseableAsFloat(n.atom.token))
+  if (is_atom(n) && is_parseable_as_float(n.atom.value))
     return n;
 
-  if (isAtom(n) && !containsInfixChar(n.atom.token))
+  if (is_atom(n) && !contains_infix_char(n.atom.value))
     return n;
 
-  if (isAtom(n))
-    n = tokenizeInfix(n);
-  if (isAtom(n))
+  if (is_atom(n))
+    n = tokenize_infix(n);
+  if (is_atom(n))
     return n;
 
-  if (isQuoteOrUnquote(n.elems.front())) {
-    list<AstNode>::iterator p = n.elems.begin();
-    while (isQuoteOrUnquote(*p)) {
+  if (is_quote_or_unquote(n.elems.front())) {
+    list<ast_node>::iterator p = n.elems.begin();
+    while (is_quote_or_unquote(*p)) {
       ++p;
       if (p == n.elems.end()) return n;
     }
-    AstNode result = (p == --n.elems.end())
-        ? transformInfix(*p)
-        : transformInfix(AstNode(list<AstNode>(p, n.elems.end())));
-    if (isAtom(result)) {
+    ast_node result = (p == --n.elems.end())
+        ? transform_infix(*p)
+        : transform_infix(ast_node(list<ast_node>(p, n.elems.end())));
+    if (is_atom(result)) {
       n.elems.erase(p, n.elems.end());
       n.elems.push_back(result);
       return n;
@@ -62,41 +62,41 @@ AstNode transformInfix(AstNode n) {
     }
   }
 
-  if (n.elems.front() != Token("("))
+  if (n.elems.front() != token("("))
     return n;
 
   if (n.elems.size() == 2)  //// ()
     return n;
 
-  if (infixOpCalledWithoutArgs(n))
+  if (is_infix_call_without_args(n))
     return *++n.elems.begin();  //// (++) => ++
 
-  int oldsize = n.elems.size();
+  int old_size = n.elems.size();
 
   // now n is guaranteed to have at least 3 ops
   // slide a window of 3, pinching into s-exprs when middle elem is an op
-  list<AstNode>::iterator prev = n.elems.begin();
-  list<AstNode>::iterator curr=prev; ++curr;
-  list<AstNode>::iterator next=curr; ++next;
+  list<ast_node>::iterator prev = n.elems.begin();
+  list<ast_node>::iterator curr=prev; ++curr;
+  list<ast_node>::iterator next=curr; ++next;
   for (; next != n.elems.end(); ++prev, ++curr, ++next) {
-    if (curr->atom.token == "...") continue;
+    if (curr->atom.value == "...") continue;
 
-    if (!isInfixOp(*curr)) {
-      *curr = transformInfix(*curr);
+    if (!is_infix_op(*curr)) {
+      *curr = transform_infix(*curr);
       continue;
     }
     if (*next == ")") {  //// postfix op
-      *curr = transformInfix(*curr);
+      *curr = transform_infix(*curr);
       continue;
     }
 
-    list<AstNode> tmp;
-    tmp.push_back(transformInfix(*curr));
+    list<ast_node> tmp;
+    tmp.push_back(transform_infix(*curr));
     if (prev == n.elems.begin()) {
       //// prefix op; grab as many non-ops as you can
-      list<AstNode>::iterator oldnext = next;
-      while (!isInfixOp(*next)) {
-        tmp.push_back(transformInfix(*next));
+      list<ast_node>::iterator oldnext = next;
+      while (!is_infix_op(*next)) {
+        tmp.push_back(transform_infix(*next));
         ++next;
         if (next == --n.elems.end()) break;
       }
@@ -108,7 +108,7 @@ AstNode transformInfix(AstNode n) {
     else {
       //// infix op; switch to prefix
       tmp.push_back(*prev);
-      tmp.push_back(transformInfix(*next));
+      tmp.push_back(transform_infix(*next));
 
       // update both prev and next
       n.elems.erase(prev);
@@ -117,26 +117,26 @@ AstNode transformInfix(AstNode n) {
       next=curr; ++next;
     }
     // wrap in parens
-    tmp.push_front(AstNode(Token("(")));
-    tmp.push_back(AstNode(Token(")")));
+    tmp.push_front(ast_node(token("(")));
+    tmp.push_back(ast_node(token(")")));
     // insert the new s-expr
-    *curr = AstNode(tmp);
+    *curr = ast_node(tmp);
   }
 
   // (a + b) will have become ((+ a b)); strip out one pair of parens
-  if (n.elems.size() == 3 && oldsize > 3)
+  if (n.elems.size() == 3 && old_size > 3)
     return *++n.elems.begin();
 
   return n;
 }
 
-AstNode tokenizeInfix(AstNode n) {
-  const char* var = n.atom.token.c_str();
+ast_node tokenize_infix(ast_node n) {
+  const char* var = n.atom.value.c_str();
 
   string out;
   for (size_t x=0; var[x] != '\0'; ++x) {
-    if (isdigit(var[x]) && (x == 0 || isInfixChar(var[x-1]))) {
-      const char* next = skipFloat(&var[x]);
+    if (isdigit(var[x]) && (x == 0 || is_infix_char(var[x-1]))) {
+      const char* next = skip_float(&var[x]);
       if (next != &var[x]) {
         out += " ";
         while (var[x] != '\0' && &var[x] != next) {
@@ -149,67 +149,67 @@ AstNode tokenizeInfix(AstNode n) {
     }
 
     if ((x > 0)
-          && ((isInfixChar(var[x]) && isRegularChar(var[x-1]) && var[x-1] != '$')
-              || (isRegularChar(var[x]) && isInfixChar(var[x-1])))) {
+          && ((is_infix_char(var[x]) && is_regular_char(var[x-1]) && var[x-1] != '$')
+              || (is_regular_char(var[x]) && is_infix_char(var[x-1])))) {
       out += " ";
     }
     out += var[x];
   }
   stringstream ss(out);
-  IndentSensitiveStream tmp(ss);
-  return nextAstNode(tmp);
+  indent_sensitive_stream tmp(ss);
+  return next_ast_node(tmp);
 }
 
 
 
-bool isInfixOp(AstNode n) {
-  if (isList(n)) return false;
+bool is_infix_op(ast_node n) {
+  if (is_list(n)) return false;
   if (n == "...") return false;
-  string s = n.atom.token;
+  string s = n.atom.value;
   string::iterator p = s.begin();
-  if (*p != '$' && !isInfixChar(*p))
+  if (*p != '$' && !is_infix_char(*p))
     return false;
   for (++p; p != s.end(); ++p)
-    if (!isInfixChar(*p))
+    if (!is_infix_char(*p))
       return false;
   return true;
 }
 
-bool containsInfixChar(string name) {
+bool contains_infix_char(string name) {
   for (string::iterator p = name.begin(); p != name.end(); ++p) {
     if (p == name.begin() && *p == '-')
       continue;
 
-    if (isInfixChar(*p)) return true;
+    if (is_infix_char(*p)) return true;
   }
   return false;
 }
 
-bool isInfixChar(char c) {
-  return !find(punctuationChars, c)
-      && !find(quoteAndUnquoteChars, c)
-      && !isalnum(c) && !find(extraSymChars, c);
+bool is_infix_char(char c) {
+  return !find(Punctuation_chars, c)
+      && !find(Quote_and_unquote_chars, c)
+      && !isalnum(c) && !find(Extra_sym_chars, c);
 }
 
-bool isRegularChar(char c) {
-  return isalnum(c) || find(extraSymChars, c);
+bool is_regular_char(char c) {
+  return isalnum(c) || find(Extra_sym_chars, c);
 }
 
-bool infixOpCalledWithoutArgs(AstNode n) {
-  if (!isList(n) || n.elems.size() != 3) return false;
-  list<AstNode>::iterator p = n.elems.begin();
-  if (*p != Token("(")) return false;
+bool is_infix_call_without_args(ast_node n) {
+  if (!is_list(n) || n.elems.size() != 3) return false;
+  list<ast_node>::iterator p = n.elems.begin();
+  if (*p != token("(")) return false;
   ++p;
-  return isInfixOp(*p);
+  return is_infix_op(*p);
 }
 
-bool parseableAsFloat(string s) {
+bool is_parseable_as_float(string s) {
   errno = 0;
-  const char* end = skipFloat(s.c_str());
+  const char* end = skip_float(s.c_str());
   return *end == '\0' && errno == 0;
 }
 
-const char* skipFloat(const char* s) {
+const char* skip_float(const char* s) {
   char* end = NULL;
   unused float dummy = strtof(s, &end);
   return end;

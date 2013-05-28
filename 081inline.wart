@@ -10,7 +10,7 @@ def (freeze tree)
 
 def (inline (tree | (f ... args)))
   awhen f :satisfies fn?
-    (replace_all (as table symbolicEvalArgs.tree) :in body.f)
+    (replace_all (as table symbolic_eval_args.tree) :in body.f)
 
 def (replace_all bindings tree|in)
   (aif tree :satisfies ~cons?

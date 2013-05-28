@@ -7,13 +7,13 @@
 //  avoid fragmentation
 //    so all cells try to have the same size (exceptions: strings, tables)
 
-unsigned long numAllocs = 0;
+unsigned long Num_allocs = 0;
 
-extern Cell* nil;
+extern cell* nil;
 
-struct Cell {
-  Cell* car;  // aliased to long or float
-  Cell* cdr;
+struct cell {
+  cell* car;  // aliased to long or float
+  cell* cdr;
 
   // ints save space on 64-bit platforms
   int type;
@@ -26,89 +26,89 @@ struct Cell {
     #define COMPILED_FN 6
   int nrefs;
 
-  Cell() :car(NULL), cdr(NULL), type(CONS), nrefs(0) {}
+  cell() :car(NULL), cdr(NULL), type(CONS), nrefs(0) {}
   void init() {
     car=cdr=nil, type=CONS, nrefs=0;
-    ++numAllocs;
+    ++Num_allocs;
   }
   void clear() { car=cdr=NULL, type=CONS, nrefs=0; }
 };
 
-Cell* nil = new Cell;
-void setupNil() {
+cell* nil = new cell;
+void setup_nil() {
   nil->car = nil->cdr = nil;
 }
 
-bool isCons(Cell* x) {
+bool is_cons(cell* x) {
   return x != nil && x->type == CONS;
 }
 
-bool isAtom(Cell* x) {
+bool is_atom(cell* x) {
   return x == nil || x->type == INTEGER || x->type == FLOAT || x->type == STRING || x->type == SYMBOL || x->type == COMPILED_FN;
 }
 
 
 
-#define HEAPCELLS (1024*1024/sizeof(Cell))  // 1MB
-struct Heap {
-  Cell cells[HEAPCELLS];
-  Heap *next;
-  Heap() :next(NULL) {}
+#define HEAPCELLS (1024*1024/sizeof(cell))  // 1MB
+struct heap {
+  cell cells[HEAPCELLS];
+  heap *next;
+  heap() :next(NULL) {}
 };
 
-Heap* firstHeap = new Heap();
-Heap* currHeap = firstHeap;
-long currCell = 0;
-Cell* freelist = NULL;
+heap* First_heap = new heap();
+heap* Curr_heap = First_heap;
+long Curr_cell = 0;
+cell* Free_cells = NULL;
 
-void growHeap() {
-  currHeap = currHeap->next = new Heap();
-  if (!currHeap) RAISE << "Out of memory" << endl << DIE;
-  currCell = 0;
+void grow_heap() {
+  Curr_heap = Curr_heap->next = new heap();
+  if (!Curr_heap) RAISE << "Out of memory" << endl << die();
+  Curr_cell = 0;
 }
 
-void resetHeap(Heap* h) {
+void reset_heap(heap* h) {
   if (h->next)
-    resetHeap(h->next);
+    reset_heap(h->next);
   delete h;
-  if (h == firstHeap) {
-    firstHeap = new Heap();
-    currHeap = firstHeap;
-    currCell = 0;
-    freelist = NULL;
+  if (h == First_heap) {
+    First_heap = new heap();
+    Curr_heap = First_heap;
+    Curr_cell = 0;
+    Free_cells = NULL;
   }
 }
 
-Cell* newCell() {
-  Cell* result = NULL;
-  if (freelist) {
-    result = freelist;
-    freelist = freelist->cdr;
+cell* new_cell() {
+  cell* result = NULL;
+  if (Free_cells) {
+    result = Free_cells;
+    Free_cells = Free_cells->cdr;
     result->init();
     return result;
   }
 
-  if (currCell == HEAPCELLS)
-    growHeap();
+  if (Curr_cell == HEAPCELLS)
+    grow_heap();
 
-  result = &currHeap->cells[currCell];
-  ++currCell;
+  result = &Curr_heap->cells[Curr_cell];
+  ++Curr_cell;
   result->init();
   return result;
 }
 
 
 
-typedef unordered_map<Cell*, Cell*> CellMap;
+typedef unordered_map<cell*, cell*> cell_map;
 
-struct Table {
-  CellMap table;
-  Cell*& operator[](Cell* c) {
-    return table[c];
+struct table {
+  cell_map value;
+  cell*& operator[](cell* c) {
+    return value[c];
   }
 
-  ~Table() {
-    for (CellMap::iterator p = table.begin(); p != table.end(); ++p) {
+  ~table() {
+    for (cell_map::iterator p = value.begin(); p != value.end(); ++p) {
       if (!p->second) continue;
       rmref(p->first);
       rmref(p->second);
@@ -116,21 +116,21 @@ struct Table {
   }
 };
 
-Cell* mkref(Cell* c) {
+cell* mkref(cell* c) {
   if (c == nil) return nil;
   ++c->nrefs;
   return c;
 }
 
-void rmref(Cell* c) {
+void rmref(cell* c) {
   if (!c)
-    RAISE << "A cell was prematurely garbage-collected." << endl << DIE;
+    RAISE << "A cell was prematurely garbage-collected." << endl << die();
   if (c == nil) return;
 
   --c->nrefs;
   if (c->nrefs > 0) return;
 
-  if (isAtom(c) && c->type != STRING && c->type != FLOAT && !runningTests)
+  if (is_atom(c) && c->type != STRING && c->type != FLOAT && !Running_tests)
     RAISE << "deleted atom: " << (void*)c << endl;
 
   switch (c->type) {
@@ -143,18 +143,18 @@ void rmref(Cell* c) {
   case CONS:
     rmref(c->car); break;
   case TABLE:
-    delete (Table*)c->car; break;
+    delete (table*)c->car; break;
   case COMPILED_FN:
     break;  // compiled functions don't need freeing
   default:
-    RAISE << "Can't rmref type " << c->type << endl << DIE;
+    RAISE << "Can't rmref type " << c->type << endl << die();
   }
 
   rmref(c->cdr);
 
   c->clear();
-  c->cdr = freelist;
-  freelist = c;
+  c->cdr = Free_cells;
+  Free_cells = c;
   return;
 }
 
@@ -162,32 +162,32 @@ void rmref(Cell* c) {
 
 // misc
 
-long numUnfreed() {
+long num_unfreed() {
   long n = 0;
-  for (Heap* h = firstHeap; h != currHeap; h=h->next)
+  for (heap* h = First_heap; h != Curr_heap; h=h->next)
     n += HEAPCELLS;
-  n += currCell;
-  for (Cell* f = freelist; f; f=f->cdr)
+  n += Curr_cell;
+  for (cell* f = Free_cells; f; f=f->cdr)
     --n;
   return n;
 }
 
-void dumpUnfreed() {
-  unordered_map<Cell*, int> numRefsRemaining;
-  for (Heap* h = firstHeap; h; h=h->next)
-    for (Cell* x = &h->cells[0]; x < &h->cells[HEAPCELLS]; ++x)
+void dump_unfreed() {
+  unordered_map<cell*, int> num_refs_remaining;
+  for (heap* h = First_heap; h; h=h->next)
+    for (cell* x = &h->cells[0]; x < &h->cells[HEAPCELLS]; ++x)
       if (x->car)
-        markAllCells(x, numRefsRemaining);
+        mark_all_cells(x, num_refs_remaining);
 
-  for (Heap* h = firstHeap; h; h=h->next)
-    for (Cell* x = &h->cells[0]; x < &h->cells[HEAPCELLS]; ++x) {
+  for (heap* h = First_heap; h; h=h->next)
+    for (cell* x = &h->cells[0]; x < &h->cells[HEAPCELLS]; ++x) {
       if (!x->car) continue;
-      if (numRefsRemaining[x] > 1) continue;
+      if (num_refs_remaining[x] > 1) continue;
       cerr << "unfreed: " << (void*)x << " " << x << endl;
     }
 }
 
-void markAllCells(Cell* x, unordered_map<Cell*, int>& mark) {
+void mark_all_cells(cell* x, unordered_map<cell*, int>& mark) {
   if (x == nil) return;
   ++mark[x];
   switch (x->type) {
@@ -197,20 +197,20 @@ void markAllCells(Cell* x, unordered_map<Cell*, int>& mark) {
   case STRING:
     break;
   case CONS:
-    markAllCells(car(x), mark); break;
+    mark_all_cells(car(x), mark); break;
   case TABLE: {
-    Table* t = (Table*)x->car;
-    for (CellMap::iterator p = t->table.begin(); p != t->table.end(); ++p) {
+    table* t = (table*)x->car;
+    for (cell_map::iterator p = t->value.begin(); p != t->value.end(); ++p) {
       if (!p->second) continue;
-      markAllCells(p->first, mark);
-      markAllCells(p->second, mark);
+      mark_all_cells(p->first, mark);
+      mark_all_cells(p->second, mark);
     }
     break;
   }
   case COMPILED_FN:
     break;
   default:
-    cerr << "Can't mark type " << x->type << endl << DIE;
+    cerr << "Can't mark type " << x->type << endl << die();
   }
-  markAllCells(cdr(x), mark);
+  mark_all_cells(cdr(x), mark);
 }

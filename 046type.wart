@@ -11,7 +11,7 @@ def (table? _)
   (isa table _)
 def (fn? _)
   (isa function _)
-def (compiled_fn? _)
+def (compiledfn? _)
   (and (fn? _)
        (~cons? body._))
 

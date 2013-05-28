@@ -1,163 +1,163 @@
 void test_build_handles_nil() {
-  readAll("()");
+  read_all("()");
   CHECK_TRACE_CONTENTS("cell", "nil\n");
 }
 
 void test_build_handles_nil2() {
-  readAll("nil");
+  read_all("nil");
   CHECK_TRACE_CONTENTS("cell", "nil\n");
 }
 
 void test_build_handles_integer() {
-  readAll("34");
+  read_all("34");
   CHECK_TRACE_CONTENTS("cell", "num: 34\n");
 }
 
 void test_build_handles_float() {
-  readAll("3.4");
+  read_all("3.4");
   CHECK_TRACE_CONTENTS("cell", "float: 3.4\n");
 }
 
 void test_build_warns_on_ambiguous_float() {
-  readAll("-.4");
-  CHECK_EQ(raiseCount, 1); raiseCount=0;
+  read_all("-.4");
+  CHECK_EQ(Raise_count, 1); Raise_count=0;
   CHECK_TRACE_CONTENTS("cell", "float: -0.4\n");
 }
 
 void test_build_creates_floats_on_overflow() {
-  readAll("100000000000000000000");
-  CHECK_EQ(raiseCount, 1); raiseCount=0;
+  read_all("100000000000000000000");
+  CHECK_EQ(Raise_count, 1); Raise_count=0;
   CHECK_TRACE_CONTENTS("cell", "float: 1e+20\n");
 }
 
 void test_build_handles_sym() {
-  readAll("a");
+  read_all("a");
   CHECK_TRACE_CONTENTS("cell", "sym: a\n");
 }
 
 void test_build_handles_string() {
-  readAll("\"a\"");
+  read_all("\"a\"");
   CHECK_TRACE_CONTENTS("cell", "string: \"a\"\n");
 }
 
 void test_build_doesnt_mix_syms_and_strings() {
-  Cell* s = newString("a");
-  CHECK(s != newSym("a"));
+  cell* s = new_string("a");
+  CHECK(s != new_sym("a"));
 }
 
 void test_build_handles_quoted_sym() {
-  list<Cell*> result = readAll("'a");
+  list<cell*> result = read_all("'a");
   CHECK_TRACE_CONTENTS("cell", 1, "'a\n");
   CHECK_TRACE_CONTENTS("cell", 2, "sym: '\nsym: a\n");
-  Cell* c = result.front();
-  CHECK_EQ(car(c), newSym("'"));
-  CHECK_EQ(cdr(c), newSym("a"));
+  cell* c = result.front();
+  CHECK_EQ(car(c), new_sym("'"));
+  CHECK_EQ(cdr(c), new_sym("a"));
 }
 
 void test_build_handles_multiple_atoms() {
-  list<Cell*> result = readAll("34\n35");
+  list<cell*> result = read_all("34\n35");
   CHECK_TRACE_CONTENTS("cell", "num: 34\nnum: 35\n");
 }
 
 void test_build_handles_form() {
-  list<Cell*> result = readAll("(34 35)");
+  list<cell*> result = read_all("(34 35)");
   CHECK_TRACE_TOP("cell", "(34 35)\n");
-  Cell* c = result.front();
-  CHECK_EQ(car(c), newNum(34));
+  cell* c = result.front();
+  CHECK_EQ(car(c), new_num(34));
   c = cdr(c);
-  CHECK_EQ(car(c), newNum(35));
+  CHECK_EQ(car(c), new_num(35));
   CHECK_EQ(cdr(c), nil);
 }
 
 void test_build_handles_dotted_list() {
-  list<Cell*> result = readAll("(34 ... 35)");
+  list<cell*> result = read_all("(34 ... 35)");
   CHECK_TRACE_TOP("cell", "(34 ... 35)\n");
-  Cell* c = result.front();
-  CHECK_EQ(car(c), newNum(34));
+  cell* c = result.front();
+  CHECK_EQ(car(c), new_num(34));
   c = cdr(c);
-  CHECK_EQ(c, newNum(35));
+  CHECK_EQ(c, new_num(35));
 }
 
 void test_build_handles_literal_ellipses() {
-  list<Cell*> result = readAll("'...");
+  list<cell*> result = read_all("'...");
   CHECK_TRACE_TOP("cell", "'...\n");
-  Cell *c = result.front();
-  CHECK_EQ(car(c), newSym("'"));
-  CHECK_EQ(cdr(c), newSym("..."));
+  cell *c = result.front();
+  CHECK_EQ(car(c), new_sym("'"));
+  CHECK_EQ(cdr(c), new_sym("..."));
 }
 
 void test_build_handles_nested_form() {
-  list<Cell*> result = readAll("(3 7 (33 23))");
+  list<cell*> result = read_all("(3 7 (33 23))");
   CHECK_TRACE_TOP("cell", "(3 7 (33 23))\n");
-  Cell* c = result.front();
-  CHECK_EQ(car(c), newNum(3));
+  cell* c = result.front();
+  CHECK_EQ(car(c), new_num(3));
   c = cdr(c);
-  CHECK_EQ(car(c), newNum(7));
+  CHECK_EQ(car(c), new_num(7));
   c = cdr(c);
-    Cell* c2 = car(c);
-    CHECK_EQ(car(c2), newNum(33));
+    cell* c2 = car(c);
+    CHECK_EQ(car(c2), new_num(33));
     c2 = cdr(c2);
-    CHECK_EQ(car(c2), newNum(23));
+    CHECK_EQ(car(c2), new_num(23));
     CHECK_EQ(cdr(c2), nil);
   CHECK_EQ(cdr(c), nil);
 }
 
 void test_build_handles_strings() {
-  list<Cell*> result = readAll("(3 7 (33 \"abc\" 23))");
+  list<cell*> result = read_all("(3 7 (33 \"abc\" 23))");
   CHECK_TRACE_TOP("cell", "(3 7 (33 \"abc\" 23))\n");
-  Cell* c = result.front();
-  CHECK_EQ(car(c), newNum(3));
+  cell* c = result.front();
+  CHECK_EQ(car(c), new_num(3));
   c = cdr(c);
-  CHECK_EQ(car(c), newNum(7));
+  CHECK_EQ(car(c), new_num(7));
   c = cdr(c);
-    Cell* c2 = car(c);
-    CHECK_EQ(car(c2), newNum(33));
+    cell* c2 = car(c);
+    CHECK_EQ(car(c2), new_num(33));
     c2 = cdr(c2);
-    CHECK(isString(car(c2)));
-    CHECK_EQ(toString(car(c2)), "abc");
+    CHECK(is_string(car(c2)));
+    CHECK_EQ(to_string(car(c2)), "abc");
     c2 = cdr(c2);
-    CHECK_EQ(car(c2), newNum(23));
+    CHECK_EQ(car(c2), new_num(23));
     CHECK_EQ(cdr(c2), nil);
   CHECK_EQ(cdr(c), nil);
 }
 
 void test_build_handles_syms() {
-  list<Cell*> result = readAll("(3 7 (33 \"abc\" 3de 23))");
+  list<cell*> result = read_all("(3 7 (33 \"abc\" 3de 23))");
   CHECK_TRACE_TOP("cell", "(3 7 (33 \"abc\" 3de 23))\n");
-  Cell* c = result.front();
-  CHECK_EQ(car(c), newNum(3));
+  cell* c = result.front();
+  CHECK_EQ(car(c), new_num(3));
   c = cdr(c);
-  CHECK_EQ(car(c), newNum(7));
+  CHECK_EQ(car(c), new_num(7));
   c = cdr(c);
-    Cell* c2 = car(c);
-    CHECK_EQ(car(c2), newNum(33));
+    cell* c2 = car(c);
+    CHECK_EQ(car(c2), new_num(33));
     c2 = cdr(c2);
-    CHECK(isString(car(c2)));
-    CHECK_EQ(toString(car(c2)), "abc");
+    CHECK(is_string(car(c2)));
+    CHECK_EQ(to_string(car(c2)), "abc");
     c2 = cdr(c2);
-    CHECK_EQ(car(c2), newSym("3de"));
+    CHECK_EQ(car(c2), new_sym("3de"));
     c2 = cdr(c2);
-    CHECK_EQ(car(c2), newNum(23));
+    CHECK_EQ(car(c2), new_num(23));
     CHECK_EQ(cdr(c2), nil);
   CHECK_EQ(cdr(c), nil);
 }
 
 void test_build_handles_indented_wrapped_lines() {
-  list<Cell*> result = readAll("a\n  (a b c\n   d e)");
+  list<cell*> result = read_all("a\n  (a b c\n   d e)");
   CHECK_TRACE_TOP("cell", "sym: a\n(a b c d e)\n");
-  Cell* c0 = result.front();  result.pop_front();
-  CHECK_EQ(c0, newSym("a"));
+  cell* c0 = result.front();  result.pop_front();
+  CHECK_EQ(c0, new_sym("a"));
 
-  Cell* c = result.front();
-  CHECK_EQ(car(c), newSym("a"));
+  cell* c = result.front();
+  CHECK_EQ(car(c), new_sym("a"));
   c = cdr(c);
-  CHECK_EQ(car(c), newSym("b"));
+  CHECK_EQ(car(c), new_sym("b"));
   c = cdr(c);
-  CHECK_EQ(car(c), newSym("c"));
+  CHECK_EQ(car(c), new_sym("c"));
   c = cdr(c);
-  CHECK_EQ(car(c), newSym("d"));
+  CHECK_EQ(car(c), new_sym("d"));
   c = cdr(c);
-  CHECK_EQ(car(c), newSym("e"));
+  CHECK_EQ(car(c), new_sym("e"));
   c = cdr(c);
   CHECK_EQ(c, nil);
 }

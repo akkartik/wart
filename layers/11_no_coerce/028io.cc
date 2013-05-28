@@ -1,46 +1,46 @@
 //// compiled primitives for I/O
 
-ostream& operator<<(ostream& os, Cell* c) {
+ostream& operator<<(ostream& os, cell* c) {
   if (c == NULL) return os << "NULLNULLNULL";
   if (c == nil) return os << "nil";
   switch(c->type) {
   case CONS:
-    if (car(c) == sym_quote || car(c) == sym_backquote || car(c) == sym_unquote || car(c) == sym_splice || car(c) == sym_unquoteSplice)
+    if (car(c) == sym_quote || car(c) == sym_backquote || car(c) == sym_unquote || car(c) == sym_splice || car(c) == sym_unquote_splice)
       return os << car(c) << cdr(c);
     os << "(" << car(c);
-    for (Cell* curr = cdr(c); curr != nil; curr = cdr(curr)) {
-      if (isCons(curr))
+    for (cell* curr = cdr(c); curr != nil; curr = cdr(curr)) {
+      if (is_cons(curr))
         os << " " << car(curr);
       else
         os << " ... " << curr;
     }
     return os << ")";
   case INTEGER:
-    return os << toInt(c);
+    return os << to_int(c);
   case FLOAT:
-    return os << toFloat(c);
+    return os << to_float(c);
   case SYMBOL:
-    return os << toString(c);
+    return os << to_string(c);
   case STRING:
-    return os << "\"" << toString(c) << "\"";
+    return os << "\"" << to_string(c) << "\"";
   case TABLE:
-    os << (Table*)c->car;
+    os << (table*)c->car;
     if (cdr(c) != nil)
       os << "->" << cdr(c);
     return os;
   case COMPILED_FN:
     return os << "#compiled";
   default:
-    return os << "Can't print type " << c->type << endl << DIE;
+    return os << "Can't print type " << c->type << endl << die();
   }
 }
 
-ostream& operator<<(ostream& os, Table* t) {
+ostream& operator<<(ostream& os, table* t) {
   os << "{";
-  if (t->table[sym_name]) os << t->table[sym_name] << ": ";
-  for (CellMap::iterator p = t->table.begin(); p != t->table.end(); ++p) {
+  if (t->value[sym_name]) os << t->value[sym_name] << ": ";
+  for (cell_map::iterator p = t->value.begin(); p != t->value.end(); ++p) {
     if (p->second && p->first != sym_name)
-      os << (Cell*)p->first << ", ";
+      os << (cell*)p->first << ", ";
   }
   return os << "}";
 }

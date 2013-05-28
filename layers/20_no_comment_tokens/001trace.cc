@@ -97,7 +97,7 @@ bool checkTraceContents(string FUNCTION, string layer, string expected) {   // e
   }
 
   cerr << "\nF " << FUNCTION << ": trace didn't contain " << expected_lines[curr_expected_line] << '\n';
-  passed = false;
+  Passed = false;
   return false;
 }
 
@@ -173,7 +173,7 @@ bool checkTraceContents(string FUNCTION, string layer, int level, string expecte
   }
 
   cerr << "\nF " << FUNCTION << ": trace didn't contain " << expected_lines[curr_expected_line] << '\n';
-  passed = false;
+  Passed = false;
   return false;
 }
 

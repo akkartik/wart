@@ -1,25 +1,25 @@
-bool runningTests = false;
+bool Running_tests = false;
 
-typedef void (*TestFn)(void);
+typedef void (*test_fn)(void);
 
-const TestFn tests[] = {
+const test_fn Tests[] = {
   #include "test_list"
 };
 
-bool passed = true;
+bool Passed = true;
 
-long numFailures = 0;
+long Num_failures = 0;
 
 #define CHECK(X) if (!(X)) { \
-    ++numFailures; \
+    ++Num_failures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
-    passed = false; \
+    Passed = false; \
     return; \
   } \
   else { cerr << "."; fflush(stderr); }
 
 #define CHECK_EQ(X, Y) if ((X) != (Y)) { \
-    ++numFailures; \
+    ++Num_failures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
     cerr << "  got " << (X) << endl;  /* BEWARE: multiple eval */ \
     return; \

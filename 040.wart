@@ -1,7 +1,7 @@
 <- mac!
    (fn '((name ... params) ... body)
      (eval `(,name <- (fn ',params
-                        # remember to update isMacro if you change this
+                        # remember to update is_macro if you change this
                         (eval ((fn() ,@body))
                               caller_scope)))
            caller_scope))

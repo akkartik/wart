@@ -15,23 +15,23 @@
 // These weren't the reasons lisp was created; they're the reasons I attribute
 // to its power.
 
-bool warn_on_unknown_var = false;
+bool Warn_on_unknown_var = false;
 
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
-    runTests();
+    run_tests();
     return 0;
   }
 
   //// Interactive loop: parse commands from user, evaluate them, print the results
   interactive_setup();
-  loadFiles(".wart");
-  warn_on_unknown_var = true;
+  load_files(".wart");
+  Warn_on_unknown_var = true;
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (!cin.eof()) {
-    list<Cell*> forms = readAll(cin);
-    for (list<Cell*>::iterator p = forms.begin(); p != forms.end(); ++p) {
-      Cell* result = eval(*p);
+    list<cell*> forms = read_all(cin);
+    for (list<cell*>::iterator p = forms.begin(); p != forms.end(); ++p) {
+      cell* result = eval(*p);
       cout << "=> " << result << endl;
       rmref(result);
       rmref(*p);
@@ -40,27 +40,27 @@ int main(int argc, unused char* argv[]) {
 }
 
 //// read: tokenize, parenthesize, parse, transform infix, build cells, transform $vars
-Cell* read(IndentSensitiveStream& in) {
-  return mkref(transformDollarVars(nextCell(in)));
+cell* read(indent_sensitive_stream& in) {
+  return mkref(transform_dollar_vars(next_cell(in)));
 }
 
 // wart does paren-insertion, which requires some extra state.
-struct IndentSensitiveStream {
+struct indent_sensitive_stream {
   istream& fd;
-  bool atStartOfLine;
-  explicit IndentSensitiveStream(istream& in) :fd(in), atStartOfLine(true) { fd >> std::noskipws; }
+  bool at_start_of_line;
+  explicit indent_sensitive_stream(istream& in) :fd(in), at_start_of_line(true) { fd >> std::noskipws; }
   // leaky version just for convenient tests
-  explicit IndentSensitiveStream(string s) :fd(*new stringstream(s)), atStartOfLine(true) { fd >> std::noskipws; }
+  explicit indent_sensitive_stream(string s) :fd(*new stringstream(s)), at_start_of_line(true) { fd >> std::noskipws; }
   bool eof() { return fd.eof(); }
-} STDIN(cin);
+};
 
 // parse a paragraph of expressions until empty line
-list<Cell*> readAll(istream& fd) {
-  IndentSensitiveStream in(fd);
-  list<Cell*> results;
+list<cell*> read_all(istream& fd) {
+  indent_sensitive_stream in(fd);
+  list<cell*> results;
   do {
     results.push_back(read(in));
-  } while (!in.atStartOfLine && fd.peek() != '\n' && !fd.eof());
+  } while (!in.at_start_of_line && fd.peek() != '\n' && !fd.eof());
   return results;
 }
 
@@ -68,87 +68,87 @@ list<Cell*> readAll(istream& fd) {
 
 //// test harness
 
-bool runningTests = false;
+bool Running_tests = false;
 
-typedef void (*TestFn)(void);
+typedef void (*test_fn)(void);
 
-const TestFn tests[] = {
+const test_fn Tests[] = {
   #include "test_list"
 };
 
-long numFailures = 0;
-bool passed = true;
+long Num_failures = 0;
+bool Passed = true;
 
 #define CHECK(X) if (!(X)) { \
-    ++numFailures; \
+    ++Num_failures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
-    passed = false; \
+    Passed = false; \
     return; \
   } \
   else { cerr << "."; fflush(stderr); }
 
 #define CHECK_EQ(X, Y) if ((X) != (Y)) { \
-    ++numFailures; \
+    ++Num_failures; \
     cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
     cerr << "  got " << (X) << endl;  /* BEWARE: multiple eval */ \
-    passed = false; \
+    Passed = false; \
     return; \
   } \
   else { cerr << "."; fflush(stderr); }
 
-void runTests() {
-  runningTests = true;
-  pretendRaise = true;  // for death tests
+void run_tests() {
+  Running_tests = true;
+  Pretend_raise = true;  // for death tests
   time_t t; time(&t);
   cerr << "C tests: " << ctime(&t);
-  for (unsigned long i=0; i < sizeof(tests)/sizeof(tests[0]); ++i) {
+  for (unsigned long i=0; i < sizeof(Tests)/sizeof(Tests[0]); ++i) {
     setup();
-    (*tests[i])();
+    (*Tests[i])();
     verify();
   }
 
-  pretendRaise = false;
+  Pretend_raise = false;
   setup();
-  loadFiles(".wart");   // after GC tests
-  loadFiles(".test");
+  load_files(".wart");   // after GC tests
+  load_files(".test");
 
   cerr << endl;
-  if (numFailures > 0)
-    cerr << numFailures << " failure"
-         << (numFailures > 1 ? "s" : "")
+  if (Num_failures > 0)
+    cerr << Num_failures << " failure"
+         << (Num_failures > 1 ? "s" : "")
          << endl;
 }
 
 void verify() {
-  teardownStreams();
-  teardownCompiledFns();
-  teardownCells();
-  if (!passed) return;
-  if (raiseCount != 0) cerr << raiseCount << " errors encountered" << endl;
-  if (numUnfreed() > 0) dumpUnfreed();
+  teardown_streams();
+  teardown_compiledfns();
+  teardown_cells();
+  if (!Passed) return;
+  if (Raise_count != 0) cerr << Raise_count << " errors encountered" << endl;
+  if (num_unfreed() > 0) dump_unfreed();
 }
 
 // helper to read from string
 // leaks memory; just for convenient tests
-Cell* read(string s) {
+cell* read(string s) {
   return read(*new stringstream(s));
 }
 
 
 
 void setup() {
-  setupCells();
-  setupCommonSyms();
-  setupScopes();
-  setupCompiledFns();
-  setupStreams();
-  raiseCount = 0;
-  passed = true;
+  setup_cells();
+  setup_common_syms();
+  setup_scopes();
+  setup_compiledfns();
+  setup_streams();
+  Raise_count = 0;
+  Passed = true;
 }
 
-bool interactive = false;
+bool Interactive = false;
 void interactive_setup() {
   setup();
-  interactive = true;
-  catchCtrlC();
+  Interactive = true;
+  catch_ctrl_c();
 }

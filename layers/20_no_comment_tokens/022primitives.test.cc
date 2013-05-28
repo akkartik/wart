@@ -1,9 +1,9 @@
 void test_fn_works() {
-  Cell* result = run("(fn(x) x)");
+  cell* result = run("(fn(x) x)");
   // {sig: (x), body: (x)}
-  CHECK_EQ(car(get(result, sym_sig)), newSym("x"));
+  CHECK_EQ(car(get(result, sym_sig)), new_sym("x"));
   CHECK_EQ(cdr(get(result, sym_sig)), nil);
-  CHECK_EQ(car(get(result, sym_body)), newSym("x"));
+  CHECK_EQ(car(get(result, sym_body)), new_sym("x"));
   CHECK_EQ(cdr(get(result, sym_body)), nil);
 }
 
@@ -33,7 +33,7 @@ void test_cons_works() {
 
 void test_assign_to_non_sym_warns() {
   run("(<- 3 nil)");
-  CHECK_EQ(raiseCount, 1);   raiseCount=0;
+  CHECK_EQ(Raise_count, 1);   Raise_count=0;
 }
 
 void test_assign_lexical_var() {
@@ -81,6 +81,6 @@ void test_equal_handles_floats() {
 
 void test_equal_handles_float_vs_nil() {
   run("(= nil 1.5)");
-  CHECK_EQ(raiseCount, 0);
+  CHECK_EQ(Raise_count, 0);
   CHECK_TRACE_TOP("eval", "compiled fn\n=> nil\n");
 }

@@ -1,10 +1,10 @@
 void test_fn_works() {
-  Cell* fn = read("(fn(x) x)");
-  Cell* result = eval(fn);
+  cell* fn = read("(fn(x) x)");
+  cell* result = eval(fn);
   // {sig: (x), body: (x)}
-  CHECK_EQ(car(get(result, sym_sig)), newSym("x"));
+  CHECK_EQ(car(get(result, sym_sig)), new_sym("x"));
   CHECK_EQ(cdr(get(result, sym_sig)), nil);
-  CHECK_EQ(car(get(result, sym_body)), newSym("x"));
+  CHECK_EQ(car(get(result, sym_body)), new_sym("x"));
   CHECK_EQ(cdr(get(result, sym_body)), nil);
   rmref(result);
   rmref(fn);
@@ -13,68 +13,68 @@ void test_fn_works() {
 
 
 void test_if_sees_args_in_then_and_else() {
-  Cell* fn = read("(fn(x) (if 34 x))");
-  Cell* f = eval(fn);
-  newDynamicScope("f", f);
-  Cell* call = read("(f 35)");
-  Cell* result = eval(call);
-  CHECK_EQ(result, newNum(35));
+  cell* fn = read("(fn(x) (if 34 x))");
+  cell* f = eval(fn);
+  new_dynamic_scope("f", f);
+  cell* call = read("(f 35)");
+  cell* result = eval(call);
+  CHECK_EQ(result, new_num(35));
   rmref(result);
   rmref(call);
-  endDynamicScope("f");
+  end_dynamic_scope("f");
   rmref(f);
   rmref(fn);
 }
 
 void test_not_works() {
-  Cell* call = read("(not 35)");
-  Cell* result = eval(call);
+  cell* call = read("(not 35)");
+  cell* result = eval(call);
   CHECK_EQ(result, nil);
   rmref(result);
   rmref(call);
 }
 
 void test_not_works2() {
-  Cell* call = read("(not nil)");
-  Cell* result = eval(call);
-  CHECK_EQ(result, newNum(1));
+  cell* call = read("(not nil)");
+  cell* result = eval(call);
+  CHECK_EQ(result, new_num(1));
   rmref(result);
   rmref(call);
 }
 
 void test_cons_works() {
-  Cell* call = read("(cons 1 2)");
-  Cell* result = eval(call);
+  cell* call = read("(cons 1 2)");
+  cell* result = eval(call);
   // (1 ... 2)
-  CHECK_EQ(car(result), newNum(1));
-  CHECK_EQ(cdr(result), newNum(2));
+  CHECK_EQ(car(result), new_num(1));
+  CHECK_EQ(cdr(result), new_num(2));
   rmref(result);
   rmref(call);
 }
 
 void test_assign_to_non_sym_warns() {
-  Cell* expr = read("(<- 3 nil)");
-  Cell* result = eval(expr);
-  CHECK_EQ(raiseCount, 1);   raiseCount=0;
+  cell* expr = read("(<- 3 nil)");
+  cell* result = eval(expr);
+  CHECK_EQ(Raise_count, 1);   Raise_count=0;
   rmref(result);
   rmref(expr);
 }
 
 void test_assign_lexical_var() {
-  Cell* fn = read("((fn(x) (<- x 34) x))");
-  Cell* call = eval(fn);
-  CHECK_EQ(call, newNum(34));
+  cell* fn = read("((fn(x) (<- x 34) x))");
+  cell* call = eval(fn);
+  CHECK_EQ(call, new_num(34));
   rmref(call);
   rmref(fn);
 }
 
 void test_assign_overrides_dynamic_vars() {
-  Cell* init1 = read("(<- x 3)");
-  Cell* call1 = eval(init1);
-  Cell* init2 = read("(<- x 5)");
-  Cell* call2 = eval(init2);
-  CHECK_EQ(lookup("x"), newNum(5));
-  endDynamicScope("x");
+  cell* init1 = read("(<- x 3)");
+  cell* call1 = eval(init1);
+  cell* init2 = read("(<- x 5)");
+  cell* call2 = eval(init2);
+  CHECK_EQ(lookup("x"), new_num(5));
+  end_dynamic_scope("x");
   rmref(call2);
   rmref(init2);
   rmref(call1);
@@ -82,12 +82,12 @@ void test_assign_overrides_dynamic_vars() {
 }
 
 void test_assign_overrides_within_lexical_scope() {
-  Cell* init1 = read("(<- x 3)");
-  Cell* call1 = eval(init1);
-  Cell* init2 = read("((fn() (<- x 5)))");
-  Cell* call2 = eval(init2);
-  CHECK_EQ(lookup("x"), newNum(5));
-  endDynamicScope("x");
+  cell* init1 = read("(<- x 3)");
+  cell* call1 = eval(init1);
+  cell* init2 = read("((fn() (<- x 5)))");
+  cell* call2 = eval(init2);
+  CHECK_EQ(lookup("x"), new_num(5));
+  end_dynamic_scope("x");
   rmref(call2);
   rmref(init2);
   rmref(call1);
@@ -95,25 +95,25 @@ void test_assign_overrides_within_lexical_scope() {
 }
 
 void test_assign_never_overrides_lexical_vars_in_caller_scope() {
-  Cell* fn = read("((fn(x) (<- y x)) 34)");
-  Cell* def = eval(fn);
-  CHECK_EQ(lookup("y"), newNum(34));
-  endDynamicScope("y");
+  cell* fn = read("((fn(x) (<- y x)) 34)");
+  cell* def = eval(fn);
+  CHECK_EQ(lookup("y"), new_num(34));
+  end_dynamic_scope("y");
   rmref(def);
   rmref(fn);
 }
 
 void test_assign_overrides_lexical_var() {
-  Cell* fn = read("((fn(x) (<- x 35) (<- x 36) x) 34)");
-  Cell* call = eval(fn);
-  CHECK_EQ(call, newNum(36));
+  cell* fn = read("((fn(x) (<- x 35) (<- x 36) x) 34)");
+  cell* call = eval(fn);
+  CHECK_EQ(call, new_num(36));
   rmref(call);
   rmref(fn);
 }
 
 void test_equal_handles_nil() {
-  Cell* call = read("(= nil nil)");
-  Cell* result = eval(call);
+  cell* call = read("(= nil nil)");
+  cell* result = eval(call);
   CHECK(result);
   CHECK(result != nil);
   rmref(result);
@@ -121,8 +121,8 @@ void test_equal_handles_nil() {
 }
 
 void test_equal_handles_floats() {
-  Cell* call = read("(= (/ 3.0 2) 1.5)");
-  Cell* result = eval(call);
+  cell* call = read("(= (/ 3.0 2) 1.5)");
+  cell* result = eval(call);
   CHECK(result);
   CHECK(result != nil);
   rmref(result);
@@ -130,8 +130,8 @@ void test_equal_handles_floats() {
 }
 
 void test_equal_handles_float_vs_nil() {
-  Cell* call = read("(= nil 1.5)");
+  cell* call = read("(= nil 1.5)");
   eval(call);
-  CHECK_EQ(raiseCount, 0);
+  CHECK_EQ(Raise_count, 0);
   rmref(call);
 }

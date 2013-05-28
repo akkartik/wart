@@ -17,81 +17,81 @@
 
 #include<assert.h>
 
-list<Token> nextExpr(IndentSensitiveStream& in) {
-  list<Token> result;   // emit tokens here
+list<token> next_expr(indent_sensitive_stream& in) {
+  list<token> result;   // emit tokens here
   if (in.eof()) return result;
 
-  if (!in.atStartOfLine) {
+  if (!in.at_start_of_line) {
     // we're in the middle of a line,
     // because there were multiple exprs on a single line
-    result = indentInsensitiveExpr(in);
+    result = indent_insensitive_expr(in);
     if (!result.empty()) return result;
   }
 
   if (in.eof()) return result;
-  assert(in.atStartOfLine);
+  assert(in.at_start_of_line);
 
   //// rule: insert implicit paren before lines that:
   ////   a) have 2 or more words
   ////   b) aren't already parenthesized at the front
   //// both conditions are oblivious of quotes and unquotes
-  list<Token> buffer;
-  long numWordsInLine = 0;
-  bool parenAtStartOfLine = false;
+  list<token> buffer;
+  long num_words_in_line = 0;
+  bool paren_at_start_of_line = false;
   ////   c) aren't inside open parens
-  long explicitOpenParens = 0;  // parens in the original
-  stack<long> implicitOpenParens;   // parens we inserted with their indent levels
+  long explicit_open_parens = 0;  // parens in the original
+  stack<long> implicit_open_parens;   // parens we inserted with their indent levels
 
-  long thisLineIndent = skipInitialNewlinesToFirstIndent(in);
+  long this_line_indent = skip_initial_newslines_to_first_indent(in);
   while (!in.eof()) {
-    Token curr = nextToken(in);
+    token curr = next_token(in);
 
     //// various book-keeping based on curr token
-    if (isIndent(curr) || curr.newline)
-      numWordsInLine = 0;
-    else if (isWord(curr))
-      ++numWordsInLine;
+    if (is_indent(curr) || curr.newline)
+      num_words_in_line = 0;
+    else if (is_word(curr))
+      ++num_words_in_line;
 
-    if (isIndent(curr))
-      thisLineIndent = curr.indentLevel;
+    if (is_indent(curr))
+      this_line_indent = curr.indent_level;
 
-    if (isIndent(curr) || curr.newline)
-      parenAtStartOfLine = false;
-    else if (isOpenParen(curr) && numWordsInLine == 0)
-      parenAtStartOfLine = true;
+    if (is_indent(curr) || curr.newline)
+      paren_at_start_of_line = false;
+    else if (is_open_paren(curr) && num_words_in_line == 0)
+      paren_at_start_of_line = true;
 
     //// decide what to emit, tracking (implicit/explicit) open parens
-    if (parenAtStartOfLine || isIndent(curr) || curr.newline)
-      emitAll(buffer, curr, result, explicitOpenParens);
-    else if (numWordsInLine < 2)
+    if (paren_at_start_of_line || is_indent(curr) || curr.newline)
+      emit_all(buffer, curr, result, explicit_open_parens);
+    else if (num_words_in_line < 2)
       buffer.push_back(curr);
     else {
-      if (numWordsInLine == 2 && isWord(curr) && explicitOpenParens == 0) {
-        result.push_back(Token("("));
-        implicitOpenParens.push(thisLineIndent);
+      if (num_words_in_line == 2 && is_word(curr) && explicit_open_parens == 0) {
+        result.push_back(token("("));
+        implicit_open_parens.push(this_line_indent);
       }
-      emitAll(buffer, curr, result, explicitOpenParens);
+      emit_all(buffer, curr, result, explicit_open_parens);
     }
 
-    if (isIndent(curr)) {
-      while (!implicitOpenParens.empty() && implicitOpenParens.top() >= thisLineIndent) {
-        result.push_back(Token(")"));
-        implicitOpenParens.pop();
+    if (is_indent(curr)) {
+      while (!implicit_open_parens.empty() && implicit_open_parens.top() >= this_line_indent) {
+        result.push_back(token(")"));
+        implicit_open_parens.pop();
       }
     }
 
     //// we done?
-    if (explicitOpenParens == 0 && implicitOpenParens.empty()) {
-      if (isIndent(curr)) restoreIndent(thisLineIndent, in);
-      if (isIndent(curr) || curr.newline || curr == ")") break;
+    if (explicit_open_parens == 0 && implicit_open_parens.empty()) {
+      if (is_indent(curr)) restore_indent(this_line_indent, in);
+      if (is_indent(curr) || curr.newline || curr == ")") break;
     }
-    if (interactive && curr.newline && explicitOpenParens == 0 && in.fd.peek() == '\n')
+    if (Interactive && curr.newline && explicit_open_parens == 0 && in.fd.peek() == '\n')
       break;
   }
 
-  emitAll(buffer, /*dummy*/Token::Newline(), result, explicitOpenParens);
-  for (unsigned long i=0; i < implicitOpenParens.size(); ++i)
-    result.push_back(Token(")"));
+  emit_all(buffer, /*dummy*/token::Newline(), result, explicit_open_parens);
+  for (unsigned long i=0; i < implicit_open_parens.size(); ++i)
+    result.push_back(token(")"));
   return result;
 }
 
@@ -99,87 +99,87 @@ list<Token> nextExpr(IndentSensitiveStream& in) {
 
 //// internals
 
-void emit(const Token& t, list<Token>& out, long& explicitOpenParens) {
-  if (t.newline || isIndent(t)) return;
+void emit(const token& t, list<token>& out, long& explicit_open_parens) {
+  if (t.newline || is_indent(t)) return;
   out.push_back(t);
-  if (isOpenParen(t)) ++explicitOpenParens;
-  if (isCloseParen(t)) --explicitOpenParens;
-  if (explicitOpenParens < 0) RAISE << "Unbalanced )" << endl;
+  if (is_open_paren(t)) ++explicit_open_parens;
+  if (is_close_paren(t)) --explicit_open_parens;
+  if (explicit_open_parens < 0) RAISE << "Unbalanced )" << endl;
 }
 
-void emitAll(list<Token>& buffer, const Token& curr, list<Token>& out, long& explicitOpenParens) {
-  for (list<Token>::const_iterator p = buffer.begin(); p != buffer.end(); ++p)
-    emit(*p, out, explicitOpenParens);
+void emit_all(list<token>& buffer, const token& curr, list<token>& out, long& explicit_open_parens) {
+  for (list<token>::const_iterator p = buffer.begin(); p != buffer.end(); ++p)
+    emit(*p, out, explicit_open_parens);
   buffer.clear();
-  emit(curr, out, explicitOpenParens);
+  emit(curr, out, explicit_open_parens);
 }
 
-void restoreIndent(long indent, IndentSensitiveStream& in) {
+void restore_indent(long indent, indent_sensitive_stream& in) {
   if (in.eof()) return;
   for (int i = 0; i < indent; ++i)
     in.fd.putback(' ');
-  in.atStartOfLine = true;
+  in.at_start_of_line = true;
 }
 
-list<Token> indentInsensitiveExpr(IndentSensitiveStream& in) {
-  list<Token> result;
-  long explicitOpenParens = 0;
+list<token> indent_insensitive_expr(indent_sensitive_stream& in) {
+  list<token> result;
+  long explicit_open_parens = 0;
   while (!in.eof()) {
-    Token curr = nextToken(in);
+    token curr = next_token(in);
     if (curr.newline) {
-      assert(in.atStartOfLine);
-      if (explicitOpenParens == 0) break;
+      assert(in.at_start_of_line);
+      if (explicit_open_parens == 0) break;
     }
-    else if (isIndent(curr)) {
+    else if (is_indent(curr)) {
     }
-    else if (isQuoteOrUnquote(curr)) {
+    else if (is_quote_or_unquote(curr)) {
       result.push_back(curr);
     }
-    else if (isOpenParen(curr)) {
+    else if (is_open_paren(curr)) {
       result.push_back(curr);
-      ++explicitOpenParens;
+      ++explicit_open_parens;
     }
-    else if (isCloseParen(curr)) {
+    else if (is_close_paren(curr)) {
       result.push_back(curr);
-      --explicitOpenParens;
-      if (explicitOpenParens == 0) break;
+      --explicit_open_parens;
+      if (explicit_open_parens == 0) break;
     }
     else { //// word
       result.push_back(curr);
-      if (explicitOpenParens == 0) break;
+      if (explicit_open_parens == 0) break;
     }
   }
   return result;
 }
 
-long skipInitialNewlinesToFirstIndent(IndentSensitiveStream& in) {
+long skip_initial_newslines_to_first_indent(indent_sensitive_stream& in) {
   for (;;) {
-    Token token = nextToken(in);
-    if (isIndent(token)) return token.indentLevel;
+    token token = next_token(in);
+    if (is_indent(token)) return token.indent_level;
     assert(token.newline);
   }
 }
 
-bool isIndent(const Token& t) {
-  return t.token == "" && !t.newline;
+bool is_indent(const token& t) {
+  return t.value == "" && !t.newline;
 }
 
-bool isParen(const Token& t) {
-  return isOpenParen(t) || isCloseParen(t);
+bool is_paren(const token& t) {
+  return is_open_paren(t) || is_close_paren(t);
 }
 
-bool isOpenParen(const Token& t) {
+bool is_open_paren(const token& t) {
   return t == "(";
 }
-bool isCloseParen(const Token& t) {
+bool is_close_paren(const token& t) {
   return t == ")";
 }
 
-bool isQuoteOrUnquote(const Token& t) {
+bool is_quote_or_unquote(const token& t) {
   return t == "'" || t == "`"
       || t == "," || t == ",@";
 }
 
-bool isWord(const Token& t) {
-  return !t.newline && !isIndent(t) && !isParen(t) && !isQuoteOrUnquote(t);
+bool is_word(const token& t) {
+  return !t.newline && !is_indent(t) && !is_paren(t) && !is_quote_or_unquote(t);
 }

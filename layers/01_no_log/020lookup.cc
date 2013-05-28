@@ -1,36 +1,36 @@
 //// symbol bindings
 
 // Dynamic scopes are for rebinding global variables, and for undoing bindings.
-unordered_map<Cell*, stack<Cell*> > dynamics;
+unordered_map<cell*, stack<cell*> > Dynamics;
 
 // The current lexical scope is a first-class dynamic variable, usually bound
 // to a table of bindings.
 //
 // Entering lexical scopes modifies the current dynamic binding of
-// currLexicalScope; calling functions creates new dynamic bindings
-// to currLexicalScope
-Cell* CURR_LEXICAL_SCOPE;
-#define currLexicalScopes dynamics[CURR_LEXICAL_SCOPE]
-#define currLexicalScope currLexicalScopes.top()
+// Curr_lexical_scope; calling functions creates new dynamic bindings
+// to Curr_lexical_scope
+cell* CURR_LEXICAL_SCOPE;
+#define Curr_lexical_scopes Dynamics[CURR_LEXICAL_SCOPE]
+#define Curr_lexical_scope Curr_lexical_scopes.top()
 
-Cell* lookup(string s) {
-  return lookup(newSym(s));
+cell* lookup(string s) {
+  return lookup(new_sym(s));
 }
 
-// keepAlreadyEvald is for supporting @args in macro calls
-Cell* lookup(Cell* sym, Cell* scope, bool keepAlreadyEvald) {
-  Cell* result = lookupLexicalBinding(sym, scope);
-  if (result) return maybeStripAlreadyEvald(keepAlreadyEvald, result);
-  result = lookupDynamicBinding(sym);
-  if (result) return maybeStripAlreadyEvald(keepAlreadyEvald, result);
-  return newObject("incomplete_eval", sym);
+// keep_already_evald is for supporting @args in macro calls
+cell* lookup(cell* sym, cell* scope, bool keep_already_evald) {
+  cell* result = lookup_lexical_binding(sym, scope);
+  if (result) return maybe_strip_already_evald(keep_already_evald, result);
+  result = lookup_dynamic_binding(sym);
+  if (result) return maybe_strip_already_evald(keep_already_evald, result);
+  return new_object("incomplete_eval", sym);
 }
 
-Cell* lookup(Cell* sym) {
-  return lookup(sym, currLexicalScope);
+cell* lookup(cell* sym) {
+  return lookup(sym, Curr_lexical_scope);
 }
 
-Cell* lookup(Cell* sym, Cell* scope) {
+cell* lookup(cell* sym, cell* scope) {
   return lookup(sym, scope, false);
 }
 
@@ -38,24 +38,24 @@ Cell* lookup(Cell* sym, Cell* scope) {
 
 //// dynamic scope
 
-Cell* lookupDynamicBinding(Cell* sym) {
-  stack<Cell*>& bindings = dynamics[sym];
+cell* lookup_dynamic_binding(cell* sym) {
+  stack<cell*>& bindings = Dynamics[sym];
   if (bindings.empty()) return NULL;
   return bindings.top();
 }
 
-void newDynamicScope(Cell* sym, Cell* val) {
+void new_dynamic_scope(cell* sym, cell* val) {
   mkref(sym);
   mkref(val);
-  dynamics[sym].push(val);
+  Dynamics[sym].push(val);
 }
 
-void newDynamicScope(string s, Cell* val) {
-  newDynamicScope(newSym(s), val);
+void new_dynamic_scope(string s, cell* val) {
+  new_dynamic_scope(new_sym(s), val);
 }
 
-void endDynamicScope(Cell* sym) {
-  stack<Cell*>& bindings = dynamics[sym];
+void end_dynamic_scope(cell* sym) {
+  stack<cell*>& bindings = Dynamics[sym];
   if (bindings.empty()) {
     RAISE << "No dynamic binding for " << sym << endl;
     return;
@@ -65,15 +65,15 @@ void endDynamicScope(Cell* sym) {
   bindings.pop();
 }
 
-void endDynamicScope(string s) {
-  endDynamicScope(newSym(s));
+void end_dynamic_scope(string s) {
+  end_dynamic_scope(new_sym(s));
 }
 
-void assignDynamicVar(Cell* sym, Cell* val) {
-  stack<Cell*>& bindings = dynamics[sym];
+void assign_dynamic_var(cell* sym, cell* val) {
+  stack<cell*>& bindings = Dynamics[sym];
   if (bindings.empty()) {
     RAISE << "No dynamic binding to assign for " << sym << endl;
-    newDynamicScope(sym, val);
+    new_dynamic_scope(sym, val);
     return;
   }
   rmref(bindings.top());
@@ -86,72 +86,72 @@ void assignDynamicVar(Cell* sym, Cell* val) {
 
 //// lexical scope -- a table, except that nils are not deleted
 
-Cell* lookupLexicalBinding(Cell* sym, Cell* scope) {
-  Cell* result = NULL;
+cell* lookup_lexical_binding(cell* sym, cell* scope) {
+  cell* result = NULL;
   for (; scope != nil; scope = cdr(scope)) {
-    if (isTable(scope))
-      result = unsafeGet(scope, sym);
+    if (is_table(scope))
+      result = unsafe_get(scope, sym);
     if (result) return result;
   }
 
   return NULL;
 }
 
-Cell* scopeContainingBinding(Cell* sym, Cell* scope) {
+cell* scope_containing_binding(cell* sym, cell* scope) {
   for (; scope != nil; scope = cdr(scope)) {
-    if (isTable(scope) && unsafeGet(scope, sym))
+    if (is_table(scope) && unsafe_get(scope, sym))
       return scope;
   }
 
-  if (lookupDynamicBinding(sym))
+  if (lookup_dynamic_binding(sym))
     return nil;
   return NULL;
 }
 
-void newLexicalScope() {
-  Cell* newScope = newTable();
-  setCdr(newScope, currLexicalScope);
-  newDynamicScope(CURR_LEXICAL_SCOPE, newScope);
+void new_lexical_scope() {
+  cell* new_scope = new_table();
+  set_cdr(new_scope, Curr_lexical_scope);
+  new_dynamic_scope(CURR_LEXICAL_SCOPE, new_scope);
 }
 
-void endLexicalScope() {
-  if (currLexicalScope == nil)
-    RAISE << "No lexical scope to end" << endl << DIE;
-  endDynamicScope(CURR_LEXICAL_SCOPE);
+void end_lexical_scope() {
+  if (Curr_lexical_scope == nil)
+    RAISE << "No lexical scope to end" << endl << die();
+  end_dynamic_scope(CURR_LEXICAL_SCOPE);
 }
 
-void addLexicalScope(Cell* newScope) {
-  setCdr(newScope, currLexicalScope);
-  newDynamicScope(CURR_LEXICAL_SCOPE, newScope);
+void add_lexical_scope(cell* new_scope) {
+  set_cdr(new_scope, Curr_lexical_scope);
+  new_dynamic_scope(CURR_LEXICAL_SCOPE, new_scope);
 }
 
-void addLexicalBinding(Cell* sym, Cell* val, Cell* scope) {
-  if (unsafeGet(scope, sym))
-    RAISE << "Can't rebind within a lexical scope" << endl << DIE;
-  unsafeSet(scope, sym, val, false);  // deleting nil might expose a shadowed binding
+void add_lexical_binding(cell* sym, cell* val, cell* scope) {
+  if (unsafe_get(scope, sym))
+    RAISE << "Can't rebind within a lexical scope" << endl << die();
+  unsafe_set(scope, sym, val, false);  // deleting nil might expose a shadowed binding
 }
 
-void addLexicalBinding(Cell* sym, Cell* val) {
-  addLexicalBinding(sym, val, currLexicalScope);
+void add_lexical_binding(cell* sym, cell* val) {
+  add_lexical_binding(sym, val, Curr_lexical_scope);
 }
 
-void addLexicalBinding(string var, Cell* val, Cell* scope) {
-  addLexicalBinding(newSym(var), val, scope);
+void add_lexical_binding(string var, cell* val, cell* scope) {
+  add_lexical_binding(new_sym(var), val, scope);
 }
 
-void addLexicalBinding(string var, Cell* val) {
-  addLexicalBinding(newSym(var), val);
+void add_lexical_binding(string var, cell* val) {
+  add_lexical_binding(new_sym(var), val);
 }
 
 
 
 //// internals
 
-unordered_set<Cell*> initialSyms;
+unordered_set<cell*> Initial_syms;
 
-void setupScopes() {
-  dynamics.clear();   // leaks memory for strings and tables
-  CURR_LEXICAL_SCOPE = newSym("currLexicalScope");
-  newDynamicScope(CURR_LEXICAL_SCOPE, nil);
-  initialSyms.insert(CURR_LEXICAL_SCOPE);
+void setup_scopes() {
+  Dynamics.clear();   // leaks memory for strings and tables
+  CURR_LEXICAL_SCOPE = new_sym("Curr_lexical_scope");
+  new_dynamic_scope(CURR_LEXICAL_SCOPE, nil);
+  Initial_syms.insert(CURR_LEXICAL_SCOPE);
 }

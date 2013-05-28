@@ -1,35 +1,35 @@
 //// split input into tokens separated by the following boundaries:
-const string punctuationChars = "()#\"";  // the skeleton of a wart program
-const string quoteAndUnquoteChars = "'";  // controlling eval
+const string Punctuation_chars = "()#\"";  // the skeleton of a wart program
+const string Quote_and_unquote_chars = "'";  // controlling eval
 
 // Design considered the following:
 //  avoid modifying strings
 //    so parse them here and make them easy for later passes to detect
 
-typedef string Token;
+typedef string token;
 
-Token nextToken(istream& in) {
+token next_token(istream& in) {
   trace("tokenize 2") << "eof: " << in.eof() << '\n';
   in >> std::noskipws;
   while (in.peek() == '#' || isspace(in.peek())) {
-    skipWhitespace(in);
+    skip_whitespace(in);
     if (in.peek() == '#')
-      skipComment(in);
+      skip_comment(in);
   }
 
   trace("tokenize 2") << "eof2: " << in.eof() << '\n';
   ostringstream out;
   if (in.peek() == '"')
-    slurpString(in, out);
-  else if (find(punctuationChars, in.peek()))
-    slurpChar(in, out);
-  else if (find(quoteAndUnquoteChars, in.peek()))
-    slurpChar(in, out);
+    slurp_string(in, out);
+  else if (find(Punctuation_chars, in.peek()))
+    slurp_char(in, out);
+  else if (find(Quote_and_unquote_chars, in.peek()))
+    slurp_char(in, out);
   else
-    slurpWord(in, out);
+    slurp_word(in, out);
 
   trace("tokenize") << out.str() << '\n';
-  return Token(out.str());
+  return token(out.str());
 }
 
 
@@ -37,15 +37,15 @@ Token nextToken(istream& in) {
 //// internals
 
 // slurp functions read a token when you're sure to be at it
-void slurpChar(istream& in, ostream& out) {
+void slurp_char(istream& in, ostream& out) {
   out << (char)in.get();
 }
 
-void slurpWord(istream& in, ostream& out) {
+void slurp_word(istream& in, ostream& out) {
   char c;
-//?   trace << "slurpWord\n";
+//?   trace << "slurp_word\n";
   while (in >> c) {
-    if (isspace(c) || find(punctuationChars, c) || find(quoteAndUnquoteChars, c)) {
+    if (isspace(c) || find(Punctuation_chars, c) || find(Quote_and_unquote_chars, c)) {
       in.putback(c);
       break;
     }
@@ -53,13 +53,13 @@ void slurpWord(istream& in, ostream& out) {
   }
 }
 
-void slurpString(istream& in, ostream& out) {
-  slurpChar(in, out);   // initial quote
+void slurp_string(istream& in, ostream& out) {
+  slurp_char(in, out);   // initial quote
   char c;
   while (in >> c) {
     out << c;
     if (c == '\\')
-      slurpChar(in, out);   // blindly read next
+      slurp_char(in, out);   // blindly read next
     else if (c == '"')
       break;
   }
@@ -67,7 +67,7 @@ void slurpString(istream& in, ostream& out) {
 
 
 
-void skipComment(istream& in) {
+void skip_comment(istream& in) {
   char c;
   while (in >> c) {
     if (c == '\n') {
@@ -78,7 +78,7 @@ void skipComment(istream& in) {
 }
 
 
-void skipWhitespace(istream& in) {
+void skip_whitespace(istream& in) {
   while (isspace(in.peek()))
     in.get();
 }

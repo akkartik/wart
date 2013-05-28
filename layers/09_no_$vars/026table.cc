@@ -1,39 +1,39 @@
 //// compiled primitives for tables
 
-COMPILE_FN(table, compiledFn_table, "()",
-  return mkref(newTable());
+COMPILE_FN(table, compiledfn_table, "()",
+  return mkref(new_table());
 )
 
-COMPILE_FN(table_set, compiledFn_table_set, "($table $key $val)",
-  Cell* table = lookup("$table");
-  Cell* key = lookup("$key");
-  Cell* val = lookup("$val");
-  if (isTable(table))
+COMPILE_FN(table_set, compiledfn_table_set, "($table $key $val)",
+  cell* table = lookup("$table");
+  cell* key = lookup("$key");
+  cell* val = lookup("$val");
+  if (is_table(table))
     set(table, key, val);
   else
     RAISE << "can't set in a non-table: " << table << endl;
   return mkref(val);
 )
 
-COMPILE_FN(table_get, compiledFn_table_get, "($table $key)",
-  Cell* table = lookup("$table");
-  Cell* key = lookup("$key");
+COMPILE_FN(table_get, compiledfn_table_get, "($table $key)",
+  cell* table = lookup("$table");
+  cell* key = lookup("$key");
   return mkref(get(table, key));
 )
 
-COMPILE_FN(table_to_list, compiledFn_table_to_list, "($table)",
-  CellMap table = toTable(lookup("$table"))->table;
-  Cell* result = newCell();
-  Cell* curr = result;
-  for (CellMap::iterator p = table.begin(); p != table.end(); ++p) {
+COMPILE_FN(table_to_list, compiledfn_table_to_list, "($table)",
+  cell_map table = to_table(lookup("$table"))->value;
+  cell* result = new_cell();
+  cell* curr = result;
+  for (cell_map::iterator p = table.begin(); p != table.end(); ++p) {
     if (!p->second) continue;
-    addCons(curr, newCons(p->first, newCons(p->second)));
+    add_cons(curr, new_cons(p->first, new_cons(p->second)));
     curr=cdr(curr);
   }
-  return dropPtr(result);
+  return drop_ptr(result);
 )
 
-COMPILE_FN(table_length, compiledFn_table_length, "($table)",
-  CellMap table = toTable(lookup("$table"))->table;
-  return mkref(newNum((long)table.size()));
+COMPILE_FN(table_length, compiledfn_table_length, "($table)",
+  cell_map table = to_table(lookup("$table"))->value;
+  return mkref(new_num((long)table.size()));
 )

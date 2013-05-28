@@ -1,15 +1,15 @@
 //// segment the tokens into top-level expressions
 
-list<Token> nextExpr(istream& in) {
-  list<Token> result;   // emit tokens here
+list<token> next_expr(istream& in) {
+  list<token> result;   // emit tokens here
 
-  long explicitOpenParens = 0;
+  long explicit_open_parens = 0;
   for(;;) {
     if (in.eof()) break;
-    result.push_back(nextToken(in));
-    if (result.back() == "(") ++explicitOpenParens;
-    if (result.back() == ")") --explicitOpenParens;
-    if (!isQuoteOrUnquote(result.back()) && explicitOpenParens == 0) break;
+    result.push_back(next_token(in));
+    if (result.back() == "(") ++explicit_open_parens;
+    if (result.back() == ")") --explicit_open_parens;
+    if (!is_quote_or_unquote(result.back()) && explicit_open_parens == 0) break;
   }
   if (result.empty()) result.push_back("");
   return result;
@@ -19,10 +19,10 @@ list<Token> nextExpr(istream& in) {
 
 //// internals
 
-bool isParen(const Token& t) {
+bool is_paren(const token& t) {
   return t == "(" || t == ")";
 }
 
-bool isQuoteOrUnquote(const Token& t) {
+bool is_quote_or_unquote(const token& t) {
   return t == "'";
 }
