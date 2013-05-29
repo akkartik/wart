@@ -71,12 +71,12 @@ void test_assign_overrides_lexical_var() {
 
 void test_equal_handles_nil() {
   run("(= nil nil)");
-  CHECK_TRACE_DOESNT_CONTAIN("eval", 1, "compiled fn\n=> nil\n");
+  CHECK_TRACE_DOESNT_CONTAIN("eval", 1, "=> nil\n");
 }
 
 void test_equal_handles_floats() {
   run("(= (/ 3.0 2) 1.5)");
-  CHECK_TRACE_DOESNT_CONTAIN("eval", 1, "compiled fn\n=> nil\n");
+  CHECK_TRACE_DOESNT_CONTAIN("eval", 1, "=> nil\n");
 }
 
 void test_equal_handles_float_vs_nil() {
