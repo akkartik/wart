@@ -129,6 +129,16 @@ int trace_count(string layer, int level, string line) {
   return result;
 }
 
+bool trace_doesnt_contain(string layer, string line) {
+  return trace_count(layer, line) == 0;
+}
+
+bool trace_doesnt_contain(string layer, int level, string line) {
+  return trace_count(layer, level, line) == 0;
+}
+
+#define CHECK_TRACE_DOESNT_CONTAIN(...) CHECK(trace_doesnt_contain(__VA_ARGS__))
+
 
 
 // manage layer counts in global_trace_stream using RAII
