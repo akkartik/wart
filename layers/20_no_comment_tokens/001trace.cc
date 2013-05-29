@@ -1,8 +1,8 @@
 using std::pair;
 
 struct trace_stream {
-  vector<pair<string, pair<int, string> > > past_lines;   // [(layer label, level, line)]
-  unordered_map<string, int> level;
+  vector<pair<string, pair<int, string> > > past_lines;   // [(layer label, frame, line)]
+  unordered_map<string, int> frame;
   // accumulator for current line
   ostringstream* curr_stream;
   string curr_layer;
@@ -17,10 +17,10 @@ struct trace_stream {
     return *curr_stream;
   }
 
-  // be sure to call this before messing with curr_stream or curr_layer or level
+  // be sure to call this before messing with curr_stream or curr_layer or frame
   void newline() {
     if (!curr_stream) return;
-    past_lines.push_back(pair<string, pair<int, string> >(curr_layer, pair<int, string>(level[curr_layer], curr_stream->str())));
+    past_lines.push_back(pair<string, pair<int, string> >(curr_layer, pair<int, string>(frame[curr_layer], curr_stream->str())));
     if (curr_layer == dump_layer || curr_layer == "dump") cerr << curr_stream->str() << '\n';
     delete curr_stream;
     curr_stream = NULL;
@@ -39,12 +39,12 @@ struct trace_stream {
 
   void dump_browseable_contents(string layer) {
     ofstream dump("dump");
-    dump << "<div class='level' level_index='1'>start</div>\n";
+    dump << "<div class='frame' frame_index='1'>start</div>\n";
     for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p) {
       if (p->first != layer) continue;
-      dump << "<div class='level";
+      dump << "<div class='frame";
       if (p->second.first > 1) dump << " hidden";
-      dump << "' level_index='" << p->second.first << "'>";
+      dump << "' frame_index='" << p->second.first << "'>";
       dump << p->second.second;
       dump << "</div>\n";
     }
@@ -118,11 +118,11 @@ int trace_count(string layer, string line) {
   return result;
 }
 
-int trace_count(string layer, int level, string line) {
+int trace_count(string layer, int frame, string line) {
   long result = 0;
   vector<string> layers = split(layer, ',');
   for (vector<pair<string, pair<int, string> > >::iterator p = global_trace_stream->past_lines.begin(); p != global_trace_stream->past_lines.end(); ++p) {
-    if (any_prefix_match(layers, p->first) && p->second.first == level)
+    if (any_prefix_match(layers, p->first) && p->second.first == frame)
       if (line == "" || p->second.second == line)
         ++result;
   }
@@ -133,8 +133,8 @@ bool trace_doesnt_contain(string layer, string line) {
   return trace_count(layer, line) == 0;
 }
 
-bool trace_doesnt_contain(string layer, int level, string line) {
-  return trace_count(layer, level, line) == 0;
+bool trace_doesnt_contain(string layer, int frame, string line) {
+  return trace_count(layer, frame, line) == 0;
 }
 
 #define CHECK_TRACE_DOESNT_CONTAIN(...) CHECK(trace_doesnt_contain(__VA_ARGS__))
@@ -147,17 +147,17 @@ struct lease_trace_frame {
   lease_trace_frame(string l) :layer(l) {
     if (!global_trace_stream) return;
     global_trace_stream->newline();
-    ++global_trace_stream->level[layer];
+    ++global_trace_stream->frame[layer];
   }
   ~lease_trace_frame() {
     if (!global_trace_stream) return;
     global_trace_stream->newline();
-    --global_trace_stream->level[layer];
+    --global_trace_stream->frame[layer];
   }
 };
-#define new_trace_frame(layer) lease_trace_frame lease_trace_level(layer);
+#define new_trace_frame(layer) lease_trace_frame leased_frame(layer);
 
-bool check_trace_contents(string FUNCTION, string layer, int level, string expected) {  // multiple layers, hierarchical layers
+bool check_trace_contents(string FUNCTION, string layer, int frame, string expected) {  // multiple layers, hierarchical layers
   vector<string> expected_lines = split(expected, '\n');
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
@@ -169,7 +169,7 @@ bool check_trace_contents(string FUNCTION, string layer, int level, string expec
   for (vector<pair<string, pair<int, string> > >::iterator p = global_trace_stream->past_lines.begin(); p != global_trace_stream->past_lines.end(); ++p) {
     if (!layer.empty() && !any_prefix_match(layers, p->first))
       continue;
-    if (p->second.first != level)
+    if (p->second.first != frame)
       continue;
     if (p->second.second != expected_lines[curr_expected_line])
       continue;
