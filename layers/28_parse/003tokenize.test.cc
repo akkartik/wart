@@ -1,77 +1,77 @@
 void test_tokenize_handles_multiple_atoms() {
   stringstream in("34 abc 3.4");
   read_all(in);
-  checkTraceContents("tokenize", "34\nabc\n3.4\n");
+  check_trace_contents("tokenize", "34\nabc\n3.4\n");
 }
 
 void test_tokenize_handles_string_literal() {
   stringstream in("34 \"abc\"");
   read_all(in);
-  checkTraceContents("tokenize", "34\n\"abc\"\n");
+  check_trace_contents("tokenize", "34\n\"abc\"\n");
 }
 
 void test_tokenize_handles_multiple_lines() {
   stringstream in("34\n\"abc\"");
   read_all(in);
-  checkTraceContents("tokenize", "34\n\"abc\"\n");
+  check_trace_contents("tokenize", "34\n\"abc\"\n");
 }
 
 void test_tokenize_handles_string_with_space() {
   stringstream in("34\n\"abc def\"");
   read_all(in);
-  checkTraceContents("tokenize", "34\n\"abc def\"\n");
+  check_trace_contents("tokenize", "34\n\"abc def\"\n");
 }
 
 void test_tokenize_handles_string_with_escape() {
   stringstream in("34\n\"abc \\\"quote def\"");
   read_all(in);
-  checkTraceContents("tokenize", "34\n\"abc \\\"quote def\"\n");
+  check_trace_contents("tokenize", "34\n\"abc \\\"quote def\"\n");
 }
 
 void test_tokenize_handles_comment() {
   stringstream in("()'a #abc def ghi");
   read_all(in);
-  checkTraceContents("tokenize", "(\n)\n'\na\n\n");   // extra newline just an artifact
+  check_trace_contents("tokenize", "(\n)\n'\na\n\n");   // extra newline just an artifact
 }
 
 void test_tokenize_ends_comment_at_newline() {
   stringstream in("#abc def ghi\nabc");
   read_all(in);
-  checkTraceContents("tokenize", "abc\n");
+  check_trace_contents("tokenize", "abc\n");
 }
 
 void test_tokenize_suppresses_comments() {
   stringstream in("abc\n#abc\ndef\nghi");
   read_all(in);
-  checkTraceContents("tokenize", "abc\ndef\nghi\n");
+  check_trace_contents("tokenize", "abc\ndef\nghi\n");
 }
 
 void test_tokenize_suppresses_comments2() {
   stringstream in("a b\n  c\n#abc\ndef\n  ghi\n\njkl");
   read_all(in);
-  checkTraceContents("tokenize", "a\nb\nc\ndef\nghi\njkl\n");
+  check_trace_contents("tokenize", "a\nb\nc\ndef\nghi\njkl\n");
 }
 
 void test_tokenize_suppresses_trailing_whitespace() {
   stringstream in("a \nb\r\nc");
   read_all(in);
-  checkTraceContents("tokenize", "a\nb\nc\n");
+  check_trace_contents("tokenize", "a\nb\nc\n");
 }
 
 void test_tokenize_suppresses_repeated_newline() {
   stringstream in("34\n\n\"abc \\\"quote def\"");
   read_all(in);
-  checkTraceContents("tokenize", "34\n\"abc \\\"quote def\"\n");
+  check_trace_contents("tokenize", "34\n\"abc \\\"quote def\"\n");
 }
 
 void test_tokenize_suppresses_whitespace_lines() {
   stringstream in("abc def ghi\n\n    \n  def");
   read_all(in);
-  checkTraceContents("tokenize", "abc\ndef\nghi\ndef\n");
+  check_trace_contents("tokenize", "abc\ndef\nghi\ndef\n");
 }
 
 void test_tokenize_suppresses_whitespace_lines2() {
   stringstream in("  \nabc def ghi\n\n    \n  def");
   read_all(in);
-  checkTraceContents("tokenize", "abc\ndef\nghi\ndef\n");
+  check_trace_contents("tokenize", "abc\ndef\nghi\ndef\n");
 }

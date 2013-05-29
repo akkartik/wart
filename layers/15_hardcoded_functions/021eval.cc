@@ -32,7 +32,7 @@ cell* eval(cell* expr) {
   if (is_quoted(expr))
     return mkref(cdr(expr));
 
-  cell* result = evalPrimitive(car(expr), cdr(expr));
+  cell* result = eval_primitive(car(expr), cdr(expr));
   if (result) return result;  // already mkref'd
 
   // expr is a call
@@ -42,8 +42,8 @@ cell* eval(cell* expr) {
         << "Perhaps you need to split the line in two." << endl;
 
   // eval its args, create new bindings
-  list<cell*> varsBound;
-  eval_bind_all(sig(fn), cdr(expr), varsBound);
+  list<cell*> vars_bound;
+  eval_bind_all(sig(fn), cdr(expr), vars_bound);
 
   result = nil;
   // eval all forms in body, save result of final form
@@ -52,13 +52,13 @@ cell* eval(cell* expr) {
     result = eval(car(form));
   }
 
-  for (list<cell*>::iterator p = varsBound.begin(); p != varsBound.end(); ++p)
+  for (list<cell*>::iterator p = vars_bound.begin(); p != vars_bound.end(); ++p)
     end_dynamic_scope(*p);
   rmref(fn);
   return result;  // already mkref'd
 }
 
-cell* evalPrimitive(cell* f, cell* args) {
+cell* eval_primitive(cell* f, cell* args) {
   if (f == new_sym("fn")) {
     cell* f = new_table();
     set(f, sym_sig, car(args));
@@ -219,7 +219,7 @@ cell* evalPrimitive(cell* f, cell* args) {
 // bind params to args in new_scope, taking into account:
 //  quoted params (eval'ing args as necessary; args is never quoted, though)
 //  destructured params
-void eval_bind_all(cell* params, cell* args, list<cell*>& varsBound) {
+void eval_bind_all(cell* params, cell* args, list<cell*>& vars_bound) {
   if (params == nil)
     return;
 
@@ -234,7 +234,7 @@ void eval_bind_all(cell* params, cell* args, list<cell*>& varsBound) {
 
   if (is_sym(params)) {
     cell* val = eval_all(args2);
-    bind_params(params, val, varsBound);
+    bind_params(params, val, vars_bound);
     rmref(val);
   }
 
@@ -242,13 +242,13 @@ void eval_bind_all(cell* params, cell* args, list<cell*>& varsBound) {
     ;
 
   else {
-    eval_bind_param(car(params), car(args2), varsBound);
-    eval_bind_all(cdr(params), cdr(args2), varsBound);
+    eval_bind_param(car(params), car(args2), vars_bound);
+    eval_bind_all(cdr(params), cdr(args2), vars_bound);
   }
   rmref(args2);
 }
 
-void eval_bind_param(cell* param, cell* arg, list<cell*>& varsBound) {
+void eval_bind_param(cell* param, cell* arg, list<cell*>& vars_bound) {
   cell* arg2 = NULL;
   if (is_quoted(param)) {
     param = strip_quote(param);
@@ -258,32 +258,32 @@ void eval_bind_param(cell* param, cell* arg, list<cell*>& varsBound) {
     arg2 = mkref(arg);
 
   cell* val = eval(arg2);
-  bind_params(param, val, varsBound);
+  bind_params(param, val, vars_bound);
   rmref(val);
   rmref(arg2);
 }
 
-void bind_params(cell* params, cell* args, list<cell*>& varsBound) {
+void bind_params(cell* params, cell* args, list<cell*>& vars_bound) {
   if (is_quoted(params))
-    bind_params(strip_quote(params), args, varsBound);
+    bind_params(strip_quote(params), args, vars_bound);
 
   else if (params == nil)
     ;
 
   else if (is_sym(params)) {
     new_dynamic_scope(params, args);
-    varsBound.push_back(params);
+    vars_bound.push_back(params);
   }
 
   else if (!is_cons(params))
     ;
 
   else if (args != nil && !is_cons(args))
-    bind_params(params, nil, varsBound);
+    bind_params(params, nil, vars_bound);
 
   else {
-    bind_params(car(params), car(args), varsBound);
-    bind_params(cdr(params), cdr(args), varsBound);
+    bind_params(car(params), car(args), vars_bound);
+    bind_params(cdr(params), cdr(args), vars_bound);
   }
 }
 

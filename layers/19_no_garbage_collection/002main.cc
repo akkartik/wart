@@ -102,7 +102,7 @@ void run_tests() {
 }
 
 void verify() {
-  teardownBindings();
+  teardown_bindings();
   if (!Passed) return;
   if (Raise_count != 0) cerr << Raise_count << " errors encountered" << endl;
 }

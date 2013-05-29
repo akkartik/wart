@@ -14,14 +14,14 @@ cell* lookup(cell* sym) {
   return bindings[sym];
 }
 
-void newBinding(string sym, cell* val) {
-  newBinding(new_sym(sym), val);
+void new_binding(string sym, cell* val) {
+  new_binding(new_sym(sym), val);
 }
 
-void newBinding(cell* sym, cell* val) {
+void new_binding(cell* sym, cell* val) {
   bindings[sym] = val;
 }
 
-void teardownBindings() {
+void teardown_bindings() {
   bindings.clear();
 }

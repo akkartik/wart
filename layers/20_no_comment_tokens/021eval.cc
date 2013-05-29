@@ -11,7 +11,7 @@
 //  passing in lists to functions: ((fn ((x y)) (+ x y)) '(3 4)) => 7
 
 cell* eval(cell* expr) {
-  incTraceForRestOfScope("eval");
+  new_trace_frame("eval");
   if (!expr)
     RAISE << "eval: cell should never be NULL" << endl << die();
 
@@ -47,7 +47,7 @@ cell* eval(cell* expr) {
     return cdr(expr);
   }
 
-  cell* result = evalPrimitive(car(expr), cdr(expr));
+  cell* result = eval_primitive(car(expr), cdr(expr));
   if (result) {
     trace("eval") << "compiled fn";
     trace("eval") << "=> " << result;
@@ -70,7 +70,7 @@ cell* eval(cell* expr) {
   return result;
 }
 
-cell* evalPrimitive(cell* f, cell* args) {
+cell* eval_primitive(cell* f, cell* args) {
   if (f == new_sym("fn")) {
     cell* f = new_table();
     set(f, sym_sig, car(args));
@@ -117,7 +117,7 @@ cell* evalPrimitive(cell* f, cell* args) {
       return nil;
     }
     cell* val = eval(car(cdr(args)));
-    newBinding(var, val);
+    new_binding(var, val);
     return val;
   }
 
@@ -210,7 +210,7 @@ void bind_params(cell* params, cell* args) {
     ;
 
   else if (is_sym(params))
-    newBinding(params, args);
+    new_binding(params, args);
 
   else if (!is_cons(params))
     ;

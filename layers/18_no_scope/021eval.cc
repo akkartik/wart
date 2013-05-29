@@ -29,7 +29,7 @@ cell* eval(cell* expr) {
   if (is_quoted(expr))
     return mkref(cdr(expr));
 
-  cell* result = evalPrimitive(car(expr), cdr(expr));
+  cell* result = eval_primitive(car(expr), cdr(expr));
   if (result) return result;  // already mkref'd
 
   // expr is a call
@@ -52,7 +52,7 @@ cell* eval(cell* expr) {
   return result;  // already mkref'd
 }
 
-cell* evalPrimitive(cell* f, cell* args) {
+cell* eval_primitive(cell* f, cell* args) {
   if (f == new_sym("fn")) {
     cell* f = new_table();
     set(f, sym_sig, car(args));
@@ -109,7 +109,7 @@ cell* evalPrimitive(cell* f, cell* args) {
       return nil;
     }
     cell* val = eval(car(cdr(args)));
-    newBinding(var, val);
+    new_binding(var, val);
     return val;   // already mkref'd
   }
 
@@ -240,7 +240,7 @@ void bind_params(cell* params, cell* args) {
     ;
 
   else if (is_sym(params))
-    newBinding(params, args);
+    new_binding(params, args);
 
   else if (!is_cons(params))
     ;

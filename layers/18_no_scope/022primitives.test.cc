@@ -15,7 +15,7 @@ void test_fn_works() {
 void test_if_sees_args_in_then_and_else() {
   cell* fn = read("(fn(x) (if 34 x))");
   cell* f = eval(fn);
-  newBinding("f", f);
+  new_binding("f", f);
   cell* call = read("(f 35)");
   cell* result = eval(call);
   CHECK_EQ(result, new_num(35));

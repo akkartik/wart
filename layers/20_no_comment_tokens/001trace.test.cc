@@ -51,7 +51,7 @@ void test_trace_segments_within_layers() {
   CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 2") << "bar";
-  incTraceForRestOfScope("test layer 1");
+  new_trace_frame("test layer 1");
   trace("test layer 1") << "qux";
   CHECK_TRACE_CONTENTS("test layer 1", "foo\nqux\n");
   CHECK_TRACE_CONTENTS("test layer 1", 0, "foo\n");
@@ -59,7 +59,7 @@ void test_trace_segments_within_layers() {
 
 void trace_test_fn(int n) {
   if (n == 0) return;
-  incTraceForRestOfScope("foo");
+  new_trace_frame("foo");
   trace("foo") << "before: " << n;
   trace_test_fn(n-1);
   trace("foo") << "after: " << n;
@@ -91,14 +91,14 @@ void test_trace_supports_count() {
   CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 1") << "foo";
-  CHECK_EQ(traceCount("test layer 1", "foo"), 2);
+  CHECK_EQ(trace_count("test layer 1", "foo"), 2);
 }
 
 void test_trace_supports_count2() {
   CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 1") << "bar";
-  CHECK_EQ(traceCount("test layer 1"), 2);
+  CHECK_EQ(trace_count("test layer 1"), 2);
 }
 
 

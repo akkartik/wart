@@ -1,14 +1,14 @@
 using std::pair;
 
-struct TraceStream {
+struct trace_stream {
   vector<pair<string, pair<int, string> > > past_lines;   // [(layer label, level, line)]
   unordered_map<string, int> level;
   // accumulator for current line
   ostringstream* curr_stream;
   string curr_layer;
   string dump_layer;
-  TraceStream() :curr_stream(NULL) {}
-  ~TraceStream() { if (curr_stream) delete curr_stream; }
+  trace_stream() :curr_stream(NULL) {}
+  ~trace_stream() { if (curr_stream) delete curr_stream; }
 
   ostringstream& stream(string layer) {
     newline();
@@ -54,16 +54,16 @@ struct TraceStream {
 
 
 
-TraceStream* global_trace_stream = NULL;
+trace_stream* global_trace_stream = NULL;
 
-// global_trace_stream is a resource, LeaseTracer uses RAII to manage it.
-struct LeaseTracer {
-  LeaseTracer() { global_trace_stream = new TraceStream; }
-  ~LeaseTracer() { delete global_trace_stream, global_trace_stream = NULL; }
+// global_trace_stream is a resource, lease_tracer uses RAII to manage it.
+struct lease_tracer {
+  lease_tracer() { global_trace_stream = new trace_stream; }
+  ~lease_tracer() { delete global_trace_stream, global_trace_stream = NULL; }
 };
-#define START_TRACING_UNTIL_END_OF_SCOPE LeaseTracer lease_tracer;
+#define START_TRACING_UNTIL_END_OF_SCOPE lease_tracer leased_tracer;
 
-#define CLEAR_TRACE delete global_trace_stream, global_trace_stream = new TraceStream;
+#define CLEAR_TRACE delete global_trace_stream, global_trace_stream = new trace_stream;
 
 #define DUMP cerr << global_trace_stream->readable_contents("");
 
@@ -73,7 +73,7 @@ struct LeaseTracer {
 // never write explicit newlines into trace
 #define trace(layer) !global_trace_stream ? cerr /*print nothing*/ : global_trace_stream->stream(layer)
 
-bool checkTraceContents(string FUNCTION, string layer, string expected) {   // empty layer == everything, multiple layers, hierarchical layers
+bool check_trace_contents(string FUNCTION, string layer, string expected) {   // empty layer == everything, multiple layers, hierarchical layers
   vector<string> expected_lines = split(expected, '\n');
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
@@ -101,13 +101,13 @@ bool checkTraceContents(string FUNCTION, string layer, string expected) {   // e
   return false;
 }
 
-#define CHECK_TRACE_CONTENTS(...) checkTraceContents(__FUNCTION__, __VA_ARGS__)
+#define CHECK_TRACE_CONTENTS(...) check_trace_contents(__FUNCTION__, __VA_ARGS__)
 
-int traceCount(string layer) {
-  return traceCount(layer, "");
+int trace_count(string layer) {
+  return trace_count(layer, "");
 }
 
-int traceCount(string layer, string line) {
+int trace_count(string layer, string line) {
   long result = 0;
   vector<string> layers = split(layer, ',');
   for (vector<pair<string, pair<int, string> > >::iterator p = global_trace_stream->past_lines.begin(); p != global_trace_stream->past_lines.end(); ++p) {
@@ -118,7 +118,7 @@ int traceCount(string layer, string line) {
   return result;
 }
 
-int traceCount(string layer, int level, string line) {
+int trace_count(string layer, int level, string line) {
   long result = 0;
   vector<string> layers = split(layer, ',');
   for (vector<pair<string, pair<int, string> > >::iterator p = global_trace_stream->past_lines.begin(); p != global_trace_stream->past_lines.end(); ++p) {
@@ -132,22 +132,22 @@ int traceCount(string layer, int level, string line) {
 
 
 // manage layer counts in global_trace_stream using RAII
-struct LeaseTraceLevel {
+struct lease_trace_frame {
   string layer;
-  LeaseTraceLevel(string l) :layer(l) {
+  lease_trace_frame(string l) :layer(l) {
     if (!global_trace_stream) return;
     global_trace_stream->newline();
     ++global_trace_stream->level[layer];
   }
-  ~LeaseTraceLevel() {
+  ~lease_trace_frame() {
     if (!global_trace_stream) return;
     global_trace_stream->newline();
     --global_trace_stream->level[layer];
   }
 };
-#define incTraceForRestOfScope(layer) LeaseTraceLevel lease_trace_level(layer);
+#define new_trace_frame(layer) lease_trace_frame lease_trace_level(layer);
 
-bool checkTraceContents(string FUNCTION, string layer, int level, string expected) {  // multiple layers, hierarchical layers
+bool check_trace_contents(string FUNCTION, string layer, int level, string expected) {  // multiple layers, hierarchical layers
   vector<string> expected_lines = split(expected, '\n');
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())

@@ -6,10 +6,10 @@ void test_eval_bind_all_handles_unquoted_param() {
   cell* params = read("(x)");
   cell* args = read("(a)");
   new_dynamic_scope("a", new_num(3));
-  list<cell*> varsBound;
-  eval_bind_all(params, args, varsBound);
-  CHECK_EQ(varsBound.size(), 1);
-  CHECK(contains(varsBound, "x"));
+  list<cell*> vars_bound;
+  eval_bind_all(params, args, vars_bound);
+  CHECK_EQ(vars_bound.size(), 1);
+  CHECK(contains(vars_bound, "x"));
   CHECK_EQ(lookup("x"), new_num(3));
   end_dynamic_scope("x");
   end_dynamic_scope("a");
@@ -21,13 +21,13 @@ void test_eval_bind_all_binds_missing_params() {
   cell* params = read("(x y)");
   cell* args = read("(a)");
   new_dynamic_scope("a", new_num(3));
-  list<cell*> varsBound;
-  eval_bind_all(params, args, varsBound);
+  list<cell*> vars_bound;
+  eval_bind_all(params, args, vars_bound);
   CHECK_EQ(lookup("x"), new_num(3));
   CHECK_EQ(lookup("y"), nil);
-  CHECK_EQ(varsBound.size(), 2);
-  CHECK(contains(varsBound, "x"));
-  CHECK(contains(varsBound, "y"));
+  CHECK_EQ(vars_bound.size(), 2);
+  CHECK(contains(vars_bound, "x"));
+  CHECK(contains(vars_bound, "y"));
   end_dynamic_scope("x");
   end_dynamic_scope("y");
   end_dynamic_scope("a");
@@ -38,10 +38,10 @@ void test_eval_bind_all_binds_missing_params() {
 void test_eval_bind_all_handles_quoted_param() {
   cell* params = read("('x)");
   cell* args = read("(a)");
-  list<cell*> varsBound;
-  eval_bind_all(params, args, varsBound);
-  CHECK_EQ(varsBound.size(), 1);
-  CHECK(contains(varsBound, "x"));
+  list<cell*> vars_bound;
+  eval_bind_all(params, args, vars_bound);
+  CHECK_EQ(vars_bound.size(), 1);
+  CHECK(contains(vars_bound, "x"));
   CHECK_EQ(lookup("x"), new_sym("a"));
   end_dynamic_scope("x");
   rmref(args);
@@ -53,10 +53,10 @@ void test_eval_bind_all_handles_varargs_param() {
   cell* args = read("(a b)");
   new_dynamic_scope("a", new_num(3));
   new_dynamic_scope("b", new_num(4));
-  list<cell*> varsBound;
-  eval_bind_all(params, args, varsBound);
-  CHECK_EQ(varsBound.size(), 1);
-  CHECK(contains(varsBound, "x"));
+  list<cell*> vars_bound;
+  eval_bind_all(params, args, vars_bound);
+  CHECK_EQ(vars_bound.size(), 1);
+  CHECK(contains(vars_bound, "x"));
   // {x: (3 4)}
   CHECK_EQ(car(lookup("x")), new_num(3));
   CHECK_EQ(car(cdr(lookup("x"))), new_num(4));
@@ -73,10 +73,10 @@ void test_eval_bind_all_handles_quoted_varargs_param() {
   cell* args = read("(a b)");
   new_dynamic_scope("a", new_num(3));
   new_dynamic_scope("b", new_num(4));
-  list<cell*> varsBound;
-  eval_bind_all(params, args, varsBound);
-  CHECK_EQ(varsBound.size(), 1);
-  CHECK(contains(varsBound, "x"));
+  list<cell*> vars_bound;
+  eval_bind_all(params, args, vars_bound);
+  CHECK_EQ(vars_bound.size(), 1);
+  CHECK(contains(vars_bound, "x"));
   // {x: (a b)}
   CHECK_EQ(car(lookup("x")), new_sym("a"));
   CHECK_EQ(car(cdr(lookup("x"))), new_sym("b"));
@@ -93,8 +93,8 @@ void test_eval_bind_all_handles_rest_param() {
   cell* args = read("(a b)");
   new_dynamic_scope("a", new_num(3));
   new_dynamic_scope("b", new_num(4));
-  list<cell*> varsBound;
-  eval_bind_all(params, args, varsBound);
+  list<cell*> vars_bound;
+  eval_bind_all(params, args, vars_bound);
   // {x: 3, y: (4)}
   CHECK_EQ(lookup("x"), new_num(3));
   CHECK_EQ(car(lookup("y")), new_num(4));
@@ -112,8 +112,8 @@ void test_eval_bind_all_handles_quoted_rest_param() {
   cell* args = read("(a b)");
   new_dynamic_scope("a", new_num(3));
   new_dynamic_scope("b", new_num(4));
-  list<cell*> varsBound;
-  eval_bind_all(params, args, varsBound);
+  list<cell*> vars_bound;
+  eval_bind_all(params, args, vars_bound);
   // {x: 3, y: (b)}
   CHECK_EQ(lookup("x"), new_num(3));
   CHECK_EQ(car(lookup("y")), new_sym("b"));
@@ -131,8 +131,8 @@ void test_eval_bind_all_handles_destructured_params() {
   cell* args = read("((cons x (cons y)))");
   new_dynamic_scope("x", new_num(3));
   new_dynamic_scope("y", new_num(4));
-  list<cell*> varsBound;
-  eval_bind_all(params, args, varsBound);
+  list<cell*> vars_bound;
+  eval_bind_all(params, args, vars_bound);
   // {a: 3, b: 4}
   CHECK_EQ(lookup("a"), new_num(3));
   CHECK_EQ(lookup("b"), new_num(4));

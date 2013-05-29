@@ -5,7 +5,7 @@ cell* next_cell(istream& in) {
 }
 
 cell* build_cell(ast_node n) {
-  incTraceForRestOfScope("cell");
+  new_trace_frame("cell");
   if (n == "") return nil;  // void
 
   if (is_nil(n)) {

@@ -14,11 +14,11 @@ cell* lookup(cell* sym) {
   return bindings[sym];
 }
 
-void newBinding(string sym, cell* val) {
-  newBinding(new_sym(sym), val);
+void new_binding(string sym, cell* val) {
+  new_binding(new_sym(sym), val);
 }
 
-void newBinding(cell* sym, cell* val) {
+void new_binding(cell* sym, cell* val) {
   if (bindings[sym] == val) return;
   if (!bindings[sym]) mkref(sym);
   if (bindings[sym]) rmref(bindings[sym]);
@@ -26,7 +26,7 @@ void newBinding(cell* sym, cell* val) {
   bindings[sym] = val;
 }
 
-void teardownBindings() {
+void teardown_bindings() {
   for (unordered_map<cell*, cell*>::iterator p = bindings.begin(); p != bindings.end(); ++p) {
     if (!p->second) continue;
     rmref(p->first);

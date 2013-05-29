@@ -1,7 +1,7 @@
 void test_eval_bind_all_handles_unquoted_param() {
   cell* params = read("(x)");
   cell* args = read("(a)");
-  newBinding("a", new_num(3));
+  new_binding("a", new_num(3));
   eval_bind_all(params, args);
   CHECK_EQ(lookup("x"), new_num(3));
   rmref(args);
@@ -11,7 +11,7 @@ void test_eval_bind_all_handles_unquoted_param() {
 void test_eval_bind_all_binds_missing_params() {
   cell* params = read("(x y)");
   cell* args = read("(a)");
-  newBinding("a", new_num(3));
+  new_binding("a", new_num(3));
   eval_bind_all(params, args);
   CHECK_EQ(lookup("x"), new_num(3));
   CHECK_EQ(lookup("y"), nil);
@@ -22,8 +22,8 @@ void test_eval_bind_all_binds_missing_params() {
 void test_eval_bind_all_handles_varargs_param() {
   cell* params = read("x");
   cell* args = read("(a b)");
-  newBinding("a", new_num(3));
-  newBinding("b", new_num(4));
+  new_binding("a", new_num(3));
+  new_binding("b", new_num(4));
   eval_bind_all(params, args);
   // {x: (3 4)}
   CHECK_EQ(car(lookup("x")), new_num(3));
@@ -36,8 +36,8 @@ void test_eval_bind_all_handles_varargs_param() {
 void test_eval_bind_all_handles_rest_param() {
   cell* params = read("(x ... y)");
   cell* args = read("(a b)");
-  newBinding("a", new_num(3));
-  newBinding("b", new_num(4));
+  new_binding("a", new_num(3));
+  new_binding("b", new_num(4));
   eval_bind_all(params, args);
   // {x: 3, y: (4)}
   CHECK_EQ(lookup("x"), new_num(3));
@@ -50,8 +50,8 @@ void test_eval_bind_all_handles_rest_param() {
 void test_eval_bind_all_handles_destructured_params() {
   cell* params = read("((a b))");
   cell* args = read("((cons x (cons y)))");
-  newBinding("x", new_num(3));
-  newBinding("y", new_num(4));
+  new_binding("x", new_num(3));
+  new_binding("y", new_num(4));
   eval_bind_all(params, args);
   // {a: 3, b: 4}
   CHECK_EQ(lookup("a"), new_num(3));
@@ -88,7 +88,7 @@ void test_colonsym_evals_to_itself() {
 
 void test_colon_evals() {
   cell* expr = read(":");
-  newBinding(":", nil);
+  new_binding(":", nil);
   cell* result = eval(expr);
   CHECK_EQ(result, nil);
   rmref(expr);
@@ -103,7 +103,7 @@ void test_string_evals_to_itself() {
 }
 
 void test_sym_evals_to_value() {
-  newBinding("a", new_num(34));
+  new_binding("a", new_num(34));
   cell* expr = read("a");
   cell* result = eval(expr);
   CHECK_EQ(result, new_num(34));
@@ -112,7 +112,7 @@ void test_sym_evals_to_value() {
 }
 
 void test_sym_evals_to_itself() {
-  newBinding("a", new_sym("a"));
+  new_binding("a", new_sym("a"));
   cell* expr = read("a");
   cell* result = eval(expr);
   CHECK_EQ(result, expr);
@@ -170,7 +170,7 @@ void test_eval_handles_fn_calls() {
 
 void test_eval_expands_syms_in_fn_bodies() {
   cell* fn = read("((fn () a))");
-  newBinding("a", new_num(34));
+  new_binding("a", new_num(34));
   cell* result = eval(fn);
   CHECK_EQ(result, new_num(34));
   rmref(result);
@@ -180,7 +180,7 @@ void test_eval_expands_syms_in_fn_bodies() {
 void test_eval_handles_assigned_fn_calls() {
   cell* fn = read("(fn () 34)");
   cell* f = eval(fn);
-  newBinding("f", f);
+  new_binding("f", f);
     cell* call = read("(f)");
     cell* result = eval(call);
     CHECK_EQ(result, new_num(34));
@@ -193,7 +193,7 @@ void test_eval_handles_assigned_fn_calls() {
 void test_eval_handles_multiple_args() {
   cell* fn = read("(fn (a b) b)");
   cell* f = eval(fn);
-  newBinding("f", f);
+  new_binding("f", f);
   cell* call = read("(f 1 2)");
   cell* result = eval(call);
   CHECK_EQ(result, new_num(2));
@@ -206,7 +206,7 @@ void test_eval_handles_multiple_args() {
 void test_eval_handles_multiple_body_exprs() {
   cell* fn = read("(fn () 1 2)");
   cell* f = eval(fn);
-  newBinding("f", f);
+  new_binding("f", f);
   cell* call = read("(f)");
   cell* result = eval(call);
   CHECK_EQ(result, new_num(2));
