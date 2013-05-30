@@ -209,8 +209,7 @@ cell* unsafe_get(cell* t, cell* key) {
     RAISE << "get on a non-table\n";
     return nil;
   }
-  table& t2 = *(table*)(t->car);
-  return t2[key];
+  return (*(table*)(t->car))[key];
 }
 
 cell* unsafe_get(cell* t, string k) {
