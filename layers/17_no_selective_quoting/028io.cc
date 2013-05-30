@@ -24,7 +24,7 @@ ostream& operator<<(ostream& os, cell* c) {
   case STRING:
     return os << "\"" << to_string(c) << "\"";
   case TABLE:
-    os << (table*)c->car;
+    os << *(cell_map*)c->car;
     if (cdr(c) != nil)
       os << "->" << cdr(c);
     return os;
@@ -33,10 +33,10 @@ ostream& operator<<(ostream& os, cell* c) {
   }
 }
 
-ostream& operator<<(ostream& os, table* t) {
+ostream& operator<<(ostream& os, cell_map& t) {
   os << "{";
-  if (t->value[sym_name]) os << t->value[sym_name] << ": ";
-  for (cell_map::iterator p = t->value.begin(); p != t->value.end(); ++p) {
+  if (t[sym_name]) os << t[sym_name] << ": ";
+  for (cell_map::iterator p = t.begin(); p != t.end(); ++p) {
     if (p->second && p->first != sym_name)
       os << (cell*)p->first << ", ";
   }

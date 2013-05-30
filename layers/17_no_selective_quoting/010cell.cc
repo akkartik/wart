@@ -9,8 +9,6 @@
 
 unsigned long Num_allocs = 0;
 
-extern cell* nil;
-
 struct cell {
   cell* car;  // aliased to long or float
   cell* cdr;
@@ -61,6 +59,7 @@ long Curr_cell = 0;
 cell* Free_cells = NULL;
 
 void grow_heap() {
+  trace("gc") << "grow_heap";
   Curr_heap = Curr_heap->next = new heap();
   if (!Curr_heap) RAISE << "Out of memory\n" << die();
   Curr_cell = 0;
@@ -79,20 +78,22 @@ void reset_heap(heap* h) {
 }
 
 cell* new_cell() {
+  trace("gc") << "alloc";
   cell* result = NULL;
   if (Free_cells) {
+    trace("gc/alloc") << "reuse";
     result = Free_cells;
     Free_cells = Free_cells->cdr;
-    result->init();
-    return result;
+  } else {
+    trace("gc/alloc") << "new";
+    if (Curr_cell == CELLS_PER_HEAP)
+      grow_heap();
+
+    result = &Curr_heap->cells[Curr_cell];
+    ++Curr_cell;
   }
-
-  if (Curr_cell == CELLS_PER_HEAP)
-    grow_heap();
-
-  result = &Curr_heap->cells[Curr_cell];
-  ++Curr_cell;
   result->init();
+  trace("gcdump") << "alloc: " << (void*)result;
   return result;
 }
 
@@ -117,6 +118,8 @@ struct table {
 
 cell* mkref(cell* c) {
   if (c == nil) return nil;
+  trace("gc") << "mkref";
+  trace("gc/mkref") << c;
   ++c->nrefs;
   return c;
 }
@@ -126,9 +129,13 @@ void rmref(cell* c) {
     RAISE << "A cell was prematurely garbage-collected.\n" << die();
   if (c == nil) return;
 
+  new_trace_frame("rmref");
+  trace("gc") << "rmref";
+  trace("gc/rmref") << c;
   --c->nrefs;
   if (c->nrefs > 0) return;
 
+  trace("gcdump") << "free: " << (void*)c << " " << c << " " << c->nrefs;
   if (is_atom(c) && c->type != STRING && c->type != FLOAT && !Running_tests)
     RAISE << "deleted atom: " << (void*)c << '\n';
 
@@ -149,15 +156,43 @@ void rmref(cell* c) {
 
   rmref(c->cdr);
 
+  trace("gc") << "free";
   c->clear();
   c->cdr = Free_cells;
   Free_cells = c;
   return;
 }
 
+// helper for tests
+bool is_free(cell* x) {
+  return x->car == NULL;
+}
+
+long excess_mkrefs() {
+  return trace_count("gc", "mkref") - trace_count("gc", "rmref");
+}
+
 
 
-// misc
+//// Tracking refcounts.
+
+// RAII for temporaries
+struct lease_cell {
+  cell* value;
+  lease_cell(cell* v) :value(v) {}
+  ~lease_cell() { rmref(value); }
+};
+
+#define TEMP(var, cell_expr) cell* var = cell_expr; lease_cell lease_##var(var);
+
+void update(cell*& var, cell* expr) {
+  rmref(var);
+  var = expr;
+}
+
+
+
+//// Debugging leaks.
 
 long num_unfreed() {
   long n = 0;
