@@ -28,7 +28,10 @@ token next_token(istream& in) {
   else
     slurp_word(in, out);
 
-  if (out.str() == ":") return next_token(in);
+  if (out.str() == ":") {
+    trace("skip during tokenize") << "comment token";
+    return next_token(in);
+  }
 
   trace("tokenize") << out.str();
   return token(out.str());
