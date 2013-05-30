@@ -48,8 +48,8 @@ void test_eval_handles_fn_calls() {
 }
 
 void test_eval_expands_syms_in_fn_bodies() {
-  new_binding("a", new_num(34));
-  run("((fn () a))");
+  new_binding("x", new_num(34));
+  run("((fn () x))");
   CHECK_TRACE_TOP("eval", "=> 34\n");
 }
 
@@ -59,10 +59,10 @@ void test_eval_handles_multiple_body_exprs() {
 }
 
 void test_eval_evals_arg() {
-  new_binding("a", new_num(3));
+  new_binding("x", new_num(3));
   CLEAR_TRACE;
-  run("((fn (x)) a)");
-  CHECK_TRACE_CONTENTS("bind", "x: 3\n");
+  run("((fn (a)) x)");
+  CHECK_TRACE_CONTENTS("bind", "a: 3\n");
 }
 
 void test_eval_evals_arg2() {
@@ -76,10 +76,10 @@ void test_eval_handles_multiple_args() {
 }
 
 void test_eval_binds_missing_params() {
-  new_binding("a", new_num(3));
+  new_binding("x", new_num(3));
   CLEAR_TRACE;
-  run("((fn (x y)) a)");
-  CHECK_TRACE_CONTENTS("bind", "x: 3\ny: nil\n");
+  run("((fn (a b)) x)");
+  CHECK_TRACE_CONTENTS("bind", "a: 3\nb: nil\n");
 }
 
 void test_eval_handles_vararg_param() {
@@ -88,12 +88,12 @@ void test_eval_handles_vararg_param() {
 }
 
 void test_eval_evals_vararg_args() {
-  new_binding("a", new_num(3));
-  new_binding("b", new_num(4));
+  new_binding("x", new_num(3));
+  new_binding("y", new_num(4));
   CLEAR_TRACE;
-  run("((fn x) a b)");
-  CHECK_TRACE_CONTENTS("eval", "a\nsym\n=> 3\nb\nsym\n=> 4\n");
-  CHECK_TRACE_CONTENTS("bind", "x: (3 4)\n");
+  run("((fn args) x y)");
+  CHECK_TRACE_CONTENTS("eval", "x\nsym\n=> 3\ny\nsym\n=> 4\n");
+  CHECK_TRACE_CONTENTS("bind", "args: (3 4)\n");
 }
 
 void test_eval_handles_rest_params() {
@@ -102,11 +102,11 @@ void test_eval_handles_rest_params() {
 }
 
 void test_eval_evals_rest_args() {
-  new_binding("a", new_num(3));
-  new_binding("b", new_num(4));
+  new_binding("x", new_num(3));
+  new_binding("y", new_num(4));
   CLEAR_TRACE;
-  run("((fn (x ... y)) a b)");
-  CHECK_TRACE_CONTENTS("bind", "x: 3\ny: (4)\n");
+  run("((fn (a ... b)) x y)");
+  CHECK_TRACE_CONTENTS("bind", "a: 3\nb: (4)\n");
 }
 
 void test_eval_handles_destructured_params() {
