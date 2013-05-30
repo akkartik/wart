@@ -35,8 +35,17 @@ int main(int argc, unused char* argv[]) {
 
 //// read: tokenize, segment, parse, build cells
 cell* read(istream& in) {
-  return next_cell(in);
+  return mkref(next_cell(in));
 }
+
+// RAII for temporaries
+struct lease_cell {
+  cell* value;
+  lease_cell(cell* v) :value(v) {}
+  ~lease_cell() { rmref(value); }
+};
+
+#define TEMP(var, cell_expr) cell* var = cell_expr; lease_cell lease_##var(var);
 
 // In batch mode, evaluate all exprs in input.
 // In interactive mode, evaluate all exprs until empty line.
@@ -44,7 +53,9 @@ cell* read(istream& in) {
 cell* run(istream& in) {
   cell* result = NULL;
   do {
-    result = eval(read(in));
+    TEMP(c, read(in));
+    cerr << c << '\n';
+    result = eval(c);
   } while (!eof(in) && (!Interactive || in.peek() != '\n'));
   return result;
 }
