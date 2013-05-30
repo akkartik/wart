@@ -131,7 +131,7 @@ void rmref(cell* c) {
 
   new_trace_frame("rmref");
   trace("gc") << "rmref";
-  trace("rmref") << c;
+  trace("gc/rmref") << c;
   --c->nrefs;
   if (c->nrefs > 0) return;
 
@@ -166,6 +166,10 @@ void rmref(cell* c) {
 // helper for tests
 bool is_free(cell* x) {
   return x->car == NULL;
+}
+
+long excess_mkrefs() {
+  return trace_count("gc", "mkref") - trace_count("gc", "rmref");
 }
 
 

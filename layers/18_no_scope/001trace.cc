@@ -96,7 +96,7 @@ bool check_trace_contents(string FUNCTION, string layer, string expected) {   //
     }
   }
 
-  cerr << "\nF " << FUNCTION << ": trace didn't contain " << expected_lines[curr_expected_line] << '\n';
+  cerr << "\nF " << FUNCTION << ": trace for " << layer << " didn't contain " << expected_lines[curr_expected_line] << '\n';
   Passed = false;
   return false;
 }
