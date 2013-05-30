@@ -49,9 +49,9 @@ bool is_atom(cell* x) {
 
 
 
-#define HEAPCELLS (4*1024/sizeof(cell))  // default linux pagesize
+#define CELLS_PER_HEAP (4*1024/sizeof(cell))  // default linux pagesize
 struct heap {
-  cell cells[HEAPCELLS];
+  cell cells[CELLS_PER_HEAP];
   heap *next;
   heap() :next(NULL) {}
 };
@@ -88,7 +88,7 @@ cell* new_cell() {
     return result;
   }
 
-  if (Curr_cell == HEAPCELLS)
+  if (Curr_cell == CELLS_PER_HEAP)
     grow_heap();
 
   result = &Curr_heap->cells[Curr_cell];
@@ -165,7 +165,7 @@ void rmref(cell* c) {
 long num_unfreed() {
   long n = 0;
   for (heap* h = First_heap; h != Curr_heap; h=h->next)
-    n += HEAPCELLS;
+    n += CELLS_PER_HEAP;
   n += Curr_cell-1;   // for Curr_lexical_scope
   for (cell* f = Free_cells; f; f=f->cdr)
     --n;
@@ -175,12 +175,12 @@ long num_unfreed() {
 void dump_unfreed() {
   unordered_map<cell*, int> num_refs_remaining;
   for (heap* h = First_heap; h; h=h->next)
-    for (cell* x = &h->cells[0]; x < &h->cells[HEAPCELLS]; ++x)
+    for (cell* x = &h->cells[0]; x < &h->cells[CELLS_PER_HEAP]; ++x)
       if (x->car)
         mark_all_cells(x, num_refs_remaining);
 
   for (heap* h = First_heap; h; h=h->next)
-    for (cell* x = &h->cells[0]; x < &h->cells[HEAPCELLS]; ++x) {
+    for (cell* x = &h->cells[0]; x < &h->cells[CELLS_PER_HEAP]; ++x) {
       if (!x->car) continue;
       if (num_refs_remaining[x] > 1) continue;
       if (is_sym(x) && to_string(x) == "Curr_lexical_scope")

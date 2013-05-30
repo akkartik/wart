@@ -39,9 +39,9 @@ bool is_atom(cell* x) {
 
 
 
-#define HEAPCELLS (4*1024/sizeof(cell))  // default linux pagesize
+#define CELLS_PER_HEAP (4*1024/sizeof(cell))  // default linux pagesize
 struct heap {
-  cell cells[HEAPCELLS];
+  cell cells[CELLS_PER_HEAP];
   heap *next;
   heap() :next(NULL) {}
 };
@@ -78,7 +78,7 @@ cell* new_cell() {
     return result;
   }
 
-  if (Curr_cell == HEAPCELLS)
+  if (Curr_cell == CELLS_PER_HEAP)
     grow_heap();
 
   result = &Curr_heap->cells[Curr_cell];
