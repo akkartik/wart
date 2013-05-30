@@ -143,12 +143,10 @@ string to_string(cell* x) {
 
 //// associative arrays
 
-typedef unordered_map<cell*, cell*> cell_map;
-
 cell* new_table() {
   cell* result = new_cell();
   result->type = TABLE;
-  result->car = (cell*)new cell_map();
+  result->car = (cell*)new table();
   return result;
 }
 
@@ -156,9 +154,9 @@ bool is_table(cell* x) {
   return x->type == TABLE;
 }
 
-cell_map* to_table(cell* x) {
+table* to_table(cell* x) {
   if (!is_table(x)) return NULL;
-  return (cell_map*)x->car;
+  return (table*)x->car;
 }
 
 void set(cell* t, string k, cell* val) {
@@ -185,16 +183,20 @@ void unsafe_set(cell* t, cell* key, cell* val, bool delete_nils) {
     return;
   }
 
-  cell_map& t2 = *(cell_map*)(t->car);
+  table& t2 = *(table*)(t->car);
   if (val == nil && delete_nils) {
-    if (t2[key])
+    if (t2[key]) {
+      rmref(t2[key]);
       t2[key] = NULL;
+      rmref(key);
+    }
     return;
   }
 
   if (val == t2[key]) return;
 
   if (!t2[key]) mkref(key);
+  else rmref(t2[key]);
   t2[key] = mkref(val);
 }
 
@@ -207,7 +209,7 @@ cell* unsafe_get(cell* t, cell* key) {
     RAISE << "get on a non-table\n";
     return nil;
   }
-  return (*(cell_map*)(t->car))[key];
+  return (*(table*)(t->car))[key];
 }
 
 cell* unsafe_get(cell* t, string k) {
