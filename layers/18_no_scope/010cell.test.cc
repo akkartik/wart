@@ -4,7 +4,7 @@ void test_pointers_from_nil_are_nil() {
 }
 
 void test_new_cell_has_nil_car_and_cdr() {
-  TEMP(x, new_cell());
+  cell* x = new_cell();
   CHECK_EQ(x->car, nil);
   CHECK_EQ(x->cdr, nil);
 }
