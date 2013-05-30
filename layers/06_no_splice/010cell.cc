@@ -139,7 +139,7 @@ void rmref(cell* c) {
   if (c->nrefs > 0) return;
 
   if (c->type == INTEGER || c->type == SYMBOL)
-    RAISE << "deleted atom: " << (void*)c << '\n';
+    RAISE << "deleted interned atom: " << c << '\n';
 
   switch (c->type) {
   case INTEGER:
