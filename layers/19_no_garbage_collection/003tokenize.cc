@@ -9,7 +9,6 @@ const string Quote_and_unquote_chars = "'";  // controlling eval
 typedef string token;
 
 token next_token(istream& in) {
-  trace("tokenize 2") << "eof: " << in.eof();
   in >> std::noskipws;
   while (in.peek() == '#' || isspace(in.peek())) {
     skip_whitespace(in);
@@ -17,7 +16,6 @@ token next_token(istream& in) {
       skip_comment(in);
   }
 
-  trace("tokenize 2") << "eof2: " << in.eof();
   ostringstream out;
   if (in.peek() == '"')
     slurp_string(in, out);
