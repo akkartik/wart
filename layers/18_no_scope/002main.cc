@@ -92,11 +92,6 @@ void verify() {
   if (!Passed) return;
   if (Raise_count != 0) cerr << Raise_count << " errors encountered\n";
   if (num_unfreed() > 0) dump_unfreed();
-  if (trace_count("gc", "alloc") != trace_count("gc", "free")) {
-    cerr << trace_count("gc", "alloc") << " alloc vs " << trace_count("gc", "free") << " free.\n";
-    cerr << global_trace_stream->readable_contents("gcdump");
-    exit(0);
-  }
 }
 
 void setup() {

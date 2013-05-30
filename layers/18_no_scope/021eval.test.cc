@@ -1,5 +1,4 @@
 void test_eval_bind_all_handles_unquoted_param() {
-  cerr << "AA\n";
   new_binding("a", new_num(3));
   CLEAR_TRACE;
   run("((fn (x)) a)");

@@ -77,7 +77,6 @@ void reset_heap(heap* h) {
 }
 
 cell* new_cell() {
-  trace("gc") << "alloc";
   cell* result = NULL;
   if (Free_cells) {
     result = Free_cells;
@@ -151,7 +150,6 @@ void rmref(cell* c) {
 
   rmref(c->cdr);
 
-  trace("gc") << "free";
   c->clear();
   c->cdr = Free_cells;
   Free_cells = c;
