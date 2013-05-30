@@ -97,6 +97,14 @@ cell* new_cell() {
   return result;
 }
 
+
+void free_cell(cell* c) {
+  c->clear();
+  c->cdr = Free_cells;
+  Free_cells = c;
+  return;
+}
+
 
 
 typedef unordered_map<cell*, cell*> cell_map;
@@ -151,11 +159,7 @@ void rmref(cell* c) {
   }
 
   rmref(c->cdr);
-
-  c->clear();
-  c->cdr = Free_cells;
-  Free_cells = c;
-  return;
+  free_cell(c);
 }
 
 
