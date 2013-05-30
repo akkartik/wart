@@ -9,8 +9,6 @@
 
 unsigned long Num_allocs = 0;
 
-extern cell* nil;
-
 struct cell {
   cell* car;  // aliased to long or float
   cell* cdr;

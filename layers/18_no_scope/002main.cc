@@ -38,13 +38,16 @@ cell* read(istream& in) {
   return mkref(next_cell(in));
 }
 
+extern cell* nil;
+
 // In batch mode, evaluate all exprs in input.
 // In interactive mode, evaluate all exprs until empty line.
 // Return value of last expr.
 cell* run(istream& in) {
-  cell* result = NULL;
+  cell* result = nil;
   do {
     cell* form = read(in);
+    rmref(result);
     result = eval(form);
     rmref(form);
   } while (!eof(in) && (!Interactive || in.peek() != '\n'));
