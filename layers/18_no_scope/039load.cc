@@ -12,8 +12,11 @@ void load_file(const char* filename) {
   bool old_interactive = Interactive; Interactive = false;
   ifstream f(filename);
   if (f.fail()) return;
-  while (!f.eof())
-    eval(read(f));
+  while (!f.eof()) {
+    TEMP(form, read(f));
+    trace("dump ") << form << '\n';  // remove trailing space to track down errors in wart files
+    rmref(eval(form));
+  }
   Interactive = old_interactive;
 }
 
