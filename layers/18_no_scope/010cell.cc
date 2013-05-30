@@ -2,12 +2,6 @@
 
 // Design considered the following:
 //  represent numbers, strings, symbols, lists, and hash-tables
-//  reclaim unused cells
-//  minimize memory footprint
-//  avoid fragmentation
-//    so all cells try to have the same size (exceptions: strings, tables)
-
-unsigned long Num_allocs = 0;
 
 extern cell* nil;
 
@@ -23,14 +17,11 @@ struct cell {
     #define SYMBOL 3
     #define STRING 4
     #define TABLE 5
-  int nrefs;
 
-  cell() :car(NULL), cdr(NULL), type(CONS), nrefs(0) {}
+  cell() :car(NULL), cdr(NULL), type(CONS) {}
   void init() {
-    car=cdr=nil, type=CONS, nrefs=0;
-    ++Num_allocs;
+    car=cdr=nil, type=CONS;
   }
-  void clear() { car=cdr=NULL, type=CONS, nrefs=0; }
 };
 
 cell* nil = new cell;
@@ -94,120 +85,4 @@ cell* new_cell() {
   ++Curr_cell;
   result->init();
   return result;
-}
-
-
-
-typedef unordered_map<cell*, cell*> cell_map;
-
-struct table {
-  cell_map value;
-  cell*& operator[](cell* c) {
-    return value[c];
-  }
-
-  ~table() {
-    for (cell_map::iterator p = value.begin(); p != value.end(); ++p) {
-      if (!p->second) continue;
-      rmref(p->first);
-      rmref(p->second);
-    }
-  }
-};
-
-cell* mkref(cell* c) {
-  if (c == nil) return nil;
-  ++c->nrefs;
-  return c;
-}
-
-void rmref(cell* c) {
-  if (!c)
-    RAISE << "A cell was prematurely garbage-collected.\n" << die();
-  if (c == nil) return;
-
-  --c->nrefs;
-  if (c->nrefs > 0) return;
-
-  if (is_atom(c) && c->type != STRING && c->type != FLOAT && !Running_tests)
-    RAISE << "deleted atom: " << (void*)c << '\n';
-
-  switch (c->type) {
-  case INTEGER:
-  case FLOAT:
-    break;  // numbers don't need freeing
-  case STRING:
-  case SYMBOL:
-    delete (string*)c->car; break;
-  case CONS:
-    rmref(c->car); break;
-  case TABLE:
-    delete (table*)c->car; break;
-  default:
-    RAISE << "Can't rmref type " << c->type << '\n' << die();
-  }
-
-  rmref(c->cdr);
-
-  c->clear();
-  c->cdr = Free_cells;
-  Free_cells = c;
-  return;
-}
-
-
-
-// misc
-
-long num_unfreed() {
-  long n = 0;
-  for (heap* h = First_heap; h != Curr_heap; h=h->next)
-    n += CELLS_PER_HEAP;
-  n += Curr_cell-1;   // for Curr_lexical_scope
-  for (cell* f = Free_cells; f; f=f->cdr)
-    --n;
-  return n;
-}
-
-void dump_unfreed() {
-  unordered_map<cell*, int> num_refs_remaining;
-  for (heap* h = First_heap; h; h=h->next)
-    for (cell* x = &h->cells[0]; x < &h->cells[CELLS_PER_HEAP]; ++x)
-      if (x->car)
-        mark_all_cells(x, num_refs_remaining);
-
-  for (heap* h = First_heap; h; h=h->next)
-    for (cell* x = &h->cells[0]; x < &h->cells[CELLS_PER_HEAP]; ++x) {
-      if (!x->car) continue;
-      if (num_refs_remaining[x] > 1) continue;
-      if (is_sym(x) && to_string(x) == "Curr_lexical_scope")
-        continue;
-      cerr << "unfreed: " << (void*)x << " " << x << '\n';
-    }
-}
-
-void mark_all_cells(cell* x, unordered_map<cell*, int>& mark) {
-  if (x == nil) return;
-  ++mark[x];
-  switch (x->type) {
-  case INTEGER:
-  case FLOAT:
-  case SYMBOL:
-  case STRING:
-    break;
-  case CONS:
-    mark_all_cells(car(x), mark); break;
-  case TABLE: {
-    table* t = (table*)x->car;
-    for (cell_map::iterator p = t->value.begin(); p != t->value.end(); ++p) {
-      if (!p->second) continue;
-      mark_all_cells(p->first, mark);
-      mark_all_cells(p->second, mark);
-    }
-    break;
-  }
-  default:
-    cerr << "Can't mark type " << x->type << '\n' << die();
-  }
-  mark_all_cells(cdr(x), mark);
 }

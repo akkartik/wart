@@ -17,9 +17,6 @@ void set_car(cell* x, cell* y) {
     RAISE << "set_car on nil\n";
     return;
   }
-  mkref(y);
-  if (is_cons(x))
-    rmref(car(x));
   x->car = y;
 }
 
@@ -28,8 +25,6 @@ void set_cdr(cell* x, cell* y) {
     RAISE << "set_cdr on nil\n";
     return;
   }
-  mkref(y);
-  rmref(cdr(x));
   x->cdr = y;
 }
 
@@ -56,7 +51,7 @@ cell* new_num(long x) {
   Int_literals[x] = new_cell();
   Int_literals[x]->car = (cell*)x;
   Int_literals[x]->type = INTEGER;
-  return mkref(Int_literals[x]);
+  return Int_literals[x];
 }
 
 cell* new_num(int x) {   // just for integer literals
@@ -113,7 +108,7 @@ cell* new_sym(string x) {
   Sym_literals[x] = new_cell();
   Sym_literals[x]->car = (cell*)new string(x);   // not aligned like cells; can fragment memory
   Sym_literals[x]->type = SYMBOL;
-  return mkref(Sym_literals[x]);
+  return Sym_literals[x];
 }
 
 bool is_sym(cell* x) {
@@ -143,10 +138,12 @@ string to_string(cell* x) {
 
 //// associative arrays
 
+typedef unordered_map<cell*, cell*> cell_map;
+
 cell* new_table() {
   cell* result = new_cell();
   result->type = TABLE;
-  result->car = (cell*)new table();
+  result->car = (cell*)new cell_map();
   return result;
 }
 
@@ -154,9 +151,9 @@ bool is_table(cell* x) {
   return x->type == TABLE;
 }
 
-table* to_table(cell* x) {
+cell_map* to_table(cell* x) {
   if (!is_table(x)) return NULL;
-  return (table*)x->car;
+  return (cell_map*)x->car;
 }
 
 void set(cell* t, string k, cell* val) {
@@ -183,21 +180,16 @@ void unsafe_set(cell* t, cell* key, cell* val, bool delete_nils) {
     return;
   }
 
-  table& t2 = *(table*)(t->car);
+  cell_map& t2 = *(cell_map*)(t->car);
   if (val == nil && delete_nils) {
-    if (t2[key]) {
-      rmref(t2[key]);
+    if (t2[key])
       t2[key] = NULL;
-      rmref(key);
-    }
     return;
   }
 
   if (val == t2[key]) return;
 
-  if (!t2[key]) mkref(key);
-  else rmref(t2[key]);
-  t2[key] = mkref(val);
+  t2[key] = val;
 }
 
 void unsafe_set(cell* t, string k, cell* val, bool delete_nils) {
@@ -209,7 +201,7 @@ cell* unsafe_get(cell* t, cell* key) {
     RAISE << "get on a non-table\n";
     return nil;
   }
-  return (*(table*)(t->car))[key];
+  return (*(cell_map*)(t->car))[key];
 }
 
 cell* unsafe_get(cell* t, string k) {
@@ -225,25 +217,6 @@ void setup_cells() {
   Int_literals.clear();
   Sym_literals.clear();
   reset_heap(First_heap);
-}
-
-void teardown_cells() {
-  if (nil->car != nil || nil->cdr != nil)
-    RAISE << "nil was corrupted\n";
-
-  for (unordered_map<long, cell*>::iterator p = Int_literals.begin(); p != Int_literals.end(); ++p) {
-    if (p->second->nrefs > 1)
-      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << '\n';
-    if (p->second->nrefs > 0)
-      rmref(p->second);
-  }
-
-  for (unordered_map<string, cell*>::iterator p = Sym_literals.begin(); p != Sym_literals.end(); ++p) {
-    if (p->second->nrefs > 1)
-      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << '\n';
-    if (p->second->nrefs > 0)
-      rmref(p->second);
-  }
 }
 
 // optimize lookups of common symbols

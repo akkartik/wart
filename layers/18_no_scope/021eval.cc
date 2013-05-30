@@ -11,26 +11,48 @@
 //  passing in lists to functions: ((fn ((x y)) (+ x y)) '(3 4)) => 7
 
 cell* eval(cell* expr) {
+  new_trace_frame("eval");
   if (!expr)
     RAISE << "eval: cell should never be NULL\n" << die();
 
-  if (expr == nil)
+  trace("eval") << expr;
+  if (expr == nil) {
+    trace("eval") << "nil branch";
+    trace("eval") << "=> nil";
     return nil;
+  }
 
-  if (is_keyword_sym(expr))
-    return mkref(expr);
+  if (is_keyword_sym(expr)) {
+    trace("eval") << "keyword sym";
+    trace("eval") << "=> " << expr;
+    return expr;
+  }
 
-  if (is_sym(expr))
-    return mkref(lookup(expr));
+  if (is_sym(expr)) {
+    trace("eval") << "sym";
+    cell* result = lookup(expr);
+    trace("eval") << "=> " << result;
+    return result;
+  }
 
-  if (is_atom(expr))
-    return mkref(expr);
+  if (is_atom(expr)) {
+    trace("eval") << "literal";
+    trace("eval") << "=> " << expr;
+    return expr;
+  }
 
-  if (is_quoted(expr))
-    return mkref(cdr(expr));
+  if (is_quoted(expr)) {
+    trace("eval") << "quote";
+    trace("eval") << "=> " << cdr(expr);
+    return cdr(expr);
+  }
 
   cell* result = eval_primitive(car(expr), cdr(expr));
-  if (result) return result;  // already mkref'd
+  if (result) {
+    trace("eval") << "compiled fn";
+    trace("eval") << "=> " << result;
+    return result;
+  }
 
   // expr is a call
   cell* fn = eval(car(expr));
@@ -41,15 +63,11 @@ cell* eval(cell* expr) {
   // eval its args, create new bindings
   eval_bind_all(sig(fn), cdr(expr));
 
-  result = nil;
   // eval all forms in body, save result of final form
-  for (cell* form = body(fn); form != nil; form=cdr(form)) {
-    rmref(result);
+  for (cell* form = body(fn); form != nil; form=cdr(form))
     result = eval(car(form));
-  }
-
-  rmref(fn);
-  return result;  // already mkref'd
+  trace("eval") << "=> " << result;
+  return result;
 }
 
 cell* eval_primitive(cell* f, cell* args) {
@@ -57,49 +75,39 @@ cell* eval_primitive(cell* f, cell* args) {
     cell* f = new_table();
     set(f, sym_sig, car(args));
     set(f, sym_body, cdr(args));
-    return mkref(f);
+    return f;
   }
 
   if (f == new_sym("eval")) {
     cell* arg = eval(car(args));
-    cell* result = eval(arg);
-    rmref(arg);
-    return result;  // already mkref'd
+    return eval(arg);
   }
 
   if (f == new_sym("if")) {
     cell* check = eval(car(args));
-    cell* result = (check != nil) ? eval(car(cdr(args))) : eval(car(cdr(cdr(args))));
-    rmref(check);
-    return result;  // already mkref'd
+    return (check != nil) ? eval(car(cdr(args))) : eval(car(cdr(cdr(args))));
   }
 
   if (f == new_sym("not")) {
     cell* arg = eval(car(args));
-    cell* result = (arg == nil) ? new_num(1) : nil;
-    rmref(arg);
-    return mkref(result);
+    return (arg == nil) ? new_num(1) : nil;
   }
 
   if (f == new_sym("=")) {
     cell* x = eval(car(args));
     cell* y = eval(car(cdr(args)));
-    cell* result = nil;
     if (x == nil && y == nil)
-      result = mkref(new_num(1));
+      return new_num(1);
     else if (x == nil || y == nil)
-      result = nil;
+      return nil;
     else if (x == y)
-      result = mkref(x);
+      return x;
     else if (x->type == FLOAT || y->type == FLOAT)
-      result = (equal_floats(to_float(x), to_float(y)) ? mkref(x) : nil);
+      return equal_floats(to_float(x), to_float(y)) ? x : nil;
     else if (is_string(x) && is_string(y) && to_string(x) == to_string(y))
-      result = mkref(x);
+      return x;
     else
-      result = nil;
-    rmref(x);
-    rmref(y);
-    return result;  // already mkref'd
+      return nil;
   }
 
   if (f == new_sym("<-")) {
@@ -110,99 +118,70 @@ cell* eval_primitive(cell* f, cell* args) {
     }
     cell* val = eval(car(cdr(args)));
     new_binding(var, val);
-    return val;   // already mkref'd
+    return val;
   }
 
   // lists
   if (f == new_sym("cons")) {
-    cell* result = new_cons(eval(car(args)), eval(car(cdr(args))));
-    rmref(car(result));
-    rmref(cdr(result));
-    return mkref(result);
+    return new_cons(eval(car(args)), eval(car(cdr(args))));
   }
   if (f == new_sym("car")) {
     cell* arg = eval(car(args));
-    cell* result = car(arg);
-    rmref(arg);
-    return mkref(result);
+    return car(arg);
   }
   if (f == new_sym("cdr")) {
     cell* arg = eval(car(args));
-    cell* result = cdr(arg);
-    rmref(arg);
-    return mkref(result);
+    return cdr(arg);
   }
 
   // numbers
   if (f == new_sym("+")) {
     cell* x = eval(car(args));
     cell* y = eval(car(cdr(args)));
-    cell* result = nil;
     if (x->type == FLOAT || y->type == FLOAT)
-      result = new_num(to_float(x) + to_float(y));
+      return new_num(to_float(x) + to_float(y));
     else
-      result = new_num(to_int(x) + to_int(y));
-    rmref(x);
-    rmref(y);
-    return mkref(result);
+      return new_num(to_int(x) + to_int(y));
   }
   if (f == new_sym("-")) {
     cell* x = eval(car(args));
     cell* y = eval(car(cdr(args)));
-    cell* result = nil;
     if (x->type == FLOAT || y->type == FLOAT)
-      result = new_num(to_float(x) - to_float(y));
+      return new_num(to_float(x) - to_float(y));
     else
-      result = new_num(to_int(x) - to_int(y));
-    rmref(x);
-    rmref(y);
-    return mkref(result);
+      return new_num(to_int(x) - to_int(y));
   }
   if (f == new_sym("*")) {
     cell* x = eval(car(args));
     cell* y = eval(car(cdr(args)));
-    cell* result = nil;
+    return nil;
     if (x->type == FLOAT || y->type == FLOAT)
-      result = new_num(to_float(x) * to_float(y));
+      return new_num(to_float(x) * to_float(y));
     else
-      result = new_num(to_int(x) * to_int(y));
-    rmref(x);
-    rmref(y);
-    return mkref(result);
+      return new_num(to_int(x) * to_int(y));
   }
   if (f == new_sym("/")) {
     cell* x = eval(car(args));
     cell* y = eval(car(cdr(args)));
-    cell* result = new_num(to_float(x) / to_float(y));
-    rmref(x);
-    rmref(y);
-    return mkref(result);
+    return new_num(to_float(x) / to_float(y));
   }
   if (f == new_sym("%")) {
     cell* x = eval(car(args));
     cell* y = eval(car(cdr(args)));
-    cell* result = new_num(to_int(x) % to_int(y));
-    rmref(x);
-    rmref(y);
-    return mkref(result);
+    return new_num(to_int(x) % to_int(y));
   }
   if (f == new_sym("<")) {
     cell* x = eval(car(args));
     cell* y = eval(car(cdr(args)));
-    cell* result = nil;
     if (x == nil || y == nil)
-      ;
+      return nil;
     else if (to_float(x) < to_float(y))
-      result = mkref(y);  // guard against gc below
-    rmref(x);
-    rmref(y);
-    return result;  // already mkref'd
+      return y;
+    return nil;
   }
   if (f == new_sym("int")) {
     cell* arg = eval(car(args));
-    cell* result = new_num(to_int(arg));
-    rmref(arg);
-    return mkref(result);
+    return new_num(to_int(arg));
   }
   return NULL;
 }
@@ -214,25 +193,16 @@ void eval_bind_all(cell* params, cell* args) {
   if (params == nil)
     ;
 
-  else if (is_sym(params)) {
-    cell* val = eval_all(args);
-    bind_params(params, val);
-    rmref(val);
-  }
+  else if (is_sym(params))
+    bind_params(params, eval_all(args));
 
   else if (!is_cons(params))
     ;
 
   else {
-    eval_bind_param(car(params), car(args));
+    bind_params(car(params), eval(car(args)));
     eval_bind_all(cdr(params), cdr(args));
   }
-}
-
-void eval_bind_param(cell* param, cell* arg) {
-  cell* val = eval(arg);
-  bind_params(param, val);
-  rmref(val);
 }
 
 void bind_params(cell* params, cell* args) {
@@ -258,12 +228,9 @@ cell* eval_all(cell* args) {
   if (!is_cons(args))
     return eval(args);
   cell* p_result = new_cell(), *curr = p_result;
-  for (; args != nil; args=cdr(args), curr=cdr(curr)) {
-    cell* val = eval(car(args));
-    add_cons(curr, val);
-    rmref(val);
-  }
-  return drop_ptr(p_result);
+  for (; args != nil; args=cdr(args), curr=cdr(curr))
+    add_cons(curr, eval(car(args)));
+  return cdr(p_result);
 }
 
 
@@ -307,5 +274,5 @@ cell* quote_all(cell* x) {
   cell* result = new_cell(), *curr = result;
   for (cell* iter = x; iter != nil; iter=cdr(iter), curr=cdr(curr))
     add_cons(curr, quote(car(iter)));
-  return drop_ptr(result);
+  return cdr(result);
 }

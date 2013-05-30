@@ -19,18 +19,10 @@ void new_binding(string sym, cell* val) {
 }
 
 void new_binding(cell* sym, cell* val) {
-  if (Bindings[sym] == val) return;
-  if (!Bindings[sym]) mkref(sym);
-  if (Bindings[sym]) rmref(Bindings[sym]);
-  mkref(val);
+  trace("bind") << sym << ": " << val;
   Bindings[sym] = val;
 }
 
 void teardown_bindings() {
-  for (unordered_map<cell*, cell*>::iterator p = Bindings.begin(); p != Bindings.end(); ++p) {
-    if (!p->second) continue;
-    rmref(p->first);
-    rmref(p->second);
-  }
   Bindings.clear();
 }
