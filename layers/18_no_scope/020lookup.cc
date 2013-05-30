@@ -1,17 +1,17 @@
 //// symbol bindings
 
-unordered_map<cell*, cell*> bindings;
+unordered_map<cell*, cell*> Bindings;
 
 cell* lookup(string s) {
   return lookup(new_sym(s));
 }
 
 cell* lookup(cell* sym) {
-  if (!bindings[sym]) {
+  if (!Bindings[sym]) {
     RAISE << "No binding for " << to_string(sym) << '\n';
     return nil;
   }
-  return bindings[sym];
+  return Bindings[sym];
 }
 
 void new_binding(string sym, cell* val) {
@@ -19,18 +19,18 @@ void new_binding(string sym, cell* val) {
 }
 
 void new_binding(cell* sym, cell* val) {
-  if (bindings[sym] == val) return;
-  if (!bindings[sym]) mkref(sym);
-  if (bindings[sym]) rmref(bindings[sym]);
+  if (Bindings[sym] == val) return;
+  if (!Bindings[sym]) mkref(sym);
+  if (Bindings[sym]) rmref(Bindings[sym]);
   mkref(val);
-  bindings[sym] = val;
+  Bindings[sym] = val;
 }
 
 void teardown_bindings() {
-  for (unordered_map<cell*, cell*>::iterator p = bindings.begin(); p != bindings.end(); ++p) {
+  for (unordered_map<cell*, cell*>::iterator p = Bindings.begin(); p != Bindings.end(); ++p) {
     if (!p->second) continue;
     rmref(p->first);
     rmref(p->second);
   }
-  bindings.clear();
+  Bindings.clear();
 }
