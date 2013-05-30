@@ -43,12 +43,12 @@ using std::ofstream;
 
 #define unused __attribute__((unused))
 
-bool Pretend_raise = false;
+bool Do_raise = true;
 long Raise_count = 0;
 
-                           // ?: to avoid dangling-else warnings
-#define RAISE Pretend_raise ? ++Raise_count,cerr /* print nothing */ \
-                           : cerr << __FILE__ << ":" << __LINE__ << " "
+                          // ?: to avoid dangling-else warnings
+#define RAISE (!Do_raise) ? ++Raise_count,cerr /* print nothing */ \
+                          : cerr << __FILE__ << ":" << __LINE__ << " "
 
 struct die {};
 ostream& operator<<(ostream& os, unused die) {

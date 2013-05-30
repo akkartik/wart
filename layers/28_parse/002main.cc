@@ -69,7 +69,7 @@ const test_fn Tests[] = {
   else { cerr << "."; fflush(stderr); }
 
 void run_tests() {
-  Pretend_raise = true;  // for death tests
+  Do_raise = false;  // for death tests
   time_t t; time(&t);
   cerr << "C tests: " << ctime(&t);
   for (unsigned long i=0; i < sizeof(Tests)/sizeof(Tests[0]); ++i) {
