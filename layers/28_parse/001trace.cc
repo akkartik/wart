@@ -53,19 +53,19 @@ struct trace_stream {
   }
 };
 
-trace_stream* global_trace_stream = NULL;
+trace_stream* Trace_stream = NULL;
 
-#define trace(layer) !global_trace_stream ? cerr : global_trace_stream->stream(layer)
+#define trace(layer) !Trace_stream ? cerr : Trace_stream->stream(layer)
 
 #define TRACE_AND_RETURN(layer, X) \
   return (trace(layer) << X << '\n'), X;
 
 
 
-// global_trace_stream is a resource, lease_tracer uses RAII to manage it.
+// Trace_stream is a resource, lease_tracer uses RAII to manage it.
 struct lease_tracer {
-  lease_tracer() { global_trace_stream = new trace_stream; }
-  ~lease_tracer() { delete global_trace_stream, global_trace_stream = NULL; }
+  lease_tracer() { Trace_stream = new trace_stream; }
+  ~lease_tracer() { delete Trace_stream, Trace_stream = NULL; }
 };
 #define START_TRACING_UNTIL_END_OF_SCOPE lease_tracer leased_tracer;
 
@@ -82,23 +82,23 @@ long Num_failures = 0;
   else { cerr << "."; fflush(stderr); }
 
 #define check_trace_contents(layer, expected) \
-  CHECK_EQ(global_trace_stream->contents(layer), expected);
+  CHECK_EQ(Trace_stream->contents(layer), expected);
 
 
 
-// manage layer counts in global_trace_stream using RAII
+// manage layer counts in Trace_stream using RAII
 struct lease_trace_frame {
   string layer;
   lease_trace_frame(string l) :layer(l) {
-    global_trace_stream->reset();
-    ++global_trace_stream->level[layer];
+    Trace_stream->reset();
+    ++Trace_stream->level[layer];
   }
   ~lease_trace_frame() {
-    global_trace_stream->reset();
-    --global_trace_stream->level[layer];
+    Trace_stream->reset();
+    --Trace_stream->level[layer];
   }
 };
 #define new_trace_frame(layer) lease_trace_frame lease_trace_level(layer);
 
 #define check_trace_contents2(layer, level, expected) \
-  CHECK_EQ(global_trace_stream->contents(layer, level), expected);
+  CHECK_EQ(Trace_stream->contents(layer, level), expected);

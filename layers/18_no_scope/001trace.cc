@@ -54,24 +54,24 @@ struct trace_stream {
 
 
 
-trace_stream* global_trace_stream = NULL;
+trace_stream* Trace_stream = NULL;
 
-// global_trace_stream is a resource, lease_tracer uses RAII to manage it.
+// Trace_stream is a resource, lease_tracer uses RAII to manage it.
 struct lease_tracer {
-  lease_tracer() { global_trace_stream = new trace_stream; }
-  ~lease_tracer() { delete global_trace_stream, global_trace_stream = NULL; }
+  lease_tracer() { Trace_stream = new trace_stream; }
+  ~lease_tracer() { delete Trace_stream, Trace_stream = NULL; }
 };
 #define START_TRACING_UNTIL_END_OF_SCOPE lease_tracer leased_tracer;
 
-#define CLEAR_TRACE delete global_trace_stream, global_trace_stream = new trace_stream;
+#define CLEAR_TRACE delete Trace_stream, Trace_stream = new trace_stream;
 
-#define DUMP cerr << global_trace_stream->readable_contents("");
+#define DUMP cerr << Trace_stream->readable_contents("");
 
 
 
 // Main entrypoint.
 // never write explicit newlines into trace
-#define trace(layer) !global_trace_stream ? cerr /*print nothing*/ : global_trace_stream->stream(layer)
+#define trace(layer) !Trace_stream ? cerr /*print nothing*/ : Trace_stream->stream(layer)
 
 bool check_trace_contents(string FUNCTION, string layer, string expected) {   // empty layer == everything, multiple layers, hierarchical layers
   vector<string> expected_lines = split(expected, '\n');
@@ -79,10 +79,10 @@ bool check_trace_contents(string FUNCTION, string layer, string expected) {   //
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
     ++curr_expected_line;
   if (curr_expected_line == expected_lines.size()) return true;
-  global_trace_stream->newline();
+  Trace_stream->newline();
   ostringstream output;
   vector<string> layers = split(layer, ',');
-  for (vector<pair<string, pair<int, string> > >::iterator p = global_trace_stream->past_lines.begin(); p != global_trace_stream->past_lines.end(); ++p) {
+  for (vector<pair<string, pair<int, string> > >::iterator p = Trace_stream->past_lines.begin(); p != Trace_stream->past_lines.end(); ++p) {
     if (!layer.empty() && !any_prefix_match(layers, p->first))
       continue;
     if (p->second.second != expected_lines[curr_expected_line])
@@ -110,7 +110,7 @@ int trace_count(string layer) {
 int trace_count(string layer, string line) {
   long result = 0;
   vector<string> layers = split(layer, ',');
-  for (vector<pair<string, pair<int, string> > >::iterator p = global_trace_stream->past_lines.begin(); p != global_trace_stream->past_lines.end(); ++p) {
+  for (vector<pair<string, pair<int, string> > >::iterator p = Trace_stream->past_lines.begin(); p != Trace_stream->past_lines.end(); ++p) {
     if (any_prefix_match(layers, p->first))
       if (line == "" || p->second.second == line)
         ++result;
@@ -121,7 +121,7 @@ int trace_count(string layer, string line) {
 int trace_count(string layer, int frame, string line) {
   long result = 0;
   vector<string> layers = split(layer, ',');
-  for (vector<pair<string, pair<int, string> > >::iterator p = global_trace_stream->past_lines.begin(); p != global_trace_stream->past_lines.end(); ++p) {
+  for (vector<pair<string, pair<int, string> > >::iterator p = Trace_stream->past_lines.begin(); p != Trace_stream->past_lines.end(); ++p) {
     if (any_prefix_match(layers, p->first) && p->second.first == frame)
       if (line == "" || p->second.second == line)
         ++result;
@@ -141,18 +141,18 @@ bool trace_doesnt_contain(string layer, int frame, string line) {
 
 
 
-// manage layer counts in global_trace_stream using RAII
+// manage layer counts in Trace_stream using RAII
 struct lease_trace_frame {
   string layer;
   lease_trace_frame(string l) :layer(l) {
-    if (!global_trace_stream) return;
-    global_trace_stream->newline();
-    ++global_trace_stream->frame[layer];
+    if (!Trace_stream) return;
+    Trace_stream->newline();
+    ++Trace_stream->frame[layer];
   }
   ~lease_trace_frame() {
-    if (!global_trace_stream) return;
-    global_trace_stream->newline();
-    --global_trace_stream->frame[layer];
+    if (!Trace_stream) return;
+    Trace_stream->newline();
+    --Trace_stream->frame[layer];
   }
 };
 #define new_trace_frame(layer) lease_trace_frame leased_frame(layer);
@@ -163,10 +163,10 @@ bool check_trace_contents(string FUNCTION, string layer, int frame, string expec
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
     ++curr_expected_line;
   if (curr_expected_line == expected_lines.size()) return true;
-  global_trace_stream->newline();
+  Trace_stream->newline();
   ostringstream output;
   vector<string> layers = split(layer, ',');
-  for (vector<pair<string, pair<int, string> > >::iterator p = global_trace_stream->past_lines.begin(); p != global_trace_stream->past_lines.end(); ++p) {
+  for (vector<pair<string, pair<int, string> > >::iterator p = Trace_stream->past_lines.begin(); p != Trace_stream->past_lines.end(); ++p) {
     if (!layer.empty() && !any_prefix_match(layers, p->first))
       continue;
     if (p->second.first != frame)

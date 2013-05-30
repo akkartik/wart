@@ -32,14 +32,14 @@ struct trace_stream {
   }
 };
 
-trace_stream* global_trace_stream = NULL;
+trace_stream* Trace_stream = NULL;
 
-#define trace(layer) !global_trace_stream ? cerr : global_trace_stream->stream(layer)
+#define trace(layer) !Trace_stream ? cerr : Trace_stream->stream(layer)
 
-// global_trace_stream is a resource, lease_tracer uses RAII to manage it.
+// Trace_stream is a resource, lease_tracer uses RAII to manage it.
 struct lease_tracer {
-  lease_tracer() { global_trace_stream = new trace_stream; }
-  ~lease_tracer() { delete global_trace_stream, global_trace_stream = NULL; }
+  lease_tracer() { Trace_stream = new trace_stream; }
+  ~lease_tracer() { delete Trace_stream, Trace_stream = NULL; }
 };
 #define START_TRACING_UNTIL_END_OF_SCOPE lease_tracer leased_tracer;
 
@@ -54,4 +54,4 @@ long Num_failures = 0;
   else { cerr << "."; fflush(stderr); }
 
 #define check_trace_contents(layer, expected) \
-  CHECK_EQ(global_trace_stream->contents(layer), expected);
+  CHECK_EQ(Trace_stream->contents(layer), expected);
