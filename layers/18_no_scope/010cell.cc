@@ -77,11 +77,13 @@ void reset_heap(heap* h) {
 }
 
 cell* new_cell() {
+  trace("gc") << "alloc";
   cell* result = NULL;
   if (Free_cells) {
     result = Free_cells;
     Free_cells = Free_cells->cdr;
     result->init();
+    trace("gcdump") << "alloc: " << (void*)result;
     return result;
   }
 
@@ -91,6 +93,7 @@ cell* new_cell() {
   result = &Curr_heap->cells[Curr_cell];
   ++Curr_cell;
   result->init();
+  trace("gcdump") << "alloc: " << (void*)result;
   return result;
 }
 
@@ -127,6 +130,7 @@ void rmref(cell* c) {
   --c->nrefs;
   if (c->nrefs > 0) return;
 
+  trace("gcdump") << "free: " << (void*)c << " " << c << " " << c->nrefs;
   if (is_atom(c) && c->type != STRING && c->type != FLOAT && !Running_tests)
     RAISE << "deleted atom: " << (void*)c << '\n';
 
@@ -147,6 +151,7 @@ void rmref(cell* c) {
 
   rmref(c->cdr);
 
+  trace("gc") << "free";
   c->clear();
   c->cdr = Free_cells;
   Free_cells = c;
