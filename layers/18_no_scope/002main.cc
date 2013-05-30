@@ -38,23 +38,15 @@ cell* read(istream& in) {
   return mkref(next_cell(in));
 }
 
-// RAII for temporaries
-struct lease_cell {
-  cell* value;
-  lease_cell(cell* v) :value(v) {}
-  ~lease_cell() { rmref(value); }
-};
-
-#define TEMP(var, cell_expr) cell* var = cell_expr; lease_cell lease_##var(var);
-
 // In batch mode, evaluate all exprs in input.
 // In interactive mode, evaluate all exprs until empty line.
 // Return value of last expr.
 cell* run(istream& in) {
   cell* result = NULL;
   do {
-    TEMP(c, read(in));
-    result = eval(c);
+    cell* form = read(in);
+    result = eval(form);
+    rmref(form);
   } while (!eof(in) && (!Interactive || in.peek() != '\n'));
   return result;
 }
