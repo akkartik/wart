@@ -163,7 +163,7 @@ long num_unfreed() {
   long n = 0;
   for (heap* h = First_heap; h != Curr_heap; h=h->next)
     n += HEAPCELLS;
-  n += Curr_cell;
+  n += Curr_cell-1;   // for Curr_lexical_scope
   for (cell* f = Free_cells; f; f=f->cdr)
     --n;
   return n;
@@ -180,6 +180,8 @@ void dump_unfreed() {
     for (cell* x = &h->cells[0]; x < &h->cells[HEAPCELLS]; ++x) {
       if (!x->car) continue;
       if (num_refs_remaining[x] > 1) continue;
+      if (is_sym(x) && to_string(x) == "Curr_lexical_scope")
+        continue;
       cerr << "unfreed: " << (void*)x << " " << x << '\n';
     }
 }

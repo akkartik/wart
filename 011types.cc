@@ -239,8 +239,7 @@ void teardown_cells() {
   }
 
   for (unordered_map<string, cell*>::iterator p = Sym_literals.begin(); p != Sym_literals.end(); ++p) {
-    if (Initial_syms.find(p->second) != Initial_syms.end()) continue;
-    if (p->second->nrefs > 1)
+    if (p->first != "Curr_lexical_scope" && p->second->nrefs > 1)
       RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << '\n';
     if (p->second->nrefs > 0)
       rmref(p->second);
