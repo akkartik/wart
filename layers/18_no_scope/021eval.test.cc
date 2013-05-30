@@ -33,9 +33,7 @@ void test_eval_bind_all_handles_destructured_params() {
   new_binding("x", new_num(3));
   new_binding("y", new_num(4));
   CLEAR_TRACE;
-  cerr << "AAA\n";
   run("((fn ((a b))) (cons x (cons y)))");
-  cerr << "BBB\n";
   CHECK_TRACE_CONTENTS("bind", "a: 3\nb: 4\n");
 }
 

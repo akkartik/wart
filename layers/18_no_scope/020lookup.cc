@@ -20,7 +20,10 @@ void new_binding(string sym, cell* val) {
 
 void new_binding(cell* sym, cell* val) {
   trace("bind") << sym << ": " << val;
-  Bindings[sym] = val;
+  if (Bindings[sym] == val) return;
+  if (!Bindings[sym]) mkref(sym);
+  if (Bindings[sym]) rmref(Bindings[sym]);
+  Bindings[sym] = mkref(val);
 }
 
 void teardown_bindings() {

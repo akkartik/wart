@@ -54,7 +54,6 @@ cell* run(istream& in) {
   cell* result = NULL;
   do {
     TEMP(c, read(in));
-    cerr << c << '\n';
     result = eval(c);
   } while (!eof(in) && (!Interactive || in.peek() != '\n'));
   return result;

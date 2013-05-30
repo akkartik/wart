@@ -17,6 +17,9 @@ void set_car(cell* x, cell* y) {
     RAISE << "set_car on nil\n";
     return;
   }
+  mkref(y);
+  if (is_cons(x))
+    rmref(car(x));
   x->car = y;
 }
 
@@ -25,6 +28,8 @@ void set_cdr(cell* x, cell* y) {
     RAISE << "set_cdr on nil\n";
     return;
   }
+  mkref(y);
+  rmref(cdr(x));
   x->cdr = y;
 }
 
@@ -51,7 +56,7 @@ cell* new_num(long x) {
   Int_literals[x] = new_cell();
   Int_literals[x]->car = (cell*)x;
   Int_literals[x]->type = INTEGER;
-  return Int_literals[x];
+  return mkref(Int_literals[x]);
 }
 
 cell* new_num(int x) {   // just for integer literals
@@ -108,7 +113,7 @@ cell* new_sym(string x) {
   Sym_literals[x] = new_cell();
   Sym_literals[x]->car = (cell*)new string(x);   // not aligned like cells; can fragment memory
   Sym_literals[x]->type = SYMBOL;
-  return Sym_literals[x];
+  return mkref(Sym_literals[x]);
 }
 
 bool is_sym(cell* x) {
@@ -189,7 +194,8 @@ void unsafe_set(cell* t, cell* key, cell* val, bool delete_nils) {
 
   if (val == t2[key]) return;
 
-  t2[key] = val;
+  if (!t2[key]) mkref(key);
+  t2[key] = mkref(val);
 }
 
 void unsafe_set(cell* t, string k, cell* val, bool delete_nils) {
