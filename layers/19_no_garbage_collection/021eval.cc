@@ -11,26 +11,48 @@
 //  passing in lists to functions: ((fn ((x y)) (+ x y)) '(3 4)) => 7
 
 cell* eval(cell* expr) {
+  new_trace_frame("eval");
   if (!expr)
     RAISE << "eval: cell should never be NULL\n" << die();
 
-  if (expr == nil)
+  trace("eval") << expr;
+  if (expr == nil) {
+    trace("eval") << "nil branch";
+    trace("eval") << "=> nil";
     return nil;
+  }
 
-  if (is_keyword_sym(expr))
+  if (is_keyword_sym(expr)) {
+    trace("eval") << "keyword sym";
+    trace("eval") << "=> " << expr;
     return expr;
+  }
 
-  if (is_sym(expr))
-    return lookup(expr);
+  if (is_sym(expr)) {
+    trace("eval") << "sym";
+    cell* result = lookup(expr);
+    trace("eval") << "=> " << result;
+    return result;
+  }
 
-  if (is_atom(expr))
+  if (is_atom(expr)) {
+    trace("eval") << "literal";
+    trace("eval") << "=> " << expr;
     return expr;
+  }
 
-  if (is_quoted(expr))
+  if (is_quoted(expr)) {
+    trace("eval") << "quote";
+    trace("eval") << "=> " << cdr(expr);
     return cdr(expr);
+  }
 
   cell* result = eval_primitive(car(expr), cdr(expr));
-  if (result) return result;
+  if (result) {
+    trace("eval") << "compiled fn";
+    trace("eval") << "=> " << result;
+    return result;
+  }
 
   // expr is a call
   cell* fn = eval(car(expr));
@@ -44,6 +66,7 @@ cell* eval(cell* expr) {
   // eval all forms in body, save result of final form
   for (cell* form = body(fn); form != nil; form=cdr(form))
     result = eval(car(form));
+  trace("eval") << "=> " << result;
   return result;
 }
 

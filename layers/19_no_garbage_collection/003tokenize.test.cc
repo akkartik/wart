@@ -1,102 +1,64 @@
 void test_tokenize_handles_multiple_atoms() {
-  stringstream in("34 abc 3.4");
-  token t = next_token(in);
-  CHECK_EQ(t, "34");            t=next_token(in);
-  CHECK_EQ(t, "abc");           t=next_token(in);
-  CHECK_EQ(t, "3.4");           t=next_token(in);
+  read_all("34 abc 3.4");
+  CHECK_TRACE_CONTENTS("tokenize", "34\nabc\n3.4\n");
 }
 
 void test_tokenize_handles_string_literal() {
-  stringstream in("34 \"abc\"");
-  token t = next_token(in);
-  CHECK_EQ(t, "34");            t=next_token(in);
-  CHECK_EQ(t, "\"abc\"");       t=next_token(in);
+  read_all("34 \"abc\"");
+  CHECK_TRACE_CONTENTS("tokenize", "34\n\"abc\"\n");
 }
 
 void test_tokenize_handles_multiple_lines() {
-  stringstream in("34\n\"abc\"");
-  token t = next_token(in);
-  CHECK_EQ(t, "34");            t=next_token(in);
-  CHECK_EQ(t, "\"abc\"");       t=next_token(in);
+  read_all("34\n\"abc\"");
+  CHECK_TRACE_CONTENTS("tokenize", "34\n\"abc\"\n");
 }
 
 void test_tokenize_handles_string_with_space() {
-  stringstream in("34\n\"abc def\"");
-  token t = next_token(in);
-  CHECK_EQ(t, "34");            t=next_token(in);
-  CHECK_EQ(t, "\"abc def\"");   t=next_token(in);
+  read_all("34\n\"abc def\"");
+  CHECK_TRACE_CONTENTS("tokenize", "34\n\"abc def\"\n");
 }
 
 void test_tokenize_handles_string_with_escape() {
-  stringstream in("34\n\"abc \\\"quote def\"");
-  token t = next_token(in);
-  CHECK_EQ(t, "34");            t=next_token(in);
-  CHECK_EQ(t, "\"abc \\\"quote def\"");
+  read_all("34\n\"abc \\\"quote def\"");
+  CHECK_TRACE_CONTENTS("tokenize", "34\n\"abc \\\"quote def\"\n");
 }
 
 void test_tokenize_handles_comment() {
-  stringstream in("()'a #abc def ghi");
-  token t = next_token(in);
-  CHECK_EQ(t, "(");             t=next_token(in);
-  CHECK_EQ(t, ")");             t=next_token(in);
-  CHECK_EQ(t, "'");             t=next_token(in);
-  CHECK_EQ(t, "a");            t=next_token(in);
+  read_all("()'a #abc def ghi");
+  CHECK_TRACE_CONTENTS("tokenize", "(\n)\n'\na\n");
 }
 
 void test_tokenize_ends_comment_at_newline() {
-  stringstream in("#abc def ghi\nabc");
-  token t = next_token(in);
-  CHECK_EQ(t, "abc");           t=next_token(in);
+  read_all("#abc def ghi\nabc");
+  CHECK_TRACE_CONTENTS("tokenize", "abc\n");
 }
 
 void test_tokenize_suppresses_comments() {
-  stringstream in("abc\n#abc\ndef\nghi");
-  token t = next_token(in);
-  CHECK_EQ(t, "abc");           t=next_token(in);
-  CHECK_EQ(t, "def");           t=next_token(in);
-  CHECK_EQ(t, "ghi");           t=next_token(in);
+  read_all("abc\n#abc\ndef\nghi");
+  CHECK_TRACE_CONTENTS("tokenize", "abc\ndef\nghi\n");
 }
 
 void test_tokenize_suppresses_comments2() {
-  stringstream in("a : b\n  : c\n#abc\ndef :\n  ghi\n\njkl");
-  token t = next_token(in);
-  CHECK_EQ(t, "a");             t=next_token(in);
-  CHECK_EQ(t, "b");             t=next_token(in);
-  CHECK_EQ(t, "c");             t=next_token(in);
-  CHECK_EQ(t, "def");           t=next_token(in);
-  CHECK_EQ(t, "ghi");           t=next_token(in);
-  CHECK_EQ(t, "jkl");           t=next_token(in);
+  read_all("a : b\n  : c\n#abc\ndef :\n  ghi\n\njkl");
+  CHECK_TRACE_CONTENTS("tokenize", "a\nb\nc\ndef\nghi\njkl\n");
 }
 
 void test_tokenize_suppresses_trailing_whitespace() {
-  stringstream in("a \nb\r\nc");
-  token t = next_token(in);
-  CHECK_EQ(t, "a");             t=next_token(in);
-  CHECK_EQ(t, "b");             t=next_token(in);
-  CHECK_EQ(t, "c");             t=next_token(in);
+  read_all("a \nb\r\nc");
+  CHECK_TRACE_CONTENTS("tokenize", "a\nb\nc\n");
 }
 
 void test_tokenize_suppresses_repeated_newline() {
-  stringstream in("34\n\n\"abc \\\"quote def\"");
-  token t = next_token(in);
-  CHECK_EQ(t, "34");            t=next_token(in);
-  CHECK_EQ(t, "\"abc \\\"quote def\"");
+  read_all("34\n\n\"abc \\\"quote def\"");
+  CHECK_TRACE_CONTENTS("tokenize", "34\n\"abc \\\"quote def\"\n");
 }
 
 void test_tokenize_suppresses_whitespace_lines() {
-  stringstream in("abc def ghi\n\n    \n  def");
-  token t = next_token(in);
-  CHECK_EQ(t, "abc");           t=next_token(in);
-  CHECK_EQ(t, "def");           t=next_token(in);
-  CHECK_EQ(t, "ghi");           t=next_token(in);
-  CHECK_EQ(t, "def");           t=next_token(in);
+  read_all("abc def ghi\n\n    \n  def");
+  CHECK_TRACE_CONTENTS("tokenize", "abc\ndef\nghi\ndef\n");
 }
 
 void test_tokenize_suppresses_whitespace_lines2() {
-  stringstream in("  \nabc def ghi\n\n    \n  def");
-  token t = next_token(in);
-  CHECK_EQ(t, "abc");           t=next_token(in);
-  CHECK_EQ(t, "def");           t=next_token(in);
-  CHECK_EQ(t, "ghi");           t=next_token(in);
-  CHECK_EQ(t, "def");           t=next_token(in);
+  read_all("  \nabc def ghi\n\n    \n  def");
+  CHECK_TRACE_CONTENTS("tokenize", "abc\ndef\nghi\ndef\n");
 }

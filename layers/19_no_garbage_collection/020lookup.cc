@@ -19,6 +19,7 @@ void new_binding(string sym, cell* val) {
 }
 
 void new_binding(cell* sym, cell* val) {
+  trace("bind") << sym << ": " << val;
   Bindings[sym] = val;
 }
 
