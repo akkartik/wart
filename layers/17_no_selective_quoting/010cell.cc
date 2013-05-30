@@ -48,7 +48,7 @@ bool is_atom(cell* x) {
 
 
 
-#define HEAPCELLS (1024*1024/sizeof(cell))  // 1MB
+#define HEAPCELLS (4*1024/sizeof(cell))  // default linux pagesize
 struct heap {
   cell cells[HEAPCELLS];
   heap *next;
