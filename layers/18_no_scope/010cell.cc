@@ -155,7 +155,7 @@ void rmref(cell* c) {
 
 
 
-//// Helpers for tracking refcounts.
+//// Tracking refcounts.
 
 // RAII for temporaries
 struct lease_cell {
@@ -173,7 +173,7 @@ void update(cell*& var, cell* expr) {
 
 
 
-//// Tracking leaks.
+//// Debugging leaks.
 
 long num_unfreed() {
   long n = 0;

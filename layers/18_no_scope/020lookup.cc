@@ -27,5 +27,10 @@ void new_binding(cell* sym, cell* val) {
 }
 
 void teardown_bindings() {
+  for (unordered_map<cell*, cell*>::iterator p = Bindings.begin(); p != Bindings.end(); ++p) {
+    if (!p->second) continue;
+    rmref(p->first);
+    rmref(p->second);
+  }
   Bindings.clear();
 }

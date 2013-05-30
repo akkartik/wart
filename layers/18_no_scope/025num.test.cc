@@ -4,19 +4,19 @@ void test_add_works() {
 }
 
 void test_add_works_for_floats() {
-  cell* result = run("(+ 1.0 2.0)");
+  TEMP(result, eval("(+ 1.0 2.0)"));
   CHECK_TRACE_TOP("eval", "compiled fn\n=> 3\n");
   CHECK_EQ(result->type, FLOAT);
 }
 
 void test_division_always_returns_floats() {
-  cell* result = run("(/ 4 2)");
+  TEMP(result, eval("(/ 4 2)"));
   CHECK_TRACE_TOP("eval", "compiled fn\n=> 2\n");
   CHECK_EQ(result->type, FLOAT);
 }
 
 void test_integer_drops_decimals() {
-  cell* result = run("(int -2.7)");
+  TEMP(result, eval("(int -2.7)"));
   CHECK_TRACE_TOP("eval", "compiled fn\n=> -2\n");
   CHECK_EQ(result->type, INTEGER);
 }

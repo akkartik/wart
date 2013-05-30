@@ -4,9 +4,25 @@ void test_pointers_from_nil_are_nil() {
 }
 
 void test_new_cell_has_nil_car_and_cdr() {
-  cell* x = new_cell();
+  TEMP(x, new_cell());
   CHECK_EQ(x->car, nil);
   CHECK_EQ(x->cdr, nil);
+}
+
+void test_rmref_frees_space() {
+  cell* c = new_cell();
+  CHECK_EQ(c->car, nil);
+  CHECK_EQ(Free_cells, NULL);
+  rmref(c);
+  CHECK_EQ(c->car, NULL);
+  CHECK_EQ(Free_cells, c);
+}
+
+void test_rmref_handles_nums() {
+  cell* c = new_num(34);
+  rmref(c);
+  CHECK_EQ(c->car, NULL);
+  CHECK_EQ(Free_cells, c);
 }
 
 void test_cell_layout_constraints() {
@@ -14,6 +30,7 @@ void test_cell_layout_constraints() {
   CHECK((sizeof(c.car)%4) == 0);
   CHECK((sizeof(c.cdr)%4) == 0);
   CHECK((sizeof(c.type)%4) == 0);
+  CHECK((sizeof(c.nrefs)%4) == 0);
 
   CHECK(sizeof(long) <= sizeof(cell*));
   CHECK(sizeof(float) <= sizeof(cell*));

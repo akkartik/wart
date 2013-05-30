@@ -88,8 +88,10 @@ void run_tests() {
 
 void verify() {
   teardown_bindings();
+  teardown_cells();
   if (!Passed) return;
   if (Raise_count != 0) cerr << Raise_count << " errors encountered\n";
+  if (num_unfreed() > 0) dump_unfreed();
 }
 
 void setup() {
@@ -103,16 +105,16 @@ void setup() {
 
 //// helpers for tests
 
-list<cell*> read_all(string s) {
+void read_all(string s) {
   stringstream in(s);
-  list<cell*> results;
   do {
-    results.push_back(read(in));
+    rmref(read(in));
   } while (!eof(in));
-  return results;
+  // return nothing; we'll just verify the trace
 }
 
-cell* run(string s) {
+void run(string s) {
   stringstream in(s);
-  return run(in);
+  rmref(run(in));
+  // return nothing; we'll just verify the trace
 }

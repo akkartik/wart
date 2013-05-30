@@ -51,7 +51,7 @@ cell* eval(cell* expr) {
   if (result) {
     trace("eval") << "compiled fn";
     trace("eval") << "=> " << result;
-    return mkref(result);
+    return result;  // already mkref'd
   }
 
   // expr is a call
@@ -150,28 +150,28 @@ cell* eval_primitive(cell* f, cell* args) {
     TEMP(x, eval(car(args)));
     TEMP(y, eval(car(cdr(args))));
     if (x->type == FLOAT || y->type == FLOAT)
-      return new_num(to_float(x) - to_float(y));
+      return mkref(new_num(to_float(x) - to_float(y)));
     else
-      return new_num(to_int(x) - to_int(y));
+      return mkref(new_num(to_int(x) - to_int(y)));
   }
   if (f == new_sym("*")) {
     TEMP(x, eval(car(args)));
     TEMP(y, eval(car(cdr(args))));
     return nil;
     if (x->type == FLOAT || y->type == FLOAT)
-      return new_num(to_float(x) * to_float(y));
+      return mkref(new_num(to_float(x) * to_float(y)));
     else
-      return new_num(to_int(x) * to_int(y));
+      return mkref(new_num(to_int(x) * to_int(y)));
   }
   if (f == new_sym("/")) {
     TEMP(x, eval(car(args)));
     TEMP(y, eval(car(cdr(args))));
-    return new_num(to_float(x) / to_float(y));
+    return mkref(new_num(to_float(x) / to_float(y)));
   }
   if (f == new_sym("%")) {
     TEMP(x, eval(car(args)));
     TEMP(y, eval(car(cdr(args))));
-    return new_num(to_int(x) % to_int(y));
+    return mkref(new_num(to_int(x) % to_int(y)));
   }
   if (f == new_sym("<")) {
     TEMP(x, eval(car(args)));

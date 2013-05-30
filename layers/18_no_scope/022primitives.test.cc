@@ -1,5 +1,10 @@
+cell* eval(string s) {
+  TEMP(form, read(s));
+  return eval(form);
+}
+
 void test_fn_works() {
-  cell* result = run("(fn(x) x)");
+  TEMP(result, eval("(fn(x) x)"));
   // {sig: (x), body: (x)}
   CHECK_EQ(car(get(result, sym_sig)), new_sym("x"));
   CHECK_EQ(cdr(get(result, sym_sig)), nil);

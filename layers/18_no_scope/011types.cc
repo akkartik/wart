@@ -227,6 +227,25 @@ void setup_cells() {
   reset_heap(First_heap);
 }
 
+void teardown_cells() {
+  if (nil->car != nil || nil->cdr != nil)
+    RAISE << "nil was corrupted\n";
+
+  for (unordered_map<long, cell*>::iterator p = Int_literals.begin(); p != Int_literals.end(); ++p) {
+    if (p->second->nrefs > 1)
+      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << '\n';
+    if (p->second->nrefs > 0)
+      rmref(p->second);
+  }
+
+  for (unordered_map<string, cell*>::iterator p = Sym_literals.begin(); p != Sym_literals.end(); ++p) {
+    if (p->second->nrefs > 1)
+      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << '\n';
+    if (p->second->nrefs > 0)
+      rmref(p->second);
+  }
+}
+
 // optimize lookups of common symbols
 cell *sym_quote, *sym_backquote, *sym_unquote, *sym_splice, *sym_unquote_splice;
 cell *sym_list, *sym_number, *sym_symbol, *sym_string, *sym_table;
