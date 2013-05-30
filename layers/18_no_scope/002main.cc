@@ -49,15 +49,6 @@ cell* run(istream& in) {
   return result;
 }
 
-// parse a paragraph of expressions until empty line
-list<cell*> read_all(istream& in) {
-  list<cell*> results;
-  do {
-    results.push_back(read(in));
-  } while (!eof(in) && (!Interactive || in.peek() != '\n'));
-  return results;
-}
-
 bool eof(istream& in) {
   in.peek();
   return in.eof();
@@ -110,7 +101,11 @@ void setup() {
 
 list<cell*> read_all(string s) {
   stringstream in(s);
-  return read_all(in);
+  list<cell*> results;
+  do {
+    results.push_back(read(in));
+  } while (!eof(in));
+  return results;
 }
 
 cell* run(string s) {
