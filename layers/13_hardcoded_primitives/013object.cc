@@ -37,7 +37,7 @@ cell* type(cell* x) {
       return car(cdr(x));
     return sym_list;
   default:
-    RAISE << "Undefined type: " << x->type << endl << die();
+    RAISE << "Undefined type: " << x->type << '\n' << die();
     return nil;   // never reached
   }
 }

@@ -31,7 +31,7 @@ ostream& operator<<(ostream& os, cell* c) {
   case COMPILED_FN:
     return os << "#compiled";
   default:
-    return os << "Can't print type " << c->type << endl << die();
+    return os << "Can't print type " << c->type << '\n' << die();
   }
 }
 

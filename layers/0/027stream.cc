@@ -14,13 +14,13 @@ cell* new_ostream(ostream* x) {
 
 istream& to_istream(cell* x) {
   if (type(x) != new_sym("istream"))
-    RAISE << "not an istream: " << x << endl << die();
+    RAISE << "not an istream: " << x << '\n' << die();
   return *(istream*)to_int(car(cdr(cdr(x))));
 }
 
 ostream& to_ostream(cell* x) {
   if (type(x) != new_sym("ostream"))
-    RAISE << "not an ostream: " << x << endl << die();
+    RAISE << "not an ostream: " << x << '\n' << die();
   return *(ostream*)to_int(car(cdr(cdr(x))));
 }
 

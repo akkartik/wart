@@ -11,7 +11,7 @@ COMPILE_FN(table_set, compiledfn_table_set, "($table $key $val)",
   if (is_table(table))
     set(table, key, val);
   else
-    RAISE << "can't set in a non-table: " << table << endl;
+    RAISE << "can't set in a non-table: " << table << '\n';
   return mkref(val);
 )
 

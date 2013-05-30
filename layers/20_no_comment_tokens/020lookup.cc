@@ -8,7 +8,7 @@ cell* lookup(string s) {
 
 cell* lookup(cell* sym) {
   if (!bindings[sym]) {
-    RAISE << "No binding for " << to_string(sym) << endl;
+    RAISE << "No binding for " << to_string(sym) << '\n';
     return nil;
   }
   return bindings[sym];

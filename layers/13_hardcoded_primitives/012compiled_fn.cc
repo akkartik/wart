@@ -49,6 +49,6 @@ bool is_compiledfn(cell* x) {
 
 compiledfn to_compiledfn(cell* x) {
   if (!is_compiledfn(x))
-    RAISE << "Not a compiled function" << endl << die();
+    RAISE << "Not a compiled function\n" << die();
   return (compiledfn)x->car;
 }

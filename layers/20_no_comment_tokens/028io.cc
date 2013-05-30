@@ -29,7 +29,7 @@ ostream& operator<<(ostream& os, cell* c) {
       os << "->" << cdr(c);
     return os;
   default:
-    return os << "Can't print type " << c->type << endl << die();
+    return os << "Can't print type " << c->type << '\n' << die();
   }
 }
 

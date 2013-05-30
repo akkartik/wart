@@ -28,7 +28,7 @@ int main(int argc, unused char* argv[]) {
   while (!cin.eof()) {
     list<cell*> forms = read_all(cin);
     for (list<cell*>::iterator p = forms.begin(); p != forms.end(); ++p)
-      cout << "=> " << eval(*p) << endl;
+      cout << "=> " << eval(*p) << '\n';
   }
 }
 
@@ -63,7 +63,7 @@ bool Passed = true;
 
 #define CHECK(X) if (!(X)) { \
     ++Num_failures; \
-    cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
+    cerr << "\nF " << __FUNCTION__ << ": " << #X << '\n'; \
     Passed = false; \
     return; \
   } \
@@ -71,8 +71,8 @@ bool Passed = true;
 
 #define CHECK_EQ(X, Y) if ((X) != (Y)) { \
     ++Num_failures; \
-    cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
-    cerr << "  got " << (X) << endl;  /* BEWARE: multiple eval */ \
+    cerr << "\nF " << __FUNCTION__ << ": " << #X << " == " << #Y << '\n'; \
+    cerr << "  got " << (X) << '\n';  /* BEWARE: multiple eval */ \
     Passed = false; \
     return; \
   } \
@@ -94,17 +94,17 @@ void run_tests() {
   load_files(".wart");   // after GC tests
   load_files(".test");
 
-  cerr << endl;
+  cerr << '\n';
   if (Num_failures > 0)
     cerr << Num_failures << " failure"
          << (Num_failures > 1 ? "s" : "")
-         << endl;
+         << '\n';
 }
 
 void verify() {
   teardown_bindings();
   if (!Passed) return;
-  if (Raise_count != 0) cerr << Raise_count << " errors encountered" << endl;
+  if (Raise_count != 0) cerr << Raise_count << " errors encountered\n";
 }
 
 // helper to read from string

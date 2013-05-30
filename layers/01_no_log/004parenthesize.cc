@@ -104,7 +104,7 @@ void emit(const token& t, list<token>& out, long& explicit_open_parens) {
   out.push_back(t);
   if (is_open_paren(t)) ++explicit_open_parens;
   if (is_close_paren(t)) --explicit_open_parens;
-  if (explicit_open_parens < 0) RAISE << "Unbalanced )" << endl;
+  if (explicit_open_parens < 0) RAISE << "Unbalanced )\n";
 }
 
 void emit_all(list<token>& buffer, const token& curr, list<token>& out, long& explicit_open_parens) {

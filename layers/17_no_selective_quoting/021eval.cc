@@ -12,7 +12,7 @@
 
 cell* eval(cell* expr) {
   if (!expr)
-    RAISE << "eval: cell should never be NULL" << endl << die();
+    RAISE << "eval: cell should never be NULL\n" << die();
 
   if (expr == nil)
     return nil;
@@ -35,8 +35,8 @@ cell* eval(cell* expr) {
   // expr is a call
   cell* fn = eval(car(expr));
   if (!is_fn(fn))
-    RAISE << "Not a call: " << expr << endl
-        << "Perhaps you need to split the line in two." << endl;
+    RAISE << "Not a call: " << expr << '\n'
+        << "Perhaps you need to split the line in two.\n";
 
   // eval its args, create new bindings
   list<cell*> vars_bound;
@@ -108,7 +108,7 @@ cell* eval_primitive(cell* f, cell* args) {
   if (f == new_sym("<-")) {
     cell* var = car(args);
     if (!is_sym(var)) {
-      RAISE << "can't assign to non-sym " << var << endl;
+      RAISE << "can't assign to non-sym " << var << '\n';
       return nil;
     }
     cell* val = eval(car(cdr(args)));

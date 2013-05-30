@@ -10,7 +10,7 @@ cell* build_cell(ast_node n) {
   if (is_nil(n))
     return nil;
   if (is_list(n) && n.elems.front() == ")") {
-    if (n.elems.size() > 1) RAISE << "Syntax error: ) not at end of expr" << endl << die();
+    if (n.elems.size() > 1) RAISE << "Syntax error: ) not at end of expr\n" << die();
     return nil;
   }
 
@@ -22,7 +22,7 @@ cell* build_cell(ast_node n) {
       return new_num(v);
 
     if (errno == ERANGE || errno == EOVERFLOW)
-      RAISE << "dropping precision for bignum " << n.atom << endl;
+      RAISE << "dropping precision for bignum " << n.atom << '\n';
 
     float f = strtof(n.atom.c_str(), &end);
     if (*end == '\0') {
@@ -60,7 +60,7 @@ cell* build_cell(ast_node n) {
   else {
     n.elems.pop_front();
     if (n.elems.empty())
-      RAISE << "Error in parsing " << n << endl << die();
+      RAISE << "Error in parsing " << n << '\n' << die();
     set_cdr(new_form, build_cell(n));
   }
 

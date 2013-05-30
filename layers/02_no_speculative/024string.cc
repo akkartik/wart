@@ -3,7 +3,7 @@
 COMPILE_FN(string_range, compiledfn_string_get, "($string $index $end)",
   cell* str = lookup("$string");
   if (!is_string(str)) {
-    RAISE << "not a string: " << str << endl;
+    RAISE << "not a string: " << str << '\n';
     return nil;
   }
 
@@ -13,7 +13,7 @@ COMPILE_FN(string_range, compiledfn_string_get, "($string $index $end)",
 
   size_t end = to_int(lookup("$end"));
   if (end > ((string*)str->car)->length()) {
-    RAISE << "no such end-index in string: " << str << " " << end << endl;
+    RAISE << "no such end-index in string: " << str << " " << end << '\n';
     return nil;
   }
 
@@ -23,20 +23,20 @@ COMPILE_FN(string_range, compiledfn_string_get, "($string $index $end)",
 COMPILE_FN(string_splice, compiledfn_string_splice, "($string $start $end $val)",
   cell* str = lookup("$string");
   if (!is_string(str)) {
-    RAISE << "can't set non-string: " << str << endl;
+    RAISE << "can't set non-string: " << str << '\n';
     return nil;
   }
 
   size_t start = to_int(lookup("$start"));
   size_t end = to_int(lookup("$end"));
   if (start > ((string*)str->car)->length()) {  // append works
-    RAISE << "string too short: " << str << " " << start << endl;
+    RAISE << "string too short: " << str << " " << start << '\n';
     return nil;
   }
 
   cell* val = lookup("$val");
   if (!is_string(val))
-    RAISE << "can't set string with non-string: " << val << endl;
+    RAISE << "can't set string with non-string: " << val << '\n';
   ((string*)str->car)->replace(start, end-start, to_string(val));
   return mkref(val);
 )

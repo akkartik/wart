@@ -18,7 +18,7 @@ cell* eval(cell* expr) {
 
 cell* eval(cell* expr, cell* scope) {
   if (!expr)
-    RAISE << "eval: cell should never be NULL" << endl << die();
+    RAISE << "eval: cell should never be NULL\n" << die();
 
   if (expr == nil)
     return nil;
@@ -41,8 +41,8 @@ cell* eval(cell* expr, cell* scope) {
   // expr is a call
   cell* fn = eval(car(expr), scope);
   if (!is_fn(fn))
-    RAISE << "Not a call: " << expr << endl
-        << "Perhaps you need to split the line in two." << endl;
+    RAISE << "Not a call: " << expr << '\n'
+        << "Perhaps you need to split the line in two.\n";
 
   // eval its args in the caller's lexical environment
   cell* new_scope = new_table();

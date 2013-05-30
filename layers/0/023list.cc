@@ -100,7 +100,7 @@ cell* nth_cdr(cell* x, long n) {
   cell* curr = x;
   for (long idx = n; idx > 0; --idx) {
     if (!is_cons(curr))
-      RAISE << "list is too short: " << x << " " << n << endl;
+      RAISE << "list is too short: " << x << " " << n << '\n';
     curr=cdr(curr);
   }
   return curr;

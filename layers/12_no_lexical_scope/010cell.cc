@@ -63,7 +63,7 @@ cell* Free_cells = NULL;
 
 void grow_heap() {
   Curr_heap = Curr_heap->next = new heap();
-  if (!Curr_heap) RAISE << "Out of memory" << endl << die();
+  if (!Curr_heap) RAISE << "Out of memory\n" << die();
   Curr_cell = 0;
 }
 
@@ -124,14 +124,14 @@ cell* mkref(cell* c) {
 
 void rmref(cell* c) {
   if (!c)
-    RAISE << "A cell was prematurely garbage-collected." << endl << die();
+    RAISE << "A cell was prematurely garbage-collected.\n" << die();
   if (c == nil) return;
 
   --c->nrefs;
   if (c->nrefs > 0) return;
 
   if (is_atom(c) && c->type != STRING && c->type != FLOAT && !Running_tests)
-    RAISE << "deleted atom: " << (void*)c << endl;
+    RAISE << "deleted atom: " << (void*)c << '\n';
 
   switch (c->type) {
   case INTEGER:
@@ -147,7 +147,7 @@ void rmref(cell* c) {
   case COMPILED_FN:
     break;  // compiled functions don't need freeing
   default:
-    RAISE << "Can't rmref type " << c->type << endl << die();
+    RAISE << "Can't rmref type " << c->type << '\n' << die();
   }
 
   rmref(c->cdr);
@@ -183,7 +183,7 @@ void dump_unfreed() {
     for (cell* x = &h->cells[0]; x < &h->cells[HEAPCELLS]; ++x) {
       if (!x->car) continue;
       if (num_refs_remaining[x] > 1) continue;
-      cerr << "unfreed: " << (void*)x << " " << x << endl;
+      cerr << "unfreed: " << (void*)x << " " << x << '\n';
     }
 }
 
@@ -210,7 +210,7 @@ void mark_all_cells(cell* x, unordered_map<cell*, int>& mark) {
   case COMPILED_FN:
     break;
   default:
-    cerr << "Can't mark type " << x->type << endl << die();
+    cerr << "Can't mark type " << x->type << '\n' << die();
   }
   mark_all_cells(cdr(x), mark);
 }

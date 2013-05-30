@@ -53,9 +53,9 @@ void end_level() {
 cell* eval(cell* expr, cell* scope) {
   if (!Do_log) return eval2(expr, scope);
   new_level();
-  log() << expr << endl;
+  log() << expr << '\n';
   cell* result = eval2(expr, scope);
-  log() << " &rArr; " << result << endl;
+  log() << " &rArr; " << result << '\n';
   end_level();
   return result;
 }
@@ -84,7 +84,7 @@ long Eval_count = 0;
 cell* eval2(cell* expr, cell* scope) {
   ++Eval_count;
   if (!expr)
-    RAISE << "eval: cell should never be NULL" << endl << die();
+    RAISE << "eval: cell should never be NULL\n" << die();
 
   if (expr == nil)
     return nil;
@@ -123,8 +123,8 @@ cell* eval2(cell* expr, cell* scope) {
     return mkref(result);
   }
   if (!is_fn(fn))
-    RAISE << "Not a call: " << expr << endl
-        << "Perhaps you need to split the line in two." << endl;
+    RAISE << "Not a call: " << expr << '\n'
+        << "Perhaps you need to split the line in two.\n";
 
   // eval its args in the caller's lexical environment
   cell* spliced_args = splice_args(cdr(expr), scope, fn);
@@ -149,7 +149,7 @@ cell* eval2(cell* expr, cell* scope) {
 
   cell* result = nil;
   if (is_compiledfn(body(fn))) {
-    if (Do_log) log(Log_levels.top()+1) << "executing primitive " << car(expr) << endl;
+    if (Do_log) log(Log_levels.top()+1) << "executing primitive " << car(expr) << '\n';
     result = to_compiledfn(body(fn))();  // all Compiledfns must mkref result
   }
   else {
@@ -337,7 +337,7 @@ COMPILE_FN(symbolic_eval_args, compiledfn_symbolic_eval_args, "($expr)",
   cell* expr = lookup("$expr");
   cell* fn = car(expr);
   if (!is_fn(fn)) {
-    RAISE << "Not a call: " << expr << endl;
+    RAISE << "Not a call: " << expr << '\n';
     return nil;
   }
   cell* spliced_args = splice_args(cdr(expr), Curr_lexical_scope, fn);
@@ -518,7 +518,7 @@ cell* splice_args(cell* args, cell* scope, cell* fn) {
     }
 
     if (is_macro(fn) && !contains(body(fn), sym_backquote))
-      RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)" << endl;
+      RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)\n";
     cell* x = unsplice(car(curr), scope);
     if (is_incomplete_eval(x))
       add_cons(tip, new_cons(sym_splice, rep(x)));
@@ -730,7 +730,7 @@ cell* to_fn(cell* x) {
   if (x == nil || is_fn(x)) return x;
   if (is_incomplete_eval(x)) return x;
   if (!lookup_dynamic_binding(sym_Coercions))
-    RAISE << "tried to call " << x << endl << die();
+    RAISE << "tried to call " << x << '\n' << die();
   cell* result = coerce_quoted(x, sym_function, lookup(sym_Coercions));   rmref(x);
   return result;
 }

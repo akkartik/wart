@@ -53,7 +53,7 @@ cell* Free_cells = NULL;
 
 void grow_heap() {
   Curr_heap = Curr_heap->next = new heap();
-  if (!Curr_heap) RAISE << "Out of memory" << endl << die();
+  if (!Curr_heap) RAISE << "Out of memory\n" << die();
   Curr_cell = 0;
 }
 

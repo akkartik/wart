@@ -63,7 +63,7 @@ const test_fn Tests[] = {
 
 #define CHECK(X) if (!(X)) { \
     ++Num_failures; \
-    cerr << endl << "F " << __FUNCTION__ << ": " << #X << endl; \
+    cerr << "\nF " << __FUNCTION__ << ": " << #X << '\n'; \
     return; \
   } \
   else { cerr << "."; fflush(stderr); }
@@ -77,9 +77,9 @@ void run_tests() {
     (*Tests[i])();
   }
 
-  cerr << endl;
+  cerr << '\n';
   if (Num_failures > 0)
     cerr << Num_failures << " failure"
          << (Num_failures > 1 ? "s" : "")
-         << endl;
+         << '\n';
 }

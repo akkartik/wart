@@ -169,7 +169,7 @@ sandbox where you can break things without consequence.
   :(code "main loop" in "main")
   while (!cin.eof()) {
     cell* form = Read(cin);
-    cout << "=> " << Eval(form) << endl;
+    cout << "=> " << Eval(form) << '\n';
   }
 
 == Turning code into cells: Read

@@ -2,7 +2,7 @@
 
 cell* car(cell* x) {
   if (x->type != CONS) {
-    RAISE << "car of non-cons: " << x << endl;
+    RAISE << "car of non-cons: " << x << '\n';
     return nil;
   }
   return x->car;
@@ -14,7 +14,7 @@ cell* cdr(cell* x) {
 
 void set_car(cell* x, cell* y) {
   if (x == nil) {
-    RAISE << "set_car on nil" << endl;
+    RAISE << "set_car on nil\n";
     return;
   }
   mkref(y);
@@ -25,7 +25,7 @@ void set_car(cell* x, cell* y) {
 
 void set_cdr(cell* x, cell* y) {
   if (x == nil) {
-    RAISE << "set_cdr on nil" << endl;
+    RAISE << "set_cdr on nil\n";
     return;
   }
   mkref(y);
@@ -84,7 +84,7 @@ long to_int(cell* x) {
     return (long)x->car;
   if (x->type == FLOAT)
     return (long)*((float*)&x->car);
-  RAISE << "not a number: " << x << endl;
+  RAISE << "not a number: " << x << '\n';
   return 0;
 }
 
@@ -93,7 +93,7 @@ float to_float(cell* x) {
     return (long)x->car;
   if (x->type == FLOAT)
     return *(float*)&x->car;
-  RAISE << "not a number: " << x << endl;
+  RAISE << "not a number: " << x << '\n';
   return 0;
 }
 
@@ -133,7 +133,7 @@ bool is_string(cell* x) {
 
 string to_string(cell* x) {
   if (!is_string(x) && !is_sym(x)) {
-    RAISE << "can't convert to string: " << x << endl;
+    RAISE << "can't convert to string: " << x << '\n';
     return "";
   }
   return *(string*)x->car;
@@ -179,7 +179,7 @@ cell* get(cell* t, string k) {
 
 void unsafe_set(cell* t, cell* key, cell* val, bool delete_nils) {
   if (!is_table(t)) {
-    RAISE << "set on a non-table: " << t << endl;
+    RAISE << "set on a non-table: " << t << '\n';
     return;
   }
 
@@ -206,7 +206,7 @@ void unsafe_set(cell* t, string k, cell* val, bool delete_nils) {
 
 cell* unsafe_get(cell* t, cell* key) {
   if (!is_table(t)) {
-    RAISE << "get on a non-table" << endl;
+    RAISE << "get on a non-table\n";
     return nil;
   }
   return (*(table*)(t->car))[key];
@@ -229,11 +229,11 @@ void setup_cells() {
 
 void teardown_cells() {
   if (nil->car != nil || nil->cdr != nil)
-    RAISE << "nil was corrupted" << endl;
+    RAISE << "nil was corrupted\n";
 
   for (unordered_map<long, cell*>::iterator p = Int_literals.begin(); p != Int_literals.end(); ++p) {
     if (p->second->nrefs > 1)
-      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << endl;
+      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << '\n';
     if (p->second->nrefs > 0)
       rmref(p->second);
   }
@@ -241,7 +241,7 @@ void teardown_cells() {
   for (unordered_map<string, cell*>::iterator p = Sym_literals.begin(); p != Sym_literals.end(); ++p) {
     if (Initial_syms.find(p->second) != Initial_syms.end()) continue;
     if (p->second->nrefs > 1)
-      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << endl;
+      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << '\n';
     if (p->second->nrefs > 0)
       rmref(p->second);
   }

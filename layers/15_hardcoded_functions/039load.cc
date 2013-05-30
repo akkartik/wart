@@ -14,7 +14,7 @@ void load_file(const char* filename) {
   if (f.fail()) return;
   while (!f.eof()) {
     cell* cell = read(f);
-//?     cerr << cell << endl;   // uncomment this to track down errors in wart files
+//?     cerr << cell << '\n';   // uncomment this to track down errors in wart files
     rmref(eval(cell));
     rmref(cell);
   }

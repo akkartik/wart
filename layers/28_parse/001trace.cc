@@ -75,8 +75,8 @@ struct lease_tracer {
 long Num_failures = 0;
 #define CHECK_EQ(X, Y) if ((X) != (Y)) { \
     ++Num_failures; \
-    cerr << endl << "F " << __FUNCTION__ << ": " << #X << " == " << #Y << endl; \
-    cerr << "  got " << (X) << endl;  /* BEWARE: multiple eval */ \
+    cerr << "\nF " << __FUNCTION__ << ": " << #X << " == " << #Y << '\n'; \
+    cerr << "  got " << (X) << '\n';  /* BEWARE: multiple eval */ \
     return; \
   } \
   else { cerr << "."; fflush(stderr); }

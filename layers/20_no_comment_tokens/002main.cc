@@ -84,17 +84,17 @@ void run_tests() {
   load_files(".wart");   // after GC tests
   load_files(".test");
 
-  cerr << endl;
+  cerr << '\n';
   if (Num_failures > 0)
     cerr << Num_failures << " failure"
          << (Num_failures > 1 ? "s" : "")
-         << endl;
+         << '\n';
 }
 
 void verify() {
   teardown_bindings();
   if (!Passed) return;
-  if (Raise_count != 0) cerr << Raise_count << " errors encountered" << endl;
+  if (Raise_count != 0) cerr << Raise_count << " errors encountered\n";
 }
 
 void setup() {

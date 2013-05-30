@@ -62,7 +62,7 @@ COMPILE_FN(<-, compiledfn_assign, "('$var $val)",
 
 void assign(cell* var, cell* val) {
   if (!is_sym(var)) {
-    RAISE << "can't assign to non-sym " << var << endl;
+    RAISE << "can't assign to non-sym " << var << '\n';
     return;
   }
   cell* scope = scope_containing_binding(var, Curr_lexical_scope);

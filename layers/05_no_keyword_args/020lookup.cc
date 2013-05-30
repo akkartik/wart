@@ -23,7 +23,7 @@ cell* lookup(cell* sym, cell* scope, bool keep_already_evald) {
   if (result) return maybe_strip_already_evald(keep_already_evald, result);
   result = lookup_dynamic_binding(sym);
   if (result) return maybe_strip_already_evald(keep_already_evald, result);
-  RAISE << "No binding for " << to_string(sym) << endl;
+  RAISE << "No binding for " << to_string(sym) << '\n';
   return nil;
 }
 
@@ -58,7 +58,7 @@ void new_dynamic_scope(string s, cell* val) {
 void end_dynamic_scope(cell* sym) {
   stack<cell*>& bindings = Dynamics[sym];
   if (bindings.empty()) {
-    RAISE << "No dynamic binding for " << sym << endl;
+    RAISE << "No dynamic binding for " << sym << '\n';
     return;
   }
   rmref(sym);
@@ -73,7 +73,7 @@ void end_dynamic_scope(string s) {
 void assign_dynamic_var(cell* sym, cell* val) {
   stack<cell*>& bindings = Dynamics[sym];
   if (bindings.empty()) {
-    RAISE << "No dynamic binding to assign for " << sym << endl;
+    RAISE << "No dynamic binding to assign for " << sym << '\n';
     new_dynamic_scope(sym, val);
     return;
   }
@@ -117,7 +117,7 @@ void new_lexical_scope() {
 
 void end_lexical_scope() {
   if (Curr_lexical_scope == nil)
-    RAISE << "No lexical scope to end" << endl << die();
+    RAISE << "No lexical scope to end\n" << die();
   end_dynamic_scope(CURR_LEXICAL_SCOPE);
 }
 
@@ -128,7 +128,7 @@ void add_lexical_scope(cell* new_scope) {
 
 void add_lexical_binding(cell* sym, cell* val, cell* scope) {
   if (unsafe_get(scope, sym))
-    RAISE << "Can't rebind within a lexical scope" << endl << die();
+    RAISE << "Can't rebind within a lexical scope\n" << die();
   unsafe_set(scope, sym, val, false);  // deleting nil might expose a shadowed binding
 }
 

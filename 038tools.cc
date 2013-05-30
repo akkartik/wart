@@ -6,8 +6,8 @@ COMPILE_FN(addr, compiledfn_addr, "($x)",
 
 COMPILE_FN(register_failed_test, compiledfn_register_failed_test, "($msg $expr)",
   ++Num_failures;
-  cout << endl << "F "; print(lookup("$msg"), cout);
-  cout << endl << "  got " << lookup("$expr") << endl;
+  cout << "\nF "; print(lookup("$msg"), cout);
+  cout << "\n  got " << lookup("$expr") << '\n';
   return nil;
 )
 
@@ -38,7 +38,7 @@ COMPILE_FN(date, compiledfn_date, "()",
 COMPILE_FN(time, compiledfn_time, "('$expr)",
   clock_t start = clock();
   cell* result = eval(lookup("$expr"));
-  cerr << clock()-start << "/" << CLOCKS_PER_SEC << endl;
+  cerr << clock()-start << "/" << CLOCKS_PER_SEC << '\n';
   return result;  // already mkref'd
 )
 

@@ -37,7 +37,7 @@ cell* type(cell* x) {
       return car(cdr(x));
     return sym_list;
   default:
-    RAISE << "Undefined type: " << x->type << endl << die();
+    RAISE << "Undefined type: " << x->type << '\n' << die();
     return nil;   // never reached
   }
 }
@@ -52,11 +52,11 @@ cell* coerce_quoted(cell* x, cell* dest_type, cell* coercions) {
   if (coercions == nil) RAISE << "Coercions not initialized yet\n";
   if (!is_table(coercions)) RAISE << "Coercions not a table\n";
   cell* tmp = get(coercions, dest_type);
-  if (tmp == nil) RAISE << "Coercions for " << dest_type << " not initialized when eval'ing " << x << endl;
+  if (tmp == nil) RAISE << "Coercions for " << dest_type << " not initialized when eval'ing " << x << '\n';
   if (!is_table(coercions)) RAISE << "Coercions for " << dest_type << " not a table\n";
   cell* coercer = get(tmp, typ);
   if (coercer == nil) {
-    RAISE << "can't coerce " << typ << " " << x << " to " << dest_type << endl;
+    RAISE << "can't coerce " << typ << " " << x << " to " << dest_type << '\n';
     return nil;
   }
   cell* expr = new_cons(coercer, new_cons(new_cons(sym_quote, x)));

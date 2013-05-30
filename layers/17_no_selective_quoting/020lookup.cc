@@ -10,7 +10,7 @@ cell* lookup(string s) {
 cell* lookup(cell* sym) {
   stack<cell*>& bindings = Dynamics[sym];
   if (bindings.empty()) {
-    RAISE << "No binding for " << to_string(sym) << endl;
+    RAISE << "No binding for " << to_string(sym) << '\n';
     return nil;
   }
   return bindings.top();
@@ -29,7 +29,7 @@ void new_dynamic_scope(string s, cell* val) {
 void end_dynamic_scope(cell* sym) {
   stack<cell*>& bindings = Dynamics[sym];
   if (bindings.empty()) {
-    RAISE << "No dynamic binding for " << sym << endl;
+    RAISE << "No dynamic binding for " << sym << '\n';
     return;
   }
   rmref(sym);
@@ -44,7 +44,7 @@ void end_dynamic_scope(string s) {
 void assign_dynamic_var(cell* sym, cell* val) {
   stack<cell*>& bindings = Dynamics[sym];
   if (bindings.empty()) {
-    RAISE << "No dynamic binding to assign for " << sym << endl;
+    RAISE << "No dynamic binding to assign for " << sym << '\n';
     new_dynamic_scope(sym, val);
     return;
   }
