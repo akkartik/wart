@@ -68,8 +68,6 @@ list<cell*> read_all(istream& fd) {
 
 //// test harness
 
-bool Running_tests = false;
-
 typedef void (*test_fn)(void);
 
 const test_fn Tests[] = {
@@ -97,7 +95,6 @@ bool Passed = true;
   else { cerr << "."; fflush(stderr); }
 
 void run_tests() {
-  Running_tests = true;
   Pretend_raise = true;  // for death tests
   time_t t; time(&t);
   cerr << "C tests: " << ctime(&t);

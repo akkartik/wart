@@ -144,7 +144,7 @@ void rmref(cell* c) {
   if (c->nrefs > 0) return;
 
   trace("gcdump") << "free: " << (void*)c << " " << c << " " << c->nrefs;
-  if (is_atom(c) && c->type != STRING && c->type != FLOAT && !Running_tests)
+  if (c->type == INTEGER || c->type == SYMBOL)
     RAISE << "deleted atom: " << (void*)c << '\n';
 
   switch (c->type) {

@@ -63,7 +63,6 @@ bool eof(istream& in) {
 //// test harness
 
 void run_tests() {
-  Running_tests = true;
   Pretend_raise = true;  // for death tests
   time_t t; time(&t);
   cerr << "C tests: " << ctime(&t);

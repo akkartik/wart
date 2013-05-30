@@ -1,4 +1,4 @@
-// CHECK all nrefs except quotes/unquotes
+// check all nrefs except quotes/unquotes
 
 void test_build_handles_nil() {
   indent_sensitive_stream in("()");
@@ -15,7 +15,6 @@ void test_build_handles_integer() {
   cell* c = next_cell(in);
   CHECK_EQ(c, new_num(34));
   CHECK_EQ(c->nrefs, 1);
-  rmref(c);
 }
 
 void test_build_handles_float() {
@@ -24,7 +23,6 @@ void test_build_handles_float() {
   CHECK(is_num(c));
   CHECK(equal_floats(to_float(c), 3.4));
   CHECK_EQ(c->nrefs, 0);   // floats aren't interned
-  rmref(c);
 }
 
 void test_build_warns_on_ambiguous_float() {
@@ -50,7 +48,6 @@ void test_build_handles_sym() {
   cell* c = next_cell(in);
   CHECK_EQ(c, new_sym("a"));
   CHECK_EQ(c->nrefs, 1);
-  rmref(c);
 }
 
 void test_build_handles_string() {
@@ -321,5 +318,4 @@ void test_build_handles_indented_wrapped_lines() {
   c = cdr(c);
   CHECK_EQ(c, nil);
   rmref(origc);
-  rmref(c0);
 }

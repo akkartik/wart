@@ -1,5 +1,3 @@
-bool Running_tests = false;
-
 typedef void (*test_fn)(void);
 
 const test_fn Tests[] = {

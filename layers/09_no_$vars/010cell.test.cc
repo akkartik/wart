@@ -19,13 +19,6 @@ void test_rmref_frees_space() {
   CHECK_EQ(Free_cells, c);
 }
 
-void test_rmref_handles_nums() {
-  cell* c = new_num(34);
-  rmref(c);
-  CHECK(!c->car);
-  CHECK_EQ(Free_cells, c);
-}
-
 void test_cell_layout_constraints() {
   cell c;
   CHECK((sizeof(c.car)%4) == 0);

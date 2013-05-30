@@ -3,8 +3,6 @@ void test_to_float_works() {
   CHECK(equal_floats(to_float(num1), 3.0));
   cell* num2 = new_num(1.5);
   CHECK(equal_floats(to_float(num2), 1.5));
-  rmref(num2);
-  rmref(num1);
 }
 
 void test_set_car_decrements_nrefs() {
@@ -69,6 +67,5 @@ void test_set_deletes_nonexistent_key() {
   CHECK_EQ(k->nrefs, 1);
   set(t, k, nil);
   CHECK_EQ(k->nrefs, 1);
-  rmref(k);
   rmref(t);
 }

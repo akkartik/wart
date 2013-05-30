@@ -137,7 +137,7 @@ void rmref(cell* c) {
   --c->nrefs;
   if (c->nrefs > 0) return;
 
-  if (is_atom(c) && c->type != STRING && c->type != FLOAT && !Running_tests)
+  if (c->type == INTEGER || c->type == SYMBOL)
     RAISE << "deleted atom: " << (void*)c << '\n';
 
   switch (c->type) {
