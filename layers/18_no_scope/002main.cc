@@ -47,8 +47,7 @@ cell* run(istream& in) {
   cell* result = nil;
   do {
     cell* form = read(in);
-    rmref(result);
-    result = eval(form);
+    update(result, eval(form));
     rmref(form);
   } while (!eof(in) && (!Interactive || in.peek() != '\n'));
   return result;

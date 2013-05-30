@@ -65,10 +65,8 @@ cell* eval(cell* expr) {
 
   result = nil;
   // eval all forms in body, save result of final form
-  for (cell* form = body(fn); form != nil; form=cdr(form)) {
-    rmref(result);
-    result = eval(car(form));
-  }
+  for (cell* form = body(fn); form != nil; form=cdr(form))
+    update(result, eval(car(form)));
   trace("eval") << "=> " << result;
   return result;
 }

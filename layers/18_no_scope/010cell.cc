@@ -166,6 +166,11 @@ struct lease_cell {
 
 #define TEMP(var, cell_expr) cell* var = cell_expr; lease_cell lease_##var(var);
 
+void update(cell*& var, cell* expr) {
+  rmref(var);
+  var = expr;
+}
+
 
 
 //// Tracking leaks.
