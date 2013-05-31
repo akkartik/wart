@@ -13,10 +13,9 @@ void load_file(const char* filename) {
   ifstream f(filename);
   if (f.fail()) return;
   while (!f.eof()) {
-    cell* cell = read(f);
-//?     cerr << cell << '\n';   // uncomment this to track down errors in wart files
-    rmref(eval(cell));
-    rmref(cell);
+    TEMP(form, read(f));
+    trace("dump ") << form << '\n';  // remove trailing space to track down errors in wart files
+    rmref(eval(form));
   }
   Interactive = old_interactive;
 }
