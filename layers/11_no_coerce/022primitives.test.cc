@@ -14,6 +14,18 @@ void test_fn_works() {
   CHECK_EQ(cdr(get(rep(result), sym_body)), nil);
 }
 
+void test_eval_on_fn_is_idempotent() {
+  TEMP(a, eval("(fn(x) x)"));
+  TEMP(result, eval(a));
+  // (object function {sig: (x), body: (x)})
+  CHECK(is_object(result));
+  CHECK_EQ(type(result), sym_function);
+  CHECK_EQ(car(get(rep(result), sym_sig)), new_sym("x"));
+  CHECK_EQ(cdr(get(rep(result), sym_sig)), nil);
+  CHECK_EQ(car(get(rep(result), sym_body)), new_sym("x"));
+  CHECK_EQ(cdr(get(rep(result), sym_body)), nil);
+}
+
 
 
 void test_if_sees_args_in_then_and_else() {
