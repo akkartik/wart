@@ -1,6 +1,6 @@
 //// split input into tokens separated by the following boundaries:
 const string Punctuation_chars = "()#\"";  // the skeleton of a wart program
-const string Quote_and_unquote_chars = ",'`@";   // controlling eval and macros
+const string Quote_and_unquote_chars = "'`,@";  // controlling eval and macros
 
 // Design considered the following:
 //  doing the minimum necessary to support macros later
@@ -31,9 +31,19 @@ token next_token(istream& in) {
   else
     slurp_word(in, out);
 
-  if (out.str() == ":") return next_token(in);
+  if (out.str() == ":") {
+    trace("skip during tokenize") << "comment token";
+    return next_token(in);
+  }
 
+  trace("tokenize") << out.str();
   return token(out.str());
+}
+
+void slurp_unquote(istream& in, ostream& out) {
+  slurp_char(in, out);  // comma
+  if (in.peek() == '@')
+    slurp_char(in, out);
 }
 
 
@@ -68,12 +78,6 @@ void slurp_string(istream& in, ostream& out) {
   }
 }
 
-void slurp_unquote(istream& in, ostream& out) {
-  slurp_char(in, out);   // comma
-  if (in.peek() == '@')
-    slurp_char(in, out); // ..and maybe splice
-}
-
 
 
 void skip_comment(istream& in) {
@@ -94,7 +98,6 @@ void skip_whitespace(istream& in) {
 
 
 
-const size_t NOT_FOUND = string::npos;
 bool find(string s, char c) {
   return s.find(c) != NOT_FOUND;
 }

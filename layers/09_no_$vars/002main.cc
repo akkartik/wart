@@ -15,6 +15,8 @@
 // These weren't the reasons lisp was created; they're the reasons I attribute
 // to its power.
 
+bool Interactive = false;
+
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
     run_tests();
@@ -22,17 +24,12 @@ int main(int argc, unused char* argv[]) {
   }
 
   //// Interactive loop: parse commands from user, evaluate them, print the results
-  interactive_setup();
+  Interactive = true;
+  setup();
   load_files(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (!cin.eof()) {
-    list<cell*> forms = read_all(cin);
-    for (list<cell*>::iterator p = forms.begin(); p != forms.end(); ++p) {
-      cell* result = eval(*p);
-      cout << "=> " << result << '\n';
-      rmref(result);
-      rmref(*p);
-    }
+    cout << "=> " << run(cin) << '\n';
   }
 }
 
@@ -41,51 +38,36 @@ cell* read(istream& in) {
   return mkref(next_cell(in));
 }
 
-// parse a paragraph of expressions until empty line
-list<cell*> read_all(istream& in) {
-  list<cell*> results;
+extern cell* nil;
+
+// In batch mode, evaluate all exprs in input.
+// In interactive mode, evaluate all exprs until empty line.
+// Return value of last expr.
+cell* run(istream& in) {
+  cell* result = nil;
   do {
-    results.push_back(read(in));
-  } while (!in.eof() && in.peek() != '\n');
-  return results;
+    cell* form = read(in);
+    update(result, eval(form));
+    rmref(form);
+  } while (!eof(in) && (!Interactive || in.peek() != '\n'));
+  return result;
+}
+
+bool eof(istream& in) {
+  in.peek();
+  return in.eof();
 }
 
 
 
 //// test harness
 
-
-typedef void (*test_fn)(void);
-
-const test_fn Tests[] = {
-  #include "test_list"
-};
-
-long Num_failures = 0;
-bool Passed = true;
-
-#define CHECK(X) if (!(X)) { \
-    ++Num_failures; \
-    cerr << "\nF " << __FUNCTION__ << ": " << #X << '\n'; \
-    Passed = false; \
-    return; \
-  } \
-  else { cerr << "."; fflush(stderr); }
-
-#define CHECK_EQ(X, Y) if ((X) != (Y)) { \
-    ++Num_failures; \
-    cerr << "\nF " << __FUNCTION__ << ": " << #X << " == " << #Y << '\n'; \
-    cerr << "  got " << (X) << '\n';  /* BEWARE: multiple eval */ \
-    Passed = false; \
-    return; \
-  } \
-  else { cerr << "."; fflush(stderr); }
-
 void run_tests() {
   Do_raise = false;  // for death tests
   time_t t; time(&t);
   cerr << "C tests: " << ctime(&t);
   for (unsigned long i=0; i < sizeof(Tests)/sizeof(Tests[0]); ++i) {
+    START_TRACING_UNTIL_END_OF_SCOPE;
     setup();
     (*Tests[i])();
     verify();
@@ -112,14 +94,6 @@ void verify() {
   if (num_unfreed() > 0) dump_unfreed();
 }
 
-// helper to read from string
-// leaks memory; just for convenient tests
-cell* read(string s) {
-  return read(*new stringstream(s));
-}
-
-
-
 void setup() {
   setup_cells();
   setup_common_syms();
@@ -130,8 +104,20 @@ void setup() {
   Passed = true;
 }
 
-bool Interactive = false;
-void interactive_setup() {
-  setup();
-  Interactive = true;
+
+
+//// helpers for tests
+
+void read_all(string s) {
+  stringstream in(s);
+  do {
+    rmref(read(in));
+  } while (!eof(in));
+  // return nothing; we'll just verify the trace
+}
+
+void run(string s) {
+  stringstream in(s);
+  rmref(run(in));
+  // return nothing; we'll just verify the trace
 }
