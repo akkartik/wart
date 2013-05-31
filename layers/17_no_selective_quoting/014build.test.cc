@@ -64,12 +64,17 @@ void test_build_handles_multiple_atoms() {
 
 void test_build_handles_form() {
   read_all("(34 35)");
-  CHECK_TRACE_TOP("cell", "(34 35)");
+  CHECK_TRACE_CONTENTS("cell", 2, "(34 35)");
+  CHECK_TRACE_CONTENTS("cell", 3, "(35)");
+  CHECK_TRACE_CONTENTS("cell", 4, "nil");
+  CHECK_TRACE_CONTENTS("cell", /*any frame*/ "num: 34num: 35");
 }
 
 void test_build_handles_dotted_list() {
   read_all("(34 ... 35)");
-  CHECK_TRACE_TOP("cell", "(34 ... 35)");
+  CHECK_TRACE_CONTENTS("cell", 2, "(34 ... 35)");
+  CHECK_TRACE_CONTENTS("cell", 3, "num: 35");
+  CHECK_TRACE_CONTENTS("cell", /*any frame*/ "num: 34num: 35");
 }
 
 void test_build_handles_literal_ellipses() {
@@ -81,20 +86,33 @@ void test_build_handles_literal_ellipses() {
 
 void test_build_handles_nested_form() {
   read_all("(3 7 (33 23))");
-  CHECK_TRACE_TOP("cell", "(3 7 (33 23))");
+  CHECK_TRACE_CONTENTS("cell", 2, "(3 7 (33 23))");
+  CHECK_TRACE_CONTENTS("cell", 3, "(7 (33 23))");
+  CHECK_TRACE_CONTENTS("cell", 4, "((33 23))");
+  CHECK_TRACE_CONTENTS("cell", 5, "nil");
+  CHECK_TRACE_CONTENTS("cell", /*any frame*/ "num: 3num: 7num: 33num: 23(33 23)");
 }
 
 void test_build_handles_strings() {
   read_all("(3 7 (33 \"abc\" 23))");
-  CHECK_TRACE_TOP("cell", "(3 7 (33 \"abc\" 23))");
+  CHECK_TRACE_CONTENTS("cell", 2, "(3 7 (33 \"abc\" 23))");
+  CHECK_TRACE_CONTENTS("cell", /*any frame*/ "string: \"abc\"");
 }
 
 void test_build_handles_syms() {
   read_all("(3 7 (33 \"abc\" 3de 23))");
   CHECK_TRACE_TOP("cell", "(3 7 (33 \"abc\" 3de 23))");
+  CHECK_TRACE_CONTENTS("cell", 2, "(3 7 (33 \"abc\" 3de 23))");
+  CHECK_TRACE_CONTENTS("cell", /*any frame*/ "sym: 3de");
 }
 
 void test_build_handles_indented_wrapped_lines() {
   read_all("a\n  (a b c\n   d e)");
   CHECK_TRACE_TOP("cell", "sym: a(a b c d e)");
+  CHECK_TRACE_CONTENTS("cell", 2, "(a b c d e)");
+  CHECK_TRACE_CONTENTS("cell", 3, "(b c d e)");
+  CHECK_TRACE_CONTENTS("cell", 4, "(c d e)");
+  CHECK_TRACE_CONTENTS("cell", 5, "(d e)");
+  CHECK_TRACE_CONTENTS("cell", 6, "(e)");
+  CHECK_TRACE_CONTENTS("cell", 7, "nil");
 }

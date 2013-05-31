@@ -14,6 +14,7 @@ cell* build_cell(ast_node n) {
   }
   if (is_list(n) && n.elems.front() == ")") {
     if (n.elems.size() > 1) RAISE << "Syntax error: ) not at end of expr\n" << die();
+    trace("cell") << "nil";
     return nil;
   }
 
