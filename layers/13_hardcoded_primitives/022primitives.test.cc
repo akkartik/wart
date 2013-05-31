@@ -82,32 +82,23 @@ void test_assign_overrides_lexical_var() {
 
 void test_unbind_works() {
   new_dynamic_scope("x", new_num(3));
-  CHECK_EQ(Dynamics[new_sym("x")].size(), 1);
-  cell* expr = read("(unbind x)");
-  eval(expr);   // always returns nil
-  CHECK_EQ(Dynamics[new_sym("x")].size(), 0);
-  rmref(expr);
+  run("(unbind x)");
+  CHECK_TRACE_CONTENTS("unbind", "x");
 }
 
 void test_unbind_handles_unbound_vars() {
-  CHECK_EQ(Dynamics[new_sym("x")].size(), 0);
-  cell* expr = read("(unbind x)");
-  eval(expr);   // always returns nil
-  CHECK_EQ(Dynamics[new_sym("x")].size(), 0);
-  rmref(expr);
+  run("(unbind x)");
+  CHECK_TRACE_DOESNT_CONTAIN("unbind", "x");
 }
 
 void test_bound_works() {
-  cell* call = read("(bound? 'a)");
-  cell* result1 = eval(call);
-  CHECK_EQ(result1, nil);
+  run("(bound? 'a)");
+  CHECK_TRACE_TOP("eval", "=> nil\n");
+  CLEAR_TRACE;
   new_dynamic_scope("a", new_num(3));
-  cell* result2 = eval(call);
-  CHECK_EQ(result2, new_sym("a"));
-  rmref(result2);
+  run("(bound? 'a)");
+  CHECK_TRACE_TOP("eval", "=> a\n");
   end_dynamic_scope("a");
-  rmref(result1);
-  rmref(call);
 }
 
 void test_equal_handles_nil() {
@@ -123,18 +114,14 @@ void test_equal_handles_floats() {
 void test_equal_handles_float_vs_nil() {
   run("(= nil 1.5)");
   CHECK_EQ(Raise_count, 0);
-  CHECK_TRACE_TOP("eval", "compiled fn\n=> nil\n");
+  CHECK_TRACE_TOP("eval", "=> nil\n");
 }
 
 void test_eval_handles_eval() {
   new_dynamic_scope("a", new_num(34));
   new_dynamic_scope("x", new_sym("a"));
-  cell* call = read("(eval x)");
-  cell* result = eval(call);
-  CHECK_EQ(result, new_num(34));
-  rmref(result);
-  rmref(call);
+  run("(eval x)");
+  CHECK_TRACE_TOP("eval", "=> 34\n");
   end_dynamic_scope("x");
   end_dynamic_scope("a");
 }
-

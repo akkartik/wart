@@ -33,6 +33,7 @@ void end_dynamic_scope(cell* sym) {
     RAISE << "No dynamic binding for " << sym << '\n';
     return;
   }
+  trace("unbind") << sym;
   rmref(sym);
   rmref(bindings.top());
   bindings.pop();

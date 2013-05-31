@@ -71,12 +71,15 @@ cell* eval(cell* expr) {
   eval_bind_all(sig(fn), cdr(expr), vars_bound);
 
   result = nil;
-  if (is_compiledfn(body(fn)))
+  if (is_compiledfn(body(fn))) {
+    trace("eval") << "compiled fn";
     result = to_compiledfn(body(fn))();   // all compiledfns mkref their result
-  else
+  } else {
+    trace("eval") << "fn";
     // eval all forms in body, save result of final form
     for (cell* form = body(fn); form != nil; form=cdr(form))
       update(result, eval(car(form)));
+  }
 
   for (list<cell*>::iterator p = vars_bound.begin(); p != vars_bound.end(); ++p)
     end_dynamic_scope(*p);
