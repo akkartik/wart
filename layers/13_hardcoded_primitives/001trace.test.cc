@@ -1,21 +1,21 @@
 void test_trace_check_compares() {
   CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer") << "foo";
-  CHECK_TRACE_CONTENTS("test layer", "foo\n");
+  CHECK_TRACE_CONTENTS("test layer", "foo");
 }
 
 void test_trace_check_filters_layers() {
   CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 2") << "bar";
-  CHECK_TRACE_CONTENTS("test layer 1", "foo\n");
+  CHECK_TRACE_CONTENTS("test layer 1", "foo");
 }
 
 void test_trace_check_ignores_other_lines() {
   CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 1") << "bar";
-  CHECK_TRACE_CONTENTS("test layer 1", "foo\n");
+  CHECK_TRACE_CONTENTS("test layer 1", "foo");
 }
 
 void test_trace_check_always_finds_empty_lines() {
@@ -29,14 +29,14 @@ void test_trace_check_treats_empty_layers_as_wildcards() {
   CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 2") << "bar";
-  CHECK_TRACE_CONTENTS("", "foo\nbar\n");
+  CHECK_TRACE_CONTENTS("", "foobar");
 }
 
 void test_trace_check_always_finds_empty_lines2() {
   CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 1") << "bar";
-  CHECK_TRACE_CONTENTS("test layer 1", "\n\n\n");
+  CHECK_TRACE_CONTENTS("test layer 1", "");
 }
 
 void test_trace_orders_across_layers() {
@@ -44,7 +44,7 @@ void test_trace_orders_across_layers() {
   trace("test layer 1") << "foo";
   trace("test layer 2") << "bar";
   trace("test layer 1") << "qux";
-  CHECK_TRACE_CONTENTS("", "foo\nbar\nqux\n");
+  CHECK_TRACE_CONTENTS("", "foobarqux");
 }
 
 void test_trace_segments_within_layers() {
@@ -53,8 +53,8 @@ void test_trace_segments_within_layers() {
   trace("test layer 2") << "bar";
   new_trace_frame("test layer 1");
   trace("test layer 1") << "qux";
-  CHECK_TRACE_CONTENTS("test layer 1", "foo\nqux\n");
-  CHECK_TRACE_CONTENTS("test layer 1", 0, "foo\n");
+  CHECK_TRACE_CONTENTS("test layer 1", "fooqux");
+  CHECK_TRACE_CONTENTS("test layer 1", 0, "foo");
 }
 
 void trace_test_fn(int n) {
@@ -68,7 +68,7 @@ void trace_test_fn(int n) {
 void test_trace_keeps_level_together() {
   CHECK_TRACE_CONTENTS("foo", "");
   trace_test_fn(4);
-  CHECK_TRACE_CONTENTS("foo", 2, "before: 3\nafter: 3\n");
+  CHECK_TRACE_CONTENTS("foo", 2, "before: 3after: 3");
 }
 
 void test_trace_supports_multiple_layers() {
@@ -76,7 +76,7 @@ void test_trace_supports_multiple_layers() {
   trace("test layer 1") << "foo";
   trace("test layer 2") << "bar";
   trace("test layer 1") << "qux";
-  CHECK_TRACE_CONTENTS("test layer 1,test layer 2", "foo\nbar\nqux\n");
+  CHECK_TRACE_CONTENTS("test layer 1,test layer 2", "foobarqux");
 }
 
 void test_trace_supports_hierarchical_layers() {
@@ -84,7 +84,7 @@ void test_trace_supports_hierarchical_layers() {
   trace("test layer/a") << "foo";
   trace("different layer/c") << "foo 2";
   trace("test layer/b") << "bar";
-  CHECK_TRACE_CONTENTS("test layer/", "foo\nbar\n");
+  CHECK_TRACE_CONTENTS("test layer/", "foobar");
 }
 
 void test_trace_supports_count() {

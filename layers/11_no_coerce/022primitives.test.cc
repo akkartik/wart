@@ -20,23 +20,23 @@ void test_if_sees_args_in_then_and_else() {
   run("(<- f (fn(x) (if 34 x)))");
   CLEAR_TRACE;
   run("(f 35)");
-  CHECK_TRACE_TOP("eval", "=> 35\n");
+  CHECK_TRACE_TOP("eval", "=> 35");
   end_dynamic_scope("f");
 }
 
 void test_not_works() {
   run("(not 35)");
-  CHECK_TRACE_TOP("eval", "compiled fn\n=> nil\n");
+  CHECK_TRACE_TOP("eval", "compiled fn=> nil");
 }
 
 void test_not_works2() {
   run("(not nil)");
-  CHECK_TRACE_TOP("eval", "compiled fn\n=> 1\n");
+  CHECK_TRACE_TOP("eval", "compiled fn=> 1");
 }
 
 void test_cons_works() {
   run("(cons 1 2)");
-  CHECK_TRACE_TOP("eval", "compiled fn\n=> (1 ... 2)\n");
+  CHECK_TRACE_TOP("eval", "compiled fn=> (1 ... 2)");
 }
 
 void test_assign_to_non_sym_warns() {
@@ -46,7 +46,7 @@ void test_assign_to_non_sym_warns() {
 
 void test_assign_lexical_var() {
   run("((fn (x) (<- x 34) x))");
-  CHECK_TRACE_TOP("eval", "=> 34\n");
+  CHECK_TRACE_TOP("eval", "=> 34");
 }
 
 void test_assign_overrides_dynamic_vars() {
@@ -54,7 +54,7 @@ void test_assign_overrides_dynamic_vars() {
   run("(<- x 5)");
   CLEAR_TRACE;
   run("x");
-  CHECK_TRACE_TOP("eval", "sym\n=> 5\n");
+  CHECK_TRACE_TOP("eval", "sym=> 5");
   end_dynamic_scope("x");
 }
 
@@ -63,7 +63,7 @@ void test_assign_overrides_within_lexical_scope() {
   run("((fn () (<- x 5)))");
   CLEAR_TRACE;
   run("x");
-  CHECK_TRACE_TOP("eval", "sym\n=> 5\n");
+  CHECK_TRACE_TOP("eval", "sym=> 5");
   end_dynamic_scope("x");
 }
 
@@ -71,13 +71,13 @@ void test_assign_never_overrides_lexical_vars_in_caller_scope() {
   run("((fn (x) (<- y x)) 34)");
   CLEAR_TRACE;
   run("y");
-  CHECK_TRACE_CONTENTS("eval", "sym\n=> 34\n");
+  CHECK_TRACE_CONTENTS("eval", "sym=> 34");
   end_dynamic_scope("y");
 }
 
 void test_assign_overrides_lexical_var() {
   run("((fn (x) (<- x 35) (<- x 36) x) 34)");
-  CHECK_TRACE_TOP("eval", "=> 36\n");
+  CHECK_TRACE_TOP("eval", "=> 36");
 }
 
 void test_unbind_works() {
@@ -93,11 +93,11 @@ void test_unbind_handles_unbound_vars() {
 
 void test_bound_works() {
   run("(bound? 'a)");
-  CHECK_TRACE_TOP("eval", "=> nil\n");
+  CHECK_TRACE_TOP("eval", "=> nil");
   CLEAR_TRACE;
   new_dynamic_scope("a", new_num(3));
   run("(bound? 'a)");
-  CHECK_TRACE_TOP("eval", "=> a\n");
+  CHECK_TRACE_TOP("eval", "=> a");
   end_dynamic_scope("a");
 }
 
@@ -114,25 +114,25 @@ void test_bound_checks_only_dynamic_scope_on_nil() {
 
 void test_equal_handles_nil() {
   run("(= nil nil)");
-  CHECK_TRACE_DOESNT_CONTAIN("eval", 1, "=> nil\n");
+  CHECK_TRACE_DOESNT_CONTAIN("eval", 1, "=> nil");
 }
 
 void test_equal_handles_floats() {
   run("(= (/ 3.0 2) 1.5)");
-  CHECK_TRACE_DOESNT_CONTAIN("eval", 1, "=> nil\n");
+  CHECK_TRACE_DOESNT_CONTAIN("eval", 1, "=> nil");
 }
 
 void test_equal_handles_float_vs_nil() {
   run("(= nil 1.5)");
   CHECK_EQ(Raise_count, 0);
-  CHECK_TRACE_TOP("eval", "=> nil\n");
+  CHECK_TRACE_TOP("eval", "=> nil");
 }
 
 void test_eval_handles_eval() {
   new_dynamic_scope("a", new_num(34));
   new_dynamic_scope("x", new_sym("a"));
   run("(eval x)");
-  CHECK_TRACE_TOP("eval", "=> 34\n");
+  CHECK_TRACE_TOP("eval", "=> 34");
   end_dynamic_scope("x");
   end_dynamic_scope("a");
 }
@@ -140,5 +140,5 @@ void test_eval_handles_eval() {
 void test_eval_warns_on_missing_binding() {
   run("(eval 'x nil)");
   CHECK_EQ(Raise_count, 1);   Raise_count=0;
-  CHECK_TRACE_TOP("eval", "=> nil\n");
+  CHECK_TRACE_TOP("eval", "=> nil");
 }
