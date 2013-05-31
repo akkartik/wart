@@ -26,8 +26,12 @@ token next_token(istream& in) {
   else
     slurp_word(in, out);
 
-  if (out.str() == ":") return next_token(in);
+  if (out.str() == ":") {
+    trace("skip during tokenize") << "comment token";
+    return next_token(in);
+  }
 
+  trace("tokenize") << out.str();
   return token(out.str());
 }
 
@@ -83,7 +87,6 @@ void skip_whitespace(istream& in) {
 
 
 
-const size_t NOT_FOUND = string::npos;
 bool find(string s, char c) {
   return s.find(c) != NOT_FOUND;
 }
