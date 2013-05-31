@@ -41,8 +41,11 @@ cell* eval(cell* expr) {
     return mkref(expr);
   }
 
-  if (is_object(expr))
+  if (is_object(expr)) {
+    trace("eval") << "object";
+    trace("eval") << "=> " << expr;
     return mkref(expr);
+  }
 
   if (is_quoted(expr)) {
     trace("eval") << "quote";

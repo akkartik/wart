@@ -37,17 +37,14 @@ void test_eval_handles_quoted_atoms() {
   CHECK_TRACE_CONTENTS("eval", "'a\nquote\n=> a\n'34\nquote\n=> 34\n");
 }
 
+void test_object_expr_evals_to_itself() {
+  run("(object foo 4)");
+  CHECK_TRACE_TOP("eval", "object\n=> (object foo 4)\n");
+}
+
 void test_eval_handles_quoted_lists() {
   run("'(a b)");
   CHECK_TRACE_TOP("eval", "quote\n=> (a b)\n");
-}
-
-void test_object_expr_evals_to_itself() {
-  cell* expr = read("(object foo 4)");
-  cell* result = eval(expr);
-  CHECK_EQ(result, expr);
-  rmref(result);
-  rmref(expr);
 }
 
 
