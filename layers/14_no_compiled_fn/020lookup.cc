@@ -17,6 +17,7 @@ cell* lookup(cell* sym) {
 }
 
 void new_dynamic_scope(cell* sym, cell* val) {
+  trace("bind") << sym << ": " << val;
   mkref(sym);
   mkref(val);
   Dynamics[sym].push(val);
