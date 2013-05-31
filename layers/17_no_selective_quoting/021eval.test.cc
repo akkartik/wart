@@ -8,7 +8,7 @@ void test_num_evals_to_itself() {
   CHECK_TRACE_TOP("eval", "literal\n=> 34\n");
 }
 
-void test_colonsym_evals_to_itself() {
+void test_keyword_sym_evals_to_itself() {
   run(":abc");
   CHECK_TRACE_TOP("eval", "keyword sym\n=> :abc\n");
 }

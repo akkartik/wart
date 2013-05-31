@@ -665,7 +665,7 @@ void test_num_evals_to_itself() {
   rmref(expr);
 }
 
-void test_colonsym_evals_to_itself() {
+void test_keyword_sym_evals_to_itself() {
   cell* expr = read(":abc");
   cell* result = eval(expr);
   CHECK_EQ(result, expr);
