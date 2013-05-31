@@ -19,11 +19,6 @@ list<token> next_expr(istream& in) {
 
 //// internals
 
-bool is_paren(const token& t) {
-  return t == "(" || t == ")";
-}
-
 bool is_quote_or_unquote(const token& t) {
-  return t == "'" || t == "`"
-      || t == "," || t == ",@";
+  return t == "'" || t == "`" || t == "," || t == ",@" || t == "@";
 }

@@ -21,32 +21,57 @@ cell* eval(cell* expr) {
 }
 
 cell* eval(cell* expr, cell* scope) {
+  new_trace_frame("eval");
   if (!expr)
     RAISE << "eval: cell should never be NULL\n" << die();
 
-  if (expr == nil)
+  trace("eval") << expr;
+  if (expr == nil) {
+    trace("eval") << "nil branch";
+    trace("eval") << "=> nil";
     return nil;
+  }
 
-  if (is_keyword_sym(expr))
+  if (is_keyword_sym(expr)) {
+    trace("eval") << "keyword sym";
+    trace("eval") << "=> " << expr;
     return mkref(expr);
+  }
 
-  if (is_sym(expr))
-    return mkref(lookup(expr, scope));
+  if (is_sym(expr)) {
+    trace("eval") << "sym";
+    cell* result = lookup(expr);
+    trace("eval") << "=> " << result;
+    return mkref(result);
+  }
 
-  if (is_atom(expr))
+  if (is_atom(expr)) {
+    trace("eval") << "literal";
+    trace("eval") << "=> " << expr;
     return mkref(expr);
+  }
 
-  if (is_object(expr))
+  if (is_object(expr)) {
+    trace("eval") << "object";
+    trace("eval") << "=> " << expr;
     return mkref(expr);
+  }
 
-  if (is_quoted(expr))
+  if (is_quoted(expr)) {
+    trace("eval") << "quote";
+    trace("eval") << "=> " << cdr(expr);
     return mkref(cdr(expr));
+  }
 
-  if (is_backquoted(expr))
-    return process_unquotes(cdr(expr), 1, scope);  // already mkref'd
+  if (is_backquoted(expr)) {
+    cell* result = process_unquotes(cdr(expr), 1, scope);
+    trace("eval") << "backquote";
+    trace("eval") << "=> " << result;
+    return result;  // already mkref'd
+  }
 
   // expr is a call
-  cell* fn = to_fn(eval(car(expr), scope));
+  TEMP(fn, to_fn(eval(car(expr), scope)));
   if (!is_fn(fn))
     RAISE << "Not a call: " << expr << '\n'
         << "Perhaps you need to split the line in two.\n";
@@ -62,19 +87,20 @@ cell* eval(cell* expr, cell* scope) {
 
   cell* result = nil;
   if (is_compiledfn(body(fn))) {
-    result = to_compiledfn(body(fn))();  // all Compiledfns must mkref result
+    trace("eval") << "compiled fn";
+    result = to_compiledfn(body(fn))();   // all compiledfns mkref their result
   }
   else {
+    trace("eval") << "fn";
     // eval all forms in body, save result of final form
-    for (cell* form = impl(fn); form != nil; form=cdr(form)) {
-      rmref(result);
-      result = eval(car(form), Curr_lexical_scope);
-    }
+    for (cell* form = impl(fn); form != nil; form=cdr(form))
+      update(result, eval(car(form)));
   }
 
   end_lexical_scope();  // implicitly rmrefs new_scope
   end_dynamic_scope(CURR_LEXICAL_SCOPE);
-  rmref(fn);
+
+  trace("eval") << "=> " << result;
   return result;  // already mkref'd
 }
 
@@ -82,22 +108,24 @@ cell* eval(cell* expr, cell* scope) {
 //  quoted params (eval'ing args as necessary; args is never quoted, though)
 //  destructured params
 void eval_bind_all(cell* params, cell* args, cell* scope, cell* new_scope) {
+  trace("eval/bind/all") << params << " <-> " << args;
   if (params == nil)
     return;
 
-  cell* args2 = NULL;
+  TEMP(args2, nil);
   if (is_quoted(params)) {
     params = strip_quote(params);
-    args2 = quote_all(args);
+    args2 = quote_all(args);   // already mkref'd
+    trace("eval/bind/all") << "stripping quote: " << params << " <-> " << args2;
   }
   else {
     args2 = mkref(args);
+    trace("eval/bind/all") << " args nrefs: " << args2->nrefs;
   }
 
   if (is_sym(params)) {
-    cell* val = eval_all(args2, scope);
+    TEMP(val, eval_all(args2, scope));
     bind_params(params, val, new_scope);
-    rmref(val);
   }
 
   else if (!is_cons(params))
@@ -107,11 +135,10 @@ void eval_bind_all(cell* params, cell* args, cell* scope, cell* new_scope) {
     eval_bind_param(car(params), car(args2), scope, new_scope);
     eval_bind_all(cdr(params), cdr(args2), scope, new_scope);
   }
-  rmref(args2);
 }
 
 void eval_bind_param(cell* param, cell* arg, cell* scope, cell* new_scope) {
-  cell* arg2 = NULL;
+  TEMP(arg2, nil);
   if (is_quoted(param)) {
     param = strip_quote(param);
     arg2 = mkref(new_cons(sym_quote, arg));
@@ -119,21 +146,22 @@ void eval_bind_param(cell* param, cell* arg, cell* scope, cell* new_scope) {
   else
     arg2 = mkref(arg);
 
-  cell* val = eval(arg2, scope);
+  TEMP(val, eval(arg2, scope));
   bind_params(param, val, new_scope);
-  rmref(val);
-  rmref(arg2);
 }
 
 void bind_params(cell* params, cell* args, cell* new_scope) {
+  trace("eval/bind/one") << params << " <-> " << args;
   if (is_quoted(params))
     bind_params(strip_quote(params), args, new_scope);
 
   else if (params == nil)
     ;
 
-  else if (is_sym(params))
+  else if (is_sym(params)) {
+    trace("eval/bind/one") << "binding " << params << " to " << args;
     add_lexical_binding(params, args, new_scope);
+  }
 
   else if (!is_cons(params))
     ;
@@ -152,9 +180,8 @@ cell* eval_all(cell* args, cell* scope) {
     return eval(args, scope);
   cell* p_result = new_cell(), *curr = p_result;
   for (; args != nil; args=cdr(args), curr=cdr(curr)) {
-    cell* val = eval(car(args), scope);
+    TEMP(val, eval(car(args), scope));
     add_cons(curr, val);
-    rmref(val);
   }
   return drop_ptr(p_result);
 }
@@ -164,37 +191,45 @@ cell* eval_all(cell* args, cell* scope) {
 //// backquoted exprs
 
 cell* process_unquotes(cell* x, long depth, cell* scope) {
-  if (!is_cons(x)) return mkref(x);
+  new_trace_frame("backquote");
+  trace("backquote") << x << " " << depth;
+  if (!is_cons(x)) {
+    trace("backquote") << "atom: " << x;
+    return mkref(x);
+  }
 
   if (unquote_depth(x) == depth) {
-    return eval(strip_unquote(x), scope);
+    cell* result = eval(strip_unquote(x), scope);
+    trace("backquote") << "eval: " << result;
+    return result;  // already mkref'd
   }
   else if (unquote_splice_depth(car(x)) == depth) {
-    cell* result = eval(strip_unquote_splice(car(x)), scope);
-    cell* splice = process_unquotes(cdr(x), depth, scope);
-    if (result == nil) return splice;
+    TEMP(splice, eval(strip_unquote_splice(car(x)), scope));
+    trace("backquote") << "splice: " << splice;
+    TEMP(rest, process_unquotes(cdr(x), depth, scope));
+    if (splice == nil) return mkref(rest);
 
     // always splice in a copy
-    cell* resultcopy = copy_list(result);
-    rmref(result);
-    append(resultcopy, splice);
-    rmref(splice);
-    return mkref(resultcopy);
+    cell* result = copy_list(splice);
+    append(result, rest);
+    return mkref(result);
   }
   else if (unquote_depth(x) > 0) {
+    trace("backquote") << "not deep enough: " << x;
     return mkref(x);
   }
 
   if (is_backquoted(x)) {
-    cell* result = new_cons(car(x), process_unquotes(cdr(x), depth+1, scope));
-    rmref(cdr(result));
+    TEMP(rest, process_unquotes(cdr(x), depth+1, scope));
+    cell* result = new_cons(car(x), rest);
+    trace("backquote") << "backquote: " << result;
     return mkref(result);
   }
 
-  cell* result = new_cons(process_unquotes(car(x), depth, scope),
-                         process_unquotes(cdr(x), depth, scope));
-  rmref(car(result));
-  rmref(cdr(result));
+  TEMP(head, process_unquotes(car(x), depth, scope));
+  TEMP(tail, process_unquotes(cdr(x), depth, scope));
+  cell* result = new_cons(head, tail);
+  trace("backquote") << "=> " << result;
   return mkref(result);
 }
 
@@ -264,9 +299,10 @@ bool is_fn(cell* x) {
 
 cell* to_fn(cell* x) {
   if (x == nil || is_fn(x)) return x;
+  lease_cell lease(x);  // we assume x is already mkref'd
   if (!lookup_dynamic_binding(sym_Coercions))
     RAISE << "tried to call " << x << '\n' << die();
-  cell* result = coerce_quoted(x, sym_function, lookup(sym_Coercions));   rmref(x);
+  cell* result = coerce_quoted(x, sym_function, lookup(sym_Coercions));
   return result;
 }
 
