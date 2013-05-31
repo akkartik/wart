@@ -1,4 +1,5 @@
 //// insert explicit parens based on indentation
+//// also segment token stream into top-level expressions
 
 // Design considered the following:
 //  keywords in other languages to look different from functions: def, if, while, etc.
@@ -176,8 +177,7 @@ bool is_close_paren(const token& t) {
 }
 
 bool is_quote_or_unquote(const token& t) {
-  return t == "'" || t == "`"
-      || t == "," || t == ",@";
+  return t == "'" || t == "`" || t == "," || t == ",@" || t == "@";
 }
 
 bool is_word(const token& t) {

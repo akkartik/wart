@@ -1,139 +1,86 @@
-void test_lexical_scope_has_nil_cdr_on_startup() {
+void test_Curr_lexical_scope_has_nil_cdr_on_startup() {
   CHECK_EQ(Curr_lexical_scopes.size(), 1);
   CHECK_EQ(cdr(Curr_lexical_scope), nil);
 }
 
 void test_lookup_returns_dynamic_binding() {
-  cell* sym = new_sym("a");
-  CHECK_EQ(sym->nrefs, 1);
+  cell* var = new_sym("a");
   cell* val = new_num(34);
-  CHECK_EQ(val->nrefs, 1);
-  new_dynamic_scope(sym, val);
-    CHECK_EQ(lookup(sym), val);
-    CHECK_EQ(sym->nrefs, 2);
-    CHECK_EQ(val->nrefs, 2);
-  end_dynamic_scope(sym);
-  CHECK_EQ(sym->nrefs, 1);
-  CHECK_EQ(val->nrefs, 1);
+  new_dynamic_scope(var, val);
+    CHECK_EQ(lookup(var), val);
+  end_dynamic_scope(var);
 }
 
 void test_lookup_returns_lexical_binding() {
-  cell* sym = new_sym("a");
-  CHECK_EQ(sym->nrefs, 1);
+  cell* var = new_sym("a");
   cell* val = new_num(34);
-  CHECK_EQ(val->nrefs, 1);
   new_lexical_scope();
-    add_lexical_binding(sym, val);
-      CHECK_EQ(lookup(sym), val);
-      CHECK_EQ(sym->nrefs, 2);
-      CHECK_EQ(val->nrefs, 2);
+    add_lexical_binding(var, val);
+      CHECK_EQ(lookup(var), val);
   end_lexical_scope();
-  CHECK_EQ(sym->nrefs, 1);
-  CHECK_EQ(val->nrefs, 1);
 }
 
 void test_lexical_binding_always_overrides_dynamic() {
-  cell* sym = new_sym("a");
-  CHECK_EQ(sym->nrefs, 1);
+  cell* var = new_sym("a");
   cell* val = new_num(34);
-  CHECK_EQ(val->nrefs, 1);
   cell* dyn_val = new_num(35);
-  CHECK_EQ(dyn_val->nrefs, 1);
-  new_dynamic_scope(sym, dyn_val);
-    CHECK_EQ(sym->nrefs, 2);
-    CHECK_EQ(val->nrefs, 1);
-    CHECK_EQ(dyn_val->nrefs, 2);
+  new_dynamic_scope(var, dyn_val);
     new_lexical_scope();
-      add_lexical_binding(sym, val);
-        CHECK_EQ(lookup(sym), val);
-        CHECK_EQ(sym->nrefs, 3);
-        CHECK_EQ(val->nrefs, 2);
-        CHECK_EQ(dyn_val->nrefs, 2);
+      add_lexical_binding(var, val);
+        CHECK_EQ(lookup(var), val);
     end_lexical_scope();
 
-    CHECK_EQ(lookup(sym), new_num(35));
-    CHECK_EQ(sym->nrefs, 2);
-    CHECK_EQ(val->nrefs, 1);
-    CHECK_EQ(dyn_val->nrefs, 2);
-  end_dynamic_scope(sym);
-  CHECK_EQ(sym->nrefs, 1);
-  CHECK_EQ(val->nrefs, 1);
-  CHECK_EQ(dyn_val->nrefs, 1);
+    CHECK_EQ(lookup(var), new_num(35));
+  end_dynamic_scope(var);
 }
 
 void test_nil_lexical_binding_works() {
-  cell* sym = new_sym("a");
-  CHECK_EQ(sym->nrefs, 1);
+  cell* var = new_sym("a");
   cell* dyn_val = new_num(35);
-  new_dynamic_scope(sym, dyn_val);
+  new_dynamic_scope(var, dyn_val);
     new_lexical_scope();
-      add_lexical_binding(sym, nil);
-        CHECK_EQ(lookup(sym), nil);
+      add_lexical_binding(var, nil);
+        CHECK_EQ(lookup(var), nil);
     end_lexical_scope();
-  end_dynamic_scope(sym);
+  end_dynamic_scope(var);
 }
 
 void test_lexical_scopes_nest_correctly() {
-  cell* sym = new_sym("a");
-  CHECK_EQ(sym->nrefs, 1);
+  cell* var = new_sym("a");
   cell* val = new_num(34);
-  CHECK_EQ(val->nrefs, 1);
   cell* val2 = new_num(35);
-  CHECK_EQ(val->nrefs, 1);
   cell* dyn_val = new_num(36);
-  CHECK_EQ(dyn_val->nrefs, 1);
-  new_dynamic_scope(sym, dyn_val);
-    CHECK_EQ(sym->nrefs, 2);
-    CHECK_EQ(val->nrefs, 1);
-    CHECK_EQ(val2->nrefs, 1);
-    CHECK_EQ(dyn_val->nrefs, 2);
+  new_dynamic_scope(var, dyn_val);
     new_lexical_scope();
       CHECK(Curr_lexical_scope != nil);
-      CHECK_EQ(Curr_lexical_scope->nrefs, 1);
-      add_lexical_binding(sym, val);
-        CHECK_EQ(lookup(sym), val);
-        CHECK_EQ(sym->nrefs, 3);
-        CHECK_EQ(val->nrefs, 2);
-        CHECK_EQ(val2->nrefs, 1);
-        CHECK_EQ(dyn_val->nrefs, 2);
+      add_lexical_binding(var, val);
+        CHECK_EQ(lookup(var), val);
         new_lexical_scope();
-          CHECK_EQ(cdr(Curr_lexical_scope)->nrefs, 2);
-          CHECK_EQ(Curr_lexical_scope->nrefs, 1);
-          add_lexical_binding(sym, val2);
-            CHECK_EQ(lookup(sym), val2);
-            CHECK_EQ(sym->nrefs, 4);
-            CHECK_EQ(val->nrefs, 2);
-            CHECK_EQ(val2->nrefs, 2);
-            CHECK_EQ(dyn_val->nrefs, 2);
+          add_lexical_binding(var, val2);
+            CHECK_EQ(lookup(var), val2);
         end_lexical_scope();
-      CHECK_EQ(Curr_lexical_scope->nrefs, 1);
-      CHECK_EQ(sym->nrefs, 3);
-      CHECK_EQ(val->nrefs, 2);
-      CHECK_EQ(val2->nrefs, 1);
-      CHECK_EQ(dyn_val->nrefs, 2);
     end_lexical_scope();
-    CHECK_EQ(lookup(sym), dyn_val);
-    CHECK_EQ(sym->nrefs, 2);
-    CHECK_EQ(val->nrefs, 1);
-    CHECK_EQ(val2->nrefs, 1);
-    CHECK_EQ(dyn_val->nrefs, 2);
-  end_dynamic_scope(sym);
-  CHECK_EQ(sym->nrefs, 1);
-  CHECK_EQ(val->nrefs, 1);
-  CHECK_EQ(val2->nrefs, 1);
-  CHECK_EQ(dyn_val->nrefs, 1);
+    CHECK_EQ(lookup(var), dyn_val);
+  end_dynamic_scope(var);
 }
 
 void test_lower_lexical_scopes_are_available() {
-  cell* sym = new_sym("a");
-  CHECK_EQ(sym->nrefs, 1);
+  cell* var = new_sym("a");
   cell* val = new_num(34);
-  CHECK_EQ(val->nrefs, 1);
   new_lexical_scope();
-    add_lexical_binding(sym, val);
-      CHECK_EQ(lookup(sym), val);
+    add_lexical_binding(var, val);
+      CHECK_EQ(lookup(var), val);
       new_lexical_scope();
-        CHECK_EQ(lookup(sym), val);
+        CHECK_EQ(lookup(var), val);
       end_lexical_scope();
   end_lexical_scope();
+}
+
+void test_new_dynamic_scope_increments_refcounts() {
+  cell* var = new_sym("a");
+  cell* val = new_num(34);
+  CLEAR_TRACE;
+  new_dynamic_scope(var, val);
+    CHECK_EQ(excess_mkrefs(), 2);   // one for var, one for val
+  end_dynamic_scope(var);
 }

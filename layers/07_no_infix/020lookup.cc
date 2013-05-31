@@ -41,6 +41,7 @@ cell* lookup_dynamic_binding(cell* sym) {
 }
 
 void new_dynamic_scope(cell* sym, cell* val) {
+  trace("bind") << sym << ": " << val;
   mkref(sym);
   mkref(val);
   Dynamics[sym].push(val);
@@ -56,6 +57,7 @@ void end_dynamic_scope(cell* sym) {
     RAISE << "No dynamic binding for " << sym << '\n';
     return;
   }
+  trace("unbind") << sym;
   rmref(sym);
   rmref(bindings.top());
   bindings.pop();
@@ -124,6 +126,7 @@ void add_lexical_scope(cell* new_scope) {
 void add_lexical_binding(cell* sym, cell* val, cell* scope) {
   if (unsafe_get(scope, sym))
     RAISE << "Can't rebind within a lexical scope\n" << die();
+  trace("bind") << sym << ": " << val;
   unsafe_set(scope, sym, val, false);  // deleting nil might expose a shadowed binding
 }
 
