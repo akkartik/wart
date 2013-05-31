@@ -207,8 +207,7 @@ void eval_bind_all(cell* params, cell* args, list<cell*>& vars_bound) {
   if (params == nil)
     return;
 
-  cell* args2 = NULL;
-//?   TEMP(args2, nil);
+  TEMP(args2, nil);
   if (is_quoted(params)) {
     params = strip_quote(params);
     args2 = quote_all(args);   // already mkref'd
@@ -232,12 +231,10 @@ void eval_bind_all(cell* params, cell* args, list<cell*>& vars_bound) {
     eval_bind_param(car(params), car(args2), vars_bound);
     eval_bind_all(cdr(params), cdr(args2), vars_bound);
   }
-  rmref(args2);
 }
 
 void eval_bind_param(cell* param, cell* arg, list<cell*>& vars_bound) {
-  cell* arg2 = NULL;
-//?   TEMP(arg2, nil);
+  TEMP(arg2, nil);
   if (is_quoted(param)) {
     param = strip_quote(param);
     arg2 = mkref(new_cons(sym_quote, arg));
@@ -247,7 +244,6 @@ void eval_bind_param(cell* param, cell* arg, list<cell*>& vars_bound) {
 
   TEMP(val, eval(arg2));
   bind_params(param, val, vars_bound);
-  rmref(arg2);
 }
 
 void bind_params(cell* params, cell* args, list<cell*>& vars_bound) {

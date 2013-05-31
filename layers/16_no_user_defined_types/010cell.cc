@@ -181,9 +181,12 @@ long excess_mkrefs() {
 
 // RAII for temporaries
 struct lease_cell {
-  cell* value;
-  lease_cell(cell* v) :value(v) {}
-  ~lease_cell() { rmref(value); }
+  cell*& value;   // reference allows us to track changes to the underlying temporary
+  lease_cell(cell*& v) :value(v) {}
+  ~lease_cell() {
+    trace("gc/out of scope") << value;
+    rmref(value);
+  }
 };
 
 #define TEMP(var, cell_expr) cell* var = cell_expr; lease_cell lease_##var(var);
