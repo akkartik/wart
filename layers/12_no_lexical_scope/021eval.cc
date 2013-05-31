@@ -11,29 +11,50 @@
 //  passing in lists to functions: ((fn ((x y)) (+ x y)) '(3 4)) => 7
 
 cell* eval(cell* expr) {
+  new_trace_frame("eval");
   if (!expr)
     RAISE << "eval: cell should never be NULL\n" << die();
 
-  if (expr == nil)
+  trace("eval") << expr;
+  if (expr == nil) {
+    trace("eval") << "nil branch";
+    trace("eval") << "=> nil";
     return nil;
+  }
 
-  if (is_keyword_sym(expr))
+  if (is_keyword_sym(expr)) {
+    trace("eval") << "keyword sym";
+    trace("eval") << "=> " << expr;
     return mkref(expr);
+  }
 
-  if (is_sym(expr))
-    return mkref(lookup(expr));
+  if (is_sym(expr)) {
+    trace("eval") << "sym";
+    cell* result = lookup(expr);
+    trace("eval") << "=> " << result;
+    return mkref(result);
+  }
 
-  if (is_atom(expr))
+  if (is_atom(expr)) {
+    trace("eval") << "literal";
+    trace("eval") << "=> " << expr;
     return mkref(expr);
+  }
 
-  if (is_object(expr))
+  if (is_object(expr)) {
+    trace("eval") << "object";
+    trace("eval") << "=> " << expr;
     return mkref(expr);
+  }
 
-  if (is_quoted(expr))
+  if (is_quoted(expr)) {
+    trace("eval") << "quote";
+    trace("eval") << "=> " << cdr(expr);
     return mkref(cdr(expr));
+  }
 
   // expr is a call
-  cell* fn = eval(car(expr));
+  TEMP(fn, eval(car(expr)));
   if (!is_fn(fn))
     RAISE << "Not a call: " << expr << '\n'
         << "Perhaps you need to split the line in two.\n";
@@ -44,19 +65,19 @@ cell* eval(cell* expr) {
 
   cell* result = nil;
   if (is_compiledfn(body(fn))) {
-    result = to_compiledfn(body(fn))();  // all Compiledfns must mkref result
-  }
-  else {
+    trace("eval") << "compiled fn";
+    result = to_compiledfn(body(fn))();   // all compiledfns mkref their result
+  } else {
+    trace("eval") << "fn";
     // eval all forms in body, save result of final form
-    for (cell* form = impl(fn); form != nil; form=cdr(form)) {
-      rmref(result);
-      result = eval(car(form));
-    }
+    for (cell* form = body(fn); form != nil; form=cdr(form))
+      update(result, eval(car(form)));
   }
 
   for (list<cell*>::iterator p = vars_bound.begin(); p != vars_bound.end(); ++p)
     end_dynamic_scope(*p);
-  rmref(fn);
+
+  trace("eval") << "=> " << result;
   return result;  // already mkref'd
 }
 
@@ -64,22 +85,26 @@ cell* eval(cell* expr) {
 //  quoted params (eval'ing args as necessary; args is never quoted, though)
 //  destructured params
 void eval_bind_all(cell* params, cell* args, list<cell*>& vars_bound) {
+  trace("eval/bind/all") << "first args nrefs: " << car(args) << " " << car(args)->nrefs;
+  trace("eval/bind/all") << params << " <-> " << args;
   if (params == nil)
     return;
 
-  cell* args2 = NULL;
+  TEMP(args2, nil);
   if (is_quoted(params)) {
     params = strip_quote(params);
-    args2 = quote_all(args);
+    args2 = quote_all(args);   // already mkref'd
+    trace("eval/bind/all") << "stripping quote: " << params << " <-> " << args2;
   }
   else {
     args2 = mkref(args);
+    trace("eval/bind/all") << " args nrefs: " << args2->nrefs;
+    trace("eval/bind/all") << " first args nrefs: " << car(args2)->nrefs;
   }
 
   if (is_sym(params)) {
-    cell* val = eval_all(args2);
+    TEMP(val, eval_all(args2));
     bind_params(params, val, vars_bound);
-    rmref(val);
   }
 
   else if (!is_cons(params))
@@ -89,11 +114,10 @@ void eval_bind_all(cell* params, cell* args, list<cell*>& vars_bound) {
     eval_bind_param(car(params), car(args2), vars_bound);
     eval_bind_all(cdr(params), cdr(args2), vars_bound);
   }
-  rmref(args2);
 }
 
 void eval_bind_param(cell* param, cell* arg, list<cell*>& vars_bound) {
-  cell* arg2 = NULL;
+  TEMP(arg2, nil);
   if (is_quoted(param)) {
     param = strip_quote(param);
     arg2 = mkref(new_cons(sym_quote, arg));
@@ -101,13 +125,12 @@ void eval_bind_param(cell* param, cell* arg, list<cell*>& vars_bound) {
   else
     arg2 = mkref(arg);
 
-  cell* val = eval(arg2);
+  TEMP(val, eval(arg2));
   bind_params(param, val, vars_bound);
-  rmref(val);
-  rmref(arg2);
 }
 
 void bind_params(cell* params, cell* args, list<cell*>& vars_bound) {
+  trace("eval/bind/one") << params << " <-> " << args;
   if (is_quoted(params))
     bind_params(strip_quote(params), args, vars_bound);
 
@@ -115,6 +138,7 @@ void bind_params(cell* params, cell* args, list<cell*>& vars_bound) {
     ;
 
   else if (is_sym(params)) {
+    trace("eval/bind/one") << "binding " << params << " to " << args;
     new_dynamic_scope(params, args);
     vars_bound.push_back(params);
   }
@@ -136,9 +160,8 @@ cell* eval_all(cell* args) {
     return eval(args);
   cell* p_result = new_cell(), *curr = p_result;
   for (; args != nil; args=cdr(args), curr=cdr(curr)) {
-    cell* val = eval(car(args));
+    TEMP(val, eval(car(args)));
     add_cons(curr, val);
-    rmref(val);
   }
   return drop_ptr(p_result);
 }
@@ -173,11 +196,6 @@ cell* sig(cell* fn) {
 
 cell* body(cell* fn) {
   return get(rep(fn), sym_body);
-}
-
-cell* impl(cell* fn) {
-  cell* impl = get(rep(fn), sym_optimized_body);
-  return (impl != nil) ? impl : body(fn);
 }
 
 cell* quote(cell* x) {

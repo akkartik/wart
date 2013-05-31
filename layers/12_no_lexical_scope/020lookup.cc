@@ -17,6 +17,7 @@ cell* lookup(cell* sym) {
 }
 
 void new_dynamic_scope(cell* sym, cell* val) {
+  trace("bind") << sym << ": " << val;
   mkref(sym);
   mkref(val);
   Dynamics[sym].push(val);
@@ -32,6 +33,7 @@ void end_dynamic_scope(cell* sym) {
     RAISE << "No dynamic binding for " << sym << '\n';
     return;
   }
+  trace("unbind") << sym;
   rmref(sym);
   rmref(bindings.top());
   bindings.pop();

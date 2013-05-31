@@ -1,5 +1,5 @@
 wart_bin: makefile type_list function_list file_list test_file_list test_list compiledfn_list
-	g++ -O3 -Wall -Wextra -fno-strict-aliasing boot.cc -o wart_bin
+	g++ -g -Wall -Wextra -fno-strict-aliasing boot.cc -o wart_bin
 	@echo
 
 type_list: boot.cc [0-9]*.cc
