@@ -30,8 +30,6 @@ cell* type(cell* x) {
     return sym_string;
   case TABLE:
     return sym_table;
-  case COMPILED_FN:
-    return sym_function;
   case CONS:
     if (is_object(x))
       return car(cdr(x));

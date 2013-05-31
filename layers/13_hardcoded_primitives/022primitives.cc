@@ -26,7 +26,7 @@ COMPILE_FN(unbind, compiledfn_unbind, "('$var)",
   return nil;
 )
 
-COMPILE_FN(bound?, compiledfn_is_bound, "($var $scope)",
+COMPILE_FN(bound?, compiledfn_isBound, "($var $scope)",
   cell* var = lookup("$var");
   if (var == nil) return mkref(new_num(1));
   if (Dynamics[var].empty()) return nil;
