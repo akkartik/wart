@@ -1,7 +1,7 @@
 void test_to_float_works() {
   cell* num1 = new_num(3);
   CHECK(equal_floats(to_float(num1), 3.0));
-  cell* num2 = new_num(1.5);
+  TEMP(num2, new_num(1.5));
   CHECK(equal_floats(to_float(num2), 1.5));
 }
 
@@ -16,7 +16,7 @@ void test_integers_are_interned() {
 
 void test_floats_are_not_interned() {
   CLEAR_TRACE;
-  cell* num = new_num(1.0);
+  TEMP(num, new_num(1.0));
   CHECK_EQ(num->type, FLOAT);
   CHECK_EQ(trace_count("gc", "alloc"), 1);
   CHECK_TRACE_DOESNT_CONTAIN("gc", "mkref");
@@ -32,7 +32,7 @@ void test_syms_are_interned() {
 
 void test_strings_are_not_interned() {
   CLEAR_TRACE;
-  cell* s = new_string("a");
+  TEMP(s, new_string("a"));
   CHECK_EQ(s->nrefs, 0);
   CHECK_TRACE_DOESNT_CONTAIN("gc", "mkref");
 }

@@ -4,14 +4,14 @@ void test_pointers_from_nil_are_nil() {
 }
 
 void test_new_cell_has_nil_car_and_cdr() {
-  cell* x = new_cell();
+  TEMP(x, new_cell());
   CHECK_EQ(x->car, nil);
   CHECK_EQ(x->cdr, nil);
 }
 
 void test_new_cell_doesnt_mkref() {
   CLEAR_TRACE;
-  new_cell();
+  TEMP(dummy, new_cell());
   CHECK_EQ(trace_count("gc", "alloc"), 1);
   CHECK_TRACE_DOESNT_CONTAIN("gc", "mkref");
 }
