@@ -67,7 +67,8 @@ cell* eval(cell* expr) {
   if (is_compiledfn(body(fn))) {
     trace("eval") << "compiled fn";
     result = to_compiledfn(body(fn))();   // all compiledfns mkref their result
-  } else {
+  }
+  else {
     trace("eval") << "fn";
     // eval all forms in body, save result of final form
     for (cell* form = body(fn); form != nil; form=cdr(form))

@@ -84,7 +84,8 @@ cell* new_cell() {
     trace("gc/alloc") << "reuse";
     result = Free_cells;
     Free_cells = Free_cells->cdr;
-  } else {
+  }
+  else {
     trace("gc/alloc") << "new";
     if (Curr_cell == CELLS_PER_HEAP)
       grow_heap();
