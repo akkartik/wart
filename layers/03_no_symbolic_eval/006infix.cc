@@ -24,29 +24,44 @@
 const string Extra_sym_chars = "$?!_:";  // besides letters and digits
 
 ast_node transform_infix(ast_node n) {
+  new_trace_frame("infix");
   // special-case: ellipses are for dotted lists, not infix
-  if (is_atom(n) && n.atom.value == "...")
+  if (is_atom(n) && n.atom.value == "...") {
+    trace("infix") << "ignoring ellipses " << n;
     return n;
+  }
 
-  if (is_atom(n) && n.atom.value[0] == '\"')
+  if (is_atom(n) && n.atom.value[0] == '\"') {
+    trace("infix") << "string: " << n;
     return n;
+  }
 
-  if (is_atom(n) && is_parseable_as_float(n.atom.value))
+  if (is_atom(n) && is_parseable_as_float(n.atom.value)) {
+    trace("infix") << "skipping float " << n;
     return n;
+  }
 
-  if (is_atom(n) && !contains_infix_char(n.atom.value))
+  if (is_atom(n) && !contains_infix_char(n.atom.value)) {
+    trace("infix") << "skipping " << n;
     return n;
+  }
 
   if (is_atom(n))
     n = tokenize_infix(n);
-  if (is_atom(n))
+  if (is_atom(n)) {
+    trace("infix") << "didn't tokenize " << n;
     return n;
+  }
 
   if (is_quote_or_unquote(n.elems.front())) {
     list<ast_node>::iterator p = n.elems.begin();
     while (is_quote_or_unquote(*p)) {
+      trace("infix") << "skipping past " << *p;
       ++p;
-      if (p == n.elems.end()) return n;
+      if (p == n.elems.end()) {
+        trace("infix") << "just quotes/unquotes " << n;
+        return n;
+      }
     }
     ast_node result = (p == --n.elems.end())
         ? transform_infix(*p)
@@ -62,14 +77,20 @@ ast_node transform_infix(ast_node n) {
     }
   }
 
-  if (n.elems.front() != token("("))
+  if (n.elems.front() != token("(")) {
+    trace("infix") << "not a list " << n;
     return n;
+  }
 
-  if (n.elems.size() == 2)  //// ()
+  if (n.elems.size() == 2) {
+    trace("infix") << "nil: " << n;
     return n;
+  }
 
-  if (is_infix_call_without_args(n))
-    return *++n.elems.begin();  //// (++) => ++
+  if (is_infix_call_without_args(n)) {
+    trace("infix") << "extracting solo infix op from " << n;
+    return *++n.elems.begin();
+  }
 
   int old_size = n.elems.size();
 
@@ -124,9 +145,13 @@ ast_node transform_infix(ast_node n) {
   }
 
   // (a + b) will have become ((+ a b)); strip out one pair of parens
-  if (n.elems.size() == 3 && old_size > 3)
+  if (n.elems.size() == 3 && old_size > 3) {
+    trace("infix") << "munging solo pinched result " << n;
+    trace("infix") << "=> " << *++n.elems.begin();
     return *++n.elems.begin();
+  }
 
+  trace("infix") << "=> " << n;
   return n;
 }
 

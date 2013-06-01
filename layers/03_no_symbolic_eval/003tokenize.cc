@@ -1,11 +1,11 @@
 //// split input into tokens separated by newlines, indent, and the following boundaries:
 const string Punctuation_chars = "()#\"";  // the skeleton of a wart program
-const string Quote_and_unquote_chars = ",'`@";   // controlling eval and macros
+const string Quote_and_unquote_chars = "'`,@";  // controlling eval and macros
 
 // Design considered the following:
 //  doing the minimum necessary to support macros later
 //    so backquote and unquote and splice are supported
-//    so infix ops are ignored
+//    so infix ops and implicit gensyms are ignored
 //  supporting whitespace sensitivity
 //    preserve indent information because later passes can't recreate it
 //    skip indent in empty lines
@@ -53,12 +53,14 @@ token next_token(indent_sensitive_stream& in) {
   if (in.fd.peek() == '\n') {
     in.fd.get();
     in.at_start_of_line = true;
+    trace("tokenize") << token::Newline();
     return token::Newline();
   }
 
   if (in.at_start_of_line) {
     // still here? no comment or newline?
     in.at_start_of_line = false;
+    trace("tokenize") << maybe_indent;
     return maybe_indent;
   }
 
@@ -74,9 +76,19 @@ token next_token(indent_sensitive_stream& in) {
   else
     slurp_word(in.fd, out);
 
-  if (out.str() == ":") return next_token(in);
+  if (out.str() == ":") {
+    trace("skip during tokenize") << "comment token";
+    return next_token(in);
+  }
 
+  trace("tokenize") << out.str();
   return token(out.str());
+}
+
+void slurp_unquote(istream& in, ostream& out) {
+  slurp_char(in, out);  // comma
+  if (in.peek() == '@')
+    slurp_char(in, out);
 }
 
 
@@ -109,12 +121,6 @@ void slurp_string(istream& in, ostream& out) {
     else if (c == '"')
       break;
   }
-}
-
-void slurp_unquote(istream& in, ostream& out) {
-  slurp_char(in, out);   // comma
-  if (in.peek() == '@')
-    slurp_char(in, out); // ..and maybe splice
 }
 
 
@@ -152,7 +158,6 @@ void skip_whitespace(istream& in) {
 
 
 
-const size_t NOT_FOUND = string::npos;
 bool find(string s, char c) {
   return s.find(c) != NOT_FOUND;
 }
