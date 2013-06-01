@@ -19,6 +19,7 @@ cell* lookup(string s) {
 
 // keep_already_evald is for supporting @args in macro calls
 cell* lookup(cell* sym, cell* scope, bool keep_already_evald) {
+  trace("already_evald") << "lookup " << sym << " " << keep_already_evald;
   cell* result = lookup_lexical_binding(sym, scope);
   if (result) return maybe_strip_already_evald(keep_already_evald, result);
   result = lookup_dynamic_binding(sym);
@@ -46,6 +47,7 @@ cell* lookup_dynamic_binding(cell* sym) {
 }
 
 void new_dynamic_scope(cell* sym, cell* val) {
+  trace("bind") << sym << ": " << val;
   mkref(sym);
   mkref(val);
   Dynamics[sym].push(val);
@@ -61,6 +63,7 @@ void end_dynamic_scope(cell* sym) {
     RAISE << "No dynamic binding for " << sym << '\n';
     return;
   }
+  trace("unbind") << sym;
   rmref(sym);
   rmref(bindings.top());
   bindings.pop();
@@ -129,6 +132,7 @@ void add_lexical_scope(cell* new_scope) {
 void add_lexical_binding(cell* sym, cell* val, cell* scope) {
   if (unsafe_get(scope, sym))
     RAISE << "Can't rebind within a lexical scope\n" << die();
+  trace("bind") << sym << ": " << val;
   unsafe_set(scope, sym, val, false);  // deleting nil might expose a shadowed binding
 }
 
