@@ -210,7 +210,10 @@ cell* eval_arg(cell* arg, cell* scope) {
 //// process :keyword args and reorder args to param order
 
 cell* reorder_keyword_args(cell* args, cell* params) {
-  if (!is_cons(strip_quote(params))) return mkref(args);
+  if (!is_cons(strip_quote(params))) {
+    trace("ordered_args") << "unchanged: " << args;
+    return mkref(args);
+  }
 
   cell_map keyword_args;  // all values will be refcounted.
   cell* non_keyword_args = extract_keyword_args(params, args, keyword_args);
@@ -218,6 +221,7 @@ cell* reorder_keyword_args(cell* args, cell* params) {
 
   for (cell_map::iterator p = keyword_args.begin(); p != keyword_args.end(); ++p)
     if (p->second) rmref(p->second);
+  trace("ordered_args") << "=> " << result;
   return result;  // already mkref'd
 }
 

@@ -433,189 +433,86 @@ void test_eval_splice_on_backquoteless_macros_warns() {
 
 
 void test_reorder_keyword_args_keeps_nil_rest_args() {
-  CHECK_EQ(reorder_keyword_args(nil, new_sym("a")), nil);
-  cell* params = mkref(new_cons(sym_quote, new_sym("a")));
-  CHECK_EQ(reorder_keyword_args(nil, params), nil);
-  rmref(params);
+  run("((fn a 3) nil)");
+  CHECK_TRACE_CONTENTS("ordered_args", "unchanged: (nil)");
+  run("((fn 'a 3) nil)");
+  CHECK_TRACE_CONTENTS("ordered_args", "unchanged: (nil)");
 }
 
 void test_reorder_keyword_args_handles_improper_lists() {
-  cell* args = mkref(new_cons(new_num(3), new_num(4)));
-  cell* params = mkref(new_cons(new_sym("a"), new_sym("b")));
-  cell* ordered_args = reorder_keyword_args(args, params);
-  // args == ordered_args
-  CHECK_EQ(car(ordered_args), car(args));
-  CHECK_EQ(cdr(ordered_args), cdr(args));
-  rmref(ordered_args);
-  rmref(args);
-  rmref(params);
+  TEMP(args, read("(3 ... 4)"));
+  TEMP(params, read("(a ... b)"));
+  rmref(reorder_keyword_args(args, params));
+  CHECK_TRACE_CONTENTS("ordered_args", "=> (3 ... 4)");
 }
 
 void test_reorder_keyword_args_handles_overlong_lists() {
-  cell* args = mkref(new_cons(new_num(3), new_cons(new_num(4), new_cons(new_num(5)))));  // (3 4 5)
-  cell* params = mkref(new_cons(new_sym("a"), new_cons(new_sym("b"))));  // (a b)
-  cell* ordered_args = reorder_keyword_args(args, params);
-  // args == ordered_args
-  CHECK_EQ(car(ordered_args), car(args));
-  CHECK_EQ(car(cdr(ordered_args)), car(cdr(args)));
-  CHECK_EQ(car(cdr(cdr(ordered_args))), car(cdr(cdr(args))));
-  rmref(ordered_args);
-  rmref(args);
-  rmref(params);
+  run("((fn (a b) 3) 3 4 5)");
+  CHECK_TRACE_CONTENTS("ordered_args", "=> (3 4 5)");
 }
 
-void test_eval_handles_keyword_args_for_fns() {
-  cell* fn = read("(fn (a b c) c)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f :c 1 2)");
-  cell* result = eval(call);
-  CHECK_EQ(result, new_num(1));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
+void test_eval_handles_keyword_args() {
+  run("((fn (a b c) c) :c 1 2)");
+  CHECK_TRACE_CONTENTS("ordered_args", "=> (2 nil 1)");
+  CHECK_TRACE_TOP("eval", "=> 1");
 }
 
-void test_eval_handles_quoted_keyword_args_for_fns() {
-  cell* fn = read("(fn (a b 'c) c)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f :c 1 2)");
-  cell* result = eval(call);
-  CHECK_EQ(result, new_num(1));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
+void test_eval_handles_quoted_keyword_args() {
+  run("((fn (a b 'c) c) :c 1 2)");
+  CHECK_TRACE_CONTENTS("ordered_args", "=> (2 nil 1)");
+  CHECK_TRACE_TOP("eval", "=> 1");
 }
 
-void test_eval_handles_quoted_keyword_args_for_fns2() {
-  cell* fn = read("(fn '(a b) b)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f :b 1 2)");
-  cell* result = eval(call);
-  CHECK_EQ(result, new_num(1));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
+void test_eval_handles_quoted_keyword_args2() {
+  run("x <- 1");
+  run("((fn (a b 'c) c) :c x 2)");
+  CHECK_TRACE_CONTENTS("ordered_args", "=> (2 nil x)");
+  CHECK_TRACE_TOP("eval", "=> x");
+  end_dynamic_scope("x");
 }
 
-void test_eval_handles_rest_keyword_arg_at_end() {
-  cell* fn = read("(fn (a ... b) b)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f 2 :b 1 3)");
-  cell* result = eval(call);
-  // (1 3)
-  CHECK_EQ(car(result), new_num(1));
-  CHECK_EQ(car(cdr(result)), new_num(3));
-  CHECK_EQ(cdr(cdr(result)), nil);
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
+void test_eval_handles_rest_keyword_arg() {
+  run("((fn (a ... b) b) 2 :b 1 3)");
+  CHECK_TRACE_CONTENTS("ordered_args", "=> (2 1 3)");
+  CHECK_TRACE_TOP("eval", "=> (1 3)");
 }
 
 void test_eval_handles_rest_keyword_arg_at_end2() {
-  cell* fn = read("(fn (a ... b) b)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f :b 1 2 3)");
-  cell* result = eval(call);
-  // (1 2 3)
-  CHECK_EQ(car(result), new_num(1));
-  CHECK_EQ(car(cdr(result)), new_num(2));
-  CHECK_EQ(car(cdr(cdr(result))), new_num(3));
-  CHECK_EQ(cdr(cdr(cdr(result))), nil);
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
+  run("((fn (a ... b) b) :b 1 2 3)");
+  CHECK_TRACE_CONTENTS("ordered_args", "=> (nil 1 2 3)");
+  CHECK_TRACE_TOP("eval", "=> (1 2 3)");
 }
 
 void test_eval_handles_args_after_rest_keyword() {
-  cell* fn = read("(fn (a ... b) b)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f :b 1 2 :a 3)");
-  cell* result = eval(call);
-  // (1 2)
-  CHECK_EQ(car(result), new_num(1));
-  CHECK_EQ(car(cdr(result)), new_num(2));
-  CHECK_EQ(cdr(cdr(result)), nil);
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
+  run("((fn (a ... b) b) :b 1 2 :a 3)");
+  CHECK_TRACE_CONTENTS("ordered_args", "=> (3 1 2)");
+  CHECK_TRACE_TOP("eval", "=> (1 2)");
 }
 
 void test_eval_handles_quoted_rest_keyword_arg() {
-  cell* fn = read("(fn (a ... 'b) b)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f :b 1 2 3)");
-  cell* result = eval(call);
-  // (1 2 3)
-  CHECK_EQ(car(result), new_num(1));
-  CHECK_EQ(car(cdr(result)), new_num(2));
-  CHECK_EQ(car(cdr(cdr(result))), new_num(3));
-  CHECK_EQ(cdr(cdr(cdr(result))), nil);
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
+  run("x <- 2");
+  run("((fn (a ... 'b) b) :b 1 x 3)");
+  CHECK_TRACE_CONTENTS("ordered_args", "=> (nil 1 x 3)");
+  CHECK_TRACE_TOP("eval", "=> (1 x 3)");
+  end_dynamic_scope("x");
 }
 
 void test_eval_handles_non_keyword_arg_colon_syms() {
-  cell* fn = read("(fn (a b) b)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f :x 1)");
-  cell* result = eval(call);
-  CHECK_EQ(result, new_num(1));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
+  run("((fn (a b) a) :x 1)");
+  CHECK_TRACE_CONTENTS("ordered_args", "=> (:x 1)");
+  CHECK_TRACE_TOP("eval", "=> :x");
 }
 
 void test_eval_handles_keyword_args_inside_splice() {
-  cell* fn = read("(fn (a b) b)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f @'(3 :a 4))");
-  cell* result = eval(call);
-  CHECK_EQ(result, new_num(3));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
+  run("((fn (a b) b) @'(3 :a 4))");
+  CHECK_TRACE_CONTENTS("ordered_args", "=> (''4 ''3)");
+  CHECK_TRACE_TOP("eval", "=> 3");
 }
 
 void test_eval_handles_keyword_args_inside_destructured_params() {
-  cell* fn = read("(fn ((a b)) b)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f '(3 :a 4))");
-  cell* result = eval(call);
-  CHECK_EQ(result, new_num(3));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
+  run("((fn ((a b)) b) '(3 :a 4))");
+  CHECK_TRACE_CONTENTS("ordered_args", "=> (4 3)");
+  CHECK_TRACE_TOP("eval", "=> 3");
 }
 
 
