@@ -1,39 +1,27 @@
 void test_add_works() {
-  cell* call = read("(+ 1 2)");
-  cell* result = eval(call);
-  CHECK_EQ(to_int(result), 3);
-  rmref(result);
-  rmref(call);
+  run("(+ 1 2)");
+  CHECK_TRACE_TOP("eval", "compiled fn=> 3");
 }
 
 void test_add_works_for_floats() {
-  cell* call = read("(+ 1.0 2.0)");
-  cell* result = eval(call);
-  CHECK_EQ(to_float(result), 3.0);
-  rmref(result);
-  rmref(call);
+  TEMP(result, eval("(+ 1.0 2.0)"));
+  CHECK_TRACE_TOP("eval", "compiled fn=> 3");
+  CHECK_EQ(result->type, FLOAT);
 }
 
 void test_division_always_returns_floats() {
-  cell* call = read("(/ 4 2)");
-  cell* result = eval(call);
+  TEMP(result, eval("(/ 4 2)"));
+  CHECK_TRACE_TOP("eval", "compiled fn=> 2");
   CHECK_EQ(result->type, FLOAT);
-  CHECK_EQ(to_float(result), 2.0);
-  rmref(result);
-  rmref(call);
 }
 
 void test_integer_drops_decimals() {
-  cell* call = read("(int -2.7)");
-  cell* result = eval(call);
+  TEMP(result, eval("(int -2.7)"));
+  CHECK_TRACE_TOP("eval", "compiled fn=> -2");
   CHECK_EQ(result->type, INTEGER);
-  CHECK_EQ(to_int(result), -2.0);
-  rmref(result);
-  rmref(call);
 }
 
 void test_lesser_always_passes_nil() {
-  cell* call = read("(< 3 nil)");
-  CHECK_EQ(eval(call), nil);
-  rmref(call);
+  run("(< 3 nil)");
+  CHECK_TRACE_TOP("eval", "compiled fn=> nil");
 }

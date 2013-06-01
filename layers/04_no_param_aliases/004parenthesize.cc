@@ -1,4 +1,5 @@
 //// insert explicit parens based on indentation
+//// also segment token stream into top-level expressions
 
 // Design considered the following:
 //  keywords in other languages to look different from functions: def, if, while, etc.
@@ -19,16 +20,24 @@
 
 list<token> next_expr(indent_sensitive_stream& in) {
   list<token> result;   // emit tokens here
-  if (in.eof()) return result;
+  #define TRACE_AND_RETURN_RESULT { \
+    for (list<token>::iterator p = result.begin(); p != result.end(); ++p) \
+      trace("parenthesize") << *p; \
+    return result; \
+  }
+
+  if (in.eof()) TRACE_AND_RETURN_RESULT;
 
   if (!in.at_start_of_line) {
+    trace("parenthesize") << "not at start of line";
     // we're in the middle of a line,
     // because there were multiple exprs on a single line
     result = indent_insensitive_expr(in);
-    if (!result.empty()) return result;
+    trace("parenthesize") << "at start of line";
+    if (!result.empty()) TRACE_AND_RETURN_RESULT;
   }
 
-  if (in.eof()) return result;
+  if (in.eof()) TRACE_AND_RETURN_RESULT;
   assert(in.at_start_of_line);
 
   //// rule: insert implicit paren before lines that:
@@ -92,7 +101,7 @@ list<token> next_expr(indent_sensitive_stream& in) {
   emit_all(buffer, /*dummy*/token::Newline(), result, explicit_open_parens);
   for (unsigned long i=0; i < implicit_open_parens.size(); ++i)
     result.push_back(token(")"));
-  return result;
+  TRACE_AND_RETURN_RESULT;
 }
 
 
@@ -176,8 +185,7 @@ bool is_close_paren(const token& t) {
 }
 
 bool is_quote_or_unquote(const token& t) {
-  return t == "'" || t == "`"
-      || t == "," || t == ",@" || t == "@";
+  return t == "'" || t == "`" || t == "," || t == ",@" || t == "@";
 }
 
 bool is_word(const token& t) {

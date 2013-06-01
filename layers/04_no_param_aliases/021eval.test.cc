@@ -1,66 +1,436 @@
-void test_splice_args_works() {
-  new_dynamic_scope("a", new_num(3));
-  new_dynamic_scope("b", new_cons(new_num(4), new_cons(new_num(5))));   // (4 5)
-  cell* args = read("(a @b a)");
-  cell* f = read("(fn nil 3)");
-  cell* fn = eval(f);
-  cell* spliced_args = splice_args(args, nil, fn);
-  // (a ''4 ''5 a)
-  CHECK_EQ(car(spliced_args), new_sym("a"));
-  CHECK_EQ(car(car(cdr(spliced_args))), sym_already_evald);
-  CHECK_EQ(cdr(car(cdr(spliced_args))), new_num(4));
-  CHECK_EQ(car(car(cdr(cdr(spliced_args)))), sym_already_evald);
-  CHECK_EQ(cdr(car(cdr(cdr(spliced_args)))), new_num(5));
-  CHECK_EQ(car(cdr(cdr(cdr(spliced_args)))), new_sym("a"));
-  CHECK_EQ(cdr(cdr(cdr(cdr(spliced_args)))), nil);
-  rmref(spliced_args);
-  rmref(fn);
-  rmref(f);
-  rmref(args);
+void test_nil_evals_to_itself() {
+  run("()");
+  CHECK_TRACE_TOP("eval", "nil branch=> nil");
+}
+
+void test_num_evals_to_itself() {
+  run("34");
+  CHECK_TRACE_TOP("eval", "literal=> 34");
+}
+
+void test_keyword_sym_evals_to_itself() {
+  run(":abc");
+  CHECK_TRACE_TOP("eval", "keyword sym=> :abc");
+}
+
+void test_string_evals_to_itself() {
+  run("\"ac bd\"");
+  CHECK_TRACE_TOP("eval", "literal=> \"ac bd\"");
+}
+
+void test_sym_evals_to_value() {
+  new_dynamic_scope("a", new_num(34));
+  run("a");
+  CHECK_TRACE_TOP("eval", "sym=> 34");
+  end_dynamic_scope("a");
+}
+
+void test_sym_evals_to_itself() {
+  new_dynamic_scope("a", new_sym("a"));
+  run("a");
+  CHECK_TRACE_TOP("eval", "sym=> a");
+  end_dynamic_scope("a");
+}
+
+void test_eval_handles_quoted_atoms() {
+  run("'a\n'34");
+  CHECK_TRACE_CONTENTS("eval", "'aquote=> a'34quote=> 34");
+}
+
+void test_object_expr_evals_to_itself() {
+  run("(object foo 4)");
+  CHECK_TRACE_TOP("eval", "object=> (object foo 4)");
+}
+
+void test_eval_handles_quoted_lists() {
+  run("'(a b)");
+  CHECK_TRACE_TOP("eval", "quote=> (a b)");
+}
+
+void test_eval_handles_backquoted_lists() {
+  run("`(a b)");
+  CHECK_TRACE_TOP("eval", "backquote=> (a b)");
+  CHECK_TRACE_CONTENTS("backquote", "atom: aatom: b");
+}
+
+void test_eval_handles_unquote() {
+  new_dynamic_scope("b", new_num(34));
+  run("`(a ,b)");
+  CHECK_TRACE_TOP("eval", "backquote=> (a 34)");
+  CHECK_TRACE_CONTENTS("backquote", "atom: aeval: 34");
+  end_dynamic_scope("b");
+}
+
+void test_eval_handles_unquote_splice() {
+  TEMP(val, read("(34 35)"));
+  new_dynamic_scope("b", val);
+  run("`(a ,@b)");
+  CHECK_TRACE_TOP("eval", "backquote=> (a 34 35)");
+  CHECK_TRACE_CONTENTS("backquote", /*any frame*/ "atom: asplice: (34 35)");
+  end_dynamic_scope("b");
+}
+
+void test_eval_splices_copies_of_lists() {
+  TEMP(a, read("(3)"));
+  new_dynamic_scope("a", a);
+  TEMP(result, eval("`(,@a)"));
+  CHECK(result != a);
+  end_dynamic_scope("a");
+}
+
+void test_eval_handles_unquote_and_unquote_splice() {
+  TEMP(a, read("(3)"));
+  new_dynamic_scope("a", a);
+  TEMP(b, read("(4)"));
+  new_dynamic_scope("b", b);
+  run("`(,@a ,b)");
+  CHECK_TRACE_TOP("eval", "backquote=> (3 (4))");
+  CHECK_TRACE_CONTENTS("backquote", /*any frame*/ "splice: (3)eval: (4)");
   end_dynamic_scope("b");
   end_dynamic_scope("a");
 }
 
-void test_splice_args_works_with_nil() {
+
+void test_eval_handles_unquote_splice_of_nil() {
+  new_dynamic_scope("b", nil);
+  run("`(a ,@b 3)");
+  CHECK_TRACE_TOP("eval", "backquote=> (a 3)");
+  CHECK_TRACE_CONTENTS("backquote", /*any frame*/ "atom: asplice: nilatom: 3");
+  end_dynamic_scope("b");
+}
+
+void test_eval_quotes_quote_comma() {
+  new_dynamic_scope("b", new_sym("x"));
+  run("`(a ',b)");
+  CHECK_TRACE_TOP("eval", "backquote=> (a 'x)");
+  CHECK_TRACE_CONTENTS("backquote", /*any frame*/ "atom: aeval: x");
+  end_dynamic_scope("b");
+}
+
+void test_eval_evals_comma_quote() {
+  new_dynamic_scope("b", new_sym("x"));
+  run("`(a ,'b)");
+  CHECK_TRACE_TOP("eval", "backquote=> (a b)");
+  CHECK_TRACE_CONTENTS("backquote", /*any frame*/ "atom: aeval: b");
+  end_dynamic_scope("b");
+}
+
+void test_eval_handles_nested_quotes() {
+  new_dynamic_scope("a", new_sym("x"));
+  TEMP(b, read("(x y)"));
+  new_dynamic_scope("b", b);
+  run("`(,a `(,a ,,a ,,@b))");
+  CHECK_TRACE_TOP("eval", "backquote=> (x `(,a x x y))");
+  CHECK_TRACE_CONTENTS("backquote", /*any frame*/ "(,a `(,a ,,a ,,@b)) 1eval: x(,a ,,a ,,@b) 2not deep enough: ,aeval: xsplice: (x y)");
+  end_dynamic_scope("a");
+  end_dynamic_scope("b");
+}
+
+
+
+void test_eval_handles_fn_calls() {
+  run("((fn () 34))");
+  CHECK_TRACE_TOP("eval", "=> 34");
+}
+
+void test_eval_expands_syms_in_fn_bodies() {
+  new_dynamic_scope("x", new_num(34));
+  run("((fn () x))");
+  CHECK_TRACE_TOP("eval", "=> 34");
+  end_dynamic_scope("x");
+}
+
+void test_eval_expands_lexically_scoped_syms_in_fn_bodies() {
+  new_lexical_scope();
+  add_lexical_binding("a", new_num(34));
+    run("((fn () a))");
+    CHECK_TRACE_TOP("eval", "=> 34");
+  end_lexical_scope();
+}
+
+void test_eval_expands_syms_in_original_lexical_scope() {
+  new_dynamic_scope("a", new_num(23));
+  new_lexical_scope();
+  add_lexical_binding("a", new_num(34));
+    run("(<- f (fn () a))");
+  end_lexical_scope();
+  run("(f)");
+  CHECK_TRACE_TOP("eval", "=> 34");
+  end_dynamic_scope("f");
+  end_dynamic_scope("a");
+}
+
+void test_eval_expands_args_in_caller_scope() {
+  new_dynamic_scope("a", new_num(23));
+  new_lexical_scope();
+  add_lexical_binding("a", new_num(34));
+    run("(<- f (fn (a) a))");
+  end_lexical_scope();
+  run("(f a)");
+  CHECK_TRACE_TOP("eval", "=> 23");
+  end_dynamic_scope("f");
+  end_dynamic_scope("a");
+}
+
+void test_eval_handles_multiple_body_exprs() {
+  run("((fn () 1 2))");
+  CHECK_TRACE_TOP("eval", "=> 2");
+}
+
+void test_eval_evals_arg() {
+  new_dynamic_scope("x", new_num(3));
+  CLEAR_TRACE;
+  run("((fn (a)) x)");
+  CHECK_TRACE_CONTENTS("bind", "a: 3");
+  end_dynamic_scope("x");
+}
+
+void test_eval_evals_arg2() {
+  run("((fn (f) (f)) (fn () 34))");
+  CHECK_TRACE_TOP("eval", "=> 34");
+}
+
+void test_eval_handles_multiple_args() {
+  run("((fn (a b) b) 1 2)");
+  CHECK_TRACE_TOP("eval", "=> 2");
+}
+
+void test_eval_binds_missing_params() {
+  new_dynamic_scope("x", new_num(3));
+  CLEAR_TRACE;
+  run("((fn (a b)) x)");
+  CHECK_TRACE_CONTENTS("bind", "a: 3b: nil");
+  end_dynamic_scope("x");
+}
+
+void test_eval_binds_quoted_param() {
+  run("((fn ('a)) x)");
+  CHECK_TRACE_CONTENTS("bind", "a: x");
+}
+
+void test_eval_handles_quoted_param_list() {
+  new_dynamic_scope("a", new_num(23));
+  run("((fn '(arg1) arg1) a)");
+  CHECK_TRACE_CONTENTS("bind", "arg1: a");
+  CHECK_TRACE_TOP("eval", "=> a");
+  end_dynamic_scope("a");
+}
+
+void test_eval_handles_vararg_param() {
+  run("((fn args args) 1)");
+  CHECK_TRACE_TOP("eval", "=> (1)");
+}
+
+void test_eval_evals_vararg_args() {
+  new_dynamic_scope("x", new_num(3));
+  new_dynamic_scope("y", new_num(4));
+  CLEAR_TRACE;
+  run("((fn args) x y)");
+  CHECK_TRACE_CONTENTS("eval", "xsym=> 3ysym=> 4");
+  CHECK_TRACE_CONTENTS("bind", "args: (3 4)");
+  end_dynamic_scope("x");
+  end_dynamic_scope("y");
+}
+
+void test_eval_binds_quoted_varargs_param() {
+  new_dynamic_scope("x", new_num(3));
+  new_dynamic_scope("y", new_num(4));
+  CLEAR_TRACE;
+  run("((fn 'args) x y)");
+  CHECK_TRACE_CONTENTS("bind", "args: (x y)");
+  end_dynamic_scope("x");
+  end_dynamic_scope("y");
+}
+
+void test_eval_handles_rest_params() {
+  run("((fn (a b ... c) c) 1 2 3 4 5)");
+  CHECK_TRACE_TOP("eval", "=> (3 4 5)");
+}
+
+void test_eval_evals_rest_args() {
+  new_dynamic_scope("x", new_num(3));
+  new_dynamic_scope("y", new_num(4));
+  CLEAR_TRACE;
+  run("((fn (a ... b)) x y)");
+  CHECK_TRACE_CONTENTS("bind", "a: 3b: (4)");
+  end_dynamic_scope("x");
+  end_dynamic_scope("y");
+}
+
+void test_eval_binds_quoted_rest_param() {
+  new_dynamic_scope("x", new_num(3));
+  new_dynamic_scope("y", new_num(4));
+  CLEAR_TRACE;
+  run("((fn (a ... 'b)) x y)");
+  CHECK_TRACE_CONTENTS("bind", "a: 3b: (y)");
+  end_dynamic_scope("x");
+  end_dynamic_scope("y");
+}
+
+void test_eval_handles_destructured_params() {
+  run("((fn ((a b)) b) '(1 2))");
+  CHECK_TRACE_CONTENTS("bind", "a: 1b: 2");
+}
+
+void test_eval_evals_destructured_args() {
+  new_dynamic_scope("x", new_num(3));
+  new_dynamic_scope("y", new_num(4));
+  CLEAR_TRACE;
+  run("((fn ((a b))) `(,x ,y))");
+  CHECK_TRACE_CONTENTS("bind", "a: 3b: 4");
+  end_dynamic_scope("x");
+  end_dynamic_scope("y");
+}
+
+void test_eval_handles_quoted_destructured_params() {
+  run("((fn ('(a b)) b) (1 2))");
+  CHECK_TRACE_CONTENTS("bind", "a: 1b: 2");
+}
+
+
+
+void test_eval_splices_args() {
+  TEMP(val, read("(3 4)"));
+  new_dynamic_scope("b", val);
+  run("cons @b");
+  CHECK_TRACE_CONTENTS("splice", "(''3 ''4)");
+  CHECK_TRACE_TOP("eval", "=> (3 ... 4)");
+  end_dynamic_scope("b");
+}
+
+void test_eval_splices_args2() {
+  new_dynamic_scope("a", new_num(3));
+  TEMP(b, read("(4 5)"));
+  new_dynamic_scope("b", b);
+  run("((fn nil 3) a @b a)");
+  CHECK_TRACE_CONTENTS("splice", "(a ''4 ''5 a)");  // other args get eval'd later
+  end_dynamic_scope("b");
+  end_dynamic_scope("a");
+}
+
+void test_eval_splices_args3() {
+  run("f <- (fn (x y) (cons x y))");
+  run("(a <- 3) (b <- 4)");
+  run("args <- '(a b)");
+  CLEAR_TRACE;
+  run("f @args");
+  CHECK_TRACE_TOP("eval", "=> (a ... b)");
+  end_dynamic_scope("args");
+  end_dynamic_scope("b");
+  end_dynamic_scope("a");
+  end_dynamic_scope("f");
+}
+
+void test_eval_splices_nil_args() {
   new_dynamic_scope("a", new_num(3));
   new_dynamic_scope("b", nil);
-  cell* args = read("(a @b a)");
-  cell* f = read("(fn nil 3)");
-  cell* fn = eval(f);
-  cell* spliced_args = splice_args(args, nil, fn);
-  // (a a)
-  CHECK_EQ(car(spliced_args), new_sym("a"));
-  CHECK_EQ(car(cdr(spliced_args)), new_sym("a"));
-  CHECK_EQ(cdr(cdr(spliced_args)), nil);
-  rmref(spliced_args);
-  rmref(fn);
-  rmref(f);
-  rmref(args);
+  run("((fn nil 3) a @b a)");
+  CHECK_TRACE_CONTENTS("splice", "(a a)");
   end_dynamic_scope("b");
   end_dynamic_scope("a");
 }
 
-void test_splice_args_works_with_keywords() {
+void test_eval_splices_keyword_syms_into_args() {
   new_dynamic_scope("a", new_num(3));
-  new_dynamic_scope("b", new_cons(new_num(4), new_cons(new_sym(":x"))));  // (4 :x)
-  cell* args = read("(a @b a)");
-  cell* f = read("(fn nil 3)");
-  cell* fn = eval(f);
-  cell* spliced_args = splice_args(args, nil, fn);
-  // (a ''4 :x a)
-  CHECK_EQ(car(spliced_args), new_sym("a"));
-  CHECK_EQ(car(car(cdr(spliced_args))), sym_already_evald);
-  CHECK_EQ(cdr(car(cdr(spliced_args))), new_num(4));
-  CHECK_EQ(car(cdr(cdr(spliced_args))), new_sym(":x"));
-  CHECK_EQ(car(cdr(cdr(cdr(spliced_args)))), new_sym("a"));
-  CHECK_EQ(cdr(cdr(cdr(cdr(spliced_args)))), nil);
-  rmref(spliced_args);
-  rmref(fn);
-  rmref(f);
-  rmref(args);
+  TEMP(b, read("(4 :x)"));
+  new_dynamic_scope("b", b);
+  run("((fn nil 3) a @b a)");
+  CHECK_TRACE_CONTENTS("splice", "(a ''4 :x a)");   // keyword syms aren't tagged with ''
   end_dynamic_scope("b");
   end_dynamic_scope("a");
 }
+
+void test_eval_handles_splice_inside_fn_body() {
+  run("((fn x (cons @x)) 1 2)");
+  CHECK_TRACE_TOP("eval", "=> (1 ... 2)");
+}
+
+void test_eval_handles_splice_and_selective_quoting() {
+  run("f <- (fn ('x y) (cons x y))");
+  run("(a <- 3) (b <- 4)");
+  run("args <- '(b)");
+  CLEAR_TRACE;
+  run("f a @args");
+  CHECK_TRACE_TOP("eval", "=> (a ... b)");
+  end_dynamic_scope("args");
+  end_dynamic_scope("b");
+  end_dynamic_scope("a");
+  end_dynamic_scope("f");
+}
+
+void test_eval_overrides_quoted_params_with_spliced_args() {
+  run("f <- (fn (x 'y) (cons x y))");
+  run("(a <- 3) (b <- 4)");
+  run("args <- '(a b)");
+  CLEAR_TRACE;
+  run("f @args");
+  CHECK_TRACE_TOP("eval", "=> (a ... b)");
+  end_dynamic_scope("args");
+  end_dynamic_scope("b");
+  end_dynamic_scope("a");
+  end_dynamic_scope("f");
+}
+
+void test_eval_handles_already_evald_arg() {
+  new_dynamic_scope("a", new_num(3));
+  TEMP(call, read("((fn (x) 3))"));
+  cell* arg = tag_already_evald(new_sym("a"));  // ''a but can't go through read
+  append(call, new_cons(arg));
+  In_macro.push(true);
+  rmref(eval(call));
+  CHECK_TRACE_CONTENTS("bind", "x: a");
+  In_macro.pop();
+  end_dynamic_scope("a");
+}
+
+void test_eval_handles_multiply_already_evald_arg() {
+  TEMP(call, read("((fn (x) 3))"));
+  cell* arg = tag_already_evald(tag_already_evald(new_sym("a")));  // ''''a
+  append(call, new_cons(arg));
+  In_macro.push(true);
+  rmref(eval(call));
+  CHECK_TRACE_CONTENTS("bind", "x: a");
+  In_macro.pop();
+}
+
+void test_eval_handles_already_evald_rest_arg() {
+  new_dynamic_scope("a", new_num(3));
+  TEMP(call, read("((fn x 3))"));
+  cell* arg = tag_already_evald(new_sym("a"));  // ''a but can't go through read
+  append(call, new_cons(arg));
+  In_macro.push(true);
+  rmref(eval(call));
+  CHECK_TRACE_CONTENTS("bind", "x: (a)");
+  In_macro.pop();
+  end_dynamic_scope("a");
+}
+
+void test_eval_splice_on_macros_with_backquote() {
+  run("m <- (fn '(x y) (eval `(cons ,x ,y) caller_scope))");
+  run("(a <- 3) (b <- 4)");
+  run("args <- '(a b)");
+  run("m @args");
+  CHECK_TRACE_TOP("eval", "=> (a ... b)");  // spliced args override quoted params
+  CHECK_EQ(Raise_count, 0);
+  end_dynamic_scope("args");
+  end_dynamic_scope("b");
+  end_dynamic_scope("a");
+  end_dynamic_scope("m");
+}
+
+void test_eval_splice_on_backquoteless_macros_warns() {
+  run("m <- (fn '(x y) (eval (cons 'cons (cons x (cons y nil))) caller_scope))");
+  run("(a <- 3) (b <- 4)");
+  run("args <- '(a b)");
+  run("m @args");
+  CHECK_EQ(Raise_count, 1);   Raise_count=0;
+  end_dynamic_scope("args");
+  end_dynamic_scope("b");
+  end_dynamic_scope("a");
+  end_dynamic_scope("m");
+}
+
+
 
 void test_reorder_keyword_args_keeps_nil_rest_args() {
   CHECK_EQ(reorder_keyword_args(nil, new_sym("a")), nil);
@@ -92,893 +462,6 @@ void test_reorder_keyword_args_handles_overlong_lists() {
   rmref(ordered_args);
   rmref(args);
   rmref(params);
-}
-
-
-
-void test_eval_bind_all_handles_unquoted_param() {
-  cell* params = read("(x)");
-  cell* args = read("(a)");
-  cell* scope = mkref(new_table());
-  set(scope, "a", new_num(3));
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, scope, new_scope);
-  CHECK_EQ(unsafe_get(new_scope, "x"), new_num(3));
-  rmref(scope);
-  rmref(new_scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_binds_missing_params() {
-  cell* params = read("(x y)");
-  cell* args = read("(a)");
-  cell* scope = mkref(new_table());
-  set(scope, "a", new_num(3));
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, scope, new_scope);
-  CHECK_EQ(unsafe_get(new_scope, "x"), new_num(3));
-  CHECK_EQ(unsafe_get(new_scope, new_sym("y")), nil);
-  rmref(scope);
-  rmref(new_scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_handles_quoted_param() {
-  cell* params = read("('x)");
-  cell* args = read("(a)");
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, nil, new_scope);
-  CHECK_EQ(unsafe_get(new_scope, "x"), new_sym("a"));
-  rmref(new_scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_handles_already_evald_arg() {
-  cell* params = read("(x)");
-  cell* args = mkref(new_cons(tag_already_evald(new_sym("a"))));   // (''a)
-  cell* scope = mkref(new_table());
-  set(scope, "a", new_num(3));
-  cell* new_scope = mkref(new_table());
-  In_macro.push(true);
-  eval_bind_all(params, args, scope, new_scope);
-  In_macro.pop();
-  CHECK_EQ(unsafe_get(new_scope, "x"), new_sym("a"));
-  rmref(new_scope);
-  rmref(scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_handles_multiply_already_evald_arg() {
-  cell* params = read("(x)");
-  cell* args = mkref(new_cons(tag_already_evald(tag_already_evald(new_sym("a")))));  // (''''a)
-  cell* scope = mkref(new_table());
-  set(scope, "a", new_num(3));
-  cell* new_scope = mkref(new_table());
-  In_macro.push(true);
-  eval_bind_all(params, args, scope, new_scope);
-  In_macro.pop();
-  CHECK_EQ(unsafe_get(new_scope, "x"), new_sym("a"));
-  rmref(new_scope);
-  rmref(scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_handles_already_evald_rest_arg() {
-  cell* params = read("x");
-  cell* args = mkref(new_cons(tag_already_evald(new_sym("a"))));
-  cell* scope = mkref(new_table());
-  set(scope, "a", new_num(3));
-  cell* new_scope = mkref(new_table());
-  In_macro.push(true);
-  eval_bind_all(params, args, scope, new_scope);
-  In_macro.pop();
-  CHECK_EQ(car(unsafe_get(new_scope, "x")), new_sym("a"));
-  rmref(new_scope);
-  rmref(scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_handles_varargs_param() {
-  cell* params = read("x");
-  cell* args = read("(a b)");
-  cell* scope = mkref(new_table());
-  set(scope, "a", new_num(3));
-  set(scope, "b", new_num(4));
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, scope, new_scope);
-  // {x: (3 4)}
-  CHECK_EQ(car(unsafe_get(new_scope, "x")), new_num(3));
-  CHECK_EQ(car(cdr(unsafe_get(new_scope, "x"))), new_num(4));
-  CHECK_EQ(cdr(cdr(unsafe_get(new_scope, "x"))), nil);
-  rmref(new_scope);
-  rmref(scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_handles_quoted_varargs_param() {
-  cell* params = read("'x");
-  cell* args = read("(a b)");
-  cell* scope = mkref(new_table());
-  set(scope, "a", new_num(3));
-  set(scope, "b", new_num(4));
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, scope, new_scope);
-  // {x: (a b)}
-  CHECK_EQ(car(unsafe_get(new_scope, "x")), new_sym("a"));
-  CHECK_EQ(car(cdr(unsafe_get(new_scope, "x"))), new_sym("b"));
-  CHECK_EQ(cdr(cdr(unsafe_get(new_scope, "x"))), nil);
-  rmref(new_scope);
-  rmref(scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_handles_rest_param() {
-  cell* params = read("(x ... y)");
-  cell* args = read("(a b)");
-  cell* scope = mkref(new_table());
-  set(scope, "a", new_num(3));
-  set(scope, "b", new_num(4));
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, scope, new_scope);
-  // {x: 3, y: (4)}
-  CHECK_EQ(unsafe_get(new_scope, "x"), new_num(3));
-  CHECK_EQ(car(unsafe_get(new_scope, "y")), new_num(4));
-  CHECK_EQ(cdr(unsafe_get(new_scope, "y")), nil);
-  rmref(new_scope);
-  rmref(scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_handles_quoted_rest_param() {
-  cell* params = read("(x ... 'y)");
-  cell* args = read("(a b)");
-  cell* scope = mkref(new_table());
-  set(scope, "a", new_num(3));
-  set(scope, "b", new_num(4));
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, scope, new_scope);
-  // {x: 3, y: (b)}
-  CHECK_EQ(unsafe_get(new_scope, "x"), new_num(3));
-  CHECK_EQ(car(unsafe_get(new_scope, "y")), new_sym("b"));
-  CHECK_EQ(cdr(unsafe_get(new_scope, "y")), nil);
-  rmref(new_scope);
-  rmref(scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_handles_destructured_params() {
-  cell* params = read("((a b))");
-  cell* args = read("(`(,x ,y))");
-  cell* scope = mkref(new_table());
-  set(scope, "x", new_num(3));
-  set(scope, "y", new_num(4));
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, scope, new_scope);
-  // {a: 3, b: 4}
-  CHECK_EQ(unsafe_get(new_scope, "a"), new_num(3));
-  CHECK_EQ(unsafe_get(new_scope, "b"), new_num(4));
-  rmref(new_scope);
-  rmref(scope);
-  rmref(args);
-  rmref(params);
-}
-
-
-
-cell* process_unquotes(cell* x, long depth) {
-  return process_unquotes(x, depth, Curr_lexical_scope);
-}
-
-void test_process_unquotes_handles_unquote() {
-  new_dynamic_scope("a", new_num(3));
-  cell* expr = read("(,a)");
-  cell* result = process_unquotes(expr, 1);
-  CHECK(is_cons(result));
-  // (3)
-  CHECK_EQ(car(result), new_num(3));
-  CHECK_EQ(cdr(result), nil);
-  rmref(result);
-  rmref(expr);
-  end_dynamic_scope("a");
-}
-
-void test_process_unquotes_handles_unquote_splice() {
-  new_dynamic_scope("a", new_cons(new_num(3)));
-  cell* expr = read("(,@a)");
-  cell* result = process_unquotes(expr, 1);
-  CHECK(is_cons(result));
-  // (3)
-  CHECK_EQ(car(result), new_num(3));
-  CHECK_EQ(cdr(result), nil);
-  rmref(result);
-  rmref(expr);
-  end_dynamic_scope("a");
-}
-
-void test_process_unquotes_handles_unquote_splice_and_unquote() {
-  new_dynamic_scope("a", new_cons(new_num(3)));
-  new_dynamic_scope("b", new_cons(new_num(4)));
-  cell* expr = read("(,@a ,b)");
-  cell* result = process_unquotes(expr, 1);
-  // (3 (4))
-  CHECK(is_cons(result));
-  CHECK_EQ(car(result), new_num(3));
-  CHECK(is_cons(car(cdr(result))));
-  CHECK_EQ(car(car(cdr(result))), new_num(4));
-  CHECK_EQ(cdr(car(cdr(result))), nil);
-  CHECK_EQ(cdr(cdr(result)), nil);
-  rmref(result);
-  rmref(expr);
-  end_dynamic_scope("b");
-  end_dynamic_scope("a");
-}
-
-void test_process_unquotes_splices_copies_of_lists() {
-  new_dynamic_scope("a", new_cons(new_num(3)));
-  new_dynamic_scope("b", new_cons(new_num(4)));
-  cell* expr = read("(,@a ,b)");
-  cell* result = process_unquotes(expr, 1);
-  CHECK(is_cons(result));
-  CHECK(result != lookup("a"))
-  rmref(result);
-  rmref(expr);
-  end_dynamic_scope("b");
-  end_dynamic_scope("a");
-}
-
-
-
-void test_nil_evals_to_itself() {
-  cell* expr = read("()");
-  cell* result = eval(expr);
-  CHECK_EQ(result, nil);
-  rmref(result);
-  rmref(expr);
-}
-
-void test_num_evals_to_itself() {
-  cell* expr = read("34");
-  cell* result = eval(expr);
-  CHECK_EQ(result, expr);
-  rmref(result);
-  rmref(expr);
-}
-
-void test_keyword_sym_evals_to_itself() {
-  cell* expr = read(":abc");
-  cell* result = eval(expr);
-  CHECK_EQ(result, expr);
-  rmref(result);
-  rmref(expr);
-}
-
-void test_colon_evals() {
-  cell* expr = read(":");
-  new_dynamic_scope(":", nil);
-  cell* result = eval(expr);
-  CHECK_EQ(result, nil);
-  end_dynamic_scope(":");
-  rmref(expr);
-}
-
-void test_string_evals_to_itself() {
-  cell* expr = read("\"ac bd\"");
-  cell* result = eval(expr);
-  CHECK_EQ(result, expr);
-  rmref(result);
-  rmref(expr);
-}
-
-void test_sym_evals_to_value() {
-  new_dynamic_scope("a", new_num(34));
-  cell* expr = read("a");
-  cell* result = eval(expr);
-  CHECK_EQ(result, new_num(34));
-  rmref(result);
-  rmref(expr);
-  end_dynamic_scope("a");
-}
-
-void test_sym_evals_to_itself() {
-  new_dynamic_scope("a", new_sym("a"));
-  cell* expr = read("a");
-  cell* result = eval(expr);
-  CHECK_EQ(result, expr);
-  rmref(result);
-  rmref(expr);
-  end_dynamic_scope("a");
-}
-
-void test_object_expr_evals_to_itself() {
-  cell* expr = read("(object foo 4)");
-  cell* result = eval(expr);
-  CHECK_EQ(result, expr);
-  rmref(result);
-  rmref(expr);
-}
-
-void test_eval_handles_quoted_atoms() {
-  cell* expr = read("'a");
-  cell* result = eval(expr);
-  CHECK_EQ(result, new_sym("a"));
-  rmref(result);
-  rmref(expr);
-
-  expr = read("'34");
-  result = eval(expr);
-  CHECK_EQ(result, new_num(34));
-  rmref(result);
-  rmref(expr);
-}
-
-void test_eval_handles_quoted_lists() {
-  cell* expr = read("'(a b)");
-  cell* result = eval(expr);
-  // (a b)
-  CHECK_EQ(car(result), new_sym("a"));
-  CHECK_EQ(car(cdr(result)), new_sym("b"));
-  CHECK_EQ(cdr(cdr(result)), nil);
-  rmref(result);
-  rmref(expr);
-}
-
-void test_eval_handles_backquoted_lists() {
-  cell* expr = read("`(a b)");
-  cell* result = eval(expr);
-  // (a b)
-  CHECK_EQ(car(result), new_sym("a"));
-  CHECK_EQ(car(cdr(result)), new_sym("b"));
-  CHECK_EQ(cdr(cdr(result)), nil);
-  rmref(result);
-  rmref(expr);
-}
-
-void test_eval_handles_unquote() {
-  cell* expr = read("`(a ,b)");
-  new_dynamic_scope("b", new_num(34));
-  cell* result = eval(expr);
-  // (a 34)
-  CHECK_EQ(car(result), new_sym("a"));
-  CHECK_EQ(car(cdr(result)), new_num(34));
-  CHECK_EQ(cdr(cdr(result)), nil);
-  rmref(result);
-  end_dynamic_scope("b");
-  rmref(expr);
-}
-
-void test_eval_handles_unquote_splice() {
-  cell* expr = read("`(a ,@b)");
-  cell* val = read("(34 35)");
-  new_dynamic_scope("b", val);
-  cell* result = eval(expr);
-  // (a 34 35)
-  CHECK_EQ(car(result), new_sym("a"));
-  CHECK_EQ(car(cdr(result)), new_num(34));
-  CHECK_EQ(car(cdr(cdr(result))), new_num(35));
-  CHECK_EQ(cdr(cdr(cdr(result))), nil);
-  rmref(result);
-  end_dynamic_scope("b");
-  rmref(val);
-  rmref(expr);
-}
-
-void test_eval_handles_unquote_splice_of_nil() {
-  cell* expr = read("`(a ,@b 3)");
-  new_dynamic_scope("b", nil);
-  cell* result = eval(expr);
-  CHECK_EQ(cdr(nil), nil);
-  // (a 3)
-  CHECK_EQ(car(result), new_sym("a"));
-  CHECK_EQ(car(cdr(result)), new_num(3));
-  CHECK_EQ(cdr(cdr(result)), nil);
-  rmref(result);
-  end_dynamic_scope("b");
-  rmref(expr);
-}
-
-void test_eval_quotes_quote_comma() {
-  cell* expr = read("`(a ',b)");
-  new_dynamic_scope("b", new_sym("x"));
-  cell* result = eval(expr);
-  // (a 'x)
-  CHECK_EQ(car(result), new_sym("a"));
-  CHECK(is_cons(car(cdr(result))));
-  CHECK_EQ(car(car(cdr(result))), new_sym("'"));
-  CHECK_EQ(cdr(car(cdr(result))), new_sym("x"));
-  CHECK_EQ(cdr(cdr(result)), nil);
-  rmref(result);
-  end_dynamic_scope("b");
-  rmref(expr);
-}
-
-void test_eval_evals_comma_quote() {
-  cell* expr = read("`(a ,'b)");
-  new_dynamic_scope("b", new_sym("x"));
-  cell* result = eval(expr);
-  // (a b)
-  CHECK_EQ(car(result), new_sym("a"));
-  CHECK_EQ(car(cdr(result)), new_sym("b"));
-  CHECK_EQ(cdr(cdr(result)), nil);
-  rmref(result);
-  end_dynamic_scope("b");
-  rmref(expr);
-}
-
-void test_eval_handles_nested_quotes() {
-  cell* expr = read("`(,a `(,a ,,a ,,@b))");
-  new_dynamic_scope("a", new_sym("x"));
-  new_dynamic_scope("b", new_cons(new_sym("x"), new_cons(new_sym("y"))));  // (x y)
-  cell* result = eval(expr);
-  // (x `(,a x x y))
-  CHECK_EQ(car(result), new_sym("x"));
-  cell* nested_expr = car(cdr(result));
-  CHECK(is_cons(nested_expr));
-  CHECK_EQ(car(nested_expr), new_sym("`"));
-  CHECK(is_cons(cdr(nested_expr)));
-  cell* nested_expr2 = cdr(nested_expr);
-  CHECK(is_cons(car(nested_expr2)));
-  CHECK_EQ(car(car(nested_expr2)), new_sym(","));
-  CHECK_EQ(cdr(car(nested_expr2)), new_sym("a"));
-  nested_expr2 = cdr(nested_expr2);
-  CHECK_EQ(car(nested_expr2), new_sym("x"));
-  nested_expr2 = cdr(nested_expr2);
-  CHECK_EQ(car(nested_expr2), new_sym("x"));
-  CHECK_EQ(car(cdr(nested_expr2)), new_sym("y"));
-  CHECK_EQ(cdr(cdr(nested_expr2)), nil);
-  rmref(result);
-  end_dynamic_scope("b");
-  end_dynamic_scope("a");
-  rmref(expr);
-}
-
-void test_eval_handles_quoted_destructured_params() {
-  cell* call = read("((fn ('(a b)) b) (1 2))");
-  cell* result = eval(call);
-  CHECK(is_num(result));
-  CHECK_EQ(to_int(result), 2);
-  rmref(result);
-  rmref(call);
-}
-
-void test_eval_handles_rest_params() {
-  cell* call = read("((fn (a b ... c) c) 1 2 3 4 5)");
-  cell* result = eval(call);
-  CHECK(is_cons(result));
-  CHECK(is_num(car(result)));
-  // (3 4 5)
-  CHECK_EQ(to_int(car(result)), 3);
-  CHECK(is_num(car(cdr(result))));
-  CHECK_EQ(to_int(car(cdr(result))), 4);
-  CHECK_EQ(to_int(car(cdr(cdr(result)))), 5);
-  CHECK_EQ(cdr(cdr(cdr(result))), nil);
-  rmref(result);
-  rmref(call);
-}
-
-void test_eval_handles_splice() {
-  cell* expr = read("(cons @b)");
-  cell* val = read("(3 4)");
-  new_dynamic_scope("b", val);
-  cell* result = eval(expr);
-  // (3 ... 4)
-  CHECK(is_cons(result));
-  CHECK_EQ(car(result), new_num(3));
-  CHECK_EQ(cdr(result), new_num(4));
-  rmref(result);
-  end_dynamic_scope("b");
-  rmref(val);
-  rmref(expr);
-}
-
-void test_eval_handles_splice2() {
-  cell* fn = read("(fn x (cons @x))");
-  cell* def = eval(fn);
-  new_dynamic_scope("f", def);
-  cell* call1 = read("(f 1 2)");
-  cell* result = eval(call1);
-  // (1 ... 2)
-  CHECK(is_cons(result));
-  CHECK_EQ(car(result), new_num(1));
-  CHECK_EQ(cdr(result), new_num(2));
-  rmref(result);
-
-  cell* call2 = read("(f 3 4)");
-  result = eval(call2);
-  // (3 ... 4)
-  CHECK(is_cons(result));
-  CHECK_EQ(car(result), new_num(3));
-  CHECK_EQ(cdr(result), new_num(4));
-  rmref(result);
-
-  rmref(call2);
-  rmref(call1);
-  end_dynamic_scope("f");
-  rmref(def);
-  rmref(fn);
-}
-
-void test_eval_handles_splice3() {
-  cell* fn = read("(fn (x y) (cons x y))");
-  cell* def = eval(fn);
-  new_dynamic_scope("f", def);
-  new_dynamic_scope("a", new_num(3));
-  new_dynamic_scope("b", new_num(4));
-  cell* argval = read("(a b)");
-  new_dynamic_scope("args", argval);
-  cell* call = read("(f @args)");
-  cell* result = eval(call);
-  // (a ... b)
-  CHECK(is_cons(result));
-  CHECK_EQ(car(result), new_sym("a"));
-  CHECK_EQ(cdr(result), new_sym("b"));
-  rmref(result);
-  rmref(call);
-  end_dynamic_scope("args");
-  rmref(argval);
-  end_dynamic_scope("b");
-  end_dynamic_scope("a");
-  end_dynamic_scope("f");
-  rmref(def);
-  rmref(fn);
-}
-
-void test_eval_handles_splice4() {
-  cell* fn = read("(fn ('x y) (cons x y))");
-  cell* def = eval(fn);
-  new_dynamic_scope("f", def);
-  new_dynamic_scope("a", new_num(3));
-  new_dynamic_scope("b", new_num(4));
-  cell* argval = read("(b)");
-  new_dynamic_scope("args", argval);
-  cell* call = read("(f a @args)");
-  cell* result = eval(call);
-  // (a ... b)
-  CHECK(is_cons(result));
-  CHECK_EQ(car(result), new_sym("a"));
-  CHECK_EQ(cdr(result), new_sym("b"));
-  rmref(result);
-  rmref(call);
-  end_dynamic_scope("args");
-  rmref(argval);
-  end_dynamic_scope("b");
-  end_dynamic_scope("a");
-  end_dynamic_scope("f");
-  rmref(def);
-  rmref(fn);
-}
-
-void test_eval_handles_splice5() {
-  cell* fn = read("(fn (x y) (cons x y))");
-  cell* def = eval(fn);
-  new_dynamic_scope("f", def);
-  new_dynamic_scope("a", new_num(3));
-  new_dynamic_scope("b", new_num(4));
-  cell* argval = read("(b)");
-  new_dynamic_scope("args", argval);
-  cell* call = read("(f a @args)");
-  cell* result = eval(call);
-  // (3 ... b)
-  CHECK(is_cons(result));
-  CHECK_EQ(car(result), new_num(3));
-  CHECK_EQ(cdr(result), new_sym("b"));
-  rmref(result);
-  rmref(call);
-  end_dynamic_scope("args");
-  rmref(argval);
-  end_dynamic_scope("b");
-  end_dynamic_scope("a");
-  end_dynamic_scope("f");
-  rmref(def);
-  rmref(fn);
-}
-
-void test_eval_handles_splice6() {
-  cell* fn = read("(fn (x 'y) (cons x y))");
-  cell* def = eval(fn);
-  new_dynamic_scope("f", def);
-  new_dynamic_scope("a", new_num(3));
-  new_dynamic_scope("b", new_num(4));
-  cell* argval = read("(a b)");
-  new_dynamic_scope("args", argval);
-  cell* call = read("(f @args)");
-  cell* result = eval(call);
-  // (a ... b)
-  CHECK(is_cons(result));
-  CHECK_EQ(car(result), new_sym("a"));
-  CHECK_EQ(cdr(result), new_sym("b"));
-  rmref(result);
-  rmref(call);
-  end_dynamic_scope("args");
-  rmref(argval);
-  end_dynamic_scope("b");
-  end_dynamic_scope("a");
-  end_dynamic_scope("f");
-  rmref(def);
-  rmref(fn);
-}
-
-void test_eval_splice_on_macros_warns() {
-  cell* expr = read("(fn '(x y) (eval (cons 'cons (cons x (cons y nil))) caller_scope))");
-  cell* fn = eval(expr);
-  new_dynamic_scope("f", fn);
-  new_dynamic_scope("a", new_num(3));
-  new_dynamic_scope("b", new_num(4));
-  cell* argval = read("(a b)");
-  new_dynamic_scope("args", argval);
-  cell* call = read("(f @args)");
-  cell* result = eval(call);
-  CHECK_EQ(Raise_count, 1);   Raise_count=0;
-  rmref(result);
-  rmref(call);
-  end_dynamic_scope("args");
-  rmref(argval);
-  end_dynamic_scope("b");
-  end_dynamic_scope("a");
-  end_dynamic_scope("f");
-  rmref(fn);
-  rmref(expr);
-}
-
-void test_eval_splice_on_macros_with_backquote() {
-  cell* expr = read("(fn '(x y) (eval `(cons ,x ,y) caller_scope))");
-  cell* fn = eval(expr);
-  new_dynamic_scope("f", fn);
-  new_dynamic_scope("a", new_num(3));
-  new_dynamic_scope("b", new_num(4));
-  cell* argval = read("(a b)");
-  new_dynamic_scope("args", argval);
-  cell* call = read("(f @args)");
-  cell* result = eval(call);
-  CHECK_EQ(Raise_count, 0);
-  rmref(result);
-  rmref(call);
-  end_dynamic_scope("args");
-  rmref(argval);
-  end_dynamic_scope("b");
-  end_dynamic_scope("a");
-  end_dynamic_scope("f");
-  rmref(fn);
-  rmref(expr);
-}
-
-void test_eval_handles_simple_fn() {
-  cell* expr = read("(fn () 34)");
-  cell* fn = eval(expr);
-  // (object function {sig: nil, body: (34), env: nil})
-  CHECK_EQ(type(fn), new_sym("function"));
-  CHECK_EQ(sig(fn), nil);
-  CHECK(is_cons(body(fn)));
-  CHECK_EQ(car(body(fn)), new_num(34));
-  CHECK_EQ(env(fn), nil);
-  rmref(fn);
-  rmref(expr);
-}
-
-void test_eval_on_fn_is_idempotent() {
-  cell* expr = read("(fn () 34)");
-  cell* fn = eval(expr);
-  cell* fn2 = eval(fn);
-  // fn == fn2
-  CHECK_EQ(type(fn2), new_sym("function"));
-  CHECK_EQ(sig(fn2), nil);
-  CHECK(is_cons(body(fn2)));
-  CHECK_EQ(car(body(fn2)), new_num(34));
-  CHECK_EQ(env(fn2), nil);
-  rmref(fn2);
-  rmref(fn);
-  rmref(expr);
-}
-
-void test_eval_handles_closure() {
-  cell* expr = read("(fn () 34)");
-  new_lexical_scope();
-    cell* new_lexical_scope = Curr_lexical_scope;
-    CHECK_EQ(new_lexical_scope->nrefs, 1);
-    cell* result = eval(expr);
-    CHECK_EQ(new_lexical_scope->nrefs, 2);
-  end_lexical_scope();
-  CHECK_EQ(new_lexical_scope->nrefs, 1);
-  // (object function {sig: nil, body: (34), env: {}})
-  CHECK_EQ(type(result), new_sym("function"));
-  CHECK_EQ(sig(result), nil);
-  CHECK_EQ(car(body(result)), new_num(34));
-  CHECK_EQ(env(result), new_lexical_scope);
-  rmref(result);
-  CHECK_EQ(new_lexical_scope->nrefs, 0);
-  rmref(expr);
-}
-
-void test_eval_handles_fn_calls() {
-  cell* call = read("((fn () 34))");
-  cell* result = eval(call);
-  CHECK_EQ(result, new_num(34));
-  rmref(result);
-  rmref(call);
-}
-
-void test_eval_expands_syms_in_fn_bodies() {
-  cell* fn = read("((fn () a))");
-  new_dynamic_scope("a", new_num(34));
-  cell* result = eval(fn);
-  CHECK_EQ(result, new_num(34));
-  end_dynamic_scope("a");
-  rmref(result);
-  rmref(fn);
-}
-
-void test_eval_handles_assigned_fn_calls() {
-  cell* fn = read("(fn () 34)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-    cell* call = read("(f)");
-    cell* result = eval(call);
-    CHECK_EQ(result, new_num(34));
-  end_dynamic_scope("f");
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-}
-
-void test_eval_expands_lexically_scoped_syms_in_fn_bodies() {
-  cell* call = read("((fn () a))");
-  new_lexical_scope();
-    add_lexical_binding("a", new_num(34));
-    cell* result = eval(call);
-    CHECK_EQ(result, new_num(34));
-  end_lexical_scope();
-  rmref(result);
-  rmref(call);
-}
-
-void test_eval_expands_syms_in_original_lexical_scope() {
-  new_dynamic_scope("a", new_num(23));
-  cell* fn = read("(fn () a)");
-  new_lexical_scope();
-  add_lexical_binding("a", new_num(34));
-    cell* f = eval(fn);
-    new_dynamic_scope("f", f);
-  end_lexical_scope();
-  cell* call = read("(f)");
-  cell* result = eval(call);
-  CHECK_EQ(result, new_num(34));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
-  end_dynamic_scope("a");
-}
-
-void test_eval_expands_args_in_caller_scope() {
-  new_dynamic_scope("a", new_num(23));
-  cell* fn = read("(fn (arg1) arg1)");
-  new_lexical_scope();
-  add_lexical_binding("arg1", new_num(34));
-    cell* f = eval(fn);
-    new_dynamic_scope("f", f);
-  end_lexical_scope();
-  cell* call = read("(f a)");
-  cell* result = eval(call);
-  CHECK_EQ(result, new_num(23));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
-  end_dynamic_scope("a");
-}
-
-void test_eval_doesnt_eval_quoted_params() {
-  new_dynamic_scope("a", new_num(23));
-  cell* fn = read("(fn ('arg1) arg1)");
-  new_lexical_scope();
-  add_lexical_binding("arg1", new_num(34));
-    cell* f = eval(fn);
-    new_dynamic_scope("f", f);
-  end_lexical_scope();
-  cell* call = read("(f a)");
-  cell* result = eval(call);
-  CHECK_EQ(result, new_sym("a"));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
-  end_dynamic_scope("a");
-}
-
-void test_eval_handles_quoted_param_list() {
-  new_dynamic_scope("a", new_num(23));
-  cell* fn = read("(fn '(arg1) arg1)");
-  new_lexical_scope();
-  add_lexical_binding("arg1", new_num(34));
-    cell* f = eval(fn);
-    new_dynamic_scope("f", f);
-  end_lexical_scope();
-  cell* call = read("(f a)");
-  cell* result = eval(call);
-  CHECK_EQ(result, new_sym("a"));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
-  end_dynamic_scope("a");
-}
-
-void test_eval_handles_multiple_args() {
-  cell* fn = read("(fn (a b) b)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f 1 2)");
-  cell* result = eval(call);
-  CHECK_EQ(result, new_num(2));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
-}
-
-void test_eval_handles_multiple_body_exprs() {
-  cell* fn = read("(fn () 1 2)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f)");
-  cell* result = eval(call);
-  CHECK_EQ(result, new_num(2));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
-}
-
-void test_eval_handles_vararg_param() {
-  cell* call = read("((fn args args) 1)");
-  cell* result = eval(call);
-  CHECK(is_cons(result));
-  CHECK_EQ(car(result), new_num(1));
-  rmref(result);
-  rmref(call);
-}
-
-void test_eval_evals_args() {
-  cell* call = read("((fn (f) (f)) (fn () 34))");
-  cell* result = eval(call);
-  CHECK(is_num(result));
-  CHECK_EQ(to_int(result), 34);
-  rmref(result);
-  rmref(call);
-}
-
-void test_eval_doesnt_leak_body_evals() {
-  cell* call = read("((fn (f) (f) (f)) (fn () 34))");
-  cell* result = eval(call);
-  CHECK(is_num(result));
-  CHECK_EQ(to_int(result), 34);
-  rmref(result);
-  rmref(call);
-}
-
-void test_eval_handles_destructured_params() {
-  cell* call = read("((fn ((a b)) b) '(1 2))");
-  cell* result = eval(call);
-  CHECK(is_num(result));
-  CHECK_EQ(to_int(result), 2);
-  rmref(result);
-  rmref(call);
 }
 
 void test_eval_handles_keyword_args_for_fns() {
@@ -1132,5 +615,15 @@ void test_eval_handles_keyword_args_inside_destructured_params() {
   rmref(call);
   rmref(f);
   rmref(fn);
+  end_dynamic_scope("f");
+}
+
+
+
+void test_eval_handles_assigned_fn_calls() {
+  run("(<- f (fn () 34))");
+  CLEAR_TRACE;
+  run("(f)");
+  CHECK_TRACE_TOP("eval", "=> 34");
   end_dynamic_scope("f");
 }
