@@ -4,6 +4,7 @@
 //  compiled 'if' needs access to caller scope
 //  avoid accidental shadowing for params
 //    so params have a '$' prefix; user-defined functions won't have it because of implicit gensyms
+//    so compiledfns never call other compiledfns
 //  always increment the nrefs of a single cell along all codepaths
 
 COMPILE_FN(fn, compiledfn_fn, "'($params ... $body)",
@@ -100,12 +101,8 @@ COMPILE_FN(num_bindings, compiledfn_num_bindings, "($var)",
 
 //// macros
 
-COMPILE_FN(eval, compiledfn_eval, "('$x $scope)",
-  // sidestep eval_args for x to handle @args
-  cell* x = eval(lookup("$x"), Curr_lexical_scope);
-  cell* ans = eval(x, lookup("$scope"));
-  rmref(x);
-  return ans;
+COMPILE_FN(eval, compiledfn_eval, "($x $scope)",
+  return eval(lookup("$x"), lookup("$scope"));
 )
 
 COMPILE_FN(uniq, compiledfn_uniq, "($x)",
