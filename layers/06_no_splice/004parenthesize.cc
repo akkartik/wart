@@ -185,7 +185,7 @@ bool is_close_paren(const token& t) {
 }
 
 bool is_quote_or_unquote(const token& t) {
-  return t == "'" || t == "`" || t == "," || t == ",@" || t == "@";
+  return t == "'" || t == "`" || t == "," || t == ",@";
 }
 
 bool is_word(const token& t) {
