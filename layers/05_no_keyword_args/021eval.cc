@@ -71,7 +71,6 @@ cell* eval(cell* expr, cell* scope) {
     return result;  // already mkref'd
   }
 
-  trace("already_evald") << "A: " << expr << " " << keep_already_evald();
   if (is_already_evald(expr))
     return mkref(keep_already_evald() ? expr : strip_already_evald(expr));
 
@@ -196,7 +195,7 @@ cell* eval_all(cell* args, cell* scope) {
 
 // eval, but always strip '' regardless of keep_already_evald()
 cell* eval_arg(cell* arg, cell* scope) {
-  trace("already_evald") << "B: " << arg;
+  trace("already_evald") << "eval_arg " << arg;
   if (is_already_evald(arg)) return mkref(strip_already_evald(arg));
   return eval(arg, scope);
 }
