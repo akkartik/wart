@@ -155,6 +155,7 @@ void eval_bind_all(cell* params, cell* args, cell* scope, cell* new_scope) {
 }
 
 void eval_bind_rest(cell* param, cell* args, cell** cached_val, cell* scope, cell* new_scope) {
+  trace("eval/bind/rest") << param << " <-> " << args;
   if (is_cons(param))
     eval_bind_all(param, args, scope, new_scope);
 
@@ -166,6 +167,7 @@ void eval_bind_rest(cell* param, cell* args, cell** cached_val, cell* scope, cel
 }
 
 void eval_bind_param(cell* param, cell* arg, cell* scope, cell* new_scope) {
+  trace("eval/bind/param") << param << " <-> " << arg;
   TEMP(arg2, nil);
   if (is_quoted(param)) {
     param = strip_quote(param);
@@ -184,6 +186,7 @@ void eval_bind_param(cell* param, cell* arg, cell* scope, cell* new_scope) {
 }
 
 void eval_bind_rest_aliases(cell* params /* (| ...) */, cell* args, cell* scope, cell* new_scope) {
+  trace("eval/bind/rest_aliases") << params << " <-> " << args;
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
   cell* cached_val = NULL;   // to ensure we don't multiply-eval
@@ -196,6 +199,7 @@ void eval_bind_rest_aliases(cell* params /* (| ...) */, cell* args, cell* scope,
 }
 
 void eval_bind_aliases(cell* params /* (| ...) */, cell* arg, cell* scope, cell* new_scope) {
+  trace("eval/bind/aliases") << params << " <-> " << arg;
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
   cell* cached_val = NULL;   // to ensure we don't multiply-eval
@@ -248,6 +252,7 @@ void bind_params(cell* params, cell* args, cell* unevald_args, cell* new_scope) 
 }
 
 void bind_aliases(cell* params /* (| ...) */, cell* arg, cell* unevald_arg, cell* new_scope) {
+  trace("eval/bind/one_aliases") << params << " <-> " << arg;
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
   for (cell* aliases=cdr(params); aliases != nil; aliases=cdr(aliases))

@@ -517,368 +517,147 @@ void test_eval_handles_keyword_args_inside_destructured_params() {
 
 
 
-void test_eval_bind_all_handles_already_evald_aliased_arg() {
-  cell* params = read("(x|y)");
-  cell* args = mkref(new_cons(tag_already_evald(new_sym("a"))));   // (''a)
-  cell* scope = mkref(new_table());
-  set(scope, "a", new_num(3));
-  cell* new_scope = mkref(new_table());
+void test_eval_handles_param_aliases() {
   In_macro.push(true);
-  eval_bind_all(params, args, scope, new_scope);
+  run("((fn (x|y) 3) 4)");
   In_macro.pop();
-  CHECK_EQ(unsafe_get(new_scope, "x"), new_sym("a"));
-  CHECK_EQ(unsafe_get(new_scope, "y"), new_sym("a"));
-  rmref(new_scope);
-  rmref(scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_handles_param_aliases() {
-  cell* params = read("(a|b)");
-  cell* args = read("(3)");
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, nil, new_scope);
-  // {a: 3, b: 3}
-  CHECK_EQ(unsafe_get(new_scope, "a"), new_num(3));
-  CHECK_EQ(unsafe_get(new_scope, "b"), new_num(3));
-  rmref(new_scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_only_reorders_when_necessary() {
-  cell* params = read("((a|b))");
-  cell* x = read("(3)");
-  Trace_stream = NULL;  // leak; trace can't handle cycles yet
-  set_cdr(x, x);   // cycle
-  cell* scope = mkref(new_table());
-  set(scope, "x", x);
-  cell* arg = read("((fn args args) x)");   // (list x)
-  cell* args = mkref(new_cons(arg));
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, scope, new_scope);
-  // should terminate
-  set_cdr(x, nil);
-  rmref(new_scope);
-  rmref(args);
-  rmref(arg);
-  rmref(scope);
-  rmref(x);
-  rmref(params);
-}
-
-void test_eval_bind_all_binds_as_params() {
-  cell* params = read("(a | (b c))");
-  cell* args = read("(1 2)");
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, nil, new_scope);
-  // {a: (1 2), b: 1, c: 2}
-  CHECK_EQ(car(unsafe_get(new_scope, "a")), new_num(1));
-  CHECK_EQ(car(cdr(unsafe_get(new_scope, "a"))), new_num(2));
-  CHECK_EQ(cdr(cdr(unsafe_get(new_scope, "a"))), nil);
-  CHECK_EQ(unsafe_get(new_scope, "b"), new_num(1));
-  CHECK_EQ(unsafe_get(new_scope, "c"), new_num(2));
-  rmref(new_scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_binds_as_params_recursively() {
-  cell* params = read("(a | (b ... (c | (d e))))");
-  cell* args = read("(1 2 3)");
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, nil, new_scope);
-  // {a: (1 2 3), b: 1, c: (2 3), d: 2, e: 3}
-  CHECK_EQ(car(unsafe_get(new_scope, "a")), new_num(1));
-  CHECK_EQ(car(cdr(unsafe_get(new_scope, "a"))), new_num(2));
-  CHECK_EQ(car(cdr(cdr(unsafe_get(new_scope, "a")))), new_num(3));
-  CHECK_EQ(cdr(cdr(cdr(unsafe_get(new_scope, "a")))), nil);
-  CHECK_EQ(unsafe_get(new_scope, "b"), new_num(1));
-  CHECK_EQ(car(unsafe_get(new_scope, "c")), new_num(2));
-  CHECK_EQ(car(cdr(unsafe_get(new_scope, "c"))), new_num(3));
-  CHECK_EQ(cdr(cdr(unsafe_get(new_scope, "c"))), nil);
-  CHECK_EQ(unsafe_get(new_scope, "d"), new_num(2));
-  CHECK_EQ(unsafe_get(new_scope, "e"), new_num(3));
-  rmref(new_scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_handles_quoted_param_aliases() {
-  cell* params = read("((a | 'b))");
-  cell* args = read("(x)");
-  cell* scope = mkref(new_table());
-  set(scope, "x", new_num(3));
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, scope, new_scope);
-  // {a: 3, b: x}
-  CHECK_EQ(unsafe_get(new_scope, "a"), new_num(3));
-  CHECK_EQ(unsafe_get(new_scope, "b"), new_sym("x"));
-  rmref(new_scope);
-  rmref(scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_handles_quoted_rest_param_aliases() {
-  cell* params = read("(a | 'b)");
-  cell* args = read("(x)");
-  cell* scope = mkref(new_table());
-  set(scope, "x", new_num(3));
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, scope, new_scope);
-  // {a: (3), b: (x)}
-  CHECK_EQ(car(unsafe_get(new_scope, "a")), new_num(3));
-  CHECK_EQ(car(unsafe_get(new_scope, "b")), new_sym("x"));
-  rmref(new_scope);
-  rmref(scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_handles_quoted_destructured_rest_param_aliases0() {
-  cell* params = read("('a | ('b))");
-  cell* args = read("(x)");
-  cell* scope = mkref(new_table());
-  set(scope, "x", new_num(3));
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, scope, new_scope);
-  // {a: (x), b: x}
-  CHECK_EQ(car(unsafe_get(new_scope, "a")), new_sym("x"));
-  CHECK_EQ(unsafe_get(new_scope, "b"), new_sym("x"));
-  rmref(new_scope);
-  rmref(scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_handles_quoted_destructured_rest_param_aliases() {
-  cell* params = read("(a | ('b))");
-  cell* args = read("(x)");
-  cell* scope = mkref(new_table());
-  set(scope, "x", new_num(3));
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, scope, new_scope);
-  // {a: (3), b: x}
-  CHECK_EQ(car(unsafe_get(new_scope, "a")), new_num(3));
-  CHECK_EQ(unsafe_get(new_scope, "b"), new_sym("x"));
-  rmref(new_scope);
-  rmref(scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_evals_aliases_only_when_necessary() {
-  cell* params = read("(('a | 'b))");
-  cell* args = read("(x)");
-  cell* new_scope = mkref(new_table());
-  long old_eval_count = Eval_count;
-  eval_bind_all(params, args, nil, new_scope);
-  CHECK_EQ(Eval_count-old_eval_count, 0);
-  // {a: x, b: x}
-  CHECK_EQ(unsafe_get(new_scope, "a"), new_sym("x"));
-  CHECK_EQ(unsafe_get(new_scope, "b"), new_sym("x"));
-  rmref(new_scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_evals_aliases_only_when_necessary2() {
-  cell* params = read("('a | ('b))");
-  cell* args = read("(x)");
-  cell* new_scope = mkref(new_table());
-  long old_eval_count = Eval_count;
-  eval_bind_all(params, args, nil, new_scope);
-  CHECK(Eval_count-old_eval_count > 0);
-  // {a: (x), b: x}
-  CHECK_EQ(car(unsafe_get(new_scope, "a")), new_sym("x"));
-  CHECK_EQ(unsafe_get(new_scope, "b"), new_sym("x"));
-  rmref(new_scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_evals_aliases_only_when_necessary3() {
-  cell* params = read("(| 'a ('b c))");
-  cell* args = read("(x y)");
-  cell* scope = mkref(new_table());
-  set(scope, "y", new_num(3));
-  cell* new_scope = mkref(new_table());
-  long old_eval_count = Eval_count;
-  eval_bind_all(params, args, scope, new_scope);
-  CHECK(Eval_count-old_eval_count > 0);
-  // {a: (x y), b: x, c: 3}
-  CHECK_EQ(car(unsafe_get(new_scope, "a")), new_sym("x"));
-  CHECK_EQ(car(cdr(unsafe_get(new_scope, "a"))), new_sym("y"));
-  CHECK_EQ(cdr(cdr(unsafe_get(new_scope, "a"))), nil);
-  CHECK_EQ(unsafe_get(new_scope, "b"), new_sym("x"));
-  CHECK_EQ(unsafe_get(new_scope, "c"), new_num(3));
-  rmref(new_scope);
-  rmref(scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_evals_aliases_only_when_necessary4() {
-  cell* params = read("((| 'a (| 'b c)))");
-  cell* args = read("(x)");
-  cell* scope = mkref(new_table());
-  set(scope, "x", new_num(3));
-  cell* new_scope = mkref(new_table());
-  long old_eval_count = Eval_count;
-  eval_bind_all(params, args, scope, new_scope);
-  CHECK(Eval_count-old_eval_count > 0);
-  // {a: x, b: x, c: 3}
-  CHECK_EQ(unsafe_get(new_scope, "a"), new_sym("x"));
-  CHECK_EQ(unsafe_get(new_scope, "b"), new_sym("x"));
-  CHECK_EQ(unsafe_get(new_scope, "c"), new_num(3));
-  rmref(new_scope);
-  rmref(scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_evals_aliases_only_when_necessary5() {
-  cell* params = read("((| 'a (| 'b 'c)))");
-  cell* args = read("(x)");
-  cell* new_scope = mkref(new_table());
-  long old_eval_count = Eval_count;
-  eval_bind_all(params, args, nil, new_scope);
-  CHECK_EQ(Eval_count-old_eval_count, 0);
-  // {a: x, b: x, c: x}
-  CHECK_EQ(unsafe_get(new_scope, "a"), new_sym("x"));
-  CHECK_EQ(unsafe_get(new_scope, "b"), new_sym("x"));
-  CHECK_EQ(unsafe_get(new_scope, "c"), new_sym("x"));
-  rmref(new_scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_evals_aliases_only_when_necessary6() {
-  cell* params = read("(| 'a (| 'b 'c))");
-  cell* args = read("(x)");
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, nil, new_scope);
-  CHECK_EQ(Raise_count, 0);
-  // {a: (x), b: (x), c: (x)}
-  CHECK_EQ(car(unsafe_get(new_scope, "a")), new_sym("x"));
-  CHECK_EQ(car(unsafe_get(new_scope, "b")), new_sym("x"));
-  CHECK_EQ(car(unsafe_get(new_scope, "c")), new_sym("x"));
-  rmref(new_scope);
-  rmref(args);
-  rmref(params);
-}
-
-// gotcha: a|(b c) won't work
-void test_eval_bind_all_warns_on_unary_as() {
-  cell* params = read("(| a)");
-  cell* args = read("(1 2)");
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, nil, new_scope);
-  CHECK_EQ(Raise_count, 1);   Raise_count=0;
-  rmref(new_scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_binds_missing_as_params_to_nil() {
-  cell* params = read("(a | (b c))");
-  cell* args = read("1");
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, nil, new_scope);
-  CHECK_EQ(Raise_count, 0);
-  // {a: x}
-  CHECK_EQ(unsafe_get(new_scope, "a"), new_num(1));
-  CHECK_EQ(unsafe_get(new_scope, "b"), nil);
-  CHECK_EQ(unsafe_get(new_scope, "c"), nil);
-  rmref(new_scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_binds_alternatives_to_non_cons() {
-  cell* params = read("(a b|c)");
-  cell* args = read("(1 2)");
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, nil, new_scope);
-  CHECK_EQ(Raise_count, 0);
-  // {a: 1, b: 2, c: 2}
-  CHECK_EQ(unsafe_get(new_scope, "a"), new_num(1));
-  CHECK_EQ(unsafe_get(new_scope, "b"), new_num(2));
-  CHECK_EQ(unsafe_get(new_scope, "c"), new_num(2));
-  rmref(new_scope);
-  rmref(args);
-  rmref(params);
-}
-
-void test_eval_bind_all_handles_duplicate_destructured_aliases() {
-  cell* params = read("((a b|x) (c d|x))");
-  cell* args = read("('(1 :x 2) '(3 :x 4))");
-  cell* new_scope = mkref(new_table());
-  eval_bind_all(params, args, nil, new_scope);
-  // {a: 1, b: 2, c: 3, d: 4, x: 2 or 4}
-  CHECK_EQ(unsafe_get(new_scope, "a"), new_num(1));
-  CHECK_EQ(unsafe_get(new_scope, "b"), new_num(2));
-  CHECK_EQ(unsafe_get(new_scope, "c"), new_num(3));
-  CHECK_EQ(unsafe_get(new_scope, "d"), new_num(4));
-  cell* x = unsafe_get(new_scope, "x");
-  CHECK(x == new_num(2) || x == new_num(4));
-  rmref(new_scope);
-  rmref(args);
-  rmref(params);
+  CHECK_TRACE_CONTENTS("bind", "x: 4y: 4");
 }
 
 void test_eval_handles_keyword_args_for_fns2() {
-  cell* fn = read("(fn (a b c|x) c)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f :c 1 2)");
-  cell* result = eval(call);
-  CHECK_EQ(result, new_num(1));
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
+  run("((fn (a b c|x) c) :x 1 2)");
+  CHECK_TRACE_TOP("eval", "=> 1");
 }
 
 void test_eval_handles_body_keyword_synonym() {
-  cell* fn = read("(fn (a ... body|do) body)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f 2 :do 1 3)");
-  cell* result = eval(call);
-  // (1 3)
-  CHECK_EQ(car(result), new_num(1));
-  CHECK_EQ(car(cdr(result)), new_num(3));
-  CHECK_EQ(cdr(cdr(result)), nil);
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
+  run("((fn (a ... body|do) body) 2 :do 1 3)");
+  CHECK_TRACE_TOP("eval", "=> (1 3)");
 }
 
 void test_eval_handles_body_keyword_synonym2() {
-  cell* fn = read("(fn (a b ... body|do) `(,a ,b ,body))");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f 2 :do 1 3)");
-  cell* result = eval(call);
-  // (2 nil (1 3))
-  CHECK(is_cons(result));
-  CHECK_EQ(car(result), new_num(2));
-  CHECK_EQ(car(cdr(result)), nil);
-  CHECK(is_cons(car(cdr(cdr(result)))));
-  CHECK_EQ(car(car(cdr(cdr(result)))), new_num(1));
-  CHECK_EQ(car(cdr(car(cdr(cdr(result))))), new_num(3));
-  CHECK_EQ(cdr(cdr(car(cdr(cdr(result))))), nil);
-  rmref(result);
-  rmref(call);
-  rmref(f);
-  rmref(fn);
-  end_dynamic_scope("f");
+  run("((fn (a b ... body|do) `(,a ,b ,body)) 2 :do 1 3)");
+  CHECK_TRACE_TOP("eval", "=> (2 nil (1 3))");
+}
+
+void test_eval_handles_quoted_param_aliases() {
+  new_dynamic_scope("x", new_num(3));
+  run("((fn ((a | 'b)) 3) x)");
+  CHECK_TRACE_CONTENTS("bind", "a: 3b: x");
+  end_dynamic_scope("x");
+}
+
+void test_eval_handles_quoted_rest_param_aliases() {
+  new_dynamic_scope("x", new_num(3));
+  run("((fn (a | 'b) 3) x)");
+  CHECK_TRACE_CONTENTS("bind", "a: (3)b: (x)");
+  end_dynamic_scope("x");
+}
+
+// param aliases also stand in for as-params like in haskell
+void test_eval_binds_as_params() {
+  run("((fn (a | (b c)) 3) 1 2)");
+  CHECK_TRACE_CONTENTS("bind", "a: (1 2)b: 1c: 2");
+}
+
+void test_eval_binds_as_params_recursively() {
+  run("((fn (a | (b ... (c | (d e)))) 3) 1 2 3)");
+  CHECK_TRACE_CONTENTS("bind", "a: (1 2 3)b: 1c: (2 3)d: 2e: 3");
+}
+
+void test_eval_binds_quoted_as_params() {
+  new_dynamic_scope("x", new_num(3));
+  run("((fn ('a | ('b)) 3) x)");
+  CHECK_TRACE_CONTENTS("bind", "a: (x)b: x");
+  end_dynamic_scope("x");
+  CHECK_TRACE_CONTENTS("eval", "'x");
+  CHECK_TRACE_DOESNT_CONTAIN("eval", "x");
+}
+
+void test_eval_handles_quoted_as_params() {
+  new_dynamic_scope("x", new_num(3));
+  run("((fn (a | ('b)) 3) x)");
+  CHECK_TRACE_CONTENTS("bind", "a: (3)b: x");
+  end_dynamic_scope("x");
+}
+
+// gotcha: a|(b c) won't work
+void test_eval_warns_on_unary_as() {
+  run("((fn (| a) 3) 1 2)");
+  CHECK_EQ(Raise_count, 1);   Raise_count=0;
+}
+
+void test_eval_binds_missing_as_params_to_nil() {
+  run("((fn ((a | (b c))) 3) 1)");
+  CHECK_TRACE_CONTENTS("bind", "a: 1b: nilc: nil");
+}
+
+void test_eval_handles_duplicate_destructured_aliases() {
+  run("((fn ((a b|x) (c d|x)) 3) '(1 :x 2) '(3 :x 4))");
+  CHECK_TRACE_CONTENTS("bind", "a: 1b: 2c: 3d: 4");   // x might end up bound as either 2 or 4
+}
+
+void test_eval_handles_already_evald_aliased_arg() {
+  new_dynamic_scope("a", new_num(3));
+  // construct ((fn (x|y) 3) ''a)
+  TEMP(call, read("((fn (x|y) 3))"));
+  cell* arg = tag_already_evald(new_sym("a"));
+  append(call, new_cons(arg));
+  In_macro.push(true);
+  rmref(eval(call));
+  CHECK_TRACE_CONTENTS("bind", "x: ay: a");
+  In_macro.pop();
+  end_dynamic_scope("a");
+}
+
+void test_eval_only_reorders_when_necessary() {
+  trace_stream* old = Trace_stream; Trace_stream = NULL;  // trace can't handle cycles yet
+  TEMP(x, read("(3)"));
+  set_cdr(x, x);   // cycle
+  new_dynamic_scope("x", x);
+
+  run("((fn (x|y) 3)    ((fn args args) x))");   // arg is (list x)
+  // should terminate
+  set_cdr(x, nil);
+  end_dynamic_scope("x");
+  Trace_stream = old;
+}
+
+void test_fn_evals_arg_only_when_necessary() {
+  run("((fn ('a | (| 'b 'c)) 3) x)");
+  CHECK_TRACE_CONTENTS("bind", "a: (x)b: (x)c: (x)");
+  CHECK_TRACE_CONTENTS("eval", "'x");
+  CHECK_TRACE_DOESNT_CONTAIN("eval", "x");
+}
+
+void test_fn_evals_arg_only_when_necessary2() {
+  new_dynamic_scope("y", new_num(3));
+  run("((fn (| 'a ('b c)) 3) x y)");
+  CHECK_TRACE_CONTENTS("bind", "a: (x y)b: xc: 3");
+  CHECK_TRACE_DOESNT_CONTAIN("eval", "x");
+  CHECK_TRACE_CONTENTS("eval", "'x");
+  CHECK_TRACE_CONTENTS("eval", "y");
+  end_dynamic_scope("y");
+}
+
+void test_fn_evals_destructured_arg_only_when_necessary() {
+  run("((fn (('a | 'b)) 3) x)");
+  CHECK_TRACE_CONTENTS("bind", "a: xb: x");
+  CHECK_TRACE_DOESNT_CONTAIN("eval", "x");
+  CHECK_TRACE_DOESNT_CONTAIN("eval", "'x");
+}
+
+void test_fn_evals_destructured_arg_only_when_necessary2() {
+  run("((fn (('a | (| 'b 'c))) 3) x)");
+  CHECK_TRACE_CONTENTS("bind", "a: xb: xc: x");
+  CHECK_TRACE_DOESNT_CONTAIN("eval", "x");
+  CHECK_TRACE_DOESNT_CONTAIN("eval", "'x");
+}
+
+void test_fn_evals_destructured_arg_only_when_necessary3() {
+  new_dynamic_scope("x", new_num(3));
+  run("((fn ((| 'a (| 'b c))) 3) x)");
+  CHECK_TRACE_CONTENTS("bind", "a: xb: xc: 3");
+  end_dynamic_scope("x");
 }
 
 
