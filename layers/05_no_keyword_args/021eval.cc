@@ -222,6 +222,7 @@ cell* splice_args(cell* args, cell* scope, cell* fn) {
       add_cons(tip, tag_already_evald(car(curr2)));
     rmref(x);
   }
+  trace("splice") << cdr(p_result);
   return drop_ptr(p_result);
 }
 
