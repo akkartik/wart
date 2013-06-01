@@ -1,4 +1,4 @@
-COMPILE_FN(load, compiledFn_load, "($f)",
+COMPILE_FN(load, compiledfn_load, "($f)",
   load_file(to_string(lookup("$f")).c_str());
   return nil;
 )
