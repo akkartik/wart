@@ -4,6 +4,7 @@
 //  compiled 'if' needs access to caller scope
 //  avoid accidental shadowing for params
 //    so params have a '$' prefix; user-defined functions won't have it because of implicit gensyms
+//    so compiledfns never call other compiledfns
 //  always increment the nrefs of a single cell along all codepaths
 
 COMPILE_FN(fn, compiledfn_fn, "'($params ... $body)",

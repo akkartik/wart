@@ -45,6 +45,6 @@ encourage rewrite attempts (e.g. https://github.com/akkartik/wart/blob/master/00
 and thorough tests throughout the stack to supplant compatibility guarantees
 and avoid regressions during rewrites.
 
-Next: 001organization (http://github.com/akkartik/wart/blob/master/001organization)
+Next: organization (http://github.com/akkartik/wart/blob/master/organization)
 
 Give feedback: wart@akkartik.com

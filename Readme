@@ -59,7 +59,7 @@ To run its tests:
   $ wart test
   $ # success
 
-To learn more, read on: 000preface (http://github.com/akkartik/wart/blob/master/000preface)
+To learn more, read on: preface (http://github.com/akkartik/wart/blob/master/preface)
 
 I love feedback: wart@akkartik.com
 

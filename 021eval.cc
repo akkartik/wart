@@ -37,89 +37,74 @@ cell* eval(cell* expr) {
   return eval(expr, Curr_lexical_scope);
 }
 
-bool Do_log = false;
-stack<int> Log_levels;
-void new_level() {
-  if (Log_levels.empty()) Log_levels.push(0);   // initialization
-  if (Do_log)
-    Log_levels.push(Log_levels.top()+1);
-}
-
-void end_level() {
-  if (Do_log)
-    Log_levels.pop();
-}
-
-cell* eval(cell* expr, cell* scope) {
-  if (!Do_log) return eval2(expr, scope);
-  new_level();
-  log() << expr << '\n';
-  cell* result = eval2(expr, scope);
-  log() << " &rArr; " << result << '\n';
-  end_level();
-  return result;
-}
-
-ofstream& log() {
-  return log(Log_levels.top());
-}
-
-ofstream& log(int n) {
-  static ofstream log("log");
-  log << "</div><div class='level";
-  if (n > 1) log << " hidden";
-  log << "' level_index='" << n << "'>";
-  return log;
-}
-
-COMPILE_FN(trace, compiledfn_trace, "'($form)",
-  Do_log = true;
-  cell* result = eval(lookup("$form"), Curr_lexical_scope);
-  Do_log = false;
-  return result;
-)
-
 long Eval_count = 0;
 
-cell* eval2(cell* expr, cell* scope) {
+cell* eval(cell* expr, cell* scope) {
   ++Eval_count;
+  new_trace_frame("eval");
   if (!expr)
     RAISE << "eval: cell should never be NULL\n" << die();
 
-  if (expr == nil)
+  trace("eval") << expr;
+  if (expr == nil) {
+    trace("eval") << "nil branch";
+    trace("eval") << "=> nil";
     return nil;
+  }
 
-  if (is_keyword_sym(expr))
+  if (is_keyword_sym(expr)) {
+    trace("eval") << "keyword sym";
+    trace("eval") << "=> " << expr;
     return mkref(expr);
+  }
 
-  if (is_sym(expr))
-    return mkref(lookup(expr, scope, keep_already_evald()));
+  if (is_sym(expr)) {
+    trace("eval") << "sym";
+    cell* result = lookup(expr, scope, keep_already_evald());
+    trace("eval") << "=> " << result;
+    return mkref(result);
+  }
 
-  if (is_atom(expr))
+  if (is_atom(expr)) {
+    trace("eval") << "literal";
+    trace("eval") << "=> " << expr;
     return mkref(expr);
+  }
 
-  if (is_incomplete_eval(expr))
+  if (is_incomplete_eval(expr)) {
+    trace("eval") << "incomplete_eval";
+    trace("eval") << "=> " << expr;
     return eval(rep(expr), scope);
+  }
 
-  if (is_object(expr))
+  if (is_object(expr)) {
+    trace("eval") << "object";
+    trace("eval") << "=> " << expr;
     return mkref(expr);
+  }
 
-  if (is_quoted(expr))
+  if (is_quoted(expr)) {
+    trace("eval") << "quote";
+    trace("eval") << "=> " << cdr(expr);
     return mkref(cdr(expr));
+  }
 
-  if (is_backquoted(expr))
-    return process_unquotes(cdr(expr), 1, scope);  // already mkref'd
+  if (is_backquoted(expr)) {
+    cell* result = process_unquotes(cdr(expr), 1, scope);
+    trace("eval") << "backquote";
+    trace("eval") << "=> " << result;
+    return result;  // already mkref'd
+  }
 
   if (is_already_evald(expr))
     return mkref(keep_already_evald() ? expr : strip_already_evald(expr));
 
-  if (Do_log) log(Log_levels.top()+1) << "eval'ing args\n";
-
   // expr is a call
-  cell* fn = to_fn(eval(car(expr), scope));
+  TEMP(fn, to_fn(eval(car(expr), scope)));
   if (is_incomplete_eval(fn)) {
     cell* result = new_object("incomplete_eval", new_cons(rep(fn), cdr(expr)));
-    rmref(fn);
+    trace("eval") << "incomplete_eval fn";
+    trace("eval") << "=> " << result;
     return mkref(result);
   }
   if (!is_fn(fn))
@@ -127,18 +112,17 @@ cell* eval2(cell* expr, cell* scope) {
         << "Perhaps you need to split the line in two.\n";
 
   // eval its args in the caller's lexical environment
-  cell* spliced_args = splice_args(cdr(expr), scope, fn);
-  cell* ordered_args = reorder_keyword_args(spliced_args, sig(fn));
+  TEMP(spliced_args, splice_args(cdr(expr), scope, fn));
+  TEMP(ordered_args, reorder_keyword_args(spliced_args, sig(fn)));
   cell* new_scope = new_table();
   eval_bind_all(sig(fn), ordered_args, scope, new_scope);
 
   if (car(expr) != new_sym("speculatively")
       && any_incomplete_eval(new_scope)) {
     cell* result = ripple_incomplete_eval(fn, new_scope);
+    trace("eval") << "ripple";
+    trace("eval") << "=> " << result;
     rmref(new_scope);
-    rmref(ordered_args);
-    rmref(spliced_args);
-    rmref(fn);
     return mkref(result);
   }
 
@@ -149,41 +133,40 @@ cell* eval2(cell* expr, cell* scope) {
 
   cell* result = nil;
   if (is_compiledfn(body(fn))) {
-    if (Do_log) log(Log_levels.top()+1) << "executing primitive " << car(expr) << '\n';
-    result = to_compiledfn(body(fn))();  // all compiledfns must mkref result
+    trace("eval") << "compiled fn";
+    result = to_compiledfn(body(fn))();   // all compiledfns mkref their result
   }
   else {
-    if (Do_log) log(Log_levels.top()+1) << "eval'ing body\n";
+    trace("eval") << "fn";
     // eval all forms in body, save result of final form
-    for (cell* form = impl(fn); form != nil; form=cdr(form)) {
-      rmref(result);
-      result = eval(car(form), Curr_lexical_scope);
-    }
+    for (cell* form = impl(fn); form != nil; form=cdr(form))
+      update(result, eval(car(form)));
   }
 
   end_lexical_scope();  // implicitly rmrefs new_scope
   end_dynamic_scope(CURR_LEXICAL_SCOPE);
-  rmref(ordered_args);
-  rmref(spliced_args);
-  rmref(fn);
+
+  trace("eval") << "=> " << result;
   return result;  // already mkref'd
 }
 
 // bind params to args in new_scope, taking into account:
 //  quoted params (eval'ing args as necessary; args is never quoted, though)
 //  destructured params
-//  aliased params
 void eval_bind_all(cell* params, cell* args, cell* scope, cell* new_scope) {
+  trace("eval/bind/all") << params << " <-> " << args;
   if (params == nil)
     return;
 
-  cell* args2 = NULL;
+  TEMP(args2, nil);
   if (is_quoted(params)) {
     params = strip_quote(params);
-    args2 = quote_all(args);
+    args2 = quote_all(args);   // already mkref'd
+    trace("eval/bind/all") << "stripping quote: " << params << " <-> " << args2;
   }
   else {
     args2 = mkref(args);
+    trace("eval/bind/all") << " args nrefs: " << args2->nrefs;
   }
 
   if (is_sym(params)) {
@@ -201,10 +184,10 @@ void eval_bind_all(cell* params, cell* args, cell* scope, cell* new_scope) {
     eval_bind_param(car(params), car(args2), scope, new_scope);
     eval_bind_all(cdr(params), cdr(args2), scope, new_scope);
   }
-  rmref(args2);
 }
 
 void eval_bind_rest(cell* param, cell* args, cell** cached_val, cell* scope, cell* new_scope) {
+  trace("eval/bind/rest") << param << " <-> " << args;
   if (is_cons(param))
     eval_bind_all(param, args, scope, new_scope);
 
@@ -216,7 +199,8 @@ void eval_bind_rest(cell* param, cell* args, cell** cached_val, cell* scope, cel
 }
 
 void eval_bind_param(cell* param, cell* arg, cell* scope, cell* new_scope) {
-  cell* arg2 = NULL;
+  trace("eval/bind/param") << param << " <-> " << arg;
+  TEMP(arg2, nil);
   if (is_quoted(param)) {
     param = strip_quote(param);
     arg2 = mkref(new_cons(sym_quote, arg));
@@ -228,17 +212,16 @@ void eval_bind_param(cell* param, cell* arg, cell* scope, cell* new_scope) {
     eval_bind_aliases(param, arg2, scope, new_scope);
 
   else {
-    cell* val = eval_arg(arg2, scope);
+    TEMP(val, eval_arg(arg2, scope));
     if (is_incomplete_eval(val) && is_cons(param))
       add_lexical_binding(param, val, new_scope);
     else
       bind_params(param, val, arg2, new_scope);
-    rmref(val);
   }
-  rmref(arg2);
 }
 
 void eval_bind_rest_aliases(cell* params /* (| ...) */, cell* args, cell* scope, cell* new_scope) {
+  trace("eval/bind/rest_aliases") << params << " <-> " << args;
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
   cell* cached_val = NULL;   // to ensure we don't multiply-eval
@@ -251,12 +234,14 @@ void eval_bind_rest_aliases(cell* params /* (| ...) */, cell* args, cell* scope,
 }
 
 void eval_bind_aliases(cell* params /* (| ...) */, cell* arg, cell* scope, cell* new_scope) {
+  trace("eval/bind/aliases") << params << " <-> " << arg;
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
   cell* cached_val = NULL;   // to ensure we don't multiply-eval
   for (cell *aliases=cdr(params), *alias=car(aliases); aliases != nil; aliases=cdr(aliases),alias=car(aliases)) {
     if (is_quoted(alias))
-      bind_params(alias, arg, NULL, new_scope);
+      // TODO: take out strip_quote?
+      bind_params(strip_quote(alias), arg, NULL, new_scope);
     else if (cached_val)
       bind_params(alias, cached_val, arg, new_scope);
     else if (is_alias(alias))
@@ -269,8 +254,8 @@ void eval_bind_aliases(cell* params /* (| ...) */, cell* arg, cell* scope, cell*
   }
 }
 
-// NULL unevald_args => args are already quoted
 void bind_params(cell* params, cell* args, cell* unevald_args, cell* new_scope) {
+  trace("eval/bind/one") << params << " <-> " << args;
   if (is_quoted(params)) {
     if (unevald_args)
       bind_params(strip_quote(params), unevald_args, NULL, new_scope);
@@ -281,8 +266,10 @@ void bind_params(cell* params, cell* args, cell* unevald_args, cell* new_scope) 
   else if (params == nil)
     ;
 
-  else if (is_sym(params))
+  else if (is_sym(params)) {
+    trace("eval/bind/one") << "binding " << params << " to " << args;
     add_lexical_binding(params, args, new_scope);
+  }
 
   else if (!is_cons(params))
     ;
@@ -294,14 +281,14 @@ void bind_params(cell* params, cell* args, cell* unevald_args, cell* new_scope) 
     bind_aliases(params, args, unevald_args, new_scope);
 
   else {
-    cell* ordered_args = reorder_keyword_args(args, params);
+    TEMP(ordered_args, reorder_keyword_args(args, params));
     bind_params(car(params), car(ordered_args), unevald_args && is_cons(unevald_args) ? car(unevald_args) : unevald_args, new_scope);
     bind_params(cdr(params), cdr(ordered_args), unevald_args && is_cons(unevald_args) ? cdr(unevald_args) : unevald_args, new_scope);
-    rmref(ordered_args);
   }
 }
 
 void bind_aliases(cell* params /* (| ...) */, cell* arg, cell* unevald_arg, cell* new_scope) {
+  trace("eval/bind/one_aliases") << params << " <-> " << arg;
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
   for (cell* aliases=cdr(params); aliases != nil; aliases=cdr(aliases))
@@ -309,16 +296,15 @@ void bind_aliases(cell* params /* (| ...) */, cell* arg, cell* unevald_arg, cell
       bind_params(car(aliases), arg, unevald_arg, new_scope);
 }
 
-//// eval args - while respecting already_evald and symbolic_eval
+//// eval args - while respecting already_evald and Do_symbolic_eval
 
 cell* eval_all(cell* args, cell* scope) {
   if (!is_cons(args))
     return eval_arg(args, scope);
   cell* p_result = new_cell(), *curr = p_result;
   for (; args != nil; args=cdr(args), curr=cdr(curr)) {
-    cell* val = eval_arg(car(args), scope);
+    TEMP(val, eval_arg(car(args), scope));
     add_cons(curr, val);
-    rmref(val);
   }
   return drop_ptr(p_result);
 }
@@ -327,6 +313,7 @@ stack<bool> Do_symbolic_eval;
 
 // eval, but always strip '' regardless of keep_already_evald()
 cell* eval_arg(cell* arg, cell* scope) {
+  trace("already_evald") << "eval_arg " << arg;
   if (is_already_evald(arg)) return mkref(strip_already_evald(arg));
   if (Do_symbolic_eval.empty()) Do_symbolic_eval.push(false);
   if (Do_symbolic_eval.top()) return mkref(arg);
@@ -356,7 +343,10 @@ COMPILE_FN(symbolic_eval_args, compiledfn_symbolic_eval_args, "($expr)",
 //// process :keyword args and reorder args to param order -- respecting param aliases
 
 cell* reorder_keyword_args(cell* args, cell* params) {
-  if (!is_cons(strip_quote(params))) return mkref(args);
+  if (!is_cons(strip_quote(params))) {
+    trace("ordered_args") << "unchanged: " << args;
+    return mkref(args);
+  }
 
   cell_map keyword_args;  // all values will be refcounted.
   cell* non_keyword_args = extract_keyword_args(params, args, keyword_args);
@@ -364,6 +354,7 @@ cell* reorder_keyword_args(cell* args, cell* params) {
 
   for (cell_map::iterator p = keyword_args.begin(); p != keyword_args.end(); ++p)
     if (p->second) rmref(p->second);
+  trace("ordered_args") << "=> " << result;
   return result;  // already mkref'd
 }
 
@@ -519,14 +510,14 @@ cell* splice_args(cell* args, cell* scope, cell* fn) {
 
     if (is_macro(fn) && !contains(body(fn), sym_backquote))
       RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)\n";
-    cell* x = unsplice(car(curr), scope);
+    TEMP(x, unsplice(car(curr), scope));
     if (is_incomplete_eval(x))
       add_cons(tip, new_cons(sym_splice, rep(x)));
     else
       for (cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
         add_cons(tip, tag_already_evald(car(curr2)));
-    rmref(x);
   }
+  trace("splice") << cdr(p_result);
   return drop_ptr(p_result);
 }
 
@@ -565,6 +556,7 @@ bool is_already_evald(cell* cell) {
 }
 
 cell* strip_already_evald(cell* cell) {
+  trace("already_evald") << "stripping from " << cell;
   while (is_already_evald(cell))
     cell = cdr(cell);
   return cell;
@@ -578,44 +570,58 @@ cell* strip_already_evald(cell* cell) {
 bool Skipped_already_evald = false;
 
 cell* process_unquotes(cell* x, long depth, cell* scope) {
-  if (!is_cons(x)) return mkref(x);
+  new_trace_frame("backquote");
+  trace("backquote") << x << " " << depth;
+  if (!is_cons(x)) {
+    trace("backquote") << "atom: " << x;
+    return mkref(x);
+  }
 
   if (unquote_depth(x) == depth) {
     Skipped_already_evald = false;
     cell* result = eval(strip_unquote(x), scope);
-    return Skipped_already_evald ? push_cons(sym_already_evald, result) : result;
+    trace("backquote") << "eval: " << result;
+    if (Skipped_already_evald) {
+      result = push_cons(sym_already_evald, result);
+      trace("already_evald") << "push => " << result;
+    }
+    return result;  // already mkref'd
   }
   else if (unquote_splice_depth(car(x)) == depth) {
-    cell* result = eval(strip_unquote_splice(car(x)), scope);
-    cell* splice = process_unquotes(cdr(x), depth, scope);
-    if (result == nil) return splice;
+    TEMP(splice, eval(strip_unquote_splice(car(x)), scope));
+    trace("backquote") << "splice: " << splice;
+    TEMP(rest, process_unquotes(cdr(x), depth, scope));
+    if (splice == nil) return mkref(rest);
 
     // always splice in a copy
-    cell* resultcopy = copy_list(result);
-    rmref(result);
-    append(resultcopy, splice);
-    rmref(splice);
-    return mkref(resultcopy);
+    cell* result = copy_list(splice);
+    append(result, rest);
+    return mkref(result);
   }
   else if (unquote_depth(x) > 0) {
+    trace("backquote") << "not deep enough: " << x;
     return mkref(x);
   }
 
   if (is_backquoted(x)) {
-    cell* result = new_cons(car(x), process_unquotes(cdr(x), depth+1, scope));
-    rmref(cdr(result));
+    TEMP(rest, process_unquotes(cdr(x), depth+1, scope));
+    cell* result = new_cons(car(x), rest);
+    trace("backquote") << "backquote: " << result;
     return mkref(result);
   }
 
-  cell* result = new_cons(process_unquotes(car(x), depth, scope),
-                         process_unquotes(cdr(x), depth, scope));
-  rmref(car(result));
-  rmref(cdr(result));
+  TEMP(head, process_unquotes(car(x), depth, scope));
+  TEMP(tail, process_unquotes(cdr(x), depth, scope));
+  cell* result = new_cons(head, tail);
+  trace("backquote") << "=> " << result;
   return mkref(result);
 }
 
 cell* maybe_strip_already_evald(bool keep_already_evald, cell* x) {
+  trace("already_evald") << "maybe_strip_already_evald " << keep_already_evald << " " << x;
+  trace("already_evald") << "Skipped_already_evald used to be " << Skipped_already_evald;
   Skipped_already_evald = is_already_evald(x);
+  trace("already_evald") << "Skipped_already_evald is now " << Skipped_already_evald;
   return keep_already_evald ? x : strip_already_evald(x);
 }
 
@@ -729,9 +735,10 @@ bool is_fn(cell* x) {
 cell* to_fn(cell* x) {
   if (x == nil || is_fn(x)) return x;
   if (is_incomplete_eval(x)) return x;
+  lease_cell lease(x);  // we assume x is already mkref'd
   if (!lookup_dynamic_binding(sym_Coercions))
     RAISE << "tried to call " << x << '\n' << die();
-  cell* result = coerce_quoted(x, sym_function, lookup(sym_Coercions));   rmref(x);
+  cell* result = coerce_quoted(x, sym_function, lookup(sym_Coercions));
   return result;
 }
 

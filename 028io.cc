@@ -1,5 +1,7 @@
 //// compiled primitives for I/O
 
+long Max_depth = 12;
+
 ostream& operator<<(ostream& os, cell* c) {
   if (c == NULL) return os << "NULLNULLNULL";
   if (c == nil) return os << "nil";
@@ -38,10 +40,16 @@ ostream& operator<<(ostream& os, cell* c) {
 
 ostream& operator<<(ostream& os, table* t) {
   os << "{";
+  // order common keys deterministically for tracing tests
   if (t->value[sym_name]) os << t->value[sym_name] << ": ";
+  if (t->value[sym_sig]) os << sym_sig << ", ";
+  if (t->value[sym_body]) os << sym_body << ", ";
+  if (t->value[sym_env]) os << sym_env << ", ";
   for (cell_map::iterator p = t->value.begin(); p != t->value.end(); ++p) {
-    if (p->second && p->first != sym_name)
-      os << (cell*)p->first << ", ";
+    if (!p->second) continue;
+    if (p->first == sym_name || p->first == sym_sig || p->first == sym_body || p->first == sym_env)
+      continue;
+    os << (cell*)p->first << ", ";
   }
   return os << "}";
 }

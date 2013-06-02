@@ -105,7 +105,9 @@ COMPILE_FN(eval, compiledfn_eval, "('$x $scope)",
   In_macro.push(true);
   // sidestep eval_args for x to handle @args
   cell* x = eval(lookup("$x"), Curr_lexical_scope);
-  cell* ans = eval(x, lookup("$scope"));
+  cell* ans = eval(
+    (type(x) == new_sym("incomplete_eval_data")) ? rep(x) : x,
+    lookup("$scope"));
   rmref(x);
   In_macro.pop();
   return ans;
