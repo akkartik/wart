@@ -28,7 +28,11 @@ ast_node next_ast_node(indent_sensitive_stream& in) {
 
 ast_node next_ast_node(list<token>& in) {
   list<ast_node> subform;
-  if (in.empty()) return ast_node(subform);
+  new_trace_frame("parse");
+  if (in.empty()) {
+    trace("parse") << ast_node(subform);
+    return ast_node(subform);
+  }
 
   subform.push_back(ast_node(next_token(in)));
   while (!in.empty() && is_quote_or_unquote(subform.back().atom))
@@ -40,8 +44,12 @@ ast_node next_ast_node(list<token>& in) {
     if (!is_close_paren(subform.back())) RAISE << "Unbalanced (\n" << die();
   }
 
-  if (subform.size() == 1)
+  if (subform.size() == 1) {
+    trace("parse") << ast_node(subform.back());
     return ast_node(subform.back());
+  }
+
+  trace("parse") << ast_node(subform);
   return ast_node(subform);
 }
 
