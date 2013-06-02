@@ -1,5 +1,7 @@
 //// compiled primitives for I/O
 
+long Max_depth = 12;
+
 ostream& operator<<(ostream& os, cell* c) {
   if (c == NULL) return os << "NULLNULLNULL";
   if (c == nil) return os << "nil";
