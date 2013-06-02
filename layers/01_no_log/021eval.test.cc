@@ -703,7 +703,8 @@ void test_eval_handles_unknown_call() {
 void test_eval_handles_unknown_arg() {
   run("f <- (fn(a) a)");
   TEMP(attempt1, eval("(f x)"));
-  CHECK_TRACE_CONTENTS("eval", "ripple");  // checking function table is brittle
+  CHECK_TRACE_CONTENTS("eval", "ripple");
+  CHECK_TRACE_CONTENTS("eval", "=> (object incomplete_eval ((object function {sig, body, }) x))");
   CLEAR_TRACE;
   new_dynamic_scope("x", new_num(34));
   TEMP(attempt2, eval(attempt1));
@@ -713,64 +714,25 @@ void test_eval_handles_unknown_arg() {
 }
 
 void test_eval_handles_known_and_unknown_args() {
-  new_dynamic_scope("a", new_num(3));
-  run("f <- (fn (a b) b)");
-  TEMP(result, eval("(f a b)"));
-  // `(object incomplete_eval (,f ''3 b))
-  // checking trace for function f is brittle
-  CHECK(is_incomplete_eval(result));
-  CHECK(is_cons(rep(result)));
-  CHECK_EQ(car(rep(result)), lookup("f"));
-  CHECK(is_cons(car(cdr(rep(result)))));
-  CHECK_EQ(car(car(cdr(rep(result)))), sym_already_evald);
-  CHECK_EQ(cdr(car(cdr(rep(result)))), new_num(3));
-  CHECK_EQ(car(cdr(cdr(rep(result)))), new_sym("b"));
-  CHECK_EQ(cdr(cdr(cdr(rep(result)))), nil);
-  end_dynamic_scope("f");
-  end_dynamic_scope("a");
+  new_dynamic_scope("x", new_num(3));
+  TEMP(result, eval("((fn(a b) b) x y)"));
+  CHECK_TRACE_TOP("eval", "=> (object incomplete_eval ((object function {sig, body, }) ''3 y))");
+  end_dynamic_scope("x");
 }
 
 void test_eval_handles_quoted_and_unknown_args() {
-  run("f <- (fn ('a b) b)");
-  TEMP(result, eval("(f a b)"));
-  // `(object incomplete_eval (,f ''a b))
-  // checking trace for function f is brittle
-  CHECK(is_incomplete_eval(result));
-  CHECK(is_cons(rep(result)));
-  CHECK_EQ(car(rep(result)), lookup("f"));
-  CHECK(is_cons(car(cdr(rep(result)))));
-  CHECK_EQ(car(car(cdr(rep(result)))), sym_already_evald);
-  CHECK_EQ(cdr(car(cdr(rep(result)))), new_sym("a"));
-  CHECK_EQ(car(cdr(cdr(rep(result)))), new_sym("b"));
-  CHECK_EQ(cdr(cdr(cdr(rep(result)))), nil);
-  end_dynamic_scope("f");
+  TEMP(result, eval("((fn ('a b) b) x y)"));
+  CHECK_TRACE_TOP("eval", "=> (object incomplete_eval ((object function {sig, body, }) ''x y))");
 }
 
 void test_eval_handles_unknown_destructured_args() {
-  run("f <- (fn ((a b)) b)");
-  TEMP(result, eval("(f args)"));
-  // `(object incomplete_eval (,f args))
-  // checking trace for function f is brittle
-  CHECK(is_incomplete_eval(result));
-  CHECK(is_cons(rep(result)));
-  CHECK_EQ(car(rep(result)), lookup("f"));
-  CHECK_EQ(car(cdr(rep(result))), new_sym("args"));
-  CHECK_EQ(cdr(cdr(rep(result))), nil);
-  end_dynamic_scope("f");
+  TEMP(result, eval("((fn((a b)) b) args)"));
+  CHECK_TRACE_TOP("eval", "=> (object incomplete_eval ((object function {sig, body, }) args))");
 }
 
 void test_eval_handles_unknown_spliced_args() {
-  run("f <- (fn ((a b)) b)");
-  TEMP(result, eval("(f @args)"));
-  // `(object incomplete_eval (,f @args))
-  // checking trace for function f is brittle
-  CHECK(is_incomplete_eval(result));
-  CHECK(is_cons(rep(result)));
-  CHECK_EQ(car(rep(result)), lookup("f"));
-  cell* args = car(cdr(rep(result)));
-  CHECK_EQ(car(args), sym_splice);
-  CHECK_EQ(cdr(args), new_sym("args"));
-  end_dynamic_scope("f");
+  TEMP(result, eval("((fn((a b)) b) @args)"));
+  CHECK_TRACE_TOP("eval", "=> (object incomplete_eval ((object function {sig, body, }) @args))");
 }
 
 void test_eval_handles_literal_incomplete_args() {
@@ -779,14 +741,6 @@ void test_eval_handles_literal_incomplete_args() {
 }
 
 void test_eval_handles_incomplete_args_for_aliased_params() {
-  run("f <- (fn (a|b) a)");
-  TEMP(result, eval("(f x)"));
-  // `(object incomplete_eval (,f x))
-  // checking trace for function f is brittle
-  CHECK(is_incomplete_eval(result));
-  CHECK(is_cons(rep(result)));
-  CHECK_EQ(car(rep(result)), lookup("f"));
-  CHECK_EQ(car(cdr(rep(result))), new_sym("x"));
-  CHECK_EQ(cdr(cdr(rep(result))), nil);
-  end_dynamic_scope("f");
+  TEMP(result, eval("((fn(a|b) a) x)"));
+  CHECK_TRACE_TOP("eval", "=> (object incomplete_eval ((object function {sig, body, }) x))");
 }
