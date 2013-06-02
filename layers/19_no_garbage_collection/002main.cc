@@ -44,7 +44,7 @@ cell* read(istream& in) {
 cell* run(istream& in) {
   cell* result = NULL;
   do {
-    result = eval(read(in));
+      result = eval(read(in));
   } while (!eof(in) && (!Interactive || in.peek() != '\n'));
   return result;
 }
@@ -53,7 +53,7 @@ cell* run(istream& in) {
 list<cell*> read_all(istream& in) {
   list<cell*> results;
   do {
-    results.push_back(read(in));
+      results.push_back(read(in));
   } while (!eof(in) && (!Interactive || in.peek() != '\n'));
   return results;
 }

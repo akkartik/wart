@@ -42,7 +42,7 @@ struct ast_node {
 
 void read_all(istream& in) {
   do {
-    next_ast_node(in);
+      next_ast_node(in);
   } while (!eof(in));
 }
 

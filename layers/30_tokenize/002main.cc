@@ -26,7 +26,7 @@ int main(int argc, unused char* argv[]) {
 
 void read_all(istream& in) {
   do {
-    next_token(in);
+      next_token(in);
   } while (!eof(in));
 }
 

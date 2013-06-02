@@ -46,9 +46,9 @@ extern cell* nil;
 cell* run(istream& in) {
   cell* result = nil;
   do {
-    cell* form = read(in);
-    update(result, eval(form));
-    rmref(form);
+      cell* form = read(in);
+      update(result, eval(form));
+      rmref(form);
   } while (!eof(in) && (!Interactive || in.peek() != '\n'));
   return result;
 }
@@ -109,7 +109,7 @@ void setup() {
 void read_all(string s) {
   stringstream in(s);
   do {
-    rmref(read(in));
+      rmref(read(in));
   } while (!eof(in));
   // return nothing; we'll just verify the trace
 }
