@@ -216,8 +216,8 @@ cell* reorder_keyword_args(cell* args, cell* params) {
   }
 
   cell_map keyword_args;  // all values will be refcounted.
-  cell* non_keyword_args = extract_keyword_args(params, args, keyword_args);
-  cell* result = args_in_param_order(params, non_keyword_args, keyword_args);   rmref(non_keyword_args);
+  TEMP(non_keyword_args, extract_keyword_args(params, args, keyword_args));
+  cell* result = args_in_param_order(params, non_keyword_args, keyword_args);
 
   for (cell_map::iterator p = keyword_args.begin(); p != keyword_args.end(); ++p)
     if (p->second) rmref(p->second);
@@ -326,10 +326,9 @@ cell* splice_args(cell* args, cell* scope, cell* fn) {
 
     if (is_macro(fn) && !contains(body(fn), sym_backquote))
       RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)\n";
-    cell* x = unsplice(car(curr), scope);
+    TEMP(x, unsplice(car(curr), scope));
     for (cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
       add_cons(tip, tag_already_evald(car(curr2)));
-    rmref(x);
   }
   trace("splice") << cdr(p_result);
   return drop_ptr(p_result);

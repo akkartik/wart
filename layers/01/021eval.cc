@@ -327,14 +327,12 @@ COMPILE_FN(symbolic_eval_args, compiledfn_symbolic_eval_args, "($expr)",
     RAISE << "Not a call: " << expr << '\n';
     return nil;
   }
-  cell* spliced_args = splice_args(cdr(expr), Curr_lexical_scope, fn);
-  cell* ordered_args = reorder_keyword_args(spliced_args, sig(fn));
+  TEMP(spliced_args, splice_args(cdr(expr), Curr_lexical_scope, fn));
+  TEMP(ordered_args, reorder_keyword_args(spliced_args, sig(fn)));
   Do_symbolic_eval.push(true);
     cell* bindings = mkref(new_table());
     eval_bind_all(sig(fn), ordered_args, Curr_lexical_scope, bindings);
   Do_symbolic_eval.pop();
-  rmref(ordered_args);
-  rmref(spliced_args);
   return bindings;
 )
 
@@ -349,8 +347,8 @@ cell* reorder_keyword_args(cell* args, cell* params) {
   }
 
   cell_map keyword_args;  // all values will be refcounted.
-  cell* non_keyword_args = extract_keyword_args(params, args, keyword_args);
-  cell* result = args_in_param_order(params, non_keyword_args, keyword_args);   rmref(non_keyword_args);
+  TEMP(non_keyword_args, extract_keyword_args(params, args, keyword_args));
+  cell* result = args_in_param_order(params, non_keyword_args, keyword_args);
 
   for (cell_map::iterator p = keyword_args.begin(); p != keyword_args.end(); ++p)
     if (p->second) rmref(p->second);
@@ -373,10 +371,9 @@ cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
              && is_alias(car(kparam))) {
       args = cdr(args);   // skip keyword arg
       cell* end_rest = next_keyword(args, params);
-      cell* rest_args = snip(args, end_rest);
+      TEMP(rest_args, snip(args, end_rest));
       for (cell* p = cdr(car(kparam)); p != nil; p=cdr(p))
         keyword_args[car(p)] = mkref(rest_args);
-      rmref(rest_args);
       rmref(kparam);
       args = end_rest;
     }
@@ -680,10 +677,8 @@ cell* ripple_incomplete_eval(cell* f, cell* scope) {
     else
       add_cons(curr, tag_already_evald(table[param]));
   }
-  cell* result = new_cons(f, drop_ptr(args));
-  rmref(cdr(result));
-  result = new_object("incomplete_eval", result);
-  return result;
+  TEMP(result_args, drop_ptr(args));
+  return new_object("incomplete_eval", new_cons(f, result_args));
 }
 
 COMPILE_FN(speculatively, compiledfn_speculatively, "($x)",

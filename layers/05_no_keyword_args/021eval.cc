@@ -216,10 +216,9 @@ cell* splice_args(cell* args, cell* scope, cell* fn) {
 
     if (is_macro(fn) && !contains(body(fn), sym_backquote))
       RAISE << "calling macros with splice can have subtle effects (http://arclanguage.org/item?id=15659)\n";
-    cell* x = unsplice(car(curr), scope);
+    TEMP(x, unsplice(car(curr), scope));
     for (cell* curr2 = x; curr2 != nil; curr2=cdr(curr2), tip=cdr(tip))
       add_cons(tip, tag_already_evald(car(curr2)));
-    rmref(x);
   }
   trace("splice") << cdr(p_result);
   return drop_ptr(p_result);
