@@ -233,13 +233,13 @@ void teardown_cells() {
 
   for (unordered_map<long, cell*>::iterator p = Int_literals.begin(); p != Int_literals.end(); ++p) {
     if (p->second->nrefs > 1)
-      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << (long)p->second->car << " " << p->second->nrefs << '\n';
+      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << p->second->nrefs << '\n';
     free_cell(p->second);
   }
 
   for (unordered_map<string, cell*>::iterator p = Sym_literals.begin(); p != Sym_literals.end(); ++p) {
     if (p->second->nrefs > 1)
-      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *(string*)p->second->car << " " << p->second->nrefs << '\n';
+      RAISE << "couldn't unintern: " << p->first << ": " << (void*)p->second << " " << *p->second->nrefs << '\n';
     free_cell(p->second);
   }
 }
