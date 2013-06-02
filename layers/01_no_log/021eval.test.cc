@@ -678,169 +678,115 @@ void test_eval_handles_assigned_fn_calls() {
 
 void test_eval_on_incomplete_eval_retries() {
   trace("test") << "incomplete eval";
-  cell* expr = read("a");
-  cell* incomplete_result = eval(expr);
-  CHECK(is_object(incomplete_result));
-  CHECK_EQ(type(incomplete_result), sym_incomplete_eval);
+  TEMP(attempt1, eval("a"));
+  CHECK_TRACE_CONTENTS("lookup", "incomplete_eval");
+  CHECK_TRACE_CONTENTS("eval", "=> (object incomplete_eval a)");
   new_dynamic_scope("a", new_num(34));
-  cell* doubly_evald_result = eval(incomplete_result);
-  CHECK_EQ(doubly_evald_result, new_num(34));
-  rmref(doubly_evald_result);
+  CLEAR_TRACE;
+  TEMP(attempt2, eval(attempt1));
+  CHECK_TRACE_CONTENTS("eval", "incomplete_eval");
+  CHECK_TRACE_CONTENTS("eval", "=> 34");
   end_dynamic_scope("a");
-  rmref(incomplete_result);
-  rmref(expr);
 }
 
 void test_eval_handles_unknown_call() {
-  cell* expr = read("(f 3)");
-  cell* attempt1 = eval(expr);
-  CHECK(is_incomplete_eval(attempt1));
-  cell* fn = read("(fn (a) a)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* attempt2 = eval(attempt1);
-  CHECK_EQ(attempt2, new_num(3));
-  rmref(attempt2);
+  TEMP(attempt1, eval("(f 34)"));
+  CHECK_TRACE_CONTENTS("eval", "incomplete_eval fn");
+  CHECK_TRACE_CONTENTS("eval", "=> (object incomplete_eval (f 34))");
+  CLEAR_TRACE;
+  run("f <- (fn(a) a)");
+  TEMP(attempt2, eval(attempt1));
+  CHECK_TRACE_CONTENTS("eval", "=> 34");
   end_dynamic_scope("f");
-  rmref(f);
-  rmref(fn);
-  rmref(attempt1);
-  rmref(expr);
 }
 
 void test_eval_handles_unknown_arg() {
-  cell* fn = read("(fn (a) a)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f a)");
-  cell* attempt1 = eval(call);
-  // `(object incomplete_eval (,f a))
-  CHECK(is_incomplete_eval(attempt1));
-  CHECK(is_cons(rep(attempt1)));
-  CHECK_EQ(car(rep(attempt1)), f);
-  CHECK_EQ(car(cdr(rep(attempt1))), new_sym("a"));
-  CHECK_EQ(cdr(cdr(rep(attempt1))), nil);
-  rmref(attempt1);
-  rmref(call);
+  run("f <- (fn(a) a)");
+  TEMP(attempt1, eval("(f x)"));
+  CHECK_TRACE_CONTENTS("eval", "ripple");  // checking function table is brittle
+  CLEAR_TRACE;
+  new_dynamic_scope("x", new_num(34));
+  TEMP(attempt2, eval(attempt1));
+  CHECK_TRACE_CONTENTS("eval", "=> 34");
+  end_dynamic_scope("x");
   end_dynamic_scope("f");
-  rmref(f);
-  rmref(fn);
 }
 
 void test_eval_handles_known_and_unknown_args() {
-  cell* fn = read("(fn (a b) b)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
   new_dynamic_scope("a", new_num(3));
-  cell* call = read("(f a b)");
-  cell* attempt1 = eval(call);
+  run("f <- (fn (a b) b)");
+  TEMP(result, eval("(f a b)"));
   // `(object incomplete_eval (,f ''3 b))
-  CHECK(is_incomplete_eval(attempt1));
-  CHECK(is_cons(rep(attempt1)));
-  CHECK_EQ(car(rep(attempt1)), f);
-  CHECK(is_cons(car(cdr(rep(attempt1)))));
-  CHECK_EQ(car(car(cdr(rep(attempt1)))), sym_already_evald);
-  CHECK_EQ(cdr(car(cdr(rep(attempt1)))), new_num(3));
-  CHECK_EQ(car(cdr(cdr(rep(attempt1)))), new_sym("b"));
-  CHECK_EQ(cdr(cdr(cdr(rep(attempt1)))), nil);
-  rmref(attempt1);
-  rmref(call);
-  end_dynamic_scope("a");
+  // checking trace for function f is brittle
+  CHECK(is_incomplete_eval(result));
+  CHECK(is_cons(rep(result)));
+  CHECK_EQ(car(rep(result)), lookup("f"));
+  CHECK(is_cons(car(cdr(rep(result)))));
+  CHECK_EQ(car(car(cdr(rep(result)))), sym_already_evald);
+  CHECK_EQ(cdr(car(cdr(rep(result)))), new_num(3));
+  CHECK_EQ(car(cdr(cdr(rep(result)))), new_sym("b"));
+  CHECK_EQ(cdr(cdr(cdr(rep(result)))), nil);
   end_dynamic_scope("f");
-  rmref(f);
-  rmref(fn);
+  end_dynamic_scope("a");
 }
 
 void test_eval_handles_quoted_and_unknown_args() {
-  cell* fn = read("(fn ('a b) b)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f a b)");
-  cell* attempt1 = eval(call);
+  run("f <- (fn ('a b) b)");
+  TEMP(result, eval("(f a b)"));
   // `(object incomplete_eval (,f ''a b))
-  CHECK(is_incomplete_eval(attempt1));
-  CHECK(is_cons(rep(attempt1)));
-  CHECK_EQ(car(rep(attempt1)), f);
-  CHECK(is_cons(car(cdr(rep(attempt1)))));
-  CHECK_EQ(car(car(cdr(rep(attempt1)))), sym_already_evald);
-  CHECK_EQ(cdr(car(cdr(rep(attempt1)))), new_sym("a"));
-  CHECK_EQ(car(cdr(cdr(rep(attempt1)))), new_sym("b"));
-  CHECK_EQ(cdr(cdr(cdr(rep(attempt1)))), nil);
-  rmref(attempt1);
-  rmref(call);
+  // checking trace for function f is brittle
+  CHECK(is_incomplete_eval(result));
+  CHECK(is_cons(rep(result)));
+  CHECK_EQ(car(rep(result)), lookup("f"));
+  CHECK(is_cons(car(cdr(rep(result)))));
+  CHECK_EQ(car(car(cdr(rep(result)))), sym_already_evald);
+  CHECK_EQ(cdr(car(cdr(rep(result)))), new_sym("a"));
+  CHECK_EQ(car(cdr(cdr(rep(result)))), new_sym("b"));
+  CHECK_EQ(cdr(cdr(cdr(rep(result)))), nil);
   end_dynamic_scope("f");
-  rmref(f);
-  rmref(fn);
 }
 
 void test_eval_handles_unknown_destructured_args() {
-  cell* fn = read("(fn ((a b)) b)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f args)");
-  cell* attempt1 = eval(call);
+  run("f <- (fn ((a b)) b)");
+  TEMP(result, eval("(f args)"));
   // `(object incomplete_eval (,f args))
-  CHECK(is_incomplete_eval(attempt1));
-  CHECK(is_cons(rep(attempt1)));
-  CHECK_EQ(car(rep(attempt1)), f);
-  CHECK_EQ(car(cdr(rep(attempt1))), new_sym("args"));
-  CHECK_EQ(cdr(cdr(rep(attempt1))), nil);
-  rmref(attempt1);
-  rmref(call);
+  // checking trace for function f is brittle
+  CHECK(is_incomplete_eval(result));
+  CHECK(is_cons(rep(result)));
+  CHECK_EQ(car(rep(result)), lookup("f"));
+  CHECK_EQ(car(cdr(rep(result))), new_sym("args"));
+  CHECK_EQ(cdr(cdr(rep(result))), nil);
   end_dynamic_scope("f");
-  rmref(f);
-  rmref(fn);
 }
 
 void test_eval_handles_unknown_spliced_args() {
-  cell* fn = read("(fn ((a b)) b)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f @args)");
-  cell* attempt1 = eval(call);
+  run("f <- (fn ((a b)) b)");
+  TEMP(result, eval("(f @args)"));
   // `(object incomplete_eval (,f @args))
-  CHECK(is_incomplete_eval(attempt1));
-  CHECK(is_cons(rep(attempt1)));
-  CHECK_EQ(car(rep(attempt1)), f);
-  cell* args = car(cdr(rep(attempt1)));
+  // checking trace for function f is brittle
+  CHECK(is_incomplete_eval(result));
+  CHECK(is_cons(rep(result)));
+  CHECK_EQ(car(rep(result)), lookup("f"));
+  cell* args = car(cdr(rep(result)));
   CHECK_EQ(car(args), sym_splice);
   CHECK_EQ(cdr(args), new_sym("args"));
-  rmref(attempt1);
-  rmref(call);
   end_dynamic_scope("f");
-  rmref(f);
-  rmref(fn);
 }
 
 void test_eval_handles_literal_incomplete_args() {
-  cell* fn = read("(fn (x) x)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f (object incomplete_eval 34))");
-  cell* attempt1 = eval(call);
-  CHECK_EQ(attempt1, new_num(34));
-  rmref(attempt1);
-  rmref(call);
-  end_dynamic_scope("f");
-  rmref(f);
-  rmref(fn);
+  run("((fn(x) x) (object incomplete_eval 34))");
+  CHECK_TRACE_CONTENTS("eval", "=> 34");
 }
 
 void test_eval_handles_incomplete_args_for_aliased_params() {
-  cell* fn = read("(fn (x|y) x)");
-  cell* f = eval(fn);
-  new_dynamic_scope("f", f);
-  cell* call = read("(f a)");
-  cell* attempt1 = eval(call);
-  // `(object incomplete_eval (,f a))
-  CHECK(is_incomplete_eval(attempt1));
-  CHECK(is_cons(rep(attempt1)));
-  CHECK_EQ(car(rep(attempt1)), f);
-  CHECK_EQ(car(cdr(rep(attempt1))), new_sym("a"));
-  CHECK_EQ(cdr(cdr(rep(attempt1))), nil);
-  rmref(attempt1);
-  rmref(call);
+  run("f <- (fn (a|b) a)");
+  TEMP(result, eval("(f x)"));
+  // `(object incomplete_eval (,f x))
+  // checking trace for function f is brittle
+  CHECK(is_incomplete_eval(result));
+  CHECK(is_cons(rep(result)));
+  CHECK_EQ(car(rep(result)), lookup("f"));
+  CHECK_EQ(car(cdr(rep(result))), new_sym("x"));
+  CHECK_EQ(cdr(cdr(rep(result))), nil);
   end_dynamic_scope("f");
-  rmref(f);
-  rmref(fn);
 }

@@ -24,6 +24,7 @@ cell* lookup(cell* sym, cell* scope, bool keep_already_evald) {
   if (result) return maybe_strip_already_evald(keep_already_evald, result);
   result = lookup_dynamic_binding(sym);
   if (result) return maybe_strip_already_evald(keep_already_evald, result);
+  trace("lookup") << "incomplete_eval";
   return new_object("incomplete_eval", sym);
 }
 
