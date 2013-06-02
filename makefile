@@ -16,7 +16,7 @@ file_list: boot.cc [0-9]*.cc
 test_file_list: [0-9]*.test.cc
 	@ls [0-9]*.test.cc |perl -pwe 's/.*/#include "$$&"/' > test_file_list
 
-test_list: [0-9]*.test.cc
+test_list: [0-9]*.cc
 	@grep -h "^[[:space:]]*void test_" [0-9]*.cc |perl -pwe 's/^\s*void (.*)\(\) {$$/$$1,/' > test_list
 
 compiledfn_list: [0-9]*.cc
