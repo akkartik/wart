@@ -37,10 +37,7 @@ cell* eval(cell* expr) {
   return eval(expr, Curr_lexical_scope);
 }
 
-long Eval_count = 0;
-
 cell* eval(cell* expr, cell* scope) {
-  ++Eval_count;
   new_trace_frame("eval");
   if (!expr)
     RAISE << "eval: cell should never be NULL\n" << die();
