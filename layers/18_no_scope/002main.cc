@@ -94,9 +94,9 @@ void verify() {
 void setup() {
   setup_cells();
   setup_common_syms();
+  Count_raises = false;
   Raise_count = 0;
   Passed = true;
-  Do_raise = true;
 }
 
 

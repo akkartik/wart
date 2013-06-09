@@ -109,9 +109,9 @@ void setup() {
   setup_scopes();
   setup_compiledfns();
   setup_streams();
+  Count_raises = false;
   Raise_count = 0;
   Passed = true;
-  Do_raise = true;
 }
 
 

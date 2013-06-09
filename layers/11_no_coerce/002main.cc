@@ -96,9 +96,9 @@ void setup() {
   setup_common_syms();
   setup_scopes();
   setup_compiledfns();
+  Count_raises = false;
   Raise_count = 0;
   Passed = true;
-  Do_raise = true;
 }
 
 
