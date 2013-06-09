@@ -101,7 +101,7 @@ void verify() {
   teardown_compiledfns();
   teardown_cells();
   if (!Passed) return;
-  if (Raise_count != 0) cerr << Raise_count << " errors encountered\n";
+  if (Num_raises != 0) cerr << Num_raises << " errors encountered\n";
   if (num_unfreed() > 0) dump_unfreed();
 }
 
@@ -112,7 +112,7 @@ void setup() {
   setup_compiledfns();
   setup_streams();
   Count_raises = false;
-  Raise_count = 0;
+  Num_raises = 0;
   Passed = true;
 }
 

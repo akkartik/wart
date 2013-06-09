@@ -25,14 +25,14 @@ void test_build_handles_float() {
 void test_build_warns_on_ambiguous_float() {
   Count_raises = true;
   read_all("-.4");
-  CHECK_EQ(Raise_count, 1); Raise_count=0;
+  CHECK_EQ(Num_raises, 1); Num_raises=0;
   CHECK_TRACE_CONTENTS("cell", "float: -0.4");
 }
 
 void test_build_creates_floats_on_overflow() {
   Count_raises = true;
   read_all("100000000000000000000");
-  CHECK_EQ(Raise_count, 1); Raise_count=0;
+  CHECK_EQ(Num_raises, 1); Num_raises=0;
   CHECK_TRACE_CONTENTS("cell", "float: 1e+20");
 }
 

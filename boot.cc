@@ -44,10 +44,10 @@ using std::ofstream;
 #define unused __attribute__((unused))
 
 bool Count_raises = false;
-long Raise_count = 0;
+long Num_raises = 0;
 
                            // ?: to avoid dangling-else warnings
-#define RAISE Count_raises ? ++Raise_count,cerr /* print nothing */ \
+#define RAISE Count_raises ? ++Num_raises,cerr /* print nothing */ \
                            : cerr << __FILE__ << ":" << __LINE__ << " "
 
 struct die {};

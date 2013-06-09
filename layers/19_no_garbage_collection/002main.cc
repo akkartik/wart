@@ -91,14 +91,14 @@ void run_tests() {
 void verify() {
   teardown_bindings();
   if (!Passed) return;
-  if (Raise_count != 0) cerr << Raise_count << " errors encountered\n";
+  if (Num_raises != 0) cerr << Num_raises << " errors encountered\n";
 }
 
 void setup() {
   setup_cells();
   setup_common_syms();
   Count_raises = false;
-  Raise_count = 0;
+  Num_raises = 0;
   Passed = true;
 }
 

@@ -412,7 +412,7 @@ void test_eval_splice_on_macros_with_backquote() {
   Count_raises = true;
   run("m @args");
   CHECK_TRACE_TOP("eval", "=> (a ... b)");  // spliced args override quoted params
-  CHECK_EQ(Raise_count, 0);
+  CHECK_EQ(Num_raises, 0);
   end_dynamic_scope("args");
   end_dynamic_scope("b");
   end_dynamic_scope("a");
@@ -425,7 +425,7 @@ void test_eval_splice_on_backquoteless_macros_warns() {
   run("args <- '(a b)");
   Count_raises = true;
   run("m @args");
-  CHECK_EQ(Raise_count, 1);   Raise_count=0;
+  CHECK_EQ(Num_raises, 1);   Num_raises=0;
   end_dynamic_scope("args");
   end_dynamic_scope("b");
   end_dynamic_scope("a");

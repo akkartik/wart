@@ -63,9 +63,9 @@ COMPILE_FN(try_eval, compiledfn_try_eval, "($x ... $scope)",
     cell* ans = compiledfn_eval();
   Count_raises = old_count_raise;
 
-  if (Raise_count == 0) return ans;
+  if (Num_raises == 0) return ans;
   // error
-  Raise_count = 0;
+  Num_raises = 0;
   rmref(ans);
   return nil;
 )
