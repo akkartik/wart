@@ -364,35 +364,27 @@ cell* extract_keyword_args(cell* params, cell* args, cell* keyword_args) {
       continue;
     }
     args = cdr(args);   // skip keyword arg
-    // keyword arg for rest param alias
-    if (is_rest && is_alias(kparam)) {
-      cell* end_rest = next_keyword(args, params);
-      TEMP(rest_args, snip(args, end_rest));
-      for (cell* p = cdr(kparam); p != nil; p=cdr(p))
-        unsafe_set(keyword_args, car(p), rest_args, false);
-      args = end_rest;
-    }
-    // keyword arg for param alias
-    else if (is_alias(kparam)) {
-      for (cell* p = cdr(kparam); p != nil; p=cdr(p))
-        unsafe_set(keyword_args, car(p), car(args), false);
+    if (!is_rest) {
+      set_all_aliases(keyword_args, kparam, car(args));
       args = cdr(args);
     }
-    // simple rest keyword arg
-    else if (is_rest) {
-      cell* end_rest = next_keyword(args, params);
-      TEMP(rest_args, snip(args, end_rest));
-      unsafe_set(keyword_args, kparam, rest_args, false);
-      args = end_rest;
-    }
-    // simple keyword arg
     else {
-      unsafe_set(keyword_args, kparam, car(args), false);
-      args = cdr(args);
+      cell* end_rest = next_keyword(args, params);
+      TEMP(rest_args, snip(args, end_rest));
+      set_all_aliases(keyword_args, kparam, rest_args);
+      args = end_rest;
     }
   }
   set_cdr(curr, args);  // in case improper list
   return drop_ptr(p_non_keyword_args);
+}
+
+void set_all_aliases(cell* keyword_args, cell* param, cell* arg) {
+  if (is_alias(param))
+    for (cell* p = cdr(param); p != nil; p=cdr(p))
+      unsafe_set(keyword_args, car(p), arg, false);
+  else
+    unsafe_set(keyword_args, param, arg, false);
 }
 
 cell* next_keyword(cell* args, cell* params) {
