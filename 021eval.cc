@@ -359,7 +359,7 @@ cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
   cell *p_non_keyword_args = new_cell(), *curr = p_non_keyword_args;
   for (; is_cons(args); args=cdr(args)) {
     cell* kparam = keyword_param(car(args), params);
-    if (kparam == nil) {
+    if (kparam == NULL) {
       add_cons(curr, car(args));
       curr=cdr(curr);
     }
@@ -401,7 +401,7 @@ cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
 
 cell* next_keyword(cell* args, cell* params) {
   for (args=cdr(args); args != nil; args=cdr(args)) {
-    if (keyword_param(car(args), params) != nil)
+    if (keyword_param(car(args), params))
       return args;
   }
   return nil;
@@ -451,13 +451,13 @@ cell* args_in_param_order(cell* params, cell* non_keyword_args, cell_map& keywor
   return drop_ptr(p_reconstituted_args);
 }
 
-// return the appropriate param if arg is a valid keyword arg
+// return the appropriate param if arg is a valid keyword arg, or NULL if not
 // handle param aliases; :a => (| a b)
 // respond to rest keyword args with (rest-param)
 // combining the two: respond to rest param aliases with ((| do body))
 // doesn't look inside destructured params
 cell* keyword_param(cell* arg, cell* params) {
-  if (!is_keyword_sym(arg)) return nil;
+  if (!is_keyword_sym(arg)) return NULL;
   cell* candidate = new_sym(to_string(arg).substr(1));
   for (params=strip_quote(params); params != nil; params=strip_quote(cdr(params))) {
     if (!is_cons(params)) { // rest param
@@ -477,7 +477,7 @@ cell* keyword_param(cell* arg, cell* params) {
       return candidate;
     }
   }
-  return nil;
+  return NULL;
 }
 
 bool param_alias_match(cell* aliases, cell* candidate) {

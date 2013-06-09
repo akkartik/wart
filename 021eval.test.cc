@@ -457,6 +457,11 @@ void test_eval_passes_in_excess_args() {
   CHECK_TRACE_CONTENTS("ordered_args", "=> (3 4 5)");
 }
 
+void test_eval_handles_nil_keyword_arg() {
+  run("((fn (a) a) 2 :a nil)");
+  CHECK_TRACE_CONTENTS("ordered_args", "=> (nil 2)");
+}
+
 void test_eval_handles_keyword_args() {
   run("((fn (a b c) c) :c 1 2)");
   CHECK_TRACE_CONTENTS("ordered_args", "=> (2 nil 1)");
