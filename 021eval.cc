@@ -363,11 +363,12 @@ cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
       add_cons(curr, car(args));
       curr=cdr(curr);
       args=cdr(args);
+      continue;
     }
+    args = cdr(args);   // skip keyword arg
     // keyword arg for rest param alias
-    else if (is_cons(kparam) && cdr(kparam) == nil
+    if (is_cons(kparam) && cdr(kparam) == nil
              && is_alias(car(kparam))) {
-      args = cdr(args);   // skip keyword arg
       cell* end_rest = next_keyword(args, params);
       TEMP(rest_args, snip(args, end_rest));
       for (cell* p = cdr(car(kparam)); p != nil; p=cdr(p))
@@ -377,14 +378,12 @@ cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
     }
     // keyword arg for param alias
     else if (is_alias(kparam)) {
-      args = cdr(args);   // skip keyword arg
       for (cell* p = cdr(kparam); p != nil; p=cdr(p))
         keyword_args[car(p)] = mkref(car(args));
       args = cdr(args);
     }
     // simple rest keyword arg
     else if (is_cons(kparam)) {   // rest keyword arg
-      args = cdr(args);
       cell* end_rest = next_keyword(args, params);
       keyword_args[car(kparam)] = snip(args, end_rest);  // already mkref'd
       rmref(kparam);
@@ -392,7 +391,6 @@ cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
     }
     // simple keyword arg
     else {
-      args = cdr(args);   // skip keyword arg
       keyword_args[kparam] = mkref(car(args));
       args = cdr(args);
     }
