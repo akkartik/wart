@@ -102,7 +102,8 @@ void verify() {
   teardown_cells();
   if (!Passed) return;
   if (Num_raises != 0) cerr << Num_raises << " errors encountered\n";
-  if (num_unfreed() > 0) dump_unfreed();
+  else if (num_unfreed() > 0) dump_unfreed();
+  else cerr << ".";
 }
 
 void setup() {

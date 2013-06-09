@@ -89,10 +89,7 @@ bool check_trace_contents(string FUNCTION, string layer, string expected) {   //
     ++curr_expected_line;
     while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
       ++curr_expected_line;
-    if (curr_expected_line == expected_lines.size()) {
-      cerr << ".", cerr.flush();
-      return true;
-    }
+    if (curr_expected_line == expected_lines.size()) return true;
   }
 
   cerr << "\nF " << FUNCTION << ": trace for " << layer << " didn't contain " << expected_lines[curr_expected_line] << '\n';
@@ -175,10 +172,7 @@ bool check_trace_contents(string FUNCTION, string layer, int frame, string expec
     ++curr_expected_line;
     while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
       ++curr_expected_line;
-    if (curr_expected_line == expected_lines.size()) {
-      cerr << ".", cerr.flush();
-      return true;
-    }
+    if (curr_expected_line == expected_lines.size()) return true;
   }
 
   cerr << "\nF " << FUNCTION << ": trace didn't contain " << expected_lines[curr_expected_line] << '\n';

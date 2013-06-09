@@ -13,13 +13,12 @@ long Num_failures = 0;
     cerr << "\nF " << __FUNCTION__ << ": " << #X << '\n'; \
     Passed = false; \
     return; \
-  } \
-  else { cerr << "."; fflush(stderr); }
+  }
 
 #define CHECK_EQ(X, Y) if ((X) != (Y)) { \
     ++Num_failures; \
     cerr << "\nF " << __FUNCTION__ << ": " << #X << " == " << #Y << '\n'; \
     cerr << "  got " << (X) << '\n';  /* BEWARE: multiple eval */ \
+    Passed = false; \
     return; \
-  } \
-  else { cerr << "."; fflush(stderr); }
+  }
