@@ -407,35 +407,25 @@ cell* snip(cell* x, cell* next) {
 cell* args_in_param_order(cell* params, cell* non_keyword_args, cell* keyword_args) {
   cell *p_reconstituted_args = new_cell(), *curr = p_reconstituted_args;
   for (params=strip_quote(params); params != nil; curr=cdr(curr), params=strip_quote(cdr(params))) {
-    if (!is_cons(params)) {
-      cell* keyword_value = unsafe_get(keyword_args, params);
-      set_cdr(curr, keyword_value ? keyword_value : non_keyword_args);
-      break;
-    }
-
-    if (is_alias(params)) {
-      cell* keyword_value = unsafe_get(keyword_args, car(cdr(params)));
+    if (is_cons(params) && !is_alias(params)) {
+      cell* param = strip_quote(car(params));
+      if (is_alias(param))
+        param = car(cdr(param));
+      cell* keyword_value = unsafe_get(keyword_args, param);
       if (keyword_value) {
-        set_cdr(curr, keyword_value);
-        break;
+        add_cons(curr, keyword_value);
       }
       else {
-        set_cdr(curr, non_keyword_args);
-        break;
+        add_cons(curr, car(non_keyword_args));
+        non_keyword_args = cdr(non_keyword_args);
       }
     }
-
-    cell* param = strip_quote(car(params));
-    if (is_alias(param))
-      param = car(cdr(param));
-
-    cell* keyword_value = unsafe_get(keyword_args, param);
-    if (keyword_value) {
-      add_cons(curr, keyword_value);
-    }
     else {
-      add_cons(curr, car(non_keyword_args));
-      non_keyword_args = cdr(non_keyword_args);
+      // rest param
+      cell* param = is_alias(params) ? car(cdr(params)) : params;
+      cell* keyword_value = unsafe_get(keyword_args, param);
+      set_cdr(curr, keyword_value ? keyword_value : non_keyword_args);
+      break;
     }
   }
   if (non_keyword_args != nil)
