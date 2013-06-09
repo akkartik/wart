@@ -358,7 +358,8 @@ cell* reorder_keyword_args(cell* args, cell* params) {
 cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
   cell *p_non_keyword_args = new_cell(), *curr = p_non_keyword_args;
   while (is_cons(args)) {
-    cell* kparam = keyword_param(car(args), params);
+    bool is_rest = false;
+    cell* kparam = keyword_param(car(args), params, is_rest);
     if (kparam == NULL) {
       add_cons(curr, car(args));
       curr=cdr(curr);
@@ -367,13 +368,11 @@ cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
     }
     args = cdr(args);   // skip keyword arg
     // keyword arg for rest param alias
-    if (is_cons(kparam) && cdr(kparam) == nil
-             && is_alias(car(kparam))) {
+    if (is_rest && is_alias(kparam)) {
       cell* end_rest = next_keyword(args, params);
       TEMP(rest_args, snip(args, end_rest));
-      for (cell* p = cdr(car(kparam)); p != nil; p=cdr(p))
+      for (cell* p = cdr(kparam); p != nil; p=cdr(p))
         keyword_args[car(p)] = mkref(rest_args);
-      rmref(kparam);
       args = end_rest;
     }
     // keyword arg for param alias
@@ -383,10 +382,9 @@ cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
       args = cdr(args);
     }
     // simple rest keyword arg
-    else if (is_cons(kparam)) {   // rest keyword arg
+    else if (is_rest) {
       cell* end_rest = next_keyword(args, params);
-      keyword_args[car(kparam)] = snip(args, end_rest);  // already mkref'd
-      rmref(kparam);
+      keyword_args[kparam] = snip(args, end_rest);  // already mkref'd
       args = end_rest;
     }
     // simple keyword arg
@@ -402,7 +400,8 @@ cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
 
 cell* next_keyword(cell* args, cell* params) {
   for (args=cdr(args); args != nil; args=cdr(args)) {
-    if (keyword_param(car(args), params))
+    bool dummy;
+    if (keyword_param(car(args), params, dummy))
       return args;
   }
   return nil;
@@ -454,20 +453,24 @@ cell* args_in_param_order(cell* params, cell* non_keyword_args, cell_map& keywor
 
 // return the appropriate param if arg is a valid keyword arg, or NULL if not
 // handle param aliases; :a => (| a b)
-// respond to rest keyword args with (rest-param)
-// combining the two: respond to rest param aliases with ((| do body))
+// set is_rest if params is a rest param/alias
 // doesn't look inside destructured params
-cell* keyword_param(cell* arg, cell* params) {
+cell* keyword_param(cell* arg, cell* params, bool& is_rest) {
+  is_rest = false;
   if (!is_keyword_sym(arg)) return NULL;
   cell* candidate = new_sym(to_string(arg).substr(1));
   for (params=strip_quote(params); params != nil; params=strip_quote(cdr(params))) {
     if (!is_cons(params)) { // rest param
-      if (params == candidate)
-        return new_cons(candidate);
+      if (params == candidate) {
+        is_rest = true;
+        return candidate;
+      }
     }
     else if (is_alias(params)) {   // rest param aliases
-      if (param_alias_match(cdr(params), candidate))
-        return new_cons(params);
+      if (param_alias_match(cdr(params), candidate)) {
+        is_rest = true;
+        return params;
+      }
     }
     // ignore destructuring except param aliases
     else if (is_alias(strip_quote(car(params)))) {
