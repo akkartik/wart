@@ -343,19 +343,16 @@ cell* reorder_keyword_args(cell* args, cell* params) {
     return mkref(args);
   }
 
-  cell_map keyword_args;  // all values will be refcounted.
+  TEMP(keyword_args, new_table());
   TEMP(non_keyword_args, extract_keyword_args(params, args, keyword_args));
   cell* result = args_in_param_order(params, non_keyword_args, keyword_args);
 
-  for (cell_map::iterator p = keyword_args.begin(); p != keyword_args.end(); ++p)
-    if (p->second) rmref(p->second);
   trace("ordered_args") << "=> " << result;
   return result;  // already mkref'd
 }
 
-// extract keyword args into the cell_map provided; return non-keyword args
-// always mkref what you insert into the cell_map
-cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
+// extract keyword args into the keyword_args table and return the remaining non-keyword args
+cell* extract_keyword_args(cell* params, cell* args, cell* keyword_args) {
   cell *p_non_keyword_args = new_cell(), *curr = p_non_keyword_args;
   while (is_cons(args)) {
     bool is_rest = false;
@@ -372,24 +369,25 @@ cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
       cell* end_rest = next_keyword(args, params);
       TEMP(rest_args, snip(args, end_rest));
       for (cell* p = cdr(kparam); p != nil; p=cdr(p))
-        keyword_args[car(p)] = mkref(rest_args);
+        unsafe_set(keyword_args, car(p), rest_args, false);
       args = end_rest;
     }
     // keyword arg for param alias
     else if (is_alias(kparam)) {
       for (cell* p = cdr(kparam); p != nil; p=cdr(p))
-        keyword_args[car(p)] = mkref(car(args));
+        unsafe_set(keyword_args, car(p), car(args), false);
       args = cdr(args);
     }
     // simple rest keyword arg
     else if (is_rest) {
       cell* end_rest = next_keyword(args, params);
-      keyword_args[kparam] = snip(args, end_rest);  // already mkref'd
+      TEMP(rest_args, snip(args, end_rest));
+      unsafe_set(keyword_args, kparam, rest_args, false);
       args = end_rest;
     }
     // simple keyword arg
     else {
-      keyword_args[kparam] = mkref(car(args));
+      unsafe_set(keyword_args, kparam, car(args), false);
       args = cdr(args);
     }
   }
@@ -415,17 +413,19 @@ cell* snip(cell* x, cell* next) {
   return drop_ptr(p_result);
 }
 
-cell* args_in_param_order(cell* params, cell* non_keyword_args, cell_map& keyword_args) {
+cell* args_in_param_order(cell* params, cell* non_keyword_args, cell* keyword_args) {
   cell *p_reconstituted_args = new_cell(), *curr = p_reconstituted_args;
   for (params=strip_quote(params); params != nil; curr=cdr(curr), params=strip_quote(cdr(params))) {
     if (!is_cons(params)) {
-      set_cdr(curr, keyword_args[params] ? keyword_args[params] : non_keyword_args);
+      cell* keyword_value = unsafe_get(keyword_args, params);
+      set_cdr(curr, keyword_value ? keyword_value : non_keyword_args);
       break;
     }
 
     if (is_alias(params)) {
-      if (keyword_args[car(cdr(params))]) {
-        set_cdr(curr, keyword_args[car(cdr(params))]);
+      cell* keyword_value = unsafe_get(keyword_args, car(cdr(params)));
+      if (keyword_value) {
+        set_cdr(curr, keyword_value);
         break;
       }
       else {
@@ -438,8 +438,9 @@ cell* args_in_param_order(cell* params, cell* non_keyword_args, cell_map& keywor
     if (is_alias(param))
       param = car(cdr(param));
 
-    if (keyword_args[param]) {
-      add_cons(curr, keyword_args[param]);
+    cell* keyword_value = unsafe_get(keyword_args, param);
+    if (keyword_value) {
+      add_cons(curr, keyword_value);
     }
     else {
       add_cons(curr, car(non_keyword_args));
