@@ -391,8 +391,7 @@ cell* extract_keyword_args(cell* params, cell* args, cell* keyword_args) {
       args = cdr(args);
     }
   }
-  if (!is_cons(args))  // improper list
-    set_cdr(curr, args);
+  set_cdr(curr, args);  // in case improper list
   return drop_ptr(p_non_keyword_args);
 }
 
