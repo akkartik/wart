@@ -196,6 +196,7 @@ void test_next_expr_passes_through_unbalanced_open_paren() {
 }
 
 void test_parenthesize_errors_on_unbalanced_closed_paren() {
+  Do_raise = false;
   indent_sensitive_stream in(")");
   next_expr(in);
   CHECK(Raise_count > 0);   Raise_count=0;

@@ -38,6 +38,7 @@ void test_cons_works() {
 }
 
 void test_assign_to_non_sym_warns() {
+  Do_raise = false;
   run("(<- 3 nil)");
   CHECK_EQ(Raise_count, 1);   Raise_count=0;
 }
@@ -89,7 +90,8 @@ void test_equal_handles_floats() {
 }
 
 void test_equal_handles_float_vs_nil() {
+  Do_raise = false;
   run("(= nil 1.5)");
+  CHECK_TRACE_TOP("eval", "=> nil");
   CHECK_EQ(Raise_count, 0);
-  CHECK_TRACE_TOP("eval", "compiled fn=> nil");
 }

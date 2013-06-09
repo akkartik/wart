@@ -409,6 +409,7 @@ void test_eval_splice_on_macros_with_backquote() {
   run("m <- (fn '(x y) (eval `(cons ,x ,y) caller_scope))");
   run("(a <- 3) (b <- 4)");
   run("args <- '(a b)");
+  Do_raise = false;
   run("m @args");
   CHECK_TRACE_TOP("eval", "=> (a ... b)");  // spliced args override quoted params
   CHECK_EQ(Raise_count, 0);
@@ -422,6 +423,7 @@ void test_eval_splice_on_backquoteless_macros_warns() {
   run("m <- (fn '(x y) (eval (cons 'cons (cons x (cons y nil))) caller_scope))");
   run("(a <- 3) (b <- 4)");
   run("args <- '(a b)");
+  Do_raise = false;
   run("m @args");
   CHECK_EQ(Raise_count, 1);   Raise_count=0;
   end_dynamic_scope("args");

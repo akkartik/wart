@@ -63,7 +63,6 @@ bool eof(istream& in) {
 //// test harness
 
 void run_tests() {
-  Do_raise = false;  // for death tests
   time_t t; time(&t);
   cerr << "C tests: " << ctime(&t);
   for (unsigned long i=0; i < sizeof(Tests)/sizeof(Tests[0]); ++i) {
@@ -73,7 +72,6 @@ void run_tests() {
     verify();
   }
 
-  Do_raise = true;
   setup();
   load_files(".wart");   // after GC tests
   load_files(".test");
@@ -98,6 +96,7 @@ void setup() {
   setup_common_syms();
   Raise_count = 0;
   Passed = true;
+  Do_raise = true;
 }
 
 
