@@ -460,25 +460,14 @@ cell* keyword_param(cell* arg, cell* params, bool& is_rest) {
   if (!is_keyword_sym(arg)) return NULL;
   cell* candidate = new_sym(to_string(arg).substr(1));
   for (params=strip_quote(params); params != nil; params=strip_quote(cdr(params))) {
-    if (!is_cons(params)) { // rest param
-      if (params == candidate) {
-        is_rest = true;
-        return candidate;
-      }
-    }
-    else if (is_alias(params)) {   // rest param aliases
-      if (param_alias_match(cdr(params), candidate)) {
-        is_rest = true;
-        return params;
-      }
-    }
-    // ignore destructuring except param aliases
-    else if (is_alias(strip_quote(car(params)))) {
-      if (param_alias_match(cdr(strip_quote(car(params))), candidate))
-        return strip_quote(car(params));
-    }
-    else if (strip_quote(car(params)) == candidate) {
-      return candidate;
+    cell* param = (is_cons(params) && !is_alias(params))
+                  ? strip_quote(car(params))
+                  : params;   // rest param/alias
+    if (param == candidate
+        // ignore destructuring
+        || (is_alias(param) && param_alias_match(cdr(param), candidate))) {
+      if (param == params) is_rest = true;
+      return param;
     }
   }
   return NULL;
