@@ -357,11 +357,12 @@ cell* reorder_keyword_args(cell* args, cell* params) {
 // always mkref what you insert into the cell_map
 cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
   cell *p_non_keyword_args = new_cell(), *curr = p_non_keyword_args;
-  for (; is_cons(args); args=cdr(args)) {
+  while (is_cons(args)) {
     cell* kparam = keyword_param(car(args), params);
     if (kparam == NULL) {
       add_cons(curr, car(args));
       curr=cdr(curr);
+      args=cdr(args);
     }
     // keyword arg for rest param alias
     else if (is_cons(kparam) && cdr(kparam) == nil
@@ -379,6 +380,7 @@ cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
       args = cdr(args);   // skip keyword arg
       for (cell* p = cdr(kparam); p != nil; p=cdr(p))
         keyword_args[car(p)] = mkref(car(args));
+      args = cdr(args);
     }
     // simple rest keyword arg
     else if (is_cons(kparam)) {   // rest keyword arg
@@ -392,6 +394,7 @@ cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
     else {
       args = cdr(args);   // skip keyword arg
       keyword_args[kparam] = mkref(car(args));
+      args = cdr(args);
     }
   }
   if (!is_cons(args))  // improper list

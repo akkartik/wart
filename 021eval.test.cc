@@ -500,6 +500,12 @@ void test_eval_handles_args_after_rest_keyword() {
   CHECK_TRACE_TOP("eval", "=> (1 2)");
 }
 
+void test_eval_handles_args_after_rest_keyword2() {
+  run("((fn (a b ... c) b) :c 1 2 :b 3)");
+  CHECK_TRACE_CONTENTS("ordered_args", "=> (nil 3 1 2)");
+  CHECK_TRACE_TOP("eval", "=> 3");
+}
+
 void test_eval_handles_quoted_rest_keyword_arg() {
   run("x <- 2");
   run("((fn (a ... 'b) b) :b 1 x 3)");
