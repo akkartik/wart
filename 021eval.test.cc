@@ -438,21 +438,21 @@ void test_eval_splice_on_backquoteless_macros_warns() {
 
 
 
-void test_reorder_keyword_args_keeps_nil_rest_args() {
+void test_eval_keeps_nil_rest_args() {
   run("((fn a 3) nil)");
   CHECK_TRACE_CONTENTS("ordered_args", "unchanged: (nil)");
   run("((fn 'a 3) nil)");
   CHECK_TRACE_CONTENTS("ordered_args", "unchanged: (nil)");
 }
 
-void test_reorder_keyword_args_handles_improper_lists() {
+void test_eval_orders_improper_arg_list() {
   TEMP(args, read("(3 ... 4)"));
   TEMP(params, read("(a ... b)"));
   rmref(reorder_keyword_args(args, params));
   CHECK_TRACE_CONTENTS("ordered_args", "=> (3 ... 4)");
 }
 
-void test_reorder_keyword_args_handles_overlong_lists() {
+void test_eval_passes_in_excess_args() {
   run("((fn (a b) 3) 3 4 5)");
   CHECK_TRACE_CONTENTS("ordered_args", "=> (3 4 5)");
 }
@@ -483,7 +483,7 @@ void test_eval_handles_rest_keyword_arg() {
   CHECK_TRACE_TOP("eval", "=> (1 3)");
 }
 
-void test_eval_handles_rest_keyword_arg_at_end2() {
+void test_eval_handles_rest_keyword_arg2() {
   run("((fn (a ... b) b) :b 1 2 3)");
   CHECK_TRACE_CONTENTS("ordered_args", "=> (nil 1 2 3)");
   CHECK_TRACE_TOP("eval", "=> (1 2 3)");
