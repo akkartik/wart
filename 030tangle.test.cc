@@ -3,3 +3,27 @@ void test_hunks_works_without_metadata() {
   hunks(in);
   CHECK_TRACE_CONTENTS("tangle", "hunk: ahunk: bhunk: c");
 }
+
+
+
+void test_trim() {
+  string s = "  abc  ";
+  trim(s);
+  CHECK_EQ(s, "abc");
+
+  s = "  abc";
+  trim(s);
+  CHECK_EQ(s, "abc");
+
+  s = " a";
+  trim(s);
+  CHECK_EQ(s, "a");
+
+  s = " a ";
+  trim(s);
+  CHECK_EQ(s, "a");
+
+  s = "  ";
+  trim(s);
+  CHECK_EQ(s, "");
+}

@@ -25,3 +25,20 @@ list<hunk> hunks(istream& in) {
   result.back().lines.swap(all_lines);
   return result;
 }
+
+#include <locale>
+using std::isspace;   // unicode-aware
+
+void trim(string& s) {
+  trace("trim") << '^' << s << '$';
+  string::iterator first = s.begin();
+  while (first != s.end() && isspace(*first))
+    ++first;
+  s.erase(s.begin(), first);
+
+  string::reverse_iterator last = s.rbegin();
+  while (last != s.rend() && isspace(*last))
+    ++last;
+  s.erase(last.base(), s.end());
+  trace("trim") << "=> ^" << s << '$';
+}
