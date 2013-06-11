@@ -19,9 +19,8 @@ list<hunk> hunks(istream& in) {
   result.push_back(hunk());
   for (list<string>::iterator p = all_lines.begin(); p != all_lines.end(); ++p) {
     trace("tangle") << "line: " << *p;
-    string s = trim(*p);
-    if (s[0] == ':' && s[1] == '(') {
-      trace("tangle") << "new hunk: " << s;
+    if (starts_with(*p, ":(")) {
+      trace("tangle") << "new hunk: " << *p;
       result.push_back(hunk());
     }
     result.back().lines.push_back(*p);
@@ -31,6 +30,16 @@ list<hunk> hunks(istream& in) {
 
 #include <locale>
 using std::isspace;   // unicode-aware
+
+// does s start with pat, after skipping whitespace?
+// pat can't start with whitespace
+bool starts_with(const string& s, const string& pat) {
+  for (size_t pos = 0; pos < s.size(); ++pos) {
+    if (!isspace(s[pos]))
+      return s.compare(pos, pat.size(), pat) == 0;
+  }
+  return false;
+}
 
 string trim(const string& s) {
   string::const_iterator first = s.begin();
