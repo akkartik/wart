@@ -37,10 +37,9 @@ using std::isspace;   // unicode-aware
 // does s start with pat, after skipping whitespace?
 // pat can't start with whitespace
 bool starts_with(const string& s, const string& pat) {
-  for (size_t pos = 0; pos < s.size(); ++pos) {
+  for (size_t pos = 0; pos < s.size(); ++pos)
     if (!isspace(s[pos]))
       return s.compare(pos, pat.size(), pat) == 0;
-  }
   return false;
 }
 
