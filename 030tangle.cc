@@ -23,6 +23,7 @@ list<hunk> hunks(istream& in) {
       trace("tangle") << "new hunk: " << trim(*p);
       result.push_back(hunk());
       curr_indent = indent(*p);
+      continue;
     }
     string line = strip_indent(*p, curr_indent);
     trace("tangle") << "line: " << line;

@@ -8,6 +8,7 @@ void test_hunks_works_with_metadata() {
   std::istringstream in("a\n:(a b)\nc\n");
   hunks(in);
   CHECK_TRACE_CONTENTS("tangle", "first hunkline: anew hunk: :(a b)line: c");
+  CHECK_TRACE_DOESNT_CONTAIN("tangle", "line: :(a b)");
 }
 
 void test_hunks_works_with_indented_metadata() {
