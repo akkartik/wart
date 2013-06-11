@@ -19,6 +19,10 @@ list<hunk> hunks(istream& in) {
   result.push_back(hunk());
   for (list<string>::iterator p = all_lines.begin(); p != all_lines.end(); ++p) {
     trace("tangle") << "line: " << *p;
+    if ((*p)[0] == ':' && (*p)[1] == '(') {
+      trace("tangle") << "new hunk: " << *p;
+      result.push_back(hunk());
+    }
     result.back().lines.push_back(*p);
   }
   return result;
