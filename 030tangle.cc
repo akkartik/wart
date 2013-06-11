@@ -29,16 +29,15 @@ list<hunk> hunks(istream& in) {
 #include <locale>
 using std::isspace;   // unicode-aware
 
-void trim(string& s) {
-  trace("trim") << '^' << s << '$';
-  string::iterator first = s.begin();
+string trim(const string& s) {
+  string::const_iterator first = s.begin();
   while (first != s.end() && isspace(*first))
     ++first;
-  s.erase(s.begin(), first);
+  if (first == s.end()) return "";
 
-  string::reverse_iterator last = s.rbegin();
-  while (last != s.rend() && isspace(*last))
-    ++last;
-  s.erase(last.base(), s.end());
-  trace("trim") << "=> ^" << s << '$';
+  string::const_iterator last = --s.end();
+  while (last != s.begin() && isspace(*last))
+    --last;
+  ++last;
+  return string(first, last);
 }

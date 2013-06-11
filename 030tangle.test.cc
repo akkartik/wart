@@ -7,23 +7,17 @@ void test_hunks_works_without_metadata() {
 
 
 void test_trim() {
-  string s = "  abc  ";
-  trim(s);
-  CHECK_EQ(s, "abc");
-
-  s = "  abc";
-  trim(s);
-  CHECK_EQ(s, "abc");
-
-  s = " a";
-  trim(s);
-  CHECK_EQ(s, "a");
-
-  s = " a ";
-  trim(s);
-  CHECK_EQ(s, "a");
-
-  s = "  ";
-  trim(s);
-  CHECK_EQ(s, "");
+  CHECK_EQ(trim(""), "");
+  CHECK_EQ(trim(" "), "");
+  CHECK_EQ(trim("  "), "");
+  CHECK_EQ(trim("a"), "a");
+  CHECK_EQ(trim(" a"), "a");
+  CHECK_EQ(trim("  a"), "a");
+  CHECK_EQ(trim("  ab"), "ab");
+  CHECK_EQ(trim("a "), "a");
+  CHECK_EQ(trim("a  "), "a");
+  CHECK_EQ(trim("ab  "), "ab");
+  CHECK_EQ(trim(" a "), "a");
+  CHECK_EQ(trim("  a  "), "a");
+  CHECK_EQ(trim("  ab  "), "ab");
 }
