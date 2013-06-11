@@ -9,20 +9,18 @@ list<string> lines(istream& in) {
 }
 
 struct hunk {
-  string filename;
-  int starting_line;
   list<string> lines;
-  hunk() :starting_line(0) {}
 };
 
 list<hunk> hunks(istream& in) {
   list<hunk> result;
   list<string> all_lines = lines(in);
+  trace("tangle") << "first hunk";
   result.push_back(hunk());
-  result.back().starting_line = 1;
-  for (list<string>::iterator p = all_lines.begin(); p != all_lines.end(); ++p)
-    trace("tangle") << "hunk: " << *p;
-  result.back().lines.swap(all_lines);
+  for (list<string>::iterator p = all_lines.begin(); p != all_lines.end(); ++p) {
+    trace("tangle") << "line: " << *p;
+    result.back().lines.push_back(*p);
+  }
   return result;
 }
 
