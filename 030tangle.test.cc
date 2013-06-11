@@ -11,9 +11,9 @@ void test_hunks_works_with_metadata() {
 }
 
 void test_hunks_works_with_indented_metadata() {
-  std::istringstream in("a\n  :(a b)\nc\n");
+  std::istringstream in("a\n  :(a b)\n  c\n    d\n");
   hunks(in);
-  CHECK_TRACE_CONTENTS("tangle", "first hunkline: anew hunk: :(a b)line: c");
+  CHECK_TRACE_CONTENTS("tangle", "first hunkline: anew hunk: :(a b)line: cline:   d");
 }
 
 
@@ -32,4 +32,24 @@ void test_trim() {
   CHECK_EQ(trim(" a "), "a");
   CHECK_EQ(trim("  a  "), "a");
   CHECK_EQ(trim("  ab  "), "ab");
+}
+
+void test_strip_indent() {
+  CHECK_EQ(strip_indent("", 0), "");
+  CHECK_EQ(strip_indent("", 1), "");
+  CHECK_EQ(strip_indent("", 3), "");
+  CHECK_EQ(strip_indent(" ", 0), " ");
+  CHECK_EQ(strip_indent(" a", 0), " a");
+  CHECK_EQ(strip_indent(" ", 1), "");
+  CHECK_EQ(strip_indent(" a", 1), "a");
+  CHECK_EQ(strip_indent(" ", 2), "");
+  CHECK_EQ(strip_indent(" a", 2), "a");
+  CHECK_EQ(strip_indent("  ", 0), "  ");
+  CHECK_EQ(strip_indent("  a", 0), "  a");
+  CHECK_EQ(strip_indent("  ", 1), " ");
+  CHECK_EQ(strip_indent("  a", 1), " a");
+  CHECK_EQ(strip_indent("  ", 2), "");
+  CHECK_EQ(strip_indent("  a", 2), "a");
+  CHECK_EQ(strip_indent("  ", 3), "");
+  CHECK_EQ(strip_indent("  a", 3), "a");
 }
