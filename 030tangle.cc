@@ -20,9 +20,10 @@ list<hunk> hunks(istream& in) {
   result.push_back(hunk());
   for (list<string>::iterator p = all_lines.begin(); p != all_lines.end(); ++p) {
     if (starts_with(*p, ":(")) {
-      trace("tangle") << "new hunk: " << trim(*p);
-      result.push_back(hunk());
       curr_indent = indent(*p);
+      string directive = trim(*p);
+      trace("tangle") << "new hunk: " << directive;
+      result.push_back(hunk());
       continue;
     }
     string line = strip_indent(*p, curr_indent);
