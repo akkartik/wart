@@ -1,21 +1,23 @@
-:(to includes)
+// Includes
 #include<iostream.h>
-:(to globals)
+// Types
+// Globals
 int x;
 
-:(code)
 int main() {
-  :(body)
   return 0;
 }
 
-:(to body)
+:(before 'main()//return 0')
 cin >> x;
 trace("input") << "read " << x;
 
-:(to body)
+:(before 'main()//return 0')
 cout << x;
 trace("output") << "wrote " << x;
+
+:(in 'Globals')
+int y;
 
 :(scenario "first test")
 34
