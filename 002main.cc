@@ -86,6 +86,7 @@ void run_tests() {
   }
 
   setup();
+  cerr << '\n';
   load_files(".wart");   // after GC tests
   load_files(".test");
 
