@@ -12,6 +12,13 @@ list<string> tangle(istream& in) {
   return result;
 }
 
+void tangle_and_print(const char* filename) {
+  ifstream in(filename);
+  list<string> result = tangle(in);
+  for (list<string>::iterator p = result.begin(); p != result.end(); ++p)
+    cout << *p << '\n';
+}
+
 void process_next_hunk(istream& in, const string& directive, list<string>& out) {
   list<string> hunk;
   string curr_line;

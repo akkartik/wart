@@ -18,9 +18,13 @@
 bool Interactive = false;
 bool Warn_on_unknown_var = false;
 
-int main(int argc, unused char* argv[]) {
+int main(int argc, char* argv[]) {
   if (argc > 1) {
-    run_tests();
+    string arg(argv[1]);
+    if (arg == "test")
+      run_tests();
+    else if (arg == "tangle")
+      tangle_and_print(argv[2]);
     return 0;
   }
 
