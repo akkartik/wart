@@ -1,20 +1,21 @@
-list<string> tangle(istream& in) {
-  list<string> result;
+void tangle(istream& in, list<string>& out) {
   string curr_line;
   while (!in.eof()) {
     getline(in, curr_line);
     if (starts_with(curr_line, ":("))
-      process_next_hunk(in, trim(curr_line), result);
+      process_next_hunk(in, trim(curr_line), out);
     else
-      result.push_back(curr_line);
+      out.push_back(curr_line);
   }
-  trace_all("tangle", result);
-  return result;
+  trace_all("tangle", out);
 }
 
-void tangle_and_print(const char* filename) {
-  ifstream in(filename);
-  list<string> result = tangle(in);
+void tangle_and_print_all(const int argc, const char* argv[]) {
+  list<string> result;
+  for (int n = 0; n < argc; ++n) {
+    ifstream in(argv[n]);
+    tangle(in, result);
+  }
   for (list<string>::iterator p = result.begin(); p != result.end(); ++p)
     cout << *p << '\n';
 }
@@ -35,11 +36,13 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
   }
 
   TEMP(expr, read(directive.substr(1)));
-  list<string>::iterator target = find_substr(out, to_string(car(cdr(expr))));
-  if (target == out.end()) RAISE << "couldn't find target " << to_string(car(cdr(expr))) << '\n';
-
+  cell* x1 = car(cdr(expr));
+  list<string>::iterator target = (x1 != nil) ? find_substr(out, to_string(x1)) : out.end();
   string cmd = to_string(car(expr));
-  if (cmd == "after") ++target;
+  if (cmd == "after") {
+    if (target == out.end()) RAISE << "couldn't find target " << to_string(car(cdr(expr))) << '\n';
+    ++target;
+  }
   out.insert(target, hunk.begin(), hunk.end());
 }
 

@@ -1,18 +1,21 @@
 void test_tangle() {
   std::istringstream in("a\nb\nc\n:(before b)\nd\n");
-  tangle(in);
+  list<string> dummy;
+  tangle(in, dummy);
   CHECK_TRACE_CONTENTS("tangle", "adbc");
 }
 
 void test_tangle2() {
   std::istringstream in("a\nb\nc\n:(after b)\nd\n");
-  tangle(in);
+  list<string> dummy;
+  tangle(in, dummy);
   CHECK_TRACE_CONTENTS("tangle", "abdc");
 }
 
 void test_tangle_at_end() {
   std::istringstream in("a\nb\nc\n:(after c)\nd\n");
-  tangle(in);
+  list<string> dummy;
+  tangle(in, dummy);
   CHECK_TRACE_CONTENTS("tangle", "abcd");
 }
 

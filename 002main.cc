@@ -25,7 +25,7 @@ int main(int argc, const char* argv[]) {
     if (arg == "test")
       run_tests();
     else if (arg == "tangle")
-      tangle_and_print(argv[2]);
+      tangle_and_print_all(argc-2, argv+2);
     return 0;
   }
 
