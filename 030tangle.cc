@@ -4,10 +4,11 @@ list<string> tangle(istream& in) {
   while (!in.eof()) {
     getline(in, curr_line);
     if (starts_with(curr_line, ":("))
-      process_next_hunk(in, curr_line, result);
+      process_next_hunk(in, trim(curr_line), result);
     else
       result.push_back(curr_line);
   }
+  trace_all("tangle", result);
   return result;
 }
 
@@ -16,22 +17,30 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
   string curr_line;
   while (!in.eof()) {
     std::streampos old = in.tellg();
-    cerr << "peek: " << in.peek() << '\n';
     getline(in, curr_line);
     if (starts_with(curr_line, ":(")) {
       in.seekg(old);
-//?       put_back(in, curr_line);
-      cerr << "after: " << in.peek() << '\n';
       break;
     }
+    else {
+      hunk.push_back(curr_line);
+    }
   }
+
+  TEMP(expr, read(directive.substr(1)));
+  list<string>::iterator target = find_substr(out, to_string(car(cdr(expr))));
+  if (target == out.end()) RAISE << "couldn't find target " << to_string(car(cdr(expr))) << '\n';
+
+  string cmd = to_string(car(expr));
+  if (cmd == "after") ++target;
+  out.insert(target, hunk.begin(), hunk.end());
 }
 
-void put_back(istream& in, const string& line) {
-  cerr << "Attempting to put back " << line << "$\n";
-  in.putback('\n');
-  for (string::const_reverse_iterator p = line.rbegin(); p != line.rend(); ++p)
-    in.putback(*p);
+list<string>::iterator find_substr(list<string>& in, const string& pat) {
+  for (list<string>::iterator p = in.begin(); p != in.end(); ++p)
+    if (p->find(pat) != NOT_FOUND)
+      return p;
+  return in.end();
 }
 
 #include <locale>

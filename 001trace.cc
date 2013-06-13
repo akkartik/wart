@@ -72,6 +72,11 @@ struct lease_tracer {
 // never write explicit newlines into trace
 #define trace(layer) !Trace_stream ? cerr /*print nothing*/ : Trace_stream->stream(layer)
 
+void trace_all(const string& label, const list<string>& in) {
+  for (list<string>::const_iterator p = in.begin(); p != in.end(); ++p)
+    trace(label) << *p;
+}
+
 bool check_trace_contents(string FUNCTION, string layer, string expected) {   // empty layer == everything, multiple layers, hierarchical layers
   vector<string> expected_lines = split(expected, '');
   size_t curr_expected_line = 0;
