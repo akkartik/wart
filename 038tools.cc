@@ -77,3 +77,9 @@ COMPILE_FN(tmpfile, compiledfn_tmpfile, "()",
   close(fd);
   return mkref(new_string(tmp));
 )
+
+COMPILE_FN(trace, compiledfn_trace, "($layer '$expr)",
+  START_TRACING_UNTIL_END_OF_SCOPE;
+  Trace_stream->dump_layer = to_string(lookup("$layer"));
+  return eval(lookup("$expr"));
+)
