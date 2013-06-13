@@ -1,20 +1,27 @@
-void test_hunks_works_without_metadata() {
-  std::istringstream in("a\nb\nc\n");
-  hunks(in);
-  CHECK_TRACE_CONTENTS("tangle", "line: aline: bline: c");
-}
+//? void test_hunks_works_without_metadata() {
+//?   std::istringstream in("a\nb\nc\n");
+//?   hunks(in);
+//?   CHECK_TRACE_CONTENTS("tangle", "line: aline: bline: c");
+//? }
+//? 
+//? void test_hunks_works_with_metadata() {
+//?   std::istringstream in("a\n:(a b)\nc\n");
+//?   hunks(in);
+//?   CHECK_TRACE_CONTENTS("tangle", "a\n:(a b) =>\nc\n");
+//? }
+//? 
+//? void test_hunks_works_with_indented_metadata() {
+//?   std::istringstream in("a\n  :(a b)\n  c\n    d\n");
+//?   hunks(in);
+//?   CHECK_TRACE_CONTENTS("tangle", "a:(a b) =>\nc\n  d");
+//? }
 
-void test_hunks_works_with_metadata() {
-  std::istringstream in("a\n:(a b)\nc\n");
-  hunks(in);
-  CHECK_TRACE_CONTENTS("tangle", "first hunkline: anew hunk: :(a b)line: c");
-  CHECK_TRACE_DOESNT_CONTAIN("tangle", "line: :(a b)");
-}
-
-void test_hunks_works_with_indented_metadata() {
-  std::istringstream in("a\n  :(a b)\n  c\n    d\n");
-  hunks(in);
-  CHECK_TRACE_CONTENTS("tangle", "first hunkline: anew hunk: :(a b)line: cline:   d");
+void test_foo() {
+//?   ifstream in("x");
+  std::istringstream in("a\nb\n:(a b)\n");
+  list<string> out;
+  process_next_hunk(in, "", out);
+  exit(0);
 }
 
 

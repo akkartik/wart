@@ -1,36 +1,37 @@
-list<string> lines(istream& in) {
+list<string> tangle(istream& in) {
   list<string> result;
+  string curr_line;
   while (!in.eof()) {
-    string s;
-    getline(in, s);
-    result.push_back(s);
+    getline(in, curr_line);
+    if (starts_with(curr_line, ":("))
+      process_next_hunk(in, curr_line, result);
+    else
+      result.push_back(curr_line);
   }
   return result;
 }
 
-struct hunk {
-  list<string> lines;
-};
-
-list<hunk> hunks(istream& in) {
-  list<hunk> result;
-  list<string> all_lines = lines(in);
-  size_t curr_indent = 0;
-  trace("tangle") << "first hunk";
-  result.push_back(hunk());
-  for (list<string>::iterator p = all_lines.begin(); p != all_lines.end(); ++p) {
-    if (starts_with(*p, ":(")) {
-      curr_indent = indent(*p);
-      string directive = trim(*p);
-      trace("tangle") << "new hunk: " << directive;
-      result.push_back(hunk());
-      continue;
+void process_next_hunk(istream& in, const string& directive, list<string>& out) {
+  list<string> hunk;
+  string curr_line;
+  while (!in.eof()) {
+    std::streampos old = in.tellg();
+    cerr << "peek: " << in.peek() << '\n';
+    getline(in, curr_line);
+    if (starts_with(curr_line, ":(")) {
+      in.seekg(old);
+//?       put_back(in, curr_line);
+      cerr << "after: " << in.peek() << '\n';
+      break;
     }
-    string line = strip_indent(*p, curr_indent);
-    trace("tangle") << "line: " << line;
-    result.back().lines.push_back(line);
   }
-  return result;
+}
+
+void put_back(istream& in, const string& line) {
+  cerr << "Attempting to put back " << line << "$\n";
+  in.putback('\n');
+  for (string::const_reverse_iterator p = line.rbegin(); p != line.rend(); ++p)
+    in.putback(*p);
 }
 
 #include <locale>
