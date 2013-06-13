@@ -1,9 +1,0 @@
-:(in includes)
-#include<iostream.h>
-:(in globals)
-int x;
-
-:(code)
-int main() {
-  return 0;
-}

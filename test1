@@ -1,3 +1,23 @@
-a
-b
-c
+:(to includes)
+#include<iostream.h>
+:(to globals)
+int x;
+
+:(code)
+int main() {
+  :(body)
+  return 0;
+}
+
+:(to body)
+cin >> x;
+trace("input") << "read " << x;
+
+:(to body)
+cout << x;
+trace("output") << "wrote " << x;
+
+:(scenario "first test")
+34
+-input: read 34
+-output: wrote 34
