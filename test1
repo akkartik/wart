@@ -16,7 +16,7 @@ trace("input") << "read " << x;
 cout << x;
 trace("output") << "wrote " << x;
 
-:(in 'Globals')
+:(before 'Globals')
 int y;
 
 :(scenario "first test")
