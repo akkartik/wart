@@ -1,0 +1,13 @@
+:(in includes)
+#include<iostream.h>
+:(in globals)
+int x;
+
+:(code)
+int main() {
+  return 0;
+}
+
+:(prepend to main)
+cin >> x;
+cout << x;

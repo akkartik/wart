@@ -1,0 +1,27 @@
+:(to includes)
+#include<iostream.h>
+:(to globals)
+int x;
+
+:(code)
+int main() {
+  :(main)
+  return 0;
+}
+
+:(to main)
+  :(input)
+  :(output)
+
+:(to input)
+cin >> x;
+trace("input") << "read " << x;
+
+:(to output of main)
+cout << x;
+trace("output") << "wrote " << x;
+
+:(scenario "first test")
+34
+-input: read 34
+-output: wrote 34
