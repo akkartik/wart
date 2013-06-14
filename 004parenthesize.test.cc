@@ -199,7 +199,7 @@ void test_parenthesize_errors_on_unbalanced_closed_paren() {
   Hide_raises = true;
   indent_sensitive_stream in(")");
   next_expr(in);
-  CHECK(Num_raises > 0);   Num_raises=0;
+  CHECK_EQ(trace_count("warn"), 1);
 }
 
 void test_parenthesize_handles_early_paren() {

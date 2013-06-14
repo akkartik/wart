@@ -63,9 +63,8 @@ COMPILE_FN(try_eval, compiledfn_try_eval, "($x ... $scope)",
     cell* ans = compiledfn_eval();
   Hide_raises = old_count_raise;
 
-  if (Num_raises == 0) return ans;
+  if (trace_count("warn") == 0) return ans;
   // error
-  Num_raises = 0;
   rmref(ans);
   return nil;
 )

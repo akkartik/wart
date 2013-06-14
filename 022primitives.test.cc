@@ -57,7 +57,7 @@ void test_assign_to_non_sym_warns() {
   trace("test") << "<-";
   Hide_raises = true;
   run("(<- 3 nil)");
-  CHECK_EQ(Num_raises, 1);   Num_raises=0;
+  CHECK_EQ(trace_count("warn"), 1);
 }
 
 void test_assign_lexical_var() {
@@ -143,7 +143,7 @@ void test_equal_handles_float_vs_nil() {
   Hide_raises = true;
   run("(nil = 1.5)");
   CHECK_TRACE_TOP("eval", "=> nil");
-  CHECK_EQ(Num_raises, 0);
+  CHECK_EQ(trace_count("warn"), 0);
 }
 
 void test_eval_handles_eval() {

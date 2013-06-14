@@ -125,7 +125,6 @@ void setup() {
   setup_compiledfns();
   setup_streams();
   Hide_raises = false;
-  Num_raises = 0;
   Passed = true;
 }
 

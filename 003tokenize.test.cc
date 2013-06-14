@@ -100,5 +100,5 @@ void test_tokenize_handles_sexpr() {
 void test_quote_misuse_warns() {
   Hide_raises = true;
   read_all("' a");
-  CHECK_EQ(Num_raises, 1);   Num_raises = 0;
+  CHECK_EQ(trace_count("warn"), 1);
 }
