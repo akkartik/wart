@@ -103,14 +103,19 @@ void run_tests() {
 }
 
 void verify() {
+  bool old_hide_raises = Hide_raises;
   Hide_raises = false;
   teardown_streams();
   teardown_compiledfns();
   teardown_cells();
-  if (!Passed) return;
-  if (trace_count("warn")) DUMP("warn");
-  else if (num_unfreed() > 0) dump_unfreed();
-  else cerr << ".";
+  if (!Passed)
+    ;
+  else if (!old_hide_raises && trace_count("warn"))
+    DUMP("warn");
+  else if (num_unfreed() > 0)
+    dump_unfreed();
+  else
+    cerr << ".";
 }
 
 void setup() {
