@@ -98,7 +98,7 @@ void test_tokenize_handles_sexpr() {
 }
 
 void test_quote_misuse_warns() {
-//?   Count_raises = true;
+  Count_raises = true;
   read_all("' a");
   CHECK_EQ(Num_raises, 1);   Num_raises = 0;
 }

@@ -74,10 +74,10 @@ token next_token(indent_sensitive_stream& in) {
   else if (find(Quote_and_unquote_chars, in.fd.peek())) {
     slurp_char(in.fd, out);
     if (isspace(in.fd.peek()) || in.fd.peek() == ')') {
-      if (!Interactive)
-        RAISE << "You can't put strings in single-quotes: '" << peek_next_atom(in.fd) << '\n';
-      else
+      if (Interactive)
         RAISE << "You can't put strings in single-quotes\n";
+      else
+        RAISE << "You can't put strings in single-quotes: '" << peek_next_atom(in.fd) << '\n';
     }
   }
   else
