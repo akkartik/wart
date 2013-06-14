@@ -108,7 +108,7 @@ void verify() {
   teardown_compiledfns();
   teardown_cells();
   if (!Passed) return;
-  if (Num_raises != 0) cerr << Num_raises << " errors encountered\n";
+  if (trace_count("warn")) DUMP("warn");
   else if (num_unfreed() > 0) dump_unfreed();
   else cerr << ".";
 }

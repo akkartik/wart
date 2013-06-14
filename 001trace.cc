@@ -69,7 +69,7 @@ struct lease_tracer {
 
 #define CLEAR_TRACE delete Trace_stream, Trace_stream = new trace_stream;
 
-#define DUMP(layer) cerr << Trace_stream->readable_contents(layer);
+#define DUMP(layer) cerr << Trace_stream->readable_contents(layer)
 
 
 
