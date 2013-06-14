@@ -168,6 +168,7 @@ cell* peek_next_atom(istream& in) { // should always undo changes to 'in'
   indent_sensitive_stream dummy(in);
   cell* result = read(dummy);
   in.seekg(curr);
+  in.clear();
   return result;
 }
 
