@@ -2,6 +2,8 @@
 //  no pointers except cell*
 //  use long as the default integer type; it's always large enough to hold pointers
 
+#define unused __attribute__((unused))
+
 #include<cstdio>
 #include<cstring>
 #include<cstdlib>
@@ -41,8 +43,6 @@ using std::ofstream;
 
 
 
-#define unused __attribute__((unused))
-
 bool Count_raises = false;
 long Num_raises = 0;
 
@@ -55,8 +55,6 @@ ostream& operator<<(ostream& os, unused die) {
   os << "dying";
   exit(1);
 }
-
-
 
 // interpreter decls
 
