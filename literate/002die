@@ -1,0 +1,6 @@
+:(before "End Types")
+struct die {};
+ostream& operator<<(ostream& os, unused die) {
+  os << "dying";
+  exit(1);
+}

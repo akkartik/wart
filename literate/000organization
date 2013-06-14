@@ -1,0 +1,23 @@
+#define unused __attribute__((unused))
+
+// End Includes
+
+
+
+// End Types
+
+
+
+#include "function_list"  // auto-generated; see makefile
+
+
+
+// End Globals
+
+int main(int argc, char* argv[]) {
+  if (argc > 1) {
+    // Commandline options
+  }
+  // End Main
+  return 0;
+}
