@@ -1,6 +1,6 @@
 using std::pair;
 
-bool Count_raises = false;
+bool Hide_raises = false;
 long Num_raises = 0;
 
 struct trace_stream {
@@ -25,9 +25,9 @@ struct trace_stream {
     if (!curr_stream) return;
     past_lines.push_back(pair<string, pair<int, string> >(curr_layer, pair<int, string>(frame[curr_layer], curr_stream->str())));
     if (curr_layer == dump_layer || curr_layer == "dump" ||
-        (!Count_raises && curr_layer == "warn"))
+        (!Hide_raises && curr_layer == "warn"))
       cerr << frame[curr_layer] << ": " << curr_stream->str() << '\n';
-    if (Count_raises && curr_layer == "warn") ++Num_raises;
+    if (Hide_raises && curr_layer == "warn") ++Num_raises;
     delete curr_stream;
     curr_stream = NULL;
   }

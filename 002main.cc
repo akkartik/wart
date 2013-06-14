@@ -103,7 +103,7 @@ void run_tests() {
 }
 
 void verify() {
-  Count_raises = false;
+  Hide_raises = false;
   teardown_streams();
   teardown_compiledfns();
   teardown_cells();
@@ -119,7 +119,7 @@ void setup() {
   setup_scopes();
   setup_compiledfns();
   setup_streams();
-  Count_raises = false;
+  Hide_raises = false;
   Num_raises = 0;
   Passed = true;
 }
