@@ -7,7 +7,7 @@ type_list: boot.cc [0-9]*.cc
 	@grep -h typedef [0-9]*.cc >> type_list
 
 function_list: boot.cc [0-9]*.cc
-	@grep -h "^[^ ].*) {$$" [0-9]*.cc |perl -pwe 's/ {/;/' > function_list
+	@grep -h "^[^ #].*) {" [0-9]*.cc |perl -pwe 's/ {/;/' > function_list
 	@grep -h "^COMPILE_FN" [0-9]*.cc |perl -pwe 's/.*COMPILE_FN\(([^,]*), ([^,]*), ([^,]*),$$/cell* $$2();/' >> function_list
 
 file_list: boot.cc [0-9]*.cc
