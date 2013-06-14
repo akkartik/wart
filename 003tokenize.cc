@@ -76,8 +76,11 @@ token next_token(indent_sensitive_stream& in) {
     if (isspace(in.fd.peek()) || in.fd.peek() == ')') {
       if (Interactive)
         RAISE << "You can't put strings in single-quotes\n";
-      else
-        RAISE << "You can't put strings in single-quotes: '" << peek_next_atom(in.fd) << '\n';
+      else {
+        cell* context = peek_next_atom(in.fd);
+        RAISE << "You can't put strings in single-quotes: '" << context << '\n';
+        rmref(context);
+      }
     }
   }
   else
