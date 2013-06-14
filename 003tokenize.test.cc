@@ -96,3 +96,9 @@ void test_tokenize_handles_sexpr() {
   read_all("('a '(boo) \"foo\nbar\" `c `,d ,@e)\nabc #def ghi\ndef");
   CHECK_TRACE_CONTENTS("tokenize", ":0('a'(boo)\"foo\nbar\"`c`,d,@e)\\n:0abc\\n:0def");
 }
+
+void test_quote_misuse_warns() {
+  Count_raises = true;
+  read_all("' a");
+  CHECK_EQ(Num_raises, 1);   Num_raises = 0;
+}

@@ -71,8 +71,15 @@ token next_token(indent_sensitive_stream& in) {
     slurp_char(in.fd, out);
   else if (in.fd.peek() == ',')
     slurp_unquote(in.fd, out);
-  else if (find(Quote_and_unquote_chars, in.fd.peek()))
+  else if (find(Quote_and_unquote_chars, in.fd.peek())) {
     slurp_char(in.fd, out);
+    if (isspace(in.fd.peek()) || in.fd.peek() == ')') {
+      if (!Interactive)
+        RAISE << "You can't put strings in single-quotes: '" << peek_next_atom(in.fd) << '\n';
+      else
+        RAISE << "You can't put strings in single-quotes\n";
+    }
+  }
   else
     slurp_word(in.fd, out);
 
@@ -154,6 +161,14 @@ void skip_comment(istream& in) {
 void skip_whitespace(istream& in) {
   while (isspace(in.peek()) && in.peek() != '\n')
     in.get();
+}
+
+cell* peek_next_atom(istream& in) { // should always undo changes to 'in'
+  std::streampos curr = in.tellg();
+  indent_sensitive_stream dummy(in);
+  cell* result = read(dummy);
+  in.seekg(curr);
+  return result;
 }
 
 
