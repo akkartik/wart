@@ -215,7 +215,7 @@ long num_unfreed() {
 }
 
 void dump_unfreed() {
-  unordered_map<cell*, int> num_refs_remaining;
+  unordered_map<cell*, long> num_refs_remaining;
   for (heap* h = First_heap; h; h=h->next)
     for (cell* x = &h->cells[0]; x < &h->cells[CELLS_PER_HEAP]; ++x)
       if (x->car)
@@ -231,7 +231,7 @@ void dump_unfreed() {
     }
 }
 
-void mark_all_cells(cell* x, unordered_map<cell*, int>& mark) {
+void mark_all_cells(cell* x, unordered_map<cell*, long>& mark) {
   if (x == nil) return;
   ++mark[x];
   switch (x->type) {

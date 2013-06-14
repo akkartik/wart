@@ -92,7 +92,7 @@ ast_node transform_infix(ast_node n) {
     return *++n.elems.begin();
   }
 
-  int old_size = n.elems.size();
+  size_t old_size = n.elems.size();
 
   // now n is guaranteed to have at least 3 ops
   // slide a window of 3, pinching into s-exprs when middle elem is an op

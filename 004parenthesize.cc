@@ -125,7 +125,7 @@ void emit_all(list<token>& buffer, const token& curr, list<token>& out, long& ex
 
 void restore_indent(long indent, indent_sensitive_stream& in) {
   if (in.eof()) return;
-  for (int i = 0; i < indent; ++i)
+  for (long i = 0; i < indent; ++i)
     in.fd.putback(' ');
   in.at_start_of_line = true;
 }
