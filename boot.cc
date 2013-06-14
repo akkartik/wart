@@ -43,13 +43,6 @@ using std::ofstream;
 
 
 
-bool Count_raises = false;
-long Num_raises = 0;
-
-                           // ?: to avoid dangling-else warnings
-#define RAISE Count_raises ? ++Num_raises,cerr /* print nothing */ \
-                           : cerr << __FILE__ << ":" << __LINE__ << " "
-
 struct die {};
 ostream& operator<<(ostream& os, unused die) {
   os << "dying";

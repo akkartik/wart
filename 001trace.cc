@@ -1,5 +1,8 @@
 using std::pair;
 
+bool Count_raises = false;
+long Num_raises = 0;
+
 struct trace_stream {
   vector<pair<string, pair<int, string> > > past_lines;   // [(layer label, frame, line)]
   unordered_map<string, int> frame;
@@ -21,8 +24,10 @@ struct trace_stream {
   void newline() {
     if (!curr_stream) return;
     past_lines.push_back(pair<string, pair<int, string> >(curr_layer, pair<int, string>(frame[curr_layer], curr_stream->str())));
-    if (curr_layer == dump_layer || curr_layer == "dump")
+    if (curr_layer == dump_layer || curr_layer == "dump" ||
+        (!Count_raises && curr_layer == "warn"))
       cerr << frame[curr_layer] << ": " << curr_stream->str() << '\n';
+    if (Count_raises && curr_layer == "warn") ++Num_raises;
     delete curr_stream;
     curr_stream = NULL;
   }
@@ -71,6 +76,7 @@ struct lease_tracer {
 // Main entrypoint.
 // never write explicit newlines into trace
 #define trace(layer) !Trace_stream ? cerr /*print nothing*/ : Trace_stream->stream(layer)
+#define RAISE trace("warn") << __FILE__ << ":" << __LINE__ << " "
 
 void trace_all(const string& label, const list<string>& in) {
   for (list<string>::const_iterator p = in.begin(); p != in.end(); ++p)
