@@ -38,9 +38,15 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
   TEMP(expr, read(directive.substr(1)));
   cell* x1 = car(cdr(expr));
   list<string>::iterator target = (x1 != nil) ? find_substr(out, to_string(x1)) : out.end();
+
+  string curr_indent = target != out.end() ? indent(*target) : "";
+  for (list<string>::iterator p = hunk.begin(); p != hunk.end(); ++p)
+    p->insert(p->begin(), curr_indent.begin(), curr_indent.end());
+
   string cmd = to_string(car(expr));
   if (cmd == "after") {
-    if (target == out.end()) RAISE << "couldn't find target " << to_string(car(cdr(expr))) << '\n';
+    if (target == out.end())
+      RAISE << "couldn't find target " << to_string(car(cdr(expr))) << '\n';
     ++target;
   }
   out.insert(target, hunk.begin(), hunk.end());
@@ -65,11 +71,11 @@ bool starts_with(const string& s, const string& pat) {
   return false;
 }
 
-size_t indent(const string& s) {
+string indent(const string& s) {
   for (size_t pos = 0; pos < s.size(); ++pos)
     if (!isspace(s[pos]))
-      return pos;
-  return 0;
+      return s.substr(0, pos);
+  return "";
 }
 
 string strip_indent(const string& s, size_t n) {

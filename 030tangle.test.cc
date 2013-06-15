@@ -19,6 +19,13 @@ void test_tangle_at_end() {
   CHECK_TRACE_CONTENTS("tangle", "abcd");
 }
 
+void test_tangle_indents_hunks_correctly() {
+  std::istringstream in("a\n  b\nc\n:(after b)\nd\n");
+  list<string> dummy;
+  tangle(in, dummy);
+  CHECK_TRACE_CONTENTS("tangle", "a  b  dc");
+}
+
 
 
 void test_trim() {
