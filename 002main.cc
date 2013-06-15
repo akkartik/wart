@@ -67,15 +67,10 @@ cell* run(istream& i) {
     cell* form = read(in);
     update(result, eval(form));
     rmref(form);
-    if (eof(in.fd)) break;
-    if (Interactive && in.fd.peek() == '\n') break;
+    if (in.eof()) break;
+    if (Interactive && in.at_start_of_line) break;
   }
   return result;
-}
-
-bool eof(istream& in) {
-  in.peek();
-  return in.eof();
 }
 
 
@@ -139,7 +134,7 @@ void read_all(string s) {
   indent_sensitive_stream in(ss);
   do {
       rmref(read(in));
-  } while (!eof(in.fd));
+  } while (!in.eof());
   // return nothing; we'll just verify the trace
 }
 
