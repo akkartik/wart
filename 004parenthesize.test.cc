@@ -218,9 +218,8 @@ void test_parenthesize_breaks_at_empty_lines_when_interactive() {
 
   CLEAR_TRACE;
   Interactive = true;
-    read_all("a b\n\n  c");
-    CHECK_TRACE_CONTENTS("parenthesize", "(ab)");
-  Interactive = false;
+  read_all("a b\n\n  c");
+  CHECK_TRACE_CONTENTS("parenthesize", "(ab)");
 }
 
 void test_parenthesize_breaks_indent_at_empty_lines_when_interactive() {
@@ -229,9 +228,8 @@ void test_parenthesize_breaks_indent_at_empty_lines_when_interactive() {
 
   CLEAR_TRACE;
   Interactive = true;
-    read_all("a b\n  c\n\n  d");
-    CHECK_TRACE_CONTENTS("parenthesize", "(abc)");
-  Interactive = false;
+  read_all("a b\n  c\n\n  d");
+  CHECK_TRACE_CONTENTS("parenthesize", "(abc)");
 }
 
 void test_parenthesize_refuses_to_group_from_middle_of_line() {
@@ -271,9 +269,8 @@ void test_parenthesize_handles_multiline_parenthesized_exprs_when_interactive() 
 
   CLEAR_TRACE;
   Interactive = true;
-    read_all("(a b\n)\n");
-    CHECK_TRACE_CONTENTS("parenthesize", "(ab)");
-  Interactive = false;
+  read_all("(a b\n)\n");
+  CHECK_TRACE_CONTENTS("parenthesize", "(ab)");
 }
 
 void rewind(indent_sensitive_stream& in) {

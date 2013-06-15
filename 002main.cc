@@ -121,6 +121,7 @@ void setup() {
   setup_scopes();
   setup_compiledfns();
   setup_streams();
+  Interactive = false;
   Hide_raises = false;
   Passed = true;
 }
