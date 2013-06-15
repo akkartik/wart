@@ -101,7 +101,8 @@ bool check_trace_contents(string FUNCTION, int LINE, string layer, string expect
     if (curr_expected_line == expected_lines.size()) return true;
   }
 
-  cerr << "\nF " << FUNCTION << "(" << LINE << "): trace for " << layer << " didn't contain " << expected_lines[curr_expected_line] << '\n';
+  cerr << "\nF " << FUNCTION << "(" << LINE << "): missing '" << expected_lines[curr_expected_line] << "' in trace:\n";
+  DUMP(layer);
   Passed = false;
   return false;
 }
@@ -184,7 +185,8 @@ bool check_trace_contents(string FUNCTION, int LINE, string layer, int frame, st
     if (curr_expected_line == expected_lines.size()) return true;
   }
 
-  cerr << "\nF " << FUNCTION << "(" << LINE << "): trace didn't contain " << expected_lines[curr_expected_line] << '\n';
+  cerr << "\nF " << FUNCTION << "(" << LINE << "): missing '" << expected_lines[curr_expected_line] << "' in trace/" << frame << ":\n";
+  DUMP(layer);
   Passed = false;
   return false;
 }
