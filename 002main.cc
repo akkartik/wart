@@ -63,11 +63,13 @@ extern cell* nil;
 cell* run(istream& i) {
   indent_sensitive_stream in(i);
   cell* result = nil;
-  do {
-      cell* form = read(in);
-      update(result, eval(form));
-      rmref(form);
-  } while (!eof(in.fd) && (!Interactive || in.fd.peek() != '\n'));
+  while (true) {
+    cell* form = read(in);
+    update(result, eval(form));
+    rmref(form);
+    if (eof(in.fd)) break;
+    if (Interactive && in.fd.peek() == '\n') break;
+  }
   return result;
 }
 
