@@ -1,3 +1,13 @@
+void tangle_and_print_all(const int argc, const char* argv[]) {
+  list<string> result;
+  for (int n = 0; n < argc; ++n) {
+    ifstream in(argv[n]);
+    tangle(in, result);
+  }
+  for (list<string>::iterator p = result.begin(); p != result.end(); ++p)
+    cout << *p << '\n';
+}
+
 void tangle(istream& in, list<string>& out) {
   string curr_line;
   while (!in.eof()) {
@@ -8,16 +18,6 @@ void tangle(istream& in, list<string>& out) {
       out.push_back(curr_line);
   }
   trace_all("tangle", out);
-}
-
-void tangle_and_print_all(const int argc, const char* argv[]) {
-  list<string> result;
-  for (int n = 0; n < argc; ++n) {
-    ifstream in(argv[n]);
-    tangle(in, result);
-  }
-  for (list<string>::iterator p = result.begin(); p != result.end(); ++p)
-    cout << *p << '\n';
 }
 
 void process_next_hunk(istream& in, const string& directive, list<string>& out) {
