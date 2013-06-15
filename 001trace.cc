@@ -81,7 +81,7 @@ void trace_all(const string& label, const list<string>& in) {
     trace(label) << *p;
 }
 
-bool check_trace_contents(string FUNCTION, string layer, string expected) {   // empty layer == everything, multiple layers, hierarchical layers
+bool check_trace_contents(string FUNCTION, int LINE, string layer, string expected) {   // empty layer == everything, multiple layers, hierarchical layers
   vector<string> expected_lines = split(expected, '');
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
@@ -101,12 +101,12 @@ bool check_trace_contents(string FUNCTION, string layer, string expected) {   //
     if (curr_expected_line == expected_lines.size()) return true;
   }
 
-  cerr << "\nF " << FUNCTION << ": trace for " << layer << " didn't contain " << expected_lines[curr_expected_line] << '\n';
+  cerr << "\nF " << FUNCTION << "(" << LINE << "): trace for " << layer << " didn't contain " << expected_lines[curr_expected_line] << '\n';
   Passed = false;
   return false;
 }
 
-#define CHECK_TRACE_CONTENTS(...) check_trace_contents(__FUNCTION__, __VA_ARGS__)
+#define CHECK_TRACE_CONTENTS(...) check_trace_contents(__FUNCTION__, __LINE__, __VA_ARGS__)
 
 int trace_count(string layer) {
   return trace_count(layer, "");
@@ -162,7 +162,7 @@ struct lease_trace_frame {
 };
 #define new_trace_frame(layer) lease_trace_frame leased_frame(layer);
 
-bool check_trace_contents(string FUNCTION, string layer, int frame, string expected) {  // multiple layers, hierarchical layers
+bool check_trace_contents(string FUNCTION, int LINE, string layer, int frame, string expected) {  // multiple layers, hierarchical layers
   vector<string> expected_lines = split(expected, '');  // hack: doesn't handle newlines in embedded in lines
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
@@ -184,7 +184,7 @@ bool check_trace_contents(string FUNCTION, string layer, int frame, string expec
     if (curr_expected_line == expected_lines.size()) return true;
   }
 
-  cerr << "\nF " << FUNCTION << ": trace didn't contain " << expected_lines[curr_expected_line] << '\n';
+  cerr << "\nF " << FUNCTION << "(" << LINE << "): trace didn't contain " << expected_lines[curr_expected_line] << '\n';
   Passed = false;
   return false;
 }
