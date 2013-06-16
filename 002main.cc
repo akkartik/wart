@@ -35,8 +35,6 @@ int main(int argc, const char* argv[]) {
   load_files(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   Interactive = true;   // stop run on two enters
-  Trace_stream = new trace_stream;
-  Trace_stream->dump_layer = "tokenize";
   while (!cin.eof()) {
     cout << "=> " << run(cin) << '\n';
   }
@@ -70,8 +68,8 @@ cell* run(istream& i) {
     update(result, eval(form));
     rmref(form);
     if (in.eof()) break;
-    if (Interactive && in.at_start_of_line) { cerr << "AA\n"; break;}
-    if (Interactive && in.fd.peek() == '\n') { cerr << "BB\n"; break;}
+    if (Interactive && in.at_start_of_line) break;
+    if (Interactive && in.fd.peek() == '\n') break;
   }
   return result;
 }
