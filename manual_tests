@@ -1,0 +1,49 @@
+I. ctrl-d quits
+^D
+
+II. Fully-parenthesized form immediately evals
+(prn "world")<Enter>
+=> "world"
+34<Enter>
+=> 34
+
+III. Expr and comment
+34 # this is a comment!<Enter>
+
+IV. Two exprs on a single line:
+() 34<Enter>
+=> 34
+
+V. Three exprs on a single line:
+() 3 4<Enter>
+=> 4
+
+VI. Two exprs and comment:
+() 3 <Enter>
+=> 3
+
+VII. Two exprs and trailing whitespace:
+() 3 <Enter>
+=> 3
+
+VIII. Comments and newlines silently wait for next input
+# skip<Enter>
+
+IX. Partial expr waits to complete:
+(def (foo)<Enter>
+<Enter>
+34)<Enter>
+=> (object function ..)
+
+X. Expr and partial expr and comment:
+() (def (foo)<Enter>
+=> nil
+  34) # abc<Enter>
+<Enter>
+=> (object function ..)
+
+XI. Implicit parens after explicit
+(prn 'a)
+=> 'a
+prn 'a
+=> 'a
