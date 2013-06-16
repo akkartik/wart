@@ -92,6 +92,8 @@ list<token> next_expr(indent_sensitive_stream& in) {
     //// we done?
     if (explicit_open_parens == 0 && implicit_open_parens.empty()) {
       if (is_indent(curr)) restore_indent(this_line_indent, in);
+      trace("tokenize") << "aa";
+      if (curr.newline) { trace("tokenize") << "bb"; in.fd.putback('\n'); in.at_start_of_line = false; }
       if (is_indent(curr) || curr.newline || curr == ")") break;
     }
     if (Interactive && curr.newline && explicit_open_parens == 0 && in.fd.peek() == '\n')
