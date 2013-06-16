@@ -68,6 +68,7 @@ cell* run(istream& i) {
     update(result, eval(form));
     rmref(form);
     if (in.eof()) break;
+    if (Interactive && in.at_start_of_line) break;
     if (Interactive && in.fd.peek() == '\n') break;
   }
   return result;
