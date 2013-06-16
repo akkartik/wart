@@ -51,7 +51,7 @@ list<token> next_expr(indent_sensitive_stream& in) {
   long explicit_open_parens = 0;  // parens in the original
   stack<long> implicit_open_parens;   // parens we inserted with their indent levels
 
-  long this_line_indent = skip_initial_newslines_to_first_indent(in);
+  long this_line_indent = skip_initial_newlines_to_first_indent(in);
   while (!in.eof()) {
     token curr = next_token(in);
 
@@ -161,7 +161,7 @@ list<token> indent_insensitive_expr(indent_sensitive_stream& in) {
   return result;
 }
 
-long skip_initial_newslines_to_first_indent(indent_sensitive_stream& in) {
+long skip_initial_newlines_to_first_indent(indent_sensitive_stream& in) {
   for (;;) {
     token token = next_token(in);
     if (is_indent(token)) return token.indent_level;
