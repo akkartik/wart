@@ -1,3 +1,5 @@
+" Highlighting wart's literate directives in C++ sources.
+" Here's how it looks for me: http://i.imgur.com/Q7Gv008.png
 autocmd BufReadPost,BufNewFile 0* call HighlightTangledFile()
 function! HighlightTangledFile()
   set ft=cpp
