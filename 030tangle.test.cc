@@ -1,26 +1,26 @@
 void test_tangle() {
-  std::istringstream in("a\nb\nc\n:(before b)\nd\n");
+  istringstream in("a\nb\nc\n:(before b)\nd\n");
   list<string> dummy;
   tangle(in, dummy);
   CHECK_TRACE_CONTENTS("tangle", "adbc");
 }
 
 void test_tangle2() {
-  std::istringstream in("a\nb\nc\n:(after b)\nd\n");
+  istringstream in("a\nb\nc\n:(after b)\nd\n");
   list<string> dummy;
   tangle(in, dummy);
   CHECK_TRACE_CONTENTS("tangle", "abdc");
 }
 
 void test_tangle_at_end() {
-  std::istringstream in("a\nb\nc\n:(after c)\nd\n");
+  istringstream in("a\nb\nc\n:(after c)\nd\n");
   list<string> dummy;
   tangle(in, dummy);
   CHECK_TRACE_CONTENTS("tangle", "abcd");
 }
 
 void test_tangle_indents_hunks_correctly() {
-  std::istringstream in("a\n  b\nc\n:(after b)\nd\n");
+  istringstream in("a\n  b\nc\n:(after b)\nd\n");
   list<string> dummy;
   tangle(in, dummy);
   CHECK_TRACE_CONTENTS("tangle", "a  b  dc");

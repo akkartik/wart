@@ -35,6 +35,7 @@ using std::cerr;
 
 #include<sstream>
 using std::stringstream;
+using std::istringstream;
 using std::ostringstream;
 
 #include<fstream>
