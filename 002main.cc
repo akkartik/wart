@@ -69,6 +69,7 @@ cell* run(istream& i) {
     rmref(form);
     if (in.eof()) break;
     if (Interactive && in.at_start_of_line) break;
+    skip_whitespace(in.fd);
     if (Interactive && in.fd.peek() == '\n') break;
   }
   return result;
