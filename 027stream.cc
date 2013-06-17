@@ -1,5 +1,5 @@
 //// compiled primitives for files and streams
-//
+
 // Design considered the following:
 //   permit cascading of close operations
 //     so return non-nil on success

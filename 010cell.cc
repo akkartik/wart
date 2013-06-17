@@ -181,7 +181,7 @@ long excess_mkrefs() {
 
 
 
-//// Tracking refcounts.
+//// tracking refcounts
 
 // RAII for temporaries
 struct lease_cell {

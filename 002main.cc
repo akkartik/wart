@@ -57,9 +57,6 @@ struct indent_sensitive_stream {
 
 extern cell* nil;
 
-// In batch mode, evaluate all exprs in input.
-// In interactive mode, evaluate all exprs until empty line.
-// Return value of last expr.
 cell* run(istream& i) {
   indent_sensitive_stream in(i);
   cell* result = nil;
