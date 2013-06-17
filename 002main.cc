@@ -71,6 +71,7 @@ cell* run(istream& i) {
     if (Interactive) {
       if (in.at_start_of_line) break;
       skip_whitespace(in.fd);
+      if (in.fd.peek() == '#') skip_comment(in.fd);
       if (in.fd.peek() == '\n') break;
     }
   }

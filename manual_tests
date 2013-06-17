@@ -1,5 +1,7 @@
 I. ctrl-d quits
 ^D
+=> nil
+$
 
 II. Fully-parenthesized form immediately evals
 (prn "world")<Enter>
@@ -19,7 +21,7 @@ V. Three exprs on a single line:
 => 4
 
 VI. Two exprs and comment:
-() 3 <Enter>
+() 3 # abc<Enter>
 => 3
 
 VII. Two exprs and trailing whitespace:
@@ -37,7 +39,7 @@ IX. Partial expr waits to complete:
 
 X. Expr and partial expr and comment:
 () (def (foo)<Enter>
-=> nil
+<Enter>
   34) # abc<Enter>
 <Enter>
 => (object function ..)
