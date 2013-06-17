@@ -68,14 +68,19 @@ cell* run(istream& i) {
     update(result, eval(form));
     rmref(form);
     if (in.eof()) break;
-    if (Interactive) {
-      if (in.at_start_of_line) break;
-      skip_whitespace(in.fd);
-      if (in.fd.peek() == '#') skip_comment(in.fd);
-      if (in.fd.peek() == '\n') break;
-    }
+    if (Interactive && at_end_of_line(in))
+      // 'in' has no state left; destroy and print
+      break;
   }
   return result;
+}
+
+bool at_end_of_line(indent_sensitive_stream& in) {
+  if (in.at_start_of_line) return true;
+  skip_whitespace(in.fd);
+  if (in.fd.peek() == '#')
+    skip_comment(in.fd);
+  return in.fd.peek() == '\n';
 }
 
 
