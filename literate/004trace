@@ -3,7 +3,7 @@ using std::pair;
 
 :(before "End Types")
 struct trace_stream {
-  vector<pair<string, string> > past_lines;   // [(layer label, line)]
+  vector<pair<string, string> > past_lines;  // [(layer label, line)]
   // accumulator for current line
   ostringstream* curr_stream;
   string curr_layer;
