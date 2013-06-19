@@ -81,7 +81,7 @@ void trace_all(const string& label, const list<string>& in) {
     trace(label) << *p;
 }
 
-bool check_trace_contents(string FUNCTION, int LINE, string layer, string expected) {   // empty layer == everything, multiple layers, hierarchical layers
+bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, string expected) {   // empty layer == everything, multiple layers, hierarchical layers
   vector<string> expected_lines = split(expected, '');
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
@@ -101,13 +101,13 @@ bool check_trace_contents(string FUNCTION, int LINE, string layer, string expect
     if (curr_expected_line == expected_lines.size()) return true;
   }
 
-  cerr << "\nF " << FUNCTION << "(" << LINE << "): missing '" << expected_lines[curr_expected_line] << "' in trace:\n";
+  cerr << "\nF " << FUNCTION << "(" << FILE << ":" << LINE << "): missing '" << expected_lines[curr_expected_line] << "' in trace:\n";
   DUMP(layer);
   Passed = false;
   return false;
 }
 
-#define CHECK_TRACE_CONTENTS(...) check_trace_contents(__FUNCTION__, __LINE__, __VA_ARGS__)
+#define CHECK_TRACE_CONTENTS(...) check_trace_contents(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
 
 int trace_count(string layer) {
   return trace_count(layer, "");
@@ -163,7 +163,7 @@ struct lease_trace_frame {
 };
 #define new_trace_frame(layer) lease_trace_frame leased_frame(layer);
 
-bool check_trace_contents(string FUNCTION, int LINE, string layer, int frame, string expected) {  // multiple layers, hierarchical layers
+bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, int frame, string expected) {  // multiple layers, hierarchical layers
   vector<string> expected_lines = split(expected, '');  // hack: doesn't handle newlines in embedded in lines
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
@@ -185,7 +185,7 @@ bool check_trace_contents(string FUNCTION, int LINE, string layer, int frame, st
     if (curr_expected_line == expected_lines.size()) return true;
   }
 
-  cerr << "\nF " << FUNCTION << "(" << LINE << "): missing '" << expected_lines[curr_expected_line] << "' in trace/" << frame << ":\n";
+  cerr << "\nF " << FUNCTION << "(" << FILE << ":" << LINE << "): missing '" << expected_lines[curr_expected_line] << "' in trace/" << frame << ":\n";
   DUMP(layer);
   Passed = false;
   return false;
