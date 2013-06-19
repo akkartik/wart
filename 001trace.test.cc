@@ -5,42 +5,36 @@ void test_trace_check_compares() {
 }
 
 void test_trace_check_filters_layers() {
-  CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 2") << "bar";
   CHECK_TRACE_CONTENTS("test layer 1", "foo");
 }
 
 void test_trace_check_ignores_other_lines() {
-  CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 1") << "bar";
   CHECK_TRACE_CONTENTS("test layer 1", "foo");
 }
 
 void test_trace_check_always_finds_empty_lines() {
-  CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 1") << "bar";
   CHECK_TRACE_CONTENTS("test layer 1", "");
 }
 
 void test_trace_check_treats_empty_layers_as_wildcards() {
-  CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 2") << "bar";
   CHECK_TRACE_CONTENTS("", "foobar");
 }
 
 void test_trace_check_always_finds_empty_lines2() {
-  CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 1") << "bar";
   CHECK_TRACE_CONTENTS("test layer 1", "");
 }
 
 void test_trace_orders_across_layers() {
-  CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 2") << "bar";
   trace("test layer 1") << "qux";
@@ -48,7 +42,6 @@ void test_trace_orders_across_layers() {
 }
 
 void test_trace_segments_within_layers() {
-  CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 2") << "bar";
   new_trace_frame("test layer 1");
@@ -72,7 +65,6 @@ void test_trace_keeps_level_together() {
 }
 
 void test_trace_supports_multiple_layers() {
-  CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 2") << "bar";
   trace("test layer 1") << "qux";
@@ -80,7 +72,6 @@ void test_trace_supports_multiple_layers() {
 }
 
 void test_trace_supports_hierarchical_layers() {
-  CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer/a") << "foo";
   trace("different layer/c") << "foo 2";
   trace("test layer/b") << "bar";
@@ -88,14 +79,12 @@ void test_trace_supports_hierarchical_layers() {
 }
 
 void test_trace_supports_count() {
-  CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 1") << "foo";
   CHECK_EQ(trace_count("test layer 1", "foo"), 2);
 }
 
 void test_trace_supports_count2() {
-  CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer 1") << "foo";
   trace("test layer 1") << "bar";
   CHECK_EQ(trace_count("test layer 1"), 2);
