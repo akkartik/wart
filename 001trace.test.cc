@@ -41,6 +41,13 @@ void test_trace_orders_across_layers() {
   CHECK_TRACE_CONTENTS("", "foobarqux");
 }
 
+void test_trace_checks_ordering_spanning_multiple_layers() {
+  trace("layer1") << "foo";
+  trace("layer2") << "bar";
+  trace("layer1") << "qux";
+  CHECK_TRACE_CONTENTS("layer1:foolayer2:barlayer1:qux");
+}
+
 void test_trace_segments_within_layers() {
   trace("test layer 1") << "foo";
   trace("test layer 2") << "bar";
