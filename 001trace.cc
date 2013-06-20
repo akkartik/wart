@@ -82,6 +82,7 @@ void trace_all(const string& label, const list<string>& in) {
 }
 
 bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, string expected) {   // empty layer == everything, multiple layers, hierarchical layers
+  Trace_stream->newline();
   vector<string> expected_lines = split(expected, '');
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
@@ -114,6 +115,7 @@ int trace_count(string layer) {
 }
 
 int trace_count(string layer, string line) {
+  Trace_stream->newline();
   long result = 0;
   vector<string> layers = split(layer, ',');
   for (vector<pair<string, pair<int, string> > >::iterator p = Trace_stream->past_lines.begin(); p != Trace_stream->past_lines.end(); ++p) {
@@ -125,6 +127,7 @@ int trace_count(string layer, string line) {
 }
 
 int trace_count(string layer, int frame, string line) {
+  Trace_stream->newline();
   long result = 0;
   vector<string> layers = split(layer, ',');
   for (vector<pair<string, pair<int, string> > >::iterator p = Trace_stream->past_lines.begin(); p != Trace_stream->past_lines.end(); ++p) {
@@ -164,6 +167,7 @@ struct lease_trace_frame {
 #define new_trace_frame(layer) lease_trace_frame leased_frame(layer);
 
 bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, int frame, string expected) {  // multiple layers, hierarchical layers
+  Trace_stream->newline();
   vector<string> expected_lines = split(expected, '');  // hack: doesn't handle newlines in embedded in lines
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
