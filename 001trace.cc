@@ -202,13 +202,10 @@ vector<string> split(string s, char delim) {
   vector<string> result;
   string::size_type begin=0, end=s.find(delim);
   while (true) {
-    trace("string split") << begin << '-' << end;
     if (end == NOT_FOUND) {
-      trace("string split: inserting") << string(s, begin, end);
       result.push_back(string(s, begin, NOT_FOUND));
       break;
     }
-    trace("string split: inserting") << string(s, begin, end-begin);
     result.push_back(string(s, begin, end-begin));
     begin = end+1;
     end = s.find(delim, begin);
