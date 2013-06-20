@@ -72,7 +72,6 @@ struct lease_tracer {
 
 
 // Main entrypoint.
-// never write explicit newlines into trace
 #define trace(layer) !Trace_stream ? cerr /*print nothing*/ : Trace_stream->stream(layer)
 #define RAISE trace("warn") << __FILE__ << ":" << __LINE__ << " "
 
