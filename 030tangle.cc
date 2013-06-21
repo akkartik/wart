@@ -36,6 +36,28 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
   }
 
   TEMP(expr, read(directive.substr(1)));
+  string cmd = to_string(car(expr));
+
+  if (cmd == "scenario") {
+    list<string> result;
+    string cot = to_string(car(cdr(expr)));
+    string doc = to_string(car(cdr(cdr(expr))));
+    result.push_back("void test_"+cot+"_"+doc+"() {");
+    string arg = hunk.front();
+    hunk.pop_front();
+    result.push_back("  "+cot+"(\""+arg+"\");");
+    string trace;
+    for (list<string>::iterator p = hunk.begin(); p != hunk.end(); ++p) {
+      if (*p->begin() != '-') continue;
+      p->erase(0, 1);
+      trace += (*p + '');
+    }
+    result.push_back("  CHECK_TRACE_CONTENTS(\""+trace+"\");");
+    result.push_back("}");
+    out.insert(out.end(), result.begin(), result.end());
+    return;
+  }
+
   cell* x1 = car(cdr(expr));
   list<string>::iterator target = (x1 != nil) ? find_substr(out, to_string(x1)) : out.end();
 
@@ -43,7 +65,6 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
   for (list<string>::iterator p = hunk.begin(); p != hunk.end(); ++p)
     p->insert(p->begin(), curr_indent.begin(), curr_indent.end());
 
-  string cmd = to_string(car(expr));
   if (cmd == "after") {
     if (target == out.end())
       RAISE << "couldn't find target " << to_string(car(cdr(expr))) << '\n';
