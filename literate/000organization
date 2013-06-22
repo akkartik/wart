@@ -14,6 +14,8 @@
 
 // End Globals
 
+// End Tracing            // hacky special-case
+
 int main(int argc, char* argv[]) {
   if (argc > 1) {
     // Commandline options

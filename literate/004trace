@@ -1,4 +1,4 @@
-:(before "End Globals")
+:(before "End Tracing")
 bool Hide_raises = false;
 
 struct trace_stream {
@@ -71,7 +71,7 @@ struct lease_tracer {
 :(before "End Test Initialization")
 START_TRACING_UNTIL_END_OF_SCOPE
 
-:(before "End Globals")
+:(before "End Tracing")
 void trace_all(const string& label, const list<string>& in) {
   for (list<string>::const_iterator p = in.begin(); p != in.end(); ++p)
     trace(label) << *p;
