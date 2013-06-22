@@ -1,6 +1,3 @@
-:(before "End Includes")
-using std::pair;
-
 :(before "End Types")
 struct trace_stream {
   vector<pair<string, string> > past_lines;  // [(layer label, line)]
