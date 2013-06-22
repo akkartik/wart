@@ -36,8 +36,9 @@ void run_tests() {
   time_t t; time(&t);
   cerr << "C tests: " << ctime(&t);
   for (unsigned long i=0; i < sizeof(Tests)/sizeof(Tests[0]); ++i) {
-    START_TRACING_UNTIL_END_OF_SCOPE;
+    // End Test Initialization
     (*Tests[i])();
+    // End Test Verification
   }
 
   cerr << '\n';
