@@ -47,6 +47,6 @@ void run_tests() {
          << '\n';
 }
 
-bool is_equal(char* a, char* b) {
+bool is_equal(char* a, const char* b) {
   return strcmp(a, b) == 0;
 }
