@@ -1,0 +1,34 @@
+:(before "End Types")
+typedef string token;
+
+:(code)
+token next_token(istream& in) {
+  ostringstream out;
+  slurp_word(in, out);
+  return token(out.str());
+}
+
+void slurp_word(istream& in, ostream& out) {
+  char c;
+  while (in >> c) {
+    if (isspace(c)) {
+      in.putback(c);
+      break;
+    }
+    out << c;
+  }
+}
+
+void read_all(string s) {
+  stringstream in(s);
+  do {
+      next_token(in);
+  } while (!in.eof());
+  // return nothing; we'll just verify the trace
+}
+
+:(scenario read_all tokenize_breaks_at_whitespace)
+34 abc 3.4
+-tokenize: 34
+-tokenize: abc
+-tokenize: 3.4
