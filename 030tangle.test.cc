@@ -84,6 +84,30 @@ void test_tangle_supports_multiline_input_in_scenarios() {
   CHECK(lines.empty());
 }
 
+void test_tangle_can_check_for_absence_at_end_of_scenarios() {
+  istringstream in(":(scenario does_bar)\nabc def\n  efg\n-layer1: pqr\n~layer1: xyz");
+  list<string> lines;
+  tangle(in, lines);
+  CHECK_EQ(lines.front(), "void test_does_bar() {"); lines.pop_front();
+  CHECK_EQ(lines.front(), "  run(\"abc def\\n  efg\\n\");"); lines.pop_front();
+  CHECK_EQ(lines.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqr\");"); lines.pop_front();
+  CHECK_EQ(lines.front(), "  CHECK_TRACE_DOESNT_CONTAIN(\"layer1: xyz\");"); lines.pop_front();
+  CHECK_EQ(lines.front(), "}"); lines.pop_front();
+  CHECK(lines.empty());
+}
+
+void test_tangle_can_check_for_absence_at_end_of_scenarios2() {
+  istringstream in(":(scenario does_bar)\nabc def\n  efg\n~layer1: pqr\n~layer1: xyz");
+  list<string> lines;
+  tangle(in, lines);
+  CHECK_EQ(lines.front(), "void test_does_bar() {"); lines.pop_front();
+  CHECK_EQ(lines.front(), "  run(\"abc def\\n  efg\\n\");"); lines.pop_front();
+  CHECK_EQ(lines.front(), "  CHECK_TRACE_DOESNT_CONTAIN(\"layer1: pqr\");"); lines.pop_front();
+  CHECK_EQ(lines.front(), "  CHECK_TRACE_DOESNT_CONTAIN(\"layer1: xyz\");"); lines.pop_front();
+  CHECK_EQ(lines.front(), "}"); lines.pop_front();
+  CHECK(lines.empty());
+}
+
 
 
 void test_trim() {

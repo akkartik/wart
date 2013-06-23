@@ -172,6 +172,11 @@ bool trace_doesnt_contain(string layer, string line) {
   return trace_count(layer, line) == 0;
 }
 
+bool trace_doesnt_contain(string expected) {
+  vector<string> tmp = split(expected, ": ");
+  return trace_doesnt_contain(tmp[0], tmp[1]);
+}
+
 bool trace_doesnt_contain(string layer, int frame, string line) {
   return trace_count(layer, frame, line) == 0;
 }
