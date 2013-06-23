@@ -4,6 +4,14 @@ typedef string token;
 :(code)
 token next_token(istream& in) {
   in >> std::noskipws;
+  for (;;) {
+    skip_whitespace(in);
+    if (in.peek() == '#')
+      skip_comment(in);
+    else
+      break;
+  }
+  while (in.peek() == '#' || isspace(in.peek()))
   skip_whitespace(in);
   ostringstream out;
   if (in.peek() == '"')
@@ -48,6 +56,16 @@ void skip_whitespace(istream& in) {
     in.get();
 }
 
+void skip_comment(istream& in) {
+  char c;
+  while (in >> c) {
+    if (c == '\n') {
+      in.putback(c);
+      break;
+    }
+  }
+}
+
 void read_all(string s) {
   stringstream in(s);
   do {
@@ -86,3 +104,17 @@ void read_all(string s) {
 "abc \"def"
 -tokenize: 34
 -tokenize: "abc \"def"
+
+:(scenario tokenize_skips_comment)
+34 #abc
+-tokenize: 34
+~tokenize: #abc
+
+:(scenario tokenize_skips_multiple_comment_lines)
+34 #abc
+# def gh
+35
+-tokenize: 34
+-tokenize: 35
+~tokenize: #abc
+~tokenize: # def gh
