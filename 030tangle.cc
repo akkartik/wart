@@ -48,12 +48,7 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
     list<string> result;
     string name = to_string(car(cdr(expr)));
     result.push_back("void test_"+name+"() {");
-    string arg;
-    while (*hunk.front().begin() != '-') {
-      arg += hunk.front() + "";
-      hunk.pop_front();
-    }
-    result.push_back("  "+Toplevel+"(\""+escape(arg)+"\");");
+    result.push_back("  "+Toplevel+"(\""+input_lines(hunk)+"\");");
     result.push_back("  CHECK_TRACE_CONTENTS(\""+expected_in_trace(hunk)+"\");");
     result.push_back("}");
     out.insert(out.end(), result.begin(), result.end());
@@ -73,6 +68,15 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
     ++target;
   }
   out.insert(target, hunk.begin(), hunk.end());
+}
+
+string input_lines(list<string>& hunk) {
+  string result;
+  while (*hunk.front().begin() != '-') {
+    result += hunk.front()+"";
+    hunk.pop_front();
+  }
+  return escape(result);
 }
 
 string expected_in_trace(list<string>& hunk) {
