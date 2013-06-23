@@ -38,6 +38,7 @@ void run_tests() {
   for (unsigned long i=0; i < sizeof(Tests)/sizeof(Tests[0]); ++i) {
     // End Test Initialization
     (*Tests[i])();
+    if (Passed) cerr << ".";
     // End Test Verification
   }
 

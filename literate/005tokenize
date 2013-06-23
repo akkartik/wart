@@ -3,11 +3,15 @@ typedef string token;
 
 :(code)
 token next_token(istream& in) {
+  in >> std::noskipws;
+  skip_whitespace(in);
   ostringstream out;
   if (in.peek() == '"')
     slurp_string(in, out);
   else
     slurp_word(in, out);
+
+  trace("tokenize") << out.str();
   return token(out.str());
 }
 
@@ -37,6 +41,11 @@ void slurp_string(istream& in, ostream& out) {
 
 void slurp_char(istream& in, ostream& out) {
   out << (char)in.get();
+}
+
+void skip_whitespace(istream& in) {
+  while (isspace(in.peek()))
+    in.get();
 }
 
 void read_all(string s) {
