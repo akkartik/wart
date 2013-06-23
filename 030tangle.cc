@@ -54,13 +54,7 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
       hunk.pop_front();
     }
     result.push_back("  "+Toplevel+"(\""+escape(arg)+"\");");
-    string trace;
-    for (list<string>::iterator p = hunk.begin(); p != hunk.end(); ++p) {
-      if (*p->begin() != '-') continue;
-      p->erase(0, 1);
-      trace += (*p + '');
-    }
-    result.push_back("  CHECK_TRACE_CONTENTS(\""+escape(trace)+"\");");
+    result.push_back("  CHECK_TRACE_CONTENTS(\""+expected_in_trace(hunk)+"\");");
     result.push_back("}");
     out.insert(out.end(), result.begin(), result.end());
     return;
@@ -79,6 +73,16 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
     ++target;
   }
   out.insert(target, hunk.begin(), hunk.end());
+}
+
+string expected_in_trace(list<string>& hunk) {
+  string result;
+  while (!hunk.empty() && hunk.front()[0] == '-') {
+    hunk.front().erase(0, 1);
+    result += hunk.front()+"";
+    hunk.pop_front();
+  }
+  return escape(result);
 }
 
 list<string>::iterator find_substr(list<string>& in, const string& pat) {
