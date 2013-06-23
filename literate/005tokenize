@@ -55,5 +55,5 @@ void read_all(string s) {
 
 :(scenario read_all tokenize_handles_string_literals)
 34 "abc"
-- tokenize: 34
-- tokenize: "abc"
+-tokenize: 34
+-tokenize: "abc"
