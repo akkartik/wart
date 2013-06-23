@@ -79,7 +79,7 @@ void trace_all(const string& label, const list<string>& in) {
 }
 
 bool check_trace_contents(string FUNCTION, string FILE, int LINE, string expected) {
-  vector<string> expected_lines = split(expected, '');
+  vector<string> expected_lines = split(expected, "");
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
     ++curr_expected_line;
@@ -87,9 +87,9 @@ bool check_trace_contents(string FUNCTION, string FILE, int LINE, string expecte
   Trace_stream->newline();
   ostringstream output;
   for (vector<pair<string, pair<int, string> > >::iterator p = Trace_stream->past_lines.begin(); p != Trace_stream->past_lines.end(); ++p) {
-    vector<string> tmp = split_first(expected_lines[curr_expected_line], ':');
+    vector<string> tmp = split_first(expected_lines[curr_expected_line], ": ");
     string layer = (tmp.size() == 2) ? tmp[0] : "";
-    vector<string> layers = split(layer, ',');
+    vector<string> layers = split(layer, ",");
     if (!layer.empty() && !any_prefix_match(layers, p->first))
       continue;
 
@@ -103,7 +103,7 @@ bool check_trace_contents(string FUNCTION, string FILE, int LINE, string expecte
     if (curr_expected_line == expected_lines.size()) return true;
   }
 
-  vector<string> tmp = split_first(expected_lines[curr_expected_line], ':');
+  vector<string> tmp = split_first(expected_lines[curr_expected_line], ": ");
   string layer = (tmp.size() == 2) ? tmp[0] : "";
   string expected_line = (tmp.size() == 2) ? tmp[1] : tmp[0];
   cerr << "\nF " << FUNCTION << "(" << FILE << ":" << LINE << "): missing '" << expected_line << "' in trace:\n";
@@ -113,14 +113,14 @@ bool check_trace_contents(string FUNCTION, string FILE, int LINE, string expecte
 }
 
 bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, string expected) {   // empty layer == everything, multiple layers, hierarchical layers
-  vector<string> expected_lines = split(expected, '');
+  vector<string> expected_lines = split(expected, "");
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
     ++curr_expected_line;
   if (curr_expected_line == expected_lines.size()) return true;
   Trace_stream->newline();
   ostringstream output;
-  vector<string> layers = split(layer, ',');
+  vector<string> layers = split(layer, ",");
   for (vector<pair<string, pair<int, string> > >::iterator p = Trace_stream->past_lines.begin(); p != Trace_stream->past_lines.end(); ++p) {
     if (!layer.empty() && !any_prefix_match(layers, p->first))
       continue;
@@ -147,7 +147,7 @@ int trace_count(string layer) {
 int trace_count(string layer, string line) {
   Trace_stream->newline();
   long result = 0;
-  vector<string> layers = split(layer, ',');
+  vector<string> layers = split(layer, ",");
   for (vector<pair<string, pair<int, string> > >::iterator p = Trace_stream->past_lines.begin(); p != Trace_stream->past_lines.end(); ++p) {
     if (any_prefix_match(layers, p->first))
       if (line == "" || p->second.second == line)
@@ -159,7 +159,7 @@ int trace_count(string layer, string line) {
 int trace_count(string layer, int frame, string line) {
   Trace_stream->newline();
   long result = 0;
-  vector<string> layers = split(layer, ',');
+  vector<string> layers = split(layer, ",");
   for (vector<pair<string, pair<int, string> > >::iterator p = Trace_stream->past_lines.begin(); p != Trace_stream->past_lines.end(); ++p) {
     if (any_prefix_match(layers, p->first) && p->second.first == frame)
       if (line == "" || p->second.second == line)
@@ -197,14 +197,14 @@ struct lease_trace_frame {
 #define new_trace_frame(layer) lease_trace_frame leased_frame(layer);
 
 bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, int frame, string expected) {  // multiple layers, hierarchical layers
-  vector<string> expected_lines = split(expected, '');  // hack: doesn't handle newlines in embedded in lines
+  vector<string> expected_lines = split(expected, "");  // hack: doesn't handle newlines in embedded in lines
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
     ++curr_expected_line;
   if (curr_expected_line == expected_lines.size()) return true;
   Trace_stream->newline();
   ostringstream output;
-  vector<string> layers = split(layer, ',');
+  vector<string> layers = split(layer, ",");
   for (vector<pair<string, pair<int, string> > >::iterator p = Trace_stream->past_lines.begin(); p != Trace_stream->past_lines.end(); ++p) {
     if (!layer.empty() && !any_prefix_match(layers, p->first))
       continue;
@@ -230,7 +230,7 @@ bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, 
 
 const size_t NOT_FOUND = string::npos;
 
-vector<string> split(string s, char delim) {
+vector<string> split(string s, string delim) {
   vector<string> result;
   string::size_type begin=0, end=s.find(delim);
   while (true) {
@@ -239,13 +239,13 @@ vector<string> split(string s, char delim) {
       break;
     }
     result.push_back(string(s, begin, end-begin));
-    begin = end+1;
+    begin = end+delim.size();
     end = s.find(delim, begin);
   }
   return result;
 }
 
-vector<string> split_first(string s, char delim) {
+vector<string> split_first(string s, string delim) {
   vector<string> result;
   string::size_type pos=s.find(delim);
   if (pos == NOT_FOUND) {
@@ -253,7 +253,7 @@ vector<string> split_first(string s, char delim) {
   }
   else {
     result.push_back(string(s, 0, pos));
-    result.push_back(string(s, pos+1, NOT_FOUND));
+    result.push_back(string(s, pos+delim.size(), NOT_FOUND));
   }
   return result;
 }
