@@ -27,44 +27,58 @@ void test_tangle_indents_hunks_correctly() {
 }
 
 void test_tangle_supports_scenarios() {
-  istringstream in(":(scenario foo does_bar)\nabc def\n-layer1: pqr\n-layer2: xyz");
+  istringstream in(":(scenario does_bar)\nabc def\n-layer1: pqr\n-layer2: xyz");
   list<string> dummy;
   tangle(in, dummy);
   CHECK_EQ(dummy.front(), "void test_does_bar() {"); dummy.pop_front();
-  CHECK_EQ(dummy.front(), "  foo(\"abc def\\n\");"); dummy.pop_front();
+  CHECK_EQ(dummy.front(), "  run(\"abc def\\n\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqrlayer2: xyz\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "}"); dummy.pop_front();
   CHECK(dummy.empty());
 }
 
-void test_tangle_supports_strings_in_scenarios() {
-  istringstream in(":(scenario foo does_bar)\nabc \"def\"\n-layer1: pqr\n-layer2: \"xyz\"");
+void test_tangle_supports_configurable_toplevel() {
+  istringstream in(":(scenarios foo)\n:(scenario does_bar)\nabc def\n-layer1: pqr");
   list<string> dummy;
   tangle(in, dummy);
   CHECK_EQ(dummy.front(), "void test_does_bar() {"); dummy.pop_front();
-  CHECK_EQ(dummy.front(), "  foo(\"abc \\\"def\\\"\\n\");"); dummy.pop_front();
+  CHECK_EQ(dummy.front(), "  foo(\"abc def\\n\");"); dummy.pop_front();
+  CHECK_EQ(dummy.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqr\");"); dummy.pop_front();
+  CHECK_EQ(dummy.front(), "}"); dummy.pop_front();
+  CHECK(dummy.empty());
+
+  istringstream cleanup(":(scenarios run)\n");
+  tangle(cleanup, dummy);
+}
+
+void test_tangle_supports_strings_in_scenarios() {
+  istringstream in(":(scenario does_bar)\nabc \"def\"\n-layer1: pqr\n-layer2: \"xyz\"");
+  list<string> dummy;
+  tangle(in, dummy);
+  CHECK_EQ(dummy.front(), "void test_does_bar() {"); dummy.pop_front();
+  CHECK_EQ(dummy.front(), "  run(\"abc \\\"def\\\"\\n\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqrlayer2: \\\"xyz\\\"\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "}"); dummy.pop_front();
   CHECK(dummy.empty());
 }
 
 void test_tangle_supports_strings_in_scenarios2() {
-  istringstream in(":(scenario foo does_bar)\nabc \"\"\n-layer1: pqr\n-layer2: \"\"");
+  istringstream in(":(scenario does_bar)\nabc \"\"\n-layer1: pqr\n-layer2: \"\"");
   list<string> dummy;
   tangle(in, dummy);
   CHECK_EQ(dummy.front(), "void test_does_bar() {"); dummy.pop_front();
-  CHECK_EQ(dummy.front(), "  foo(\"abc \\\"\\\"\\n\");"); dummy.pop_front();
+  CHECK_EQ(dummy.front(), "  run(\"abc \\\"\\\"\\n\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqrlayer2: \\\"\\\"\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "}"); dummy.pop_front();
   CHECK(dummy.empty());
 }
 
 void test_tangle_supports_multiline_input() {
-  istringstream in(":(scenario foo does_bar)\nabc def\n  efg\n-layer1: pqr\n-layer2: \"\"");
+  istringstream in(":(scenario does_bar)\nabc def\n  efg\n-layer1: pqr\n-layer2: \"\"");
   list<string> dummy;
   tangle(in, dummy);
   CHECK_EQ(dummy.front(), "void test_does_bar() {"); dummy.pop_front();
-  CHECK_EQ(dummy.front(), "  foo(\"abc def\\n  efg\\n\");"); dummy.pop_front();
+  CHECK_EQ(dummy.front(), "  run(\"abc def\\n  efg\\n\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqrlayer2: \\\"\\\"\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "}"); dummy.pop_front();
   CHECK(dummy.empty());

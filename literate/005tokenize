@@ -56,30 +56,32 @@ void read_all(string s) {
   // return nothing; we'll just verify the trace
 }
 
-:(scenario read_all tokenize_breaks_at_whitespace)
+:(scenarios read_all)
+
+:(scenario tokenize_breaks_at_whitespace)
 34 abc 3.4
 -tokenize: 34
 -tokenize: abc
 -tokenize: 3.4
 
-:(scenario read_all tokenize_handles_string_literals)
+:(scenario tokenize_handles_string_literals)
 34 "abc"
 -tokenize: 34
 -tokenize: "abc"
 
-:(scenario read_all tokenize_handles_multiple_lines)
+:(scenario tokenize_handles_multiple_lines)
 34
 "abc"
 -tokenize: 34
 -tokenize: "abc"
 
-:(scenario read_all tokenize_handles_string_with_space)
+:(scenario tokenize_handles_string_with_space)
 34
 "abc def"
 -tokenize: 34
 -tokenize: "abc def"
 
-:(scenario read_all tokenize_handles_string_with_escape)
+:(scenario tokenize_handles_string_with_escape)
 34
 "abc \"def"
 -tokenize: 34

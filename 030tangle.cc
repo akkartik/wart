@@ -38,17 +38,22 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
   TEMP(expr, read(directive.substr(1)));
   string cmd = to_string(car(expr));
 
+  static string Toplevel = "run";
+  if (cmd == "scenarios") {
+    Toplevel = to_string(car(cdr(expr)));
+    return;
+  }
+
   if (cmd == "scenario") {
     list<string> result;
-    string cot = to_string(car(cdr(expr)));
-    string name = to_string(car(cdr(cdr(expr))));
+    string name = to_string(car(cdr(expr)));
     result.push_back("void test_"+name+"() {");
     string arg;
     while (*hunk.front().begin() != '-') {
       arg += hunk.front() + "";
       hunk.pop_front();
     }
-    result.push_back("  "+cot+"(\""+escape(arg)+"\");");
+    result.push_back("  "+Toplevel+"(\""+escape(arg)+"\");");
     string trace;
     for (list<string>::iterator p = hunk.begin(); p != hunk.end(); ++p) {
       if (*p->begin() != '-') continue;
