@@ -31,7 +31,7 @@ void test_tangle_supports_scenarios() {
   list<string> dummy;
   tangle(in, dummy);
   CHECK_EQ(dummy.front(), "void test_does_bar() {"); dummy.pop_front();
-  CHECK_EQ(dummy.front(), "  foo(\"abc def\");"); dummy.pop_front();
+  CHECK_EQ(dummy.front(), "  foo(\"abc def\\n\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqrlayer2: xyz\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "}"); dummy.pop_front();
   CHECK(dummy.empty());
@@ -42,7 +42,7 @@ void test_tangle_supports_strings_in_scenarios() {
   list<string> dummy;
   tangle(in, dummy);
   CHECK_EQ(dummy.front(), "void test_does_bar() {"); dummy.pop_front();
-  CHECK_EQ(dummy.front(), "  foo(\"abc \\\"def\\\"\");"); dummy.pop_front();
+  CHECK_EQ(dummy.front(), "  foo(\"abc \\\"def\\\"\\n\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqrlayer2: \\\"xyz\\\"\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "}"); dummy.pop_front();
   CHECK(dummy.empty());
@@ -53,7 +53,18 @@ void test_tangle_supports_strings_in_scenarios2() {
   list<string> dummy;
   tangle(in, dummy);
   CHECK_EQ(dummy.front(), "void test_does_bar() {"); dummy.pop_front();
-  CHECK_EQ(dummy.front(), "  foo(\"abc \\\"\\\"\");"); dummy.pop_front();
+  CHECK_EQ(dummy.front(), "  foo(\"abc \\\"\\\"\\n\");"); dummy.pop_front();
+  CHECK_EQ(dummy.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqrlayer2: \\\"\\\"\");"); dummy.pop_front();
+  CHECK_EQ(dummy.front(), "}"); dummy.pop_front();
+  CHECK(dummy.empty());
+}
+
+void test_tangle_supports_multiline_input() {
+  istringstream in(":(scenario foo does_bar)\nabc def\n  efg\n-layer1: pqr\n-layer2: \"\"");
+  list<string> dummy;
+  tangle(in, dummy);
+  CHECK_EQ(dummy.front(), "void test_does_bar() {"); dummy.pop_front();
+  CHECK_EQ(dummy.front(), "  foo(\"abc def\\n  efg\\n\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqrlayer2: \\\"\\\"\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "}"); dummy.pop_front();
   CHECK(dummy.empty());

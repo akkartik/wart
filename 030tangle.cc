@@ -43,8 +43,11 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
     string cot = to_string(car(cdr(expr)));
     string name = to_string(car(cdr(cdr(expr))));
     result.push_back("void test_"+name+"() {");
-    string arg = hunk.front();
-    hunk.pop_front();
+    string arg;
+    while (*hunk.front().begin() != '-') {
+      arg += hunk.front() + "\\n";
+      hunk.pop_front();
+    }
     result.push_back("  "+cot+"(\"" + replace_all(arg, "\"", "\\\"") + "\");");
     string trace;
     for (list<string>::iterator p = hunk.begin(); p != hunk.end(); ++p) {

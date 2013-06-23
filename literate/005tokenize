@@ -57,3 +57,9 @@ void read_all(string s) {
 34 "abc"
 -tokenize: 34
 -tokenize: "abc"
+
+:(scenario read_all tokenize_handles_multiple_lines)
+34
+"abc"
+-tokenize: 34
+-tokenize: "abc"
