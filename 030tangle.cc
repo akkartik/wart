@@ -45,17 +45,17 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
     result.push_back("void test_"+name+"() {");
     string arg;
     while (*hunk.front().begin() != '-') {
-      arg += hunk.front() + "\\n";
+      arg += hunk.front() + "";
       hunk.pop_front();
     }
-    result.push_back("  "+cot+"(\"" + replace_all(arg, "\"", "\\\"") + "\");");
+    result.push_back("  "+cot+"(\""+escape(arg)+"\");");
     string trace;
     for (list<string>::iterator p = hunk.begin(); p != hunk.end(); ++p) {
       if (*p->begin() != '-') continue;
       p->erase(0, 1);
       trace += (*p + '');
     }
-    result.push_back("  CHECK_TRACE_CONTENTS(\"" + replace_all(trace, "\"", "\\\"") + "\");");
+    result.push_back("  CHECK_TRACE_CONTENTS(\""+escape(trace)+"\");");
     result.push_back("}");
     out.insert(out.end(), result.begin(), result.end());
     return;
@@ -123,6 +123,13 @@ string trim(const string& s) {
     --last;
   ++last;
   return string(first, last);
+}
+
+string escape(string s) {
+  s = replace_all(s, "\\", "\\\\");
+  s = replace_all(s, "\"", "\\\"");
+  s = replace_all(s, "", "\\n");
+  return s;
 }
 
 string replace_all(string s, const string& a, const string& b) {
