@@ -30,7 +30,7 @@ void test_tangle_supports_scenarios() {
   istringstream in(":(scenario foo does_bar)\nabc def\n-layer1: foo\n-layer2: bar");
   list<string> dummy;
   tangle(in, dummy);
-  CHECK_EQ(dummy.front(), "void test_foo_does_bar() {"); dummy.pop_front();
+  CHECK_EQ(dummy.front(), "void test_does_bar() {"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "  foo(\"abc def\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "  CHECK_TRACE_CONTENTS(\"layer1: foolayer2: bar\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "}"); dummy.pop_front();
@@ -41,7 +41,7 @@ void test_tangle_supports_strings_in_scenarios() {
   istringstream in(":(scenario foo does_bar)\nabc \"def\"\n-layer1: abc\n-layer2: \"def\"");
   list<string> dummy;
   tangle(in, dummy);
-  CHECK_EQ(dummy.front(), "void test_foo_does_bar() {"); dummy.pop_front();
+  CHECK_EQ(dummy.front(), "void test_does_bar() {"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "  foo(\"abc \\\"def\\\"\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "  CHECK_TRACE_CONTENTS(\"layer1: abclayer2: \\\"def\\\"\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "}"); dummy.pop_front();
@@ -52,7 +52,7 @@ void test_tangle_supports_strings_in_scenarios2() {
   istringstream in(":(scenario foo does_bar)\nabc \"\"\n-layer1: abc\n-layer2: \"\"");
   list<string> dummy;
   tangle(in, dummy);
-  CHECK_EQ(dummy.front(), "void test_foo_does_bar() {"); dummy.pop_front();
+  CHECK_EQ(dummy.front(), "void test_does_bar() {"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "  foo(\"abc \\\"\\\"\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "  CHECK_TRACE_CONTENTS(\"layer1: abclayer2: \\\"\\\"\");"); dummy.pop_front();
   CHECK_EQ(dummy.front(), "}"); dummy.pop_front();

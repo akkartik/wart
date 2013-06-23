@@ -42,7 +42,7 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
     list<string> result;
     string cot = to_string(car(cdr(expr)));
     string doc = to_string(car(cdr(cdr(expr))));
-    result.push_back("void test_"+cot+"_"+doc+"() {");
+    result.push_back("void test_"+doc+"() {");
     string arg = hunk.front();
     hunk.pop_front();
     result.push_back("  "+cot+"(\"" + replace_all(arg, "\"", "\\\"") + "\");");
