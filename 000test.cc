@@ -1,7 +1,7 @@
 typedef void (*test_fn)(void);
 
 const test_fn Tests[] = {
-  #include "test_list"
+  #include "test_list"  // auto-generated; see makefile
 };
 
 bool Passed = true;

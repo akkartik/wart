@@ -1,5 +1,3 @@
-using std::pair;
-
 bool Hide_raises = false;
 
 struct trace_stream {
@@ -58,22 +56,22 @@ struct trace_stream {
 
 trace_stream* Trace_stream = NULL;
 
-// Trace_stream is a resource, lease_tracer uses RAII to manage it.
-struct lease_tracer {
-  lease_tracer() { Trace_stream = new trace_stream; }
-  ~lease_tracer() { delete Trace_stream, Trace_stream = NULL; }
-};
-#define START_TRACING_UNTIL_END_OF_SCOPE lease_tracer leased_tracer;
+#define trace(layer) !Trace_stream ? cerr /*print nothing*/ : Trace_stream->stream(layer)
+#define RAISE trace("warn") << __FILE__ << ":" << __LINE__ << " "
 
 #define CLEAR_TRACE delete Trace_stream, Trace_stream = new trace_stream;
 
 #define DUMP(layer) cerr << Trace_stream->readable_contents(layer)
 
-
+// Trace_stream is a resource, lease_tracer uses RAII to manage it.
+struct lease_tracer {
+  lease_tracer() { Trace_stream = new trace_stream; }
+  ~lease_tracer() { delete Trace_stream, Trace_stream = NULL; }
+};
 
-// Main entrypoint.
-#define trace(layer) !Trace_stream ? cerr /*print nothing*/ : Trace_stream->stream(layer)
-#define RAISE trace("warn") << __FILE__ << ":" << __LINE__ << " "
+#define START_TRACING_UNTIL_END_OF_SCOPE lease_tracer leased_tracer;
+
+
 
 void trace_all(const string& label, const list<string>& in) {
   for (list<string>::const_iterator p = in.begin(); p != in.end(); ++p)
