@@ -4,10 +4,14 @@ typedef string token;
 :(code)
 token next_token(istream& in) {
   ostringstream out;
-  slurp_word(in, out);
+  if (in.peek() == '"')
+    slurp_string(in, out);
+  else
+    slurp_word(in, out);
   return token(out.str());
 }
 
+// slurp functions read a token when you're sure to be at it
 void slurp_word(istream& in, ostream& out) {
   char c;
   while (in >> c) {
@@ -17,6 +21,22 @@ void slurp_word(istream& in, ostream& out) {
     }
     out << c;
   }
+}
+
+void slurp_string(istream& in, ostream& out) {
+  slurp_char(in, out);   // initial quote
+  char c;
+  while (in >> c) {
+    out << c;
+    if (c == '\\')
+      slurp_char(in, out);   // blindly read next
+    else if (c == '"')
+      break;
+  }
+}
+
+void slurp_char(istream& in, ostream& out) {
+  out << (char)in.get();
 }
 
 void read_all(string s) {
@@ -32,3 +52,8 @@ void read_all(string s) {
 -tokenize: 34
 -tokenize: abc
 -tokenize: 3.4
+
+:(scenario read_all tokenize_handles_string_literals)
+34 "abc"
+- tokenize: 34
+- tokenize: "abc"
