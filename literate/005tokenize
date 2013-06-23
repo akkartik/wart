@@ -1,6 +1,9 @@
 :(before "End Types")
 typedef string token;
 
+:(before "End Globals")
+const string Punctuation_chars = "()#\"";
+
 :(code)
 token next_token(istream& in) {
   in >> std::noskipws;
@@ -16,6 +19,8 @@ token next_token(istream& in) {
   ostringstream out;
   if (in.peek() == '"')
     slurp_string(in, out);
+  else if (find(Punctuation_chars, in.peek()))
+    slurp_char(in, out);
   else
     slurp_word(in, out);
 
@@ -27,7 +32,7 @@ token next_token(istream& in) {
 void slurp_word(istream& in, ostream& out) {
   char c;
   while (in >> c) {
-    if (isspace(c)) {
+    if (isspace(c) || find(Punctuation_chars, c)) {
       in.putback(c);
       break;
     }
@@ -41,7 +46,7 @@ void slurp_string(istream& in, ostream& out) {
   while (in >> c) {
     out << c;
     if (c == '\\')
-      slurp_char(in, out);   // blindly read next
+      slurp_char(in, out);   // escape; blindly read next
     else if (c == '"')
       break;
   }
@@ -72,6 +77,10 @@ void read_all(string s) {
       next_token(in);
   } while (!in.eof());
   // return nothing; we'll just verify the trace
+}
+
+bool find(string s, char c) {
+  return s.find(c) != NOT_FOUND;
 }
 
 :(scenarios read_all)
@@ -118,3 +127,14 @@ void read_all(string s) {
 -tokenize: 35
 ~tokenize: #abc
 ~tokenize: # def gh
+
+:(scenario tokenize_breaks_at_punctuation)
+() a(b c)"def"
+-tokenize: (
+-tokenize: )
+-tokenize: a
+-tokenize: (
+-tokenize: b
+-tokenize: c
+-tokenize: )
+-tokenize: "def"
