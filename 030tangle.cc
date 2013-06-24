@@ -21,9 +21,9 @@ void tangle(istream& in, list<string>& out) {
 }
 
 // A trace is one or more lines of input
-//  followed by one or more lines expected in trace ('-')
-//  followed by one or more lines trace shouldn't include ('~')
-static string TRACE_MATCHERS = "-~";
+//  followed by one or more lines expected in trace in order ('+')
+//  followed by one or more lines trace shouldn't include ('-')
+static string TRACE_MATCHERS = "+-";
 
 void process_next_hunk(istream& in, const string& directive, list<string>& out) {
   list<string> hunk;
@@ -54,9 +54,9 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
     string name = to_string(car(cdr(expr)));
     result.push_back("void test_"+name+"() {");
     result.push_back("  "+Toplevel+"(\""+input_lines(hunk)+"\");");
-    if (!hunk.empty() && hunk.front()[0] == '-')
+    if (!hunk.empty() && hunk.front()[0] == '+')
       result.push_back("  CHECK_TRACE_CONTENTS(\""+expected_in_trace(hunk)+"\");");
-    while (!hunk.empty() && hunk.front()[0] == '~') {
+    while (!hunk.empty() && hunk.front()[0] == '-') {
       result.push_back("  CHECK_TRACE_DOESNT_CONTAIN(\""+expected_not_in_trace(hunk.front())+"\");");
       hunk.pop_front();
     }
@@ -91,7 +91,7 @@ string input_lines(list<string>& hunk) {
 
 string expected_in_trace(list<string>& hunk) {
   string result;
-  while (!hunk.empty() && hunk.front()[0] == '-') {
+  while (!hunk.empty() && hunk.front()[0] == '+') {
     hunk.front().erase(0, 1);
     result += hunk.front()+"";
     hunk.pop_front();

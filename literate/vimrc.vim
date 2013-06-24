@@ -3,9 +3,9 @@ function! HighlightTangledFile()
   set ft=cpp
   syntax region wartTangle start=+:(+ end=+)+
   highlight link wartTangle Delimiter
-  syntax region wartTrace start="^-" end="$"
+  syntax region wartTrace start="^+" end="$"
   highlight wartTrace ctermfg=darkgreen
-  syntax region wartTraceAbsent start="^\~" end="$"
+  syntax region wartTraceAbsent start="^-" end="$"
   highlight wartTraceAbsent ctermfg=darkred
 endfunction
 call HighlightTangledFile()

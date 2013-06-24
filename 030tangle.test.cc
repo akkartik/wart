@@ -27,7 +27,7 @@ void test_tangle_indents_hunks_correctly() {
 }
 
 void test_tangle_supports_scenarios() {
-  istringstream in(":(scenario does_bar)\nabc def\n-layer1: pqr\n-layer2: xyz");
+  istringstream in(":(scenario does_bar)\nabc def\n+layer1: pqr\n+layer2: xyz");
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {"); lines.pop_front();
@@ -38,7 +38,7 @@ void test_tangle_supports_scenarios() {
 }
 
 void test_tangle_supports_configurable_toplevel() {
-  istringstream in(":(scenarios foo)\n:(scenario does_bar)\nabc def\n-layer1: pqr");
+  istringstream in(":(scenarios foo)\n:(scenario does_bar)\nabc def\n+layer1: pqr");
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {"); lines.pop_front();
@@ -52,7 +52,7 @@ void test_tangle_supports_configurable_toplevel() {
 }
 
 void test_tangle_supports_strings_in_scenarios() {
-  istringstream in(":(scenario does_bar)\nabc \"def\"\n-layer1: pqr\n-layer2: \"xyz\"");
+  istringstream in(":(scenario does_bar)\nabc \"def\"\n+layer1: pqr\n+layer2: \"xyz\"");
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {"); lines.pop_front();
@@ -63,7 +63,7 @@ void test_tangle_supports_strings_in_scenarios() {
 }
 
 void test_tangle_supports_strings_in_scenarios2() {
-  istringstream in(":(scenario does_bar)\nabc \"\"\n-layer1: pqr\n-layer2: \"\"");
+  istringstream in(":(scenario does_bar)\nabc \"\"\n+layer1: pqr\n+layer2: \"\"");
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {"); lines.pop_front();
@@ -74,7 +74,7 @@ void test_tangle_supports_strings_in_scenarios2() {
 }
 
 void test_tangle_supports_multiline_input_in_scenarios() {
-  istringstream in(":(scenario does_bar)\nabc def\n  efg\n-layer1: pqr\n-layer2: \"\"");
+  istringstream in(":(scenario does_bar)\nabc def\n  efg\n+layer1: pqr\n+layer2: \"\"");
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {"); lines.pop_front();
@@ -85,7 +85,7 @@ void test_tangle_supports_multiline_input_in_scenarios() {
 }
 
 void test_tangle_can_check_for_absence_at_end_of_scenarios() {
-  istringstream in(":(scenario does_bar)\nabc def\n  efg\n-layer1: pqr\n~layer1: xyz");
+  istringstream in(":(scenario does_bar)\nabc def\n  efg\n+layer1: pqr\n-layer1: xyz");
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {"); lines.pop_front();
@@ -97,7 +97,7 @@ void test_tangle_can_check_for_absence_at_end_of_scenarios() {
 }
 
 void test_tangle_can_check_for_absence_at_end_of_scenarios2() {
-  istringstream in(":(scenario does_bar)\nabc def\n  efg\n~layer1: pqr\n~layer1: xyz");
+  istringstream in(":(scenario does_bar)\nabc def\n  efg\n-layer1: pqr\n-layer1: xyz");
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {"); lines.pop_front();
