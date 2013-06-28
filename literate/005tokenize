@@ -14,8 +14,6 @@ token next_token(istream& in) {
     else
       break;
   }
-  while (in.peek() == '#' || isspace(in.peek()))
-  skip_whitespace(in);
   ostringstream out;
   if (in.peek() == '"')
     slurp_string(in, out);
