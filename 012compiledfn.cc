@@ -12,7 +12,7 @@ struct compiledfn_metadata {
 };
 
 const compiledfn_metadata Compiledfns[] = {
-  #include "compiledfn_list"
+  #include "compiledfn_list"  // auto-generated; see makefile
 };
 
 void setup_compiledfns() {
