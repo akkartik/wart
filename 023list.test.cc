@@ -103,7 +103,7 @@ void test_contains_handles_circular_lists() {
   TEMP(x, new_cons(new_num(1)));
   set_cdr(x, x);
   CHECK(!contains(x, new_sym("a"), done));
-  x->cdr = nil;   // break cycle for gc
+  x->cdr = nil;  // break cycle for gc
 }
 
 void test_list_sort() {

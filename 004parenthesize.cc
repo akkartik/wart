@@ -19,7 +19,7 @@
 #include<assert.h>
 
 list<token> next_expr(indent_sensitive_stream& in) {
-  list<token> result;   // emit tokens here
+  list<token> result;  // emit tokens here
   #define TRACE_AND_RETURN_RESULT { \
     for (list<token>::iterator p = result.begin(); p != result.end(); ++p) \
       trace("parenthesize") << *p; \
@@ -49,7 +49,7 @@ list<token> next_expr(indent_sensitive_stream& in) {
   bool paren_at_start_of_line = false;
   ////   c) aren't inside open parens
   long explicit_open_parens = 0;  // parens in the original
-  stack<long> implicit_open_parens;   // parens we inserted with their indent levels
+  stack<long> implicit_open_parens;  // parens we inserted with their indent levels
 
   long this_line_indent = skip_initial_newlines_to_first_indent(in);
   while (!in.eof()) {
@@ -153,7 +153,7 @@ list<token> indent_insensitive_expr(indent_sensitive_stream& in) {
       --explicit_open_parens;
       if (explicit_open_parens == 0) break;
     }
-    else { //// word
+    else {  //// word
       result.push_back(curr);
       if (explicit_open_parens == 0) break;
     }

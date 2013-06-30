@@ -51,7 +51,7 @@ cell* transform_dollar_vars(cell* input, table& map) {
     return map[input];
   }
 
-  if (!is_cons(input)) return input;   // no tables or compiledfns in static code
+  if (!is_cons(input)) return input;  // no tables or compiledfns in static code
   set_car(input, transform_dollar_vars(car(input), map));
   set_cdr(input, transform_dollar_vars(cdr(input), map));
   return input;

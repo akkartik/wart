@@ -122,12 +122,12 @@ void slurp_word(istream& in, ostream& out) {
 }
 
 void slurp_string(istream& in, ostream& out) {
-  slurp_char(in, out);   // initial quote
+  slurp_char(in, out);  // initial quote
   char c;
   while (in >> c) {
     out << c;
     if (c == '\\')
-      slurp_char(in, out);   // blindly read next
+      slurp_char(in, out);  // blindly read next
     else if (c == '"')
       break;
   }
@@ -166,7 +166,7 @@ void skip_whitespace(istream& in) {
     in.get();
 }
 
-cell* peek_next_atom(istream& in) { // should always undo changes to 'in'
+cell* peek_next_atom(istream& in) {  // should always undo changes to 'in'
   std::streampos curr = in.tellg();
   indent_sensitive_stream dummy(in);
   cell* result = read(dummy);

@@ -38,7 +38,7 @@ cell* type(cell* x) {
     return sym_list;
   default:
     RAISE << "Undefined type: " << x->type << '\n' << die();
-    return nil;   // never reached
+    return nil;  // never reached
   }
 }
 

@@ -111,7 +111,7 @@ list<string>::iterator find_substr(list<string>& in, const string& pat) {
 }
 
 #include <locale>
-using std::isspace;   // unicode-aware
+using std::isspace;  // unicode-aware
 
 // does s start with pat, after skipping whitespace?
 // pat can't start with whitespace

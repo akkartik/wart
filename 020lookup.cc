@@ -157,7 +157,7 @@ void add_lexical_binding(string var, cell* val) {
 //// internals
 
 void setup_scopes() {
-  Dynamics.clear();   // leaks memory for strings and tables
+  Dynamics.clear();  // leaks memory for strings and tables
   CURR_LEXICAL_SCOPE = new_sym("Curr_lexical_scope");
   new_dynamic_scope(CURR_LEXICAL_SCOPE, nil);
 }

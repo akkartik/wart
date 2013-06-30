@@ -34,7 +34,7 @@ int main(int argc, const char* argv[]) {
   setup();
   load_files(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
-  Interactive = true;   // stop run on two enters
+  Interactive = true;  // stop run on two enters
   while (!cin.eof()) {
     cout << "=> " << run(cin) << '\n';
   }
@@ -96,7 +96,7 @@ void run_tests() {
 
   setup();
   cerr << '\n';
-  load_files(".wart");   // after GC tests
+  load_files(".wart");  // after GC tests
   load_files(".test");
 
   cerr << '\n';

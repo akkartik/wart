@@ -81,6 +81,6 @@ void test_new_dynamic_scope_increments_refcounts() {
   cell* val = new_num(34);
   CLEAR_TRACE;
   new_dynamic_scope(var, val);
-    CHECK_EQ(excess_mkrefs(), 2);   // one for var, one for val
+    CHECK_EQ(excess_mkrefs(), 2);  // one for var, one for val
   end_dynamic_scope(var);
 }

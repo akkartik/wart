@@ -59,11 +59,11 @@ cell* new_num(long x) {
   return mkref(Int_literals[x]);
 }
 
-cell* new_num(int x) {   // just for integer literals
+cell* new_num(int x) {  // just for integer literals
   return new_num((long)x);
 }
 
-cell* new_num(float x) {   // don't intern floats
+cell* new_num(float x) {  // don't intern floats
   cell* result = new_cell();
   result->car = *(cell**)&x;
   result->type = FLOAT;
@@ -111,7 +111,7 @@ cell* new_sym(string x) {
   if (Sym_literals[x])
     return Sym_literals[x];
   Sym_literals[x] = new_cell();
-  Sym_literals[x]->car = (cell*)new string(x);   // not aligned like cells; can fragment memory
+  Sym_literals[x]->car = (cell*)new string(x);  // not aligned like cells; can fragment memory
   Sym_literals[x]->type = SYMBOL;
   return mkref(Sym_literals[x]);
 }
@@ -120,7 +120,7 @@ bool is_sym(cell* x) {
   return x->type == SYMBOL;
 }
 
-cell* new_string(string x) {   // don't intern strings
+cell* new_string(string x) {  // don't intern strings
   cell* result = new_cell();
   result->car = (cell*)new string(x);
   result->type = STRING;

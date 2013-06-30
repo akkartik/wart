@@ -185,7 +185,7 @@ long excess_mkrefs() {
 
 // RAII for temporaries
 struct lease_cell {
-  cell*& value;   // reference allows us to track changes to the underlying temporary
+  cell*& value;  // reference allows us to track changes to the underlying temporary
   lease_cell(cell*& v) :value(v) {}
   ~lease_cell() {
     trace("gc/out of scope") << value;
@@ -208,7 +208,7 @@ long num_unfreed() {
   long n = 0;
   for (heap* h = First_heap; h != Curr_heap; h=h->next)
     n += CELLS_PER_HEAP;
-  n += Curr_cell-1;   // for Curr_lexical_scope
+  n += Curr_cell-1;  // for Curr_lexical_scope
   for (cell* f = Free_cells; f; f=f->cdr)
     --n;
   return n;

@@ -1,7 +1,7 @@
 bool Hide_raises = false;
 
 struct trace_stream {
-  vector<pair<string, pair<int, string> > > past_lines;   // [(layer label, frame, line)]
+  vector<pair<string, pair<int, string> > > past_lines;  // [(layer label, frame, line)]
   unordered_map<string, int> frame;
   // accumulator for current line
   ostringstream* curr_stream;
@@ -112,7 +112,7 @@ bool check_trace_contents(string FUNCTION, string FILE, int LINE, string expecte
   return false;
 }
 
-bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, string expected) {   // empty layer == everything, multiple layers, hierarchical layers
+bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, string expected) {  // empty layer == everything, multiple layers, hierarchical layers
   vector<string> expected_lines = split(expected, "");
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
