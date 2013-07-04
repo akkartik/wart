@@ -2,7 +2,7 @@
 bool Hide_warnings = false;
 
 struct trace_stream {
-  vector<pair<string, pair<int, string> > > past_lines;   // [(layer label, frame, line)]
+  vector<pair<string, pair<int, string> > > past_lines;  // [(layer label, frame, line)]
   unordered_map<string, int> frame;
   // accumulator for current line
   ostringstream* curr_stream;
@@ -24,7 +24,7 @@ struct trace_stream {
     past_lines.push_back(pair<string, pair<int, string> >(curr_layer, pair<int, string>(frame[curr_layer], curr_stream->str())));
     if (curr_layer == dump_layer || curr_layer == "dump" ||
         (!Hide_warnings && curr_layer == "warn"))
-      cerr << frame[curr_layer] << ": " << curr_stream->str() << '\n';
+      cerr << frame[curr_layer] << ": " << with_newline(curr_stream->str());
     delete curr_stream;
     curr_stream = NULL;
   }
@@ -34,7 +34,7 @@ struct trace_stream {
     ostringstream output;
     for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
       if (layer.empty() || prefix_match(layer, p->first))
-        output << p->first << "/" << p->second.first << ": " << p->second.second << '\n';
+        output << p->first << "/" << p->second.first << ": " << with_newline(p->second.second);
     return output.str();
   }
 
@@ -51,11 +51,29 @@ struct trace_stream {
     }
     dump.close();
   }
+
+  string with_newline(string s) {
+    if (s[s.size()-1] != '\n') return s+'\n';
+    return s;
+  }
 };
+
+
+
 trace_stream* Trace_stream = NULL;
 
 #define trace(layer) !Trace_stream ? cerr /*print nothing*/ : Trace_stream->stream(layer)
-#define RAISE trace("warn") << __FILE__ << ":" << __LINE__ << " "
+#define RAISE (!Trace_stream ? cerr /*do print*/ : Trace_stream->stream("warn")) << __FILE__ << ":" << __LINE__ << " "
+
+:(before "End Types")
+// RAISE << die exits after printing -- unless Hide_warnings is set.
+struct die {};
+:(before "End Tracing")
+ostream& operator<<(ostream& os, unused die) {
+  if (Hide_warnings) return os;
+  os << "dying";
+  exit(1);
+}
 
 #define CLEAR_TRACE delete Trace_stream, Trace_stream = new trace_stream;
 
@@ -111,7 +129,7 @@ bool check_trace_contents(string FUNCTION, string FILE, int LINE, string expecte
   return false;
 }
 
-bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, string expected) {   // empty layer == everything, multiple layers, hierarchical layers
+bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, string expected) {  // empty layer == everything, multiple layers, hierarchical layers
   vector<string> expected_lines = split(expected, "");
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
@@ -165,6 +183,15 @@ int trace_count(string layer, int frame, string line) {
         ++result;
   }
   return result;
+}
+
+#define CHECK_TRACE_WARNS()   CHECK(trace_count("warn") > 0)
+#define CHECK_TRACE_DOESNT_WARN()   if (trace_count("warn") > 0) { \
+  ++Num_failures; \
+  cerr << "\nF " << __FUNCTION__ << "(" << __FILE__ << ":" << __LINE__ << "): unexpected warnings\n"; \
+  DUMP("warn"); \
+  Passed = false; \
+  return; \
 }
 
 bool trace_doesnt_contain(string layer, string line) {
