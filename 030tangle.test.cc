@@ -26,6 +26,24 @@ void test_tangle_indents_hunks_correctly() {
   CHECK_TRACE_CONTENTS("tangle", "a  b  dc");
 }
 
+void test_tangle_warns_on_missing_target() {
+  Hide_warnings = true;
+  istringstream in(":(before)\nabc def\n");
+  list<string> lines;
+  tangle(in, lines);
+  CHECK_TRACE_WARNS();
+}
+
+void test_tangle_warns_on_unknown_target() {
+  Hide_warnings = true;
+  istringstream in(":(before \"foo\")\nabc def\n");
+  list<string> lines;
+  tangle(in, lines);
+  CHECK_TRACE_WARNS();
+}
+
+// todo: include line numbers in tangle errors
+
 void test_tangle_supports_scenarios() {
   istringstream in(":(scenario does_bar)\nabc def\n+layer1: pqr\n+layer2: xyz");
   list<string> lines;

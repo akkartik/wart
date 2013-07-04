@@ -43,6 +43,11 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
   TEMP(expr, read(directive.substr(1)));
   string cmd = to_string(car(expr));
 
+  if (cmd == "code") {
+    out.insert(out.end(), hunk.begin(), hunk.end());
+    return;
+  }
+
   static string Toplevel = "run";
   if (cmd == "scenarios") {
     Toplevel = to_string(car(cdr(expr)));
@@ -65,19 +70,22 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
     return;
   }
 
-  cell* x1 = car(cdr(expr));
-  list<string>::iterator target = (x1 != nil) ? find_substr(out, to_string(x1)) : out.end();
+  if (cmd == "before" || cmd == "after") {
+    cell* x1 = car(cdr(expr));
+    if (x1 == nil) RAISE << "No target for " << cmd << " directive.\n" << die();
+    list<string>::iterator target = find_substr(out, to_string(x1));
 
-  string curr_indent = target != out.end() ? indent(*target) : "";
-  for (list<string>::iterator p = hunk.begin(); p != hunk.end(); ++p)
-    p->insert(p->begin(), curr_indent.begin(), curr_indent.end());
+    if (target == out.end()) RAISE << "Couldn't find target " << x1 << '\n' << die();
+    string curr_indent = indent(*target);
+    for (list<string>::iterator p = hunk.begin(); p != hunk.end(); ++p)
+      p->insert(p->begin(), curr_indent.begin(), curr_indent.end());
 
-  if (cmd == "after") {
-    if (target == out.end())
-      RAISE << "couldn't find target " << to_string(car(cdr(expr))) << '\n';
-    ++target;
+    if (cmd == "after") ++target;
+    out.insert(target, hunk.begin(), hunk.end());
+    return;
   }
-  out.insert(target, hunk.begin(), hunk.end());
+
+  RAISE << "unknown directive " << cmd << '\n';
 }
 
 string input_lines(list<string>& hunk) {
