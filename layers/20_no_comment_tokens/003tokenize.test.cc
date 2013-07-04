@@ -27,38 +27,3 @@ void test_tokenize_handles_comment() {
   read_all("()'a #abc def ghi");
   CHECK_TRACE_CONTENTS("tokenize", "()'a");
 }
-
-void test_tokenize_ends_comment_at_newline() {
-  read_all("#abc def ghi\nabc");
-  CHECK_TRACE_CONTENTS("tokenize", "abc");
-}
-
-void test_tokenize_suppresses_comments() {
-  read_all("abc\n#abc\ndef\nghi");
-  CHECK_TRACE_CONTENTS("tokenize", "abcdefghi");
-}
-
-void test_tokenize_suppresses_comments2() {
-  read_all("a b\n  c\n#abc\ndef\n  ghi\n\njkl");
-  CHECK_TRACE_CONTENTS("tokenize", "abcdefghijkl");
-}
-
-void test_tokenize_suppresses_trailing_whitespace() {
-  read_all("a \nb\r\nc");
-  CHECK_TRACE_CONTENTS("tokenize", "abc");
-}
-
-void test_tokenize_suppresses_repeated_newline() {
-  read_all("34\n\n\"abc \\\"quote def\"");
-  CHECK_TRACE_CONTENTS("tokenize", "34\"abc \\\"quote def\"");
-}
-
-void test_tokenize_suppresses_whitespace_lines() {
-  read_all("abc def ghi\n\n    \n  def");
-  CHECK_TRACE_CONTENTS("tokenize", "abcdefghidef");
-}
-
-void test_tokenize_suppresses_whitespace_lines2() {
-  read_all("  \nabc def ghi\n\n    \n  def");
-  CHECK_TRACE_CONTENTS("tokenize", "abcdefghidef");
-}
