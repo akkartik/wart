@@ -23,7 +23,7 @@ struct trace_stream {
     past_lines.push_back(pair<string, pair<int, string> >(curr_layer, pair<int, string>(frame[curr_layer], curr_stream->str())));
     if (curr_layer == dump_layer || curr_layer == "dump" ||
         (!Hide_warnings && curr_layer == "warn"))
-      cerr << frame[curr_layer] << ": " << curr_stream->str() << '\n';
+      cerr << frame[curr_layer] << ": " << with_newline(curr_stream->str());
     delete curr_stream;
     curr_stream = NULL;
   }
@@ -33,7 +33,7 @@ struct trace_stream {
     ostringstream output;
     for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
       if (layer.empty() || prefix_match(layer, p->first))
-        output << p->first << "/" << p->second.first << ": " << p->second.second << '\n';
+        output << p->first << "/" << p->second.first << ": " << with_newline(p->second.second);
     return output.str();
   }
 
@@ -49,6 +49,11 @@ struct trace_stream {
       dump << "</div>\n";
     }
     dump.close();
+  }
+
+  string with_newline(string s) {
+    if (s[s.size()-1] != '\n') return s+'\n';
+    return s;
   }
 };
 
