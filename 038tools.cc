@@ -12,12 +12,12 @@ COMPILE_FN(register_failed_test, compiledfn_register_failed_test, "($msg $expr)"
 )
 
 COMPILE_FN(hide_warnings, compiledfn_hide_warnings, "()",
-  Hide_raises = true;
+  Hide_warnings = true;
   return nil;
 )
 
 COMPILE_FN(show_warnings, compiledfn_show_warnings, "()",
-  Hide_raises = false;
+  Hide_warnings = false;
   return nil;
 )
 
@@ -58,10 +58,10 @@ COMPILE_FN(globals, compiledfn_globals, "()",
 
 // eval in a sandbox
 COMPILE_FN(try_eval, compiledfn_try_eval, "($x ... $scope)",
-  bool old_count_raise = Hide_raises;
-  Hide_raises = true;
+  bool old_count_raise = Hide_warnings;
+  Hide_warnings = true;
     cell* ans = compiledfn_eval();
-  Hide_raises = old_count_raise;
+  Hide_warnings = old_count_raise;
 
   if (trace_count("warn") == 0) return ans;
   // error

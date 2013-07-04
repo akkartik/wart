@@ -413,7 +413,7 @@ void test_eval_splice_on_macros_with_backquote() {
   run("m <- (fn '(x y) (eval `(cons ,x ,y) caller_scope))");
   run("(a <- 3) (b <- 4)");
   run("args <- '(a b)");
-  Hide_raises = true;
+  Hide_warnings = true;
   run("m @args");
   CHECK_TRACE_TOP("eval", "=> (a ... b)");  // spliced args override quoted params
   CHECK_EQ(trace_count("warn"), 0);
@@ -427,7 +427,7 @@ void test_eval_splice_on_backquoteless_macros_warns() {
   run("m <- (fn '(x y) (eval (cons 'cons (cons x (cons y nil))) caller_scope))");
   run("(a <- 3) (b <- 4)");
   run("args <- '(a b)");
-  Hide_raises = true;
+  Hide_warnings = true;
   run("m @args");
   CHECK_EQ(trace_count("warn"), 1);
   end_dynamic_scope("args");
@@ -599,7 +599,7 @@ void test_eval_handles_quoted_as_params() {
 
 // gotcha: a|(b c) won't work
 void test_eval_warns_on_unary_as() {
-  Hide_raises = true;
+  Hide_warnings = true;
   run("((fn (| a) 3) 1 2)");
   CHECK_EQ(trace_count("warn"), 1);
 }
