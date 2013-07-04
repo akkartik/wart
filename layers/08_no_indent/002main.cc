@@ -84,12 +84,19 @@ void run_tests() {
 }
 
 void verify() {
+  bool old_hide_warnings = Hide_warnings;
+  Hide_warnings = false;
   teardown_streams();
   teardown_compiledfns();
   teardown_cells();
-  if (!Passed) return;
-  if (Num_raises != 0) cerr << Num_raises << " errors encountered\n";
-  if (num_unfreed() > 0) dump_unfreed();
+  if (!Passed)
+    ;
+  else if (!old_hide_warnings && trace_count("warn"))
+    DUMP("warn");
+  else if (num_unfreed() > 0)
+    dump_unfreed();
+  else
+    cerr << ".";
 }
 
 void setup() {
@@ -98,8 +105,7 @@ void setup() {
   setup_scopes();
   setup_compiledfns();
   setup_streams();
-  Count_raises = false;
-  Num_raises = 0;
+  Hide_warnings = false;
   Passed = true;
 }
 

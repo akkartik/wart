@@ -89,16 +89,22 @@ void run_tests() {
 }
 
 void verify() {
+  bool old_hide_warnings = Hide_warnings;
+  Hide_warnings = false;
   teardown_bindings();
-  if (!Passed) return;
-  if (Num_raises != 0) cerr << Num_raises << " errors encountered\n";
+  if (!Passed)
+    ;
+  else if (!old_hide_warnings && trace_count("warn"))
+    DUMP("warn");
+  else
+    cerr << ".";
+
 }
 
 void setup() {
   setup_cells();
   setup_common_syms();
-  Count_raises = false;
-  Num_raises = 0;
+  Hide_warnings = false;
   Passed = true;
 }
 

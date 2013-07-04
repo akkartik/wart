@@ -55,9 +55,9 @@ void test_cons_works() {
 
 void test_assign_to_non_sym_warns() {
   trace("test") << "<-";
-  Count_raises = true;
+  Hide_warnings = true;
   run("(<- 3 nil)");
-  CHECK_EQ(Num_raises, 1);   Num_raises=0;
+  CHECK_EQ(trace_count("warn"), 1);
 }
 
 void test_assign_lexical_var() {
@@ -140,10 +140,10 @@ void test_equal_handles_floats() {
 }
 
 void test_equal_handles_float_vs_nil() {
-  Count_raises = true;
+  Hide_warnings = true;
   run("(nil = 1.5)");
   CHECK_TRACE_TOP("eval", "=> nil");
-  CHECK_EQ(Num_raises, 0);
+  CHECK_EQ(trace_count("warn"), 0);
 }
 
 void test_eval_handles_eval() {
