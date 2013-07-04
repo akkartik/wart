@@ -59,6 +59,15 @@ trace_stream* Trace_stream = NULL;
 #define trace(layer) !Trace_stream ? cerr /*print nothing*/ : Trace_stream->stream(layer)
 #define RAISE (!Trace_stream ? cerr /*do print*/ : Trace_stream->stream("warn")) << __FILE__ << ":" << __LINE__ << " "
 
+// RAISE << die exits after printing -- unless Hide_warnings is set.
+struct die {
+};
+ostream& operator<<(ostream& os, unused die) {
+  if (Hide_warnings) return os;
+  os << "dying";
+  exit(1);
+}
+
 #define CLEAR_TRACE delete Trace_stream, Trace_stream = new trace_stream;
 
 #define DUMP(layer) cerr << Trace_stream->readable_contents(layer)

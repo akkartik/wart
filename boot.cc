@@ -47,12 +47,6 @@ using std::ofstream;
 
 
 
-struct die {};
-ostream& operator<<(ostream& os, unused die) {
-  os << "dying";
-  exit(1);
-}
-
 // interpreter decls
 
 #include "type_list"

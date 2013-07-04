@@ -3,6 +3,7 @@ wart_bin: makefile type_list function_list file_list test_file_list test_list co
 	@echo
 
 type_list: boot.cc [0-9]*.cc
+	@# struct decl should always end line with '{' or build might break
 	@grep -h "^struct .*{$$" [0-9]*.cc |perl -pwe 's/(struct *[^ ]*).*/$$1;/' > type_list
 	@grep -h typedef [0-9]*.cc >> type_list
 
