@@ -57,7 +57,7 @@ struct trace_stream {
 trace_stream* Trace_stream = NULL;
 
 #define trace(layer) !Trace_stream ? cerr /*print nothing*/ : Trace_stream->stream(layer)
-#define RAISE trace("warn") << __FILE__ << ":" << __LINE__ << " "
+#define RAISE (!Trace_stream ? cerr /*do print*/ : Trace_stream->stream("warn")) << __FILE__ << ":" << __LINE__ << " "
 
 #define CLEAR_TRACE delete Trace_stream, Trace_stream = new trace_stream;
 

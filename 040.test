@@ -42,13 +42,12 @@ err "wart tests: "
   :valueof (foo @'(1 (2 3)))
   :should be '(1 3))
 
-(hide_warnings)
+(hiding_warnings
   (def! (foo a b) `(cons ,a ,cdr.b))
   (mac! (bar a b) (foo a b))
   (test "macros calling function helpers work with splice"
     :valueof (bar @'(1 (2 3)))
-    :should be '(1 3))
-(show_warnings)
+    :should be '(1 3)))
 
 (test "fn evals rest arg aliases only once"
   :valueof (ret x 0 ((fn (| a b) a) ++x))

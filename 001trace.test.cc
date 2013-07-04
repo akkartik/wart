@@ -97,6 +97,11 @@ void test_trace_supports_count2() {
   CHECK_EQ(trace_count("test layer 1"), 2);
 }
 
+// pending: RAISE also prints to stderr.
+// pending: RAISE doesn't print to stderr if Hide_warnings is set.
+// pending: RAISE prints to stderr if Trace_stream is NULL.
+// pending: RAISE prints to stderr if Trace_stream is NULL even if Hide_warnings is set.
+
 
 
 // can't check trace because trace methods call 'split'

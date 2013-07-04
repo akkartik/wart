@@ -11,13 +11,16 @@ COMPILE_FN(register_failed_test, compiledfn_register_failed_test, "($msg $expr)"
   return nil;
 )
 
-COMPILE_FN(hide_warnings, compiledfn_hide_warnings, "()",
+COMPILE_FN(hiding_warnings, compiledfn_hide_warnings, "'$body",
+  START_TRACING_UNTIL_END_OF_SCOPE;
   Hide_warnings = true;
+  for (cell* body = lookup("$body"); body != nil; body=cdr(body))
+    rmref(eval(car(body)));
+  Hide_warnings = false;
   return nil;
 )
 
 COMPILE_FN(show_warnings, compiledfn_show_warnings, "()",
-  Hide_warnings = false;
   return nil;
 )
 
