@@ -181,6 +181,15 @@ int trace_count(string layer, int frame, string line) {
   return result;
 }
 
+#define CHECK_TRACE_WARNS()   CHECK(trace_count("warn") > 0)
+#define CHECK_TRACE_DOESNT_WARN()   if (trace_count("warn") > 0) { \
+  ++Num_failures; \
+  cerr << "\nF " << __FUNCTION__ << "(" << __FILE__ << ":" << __LINE__ << "): unexpected warnings\n"; \
+  DUMP("warn"); \
+  Passed = false; \
+  return; \
+}
+
 bool trace_doesnt_contain(string layer, string line) {
   return trace_count(layer, line) == 0;
 }

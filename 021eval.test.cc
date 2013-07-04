@@ -416,7 +416,7 @@ void test_eval_splice_on_macros_with_backquote() {
   Hide_warnings = true;
   run("m @args");
   CHECK_TRACE_TOP("eval", "=> (a ... b)");  // spliced args override quoted params
-  CHECK_EQ(trace_count("warn"), 0);
+  CHECK_TRACE_DOESNT_WARN();
   end_dynamic_scope("args");
   end_dynamic_scope("b");
   end_dynamic_scope("a");
@@ -429,7 +429,7 @@ void test_eval_splice_on_backquoteless_macros_warns() {
   run("args <- '(a b)");
   Hide_warnings = true;
   run("m @args");
-  CHECK_EQ(trace_count("warn"), 1);
+  CHECK_TRACE_WARNS();
   end_dynamic_scope("args");
   end_dynamic_scope("b");
   end_dynamic_scope("a");
@@ -601,7 +601,7 @@ void test_eval_handles_quoted_as_params() {
 void test_eval_warns_on_unary_as() {
   Hide_warnings = true;
   run("((fn (| a) 3) 1 2)");
-  CHECK_EQ(trace_count("warn"), 1);
+  CHECK_TRACE_WARNS();
 }
 
 void test_eval_binds_missing_as_params_to_nil() {
