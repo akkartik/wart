@@ -39,7 +39,7 @@ void run_tests() {
     // End Test Initialization
     (*Tests[i])();
     if (Passed) cerr << ".";
-    // End Test Verification
+    // Test Verification
   }
 
   cerr << '\n';
