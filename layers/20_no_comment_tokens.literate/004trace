@@ -1,5 +1,5 @@
 :(before "End Tracing")
-bool Hide_raises = false;
+bool Hide_warnings = false;
 
 struct trace_stream {
   vector<pair<string, pair<int, string> > > past_lines;   // [(layer label, frame, line)]
@@ -23,7 +23,7 @@ struct trace_stream {
     if (!curr_stream) return;
     past_lines.push_back(pair<string, pair<int, string> >(curr_layer, pair<int, string>(frame[curr_layer], curr_stream->str())));
     if (curr_layer == dump_layer || curr_layer == "dump" ||
-        (!Hide_raises && curr_layer == "warn"))
+        (!Hide_warnings && curr_layer == "warn"))
       cerr << frame[curr_layer] << ": " << curr_stream->str() << '\n';
     delete curr_stream;
     curr_stream = NULL;
