@@ -60,8 +60,7 @@ trace_stream* Trace_stream = NULL;
 #define RAISE (!Trace_stream ? cerr /*do print*/ : Trace_stream->stream("warn")) << __FILE__ << ":" << __LINE__ << " "
 
 // RAISE << die exits after printing -- unless Hide_warnings is set.
-struct die {
-};
+struct die {};
 ostream& operator<<(ostream& os, unused die) {
   if (Hide_warnings) return os;
   os << "dying";
