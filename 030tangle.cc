@@ -20,10 +20,7 @@ void tangle(istream& in, list<string>& out) {
   trace_all("tangle", out);
 }
 
-// A trace is one or more lines of input
-//  followed by one or more lines expected in trace in order ('+')
-//  followed by one or more lines trace shouldn't include ('-')
-static string TRACE_MATCHERS = "+-";
+static string SCENARIO_MATCHERS = "+-";
 
 void process_next_hunk(istream& in, const string& directive, list<string>& out) {
   list<string> hunk;
@@ -55,6 +52,9 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
   }
 
   if (cmd == "scenario") {
+    // A scenario is one or more lines of input
+    //  followed by one or more lines expected in trace in order ('+')
+    //  followed by one or more lines trace shouldn't include ('-')
     list<string> result;
     string name = to_string(car(cdr(expr)));
     result.push_back("void test_"+name+"() {");
@@ -98,7 +98,7 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
 
 string input_lines(list<string>& hunk) {
   string result;
-  while (!hunk.empty() && TRACE_MATCHERS.find(hunk.front()[0]) == NOT_FOUND) {
+  while (!hunk.empty() && SCENARIO_MATCHERS.find(hunk.front()[0]) == NOT_FOUND) {
     result += hunk.front()+"";
     hunk.pop_front();
   }
