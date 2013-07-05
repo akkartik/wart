@@ -554,6 +554,7 @@ bool is_nil(const ast_node& n) {
 }
 
 :(before "End Types")
+// token Decl
 struct ast_node {
   token atom;
   list<ast_node> elems;
@@ -708,8 +709,9 @@ bool is_atom(cell* x) {
 
 //// numbers
 
+:(before "End Globals")
 unordered_map<long, cell*> Int_literals;
-
+:(code)
 cell* new_num(long x) {
   if (Int_literals[x])
     return Int_literals[x];
@@ -738,9 +740,9 @@ long to_int(cell* x) {
 
 
 //// symbols
-
+:(before "End Globals")
 unordered_map<string, cell*> Sym_literals;
-
+:(code)
 cell* new_sym(string x) {
   if (Sym_literals[x])
     return Sym_literals[x];
@@ -790,8 +792,144 @@ list<token> next_expr(istream& in) {
   return result;
 }
 
-
+:(after "token Decl")
+typedef string token;
+:(before "End Globals")
+const string Punctuation_chars = "()#\"";
 
+:(code)
+token next_token(istream& in) {
+  in >> std::noskipws;
+  for (;;) {
+    skip_whitespace(in);
+    if (in.peek() == '#')
+      skip_comment(in);
+    else
+      break;
+  }
+  ostringstream out;
+  if (in.peek() == '"')
+    slurp_string(in, out);
+  else if (find(Punctuation_chars, in.peek()))
+    slurp_char(in, out);
+  else if (in.peek() == '\'')
+    slurp_char(in, out);
+  else
+    slurp_word(in, out);
+
+  trace("tokenize") << out.str();
+  return token(out.str());
+}
+
+// slurp functions read a token when you're sure to be at it
+void slurp_word(istream& in, ostream& out) {
+  char c;
+  while (in >> c) {
+    if (isspace(c) || find(Punctuation_chars, c)) {
+      in.putback(c);
+      break;
+    }
+    out << c;
+  }
+}
+
+void slurp_string(istream& in, ostream& out) {
+  slurp_char(in, out);   // initial quote
+  char c;
+  while (in >> c) {
+    out << c;
+    if (c == '\\')
+      slurp_char(in, out);   // escape; blindly read next
+    else if (c == '"')
+      break;
+  }
+}
+
+void slurp_char(istream& in, ostream& out) {
+  out << (char)in.get();
+}
+
+void skip_whitespace(istream& in) {
+  while (isspace(in.peek()))
+    in.get();
+}
+
+void skip_comment(istream& in) {
+  char c;
+  while (in >> c) {
+    if (c == '\n') {
+      in.putback(c);
+      break;
+    }
+  }
+}
+
+list<cell*> read_all(string s) {
+  stringstream in(s);
+  return read_all(in);
+}
+
+bool find(string s, char c) {
+  return s.find(c) != NOT_FOUND;
+}
+
+:(scenarios read_all)
+
+:(scenario tokenize_breaks_at_whitespace)
+34 abc 3.4
++tokenize: 34
++tokenize: abc
++tokenize: 3.4
+
+:(scenario tokenize_handles_string_literals)
+34 "abc"
++tokenize: 34
++tokenize: "abc"
+
+:(scenario tokenize_handles_multiple_lines)
+34
+"abc"
++tokenize: 34
++tokenize: "abc"
+
+:(scenario tokenize_handles_string_with_space)
+34
+"abc def"
++tokenize: 34
++tokenize: "abc def"
+
+:(scenario tokenize_handles_string_with_escape)
+34
+"abc \"def"
++tokenize: 34
++tokenize: "abc \"def"
+
+:(scenario tokenize_skips_comment)
+34 #abc
++tokenize: 34
+-tokenize: #abc
+
+:(scenario tokenize_skips_multiple_comment_lines)
+34 #abc
+# def gh
+35
++tokenize: 34
++tokenize: 35
+-tokenize: #abc
+-tokenize: # def gh
+
+:(scenario tokenize_breaks_at_punctuation)
+() a(b c)"def"
++tokenize: (
++tokenize: )
++tokenize: a
++tokenize: (
++tokenize: b
++tokenize: c
++tokenize: )
++tokenize: "def"
+
+:(code)
 bool is_paren(const token& t) {
   return t == "(" || t == ")";
 }
@@ -799,8 +937,6 @@ bool is_paren(const token& t) {
 bool is_quote_or_unquote(const token& t) {
   return t == "'";
 }
-
-
 
 void setup_cells() {
   setup_nil();
