@@ -302,6 +302,13 @@ cell* eval(cell* expr) {
 +eval: literal
 +eval: => "ac bd"
 
+:(scenario eval_sym)
+(<- a 34)
+===
+a
++eval: sym
++eval: => 34
+
 :(code)
 cell* eval_primitive(cell* f, cell* args) {
   if (f == new_sym("fn")) {

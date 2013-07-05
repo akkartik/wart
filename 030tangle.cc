@@ -20,8 +20,6 @@ void tangle(istream& in, list<string>& out) {
   trace_all("tangle", out);
 }
 
-static string SCENARIO_MATCHERS = "+-";
-
 void process_next_hunk(istream& in, const string& directive, list<string>& out) {
   list<string> hunk;
   string curr_line;
@@ -52,13 +50,21 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
   }
 
   if (cmd == "scenario") {
-    // A scenario is one or more lines of input
+    // A scenario is one or more lines of input separated by a call to CLEAR_TRACE ('===')
     //  followed by one or more lines expected in trace in order ('+')
     //  followed by one or more lines trace shouldn't include ('-')
+    // Remember to update is_input below if you add to this format.
     list<string> result;
     string name = to_string(car(cdr(expr)));
     result.push_back("void test_"+name+"() {");
-    result.push_back("  "+Toplevel+"(\""+input_lines(hunk)+"\");");
+    if (!hunk.empty() && is_input(hunk.front()))
+      result.push_back("  "+Toplevel+"(\""+input_lines(hunk)+"\");");
+    if (!hunk.empty() && hunk.front() == "===") {
+      result.push_back("  CLEAR_TRACE;");
+      hunk.pop_front();
+    }
+    if (!hunk.empty() && is_input(hunk.front()))
+      result.push_back("  "+Toplevel+"(\""+input_lines(hunk)+"\");");
     if (!hunk.empty() && hunk.front()[0] == '+')
       result.push_back("  CHECK_TRACE_CONTENTS(\""+expected_in_trace(hunk)+"\");");
     while (!hunk.empty() && hunk.front()[0] == '-') {
@@ -96,9 +102,13 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
   RAISE << "unknown directive " << cmd << '\n';
 }
 
+bool is_input(const string& line) {
+  return line != "===" && line[0] != '+' && line[0] != '-';
+}
+
 string input_lines(list<string>& hunk) {
   string result;
-  while (!hunk.empty() && SCENARIO_MATCHERS.find(hunk.front()[0]) == NOT_FOUND) {
+  while (!hunk.empty() && is_input(hunk.front())) {
     result += hunk.front()+"";
     hunk.pop_front();
   }
