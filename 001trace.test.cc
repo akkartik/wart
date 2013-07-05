@@ -113,6 +113,7 @@ void test_trace_supports_count2() {
   CHECK_EQ(trace_count("test layer 1"), 2);
 }
 
+// pending: DUMP tests
 // pending: readable_contents() adds newline if necessary.
 // pending: RAISE also prints to stderr.
 // pending: RAISE doesn't print to stderr if Hide_warnings is set.

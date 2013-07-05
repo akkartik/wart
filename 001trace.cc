@@ -28,11 +28,13 @@ struct trace_stream {
     curr_stream = NULL;
   }
 
-  string readable_contents(string layer) {  // empty layer = everything
+  string readable_contents(string layer) {  // missing layer = everything, frame, hierarchical layers
     newline();
     ostringstream output;
+    string real_layer, frame;
+    parse_layer_and_frame(layer, &real_layer, &frame);
     for (vector<pair<string, pair<int, string> > >::iterator p = past_lines.begin(); p != past_lines.end(); ++p)
-      if (layer.empty() || prefix_match(layer, p->first))
+      if (layer.empty() || prefix_match(real_layer, p->first))
         output << p->first << "/" << p->second.first << ": " << with_newline(p->second.second);
     return output.str();
   }
