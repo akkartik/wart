@@ -309,6 +309,37 @@ a
 +eval: sym
 +eval: => 34
 
+:(scenario eval_quoted_atoms)
+'a
+'34
++eval: 'a
++eval: quote
++eval: => a
++cell: num 34
++eval: '34
++eval: quote
++eval: => 34
+
+:(scenario eval_quoted_lists)
+'(a b)
++eval: quote
++eval: => (a b)
+
+:(scenario eval_fn_call)
+((fn () 34))
++eval/1: => 34
+
+:(scenario eval_fn_call2)
+(<- x 34)
+===
+((fn () x))
++eval/1: => 34
+
+:(scenario eval_fn_multiple_body_exprs)
+((fn () 1 2))
++eval/1: => 2
+-eval/1: => 1
+
 :(code)
 cell* eval_primitive(cell* f, cell* args) {
   if (f == new_sym("fn")) {
@@ -393,6 +424,43 @@ cell* eval_primitive(cell* f, cell* args) {
   return NULL;
 }
 
+void test_fn_works() {
+  cell* result = run("(fn(x) x)");
+  // {sig: (x), body: (x)}
+  cell* sig = car(cdr(result));
+  CHECK_EQ(car(sig), new_sym("x"));
+  CHECK_EQ(cdr(sig), nil);
+  cell* body = cdr(cdr(result));
+  CHECK_EQ(car(body), new_sym("x"));
+  CHECK_EQ(cdr(body), nil);
+}
+
+:(scenario if_sees_args_in_then_and_else)
+(<- f (fn(x) (if 34 x)))
+===
+(f 35)
++eval/1: => 35
+
+:(scenario not)
+(not 35)
++eval: compiled fn
++eval/1: => nil
+
+:(scenario not2)
+(not nil)
++eval: compiled fn
++eval/1: => 1
+
+:(scenario cons)
+(cons 1 2)
++eval: compiled fn
++eval/1: => (1 ... 2)
+
+:(scenario assign_lexical)
+((fn (x) (<- x 34) x))
++eval/1: => 34
+
+:(code)
 // bind params to args in new_scope, taking into account:
 //  quoted params (eval'ing args as necessary; args is never quoted, though)
 //  destructured params
