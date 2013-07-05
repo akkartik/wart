@@ -101,9 +101,14 @@ bool check_trace_contents(string FUNCTION, string FILE, int LINE, string expecte
   ostringstream output;
   for (vector<pair<string, pair<int, string> > >::iterator p = Trace_stream->past_lines.begin(); p != Trace_stream->past_lines.end(); ++p) {
     vector<string> tmp = split_first(expected_lines[curr_expected_line], ": ");
-    string layer = (tmp.size() == 2) ? tmp[0] : "";
-    vector<string> layers = split(layer, ",");
-    if (!layer.empty() && !any_prefix_match(layers, p->first))
+    string full_layer = (tmp.size() == 2) ? tmp[0] : "";
+    vector<string> layer_and_frame = parse_layer_and_frame(full_layer);
+    string layer = layer_and_frame[0];
+    if (!layer.empty() && !prefix_match(layer, p->first))
+      continue;
+
+    if (layer_and_frame.size() == 2
+        && strtol(layer_and_frame[1].c_str(), NULL, 0) != p->second.first)
       continue;
 
     string expected_line = (tmp.size() == 2) ? tmp[1] : tmp[0];
@@ -124,6 +129,18 @@ bool check_trace_contents(string FUNCTION, string FILE, int LINE, string expecte
   DUMP(layer);
   Passed = false;
   return false;
+}
+
+vector<string> parse_layer_and_frame(const string& layer_and_frame) {
+  vector<string> result;
+  size_t last_slash = layer_and_frame.rfind('/');
+  if (layer_and_frame.find_last_not_of("0123456789") != last_slash) {
+    result.push_back(layer_and_frame);
+    return result;
+  }
+  result.push_back(string(layer_and_frame, 0, last_slash));
+  result.push_back(string(layer_and_frame, last_slash+1));
+  return result;
 }
 
 bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, string expected) {  // empty layer == everything, multiple layers, hierarchical layers

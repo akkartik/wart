@@ -57,6 +57,15 @@ void test_trace_segments_within_layers() {
   CHECK_TRACE_CONTENTS("test layer 1", 0, "foo");
 }
 
+void test_trace_checks_ordering_across_layers_and_frames() {
+  trace("test layer 1") << "foo";
+  trace("test layer 2") << "bar";
+  new_trace_frame("test layer 1");
+  trace("test layer 1") << "qux";
+  CHECK_TRACE_CONTENTS("test layer 1/0: footest layer 2: bartest layer 1: qux");
+  CHECK_TRACE_CONTENTS("test layer 1: footest layer 2: bartest layer 1/1: qux");
+}
+
 void trace_test_fn(int n) {
   if (n == 0) return;
   new_trace_frame("foo");
