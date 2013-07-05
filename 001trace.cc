@@ -293,15 +293,15 @@ vector<string> split(string s, string delim) {
   return result;
 }
 
-void split_first(const string& s, const string& delim, string* first, string* second) {
-  string::size_type pos=s.find(delim);
+void split_first(const string& s, const string& delim, string* prefix, string* core) {
+  string::size_type pos = s.find(delim);
   if (pos == NOT_FOUND) {
-    *first = s;
-    *second = "";
+    *prefix = "";
+    *core = s;
   }
   else {
-    *first = s.substr(0, pos);
-    *second = s.substr(pos+delim.size());
+    *prefix = s.substr(0, pos);
+    *core = s.substr(pos+delim.size());
   }
 }
 
