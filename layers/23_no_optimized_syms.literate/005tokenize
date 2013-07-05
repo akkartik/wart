@@ -19,6 +19,8 @@ token next_token(istream& in) {
     slurp_string(in, out);
   else if (find(Punctuation_chars, in.peek()))
     slurp_char(in, out);
+  else if (in.peek() == '\'')
+    slurp_char(in, out);
   else
     slurp_word(in, out);
 
@@ -69,12 +71,9 @@ void skip_comment(istream& in) {
   }
 }
 
-void read_all(string s) {
+list<cell*> read_all(string s) {
   stringstream in(s);
-  do {
-      next_token(in);
-  } while (!in.eof());
-  // return nothing; we'll just verify the trace
+  return read_all(in);
 }
 
 bool find(string s, char c) {
