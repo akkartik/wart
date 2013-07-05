@@ -127,8 +127,20 @@ bool check_trace_contents(string FUNCTION, string FILE, int LINE, string expecte
 
 void parse_layer_frame_contents(const string& orig, string* layer, string* frame, string* contents) {
   string layer_and_frame;
-  split_first(orig, ": ", &layer_and_frame, contents);
+  parse_contents(orig, ": ", &layer_and_frame, contents);
   parse_layer_and_frame(layer_and_frame, layer, frame);
+}
+
+void parse_contents(const string& s, const string& delim, string* prefix, string* contents) {
+  string::size_type pos = s.find(delim);
+  if (pos == NOT_FOUND) {
+    *prefix = "";
+    *contents = s;
+  }
+  else {
+    *prefix = s.substr(0, pos);
+    *contents = s.substr(pos+delim.size());
+  }
 }
 
 void parse_layer_and_frame(const string& orig, string* layer, string* frame) {
@@ -291,18 +303,6 @@ vector<string> split(string s, string delim) {
     end = s.find(delim, begin);
   }
   return result;
-}
-
-void split_first(const string& s, const string& delim, string* prefix, string* core) {
-  string::size_type pos = s.find(delim);
-  if (pos == NOT_FOUND) {
-    *prefix = "";
-    *core = s;
-  }
-  else {
-    *prefix = s.substr(0, pos);
-    *core = s.substr(pos+delim.size());
-  }
 }
 
 bool any_prefix_match(const vector<string>& pats, const string& needle) {
