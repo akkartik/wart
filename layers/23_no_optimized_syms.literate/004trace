@@ -120,6 +120,7 @@ bool check_trace_contents(string FUNCTION, string FILE, int LINE, string expecte
     if (curr_expected_line == expected_lines.size()) return true;
   }
 
+  ++Num_failures;
   vector<string> tmp = split_first(expected_lines[curr_expected_line], ": ");
   string layer = (tmp.size() == 2) ? tmp[0] : "";
   string expected_line = (tmp.size() == 2) ? tmp[1] : tmp[0];
@@ -149,6 +150,7 @@ bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, 
     if (curr_expected_line == expected_lines.size()) return true;
   }
 
+  ++Num_failures;
   cerr << "\nF " << FUNCTION << "(" << FILE << ":" << LINE << "): missing '" << expected_lines[curr_expected_line] << "' in trace:\n";
   DUMP(layer);
   Passed = false;
@@ -249,6 +251,7 @@ bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, 
     if (curr_expected_line == expected_lines.size()) return true;
   }
 
+  ++Num_failures;
   cerr << "\nF " << FUNCTION << "(" << FILE << ":" << LINE << "): missing '" << expected_lines[curr_expected_line] << "' in trace/" << frame << ":\n";
   DUMP(layer);
   Passed = false;
