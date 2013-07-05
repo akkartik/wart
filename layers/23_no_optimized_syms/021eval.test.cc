@@ -13,12 +13,6 @@ void test_keyword_sym_evals_to_itself() {
   CHECK_TRACE_TOP("eval", "keyword sym=> :abc");
 }
 
-void test_colon_evals() {
-  new_binding(":", new_num(34));
-  run(":");
-  CHECK_TRACE_TOP("eval", "sym=> 34");
-}
-
 void test_string_evals_to_itself() {
   run("\"ac bd\"");
   CHECK_TRACE_TOP("eval", "literal=> \"ac bd\"");

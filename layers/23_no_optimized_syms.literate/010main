@@ -80,6 +80,34 @@ void test_pointers_from_nil_are_always_nil() {
   CHECK_EQ(nil->cdr, nil);
 }
 
+// helper: print cells in traces, scenarios
+ostream& operator<<(ostream& os, cell* c) {
+  if (c == NULL) return os << "NULLNULLNULL";
+  if (c == nil) return os << "nil";
+  switch(c->type) {
+  case CONS:
+    if (car(c) == new_sym("'"))
+      return os << car(c) << cdr(c);
+    os << "(" << car(c);
+    for (cell* curr = cdr(c); curr != nil; curr = cdr(curr)) {
+      if (is_cons(curr))
+        os << " " << car(curr);
+      else
+        os << " ... " << curr;
+    }
+    return os << ")";
+  case INTEGER:
+    return os << to_int(c);
+  case SYMBOL:
+    return os << to_string(c);
+  case STRING:
+    return os << "\"" << to_string(c) << "\"";
+  default:
+    cerr << "Can't print type " << c->type << '\n' << die();
+    return os;
+  }
+}
+
 // helper: convert all exprs in input into cells
 list<cell*> read_all(istream& in) {
   list<cell*> results;
@@ -112,33 +140,6 @@ a
 +cell: string "a"
 
 :(code)
-ostream& operator<<(ostream& os, cell* c) {
-  if (c == NULL) return os << "NULLNULLNULL";
-  if (c == nil) return os << "nil";
-  switch(c->type) {
-  case CONS:
-    if (car(c) == new_sym("'"))
-      return os << car(c) << cdr(c);
-    os << "(" << car(c);
-    for (cell* curr = cdr(c); curr != nil; curr = cdr(curr)) {
-      if (is_cons(curr))
-        os << " " << car(curr);
-      else
-        os << " ... " << curr;
-    }
-    return os << ")";
-  case INTEGER:
-    return os << to_int(c);
-  case SYMBOL:
-    return os << to_string(c);
-  case STRING:
-    return os << "\"" << to_string(c) << "\"";
-  default:
-    cerr << "Can't print type " << c->type << '\n' << die();
-    return os;
-  }
-}
-
 void test_strings_and_syms_are_different() {
   cell* s = new_string("a");
   CHECK(s != new_sym("a"));
@@ -157,7 +158,7 @@ void test_read_handles_quoted_sym2() {
   CHECK_EQ(cdr(c), new_sym("a"));
 }
 
-:(scenario read_handles_multiple_atoms)
+:(scenario read_handles_atoms)
 34
 35
 +cell: num 34
@@ -171,57 +172,53 @@ void test_read_handles_quoted_sym2() {
 +cell/3: (35)
 +cell/2: (34 35)
 
+:(scenario read_handles_dotted_list)
+(34 ... 35)
++cell: num 34
++cell: num 35
++cell/2: (34 ... 35)
+
+:(scenario read_handles_literal_ellipses)
+'...
++cell: '...
+
+:(scenario read_handles_nested_form)
+(3 7 (33 23))
++cell: num 3
++cell: num 7
++cell: num 33
++cell: num 23
++cell: nil
++cell: ((33 23))
++cell: (7 (33 23))
++cell: (3 7 (33 23))
+
+:(scenario read_handles_strings)
+(3 7 (33 "abc" 23))
++cell: num 3
++cell: num 7
++cell: num 33
++cell: string "abc"
++cell: num 23
++cell: nil
++cell: ((33 "abc" 23))
++cell: (7 (33 "abc" 23))
++cell: (3 7 (33 "abc" 23))
+
+:(scenario read_handles_syms)
+(3 7 (33 "abc" 3de 23))
++cell: num 3
++cell: num 7
++cell: num 33
++cell: string "abc"
++cell: sym 3de
++cell: num 23
++cell: nil
++cell: ((33 "abc" 3de 23))
++cell: (7 (33 "abc" 3de 23))
++cell: (3 7 (33 "abc" 3de 23))
+
 :(code)
-void test_build_handles_dotted_list() {
-  read_all("(34 ... 35)");
-  CHECK_TRACE_CONTENTS("cell", 2, "(34 ... 35)");
-  CHECK_TRACE_CONTENTS("cell", 3, "num 35");
-  CHECK_TRACE_CONTENTS("cell", /*any frame*/ "num 34num 35");
-}
-
-void test_build_handles_literal_ellipses() {
-  list<cell*> result = read_all("'...");
-  CHECK_TRACE_TOP("cell", "'...");
-  cell *c = result.front();
-  CHECK_EQ(car(c), new_sym("'"));
-  CHECK_EQ(cdr(c), new_sym("..."));
-}
-
-void test_build_handles_nested_form() {
-  read_all("(3 7 (33 23))");
-  CHECK_TRACE_CONTENTS("cell", 2, "(3 7 (33 23))");
-  CHECK_TRACE_CONTENTS("cell", 3, "(7 (33 23))");
-  CHECK_TRACE_CONTENTS("cell", 4, "((33 23))");
-  CHECK_TRACE_CONTENTS("cell", 5, "nil");
-  CHECK_TRACE_CONTENTS("cell", /*any frame*/ "num 3num 7num 33num 23(33 23)");
-}
-
-void test_build_handles_strings() {
-  read_all("(3 7 (33 \"abc\" 23))");
-  CHECK_TRACE_CONTENTS("cell", 2, "(3 7 (33 \"abc\" 23))");
-  CHECK_TRACE_CONTENTS("cell", /*any frame*/ "string \"abc\"");
-}
-
-void test_build_handles_syms() {
-  read_all("(3 7 (33 \"abc\" 3de 23))");
-  CHECK_TRACE_TOP("cell", "(3 7 (33 \"abc\" 3de 23))");
-  CHECK_TRACE_CONTENTS("cell", 2, "(3 7 (33 \"abc\" 3de 23))");
-  CHECK_TRACE_CONTENTS("cell", /*any frame*/ "sym 3de");
-}
-
-void test_build_handles_indented_wrapped_lines() {
-  read_all("a\n  (a b c\n   d e)");
-  CHECK_TRACE_TOP("cell", "sym a(a b c d e)");
-  CHECK_TRACE_CONTENTS("cell", 2, "(a b c d e)");
-  CHECK_TRACE_CONTENTS("cell", 3, "(b c d e)");
-  CHECK_TRACE_CONTENTS("cell", 4, "(c d e)");
-  CHECK_TRACE_CONTENTS("cell", 5, "(d e)");
-  CHECK_TRACE_CONTENTS("cell", 6, "(e)");
-  CHECK_TRACE_CONTENTS("cell", 7, "nil");
-}
-
-
-
 // evaluate tree of cells as code
 cell* eval(cell* expr) {
   new_trace_frame("eval");
@@ -283,6 +280,29 @@ cell* eval(cell* expr) {
   return result;
 }
 
+:(scenarios run)
+
+:(scenario eval_nil)
+()
++eval: nil branch
++eval: => nil
+
+:(scenario eval_num)
+34
++eval: literal
++eval: => 34
+
+:(scenario eval_keyword)
+:abc
++eval: keyword sym
++eval: => :abc
+
+:(scenario eval_string)
+"ac bd"
++eval: literal
++eval: => "ac bd"
+
+:(code)
 cell* eval_primitive(cell* f, cell* args) {
   if (f == new_sym("fn")) {
     return new_cons(f, args);
@@ -438,6 +458,13 @@ void new_binding(cell* sym, cell* val) {
 
 void teardown_bindings() {
   Bindings.clear();
+}
+
+void test_lookup_returns_dynamic_binding() {
+  cell* sym = new_sym("a");
+  cell* val = new_num(34);
+  new_binding(sym, val);
+  CHECK_EQ(lookup(sym), val);
 }
 
 bool is_quoted(cell* cell) {
@@ -630,6 +657,15 @@ void test_parse_handles_empty_stream() {
 (a b (c d # abc
 ))
 +parse: (a b (c d))
+
+:(scenario parse_handles_nested_lists)
+(34 (2 3) "a b c")
++parse/2: 34
++parse/3: 2
++parse/3: 3
++parse/2: (2 3)
++parse/2: "a b c"
++parse/1: (34 (2 3) "a b c")
 
 
 
