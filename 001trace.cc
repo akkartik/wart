@@ -91,7 +91,7 @@ void trace_all(const string& label, const list<string>& in) {
     trace(label) << *p;
 }
 
-bool check_trace_contents(string FUNCTION, string FILE, int LINE, string expected) {
+bool check_trace_contents(string FUNCTION, string FILE, int LINE, string expected) {  // missing layer == anywhere, frame, hierarchical layers
   vector<string> expected_lines = split(expected, "");
   size_t curr_expected_line = 0;
   while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
@@ -99,49 +99,52 @@ bool check_trace_contents(string FUNCTION, string FILE, int LINE, string expecte
   if (curr_expected_line == expected_lines.size()) return true;
   Trace_stream->newline();
   ostringstream output;
+  string layer, frame, contents;
+  parse_layer_frame_contents(expected_lines[curr_expected_line], &layer, &frame, &contents);
   for (vector<pair<string, pair<int, string> > >::iterator p = Trace_stream->past_lines.begin(); p != Trace_stream->past_lines.end(); ++p) {
-    vector<string> tmp = split_first(expected_lines[curr_expected_line], ": ");
-    string full_layer = (tmp.size() == 2) ? tmp[0] : "";
-    vector<string> layer_and_frame = parse_layer_and_frame(full_layer);
-    string layer = layer_and_frame[0];
     if (!layer.empty() && !prefix_match(layer, p->first))
       continue;
 
-    if (layer_and_frame.size() == 2
-        && strtol(layer_and_frame[1].c_str(), NULL, 0) != p->second.first)
+    if (!frame.empty() && strtol(frame.c_str(), NULL, 0) != p->second.first)
       continue;
 
-    string expected_line = (tmp.size() == 2) ? tmp[1] : tmp[0];
-    if (p->second.second != expected_line)
+    if (contents != p->second.second)
       continue;
 
     ++curr_expected_line;
     while (curr_expected_line < expected_lines.size() && expected_lines[curr_expected_line].empty())
       ++curr_expected_line;
     if (curr_expected_line == expected_lines.size()) return true;
+    parse_layer_frame_contents(expected_lines[curr_expected_line], &layer, &frame, &contents);
   }
 
   ++Num_failures;
-  vector<string> tmp = split_first(expected_lines[curr_expected_line], ": ");
-  string layer = (tmp.size() == 2) ? tmp[0] : "";
-  string expected_line = (tmp.size() == 2) ? tmp[1] : tmp[0];
-  cerr << "\nF " << FUNCTION << "(" << FILE << ":" << LINE << "): missing [" << expected_line << "] in trace:\n";
+  cerr << "\nF " << FUNCTION << "(" << FILE << ":" << LINE << "): missing [" << contents << "] in trace:\n";
   DUMP(layer);
   Passed = false;
   return false;
 }
 
-vector<string> parse_layer_and_frame(const string& layer_and_frame) {
-  vector<string> result;
-  size_t last_slash = layer_and_frame.rfind('/');
-  if (layer_and_frame.find_last_not_of("0123456789") != last_slash) {
-    result.push_back(layer_and_frame);
-    return result;
-  }
-  result.push_back(string(layer_and_frame, 0, last_slash));
-  result.push_back(string(layer_and_frame, last_slash+1));
-  return result;
+void parse_layer_frame_contents(const string& orig, string* layer, string* frame, string* contents) {
+  string layer_and_frame;
+  split_first(orig, ": ", &layer_and_frame, contents);
+  parse_layer_and_frame(layer_and_frame, layer, frame);
 }
+
+void parse_layer_and_frame(const string& orig, string* layer, string* frame) {
+  size_t last_slash = orig.rfind('/');
+  if (last_slash == NOT_FOUND
+      || orig.find_last_not_of("0123456789") != last_slash) {
+    *layer = orig;
+    *frame = "";
+  }
+  else {
+    *layer = orig.substr(0, last_slash);
+    *frame = orig.substr(last_slash+1);
+  }
+}
+
+
 
 bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, string expected) {  // empty layer == everything, multiple layers, hierarchical layers
   vector<string> expected_lines = split(expected, "");
@@ -275,8 +278,6 @@ bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, 
 
 
 
-const size_t NOT_FOUND = string::npos;
-
 vector<string> split(string s, string delim) {
   vector<string> result;
   string::size_type begin=0, end=s.find(delim);
@@ -292,17 +293,16 @@ vector<string> split(string s, string delim) {
   return result;
 }
 
-vector<string> split_first(string s, string delim) {
-  vector<string> result;
+void split_first(const string& s, const string& delim, string* first, string* second) {
   string::size_type pos=s.find(delim);
   if (pos == NOT_FOUND) {
-    result.push_back(s);
+    *first = s;
+    *second = "";
   }
   else {
-    result.push_back(string(s, 0, pos));
-    result.push_back(string(s, pos+delim.size(), NOT_FOUND));
+    *first = s.substr(0, pos);
+    *second = s.substr(pos+delim.size());
   }
-  return result;
 }
 
 bool any_prefix_match(const vector<string>& pats, const string& needle) {
