@@ -67,6 +67,14 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
     }
     result.push_back("}");
     out.insert(out.end(), result.begin(), result.end());
+
+    while (!hunk.empty() &&
+           (trim(hunk.front()).empty() || starts_with(hunk.front(), "//")))
+      hunk.pop_front();
+    if (!hunk.empty()) {
+      cerr << hunk.size() << " unprocessed lines in scenario.\n";
+      exit(1);
+    }
     return;
   }
 
