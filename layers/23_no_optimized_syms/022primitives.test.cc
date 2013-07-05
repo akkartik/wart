@@ -39,37 +39,12 @@ void test_assign_to_non_sym_warns() {
   CHECK_EQ(trace_count("warn"), 1);
 }
 
-void test_assign_lexical_var() {
-  run("((fn (x) (<- x 34) x))");
-  CHECK_TRACE_TOP("eval", "=> 34");
-}
-
 void test_assign_overrides_dynamic_vars() {
   run("(<- x 3)");
   run("(<- x 5)");
   CLEAR_TRACE;
   run("x");
   CHECK_TRACE_TOP("eval", "sym=> 5");
-}
-
-void test_assign_overrides_within_lexical_scope() {
-  run("(<- x 3)");
-  run("((fn () (<- x 5)))");
-  CLEAR_TRACE;
-  run("x");
-  CHECK_TRACE_TOP("eval", "sym=> 5");
-}
-
-void test_assign_never_overrides_lexical_vars_in_caller_scope() {
-  run("((fn (x) (<- y x)) 34)");
-  CLEAR_TRACE;
-  run("y");
-  CHECK_TRACE_CONTENTS("eval", "sym=> 34");
-}
-
-void test_assign_overrides_lexical_var() {
-  run("((fn (x) (<- x 35) (<- x 36) x) 34)");
-  CHECK_TRACE_TOP("eval", "=> 36");
 }
 
 void test_equal_handles_nil() {
