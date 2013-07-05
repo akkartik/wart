@@ -456,6 +456,14 @@ void test_fn_works() {
 +eval: compiled fn
 +eval/1: => (1 ... 2)
 
+:(scenario car)
+(car '(1 2))
++eval/1: => 1
+
+:(scenario cdr)
+(cdr '(1 2))
++eval/1: => (2)
+
 :(scenario assign_var)
 (<- x 3)
 ===
@@ -469,6 +477,14 @@ x
 x
 +eval/1: => 5
 
+:(scenario eval)
+(<- x 'y)
+(<- y 23)
+===
+(eval x)
++eval/2: => y
++eval/1: => 23
+
 :(code)
 void test_assign_to_non_sym_warns() {
   Hide_warnings = true;
@@ -476,9 +492,38 @@ void test_assign_to_non_sym_warns() {
   CHECK_EQ(trace_count("warn"), 1);
 }
 
+:(scenario equal)
+(= 23 23)
++eval/1: => 23
+
+:(scenario equal2)
+(= 2 3)
++eval/1: => nil
+
 :(scenario equal_handles_nil)
 (= nil nil)
 -eval/1: => nil
+
+:(scenario add)
+(+ 1 2)
++eval/1: compiled fn
++eval/1: => 3
+
+:(scenario subtract)
+(- 1 2)
++eval/1: => -1
+
+:(scenario multiply)
+(* 3 4)
++eval/1: => 12
+
+:(scenario comparison)
+(< 3 4)
+-eval/1: => nil
+
+:(scenario comparison2)
+(< 3 4)
++eval/1: => nil
 
 :(code)
 // bind params to args in new_scope, taking into account:
