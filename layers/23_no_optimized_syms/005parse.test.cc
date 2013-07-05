@@ -3,16 +3,6 @@ void test_parse_handles_empty_stream() {
   CHECK_TRACE_CONTENTS("parse", "");
 }
 
-void test_parse_handles_trailing_comment() {
-  read_all("34 # abc");
-  CHECK_TRACE_CONTENTS("parse", "34");
-}
-
-void test_parse_handles_atom() {
-  read_all("34");
-  CHECK_TRACE_CONTENTS("parse", "34");
-}
-
 void test_parse_handles_atoms() {
   read_all("34\n\"a b c\"\n3.4");
   CHECK_TRACE_CONTENTS("parse", "34\"a b c\"3.4");

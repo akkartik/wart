@@ -139,33 +139,39 @@ ostream& operator<<(ostream& os, cell* c) {
   }
 }
 
-void test_build_doesnt_mix_syms_and_strings() {
+void test_strings_and_syms_are_different() {
   cell* s = new_string("a");
   CHECK(s != new_sym("a"));
 }
 
-void test_build_handles_quoted_sym() {
+:(scenario read_handles_quoted_sym)
+'a
++cell: sym '
++cell: sym a
++cell: 'a
+:(code)
+void test_read_handles_quoted_sym2() {
   list<cell*> result = read_all("'a");
-  CHECK_TRACE_CONTENTS("cell", 1, "'a");
-  CHECK_TRACE_CONTENTS("cell", 2, "sym 'sym a");
   cell* c = result.front();
   CHECK_EQ(car(c), new_sym("'"));
   CHECK_EQ(cdr(c), new_sym("a"));
 }
 
-void test_build_handles_multiple_atoms() {
-  read_all("34\n35");
-  CHECK_TRACE_CONTENTS("cell", "num 34num 35");
-}
+:(scenario read_handles_multiple_atoms)
+34
+35
++cell: num 34
++cell: num 35
 
-void test_build_handles_form() {
-  read_all("(34 35)");
-  CHECK_TRACE_CONTENTS("cell", 2, "(34 35)");
-  CHECK_TRACE_CONTENTS("cell", 3, "(35)");
-  CHECK_TRACE_CONTENTS("cell", 4, "nil");
-  CHECK_TRACE_CONTENTS("cell", /*any frame*/ "num 34num 35");
-}
+:(scenario read_handles_form)
+(34 35)
++cell: num 34
++cell: num 35
++cell/4: nil
++cell/3: (35)
++cell/2: (34 35)
 
+:(code)
 void test_build_handles_dotted_list() {
   read_all("(34 ... 35)");
   CHECK_TRACE_CONTENTS("cell", 2, "(34 ... 35)");
@@ -602,6 +608,28 @@ ast_node next_ast_node(list<token>& in) {
   trace("parse") << ast_node(subform);
   return ast_node(subform);
 }
+
+void test_parse_handles_empty_stream() {
+  read_all("");
+  CHECK_TRACE_CONTENTS("parse", "");
+}
+
+:(scenarios read_all)
+
+:(scenario parse_handles_atoms)
+34
+"a b c"
++parse: 34
++parse: "a b c"
+
+:(scenario parse_handles_lists)
+(34 "a b c")
++parse: (34 "a b c")
+
+:(scenario parse_handles_lists_with_comments)
+(a b (c d # abc
+))
++parse: (a b (c d))
 
 
 
