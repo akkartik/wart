@@ -573,6 +573,76 @@ cell* eval_all(cell* args) {
   return cdr(p_result);
 }
 
+:(scenario eval_handles_param)
+(<- x 3)
+===
+((fn (a)) x)
++bind: a: 3
+
+:(scenario eval_evals_arg)
+(<- f (fn (x)
+        (x)))
+===
+(f (fn ()
+     34))
++eval/1: => 34
+
+:(scenario eval_handles_multiple_params)
+((fn (a b) b) 1 2)
++bind: a: 1
++bind: b: 2
++eval/1: => 2
+
+:(scenario eval_binds_missing_param)
+((fn (a b) b) 1)
++bind: a: 1
++bind: b: nil
++eval/1: => nil
+
+:(scenario eval_handles_vararg_param)   // named param list
+((fn args) 1 2)
++bind: args: (1 2)
+
+:(scenario eval_evals_vararg_args)
+(<- x 3)
+(<- y 4)
+===
+((fn args) x y)
++eval: x
++eval: sym
++eval: => 3
++eval: y
++eval: sym
++eval: => 4
++bind: args: (3 4)
+
+:(scenario eval_handles_rest_param)
+((fn (a b ... c) c) 1 2 3 4 5)
++eval/1: => (3 4 5)
+
+:(scenario eval_evals_rest_args)
+(<- x 3)
+(<- y 4)
+===
+((fn (a ... b)) x y)
++bind: a: 3
++bind: b: (4)
+
+:(scenario eval_handles_destructured_params)
+((fn ((a b)) b) '(1 2))
++bind: a: 1
++bind: b: 2
++eval: => 2
+
+:(scenario eval_evals_destructured_args)
+(<- x 3)
+(<- y 4)
+===
+((fn ((a b)) b) (cons x (cons y)))
++bind: a: 3
++bind: b: 4
+
+:(code)
 unordered_map<cell*, cell*> Bindings;
 
 cell* lookup(string s) {
