@@ -126,6 +126,19 @@ list<string>::iterator find_substr(list<string>& in, const string& pat) {
   return in.end();
 }
 
+string escape(string s) {
+  s = replace_all(s, "\\", "\\\\");
+  s = replace_all(s, "\"", "\\\"");
+  s = replace_all(s, "", "\\n");
+  return s;
+}
+
+string replace_all(string s, const string& a, const string& b) {
+  for (size_t pos = s.find(a); pos != NOT_FOUND; pos = s.find(a, pos+b.size()))
+    s = s.replace(pos, a.size(), b);
+  return s;
+}
+
 #include <locale>
 using std::isspace;  // unicode-aware
 
@@ -166,17 +179,4 @@ string trim(const string& s) {
     --last;
   ++last;
   return string(first, last);
-}
-
-string escape(string s) {
-  s = replace_all(s, "\\", "\\\\");
-  s = replace_all(s, "\"", "\\\"");
-  s = replace_all(s, "", "\\n");
-  return s;
-}
-
-string replace_all(string s, const string& a, const string& b) {
-  for (size_t pos = s.find(a); pos != NOT_FOUND; pos = s.find(a, pos+b.size()))
-    s = s.replace(pos, a.size(), b);
-  return s;
 }
