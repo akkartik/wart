@@ -109,7 +109,7 @@ bool is_input(const string& line) {
 string input_lines(list<string>& hunk) {
   string result;
   while (!hunk.empty() && is_input(hunk.front())) {
-    result += hunk.front()+"";
+    result += hunk.front()+"";  // temporary delimiter; replace with escaped newline after escaping other backslashes
     hunk.pop_front();
   }
   return escape(result);
