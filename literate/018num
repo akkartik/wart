@@ -2,6 +2,8 @@
 
 :(before "End Globals")
 unordered_map<long, cell*> Int_literals;
+:(after "Test Teardown")
+Int_literals.clear();
 :(code)
 cell* new_num(long x) {
   if (Int_literals[x])

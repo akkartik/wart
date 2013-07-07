@@ -191,3 +191,10 @@ void test_read_handles_quoted_sym2() {
 +cell: ((33 "abc" 3de 23))
 +cell: (7 (33 "abc" 3de 23))
 +cell: (3 7 (33 "abc" 3de 23))
+
+:(code)
+// we might be at eof and just not know it if we haven't looked around yet
+bool eof(istream& in) {
+  in.peek();
+  return in.eof();
+}

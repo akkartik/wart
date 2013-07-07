@@ -6,31 +6,7 @@ struct heap {
   heap() :next(NULL) {}
 };
 
-:(before "End Globals")
-heap* First_heap = new heap();
-heap* Curr_heap = First_heap;
-long Curr_cell = 0;
-cell* Free_cells = NULL;
-
 :(code)
-void grow_heap() {
-  Curr_heap = Curr_heap->next = new heap();
-  if (!Curr_heap) RAISE << "Out of memory\n" << die();
-  Curr_cell = 0;
-}
-
-void reset_heap(heap* h) {
-  if (h->next)
-    reset_heap(h->next);
-  delete h;
-  if (h == First_heap) {
-    First_heap = new heap();
-    Curr_heap = First_heap;
-    Curr_cell = 0;
-    Free_cells = NULL;
-  }
-}
-
 cell* new_cell() {
   cell* result = NULL;
   if (Free_cells) {
@@ -47,4 +23,30 @@ cell* new_cell() {
   ++Curr_cell;
   result->init();
   return result;
+}
+
+:(before "End Globals")
+heap* First_heap = new heap();
+heap* Curr_heap = First_heap;
+long Curr_cell = 0;
+cell* Free_cells = NULL;
+:(before "End Setup")
+reset_heap(First_heap);
+:(code)
+void reset_heap(heap* h) {
+  if (h->next)
+    reset_heap(h->next);
+  delete h;
+  if (h == First_heap) {
+    First_heap = new heap();
+    Curr_heap = First_heap;
+    Curr_cell = 0;
+    Free_cells = NULL;
+  }
+}
+
+void grow_heap() {
+  Curr_heap = Curr_heap->next = new heap();
+  if (!Curr_heap) RAISE << "Out of memory\n" << die();
+  Curr_cell = 0;
 }
