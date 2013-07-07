@@ -1,36 +1,37 @@
 void test_trace_check_compares() {
   CHECK_TRACE_CONTENTS("test layer", "");
   trace("test layer") << "foo";
-  CHECK_TRACE_CONTENTS("test layer", "foo");
+  CHECK_TRACE_CONTENTS("test layer", "foo");
 }
 
 void test_trace_check_filters_layers() {
   trace("test layer 1") << "foo";
   trace("test layer 2") << "bar";
-  CHECK_TRACE_CONTENTS("test layer 1", "foo");
+  CHECK_TRACE_CONTENTS("test layer 1", "foo");
 }
 
 void test_trace_check_ignores_other_lines() {
   trace("test layer 1") << "foo";
   trace("test layer 1") << "bar";
-  CHECK_TRACE_CONTENTS("test layer 1", "foo");
+  CHECK_TRACE_CONTENTS("test layer 1", "foo");
 }
 
 void test_trace_check_always_finds_empty_lines() {
-  trace("test layer 1") << "foo";
-  trace("test layer 1") << "bar";
   CHECK_TRACE_CONTENTS("test layer 1", "");
 }
 
 void test_trace_check_treats_empty_layers_as_wildcards() {
+  trace("test layer 1") << "foo";
+  CHECK_TRACE_CONTENTS("", "foo");
+}
+
+void test_trace_check_multiple_lines_at_once() {
   trace("test layer 1") << "foo";
   trace("test layer 2") << "bar";
   CHECK_TRACE_CONTENTS("", "foobar");
 }
 
 void test_trace_check_always_finds_empty_lines2() {
-  trace("test layer 1") << "foo";
-  trace("test layer 1") << "bar";
   CHECK_TRACE_CONTENTS("test layer 1", "");
 }
 
@@ -62,6 +63,7 @@ void test_trace_segments_within_layers() {
   trace("test layer 1") << "qux";
   CHECK_TRACE_CONTENTS("test layer 1", "fooqux");
   CHECK_TRACE_CONTENTS("test layer 1", 0, "foo");
+  CHECK_TRACE_DOESNT_CONTAIN("test layer 1", 1, "foo");
 }
 
 void test_trace_checks_ordering_across_layers_and_frames() {

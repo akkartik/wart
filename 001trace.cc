@@ -86,8 +86,6 @@ struct lease_tracer {
 
 #define START_TRACING_UNTIL_END_OF_SCOPE lease_tracer leased_tracer;
 
-
-
 void trace_all(const string& label, const list<string>& in) {
   for (list<string>::const_iterator p = in.begin(); p != in.end(); ++p)
     trace(label) << *p;
