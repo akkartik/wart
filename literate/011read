@@ -41,7 +41,7 @@ cell* nil = new cell;
 void setup_nil() {
   nil->car = nil->cdr = nil;
 }
-:(before "End Test Initialization")
+:(before "End Setup")
 setup_nil();
 :(code)
 void test_pointers_from_nil_are_always_nil() {

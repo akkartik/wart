@@ -18,6 +18,12 @@ int main(int argc, char* argv[]) {
   if (argc > 1) {
     // Commandline options
   }
+
+  setup();
   // End Main
   return 0;
+}
+
+void setup() {
+  // End Setup
 }
