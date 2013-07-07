@@ -1,0 +1,30 @@
+:(before "End Main")
+setup_nil();
+load_file("init.wart");
+
+:(code)
+void load_file(const char* filename) {
+  ifstream f(filename);
+  if (f.fail()) return;
+  run(f);
+}
+
+// evaluate all exprs in input, return value of last expr
+cell* run(istream& in) {
+  cell* result = NULL;
+  do {
+      result = eval(read(in));  // see read, eval
+  } while (!eof(in));
+  return result;
+}
+
+cell* run(string s) {
+  stringstream in(s);
+  return run(in);
+}
+
+:(scenarios run)
+
+:(scenario example_run)
+(+ 1 1)
++eval: => 2

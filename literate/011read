@@ -1,0 +1,193 @@
+:(code)
+// construct a tree of cells out of next expr in input
+cell* read(istream& in) {
+  return build_cell(next_ast_node(in));  // see parse, build
+}
+
+:(before "End Types")
+extern struct cell* nil;
+
+struct cell {
+  cell* car;  // aliased to long or float
+  cell* cdr;
+
+  // ints save space on 64-bit platforms
+  int type;
+    #define CONS 0
+    #define INTEGER 1
+    #define SYMBOL 2
+    #define STRING 3
+
+  cell() :car(NULL), cdr(NULL), type(CONS) {}
+  void init() {
+    car=cdr=nil, type=CONS;
+  }
+};
+
+:(code)
+// cells are designed to minimize fragmentation on the heap
+void test_cell_layout_constraints() {
+  cell c;
+  CHECK((sizeof(c.car)%4) == 0);
+  CHECK((sizeof(c.cdr)%4) == 0);
+  CHECK((sizeof(c.type)%4) == 0);
+
+  CHECK(sizeof(long) <= sizeof(cell*));
+  CHECK(sizeof(float) <= sizeof(cell*));
+  CHECK(sizeof(size_t) <= sizeof(cell*));
+}
+
+cell* nil = new cell;
+void setup_nil() {
+  nil->car = nil->cdr = nil;
+}
+:(before "End Test Initialization")
+setup_nil();
+:(code)
+void test_pointers_from_nil_are_always_nil() {
+  CHECK_EQ(nil->car, nil);
+  CHECK_EQ(nil->cdr, nil);
+}
+
+// helper: print cells in traces, scenarios
+ostream& operator<<(ostream& os, cell* c) {
+  if (c == NULL) return os << "NULLNULLNULL";
+  if (c == nil) return os << "nil";
+  switch(c->type) {
+  case CONS:
+    if (car(c) == new_sym("'"))
+      return os << car(c) << cdr(c);
+    os << "(" << car(c);
+    for (cell* curr = cdr(c); curr != nil; curr = cdr(curr)) {
+      if (is_cons(curr))
+        os << " " << car(curr);
+      else
+        os << " ... " << curr;
+    }
+    return os << ")";
+  case INTEGER:
+    return os << to_int(c);
+  case SYMBOL:
+    return os << to_string(c);
+  case STRING:
+    return os << "\"" << to_string(c) << "\"";
+  default:
+    cerr << "Can't print type " << c->type << '\n' << die();
+    return os;
+  }
+}
+
+// helper: convert all exprs in input into cells
+list<cell*> read_all(istream& in) {
+  list<cell*> results;
+  do {
+      results.push_back(read(in));
+  } while (!eof(in));
+  return results;
+}
+
+list<cell*> read_all(string s) {
+  stringstream in(s);
+  return read_all(in);
+}
+
+:(scenarios read_all)
+
+:(scenario read_nil)
+()
++cell: nil
+
+:(scenario read_nil2)
+nil
++cell: nil
+
+:(scenario read_integer)
+34
++cell: num 34
+
+:(scenario read_symbol)
+a
++cell: sym a
+
+:(scenario read_string)
+"a"
++cell: string "a"
+
+:(code)
+void test_strings_and_syms_are_different() {
+  cell* s = new_string("a");
+  CHECK(s != new_sym("a"));
+}
+
+:(scenario read_handles_quoted_sym)
+'a
++cell: sym '
++cell: sym a
++cell: 'a
+:(code)
+void test_read_handles_quoted_sym2() {
+  list<cell*> result = read_all("'a");
+  cell* c = result.front();
+  CHECK_EQ(car(c), new_sym("'"));
+  CHECK_EQ(cdr(c), new_sym("a"));
+}
+
+:(scenario read_handles_atoms)
+34
+35
++cell: num 34
++cell: num 35
+
+:(scenario read_handles_form)
+(34 35)
++cell: num 34
++cell: num 35
++cell/4: nil
++cell/3: (35)
++cell/2: (34 35)
+
+:(scenario read_handles_dotted_list)
+(34 ... 35)
++cell: num 34
++cell: num 35
++cell/2: (34 ... 35)
+
+:(scenario read_handles_literal_ellipses)
+'...
++cell: '...
+
+:(scenario read_handles_nested_form)
+(3 7 (33 23))
++cell: num 3
++cell: num 7
++cell: num 33
++cell: num 23
++cell: nil
++cell: ((33 23))
++cell: (7 (33 23))
++cell: (3 7 (33 23))
+
+:(scenario read_handles_strings)
+(3 7 (33 "abc" 23))
++cell: num 3
++cell: num 7
++cell: num 33
++cell: string "abc"
++cell: num 23
++cell: nil
++cell: ((33 "abc" 23))
++cell: (7 (33 "abc" 23))
++cell: (3 7 (33 "abc" 23))
+
+:(scenario read_handles_syms)
+(3 7 (33 "abc" 3de 23))
++cell: num 3
++cell: num 7
++cell: num 33
++cell: string "abc"
++cell: sym 3de
++cell: num 23
++cell: nil
++cell: ((33 "abc" 3de 23))
++cell: (7 (33 "abc" 3de 23))
++cell: (3 7 (33 "abc" 3de 23))

@@ -40,3 +40,5 @@ using std::ostringstream;
 #include<fstream>
 using std::ifstream;
 using std::ofstream;
+
+#define unused __attribute__((unused))

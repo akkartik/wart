@@ -1,0 +1,29 @@
+//// numbers
+
+:(before "End Globals")
+unordered_map<long, cell*> Int_literals;
+:(code)
+cell* new_num(long x) {
+  if (Int_literals[x])
+    return Int_literals[x];
+  Int_literals[x] = new_cell();
+  Int_literals[x]->car = (cell*)x;
+  Int_literals[x]->type = INTEGER;
+  return Int_literals[x];
+}
+
+cell* new_num(int x) {   // just for integer literals
+  return new_num((long)x);
+}
+
+bool is_num(cell* x) {
+  return x->type == INTEGER;
+}
+
+long to_int(cell* x) {
+  // ignore endianness; cells are never persisted
+  if (x->type == INTEGER)
+    return (long)x->car;
+  RAISE << "not a number: " << x << '\n';
+  return 0;
+}

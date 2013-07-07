@@ -1,0 +1,50 @@
+:(before "End Types")
+#define CELLS_PER_HEAP (4*1024/sizeof(cell))  // default linux pagesize
+struct heap {
+  cell cells[CELLS_PER_HEAP];
+  heap *next;
+  heap() :next(NULL) {}
+};
+
+:(before "End Globals")
+heap* First_heap = new heap();
+heap* Curr_heap = First_heap;
+long Curr_cell = 0;
+cell* Free_cells = NULL;
+
+:(code)
+void grow_heap() {
+  Curr_heap = Curr_heap->next = new heap();
+  if (!Curr_heap) RAISE << "Out of memory\n" << die();
+  Curr_cell = 0;
+}
+
+void reset_heap(heap* h) {
+  if (h->next)
+    reset_heap(h->next);
+  delete h;
+  if (h == First_heap) {
+    First_heap = new heap();
+    Curr_heap = First_heap;
+    Curr_cell = 0;
+    Free_cells = NULL;
+  }
+}
+
+cell* new_cell() {
+  cell* result = NULL;
+  if (Free_cells) {
+    result = Free_cells;
+    Free_cells = Free_cells->cdr;
+    result->init();
+    return result;
+  }
+
+  if (Curr_cell == CELLS_PER_HEAP)
+    grow_heap();
+
+  result = &Curr_heap->cells[Curr_cell];
+  ++Curr_cell;
+  result->init();
+  return result;
+}

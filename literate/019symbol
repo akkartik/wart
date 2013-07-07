@@ -1,0 +1,36 @@
+//// symbols
+
+:(before "End Globals")
+unordered_map<string, cell*> Sym_literals;
+:(code)
+cell* new_sym(string x) {
+  if (Sym_literals[x])
+    return Sym_literals[x];
+  Sym_literals[x] = new_cell();
+  Sym_literals[x]->car = (cell*)new string(x);   // not aligned like cells; can fragment memory
+  Sym_literals[x]->type = SYMBOL;
+  return Sym_literals[x];
+}
+
+bool is_sym(cell* x) {
+  return x->type == SYMBOL;
+}
+
+cell* new_string(string x) {   // don't intern strings
+  cell* result = new_cell();
+  result->car = (cell*)new string(x);
+  result->type = STRING;
+  return result;
+}
+
+bool is_string(cell* x) {
+  return x->type == STRING;
+}
+
+string to_string(cell* x) {
+  if (!is_string(x) && !is_sym(x)) {
+    RAISE << "can't convert to string: " << x << '\n';
+    return "";
+  }
+  return *(string*)x->car;
+}
