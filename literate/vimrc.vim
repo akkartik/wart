@@ -8,7 +8,7 @@ function! HighlightTangledFile()
   syntax region wartTraceAbsent start="^-" end="$"
   highlight wartTraceAbsent ctermfg=darkred
   syntax region wartTraceResult start="^=>" end="$"
-  highlight wartTraceResult ctermfg=yellow
+  highlight wartTraceResult ctermfg=darkgreen cterm=bold
 endfunction
 call HighlightTangledFile()
 autocmd BufReadPost,BufNewFile 0* call HighlightTangledFile()
