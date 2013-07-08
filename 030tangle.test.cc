@@ -145,7 +145,8 @@ void test_tangle_can_check_return_values_of_scenarios() {
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {"); lines.pop_front();
   CHECK_EQ(lines.front(), "  ostringstream os;"); lines.pop_front();
-  CHECK_EQ(lines.front(), "  os << run(\"abc def\");"); lines.pop_front();
+  CHECK_EQ(lines.front(), "  os.clear();  os.str(\"\");"); lines.pop_front();
+  CHECK_EQ(lines.front(), "  os << run(\"abc def\\n\");"); lines.pop_front();
   CHECK_EQ(lines.front(), "  CHECK_EQ(os.str(), \"pqr\");"); lines.pop_front();
   CHECK_EQ(lines.front(), "}"); lines.pop_front();
   CHECK(lines.empty());

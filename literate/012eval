@@ -302,7 +302,7 @@ void test_assign_to_non_sym_warns() {
 -eval/1: => nil
 
 :(scenario comparison2)
-(< 3 4)
+(< 4 3)
 +eval/1: => nil
 
 :(code)  //// fn params

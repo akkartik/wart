@@ -23,14 +23,16 @@ cell* run(string s) {
   return run(in);
 }
 
-void test_does_bar() {
-  ostringstream os;
-  os << run("(+ 1 1)");
-  CHECK_EQ(os.str(), "2");
-}
-
 :(scenarios run)
 
 :(scenario example_run)
 (+ 1 1)
-+eval: => 2
+=> 2
+
+:(code)
+// we might be at eof and just not know it if we haven't looked around yet
+bool eof(istream& in) {
+  skip_whitespace(in);
+  in.peek();
+  return in.eof();
+}
