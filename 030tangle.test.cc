@@ -152,6 +152,23 @@ void test_tangle_can_check_return_values_of_scenarios() {
   CHECK(lines.empty());
 }
 
+void test_tangle_can_check_return_values_of_multiple_scenarios() {
+  istringstream in(":(scenario does_bar)\nabc\n=> pqr\n+layer1: pqr\ndef\n=> xyz\n");
+  list<string> lines;
+  tangle(in, lines);
+  CHECK_EQ(lines.front(), "void test_does_bar() {");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  ostringstream os;");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  os.clear();  os.str(\"\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  os << run(\"abc\\n\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  CHECK_EQ(os.str(), \"pqr\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqr\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  os.clear();  os.str(\"\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  os << run(\"def\\n\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  CHECK_EQ(os.str(), \"xyz\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "}");  lines.pop_front();
+  CHECK(lines.empty());
+}
+
 
 
 void test_trim() {

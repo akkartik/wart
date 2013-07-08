@@ -26,13 +26,25 @@ cell* run(string s) {
 :(scenarios run)
 
 :(scenario example_run)
+# function call
 (+ 1 1)
 => 2
+# assignment
+(<- x 3)
+x
+=> 3
+# list
+'(1 2 3)
+=> (1 2 3)
+(car '(1 2 3))  # first element
+=> 1
+(cdr '(1 2 3))  # everything but the first element
+=> (2 3)
 
 :(code)
 // we might be at eof and just not know it if we haven't looked around yet
 bool eof(istream& in) {
-  skip_whitespace(in);
+  skip_whitespace_and_comments(in);
   in.peek();
   return in.eof();
 }

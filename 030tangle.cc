@@ -20,6 +20,8 @@ void tangle(istream& in, list<string>& out) {
   trace_all("tangle", out);
 }
 
+string Toplevel = "run";
+
 void process_next_hunk(istream& in, const string& directive, list<string>& out) {
   list<string> hunk;
   string curr_line;
@@ -43,65 +45,16 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
     return;
   }
 
-  static string Toplevel = "run";
   if (cmd == "scenarios") {
     Toplevel = to_string(car(cdr(expr)));
     return;
   }
 
   if (cmd == "scenario") {
-    // A scenario is one or more lines of input
-    //  lines of input are separated by a call to CLEAR_TRACE ('===')
-    //    and by one or more expected return values ('=>')
-    //  followed by one or more lines expected in trace in order ('+')
-    //  followed by one or more lines trace shouldn't include ('-')
-    // Remember to update is_input below if you add to this format.
     list<string> result;
     string name = to_string(car(cdr(expr)));
-    result.push_back("void test_"+name+"() {");
-    if (!any_line_starts_with(hunk, "=>")) {
-      if (!hunk.empty() && is_input(hunk.front()))
-        result.push_back("  "+Toplevel+"(\""+input_lines(hunk)+"\");");
-      if (!hunk.empty() && hunk.front() == "===") {
-        result.push_back("  CLEAR_TRACE;");
-        hunk.pop_front();
-      }
-      if (!hunk.empty() && is_input(hunk.front()))
-        result.push_back("  "+Toplevel+"(\""+input_lines(hunk)+"\");");
-    }
-    else {
-      // might need to check result
-      result.push_back("  ostringstream os;");
-      while (!hunk.empty() && is_input(hunk.front())) {
-        result.push_back("  os.clear();  os.str(\"\");");
-        result.push_back("  os << "+Toplevel+"(\""+input_lines(hunk)+"\");");
-        if (!hunk.empty() && starts_with(hunk.front(), "=>")) {
-          size_t pos = hunk.front().find("=>")+2;  // length of '=>'
-          result.push_back("  CHECK_EQ(os.str(), \""+trim(string(hunk.front(), pos))+"\");");
-          hunk.pop_front();
-        }
-        if (!hunk.empty() && hunk.front() == "===") {
-          result.push_back("  CLEAR_TRACE;");
-          hunk.pop_front();
-        }
-      }
-    }
-    if (!hunk.empty() && hunk.front()[0] == '+')
-      result.push_back("  CHECK_TRACE_CONTENTS(\""+expected_in_trace(hunk)+"\");");
-    while (!hunk.empty() && hunk.front()[0] == '-') {
-      result.push_back("  CHECK_TRACE_DOESNT_CONTAIN(\""+expected_not_in_trace(hunk.front())+"\");");
-      hunk.pop_front();
-    }
-    result.push_back("}");
+    emit_test(name, hunk, result);
     out.insert(out.end(), result.begin(), result.end());
-
-    while (!hunk.empty() &&
-           (trim(hunk.front()).empty() || starts_with(hunk.front(), "//")))
-      hunk.pop_front();
-    if (!hunk.empty()) {
-      cerr << hunk.size() << " unprocessed lines in scenario.\n";
-      exit(1);
-    }
     return;
   }
 
@@ -121,6 +74,57 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
   }
 
   RAISE << "unknown directive " << cmd << '\n';
+}
+
+// A scenario is one or more sessions separated by calls to CLEAR_TRACE ('===')
+//  A session is one or more lines of input
+//  followed by a return value ('=>')
+//  followed by one or more lines expected in trace in order ('+')
+//  followed by one or more lines trace shouldn't include ('-')
+// Remember to update is_input below if you add to this format.
+void emit_test(const string& name, list<string>& lines, list<string>& result) {
+  result.push_back("void test_"+name+"() {");
+  if (any_line_starts_with(lines, "=>"))
+    result.push_back("  ostringstream os;");
+  while (any_non_input_line(lines)) {
+    if (!any_line_starts_with(lines, "=>"))
+      emit_session(lines, result);  // simpler version; no need to check result
+    else
+      emit_result_checking_session(lines, result);
+    if (!lines.empty() && lines.front()[0] == '+')
+      result.push_back("  CHECK_TRACE_CONTENTS(\""+expected_in_trace(lines)+"\");");
+    while (!lines.empty() && lines.front()[0] == '-') {
+      result.push_back("  CHECK_TRACE_DOESNT_CONTAIN(\""+expected_not_in_trace(lines.front())+"\");");
+      lines.pop_front();
+    }
+    if (!lines.empty() && lines.front() == "===") {
+      result.push_back("  CLEAR_TRACE;");
+      lines.pop_front();
+    }
+  }
+  result.push_back("}");
+
+  while (!lines.empty() &&
+         (trim(lines.front()).empty() || starts_with(lines.front(), "//")))
+    lines.pop_front();
+  if (!lines.empty()) {
+    cerr << lines.size() << " unprocessed lines in scenario.\n";
+    exit(1);
+  }
+}
+
+void emit_session(list<string>& lines, list<string>& result) {
+  result.push_back("  "+Toplevel+"(\""+input_lines(lines)+"\");");
+}
+
+void emit_result_checking_session(list<string>& lines, list<string>& result) {
+  result.push_back("  os.clear();  os.str(\"\");");
+  result.push_back("  os << "+Toplevel+"(\""+input_lines(lines)+"\");");
+  if (!lines.empty() && starts_with(lines.front(), "=>")) {
+    size_t pos = lines.front().find("=>")+2;  // length of '=>'
+    result.push_back("  CHECK_EQ(os.str(), \""+trim(string(lines.front(), pos))+"\");");
+    lines.pop_front();
+  }
 }
 
 bool is_input(const string& line) {
@@ -173,6 +177,12 @@ string replace_all(string s, const string& a, const string& b) {
 bool any_line_starts_with(const list<string>& lines, const string& pat) {
   for (list<string>::const_iterator p = lines.begin(); p != lines.end(); ++p)
     if (starts_with(*p, pat)) return true;
+  return false;
+}
+
+bool any_non_input_line(const list<string>& lines) {
+  for (list<string>::const_iterator p = lines.begin(); p != lines.end(); ++p)
+    if (!is_input(*p)) return true;
   return false;
 }
 

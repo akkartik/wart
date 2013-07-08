@@ -6,13 +6,7 @@ const string Punctuation_chars = "()#\"";
 :(code)
 token next_token(istream& in) {
   in >> std::noskipws;
-  for (;;) {
-    skip_whitespace(in);
-    if (in.peek() == '#')
-      skip_comment(in);
-    else
-      break;
-  }
+  skip_whitespace_and_comments(in);
   ostringstream out;
   if (in.peek() == '"')
     slurp_string(in, out);
@@ -53,6 +47,16 @@ void slurp_string(istream& in, ostream& out) {
 
 void slurp_char(istream& in, ostream& out) {
   out << (char)in.get();
+}
+
+void skip_whitespace_and_comments(istream& in) {
+  for (;;) {
+    skip_whitespace(in);
+    if (in.peek() == '#')
+      skip_comment(in);
+    else
+      break;
+  }
 }
 
 void skip_whitespace(istream& in) {
