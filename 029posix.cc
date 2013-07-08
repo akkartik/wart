@@ -23,7 +23,7 @@ COMPILE_FN(sleep, compiledfn_sleep, "($n)",
 #include<sys/socket.h>
 #include<netdb.h>
 
-#define PERR(call...) if (call < 0) perror(#call)
+#define PERR(call...)  if (call < 0) perror(#call)
 
 struct socket_type {
   int fd;

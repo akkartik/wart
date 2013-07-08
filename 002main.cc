@@ -85,7 +85,7 @@ bool at_end_of_line(indent_sensitive_stream& in) {
 //// test harness
 
 void run_tests() {
-  time_t t; time(&t);
+  time_t t;  time(&t);
   cerr << "C tests: " << ctime(&t);
   for (unsigned long i=0; i < sizeof(Tests)/sizeof(Tests[0]); ++i) {
     START_TRACING_UNTIL_END_OF_SCOPE;

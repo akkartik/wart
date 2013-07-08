@@ -628,7 +628,7 @@ void test_eval_handles_already_evald_aliased_arg() {
 }
 
 void test_eval_only_reorders_when_necessary() {
-  trace_stream* old = Trace_stream; Trace_stream = NULL;  // trace can't handle cycles yet
+  trace_stream* old = Trace_stream;  Trace_stream = NULL;  // trace can't handle cycles yet
   TEMP(x, read("(3)"));
   set_cdr(x, x);  // cycle
   new_dynamic_scope("x", x);

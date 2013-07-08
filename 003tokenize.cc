@@ -24,7 +24,7 @@ struct token {
   explicit token(long indent)
     :value(""), indent_level(indent), newline(false) {}
   static token Newline() {
-    token t(0); t.newline = true; return t; }
+    token t(0);  t.newline = true;  return t; }
 
   bool operator==(const string& x) const {
     return value == x;

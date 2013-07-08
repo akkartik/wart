@@ -14,7 +14,7 @@ void load_files(const char* ext) {
 //// internals
 
 void load_file(const char* filename) {
-  bool old_interactive = Interactive; Interactive = false;
+  bool old_interactive = Interactive;  Interactive = false;
   ifstream f(filename);
   if (f.fail()) return;
   while (!f.eof()) {

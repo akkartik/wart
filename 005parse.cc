@@ -58,7 +58,7 @@ ast_node next_ast_node(list<token>& in) {
 //// internals
 
 token next_token(list<token>& in) {
-  token result = in.front(); in.pop_front();
+  token result = in.front();  in.pop_front();
   return result;
 }
 

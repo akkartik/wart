@@ -6,7 +6,7 @@ COMPILE_FN(addr, compiledfn_addr, "($x)",
 
 COMPILE_FN(register_failed_test, compiledfn_register_failed_test, "($msg $expr)",
   ++Num_failures;
-  cout << "\nF "; print(lookup("$msg"), cout);
+  cout << "\nF ";  print(lookup("$msg"), cout);
   cout << "\n  got " << lookup("$expr") << '\n';
   return nil;
 )

@@ -59,7 +59,7 @@ cell* build_cell(ast_node n) {
   cell* new_form = new_cell();
   set_car(new_form, build_cell(n.elems.front()));
 
-  list<ast_node>::iterator next = first; ++next;
+  list<ast_node>::iterator next = first;  ++next;
   if (*next == "...") {
     if (next != --n.elems.end())
       set_cdr(new_form, build_cell(*++next));  // dotted pair

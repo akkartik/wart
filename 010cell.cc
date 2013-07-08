@@ -155,11 +155,11 @@ void rmref(cell* c) {
     break;  // numbers don't need freeing
   case STRING:
   case SYMBOL:
-    delete (string*)c->car; break;
+    delete (string*)c->car;  break;
   case CONS:
-    rmref(c->car); break;
+    rmref(c->car);  break;
   case TABLE:
-    delete (table*)c->car; break;
+    delete (table*)c->car;  break;
   case COMPILED_FN:
     break;  // compiled functions don't need freeing
   default:
@@ -193,7 +193,7 @@ struct lease_cell {
   }
 };
 
-#define TEMP(var, cell_expr) cell* var = cell_expr; lease_cell lease_##var(var);
+#define TEMP(var, cell_expr)  cell* var = cell_expr;  lease_cell lease_##var(var);
 
 void update(cell*& var, cell* expr) {
   rmref(var);
@@ -241,7 +241,7 @@ void mark_all_cells(cell* x, unordered_map<cell*, long>& mark) {
   case STRING:
     break;
   case CONS:
-    mark_all_cells(car(x), mark); break;
+    mark_all_cells(car(x), mark);  break;
   case TABLE: {
     table* t = (table*)x->car;
     for (cell_map::iterator p = t->value.begin(); p != t->value.end(); ++p) {

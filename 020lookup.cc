@@ -10,8 +10,8 @@ unordered_map<cell*, stack<cell*> > Dynamics;
 // Curr_lexical_scope; calling functions creates new dynamic bindings
 // to Curr_lexical_scope
 cell* CURR_LEXICAL_SCOPE;
-#define Curr_lexical_scopes Dynamics[CURR_LEXICAL_SCOPE]
-#define Curr_lexical_scope Curr_lexical_scopes.top()
+#define Curr_lexical_scopes  Dynamics[CURR_LEXICAL_SCOPE]
+#define Curr_lexical_scope  Curr_lexical_scopes.top()
 
 cell* lookup(string s) {
   return lookup(new_sym(s));

@@ -63,8 +63,8 @@ struct trace_stream {
 
 trace_stream* Trace_stream = NULL;
 
-#define trace(layer) !Trace_stream ? cerr /*print nothing*/ : Trace_stream->stream(layer)
-#define RAISE (!Trace_stream ? cerr /*do print*/ : Trace_stream->stream("warn")) << __FILE__ << ":" << __LINE__ << " "
+#define trace(layer)  !Trace_stream ? cerr /*print nothing*/ : Trace_stream->stream(layer)
+#define RAISE  (!Trace_stream ? cerr /*do print*/ : Trace_stream->stream("warn")) << __FILE__ << ":" << __LINE__ << " "
 
 // RAISE << die exits after printing -- unless Hide_warnings is set.
 struct die {};
@@ -74,9 +74,9 @@ ostream& operator<<(ostream& os, unused die) {
   exit(1);
 }
 
-#define CLEAR_TRACE delete Trace_stream, Trace_stream = new trace_stream;
+#define CLEAR_TRACE  delete Trace_stream, Trace_stream = new trace_stream;
 
-#define DUMP(layer) cerr << Trace_stream->readable_contents(layer)
+#define DUMP(layer)  cerr << Trace_stream->readable_contents(layer)
 
 // Trace_stream is a resource, lease_tracer uses RAII to manage it.
 struct lease_tracer {
@@ -84,7 +84,7 @@ struct lease_tracer {
   ~lease_tracer() { delete Trace_stream, Trace_stream = NULL; }
 };
 
-#define START_TRACING_UNTIL_END_OF_SCOPE lease_tracer leased_tracer;
+#define START_TRACING_UNTIL_END_OF_SCOPE  lease_tracer leased_tracer;
 
 void trace_all(const string& label, const list<string>& in) {
   for (list<string>::const_iterator p = in.begin(); p != in.end(); ++p)
@@ -185,7 +185,7 @@ bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, 
   return false;
 }
 
-#define CHECK_TRACE_CONTENTS(...) check_trace_contents(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
+#define CHECK_TRACE_CONTENTS(...)  check_trace_contents(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
 
 int trace_count(string layer) {
   return trace_count(layer, "");
@@ -215,14 +215,15 @@ int trace_count(string layer, int frame, string line) {
   return result;
 }
 
-#define CHECK_TRACE_WARNS()   CHECK(trace_count("warn") > 0)
-#define CHECK_TRACE_DOESNT_WARN()   if (trace_count("warn") > 0) { \
-  ++Num_failures; \
-  cerr << "\nF " << __FUNCTION__ << "(" << __FILE__ << ":" << __LINE__ << "): unexpected warnings\n"; \
-  DUMP("warn"); \
-  Passed = false; \
-  return; \
-}
+#define CHECK_TRACE_WARNS()  CHECK(trace_count("warn") > 0)
+#define CHECK_TRACE_DOESNT_WARN() \
+  if (trace_count("warn") > 0) { \
+    ++Num_failures; \
+    cerr << "\nF " << __FUNCTION__ << "(" << __FILE__ << ":" << __LINE__ << "): unexpected warnings\n"; \
+    DUMP("warn"); \
+    Passed = false; \
+    return; \
+  }
 
 bool trace_doesnt_contain(string layer, string line) {
   return trace_count(layer, line) == 0;
@@ -237,7 +238,7 @@ bool trace_doesnt_contain(string layer, int frame, string line) {
   return trace_count(layer, frame, line) == 0;
 }
 
-#define CHECK_TRACE_DOESNT_CONTAIN(...) CHECK(trace_doesnt_contain(__VA_ARGS__))
+#define CHECK_TRACE_DOESNT_CONTAIN(...)  CHECK(trace_doesnt_contain(__VA_ARGS__))
 
 
 
@@ -255,7 +256,7 @@ struct lease_trace_frame {
     --Trace_stream->frame[layer];
   }
 };
-#define new_trace_frame(layer) lease_trace_frame leased_frame(layer);
+#define new_trace_frame(layer)  lease_trace_frame leased_frame(layer);
 
 bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, int frame, string expected) {  // multiple layers, hierarchical layers
   vector<string> expected_lines = split(expected, "");  // hack: doesn't handle newlines in embedded in lines
@@ -286,7 +287,7 @@ bool check_trace_contents(string FUNCTION, string FILE, int LINE, string layer, 
   return false;
 }
 
-#define CHECK_TRACE_TOP(layer, expected) CHECK_TRACE_CONTENTS(layer, 1, expected)
+#define CHECK_TRACE_TOP(layer, expected)  CHECK_TRACE_CONTENTS(layer, 1, expected)
 
 
 

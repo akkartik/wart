@@ -97,8 +97,8 @@ ast_node transform_infix(ast_node n) {
   // now n is guaranteed to have at least 3 ops
   // slide a window of 3, pinching into s-exprs when middle elem is an op
   list<ast_node>::iterator prev = n.elems.begin();
-  list<ast_node>::iterator curr=prev; ++curr;
-  list<ast_node>::iterator next=curr; ++next;
+  list<ast_node>::iterator curr=prev;  ++curr;
+  list<ast_node>::iterator next=curr;  ++next;
   for (; next != n.elems.end(); ++prev, ++curr, ++next) {
     if (curr->atom.value == "...") continue;
 
@@ -124,7 +124,7 @@ ast_node transform_infix(ast_node n) {
 
       // update next
       n.elems.erase(oldnext, next);
-      next=curr; ++next;
+      next=curr;  ++next;
     }
     else {
       //// infix op; switch to prefix
@@ -133,9 +133,9 @@ ast_node transform_infix(ast_node n) {
 
       // update both prev and next
       n.elems.erase(prev);
-      prev=curr; --prev;
+      prev=curr;  --prev;
       n.elems.erase(next);
-      next=curr; ++next;
+      next=curr;  ++next;
     }
     // wrap in parens
     tmp.push_front(ast_node(token("(")));
