@@ -25,7 +25,7 @@ cell* run(string s) {
 
 :(scenarios run)
 
-:(scenario example_run)
+:(scenario examples)
 # function call
 (+ 1 1)
 => 2
