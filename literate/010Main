@@ -23,6 +23,12 @@ cell* run(string s) {
   return run(in);
 }
 
+void test_does_bar() {
+  ostringstream os;
+  os << run("(+ 1 1)");
+  CHECK_EQ(os.str(), "2");
+}
+
 :(scenarios run)
 
 :(scenario example_run)

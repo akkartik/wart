@@ -139,6 +139,18 @@ void test_tangle_can_check_for_absence_at_end_of_scenarios2() {
   CHECK(lines.empty());
 }
 
+void test_tangle_can_check_return_values_of_scenarios() {
+  istringstream in(":(scenario does_bar)\nabc def\n=> pqr");
+  list<string> lines;
+  tangle(in, lines);
+  CHECK_EQ(lines.front(), "void test_does_bar() {"); lines.pop_front();
+  CHECK_EQ(lines.front(), "  ostringstream os;"); lines.pop_front();
+  CHECK_EQ(lines.front(), "  os << run(\"abc def\");"); lines.pop_front();
+  CHECK_EQ(lines.front(), "  CHECK_EQ(os.str(), \"pqr\");"); lines.pop_front();
+  CHECK_EQ(lines.front(), "}"); lines.pop_front();
+  CHECK(lines.empty());
+}
+
 
 
 void test_trim() {
