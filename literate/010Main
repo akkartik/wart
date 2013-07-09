@@ -63,10 +63,6 @@ x
 # list; deliberately looks just like a function call
 '(1 2 3)
 => (1 2 3)
-(car '(1 2 3))  # first element
-=> 1
-(cdr '(1 2 3))  # everything but the first element
-=> (2 3)
 
 :(code)
 // we might be at eof and just not know it if we haven't looked around yet
