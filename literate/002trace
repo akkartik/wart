@@ -10,8 +10,9 @@
 // change all the tests that depend on them.
 //
 // To avoid conflicts, lines in the trace are tagged with layer labels. Later
-// on each layer will be defined in a single file, defining tracing for it and
-// tests that verify the trace in different situations.
+// on each aspect of the program will be defined in a single file or layer,
+// defining tracing for it as well as tests verifying the trace in different
+// situations.
 //
 // To build robust tests, trace facts about your domain rather than details of
 // how you computed them.

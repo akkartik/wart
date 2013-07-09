@@ -1,31 +1,27 @@
 // A bare-bones lisp interpreter. Other features of our language will layer
 // atop this versatile core.
 //
-// Lisp was the original dynamic language; functions didn't have to be defined
-// before you referred to them. They just had to exist by the time they were
-// called. Code could be constructed dynamically and run. This power fits with
-// our goal of ordering code for humans, and fewer constrants make code easier
-// to change.
+// Lisp was the original dynamic language, where functions could be defined
+// anytime, passed around like any other value, and new code could be
+// constructed on the fly.
 //
-// Lisp was also the original higher-order language; functions could be saved
-// and passed around just like other values. This powerful feature makes many
-// programs shorter.
+// It matters that it came first only because it indicates that lisp is one of
+// the easiest ways to get these features. (http://paulgraham.com/rootsoflisp.html)
 //
-// It doesn't matter for our purposes that it came first; it does matter that
-// it likely came first because it was the easiest way to get there, taking
-// close to the least possible code. (http://paulgraham.com/rootsoflisp.html)
+// These features help us both to organize code for reading and to do with as
+// little code as possible. Using just a few core powerful concepts helps
+// reduce the learning you have to wade through before you can make changes.
 //
-// Lisp remains the only language family where it's convenient to write code
-// to generate boilerplate code (using macros; we'll support them later). The
-// key insight to enable this is a uniform representation of programs as
-// expressions that can be simplified ('evaluated') to yield a result. Core
-// features of other languages like conditionals and loops fall out as
-// consequences of the simple model for simplifying expressions. As a result,
-// variants of these features can be created at will.
+// Later we'll show how to create new notations (lisp macros) on the fly that
+// are as well-supported as the original notations.
 //
 //   "In Lisp, you don't just write your program down toward the language, you
 //   also build the language up toward your program."
 //     -- http://www.paulgraham.com/progbot.html
+//
+// Lisp isn't perfect or inviolate; we'll be tweaking its rules in later
+// files/layers to further strengthen/minimize the core concepts that
+// everything else can be built out of.
 
 :(before "End Main")
 load_file("init.wart");
