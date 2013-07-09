@@ -11,7 +11,7 @@ cell* new_cell() {
   cell* result = NULL;
   if (Free_cells) {
     result = Free_cells;
-    Free_cells = Free_cells->cdr;
+    Free_cells = Free_cells->right;
     result->init();
     return result;
   }

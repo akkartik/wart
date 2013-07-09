@@ -1,51 +1,60 @@
-//// lists
-cell* car(cell* x) {
-  if (x->type != CONS) {
-    RAISE << "car of non-cons: " << x << '\n';
+//// Tree primitives that we'll extend later.
+cell* left(cell* x) {
+  if (x->type != TREE) {
+    RAISE << "cell has no left child: " << x << '\n';
     return nil;
   }
-  return x->car;
+  return x->left;
 }
 
-cell* cdr(cell* x) {
-  return x->cdr;
+cell* right(cell* x) {
+  return x->right;
 }
 
-void set_car(cell* x, cell* y) {
+void set_left(cell* x, cell* y) {
   if (x == nil) {
-    RAISE << "set_car on nil\n";
+    RAISE << "set_left on nil\n";
     return;
   }
-  x->car = y;
+  x->left = y;
 }
 
-void set_cdr(cell* x, cell* y) {
+void set_right(cell* x, cell* y) {
   if (x == nil) {
-    RAISE << "set_cdr on nil\n";
+    RAISE << "set_right on nil\n";
     return;
   }
-  x->cdr = y;
+  x->right = y;
 }
 
-cell* new_cons(cell* car, cell* cdr) {
+//// Lists are trees when 'sighted along' the right child.
+cell* first(cell* x) {
+  return left(x);
+}
+
+cell* rest(cell* x) {
+  return x->right;
+}
+
+cell* new_cell(cell* left, cell* right) {
   cell* ans = new_cell();
-  set_car(ans, car);
-  set_cdr(ans, cdr);
+  set_left(ans, left);
+  set_right(ans, right);
   return ans;
 }
 
-cell* new_cons(cell* car) {
-  return new_cons(car, nil);
+cell* new_cell(cell* left) {
+  return new_cell(left, nil);
 }
 
-bool is_cons(cell* x) {
-  return x != nil && x->type == CONS;
+bool is_cell(cell* x) {  // tree or list?
+  return x != nil && x->type == TREE;
 }
 
 bool is_atom(cell* x) {
-  return x == nil || !is_cons(x);
+  return x == nil || !is_cell(x);
 }
 
-void add_cons(cell* p, cell* x) {
-  set_cdr(p, new_cons(x));
+void add_cell(cell* p, cell* x) {
+  set_right(p, new_cell(x));
 }

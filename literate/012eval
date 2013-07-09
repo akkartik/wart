@@ -33,11 +33,11 @@ cell* eval(cell* expr) {
 
   if (is_quoted(expr)) {
     trace("eval") << "quote";
-    trace("eval") << "=> " << cdr(expr);
-    return cdr(expr);
+    trace("eval") << "=> " << right(expr);
+    return right(expr);
   }
 
-  cell* result = eval_primitive(car(expr), cdr(expr));
+  cell* result = eval_primitive(left(expr), right(expr));
   if (result) {
     trace("eval") << "compiled fn";
     trace("eval") << "=> " << result;
@@ -45,17 +45,17 @@ cell* eval(cell* expr) {
   }
 
   // expr is a call
-  cell* fn = eval(car(expr));
+  cell* fn = eval(left(expr));
   if (!is_fn(fn))
     RAISE << "Not a call: " << expr << '\n'
         << "Perhaps you need to split the line in two.\n";
 
   // eval its args, create new bindings
-  eval_bind_all(sig(fn), cdr(expr));
+  eval_bind_all(sig(fn), right(expr));
 
   // eval all forms in body, save result of final form
-  for (cell* form = body(fn); form != nil; form=cdr(form))
-    result = eval(car(form));
+  for (cell* form = body(fn); form != nil; form=right(form))
+    result = eval(left(form));
   trace("eval") << "=> " << result;
   return result;
 }
@@ -123,27 +123,27 @@ a
 :(code)
 cell* eval_primitive(cell* f, cell* args) {
   if (f == new_sym("fn")) {
-    return new_cons(f, args);
+    return new_cell(f, args);
   }
 
   if (f == new_sym("eval")) {
-    cell* arg = eval(car(args));
+    cell* arg = eval(left(args));
     return eval(arg);
   }
 
   if (f == new_sym("if")) {
-    cell* check = eval(car(args));
-    return (check != nil) ? eval(car(cdr(args))) : eval(car(cdr(cdr(args))));
+    cell* check = eval(left(args));
+    return (check != nil) ? eval(left(right(args))) : eval(left(right(right(args))));
   }
 
   if (f == new_sym("not")) {
-    cell* arg = eval(car(args));
+    cell* arg = eval(left(args));
     return (arg == nil) ? new_num(1) : nil;
   }
 
   if (f == new_sym("=")) {
-    cell* x = eval(car(args));
-    cell* y = eval(car(cdr(args)));
+    cell* x = eval(left(args));
+    cell* y = eval(left(right(args)));
     if (x == nil && y == nil)
       return new_num(1);
     else if (x == nil || y == nil)
@@ -157,48 +157,48 @@ cell* eval_primitive(cell* f, cell* args) {
   }
 
   if (f == new_sym("<-")) {
-    cell* var = car(args);
+    cell* var = left(args);
     if (!is_sym(var)) {
       RAISE << "can't assign to non-sym " << var << '\n';
       return nil;
     }
-    cell* val = eval(car(cdr(args)));
+    cell* val = eval(left(right(args)));
     new_binding(var, val);
     return val;
   }
 
   // lists
   if (f == new_sym("cons")) {
-    return new_cons(eval(car(args)), eval(car(cdr(args))));
+    return new_cell(eval(left(args)), eval(left(right(args))));
   }
   if (f == new_sym("car")) {
-    cell* arg = eval(car(args));
-    return car(arg);
+    cell* arg = eval(left(args));
+    return left(arg);
   }
   if (f == new_sym("cdr")) {
-    cell* arg = eval(car(args));
-    return cdr(arg);
+    cell* arg = eval(left(args));
+    return right(arg);
   }
 
   // numbers
   if (f == new_sym("+")) {
-    cell* x = eval(car(args));
-    cell* y = eval(car(cdr(args)));
+    cell* x = eval(left(args));
+    cell* y = eval(left(right(args)));
     return new_num(to_int(x) + to_int(y));
   }
   if (f == new_sym("-")) {
-    cell* x = eval(car(args));
-    cell* y = eval(car(cdr(args)));
+    cell* x = eval(left(args));
+    cell* y = eval(left(right(args)));
     return new_num(to_int(x) - to_int(y));
   }
   if (f == new_sym("*")) {
-    cell* x = eval(car(args));
-    cell* y = eval(car(cdr(args)));
+    cell* x = eval(left(args));
+    cell* y = eval(left(right(args)));
     return new_num(to_int(x) * to_int(y));
   }
   if (f == new_sym("<")) {
-    cell* x = eval(car(args));
-    cell* y = eval(car(cdr(args)));
+    cell* x = eval(left(args));
+    cell* y = eval(left(right(args)));
     return (to_int(x) < to_int(y)) ? new_num(1) : nil;
   }
   return NULL;
@@ -207,12 +207,12 @@ cell* eval_primitive(cell* f, cell* args) {
 void test_fn_works() {
   cell* result = run("(fn(x) x)");
   // {sig: (x), body: (x)}
-  cell* sig = car(cdr(result));
-  CHECK_EQ(car(sig), new_sym("x"));
-  CHECK_EQ(cdr(sig), nil);
-  cell* body = cdr(cdr(result));
-  CHECK_EQ(car(body), new_sym("x"));
-  CHECK_EQ(cdr(body), nil);
+  cell* sig = left(right(result));
+  CHECK_EQ(left(sig), new_sym("x"));
+  CHECK_EQ(right(sig), nil);
+  cell* body = right(right(result));
+  CHECK_EQ(left(body), new_sym("x"));
+  CHECK_EQ(right(body), nil);
 }
 
 :(scenario if_sees_args_in_then_and_else)
@@ -316,12 +316,12 @@ void eval_bind_all(cell* params, cell* args) {
   else if (is_sym(params))
     bind_params(params, eval_all(args));
 
-  else if (!is_cons(params))
+  else if (!is_cell(params))
     ;
 
   else {
-    bind_params(car(params), eval(car(args)));
-    eval_bind_all(cdr(params), cdr(args));
+    bind_params(left(params), eval(left(args)));
+    eval_bind_all(right(params), right(args));
   }
 }
 
@@ -332,25 +332,25 @@ void bind_params(cell* params, cell* args) {
   else if (is_sym(params))
     new_binding(params, args);
 
-  else if (!is_cons(params))
+  else if (!is_cell(params))
     ;
 
-  else if (args != nil && !is_cons(args))
+  else if (args != nil && !is_cell(args))
     bind_params(params, nil);
 
   else {
-    bind_params(car(params), car(args));
-    bind_params(cdr(params), cdr(args));
+    bind_params(left(params), left(args));
+    bind_params(right(params), right(args));
   }
 }
 
 cell* eval_all(cell* args) {
-  if (!is_cons(args))
+  if (!is_cell(args))
     return eval(args);
   cell* p_result = new_cell(), *curr = p_result;
-  for (; args != nil; args=cdr(args), curr=cdr(curr))
-    add_cons(curr, eval(car(args)));
-  return cdr(p_result);
+  for (; args != nil; args=right(args), curr=right(curr))
+    add_cell(curr, eval(left(args)));
+  return right(p_result);
 }
 
 :(scenario eval_handles_param)
@@ -424,11 +424,11 @@ cell* eval_all(cell* args) {
 
 :(code)   //// internals
 bool is_quoted(cell* cell) {
-  return is_cons(cell) && car(cell) == new_sym("'");
+  return is_cell(cell) && left(cell) == new_sym("'");
 }
 
 cell* strip_quote(cell* cell) {
-  return is_quoted(cell) ? cdr(cell) : cell;
+  return is_quoted(cell) ? right(cell) : cell;
 }
 
 bool is_keyword_sym(cell* x) {
@@ -440,24 +440,24 @@ bool is_keyword_sym(cell* x) {
 
 // fn = (sig ... body)
 bool is_fn(cell* x) {
-  return is_cons(x) && car(x) == new_sym("fn");
+  return is_cell(x) && left(x) == new_sym("fn");
 }
 
 cell* sig(cell* fn) {
-  return car(cdr(fn));
+  return left(right(fn));
 }
 
 cell* body(cell* fn) {
-  return cdr(cdr(fn));
+  return right(right(fn));
 }
 
 cell* quote(cell* x) {
-  return new_cons(new_sym("'"), x);
+  return new_cell(new_sym("'"), x);
 }
 
 cell* quote_all(cell* x) {
   cell* result = new_cell(), *curr = result;
-  for (cell* iter = x; iter != nil; iter=cdr(iter), curr=cdr(curr))
-    add_cons(curr, quote(car(iter)));
-  return cdr(result);
+  for (cell* iter = x; iter != nil; iter=right(iter), curr=right(curr))
+    add_cell(curr, quote(left(iter)));
+  return right(result);
 }

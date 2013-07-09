@@ -40,23 +40,23 @@ cell* build_cell(ast_node n) {
   }
 
   cell* new_form = new_cell();
-  set_car(new_form, build_cell(n.elems.front()));
+  set_left(new_form, build_cell(n.elems.front()));
 
   list<ast_node>::iterator next = first; ++next;
   if (*next == "...") {
     if (next != --n.elems.end())
-      set_cdr(new_form, build_cell(*++next));  // dotted pair
+      set_right(new_form, build_cell(*++next));  // dotted pair
     else
-      set_cdr(new_form, build_cell(*next));
+      set_right(new_form, build_cell(*next));
   }
   else if (is_quote_or_unquote(*first) && n.elems.size() == 2) {
-    set_cdr(new_form, build_cell(*next));  // dotted pair
+    set_right(new_form, build_cell(*next));  // dotted pair
   }
   else {
     n.elems.pop_front();
     if (n.elems.empty())
       RAISE << "Error in parsing " << n << '\n' << die();
-    set_cdr(new_form, build_cell(n));
+    set_right(new_form, build_cell(n));
   }
 
   trace("cell") << new_form;
@@ -100,8 +100,8 @@ void test_strings_and_syms_are_different() {
 void test_read_handles_quoted_sym2() {
   list<cell*> result = read_all("'a");
   cell* c = result.front();
-  CHECK_EQ(car(c), new_sym("'"));
-  CHECK_EQ(cdr(c), new_sym("a"));
+  CHECK_EQ(left(c), new_sym("'"));
+  CHECK_EQ(right(c), new_sym("a"));
 }
 
 :(scenario read_handles_atoms)

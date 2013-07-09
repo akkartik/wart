@@ -1,8 +1,5 @@
 :(code)
-// Construct a tree of cons cells out of next expr in input.
-// The core data structure of a lisp program is the cons cell, with car and
-// cdr fields. 'cons', 'car' and 'cdr' are unfamiliar names for a versatile
-// structure; you'll be seeing a lot about it.
+// construct a parse tree of 'cells' for the next expr in input
 cell* read(istream& in) {
   return build_cell(next_ast_node(in));  // see parse, build
 }
@@ -10,20 +7,22 @@ cell* read(istream& in) {
 :(before "End Types")
 extern struct cell* nil;  // special value to indicate false or no-value
 
+// A cell is a node in the parse tree. It can also represent lists and other
+// values.
 struct cell {
-  cell* car;  // aliased to long or float
-  cell* cdr;
+  // children
+  cell* left;
+  cell* right;
 
-  // ints save space on 64-bit platforms
-  int type;
-    #define CONS 0
-    #define INTEGER 1
-    #define SYMBOL 2
-    #define STRING 3
+  int type;           // 'left' contains:
+    #define TREE 0    //   a pointer to another cell
+    #define SYMBOL 1  //   a name
+    #define INTEGER 2 //   a number
+    #define STRING 3  //   a list of characters
 
-  cell() :car(NULL), cdr(NULL), type(CONS) {}
+  cell() :left(NULL), right(NULL), type(TREE) {}
   void init() {
-    car=cdr=nil, type=CONS;
+    left=right=nil, type=TREE;
   }
 };
 
@@ -31,8 +30,8 @@ struct cell {
 // cells are designed to minimize fragmentation on the heap
 void test_cell_layout_constraints() {
   cell c;
-  CHECK((sizeof(c.car)%4) == 0);
-  CHECK((sizeof(c.cdr)%4) == 0);
+  CHECK((sizeof(c.left)%4) == 0);
+  CHECK((sizeof(c.right)%4) == 0);
   CHECK((sizeof(c.type)%4) == 0);
 
   CHECK(sizeof(long) <= sizeof(cell*));
@@ -42,14 +41,14 @@ void test_cell_layout_constraints() {
 
 cell* nil = new cell;
 void setup_nil() {
-  nil->car = nil->cdr = nil;
+  nil->left = nil->right = nil;
 }
 :(before "End Setup")
 setup_nil();
 :(code)
 void test_pointers_from_nil_are_always_nil() {
-  CHECK_EQ(nil->car, nil);
-  CHECK_EQ(nil->cdr, nil);
+  CHECK_EQ(nil->left, nil);
+  CHECK_EQ(nil->right, nil);
 }
 
 // helper: print cells in traces, scenarios
@@ -57,13 +56,13 @@ ostream& operator<<(ostream& os, cell* c) {
   if (c == NULL) return os << "NULLNULLNULL";  // error
   if (c == nil) return os << "nil";
   switch(c->type) {
-  case CONS:
-    if (car(c) == new_sym("'"))
-      return os << car(c) << cdr(c);
-    os << "(" << car(c);
-    for (cell* curr = cdr(c); curr != nil; curr = cdr(curr)) {
-      if (is_cons(curr))
-        os << " " << car(curr);
+  case TREE:
+    if (left(c) == new_sym("'"))
+      return os << left(c) << right(c);
+    os << "(" << left(c);
+    for (cell* curr = right(c); curr != nil; curr = right(curr)) {
+      if (is_cell(curr))
+        os << " " << left(curr);
       else
         os << " ... " << curr;
     }
@@ -85,40 +84,40 @@ cell* read(string s) {
   return read(in);
 }
 
-// How cells can represent the different types.
+//// How cells can represent the different types.
 
-// Numbers, strings and symbols contain the value in the car, and nil in the cdr.
+// Numbers, strings and symbols cram their value into the left child and set
+// the type appropriately.
 void test_number_cell() {
   cell* x = read("4");
   CHECK_EQ(x->type, INTEGER);
-  CHECK_EQ((long)x->car, 4);
-  CHECK_EQ(x->cdr, nil);
+  CHECK_EQ((long)x->left, 4);
+  CHECK_EQ(x->right, nil);
 }
 
 void test_symbol_cell() {
   cell* x = read("abc");
   CHECK_EQ(x->type, SYMBOL);
-  CHECK_EQ(*(string*)x->car, "abc");
-  CHECK_EQ(x->cdr, nil);
+  CHECK_EQ(*(string*)x->left, "abc");
+  CHECK_EQ(x->right, nil);
 }
 
 void test_string_cell() {
   cell* x = read("\"abc\"");
   CHECK_EQ(x->type, STRING);
-  CHECK_EQ(*(string*)x->car, "abc");
-  CHECK_EQ(x->cdr, nil);
+  CHECK_EQ(*(string*)x->left, "abc");
+  CHECK_EQ(x->right, nil);
 }
 
-// Lists are constructed out of CONS cells, with the car containing the first
-// element and the cdr recursively pointing to the rest.
-// Trees are constructed by storing lists in the car as well.
+// A list is a tree where each element stores its value in the left child, and
+// points to the rest of the list in the right.
 void test_list_of_cells() {
   cell* x = read("(1 2 3)");
-  CHECK_EQ(x->type, CONS);
-  CHECK_EQ(car(x), new_num(1));
-  CHECK_EQ(cdr(x)->type, CONS);
-  CHECK_EQ(car(cdr(x)), new_num(2));
-  CHECK_EQ(cdr(cdr(x))->type, CONS);
-  CHECK_EQ(car(cdr(cdr(x))), new_num(3));
-  CHECK_EQ(cdr(cdr(cdr(x))), nil);
+  CHECK_EQ(x->type, TREE);
+  CHECK_EQ(left(x), new_num(1));
+  CHECK_EQ(right(x)->type, TREE);
+  CHECK_EQ(left(right(x)), new_num(2));
+  CHECK_EQ(right(right(x))->type, TREE);
+  CHECK_EQ(left(right(right(x))), new_num(3));
+  CHECK_EQ(right(right(right(x))), nil);
 }
