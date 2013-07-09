@@ -50,10 +50,25 @@
 // later to gradually work his way through the complexities on an as-needed
 // basis.
 //
+// At each point in this evolution, the codebase will try to be as simple as
+// possible to pass its available tests.
+//
 // Programmers shouldn't need to understand everything about a program to hack
 // on it. But they shouldn't be prevented from a thorough understanding of
 // each aspect either. The ideal organization of a codebase will reward
 // curiosity.
+//
+//   "If I look at any small part of it, I can see what is going on -- I don't
+//   need to refer to other parts to understand what something is doing.
+//
+//   If I look at any large part in overview, I can see what is going on -- I
+//   don't need to know all the details to get it.
+//
+//   Every level of detail is as locally coherent and as well thought-out as
+//   any other level."
+//
+//       -- Richard Gabriel, "The Quality Without A Name"
+//          (http://dreamsongs.com/Files/PatternsOfSoftware.pdf, page 42)
 
 // Includes
 // End Includes

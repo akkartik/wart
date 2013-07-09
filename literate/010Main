@@ -1,3 +1,28 @@
+// A bare-bones lisp interpreter. Other features of our language will layer
+// atop this versatile core.
+//
+// Lisp was the original dynamic language; functions didn't have to be defined
+// before you referred to them. They just had to exist by the time they were
+// called. This fits with our goal of ordering code for humans, and fewer
+// constrants make code easier to change.
+//
+// Lisp was also the original higher-order language; functions could be saved
+// and passed around just like other values. This powerful feature makes many
+// programs shorter.
+//
+// It doesn't matter for our purposes that it came first; it does matter that
+// it likely came first because it was the easiest way to get there, taking
+// close to the least possible code[1].
+//
+// Lisp remains the only language where it's convenient to write code to
+// generate code (using macros; we'll support them later).
+//
+//   "In Lisp, you don't just write your program down toward the language, you
+//   also build the language up toward your program."
+//     -- http://www.paulgraham.com/progbot.html
+//
+// More details: http://paulgraham.com/rootsoflisp.html
+
 :(before "End Main")
 setup_nil();
 load_file("init.wart");

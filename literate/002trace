@@ -9,6 +9,13 @@
 // low-level function boundaries easier to change or delete without needing to
 // change all the tests that depend on them.
 //
+// To avoid conflicts, lines in the trace are tagged with layer labels. Later
+// on each layer will be defined in a single file, defining tracing for it and
+// tests that verify the trace in different situations.
+//
+// To build robust tests, trace facts about your domain rather than details of
+// how you computed them.
+//
 // More details: http://akkartik.name/blog/tracing-tests
 
 :(before "End Tracing")
@@ -42,6 +49,7 @@ struct trace_stream {
     curr_stream = NULL;
   }
 
+  // Useful for debugging.
   string readable_contents(string layer) {  // missing layer = everything, frame, hierarchical layers
     newline();
     ostringstream output;
@@ -53,6 +61,7 @@ struct trace_stream {
     return output.str();
   }
 
+  // Useful for a newcomer to visualize the program at work.
   void dump_browseable_contents(string layer) {
     ofstream dump("dump");
     dump << "<div class='frame' frame_index='1'>start</div>\n";

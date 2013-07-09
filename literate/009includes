@@ -1,3 +1,6 @@
+// Some common includes needed all over the place.
+// More tightly-targeted includes show up in other files.
+
 :(before "End Includes")
 #include<cstdio>
 #include<cstring>
