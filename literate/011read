@@ -18,6 +18,8 @@ struct cell {
     #define INTEGER 2 //   a number
     #define STRING 3  //   a list of characters
 
+  // End Cell Fields
+
   cell() :left(NULL), right(NULL), type(TREE) {}
 };
 

@@ -1,0 +1,116 @@
+// Allocating, deallocating and reusing cells.
+//
+// A cell is brought into being by new_cell(). Each cell tracks the number of
+// other cells pointing to it, growing and shrinking this number as left/right
+// child pointers are modified. As other cells refer to it we track the number
+// of incoming pointers. When this number subsides back to 0 there's no way
+// for the program to get at it anymore, and it can be safely reclaimed and
+// reused.
+//
+// More info: https://en.wikipedia.org/wiki/Reference_counting
+// The drawback of ref-counting is that if two cells refer to each other we'll
+// never notice that they can be reclaimed, and waste space. So don't do that.
+// The programmer is responsible for breaking cycles before forgetting them.
+
+:(before "End Cell Fields")
+int nrefs;  // number of cells pointing to this one
+
+:(code)
+cell* mkref(cell* c) {
+  if (c == nil) return nil;   // nil is never reclaimed
+  trace("mem") << "mkref";
+  trace("mem/mkref") << c;
+  ++c->nrefs;
+  return c;
+}
+
+void rmref(cell* c) {
+  if (c == nil) return;
+
+  new_trace_frame("rmref");
+  trace("mem") << "rmref";
+  trace("mem/rmref") << c;
+  --c->nrefs;
+  if (c->nrefs == 0)
+    reclaim(c);
+}
+
+void reclaim(cell* c) {
+  trace("mem/dump") << "free: " << (void*)c << " " << c << " " << c->nrefs;
+  if (c->type == INTEGER || c->type == SYMBOL)
+    RAISE << "should never reclaim interned atom: " << c << '\n';
+
+  switch (c->type) {
+  case INTEGER:
+    break;  // numbers don't need freeing
+  case STRING:
+  case SYMBOL:
+    delete (string*)c->left; break;
+  case TREE:
+    rmref(c->left); break;
+  default:
+    RAISE << "Can't reclaim type " << c->type << '\n' << die();
+  }
+
+  rmref(c->right);
+  free_cell(c);
+}
+
+
+
+// All code must call mkref and rmref appropriately as it modifies left/right
+// children. If I forget to rmref when I should I waste space. If I waste too
+// much space the program will die.
+//
+// If I instead forget to *mkref* when I should the consequences are far more
+// insidious: a prematurely-reclaimed cell will cause incoming pointers to
+// clobber or interpret it as the wrong type. Execution may continue for a
+// long time before we realize something is wrong, making debugging difficult.
+//
+// To detect this insidious class of error as immediately as possible, we:
+//  a) initialize child pointers of a cell to nil when it is allocated
+//  b) clear child pointers to NULL when it is reclaimed
+//  c) re-initialize child pointers to nil when it is re-allocated
+// If a cell in use is ever found to have NULL pointers, drop everything else
+// and find the missing mkref.
+void init(cell* c) {
+  c->type = TREE;
+  c->left = c->right = nil;
+  c->nrefs = 0;
+}
+
+void clear(cell* c) {
+  c->type = TREE;
+  c->left = c->right = NULL;
+  c->nrefs = 0;
+}
+
+:(after "void rmref(cell* c")
+if (!c)
+  RAISE << "A cell was prematurely reclaimed.\n" << die();
+
+
+
+:(code)
+cell* new_cell() {
+  cell* result = new cell;
+  init(result);
+  trace("mem/dump") << "alloc: " << (void*)result;
+  return result;
+}
+
+void free_cell(cell* c) {
+  clear(c);
+  delete c;
+}
+
+void setup_nil() {
+  nil->left = nil->right = nil;
+}
+:(before "End Setup")
+setup_nil();
+:(code)
+void test_pointers_from_nil_are_always_nil() {
+  CHECK_EQ(nil->left, nil);
+  CHECK_EQ(nil->right, nil);
+}
