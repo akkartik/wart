@@ -103,14 +103,3 @@ void free_cell(cell* c) {
   clear(c);
   delete c;
 }
-
-void setup_nil() {
-  nil->left = nil->right = nil;
-}
-:(before "End Setup")
-setup_nil();
-:(code)
-void test_pointers_from_nil_are_always_nil() {
-  CHECK_EQ(nil->left, nil);
-  CHECK_EQ(nil->right, nil);
-}
