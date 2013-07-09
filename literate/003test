@@ -25,7 +25,7 @@ long Num_failures = 0;
     return; \
   }
 
-:(after "Commandline options")
+:(after "Commandline Options")
 if (is_equal(argv[1], "test")) {
   run_tests();
   return 0;

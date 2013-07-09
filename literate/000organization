@@ -1,10 +1,65 @@
+// You guessed right; the '000' prefix means you should start reading here.
+//
+// This project is setup to compile all files with a numeric prefix. Just
+// create a new file and start hacking.
+//
+// The first few files (00*) are independent of what this program does, an
+// experimental skeleton to make it easier for outsiders to understand, and
+// easier for veterans to change in arbitrary, radical ways. By making the
+// code more outsider-friendly and rewrite-friendly we hope to keep this
+// program hackable over time, rather than tying programmers up in
+// ever-increasing knots as often happens today.
+//
+// This file contains a bare-bones program in legal C++. It doesn't do
+// anything yet; subsequent files will add behaviors by inserting lines into
+// it with directives like:
+//   :(before "pattern")  // look for a line containing "pattern", insert the following lines before it
+//   #include foo
+//   #include bar
+// or:
+//   :(after "pattern")
+//   // process argument "-z"
+//   ...
+//
+// Patterns are usually in comments (capitalized to indicate you can't change
+// them willy-nilly), but they don't have to be.
+//
+// A single pattern line might have many different code fragments added before
+// or after it from all over the codebase. Use 'before' directives to insert
+// code at a location in load order, and 'after' directives to insert code in
+// reverse order. By convention patterns intended for insertion before begin
+// with 'End'. There's examples lower down.
+//
+// These directives allow the programmer to take control of ordering, and to
+// present his code in the order best suited for reading, rather than the
+// order dictated by the dumb/lazy/ossified language.
+//
+// Reordering for narrative coherence does more than just shuffle code around.
+// Past the initial skeleton of this program (currently 00*-02*), it ought to
+// be possible to build and run a program out of all files from 0-n for any n.
+// The parts that are included will pass all their tests.
+// (Relevant is http://y2u.be/c8N72t7aScY, a scene from "2001: A Space Odyssey")
+//
+// This 'subsetting guarantee' ensures that this directory contains a
+// cleaned-up narrative of the evolution of this codebase. Organizing the code
+// autobiographically allows a newcomer to rapidly orient himself, to first
+// understand a simple gestalt of a program's core purpose and features, and
+// later to gradually work his way through the complexities on an as-needed
+// basis.
+//
+// Programmers shouldn't need to understand everything about a program to hack
+// on it. But they shouldn't be prevented from a thorough understanding of
+// each aspect either. The ideal organization of a codebase will reward
+// curiosity.
+
 // Includes
 // End Includes
 
 // Types
 // End Types
 
-#include "function_list"  // auto-generated; see makefile
+// prototypes are auto-generated; define your functions in any order
+#include "function_list"  // by convention, files ending with '_list' are auto-generated
 
 // Globals
 // End Globals
@@ -13,7 +68,7 @@
 
 int main(int argc, char* argv[]) {
   if (argc > 1) {
-    // Commandline options
+    // Commandline Options
   }
 
   setup();
