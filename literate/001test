@@ -1,5 +1,5 @@
-// This file contains a simple test harness. To create new tests define
-// functions starting with 'test_'. To run all tests:
+// A simple test harness. To create new tests define functions starting with
+// 'test_'. To run all tests:
 //   $ wart test
 
 :(before "End Types")

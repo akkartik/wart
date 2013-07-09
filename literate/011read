@@ -51,7 +51,7 @@ void test_pointers_from_nil_are_always_nil() {
 
 // helper: print cells in traces, scenarios
 ostream& operator<<(ostream& os, cell* c) {
-  if (c == NULL) return os << "NULLNULLNULL";
+  if (c == NULL) return os << "NULLNULLNULL";  // error
   if (c == nil) return os << "nil";
   switch(c->type) {
   case CONS:

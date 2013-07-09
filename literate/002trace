@@ -1,7 +1,7 @@
 // This program logs facts inferred as it runs:
 //   trace("label") << "fact 1: " << val;
 // Each test can then inspect the 'trace' for its checks. As far as possible,
-// run your tests run in this manner.
+// setup your tests to run in this manner.
 //
 // Checking the trace frees tests from having to receive objects to check. All
 // tests can then be run as integration tests, calling a high-level function
