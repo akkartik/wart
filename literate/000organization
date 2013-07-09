@@ -67,19 +67,19 @@
 //       -- Richard Gabriel, "The Quality Without A Name"
 //          (http://dreamsongs.com/Files/PatternsOfSoftware.pdf, page 42)
 
-// Includes
+//// Includes
 // End Includes
 
-// Types
+//// Types
 // End Types
 
 // prototypes are auto-generated; define your functions in any order
 #include "function_list"  // by convention, files ending with '_list' are auto-generated
 
-// Globals
+//// Globals
 // End Globals
 
-// End Tracing            // hack: tracing code must come before anything else
+//// End Tracing            // hack: tracing code must come before anything else
 
 int main(int argc, char* argv[]) {
   if (argc > 1) {
