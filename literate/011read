@@ -76,3 +76,45 @@ ostream& operator<<(ostream& os, cell* c) {
     return os;
   }
 }
+
+cell* read(string s) {
+  istringstream in(s);
+  return read(in);
+}
+
+// How cells can represent the different types.
+
+// Numbers, strings and symbols contain the value in the car, and nil in the cdr.
+void test_number_cell() {
+  cell* x = read("4");
+  CHECK_EQ(x->type, INTEGER);
+  CHECK_EQ((long)x->car, 4);
+  CHECK_EQ(x->cdr, nil);
+}
+
+void test_symbol_cell() {
+  cell* x = read("abc");
+  CHECK_EQ(x->type, SYMBOL);
+  CHECK_EQ(*(string*)x->car, "abc");
+  CHECK_EQ(x->cdr, nil);
+}
+
+void test_string_cell() {
+  cell* x = read("\"abc\"");
+  CHECK_EQ(x->type, STRING);
+  CHECK_EQ(*(string*)x->car, "abc");
+  CHECK_EQ(x->cdr, nil);
+}
+
+// Lists contain the first element in the car, and (recursively) 'contain' the
+// rest of the list in the cdr.
+void test_list_of_cells() {
+  cell* x = read("(1 2 3)");
+  CHECK_EQ(x->type, CONS);
+  CHECK_EQ(car(x), new_num(1));
+  CHECK_EQ(cdr(x)->type, CONS);
+  CHECK_EQ(car(cdr(x)), new_num(2));
+  CHECK_EQ(cdr(cdr(x))->type, CONS);
+  CHECK_EQ(car(cdr(cdr(x))), new_num(3));
+  CHECK_EQ(cdr(cdr(cdr(x))), nil);
+}

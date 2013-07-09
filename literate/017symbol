@@ -9,7 +9,7 @@ cell* new_sym(string x) {
   if (Sym_literals[x])
     return Sym_literals[x];
   Sym_literals[x] = new_cell();
-  Sym_literals[x]->car = (cell*)new string(x);   // not aligned like cells; can fragment memory
+  Sym_literals[x]->car = (cell*)new string(x);  // todo: can fragment memory
   Sym_literals[x]->type = SYMBOL;
   return Sym_literals[x];
 }
