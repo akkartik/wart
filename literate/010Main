@@ -3,8 +3,9 @@
 //
 // Lisp was the original dynamic language; functions didn't have to be defined
 // before you referred to them. They just had to exist by the time they were
-// called. This fits with our goal of ordering code for humans, and fewer
-// constrants make code easier to change.
+// called. Code could be constructed dynamically and run. This power fits with
+// our goal of ordering code for humans, and fewer constrants make code easier
+// to change.
 //
 // Lisp was also the original higher-order language; functions could be saved
 // and passed around just like other values. This powerful feature makes many
@@ -12,16 +13,19 @@
 //
 // It doesn't matter for our purposes that it came first; it does matter that
 // it likely came first because it was the easiest way to get there, taking
-// close to the least possible code.
+// close to the least possible code. (http://paulgraham.com/rootsoflisp.html)
 //
-// Lisp remains the only language where it's convenient to write code to
-// generate code (using macros; we'll support them later).
+// Lisp remains the only language family where it's convenient to write code
+// to generate boilerplate code (using macros; we'll support them later). The
+// key insight to enable this is a uniform representation of programs as
+// expressions that can be simplified ('evaluated') to yield a result. Core
+// features of other languages like conditionals and loops fall out as
+// consequences of the simple model for simplifying expressions. As a result,
+// variants of these features can be created at will.
 //
 //   "In Lisp, you don't just write your program down toward the language, you
 //   also build the language up toward your program."
 //     -- http://www.paulgraham.com/progbot.html
-//
-// More details: http://paulgraham.com/rootsoflisp.html
 
 :(before "End Main")
 load_file("init.wart");
@@ -33,11 +37,15 @@ void load_file(const char* filename) {
   run(f);
 }
 
-// evaluate all exprs in input, return value of last expr
+// Run a lisp expression in two stages:
+//  a) _read_ the program and turn it into a tree of cells,
+//  b) _evaluate_ the tree of cells to yield a result
+// To run an entire program, run each expr in sequence, and return the result
+// of the final expr.
 cell* run(istream& in) {
   cell* result = NULL;
   do {
-      result = eval(read(in));  // see read, eval
+      result = eval(read(in));
   } while (!eof(in));
   return result;
 }
