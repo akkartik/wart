@@ -1,5 +1,8 @@
 :(code)
-// construct a tree of cells out of next expr in input
+// Construct a tree of cons cells out of next expr in input.
+// The core data structure of a lisp program is the cons cell, with car and
+// cdr fields. 'cons', 'car' and 'cdr' are unfamiliar names for a versatile
+// structure; you'll be seeing a lot about it.
 cell* read(istream& in) {
   return build_cell(next_ast_node(in));  // see parse, build
 }
@@ -108,9 +111,7 @@ void test_string_cell() {
 
 // Lists are constructed out of CONS cells, with the car containing the first
 // element and the cdr recursively pointing to the rest.
-//
-// 'cons', 'car' and 'cdr' are special names. We can construct lists with them
-// and (later) much more.
+// Trees are constructed by storing lists in the car as well.
 void test_list_of_cells() {
   cell* x = read("(1 2 3)");
   CHECK_EQ(x->type, CONS);
