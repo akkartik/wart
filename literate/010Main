@@ -24,7 +24,6 @@
 // More details: http://paulgraham.com/rootsoflisp.html
 
 :(before "End Main")
-setup_nil();
 load_file("init.wart");
 
 :(code)
