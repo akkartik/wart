@@ -1,6 +1,6 @@
 a.out: makefile wart.cc function_list test_list ../[0-9]*.cc
 	g++ -g -Wall -Wextra -fno-strict-aliasing wart.cc
-	@a.out test
+	-@a.out test
 
 wart.cc: 0* ../wart_bin
 	../wart_bin tangle 0* > wart.cc
