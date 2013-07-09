@@ -12,7 +12,7 @@
 //
 // It doesn't matter for our purposes that it came first; it does matter that
 // it likely came first because it was the easiest way to get there, taking
-// close to the least possible code[1].
+// close to the least possible code.
 //
 // Lisp remains the only language where it's convenient to write code to
 // generate code (using macros; we'll support them later).
