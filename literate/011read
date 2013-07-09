@@ -5,10 +5,8 @@ cell* read(istream& in) {
 }
 
 :(before "End Types")
-extern struct cell* nil;  // special value to indicate false or no-value
-
-// A cell is a node in the parse tree. It can also represent lists and other
-// values.
+// A cell is a binary tree node in the parse tree. It can also represent lists
+// and other values.
 struct cell {
   // children
   cell* left;
@@ -21,9 +19,6 @@ struct cell {
     #define STRING 3  //   a list of characters
 
   cell() :left(NULL), right(NULL), type(TREE) {}
-  void init() {
-    left=right=nil, type=TREE;
-  }
 };
 
 :(code)
@@ -39,52 +34,14 @@ void test_cell_layout_constraints() {
   CHECK(sizeof(size_t) <= sizeof(cell*));
 }
 
-cell* nil = new cell;
-void setup_nil() {
-  nil->left = nil->right = nil;
-}
-:(before "End Setup")
-setup_nil();
-:(code)
-void test_pointers_from_nil_are_always_nil() {
-  CHECK_EQ(nil->left, nil);
-  CHECK_EQ(nil->right, nil);
-}
-
-// helper: print cells in traces, scenarios
-ostream& operator<<(ostream& os, cell* c) {
-  if (c == NULL) return os << "NULLNULLNULL";  // error
-  if (c == nil) return os << "nil";
-  switch(c->type) {
-  case TREE:
-    if (left(c) == new_sym("'"))
-      return os << left(c) << right(c);
-    os << "(" << left(c);
-    for (cell* curr = right(c); curr != nil; curr = right(curr)) {
-      if (is_cell(curr))
-        os << " " << left(curr);
-      else
-        os << " ... " << curr;
-    }
-    return os << ")";
-  case INTEGER:
-    return os << to_int(c);
-  case SYMBOL:
-    return os << to_string(c);
-  case STRING:
-    return os << "\"" << to_string(c) << "\"";
-  default:
-    cerr << "Can't print type " << c->type << '\n' << die();
-    return os;
-  }
-}
-
 cell* read(string s) {
   istringstream in(s);
   return read(in);
 }
 
 //// How cells can represent the different types.
+
+cell* nil = new cell;  // special value to indicate false or empty list
 
 // Numbers, strings and symbols cram their value into the left child and set
 // the type appropriately.
@@ -120,4 +77,32 @@ void test_list_of_cells() {
   CHECK_EQ(right(right(x))->type, TREE);
   CHECK_EQ(left(right(right(x))), new_num(3));
   CHECK_EQ(right(right(right(x))), nil);
+}
+
+// helper: print cells in traces, scenarios
+ostream& operator<<(ostream& os, cell* c) {
+  if (c == NULL) return os << "NULLNULLNULL";  // error
+  if (c == nil) return os << "nil";
+  switch(c->type) {
+  case TREE:
+    if (left(c) == new_sym("'"))
+      return os << left(c) << right(c);
+    os << "(" << left(c);
+    for (cell* curr = right(c); curr != nil; curr = right(curr)) {
+      if (is_cell(curr))
+        os << " " << left(curr);
+      else
+        os << " ... " << curr;
+    }
+    return os << ")";
+  case INTEGER:
+    return os << to_int(c);
+  case SYMBOL:
+    return os << to_string(c);
+  case STRING:
+    return os << "\"" << to_string(c) << "\"";
+  default:
+    cerr << "Can't print type " << c->type << '\n' << die();
+    return os;
+  }
 }
