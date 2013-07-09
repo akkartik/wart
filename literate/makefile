@@ -9,10 +9,10 @@ wart.cc: 0* ../wart_bin
 	@cd .. && make
 
 function_list: wart.cc
-	@grep -h "^[^ #].*) {" wart.cc |perl -pwe 's/ {/;/' > function_list
+	@grep -h "^[^ #].*) {" wart.cc |perl -pwe 's/ {.*/;/' > function_list
 
 test_list: wart.cc
-	@grep -h "^[[:space:]]*void test_" wart.cc |perl -pwe 's/^\s*void (.*)\(\) {$$/$$1,/' > test_list
+	@grep -h "^[[:space:]]*void test_" wart.cc |perl -pwe 's/^\s*void (.*)\(\) {.*/$$1,/' > test_list
 
 clean:
 	@cd .. && make clean
