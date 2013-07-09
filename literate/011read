@@ -1,7 +1,7 @@
-:(code)
 // construct a parse tree of 'cells' for the next expr in input
+:(code)
 cell* read(istream& in) {
-  return build_cell(next_ast_node(in));  // see parse, build
+  return build_cell(next_ast_node(in));  // see build
 }
 
 :(before "End Types")
