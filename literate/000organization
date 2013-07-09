@@ -38,8 +38,8 @@
 //
 // Reordering for narrative coherence does more than just shuffle code around.
 // Past the initial skeleton of this program (currently 00*-02*), it ought to
-// be possible to build and run a program out of all files from 0-n for any n.
-// The parts that are included will pass all their tests.
+// be possible to stop loading after any file, build and run the program, and
+// pass all tests for loaded features.
 // (Relevant is http://youtube.com/watch?v=c8N72t7aScY, a scene from
 // "2001: A Space Odyssey".)
 //
@@ -49,9 +49,6 @@
 // understand a simple gestalt of a program's core purpose and features, and
 // later to gradually work his way through the complexities on an as-needed
 // basis.
-//
-// At each point in this evolution, the codebase will try to be as simple as
-// possible to pass its available tests.
 //
 // Programmers shouldn't need to understand everything about a program to hack
 // on it. But they shouldn't be prevented from a thorough understanding of
