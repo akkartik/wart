@@ -1,4 +1,4 @@
-// You guessed right; the '000' prefix means you should start reading here.
+// You guessed right: the '000' prefix means you should start reading here.
 //
 // This project is setup to compile all files with a numeric prefix. Just
 // create a new file and start hacking.
@@ -21,6 +21,8 @@
 //   // process argument "-z"
 //   ...
 //
+// An example in color: http://i.imgur.com/0eONnyX.png (directives shaded dark)
+//
 // Patterns are usually in comments (capitalized to indicate you can't change
 // them willy-nilly), but they don't have to be.
 //
@@ -28,7 +30,7 @@
 // or after it from all over the codebase. Use 'before' directives to insert
 // code at a location in load order, and 'after' directives to insert code in
 // reverse order. By convention patterns intended for insertion before begin
-// with 'End'. There's examples lower down.
+// with 'End'. There's some example patterns lower down.
 //
 // These directives allow the programmer to take control of ordering, and to
 // present his code in the order best suited for reading, rather than the
@@ -38,7 +40,8 @@
 // Past the initial skeleton of this program (currently 00*-02*), it ought to
 // be possible to build and run a program out of all files from 0-n for any n.
 // The parts that are included will pass all their tests.
-// (Relevant is http://y2u.be/c8N72t7aScY, a scene from "2001: A Space Odyssey")
+// (Relevant is http://youtube.com/watch?v=c8N72t7aScY, a scene from
+// "2001: A Space Odyssey".)
 //
 // This 'subsetting guarantee' ensures that this directory contains a
 // cleaned-up narrative of the evolution of this codebase. Organizing the code
