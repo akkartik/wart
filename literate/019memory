@@ -50,7 +50,6 @@ void reclaim(cell* c) {
     rmref(c->left); break;
   default:
     RAISE << "Can't reclaim type " << c->type << '\n' << die();
-    exit(0);
   }
 
   rmref(c->right);
@@ -87,10 +86,8 @@ void clear(cell* c) {
 }
 
 :(after "void rmref(cell* c")
-  if (!c) {
-    RAISE << "A cell was prematurely reclaimed.\n" << die();
-    return;
-  }
+if (!c)
+  RAISE << "A cell was prematurely reclaimed.\n" << die();
 
 
 
@@ -98,11 +95,6 @@ void clear(cell* c) {
 cell* new_cell() {
   cell* result = new cell;
   init(result);
-  if (Trace_stream) {
-    cerr << "BB\n";
-    Trace_stream->stream("a"); // << "alloc: " << (void*)result;
-  }
-//?   trace("mem/dump") << "alloc: " << (void*)result;
   return result;
 }
 
@@ -110,56 +102,3 @@ void free_cell(cell* c) {
   clear(c);
   delete c;
 }
-
-//? :(before "End Types")
-//? #define CELLS_PER_HEAP (4*1024/sizeof(cell))  // default linux pagesize
-//? struct heap {
-//?   cell cells[CELLS_PER_HEAP];
-//?   heap *next;
-//?   heap() :next(NULL) {}
-//? };
-//? 
-//? :(code)
-//? cell* new_cell() {
-//?   cell* result = NULL;
-//?   if (Free_cells) {
-//?     result = Free_cells;
-//?     Free_cells = Free_cells->right;
-//?     init(result);
-//?     return result;
-//?   }
-//? 
-//?   if (Curr_cell == CELLS_PER_HEAP)
-//?     grow_heap();
-//? 
-//?   result = &Curr_heap->cells[Curr_cell];
-//?   ++Curr_cell;
-//?   init(result);
-//?   return result;
-//? }
-//? 
-//? :(before "End Globals")
-//? heap* First_heap = new heap();
-//? heap* Curr_heap = First_heap;
-//? long Curr_cell = 0;
-//? cell* Free_cells = NULL;
-//? :(before "End Setup")
-//? reset_heap(First_heap);
-//? :(code)
-//? void reset_heap(heap* h) {
-//?   if (h->next)
-//?     reset_heap(h->next);
-//?   delete h;
-//?   if (h == First_heap) {
-//?     First_heap = new heap();
-//?     Curr_heap = First_heap;
-//?     Curr_cell = 0;
-//?     Free_cells = NULL;
-//?   }
-//? }
-//? 
-//? void grow_heap() {
-//?   Curr_heap = Curr_heap->next = new heap();
-//?   if (!Curr_heap) RAISE << "Out of memory\n" << die();
-//?   Curr_cell = 0;
-//? }

@@ -51,18 +51,18 @@ cell* run(string s) {
   return run(in);
 }
 
-//? :(scenarios run)
-//? :(scenario examples)
-//? # function call; later we'll support a more natural syntax for arithmetic
-//? (+ 1 1)
-//? => 2
-//? # assignment
-//? (<- x 3)
-//? x
-//? => 3
-//? # list; deliberately looks just like a function call
-//? '(1 2 3)
-//? => (1 2 3)
+:(scenarios run)
+:(scenario examples)
+# function call; later we'll support a more natural syntax for arithmetic
+(+ 1 1)
+=> 2
+# assignment
+(<- x 3)
+x
+=> 3
+# list; deliberately looks just like a function call
+'(1 2 3)
+=> (1 2 3)
 
 :(code)
 // we might be at eof and just not know it if we haven't looked around yet

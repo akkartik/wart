@@ -72,7 +72,6 @@ void test_string_cell() {
 // points to the rest of the list in the right.
 void test_list_of_cells() {
   cell* x = read("(1 2 3)");
-//?   exit(0);
   CHECK_EQ(x->type, TREE);
   CHECK_EQ(left(x), new_num(1));
   CHECK_EQ(right(x)->type, TREE);
@@ -83,6 +82,7 @@ void test_list_of_cells() {
 }
 
 // helper: print cells in traces, scenarios
+// beware: this code should never call trace, or os could be corrupted
 ostream& operator<<(ostream& os, cell* c) {
   if (c == NULL) return os << "NULLNULLNULL";  // error
   if (c == nil) return os << "nil";

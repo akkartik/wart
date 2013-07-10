@@ -35,7 +35,6 @@ struct trace_stream {
   ostringstream& stream(string layer) {
     newline();
     curr_stream = new ostringstream;
-    cerr << "alloc trace: " << curr_stream << '\n';
     curr_layer = layer;
     return *curr_stream;
   }
@@ -47,7 +46,6 @@ struct trace_stream {
     if (curr_layer == dump_layer || curr_layer == "dump" ||
         (!Hide_warnings && curr_layer == "warn"))
       cerr << frame[curr_layer] << ": " << with_newline(curr_stream->str());
-    cerr << "delete trace: " << curr_stream << '\n';
     delete curr_stream;
     curr_stream = NULL;
   }
