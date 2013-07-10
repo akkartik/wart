@@ -60,10 +60,15 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
 
   if (cmd == "before" || cmd == "after") {
     cell* x1 = car(cdr(expr));
-    if (x1 == nil) RAISE << "No target for " << cmd << " directive.\n" << die();
+    if (x1 == nil) {
+      RAISE << "No target for " << cmd << " directive.\n" << die();
+      return;
+    }
     list<string>::iterator target = find_substr(out, to_string(x1));
-
-    if (target == out.end()) RAISE << "Couldn't find target " << x1 << '\n' << die();
+    if (target == out.end()) {
+      RAISE << "Couldn't find target " << x1 << '\n' << die();
+      return;
+    }
     string curr_indent = indent(*target);
     for (list<string>::iterator p = hunk.begin(); p != hunk.end(); ++p)
       p->insert(p->begin(), curr_indent.begin(), curr_indent.end());
