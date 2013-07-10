@@ -54,8 +54,10 @@ cell* build_cell(ast_node n) {
   }
   else {
     n.elems.pop_front();
-    if (n.elems.empty())
+    if (n.elems.empty()) {
       RAISE << "Error in parsing " << n << '\n' << die();
+      return nil;
+    }
     set_right(new_form, build_cell(n));
   }
 
