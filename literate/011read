@@ -26,11 +26,7 @@ struct cell {
 :(code)
 // cells are designed to minimize fragmentation on the heap
 void test_cell_layout_constraints() {
-  cell c;
-  CHECK((sizeof(c.left)%4) == 0);
-  CHECK((sizeof(c.right)%4) == 0);
-  CHECK((sizeof(c.type)%4) == 0);
-
+  CHECK((sizeof(cell)%4) == 0);
   CHECK(sizeof(long) <= sizeof(cell*));
   CHECK(sizeof(float) <= sizeof(cell*));
   CHECK(sizeof(size_t) <= sizeof(cell*));
