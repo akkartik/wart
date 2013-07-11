@@ -97,6 +97,7 @@ struct die {};
 ostream& operator<<(ostream& os, unused die) {
   if (Hide_warnings) return os;
   os << "dying";
+  if (Trace_stream) Trace_stream->newline();
   exit(1);
 }
 
