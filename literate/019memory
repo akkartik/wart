@@ -87,10 +87,10 @@ void clear(cell* c) {
 }
 
 :(after "void rmref(cell* c")
-if (!c) {
-  RAISE << "A cell was prematurely reclaimed.\n" << die();
-  return;
-}
+  if (!c) {
+    RAISE << "A cell was prematurely reclaimed.\n" << die();
+    return;
+  }
 
 :(code)
 cell* new_cell() {

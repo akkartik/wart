@@ -32,10 +32,10 @@ long Num_failures = 0;
   }
 
 :(after "Commandline Options")
-if (is_equal(argv[1], "test")) {
-  run_tests();
-  return 0;
-}
+  if (is_equal(argv[1], "test")) {
+    run_tests();
+    return 0;
+  }
 
 :(code)
 void run_tests() {
