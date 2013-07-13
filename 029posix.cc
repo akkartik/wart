@@ -35,8 +35,10 @@ cell* new_socket(socket_type* s) {
 }
 
 socket_type* to_socket(cell* s) {
-  if (type(s) != new_sym("socket"))
+  if (type(s) != new_sym("socket")) {
     RAISE << "not a socket: " << s << '\n' << die();
+    return NULL;
+  }
   return (socket_type*)to_int(car(cdr(cdr(s))));
 }
 

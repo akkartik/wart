@@ -35,3 +35,9 @@ void test_parse_handles_nested_forms_with_comments() {
   CHECK_TRACE_CONTENTS("parse", 1, "(a b (c d))");
   CHECK_TRACE_CONTENTS("parse", 2, "ab(c d))");
 }
+
+void test_syntax_error() {
+  Hide_warnings = true;
+  read_all("(a b\n");
+  CHECK_TRACE_WARNS();
+}

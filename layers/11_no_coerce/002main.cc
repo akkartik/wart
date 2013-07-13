@@ -124,3 +124,7 @@ void run(string s) {
   rmref(run(in));
   // return nothing; we'll just verify the trace
 }
+
+cell* read(string s) {
+  return read(*new stringstream(s));
+}

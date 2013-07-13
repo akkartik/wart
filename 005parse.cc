@@ -41,7 +41,10 @@ ast_node next_ast_node(list<token>& in) {
   if (is_open_paren(subform.back())) {
     while (!in.empty() && subform.back() != ")")
       subform.push_back(next_ast_node(in));
-    if (!is_close_paren(subform.back())) RAISE << "Unbalanced (\n" << die();
+    if (!is_close_paren(subform.back())) {
+      RAISE << "Unbalanced (: " << ast_node(subform) << '\n' << die();
+      return ast_node(subform);
+    }
   }
 
   if (subform.size() == 1) {

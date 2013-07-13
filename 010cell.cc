@@ -62,7 +62,10 @@ cell* Free_cells = NULL;
 void grow_heap() {
   trace("gc") << "grow_heap";
   Curr_heap = Curr_heap->next = new heap();
-  if (!Curr_heap) RAISE << "Out of memory\n" << die();
+  if (!Curr_heap) {
+    RAISE << "Out of memory\n" << die();
+    exit(0);
+  }
   Curr_cell = 0;
 }
 
@@ -135,8 +138,10 @@ cell* mkref(cell* c) {
 }
 
 void rmref(cell* c) {
-  if (!c)
+  if (!c) {
     RAISE << "A cell was prematurely garbage-collected.\n" << die();
+    return;
+  }
   if (c == nil) return;
 
   new_trace_frame("rmref");
@@ -164,6 +169,7 @@ void rmref(cell* c) {
     break;  // compiled functions don't need freeing
   default:
     RAISE << "Can't rmref type " << c->type << '\n' << die();
+    return;
   }
 
   rmref(c->cdr);
@@ -255,6 +261,7 @@ void mark_all_cells(cell* x, unordered_map<cell*, long>& mark) {
     break;
   default:
     cerr << "Can't mark type " << x->type << '\n' << die();
+    return;
   }
   mark_all_cells(cdr(x), mark);
 }

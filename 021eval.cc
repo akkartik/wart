@@ -39,8 +39,10 @@ cell* eval(cell* expr) {
 
 cell* eval(cell* expr, cell* scope) {
   new_trace_frame("eval");
-  if (!expr)
+  if (!expr) {
     RAISE << "eval: cell should never be NULL\n" << die();
+    return nil;
+  }
 
   trace("eval") << expr;
   if (expr == nil) {
@@ -703,8 +705,10 @@ cell* to_fn(cell* x) {
   if (x == nil || is_fn(x)) return x;
   if (is_incomplete_eval(x)) return x;
   lease_cell lease(x);  // we assume x is already mkref'd
-  if (!lookup_dynamic_binding(sym_Coercions))
+  if (!lookup_dynamic_binding(sym_Coercions)) {
     RAISE << "tried to call " << x << '\n' << die();
+    return nil;
+  }
   cell* result = coerce_quoted(x, sym_function, lookup(sym_Coercions));
   return result;
 }

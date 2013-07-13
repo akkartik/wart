@@ -1,5 +1,5 @@
 //// compiled primitives for files and streams
-//
+
 // Design considered the following:
 //   permit cascading of close operations
 //     so return non-nil on success
@@ -13,14 +13,18 @@ cell* new_ostream(ostream* x) {
 }
 
 istream& to_istream(cell* x) {
-  if (type(x) != new_sym("istream"))
+  if (type(x) != new_sym("istream")) {
     RAISE << "not an istream: " << x << '\n' << die();
+    return cin;
+  }
   return *(istream*)to_int(car(cdr(cdr(x))));
 }
 
 ostream& to_ostream(cell* x) {
-  if (type(x) != new_sym("ostream"))
+  if (type(x) != new_sym("ostream")) {
     RAISE << "not an ostream: " << x << '\n' << die();
+    return cout;
+  }
   return *(ostream*)to_int(car(cdr(cdr(x))));
 }
 

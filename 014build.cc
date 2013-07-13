@@ -71,8 +71,10 @@ cell* build_cell(ast_node n) {
   }
   else {
     n.elems.pop_front();
-    if (n.elems.empty())
+    if (n.elems.empty()) {
       RAISE << "Error in parsing " << n << '\n' << die();
+      return new_form;
+    }
     set_cdr(new_form, build_cell(n));
   }
 

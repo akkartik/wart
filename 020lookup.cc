@@ -124,7 +124,7 @@ void new_lexical_scope() {
 
 void end_lexical_scope() {
   if (Curr_lexical_scope == nil)
-    RAISE << "No lexical scope to end\n" << die();
+    RAISE << "No lexical scope to end\n";
   end_dynamic_scope(CURR_LEXICAL_SCOPE);
 }
 
@@ -135,7 +135,7 @@ void add_lexical_scope(cell* new_scope) {
 
 void add_lexical_binding(cell* sym, cell* val, cell* scope) {
   if (unsafe_get(scope, sym))
-    RAISE << "Can't rebind within a lexical scope\n" << die();
+    RAISE << "Can't rebind within a lexical scope\n";
   trace("bind") << sym << ": " << val;
   unsafe_set(scope, sym, val, false);  // deleting nil might expose a shadowed binding
 }

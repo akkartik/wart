@@ -50,6 +50,7 @@ void reclaim(cell* c) {
     rmref(c->left); break;
   default:
     RAISE << "Can't reclaim type " << c->type << '\n' << die();
+    return;
   }
 
   rmref(c->right);
@@ -86,10 +87,10 @@ void clear(cell* c) {
 }
 
 :(after "void rmref(cell* c")
-if (!c)
+if (!c) {
   RAISE << "A cell was prematurely reclaimed.\n" << die();
-
-
+  return;
+}
 
 :(code)
 cell* new_cell() {

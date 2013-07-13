@@ -53,3 +53,15 @@ void test_parse_handles_indented_toplevel_forms() {
   CHECK_TRACE_CONTENTS("parse", 1, "a(a b c d)");
   CHECK_TRACE_CONTENTS("parse", 2, "abcd");
 }
+
+void test_syntax_error() {
+  Hide_warnings = true;
+  read_all("(a b\n");
+  CHECK_TRACE_WARNS();
+}
+
+void test_syntax_error2() {
+  Hide_warnings = true;
+  read_all("a b)\n");
+  CHECK_TRACE_WARNS();
+}

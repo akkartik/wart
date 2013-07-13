@@ -1,7 +1,3 @@
-cell* read(string s) {
-  return read(*new stringstream(s));
-}
-
 void test_build_handles_nil() {
   read_all("()");
   CHECK_TRACE_CONTENTS("cell", "nil");

@@ -47,3 +47,9 @@ void test_parse_handles_splice_operators() {
   CHECK_TRACE_CONTENTS("parse", 1, "`(2 ,@b)");
   CHECK_TRACE_CONTENTS("parse", 2, "2,@b)");
 }
+
+void test_syntax_error() {
+  Hide_warnings = true;
+  read_all("(a b\n");
+  CHECK_TRACE_WARNS();
+}

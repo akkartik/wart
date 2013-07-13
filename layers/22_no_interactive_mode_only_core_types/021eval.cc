@@ -12,8 +12,10 @@
 
 cell* eval(cell* expr) {
   new_trace_frame("eval");
-  if (!expr)
+  if (!expr) {
     RAISE << "eval: cell should never be NULL\n" << die();
+    return nil;
+  }
 
   trace("eval") << expr;
   if (expr == nil) {

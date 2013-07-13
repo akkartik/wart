@@ -47,11 +47,14 @@ struct heap {
 heap* First_heap = new heap();
 heap* Curr_heap = First_heap;
 long Curr_cell = 0;
-cell* Free_cells = NULL;
 
 void grow_heap() {
+  trace("gc") << "grow_heap";
   Curr_heap = Curr_heap->next = new heap();
-  if (!Curr_heap) RAISE << "Out of memory\n" << die();
+  if (!Curr_heap) {
+    RAISE << "Out of memory\n" << die();
+    exit(0);
+  }
   Curr_cell = 0;
 }
 
@@ -63,24 +66,20 @@ void reset_heap(heap* h) {
     First_heap = new heap();
     Curr_heap = First_heap;
     Curr_cell = 0;
-    Free_cells = NULL;
   }
 }
 
 cell* new_cell() {
+  trace("gc") << "alloc";
   cell* result = NULL;
-  if (Free_cells) {
-    result = Free_cells;
-    Free_cells = Free_cells->cdr;
-    result->init();
-    return result;
-  }
 
+  trace("gc/alloc") << "new";
   if (Curr_cell == CELLS_PER_HEAP)
     grow_heap();
 
   result = &Curr_heap->cells[Curr_cell];
   ++Curr_cell;
   result->init();
+  trace("gcdump") << "alloc: " << (void*)result;
   return result;
 }

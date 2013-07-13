@@ -29,13 +29,12 @@ cell* eval(cell* expr) {
   return eval(expr, Curr_lexical_scope);
 }
 
-long Eval_count = 0;
-
 cell* eval(cell* expr, cell* scope) {
-  ++Eval_count;
   new_trace_frame("eval");
-  if (!expr)
+  if (!expr) {
     RAISE << "eval: cell should never be NULL\n" << die();
+    return nil;
+  }
 
   trace("eval") << expr;
   if (expr == nil) {
@@ -105,7 +104,7 @@ cell* eval(cell* expr, cell* scope) {
   cell* result = nil;
   if (is_compiledfn(body(fn))) {
     trace("eval") << "compiled fn";
-    result = to_compiledfn(body(fn))();   // all compiledfns mkref their result
+    result = to_compiledfn(body(fn))();  // all compiledfns mkref their result
   }
   else {
     trace("eval") << "fn";
@@ -132,7 +131,7 @@ void eval_bind_all(cell* params, cell* args, cell* scope, cell* new_scope) {
   TEMP(args2, nil);
   if (is_quoted(params)) {
     params = strip_quote(params);
-    args2 = quote_all(args);   // already mkref'd
+    args2 = quote_all(args);  // already mkref'd
     trace("eval/bind/all") << "stripping quote: " << params << " <-> " << args2;
   }
   else {
@@ -192,7 +191,7 @@ void eval_bind_rest_aliases(cell* params /* (| ...) */, cell* args, cell* scope,
   trace("eval/bind/rest_aliases") << params << " <-> " << args;
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
-  cell* cached_val = NULL;   // to ensure we don't multiply-eval
+  cell* cached_val = NULL;  // to ensure we don't multiply-eval
   for (cell* aliases = cdr(params); aliases != nil; aliases=cdr(aliases)) {
     if (cached_val)
       bind_params(car(aliases), cached_val, args, new_scope);
@@ -205,7 +204,7 @@ void eval_bind_aliases(cell* params /* (| ...) */, cell* arg, cell* scope, cell*
   trace("eval/bind/aliases") << params << " <-> " << arg;
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
-  cell* cached_val = NULL;   // to ensure we don't multiply-eval
+  cell* cached_val = NULL;  // to ensure we don't multiply-eval
   for (cell *aliases=cdr(params), *alias=car(aliases); aliases != nil; aliases=cdr(aliases),alias=car(aliases)) {
     if (is_quoted(alias))
       bind_params(strip_quote(alias), arg, NULL, new_scope);
@@ -259,7 +258,7 @@ void bind_aliases(cell* params /* (| ...) */, cell* arg, cell* unevald_arg, cell
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
   for (cell* aliases=cdr(params); aliases != nil; aliases=cdr(aliases))
-    if (!unsafe_get(new_scope, car(aliases))) // skip duplicate destructured aliases
+    if (!unsafe_get(new_scope, car(aliases)))  // skip duplicate destructured aliases
       bind_params(car(aliases), arg, unevald_arg, new_scope);
 }
 
@@ -313,65 +312,54 @@ cell* reorder_keyword_args(cell* args, cell* params) {
     return mkref(args);
   }
 
-  cell_map keyword_args;  // all values will be refcounted.
+  TEMP(keyword_args, new_table());
   TEMP(non_keyword_args, extract_keyword_args(params, args, keyword_args));
   cell* result = args_in_param_order(params, non_keyword_args, keyword_args);
 
-  for (cell_map::iterator p = keyword_args.begin(); p != keyword_args.end(); ++p)
-    if (p->second) rmref(p->second);
   trace("ordered_args") << "=> " << result;
   return result;  // already mkref'd
 }
 
-// extract keyword args into the cell_map provided; return non-keyword args
-// always mkref what you insert into the cell_map
-cell* extract_keyword_args(cell* params, cell* args, cell_map& keyword_args) {
+// extract keyword args into the keyword_args table and return the remaining non-keyword args
+cell* extract_keyword_args(cell* params, cell* args, cell* keyword_args) {
   cell *p_non_keyword_args = new_cell(), *curr = p_non_keyword_args;
-  for (; is_cons(args); args=cdr(args)) {
-    cell* kparam = keyword_param(car(args), params);
-    if (kparam == nil) {
+  while (is_cons(args)) {
+    bool is_rest = false;
+    cell* kparam = keyword_param(car(args), params, is_rest);
+    if (kparam == NULL) {
       add_cons(curr, car(args));
       curr=cdr(curr);
+      args=cdr(args);
+      continue;
     }
-    // keyword arg for rest param alias
-    else if (is_cons(kparam) && cdr(kparam) == nil
-             && is_alias(car(kparam))) {
-      args = cdr(args);   // skip keyword arg
+    args = cdr(args);  // skip keyword arg
+    if (!is_rest) {
+      set_all_aliases(keyword_args, kparam, car(args));
+      args = cdr(args);
+    }
+    else {
       cell* end_rest = next_keyword(args, params);
       TEMP(rest_args, snip(args, end_rest));
-      for (cell* p = cdr(car(kparam)); p != nil; p=cdr(p))
-        keyword_args[car(p)] = mkref(rest_args);
-      rmref(kparam);
+      set_all_aliases(keyword_args, kparam, rest_args);
       args = end_rest;
-    }
-    // keyword arg for param alias
-    else if (is_alias(kparam)) {
-      args = cdr(args);   // skip keyword arg
-      for (cell* p = cdr(kparam); p != nil; p=cdr(p))
-        keyword_args[car(p)] = mkref(car(args));
-    }
-    // simple rest keyword arg
-    else if (is_cons(kparam)) {   // rest keyword arg
-      args = cdr(args);
-      cell* end_rest = next_keyword(args, params);
-      keyword_args[car(kparam)] = snip(args, end_rest);  // already mkref'd
-      rmref(kparam);
-      args = end_rest;
-    }
-    // simple keyword arg
-    else {
-      args = cdr(args);   // skip keyword arg
-      keyword_args[kparam] = mkref(car(args));
     }
   }
-  if (!is_cons(args))  // improper list
-    set_cdr(curr, args);
+  set_cdr(curr, args);  // in case improper list
   return drop_ptr(p_non_keyword_args);
+}
+
+void set_all_aliases(cell* keyword_args, cell* param, cell* arg) {
+  if (is_alias(param))
+    for (cell* p = cdr(param); p != nil; p=cdr(p))
+      unsafe_set(keyword_args, car(p), arg, false);
+  else
+    unsafe_set(keyword_args, param, arg, false);
 }
 
 cell* next_keyword(cell* args, cell* params) {
   for (args=cdr(args); args != nil; args=cdr(args)) {
-    if (keyword_param(car(args), params) != nil)
+    bool dummy;
+    if (keyword_param(car(args), params, dummy))
       return args;
   }
   return nil;
@@ -385,69 +373,55 @@ cell* snip(cell* x, cell* next) {
   return drop_ptr(p_result);
 }
 
-cell* args_in_param_order(cell* params, cell* non_keyword_args, cell_map& keyword_args) {
+cell* args_in_param_order(cell* params, cell* non_keyword_args, cell* keyword_args) {
   cell *p_reconstituted_args = new_cell(), *curr = p_reconstituted_args;
   for (params=strip_quote(params); params != nil; curr=cdr(curr), params=strip_quote(cdr(params))) {
-    if (!is_cons(params)) {
-      set_cdr(curr, keyword_args[params] ? keyword_args[params] : non_keyword_args);
-      break;
-    }
-
-    if (is_alias(params)) {
-      if (keyword_args[car(cdr(params))]) {
-        set_cdr(curr, keyword_args[car(cdr(params))]);
-        break;
+    if (is_cons(params) && !is_alias(params)) {
+      cell* param = strip_quote(car(params));
+      if (is_alias(param))
+        param = car(cdr(param));
+      cell* keyword_value = unsafe_get(keyword_args, param);
+      if (keyword_value) {
+        add_cons(curr, keyword_value);
       }
       else {
-        set_cdr(curr, non_keyword_args);
-        break;
+        add_cons(curr, car(non_keyword_args));
+        non_keyword_args = cdr(non_keyword_args);
       }
     }
-
-    cell* param = strip_quote(car(params));
-    if (is_alias(param))
-      param = car(cdr(param));
-
-    if (keyword_args[param]) {
-      add_cons(curr, keyword_args[param]);
-    }
     else {
-      add_cons(curr, car(non_keyword_args));
-      non_keyword_args = cdr(non_keyword_args);
+      // rest param
+      cell* param = is_alias(params) ? car(cdr(params)) : params;
+      cell* keyword_value = unsafe_get(keyword_args, param);
+      set_cdr(curr, keyword_value ? keyword_value : non_keyword_args);
+      break;
     }
   }
   if (non_keyword_args != nil)
-    set_cdr(curr, non_keyword_args);   // any remaining args
+    set_cdr(curr, non_keyword_args);  // any remaining args
   return drop_ptr(p_reconstituted_args);
 }
 
-// return the appropriate param if arg is a valid keyword arg
+// return the appropriate param if arg is a valid keyword arg, or NULL if not
 // handle param aliases; :a => (| a b)
-// respond to rest keyword args with (rest-param)
-// combining the two: respond to rest param aliases with ((| do body))
+// set is_rest if params is a rest param/alias
 // doesn't look inside destructured params
-cell* keyword_param(cell* arg, cell* params) {
-  if (!is_keyword_sym(arg)) return nil;
+cell* keyword_param(cell* arg, cell* params, bool& is_rest) {
+  is_rest = false;
+  if (!is_keyword_sym(arg)) return NULL;
   cell* candidate = new_sym(to_string(arg).substr(1));
   for (params=strip_quote(params); params != nil; params=strip_quote(cdr(params))) {
-    if (!is_cons(params)) { // rest param
-      if (params == candidate)
-        return new_cons(candidate);
-    }
-    else if (is_alias(params)) {   // rest param aliases
-      if (param_alias_match(cdr(params), candidate))
-        return new_cons(params);
-    }
-    // ignore destructuring except param aliases
-    else if (is_alias(strip_quote(car(params)))) {
-      if (param_alias_match(cdr(strip_quote(car(params))), candidate))
-        return strip_quote(car(params));
-    }
-    else if (strip_quote(car(params)) == candidate) {
-      return candidate;
+    cell* param = (is_cons(params) && !is_alias(params))
+                  ? strip_quote(car(params))
+                  : params;  // rest param/alias
+    if (param == candidate
+        // ignore destructuring
+        || (is_alias(param) && param_alias_match(cdr(param), candidate))) {
+      if (param == params) is_rest = true;
+      return param;
     }
   }
-  return nil;
+  return NULL;
 }
 
 bool param_alias_match(cell* aliases, cell* candidate) {
@@ -653,8 +627,10 @@ bool is_fn(cell* x) {
 cell* to_fn(cell* x) {
   if (x == nil || is_fn(x)) return x;
   lease_cell lease(x);  // we assume x is already mkref'd
-  if (!lookup_dynamic_binding(sym_Coercions))
+  if (!lookup_dynamic_binding(sym_Coercions)) {
     RAISE << "tried to call " << x << '\n' << die();
+    return nil;
+  }
   cell* result = coerce_quoted(x, sym_function, lookup(sym_Coercions));
   return result;
 }

@@ -61,7 +61,10 @@ cell* Free_cells = NULL;
 void grow_heap() {
   trace("gc") << "grow_heap";
   Curr_heap = Curr_heap->next = new heap();
-  if (!Curr_heap) RAISE << "Out of memory\n" << die();
+  if (!Curr_heap) {
+    RAISE << "Out of memory\n" << die();
+    exit(0);
+  }
   Curr_cell = 0;
 }
 
@@ -134,8 +137,10 @@ cell* mkref(cell* c) {
 }
 
 void rmref(cell* c) {
-  if (!c)
+  if (!c) {
     RAISE << "A cell was prematurely garbage-collected.\n" << die();
+    return;
+  }
   if (c == nil) return;
 
   new_trace_frame("rmref");
@@ -154,13 +159,14 @@ void rmref(cell* c) {
     break;  // numbers don't need freeing
   case STRING:
   case SYMBOL:
-    delete (string*)c->car; break;
+    delete (string*)c->car;  break;
   case CONS:
-    rmref(c->car); break;
+    rmref(c->car);  break;
   case TABLE:
-    delete (table*)c->car; break;
+    delete (table*)c->car;  break;
   default:
     RAISE << "Can't rmref type " << c->type << '\n' << die();
+    return;
   }
 
   rmref(c->cdr);
@@ -178,11 +184,11 @@ long excess_mkrefs() {
 
 
 
-//// Tracking refcounts.
+//// tracking refcounts
 
 // RAII for temporaries
 struct lease_cell {
-  cell*& value;   // reference allows us to track changes to the underlying temporary
+  cell*& value;  // reference allows us to track changes to the underlying temporary
   lease_cell(cell*& v) :value(v) {}
   ~lease_cell() {
     trace("gc/out of scope") << value;
@@ -190,7 +196,7 @@ struct lease_cell {
   }
 };
 
-#define TEMP(var, cell_expr) cell* var = cell_expr; lease_cell lease_##var(var);
+#define TEMP(var, cell_expr)  cell* var = cell_expr;  lease_cell lease_##var(var);
 
 void update(cell*& var, cell* expr) {
   rmref(var);
@@ -212,7 +218,7 @@ long num_unfreed() {
 }
 
 void dump_unfreed() {
-  unordered_map<cell*, int> num_refs_remaining;
+  unordered_map<cell*, long> num_refs_remaining;
   for (heap* h = First_heap; h; h=h->next)
     for (cell* x = &h->cells[0]; x < &h->cells[CELLS_PER_HEAP]; ++x)
       if (x->car)
@@ -226,7 +232,7 @@ void dump_unfreed() {
     }
 }
 
-void mark_all_cells(cell* x, unordered_map<cell*, int>& mark) {
+void mark_all_cells(cell* x, unordered_map<cell*, long>& mark) {
   if (x == nil) return;
   ++mark[x];
   switch (x->type) {
@@ -236,7 +242,7 @@ void mark_all_cells(cell* x, unordered_map<cell*, int>& mark) {
   case STRING:
     break;
   case CONS:
-    mark_all_cells(car(x), mark); break;
+    mark_all_cells(car(x), mark);  break;
   case TABLE: {
     table* t = (table*)x->car;
     for (cell_map::iterator p = t->value.begin(); p != t->value.end(); ++p) {
@@ -248,6 +254,7 @@ void mark_all_cells(cell* x, unordered_map<cell*, int>& mark) {
   }
   default:
     cerr << "Can't mark type " << x->type << '\n' << die();
+    return;
   }
   mark_all_cells(cdr(x), mark);
 }
