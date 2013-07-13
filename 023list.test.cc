@@ -92,7 +92,7 @@ void test_list_splice_returns_list_being_spliced_in() {
 }
 
 void test_nth_cdr() {
-  TEMP(x, new_cons(new_num(3), new_cons(new_num(4))));
+  TEMP(x, mkref(new_cons(new_num(3), new_cons(new_num(4)))));
   CHECK_EQ(nth_cdr(x, 0), x);
   CHECK_EQ(car(nth_cdr(x, 1)), new_num(4));
   CHECK_EQ(nth_cdr(x, 2), nil);
@@ -100,10 +100,10 @@ void test_nth_cdr() {
 
 void test_contains_handles_circular_lists() {
   unordered_set<cell*> done;
-  TEMP(x, new_cons(new_num(1)));
+  TEMP(x, mkref(new_cons(new_num(1))));
   set_cdr(x, x);
   CHECK(!contains(x, new_sym("a"), done));
-  x->cdr = nil;  // break cycle for gc
+  x->cdr = nil;  --x->nrefs;  // manually break cycle for gc
 }
 
 void test_list_sort() {

@@ -43,7 +43,7 @@ void test_build_handles_string() {
 }
 
 void test_build_doesnt_mix_syms_and_strings() {
-  TEMP(s, new_string("a"));
+  TEMP(s, mkref(new_string("a")));
   CHECK(s != new_sym("a"));
 }
 

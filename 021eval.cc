@@ -345,7 +345,7 @@ cell* reorder_keyword_args(cell* args, cell* params) {
     return mkref(args);
   }
 
-  TEMP(keyword_args, new_table());
+  TEMP(keyword_args, mkref(new_table()));
   TEMP(non_keyword_args, extract_keyword_args(params, args, keyword_args));
   cell* result = args_in_param_order(params, non_keyword_args, keyword_args);
 

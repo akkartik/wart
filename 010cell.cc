@@ -214,9 +214,14 @@ long num_unfreed() {
   long n = 0;
   for (heap* h = First_heap; h != Curr_heap; h=h->next)
     n += CELLS_PER_HEAP;
-  n += Curr_cell-1;  // for Curr_lexical_scope
-  for (cell* f = Free_cells; f; f=f->cdr)
+  n += Curr_cell;
+  for (cell* f = Free_cells; f; f=f->cdr) {
     --n;
+    if (n < 0) {
+      RAISE << "Non-null pointer in reclaimed cell. It was probably prematurely reclaimed.\n" << die();
+      break;
+    }
+  }
   return n;
 }
 
