@@ -113,7 +113,7 @@ cell* eval(cell* expr, cell* scope) {
   // eval its args in the caller's lexical environment
   TEMP(spliced_args, splice_args(cdr(expr), scope, fn));
   TEMP(ordered_args, reorder_keyword_args(spliced_args, sig(fn)));
-  cell* new_scope = new_table();
+  TEMP(new_scope, mkref(new_table()));
   eval_bind_all(sig(fn), ordered_args, scope, new_scope);
 
   if (car(expr) != new_sym("speculatively")
@@ -121,7 +121,6 @@ cell* eval(cell* expr, cell* scope) {
     cell* result = ripple_incomplete_eval(fn, new_scope);
     trace("eval") << "ripple";
     trace("eval") << "=> " << result;
-    rmref(new_scope);
     return mkref(result);
   }
 

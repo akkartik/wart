@@ -147,6 +147,9 @@ void rmref(cell* c) {
   new_trace_frame("rmref");
   trace("gc") << "rmref";
   trace("gc/rmref") << c;
+
+  if (c->nrefs <= 0) cerr << 'X' << c << '\n';
+  cerr.flush();
   --c->nrefs;
   if (c->nrefs > 0) return;
 

@@ -57,11 +57,11 @@ COMPILE_FN(list_range, compiledfn_list_range, "($list $index $end)",
 
 COMPILE_FN(list_splice, compiledfn_list_splice, "('$list $start $end $val)",
   cell* binding = lookup("$list");
-  cell* list = eval(binding);
+  TEMP(list, eval(binding));
   long start = to_int(lookup("$start"));
   cell* pre_ptr = nth_cdr(list, start-1);
   cell* start_ptr = nth_cdr(list, start);
-  cell* end_ptr = nth_cdr(list, to_int(lookup("$end")));
+  TEMP(end_ptr, mkref(nth_cdr(list, to_int(lookup("$end")))));
   cell* val = lookup("$val");
 
   if (val == nil) {
@@ -70,15 +70,11 @@ COMPILE_FN(list_splice, compiledfn_list_splice, "('$list $start $end $val)",
   }
   else {
     set_car(start_ptr, car(val));
-    mkref(end_ptr);
-    cell* val2 = copy_list(val);
+    TEMP(val2, mkref(copy_list(val)));
     set_cdr(start_ptr, cdr(val2));
     append(start_ptr, end_ptr);
-    rmref(val2);
-    rmref(end_ptr);
   }
 
-  rmref(list);
   return mkref(val);
 )
 
@@ -117,6 +113,7 @@ void append(cell* x, cell* y) {
 // then return drop_ptr(p) which GC's the dummy but mkrefs the rest.
 cell* drop_ptr(cell* p) {
   cell* x = mkref(cdr(p));
+  if (p->nrefs == 0) ++p->nrefs;
   rmref(p);
   return x;
 }
@@ -154,12 +151,9 @@ struct cell_lt_comparator :public std::binary_function<cell*, cell*, bool> {
   cell* comparer;
   cell_lt_comparator(cell* f) :comparer(f) {}
   bool operator()(cell* a, cell* b) {
-    cell* expr = new_cons(comparer, new_cons(a, new_cons(b)));
-    cell* result = eval(expr);
-    bool ans = (strip_already_evald(result) != nil);
-    rmref(result);
-    rmref(expr);
-    return ans;
+    TEMP(expr, mkref(new_cons(comparer, new_cons(a, new_cons(b)))));
+    TEMP(result, eval(expr));
+    return strip_already_evald(result) != nil;
   }
 };
 
