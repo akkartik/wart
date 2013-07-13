@@ -13,19 +13,18 @@ cell* cdr(cell* x) {
 }
 
 void set_car(cell* x, cell* y) {
-  if (x == nil) {
-    RAISE << "set_car on nil\n";
+  if (!is_cons(x)) {
+    RAISE << "can't set car of " << x << '\n';
     return;
   }
   mkref(y);
-  if (is_cons(x))
-    rmref(car(x));
+  rmref(car(x));
   x->car = y;
 }
 
 void set_cdr(cell* x, cell* y) {
-  if (x == nil) {
-    RAISE << "set_cdr on nil\n";
+  if (!is_cons(x) && !is_table(x)) {
+    RAISE << "can't set cdr of " << x << '\n';
     return;
   }
   mkref(y);

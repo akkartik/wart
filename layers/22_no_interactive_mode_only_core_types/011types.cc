@@ -13,16 +13,16 @@ cell* cdr(cell* x) {
 }
 
 void set_car(cell* x, cell* y) {
-  if (x == nil) {
-    RAISE << "set_car on nil\n";
+  if (!is_cons(x)) {
+    RAISE << "can't set car of " << x << '\n';
     return;
   }
   x->car = y;
 }
 
 void set_cdr(cell* x, cell* y) {
-  if (x == nil) {
-    RAISE << "set_cdr on nil\n";
+  if (!is_cons(x)) {
+    RAISE << "can't set cdr of " << x << '\n';
     return;
   }
   x->cdr = y;
@@ -54,7 +54,7 @@ cell* new_num(long x) {
   return Int_literals[x];
 }
 
-cell* new_num(int x) {   // just for integer literals
+cell* new_num(int x) {  // just for integer literals
   return new_num((long)x);
 }
 
@@ -80,7 +80,7 @@ cell* new_sym(string x) {
   if (Sym_literals[x])
     return Sym_literals[x];
   Sym_literals[x] = new_cell();
-  Sym_literals[x]->car = (cell*)new string(x);   // not aligned like cells; can fragment memory
+  Sym_literals[x]->car = (cell*)new string(x);  // not aligned like cells; can fragment memory
   Sym_literals[x]->type = SYMBOL;
   return Sym_literals[x];
 }
@@ -89,7 +89,7 @@ bool is_sym(cell* x) {
   return x->type == SYMBOL;
 }
 
-cell* new_string(string x) {   // don't intern strings
+cell* new_string(string x) {  // don't intern strings
   cell* result = new_cell();
   result->car = (cell*)new string(x);
   result->type = STRING;

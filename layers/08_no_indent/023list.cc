@@ -107,6 +107,7 @@ cell* nth_cdr(cell* x, long n) {
 }
 
 void append(cell* x, cell* y) {
+  if (y == nil) return;
   while(cdr(x) != nil)
     x = cdr(x);
   set_cdr(x, y);
