@@ -23,14 +23,13 @@ COMPILE_FN(table_get, compiledfn_table_get, "($table $key)",
 
 COMPILE_FN(table_to_list, compiledfn_table_to_list, "($table)",
   cell_map table = to_table(lookup("$table"))->value;
-  cell* result = new_cell();
-  cell* curr = result;
+  cell* p_result = new_cell();  cell* curr = p_result;
   for (cell_map::iterator p = table.begin(); p != table.end(); ++p) {
     if (!p->second) continue;
     add_cons(curr, new_cons(p->first, new_cons(p->second)));
     curr=cdr(curr);
   }
-  return drop_ptr(result);
+  return drop_ptr(p_result);
 )
 
 COMPILE_FN(table_length, compiledfn_table_length, "($table)",

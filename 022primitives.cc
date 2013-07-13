@@ -8,7 +8,7 @@
 //  always increment the nrefs of a single cell along all codepaths
 
 COMPILE_FN(fn, compiledfn_fn, "'($params ... $body)",
-  cell* f = new_table();
+  TEMP(f, mkref(new_table()));
   set(f, sym_sig, lookup("$params"));
   set(f, sym_body, lookup("$body"));
   set(f, sym_env, cdr(Curr_lexical_scope));

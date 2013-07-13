@@ -441,7 +441,7 @@ cell* args_in_param_order(cell* params, cell* non_keyword_args, cell* keyword_ar
 cell* keyword_param(cell* arg, cell* params, bool& is_rest) {
   is_rest = false;
   if (!is_keyword_sym(arg)) return NULL;
-  cell* candidate = new_sym(to_string(arg).substr(1));
+  TEMP(candidate, mkref(new_sym(to_string(arg).substr(1))));
   for (params=strip_quote(params); params != nil; params=strip_quote(cdr(params))) {
     cell* param = (is_cons(params) && !is_alias(params))
                   ? strip_quote(car(params))

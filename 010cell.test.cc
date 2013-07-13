@@ -9,20 +9,9 @@ void test_new_cell_has_nil_car_and_cdr() {
   CHECK_EQ(x->cdr, nil);
 }
 
-void test_new_cell_doesnt_mkref() {
-  CLEAR_TRACE;
-  unused cell* dummy = new_cell();
-  CHECK_EQ(trace_count("gc", "alloc"), 1);
-  CHECK_TRACE_DOESNT_CONTAIN("gc", "mkref");
-  rmref(dummy);
-}
-
 void test_rmref_frees_space() {
   CLEAR_TRACE;
-  cell* c = new_cell();
-  rmref(c);
-  CHECK_EQ(trace_count("gc", "free"), 1);
-  c = mkref(new_cell());
+  cell* c = mkref(new_cell());
   CLEAR_TRACE;
   rmref(c);
   CHECK_EQ(trace_count("gc", "free"), 1);
