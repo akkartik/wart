@@ -87,8 +87,11 @@ struct trace_stream {
 
 trace_stream* Trace_stream = NULL;
 
+// Top-level helper. IMPORTANT: can't nest.
 #define trace(layer)  !Trace_stream ? cerr /*print nothing*/ : Trace_stream->stream(layer)
-#define RAISE  (!Trace_stream ? cerr /*do print*/ : Trace_stream->stream("warn")) << __FILE__ << ":" << __LINE__ << " "
+// Warnings should go straight to cerr by default since calls to trace() have
+// some unfriendly constraints (they delay printing, they can't nest)
+#define RAISE  ((!Trace_stream || !Hide_warnings) ? cerr /*do print*/ : Trace_stream->stream("warn")) << __FILE__ << ":" << __LINE__ << " "
 
 :(before "End Types")
 // RAISE << die exits after printing -- unless Hide_warnings is set.

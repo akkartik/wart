@@ -119,6 +119,7 @@ void test_trace_supports_count2() {
 // pending: readable_contents() adds newline if necessary.
 // pending: RAISE also prints to stderr.
 // pending: RAISE doesn't print to stderr if Hide_warnings is set.
+// pending: RAISE doesn't have to be saved if Hide_warnings is set, just printed.
 // pending: RAISE prints to stderr if Trace_stream is NULL.
 // pending: RAISE prints to stderr if Trace_stream is NULL even if Hide_warnings is set.
 // pending: RAISE << ... die() doesn't die if Hide_warnings is set.
