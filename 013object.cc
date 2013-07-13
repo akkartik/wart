@@ -59,8 +59,6 @@ cell* coerce_quoted(cell* x, cell* dest_type, cell* coercions) {
     RAISE << "can't coerce " << typ << " " << x << " to " << dest_type << '\n';
     return nil;
   }
-  cell* expr = new_cons(coercer, new_cons(new_cons(sym_quote, x)));
-  cell* result = eval(expr);
-  rmref(expr);
-  return result;  // already mkref'd
+  TEMP(expr, mkref(new_cons(coercer, new_cons(new_cons(sym_quote, x)))));
+  return eval(expr);
 }
