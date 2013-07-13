@@ -318,7 +318,7 @@ void eval_bind_all(cell* params, cell* args) {
   else if (is_sym(params))
     bind_params(params, eval_all(args));
 
-  else if (!is_cell(params))
+  else if (!is_tree(params))
     ;
 
   else {
@@ -334,10 +334,10 @@ void bind_params(cell* params, cell* args) {
   else if (is_sym(params))
     new_binding(params, args);
 
-  else if (!is_cell(params))
+  else if (!is_tree(params))
     ;
 
-  else if (args != nil && !is_cell(args))
+  else if (args != nil && !is_tree(args))
     bind_params(params, nil);
 
   else {
@@ -347,7 +347,7 @@ void bind_params(cell* params, cell* args) {
 }
 
 cell* eval_all(cell* args) {
-  if (!is_cell(args))
+  if (!is_tree(args))
     return eval(args);
   cell* p_result = new_cell(), *curr = p_result;
   for (; args != nil; args=right(args), curr=right(curr))
@@ -426,7 +426,7 @@ cell* eval_all(cell* args) {
 
 :(code)   //// internals
 bool is_quoted(cell* cell) {
-  return is_cell(cell) && left(cell) == new_sym("'");
+  return is_tree(cell) && left(cell) == new_sym("'");
 }
 
 cell* strip_quote(cell* cell) {
@@ -442,7 +442,7 @@ bool is_keyword_sym(cell* x) {
 
 // fn = (sig ... body)
 bool is_fn(cell* x) {
-  return is_cell(x) && left(x) == new_sym("fn");
+  return is_tree(x) && left(x) == new_sym("fn");
 }
 
 cell* sig(cell* fn) {

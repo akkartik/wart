@@ -1,7 +1,7 @@
 // construct a parse tree of 'cells' for the next expr in input
 :(code)
 cell* read(istream& in) {
-  return build_cell(next_ast_node(in));  // see build
+  return build_cell(next_ast_node(in));
 }
 
 :(before "End Types")
@@ -88,7 +88,7 @@ ostream& operator<<(ostream& os, cell* c) {
       return os << left(c) << right(c);
     os << "(" << left(c);
     for (cell* curr = right(c); curr != nil; curr = right(curr)) {
-      if (is_cell(curr))
+      if (is_tree(curr))
         os << " " << left(curr);
       else
         os << " ... " << curr;
