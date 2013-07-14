@@ -82,13 +82,10 @@ void run_tests() {
 }
 
 void verify() {
-  bool old_hide_warnings = Hide_warnings;
   Hide_warnings = false;
   teardown_bindings();
   if (!Passed)
     ;
-  else if (!old_hide_warnings && trace_count("warn"))
-    DUMP("warn");
   else
     cerr << ".";
 }

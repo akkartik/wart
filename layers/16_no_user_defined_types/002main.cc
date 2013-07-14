@@ -84,13 +84,10 @@ void run_tests() {
 }
 
 void verify() {
-  bool old_hide_warnings = Hide_warnings;
   Hide_warnings = false;
   teardown_cells();
   if (!Passed)
     ;
-  else if (!old_hide_warnings && trace_count("warn"))
-    DUMP("warn");
   else if (num_unfreed() > 0)
     dump_unfreed();
   else
