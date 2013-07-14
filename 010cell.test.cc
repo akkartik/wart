@@ -10,9 +10,7 @@ void test_new_cell_has_nil_car_and_cdr() {
 }
 
 void test_rmref_frees_space() {
-  CLEAR_TRACE;
   cell* c = mkref(new_cell());
-  CLEAR_TRACE;
   rmref(c);
   CHECK_EQ(trace_count("gc", "free"), 1);
 }
