@@ -75,7 +75,7 @@
 //// Globals
 // End Globals
 
-//// End Tracing            // hack: tracing code must come before anything else
+//// End Tracing          // hack: tracing code must come before anything else
 
 int main(int argc, char* argv[]) {
   if (argc > 1) {
