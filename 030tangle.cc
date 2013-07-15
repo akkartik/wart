@@ -71,7 +71,8 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
     }
     string curr_indent = indent(*target);
     for (list<string>::iterator p = hunk.begin(); p != hunk.end(); ++p)
-      p->insert(p->begin(), curr_indent.begin(), curr_indent.end());
+      if (!p->empty())
+        p->insert(p->begin(), curr_indent.begin(), curr_indent.end());
 
     if (cmd == "after") ++target;
     out.insert(target, hunk.begin(), hunk.end());
