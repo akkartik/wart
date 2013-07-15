@@ -4,26 +4,24 @@
 // create a new file and start hacking.
 //
 // The first few files (00*) are independent of what this program does, an
-// experimental skeleton to make it easier for outsiders to understand, and
-// easier for veterans to change in arbitrary, radical ways. By making the
-// code more outsider-friendly and rewrite-friendly we hope to keep this
-// program hackable over time, rather than tying programmers up in
+// experimental skeleton allowing it to be organized in 'layers' of
+// functionality. Along with tests, organizing programs with concerns in
+// separate 'layers' will hopefully make them easier for outsiders to
+// understand, and easier for veterans to change in arbitrary, radical ways.
+// By making the code more outsider-friendly and rewrite-friendly we hope to
+// keep this program hackable over time, rather than tying programmers up in
 // ever-increasing knots as often happens today.
 //
 // This file contains a bare-bones program in legal C++. It doesn't do
 // anything yet; subsequent files will add behaviors by inserting lines into
 // it with directives like:
-//   :(before "pattern")  // look for a line containing "pattern", insert the following lines before it
-//   #include foo
-//   #include bar
-// or:
-//   :(after "pattern")
-//   // process argument "-z"
-//   ...
+//   :(before "pattern")
+// This will insert the following lines before a line in the codebase matching
+// "pattern".
 //
 // An example in color: http://i.imgur.com/0eONnyX.png (directives shaded dark)
 //
-// Patterns are usually in comments (capitalized to indicate you can't change
+// Patterns are usually in comments (capitalized to hint that you can't change
 // them willy-nilly), but they don't have to be.
 //
 // A single pattern line might have many different code fragments added before
