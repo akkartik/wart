@@ -3,14 +3,11 @@
 //
 // Lisp was the original dynamic language, where functions could be defined
 // anytime, passed around like any other value, and new code could be
-// constructed on the fly.
-//
-// It matters that it came first only because it indicates that lisp is one of
-// the easiest ways to get these features. (http://paulgraham.com/rootsoflisp.html)
-//
-// These features help us both to organize code for reading and to do with as
-// little code as possible. Using just a few core powerful concepts helps
-// reduce the learning you have to wade through before you can make changes.
+// constructed on the fly. Being first suggests it may be one of the easiest
+// ways to get these features. (http://paulgraham.com/rootsoflisp.html)
+// Less code means it's more tractable to find the right narrative, and
+// readers will hopefully require less effort to understand, and be able to
+// make changes faster.
 //
 // Later we'll show how to create new notations (lisp macros) on the fly that
 // are as well-supported as the original notations.
@@ -18,10 +15,6 @@
 //   "In Lisp, you don't just write your program down toward the language, you
 //   also build the language up toward your program."
 //     -- http://www.paulgraham.com/progbot.html
-//
-// Lisp isn't perfect or inviolate; we'll be tweaking its rules in later
-// files/layers to further strengthen/minimize the core concepts that
-// everything else can be built out of.
 
 :(before "End Main")
 load_file("init.wart");
@@ -33,16 +26,14 @@ void load_file(const char* filename) {
   run(f);
 }
 
-// Run a lisp expression in two stages:
-//  a) _read_ the program and turn it into a tree of cells,
+// Lisp programs are run in two stages:
+//  a) _read_ the text of the program into a tree of cells
 //  b) _evaluate_ the tree of cells to yield a result
-// To run an entire program, run each expr in sequence, and return the result
-// of the final expr.
 cell* run(istream& in) {
   cell* result = nil;
   do {
       // TEMP and 'update' help recycle cells after we're done with them
-      // we gotta pay attention to this anytime we manage cells; see the memory layer
+      // gotta pay attention to this all the time; see the 'memory' file
       TEMP(form, read(in));
       update(result, eval(form));
   } while (!eof(in));
