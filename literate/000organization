@@ -1,16 +1,15 @@
 // You guessed right: the '000' prefix means you should start reading here.
 //
-// This project is setup to compile all files with a numeric prefix. Just
-// create a new file and start hacking.
+// This project is setup to load all files with a numeric prefix. Just create
+// a new file and start hacking.
 //
 // The first few files (00*) are independent of what this program does, an
 // experimental skeleton allowing it to be organized in 'layers' of
-// functionality. Along with tests, organizing programs with concerns in
-// separate 'layers' will hopefully make them easier for outsiders to
-// understand, and easier for veterans to change in arbitrary, radical ways.
-// By making the code more outsider-friendly and rewrite-friendly we hope to
-// keep this program hackable over time, rather than tying programmers up in
-// ever-increasing knots as often happens today.
+// functionality. Along with tests, a layered organization will hopefully make
+// programs more malleable -- easier for outsiders to understand, and easier
+// for veterans to change in arbitrary, radical ways. By making the code more
+// outsider-friendly and rewrite-friendly we hope to avoid tying programmers
+// up in ever-increasing knots as often happens today.
 //
 // This file contains a bare-bones program in legal C++. It doesn't do
 // anything yet; subsequent files will add behaviors by inserting lines into
@@ -34,11 +33,10 @@
 // present his code in the order best suited for reading, rather than the
 // order dictated by the dumb/lazy/ossified language.
 //
-// Reordering for narrative coherence does more than just shuffle code around.
-// Past the initial skeleton of this program (currently 00*-02*), it ought to
-// be possible to stop loading after any file, build and run the program, and
-// pass all tests for loaded features.
-// (Relevant is http://youtube.com/watch?v=c8N72t7aScY, a scene from
+// Layers do more than just shuffle code around. Past the initial skeleton of
+// this program (currently 00*-02*), it ought to be possible to stop loading
+// after any file, build and run the program, and pass all tests for loaded
+// features. (Relevant is http://youtube.com/watch?v=c8N72t7aScY, a scene from
 // "2001: A Space Odyssey".)
 //
 // This 'subsetting guarantee' ensures that this directory contains a
