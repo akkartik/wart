@@ -87,13 +87,14 @@ void test_list_of_cells() {
 }
 
 // helper: print cells in traces, scenarios
-// beware: this code should never call trace, or os could be corrupted
+// warning: should never call something that calls trace
+// see how sym_quote avoids this
 ostream& operator<<(ostream& os, cell* c) {
   if (c == NULL) return os << "NULLNULLNULL";  // error
   if (c == nil) return os << "nil";
   switch(c->type) {
   case TREE:
-    if (left(c) == new_sym("'"))
+    if (left(c) == sym_quote)
       return os << left(c) << right(c);
     os << "(" << left(c);
     for (cell* curr = right(c); curr != nil; curr = right(curr)) {
@@ -114,3 +115,7 @@ ostream& operator<<(ostream& os, cell* c) {
     return os;
   }
 }
+:(before "End Globals")
+cell* sym_quote = NULL;
+:(before "End Setup")
+  sym_quote = new_sym("'");

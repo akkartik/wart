@@ -33,8 +33,8 @@ void test_cell_layout() {
 :(code)
 cell* mkref(cell* c) {
   if (c == nil) return nil;   // nil is never reclaimed
-//?   trace("mem") << "mkref";
-//?   trace("mem/mkref") << c;
+  trace("mem") << "mkref";
+  trace("mem/mkref") << c;
   ++c->nrefs;
   return c;
 }
@@ -138,7 +138,7 @@ cell* new_cell() {
   ++Num_used_cells;
   cell* result = new cell;
   init(result);
-//?   trace("mem/dump") << "alloc: " << (void*)result;  // segfaults when called from operator<<
+  trace("mem/dump") << "alloc: " << (void*)result;  // segfaults when called from operator<<
   return result;
 }
 
