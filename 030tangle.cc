@@ -89,8 +89,6 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
 // Remember to update is_input below if you add to this format.
 void emit_test(const string& name, list<string>& lines, list<string>& result) {
   result.push_back("void test_"+name+"() {");
-  if (any_line_starts_with(lines, "=>"))
-    result.push_back("  ostringstream os;");
   while (any_non_input_line(lines)) {
     if (!any_line_starts_with(lines, "=>"))
       emit_session(lines, result);  // simpler version; no need to check result
@@ -123,13 +121,15 @@ void emit_session(list<string>& lines, list<string>& result) {
 }
 
 void emit_result_checking_session(list<string>& lines, list<string>& result) {
-  result.push_back("  os.clear();  os.str(\"\");");
+  result.push_back("{");
+  result.push_back("  ostringstream os;");
   result.push_back("  os << "+Toplevel+"(\""+input_lines(lines)+"\");");
   if (!lines.empty() && starts_with(lines.front(), "=>")) {
     size_t pos = lines.front().find("=>")+2;  // length of '=>'
     result.push_back("  CHECK_EQ(os.str(), \""+trim(string(lines.front(), pos))+"\");");
     lines.pop_front();
   }
+  result.push_back("}");
 }
 
 bool is_input(const string& line) {
