@@ -2,8 +2,9 @@
 
 :(before "End Globals")
 unordered_map<string, cell*> Sym_literals;
-:(before "Test Teardown")
-Sym_literals.clear();
+:(before "End Test Teardown")
+  Sym_literals.clear();
+
 :(code)
 cell* new_sym(string x) {
   if (Sym_literals[x])

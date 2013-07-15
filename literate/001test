@@ -43,11 +43,11 @@ void run_tests() {
   cerr << "C tests: " << ctime(&t);
   for (unsigned long i=0; i < sizeof(Tests)/sizeof(Tests[0]); ++i) {
     setup();
-    // End Test Initialization
+    // End Test Setup
     (*Tests[i])();
     if (Passed) cerr << ".";
-    // Test Verification
     // Test Teardown
+    // End Test Teardown
   }
 
   cerr << '\n';

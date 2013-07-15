@@ -22,6 +22,9 @@ void new_binding(cell* sym, cell* val) {
   Bindings[sym] = val;
 }
 
+:(before "End Test Teardown")
+  teardown_bindings();
+:(code)
 void teardown_bindings() {
   Bindings.clear();
 }
