@@ -67,23 +67,23 @@ cell* build_cell(ast_node n) {
 
 :(scenarios read_all)
 
-:(scenario read_nil)
+:(scenario build_nil)
 ()
 +cell: nil
 
-:(scenario read_nil2)
+:(scenario build_nil2)
 nil
 +cell: nil
 
-:(scenario read_integer)
+:(scenario build_integer)
 34
 +cell: num 34
 
-:(scenario read_symbol)
+:(scenario build_symbol)
 a
 +cell: sym a
 
-:(scenario read_string)
+:(scenario build_string)
 "a"
 +cell: string "a"
 
@@ -93,26 +93,26 @@ void test_strings_and_syms_are_different() {
   CHECK(s != new_sym("a"));
 }
 
-:(scenario read_handles_quoted_sym)
+:(scenario build_handles_quoted_sym)
 'a
 +cell: sym '
 +cell: sym a
 +cell: 'a
 :(code)
-void test_read_handles_quoted_sym2() {
+void test_build_handles_quoted_sym2() {
   list<cell*> result = read_all("'a");
   cell* c = result.front();
   CHECK_EQ(left(c), new_sym("'"));
   CHECK_EQ(right(c), new_sym("a"));
 }
 
-:(scenario read_handles_atoms)
+:(scenario build_handles_atoms)
 34
 35
 +cell: num 34
 +cell: num 35
 
-:(scenario read_handles_form)
+:(scenario build_handles_form)
 (34 35)
 +cell: num 34
 +cell: num 35
@@ -120,17 +120,17 @@ void test_read_handles_quoted_sym2() {
 +cell/3: (35)
 +cell/2: (34 35)
 
-:(scenario read_handles_dotted_list)
+:(scenario build_handles_dotted_list)
 (34 ... 35)
 +cell: num 34
 +cell: num 35
 +cell/2: (34 ... 35)
 
-:(scenario read_handles_literal_ellipses)
+:(scenario build_handles_literal_ellipses)
 '...
 +cell: '...
 
-:(scenario read_handles_nested_form)
+:(scenario build_handles_nested_form)
 (3 7 (33 23))
 +cell: num 3
 +cell: num 7
@@ -141,7 +141,7 @@ void test_read_handles_quoted_sym2() {
 +cell: (7 (33 23))
 +cell: (3 7 (33 23))
 
-:(scenario read_handles_strings)
+:(scenario build_handles_strings)
 (3 7 (33 "abc" 23))
 +cell: num 3
 +cell: num 7
@@ -153,7 +153,7 @@ void test_read_handles_quoted_sym2() {
 +cell: (7 (33 "abc" 23))
 +cell: (3 7 (33 "abc" 23))
 
-:(scenario read_handles_syms)
+:(scenario build_handles_syms)
 (3 7 (33 "abc" 3de 23))
 +cell: num 3
 +cell: num 7
