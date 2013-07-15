@@ -49,7 +49,7 @@ void test_tangle_supports_scenarios() {
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {");  lines.pop_front();
-  CHECK_EQ(lines.front(), "  run(\"abc def\\n\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  rmref(run(\"abc def\\n\"));");  lines.pop_front();
   CHECK_EQ(lines.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqrlayer2: xyz\");");  lines.pop_front();
   CHECK_EQ(lines.front(), "}");  lines.pop_front();
   CHECK(lines.empty());
@@ -60,7 +60,7 @@ void test_tangle_supports_configurable_toplevel() {
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {");  lines.pop_front();
-  CHECK_EQ(lines.front(), "  foo(\"abc def\\n\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  rmref(foo(\"abc def\\n\"));");  lines.pop_front();
   CHECK_EQ(lines.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqr\");");  lines.pop_front();
   CHECK_EQ(lines.front(), "}");  lines.pop_front();
   CHECK(lines.empty());
@@ -74,7 +74,7 @@ void test_tangle_supports_strings_in_scenarios() {
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {");  lines.pop_front();
-  CHECK_EQ(lines.front(), "  run(\"abc \\\"def\\\"\\n\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  rmref(run(\"abc \\\"def\\\"\\n\"));");  lines.pop_front();
   CHECK_EQ(lines.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqrlayer2: \\\"xyz\\\"\");");  lines.pop_front();
   CHECK_EQ(lines.front(), "}");  lines.pop_front();
   CHECK(lines.empty());
@@ -85,7 +85,7 @@ void test_tangle_supports_strings_in_scenarios2() {
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {");  lines.pop_front();
-  CHECK_EQ(lines.front(), "  run(\"abc \\\"\\\"\\n\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  rmref(run(\"abc \\\"\\\"\\n\"));");  lines.pop_front();
   CHECK_EQ(lines.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqrlayer2: \\\"\\\"\");");  lines.pop_front();
   CHECK_EQ(lines.front(), "}");  lines.pop_front();
   CHECK(lines.empty());
@@ -96,7 +96,7 @@ void test_tangle_supports_multiline_input_in_scenarios() {
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {");  lines.pop_front();
-  CHECK_EQ(lines.front(), "  run(\"abc def\\n  efg\\n\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  rmref(run(\"abc def\\n  efg\\n\"));");  lines.pop_front();
   CHECK_EQ(lines.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqrlayer2: \\\"\\\"\");");  lines.pop_front();
   CHECK_EQ(lines.front(), "}");  lines.pop_front();
   CHECK(lines.empty());
@@ -107,9 +107,9 @@ void test_tangle_supports_reset_in_scenarios() {
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {");  lines.pop_front();
-  CHECK_EQ(lines.front(), "  run(\"abc def\\n\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  rmref(run(\"abc def\\n\"));");  lines.pop_front();
   CHECK_EQ(lines.front(), "  CLEAR_TRACE;");  lines.pop_front();
-  CHECK_EQ(lines.front(), "  run(\"efg\\n\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  rmref(run(\"efg\\n\"));");  lines.pop_front();
   CHECK_EQ(lines.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqrlayer2: \\\"\\\"\");");  lines.pop_front();
   CHECK_EQ(lines.front(), "}");  lines.pop_front();
   CHECK(lines.empty());
@@ -120,7 +120,7 @@ void test_tangle_can_check_for_absence_at_end_of_scenarios() {
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {");  lines.pop_front();
-  CHECK_EQ(lines.front(), "  run(\"abc def\\n  efg\\n\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  rmref(run(\"abc def\\n  efg\\n\"));");  lines.pop_front();
   CHECK_EQ(lines.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqr\");");  lines.pop_front();
   CHECK_EQ(lines.front(), "  CHECK_TRACE_DOESNT_CONTAIN(\"layer1: xyz\");");  lines.pop_front();
   CHECK_EQ(lines.front(), "}");  lines.pop_front();
@@ -132,7 +132,7 @@ void test_tangle_can_check_for_absence_at_end_of_scenarios2() {
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {");  lines.pop_front();
-  CHECK_EQ(lines.front(), "  run(\"abc def\\n  efg\\n\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  rmref(run(\"abc def\\n  efg\\n\"));");  lines.pop_front();
   CHECK_EQ(lines.front(), "  CHECK_TRACE_DOESNT_CONTAIN(\"layer1: pqr\");");  lines.pop_front();
   CHECK_EQ(lines.front(), "  CHECK_TRACE_DOESNT_CONTAIN(\"layer1: xyz\");");  lines.pop_front();
   CHECK_EQ(lines.front(), "}");  lines.pop_front();
@@ -144,10 +144,12 @@ void test_tangle_can_check_return_values_of_scenarios() {
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {");  lines.pop_front();
+  CHECK_EQ(lines.front(), "{");  lines.pop_front();
   CHECK_EQ(lines.front(), "  ostringstream os;");  lines.pop_front();
-  CHECK_EQ(lines.front(), "  os.clear();  os.str(\"\");");  lines.pop_front();
-  CHECK_EQ(lines.front(), "  os << run(\"abc def\\n\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  TEMP(tmp, run(\"abc def\\n\"));");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  os << tmp;");  lines.pop_front();
   CHECK_EQ(lines.front(), "  CHECK_EQ(os.str(), \"pqr\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "}");  lines.pop_front();
   CHECK_EQ(lines.front(), "}");  lines.pop_front();
   CHECK(lines.empty());
 }
@@ -157,14 +159,19 @@ void test_tangle_can_check_return_values_of_multiple_scenarios() {
   list<string> lines;
   tangle(in, lines);
   CHECK_EQ(lines.front(), "void test_does_bar() {");  lines.pop_front();
+  CHECK_EQ(lines.front(), "{");  lines.pop_front();
   CHECK_EQ(lines.front(), "  ostringstream os;");  lines.pop_front();
-  CHECK_EQ(lines.front(), "  os.clear();  os.str(\"\");");  lines.pop_front();
-  CHECK_EQ(lines.front(), "  os << run(\"abc\\n\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  TEMP(tmp, run(\"abc\\n\"));");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  os << tmp;");  lines.pop_front();
   CHECK_EQ(lines.front(), "  CHECK_EQ(os.str(), \"pqr\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "}");  lines.pop_front();
   CHECK_EQ(lines.front(), "  CHECK_TRACE_CONTENTS(\"layer1: pqr\");");  lines.pop_front();
-  CHECK_EQ(lines.front(), "  os.clear();  os.str(\"\");");  lines.pop_front();
-  CHECK_EQ(lines.front(), "  os << run(\"def\\n\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "{");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  ostringstream os;");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  TEMP(tmp, run(\"def\\n\"));");  lines.pop_front();
+  CHECK_EQ(lines.front(), "  os << tmp;");  lines.pop_front();
   CHECK_EQ(lines.front(), "  CHECK_EQ(os.str(), \"xyz\");");  lines.pop_front();
+  CHECK_EQ(lines.front(), "}");  lines.pop_front();
   CHECK_EQ(lines.front(), "}");  lines.pop_front();
   CHECK(lines.empty());
 }

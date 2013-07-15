@@ -1,8 +1,13 @@
-//// numbers
-
 :(before "End Globals")
+// reuse a single cell whenever you encounter say 34
 unordered_map<long, cell*> Int_literals;
 :(before "End Test Teardown")
+  for (unordered_map<long, cell*>::iterator p = Int_literals.begin(); p != Int_literals.end(); ++p) {
+    if (!p->second) continue;
+    if (p->second->nrefs > 1)
+      RAISE << "couldn't unintern " << p->first << " (" << p->second->nrefs << " references)\n";
+    free_cell(p->second);
+  }
   Int_literals.clear();
 
 :(code)
@@ -12,10 +17,10 @@ cell* new_num(long x) {
   Int_literals[x] = new_cell();
   Int_literals[x]->left = (cell*)x;
   Int_literals[x]->type = INTEGER;
-  return Int_literals[x];
+  return mkref(Int_literals[x]);  // track reference from Int_literals
 }
 
-cell* new_num(int x) {   // just for integer literals
+cell* new_num(int x) {
   return new_num((long)x);
 }
 
@@ -29,4 +34,10 @@ long to_int(cell* x) {
     return (long)x->left;
   RAISE << "not a number: " << x << '\n';
   return 0;
+}
+
+void test_ints_are_reused() {
+  TEMP(num, mkref(new_num(23)));
+  TEMP(num2, mkref(new_num(23)));
+  CHECK_EQ(num, num2);
 }

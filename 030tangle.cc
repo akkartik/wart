@@ -118,13 +118,14 @@ void emit_test(const string& name, list<string>& lines, list<string>& result) {
 }
 
 void emit_session(list<string>& lines, list<string>& result) {
-  result.push_back("  "+Toplevel+"(\""+input_lines(lines)+"\");");
+  result.push_back("  rmref("+Toplevel+"(\""+input_lines(lines)+"\"));");
 }
 
 void emit_result_checking_session(list<string>& lines, list<string>& result) {
   result.push_back("{");
   result.push_back("  ostringstream os;");
-  result.push_back("  os << "+Toplevel+"(\""+input_lines(lines)+"\");");
+  result.push_back("  TEMP(tmp, "+Toplevel+"(\""+input_lines(lines)+"\"));");
+  result.push_back("  os << tmp;");
   if (!lines.empty() && starts_with(lines.front(), "=>")) {
     size_t pos = lines.front().find("=>")+2;  // length of '=>'
     result.push_back("  CHECK_EQ(os.str(), \""+trim(string(lines.front(), pos))+"\");");

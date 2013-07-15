@@ -39,9 +39,12 @@ void load_file(const char* filename) {
 // To run an entire program, run each expr in sequence, and return the result
 // of the final expr.
 cell* run(istream& in) {
-  cell* result = NULL;
+  cell* result = nil;
   do {
-      result = eval(read(in));
+      // TEMP and 'update' help recycle cells after we're done with them
+      // we gotta pay attention to this anytime we manage cells; see the memory layer
+      TEMP(form, read(in));
+      update(result, eval(form));
   } while (!eof(in));
   return result;
 }
