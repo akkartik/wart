@@ -5,9 +5,9 @@
 // anytime, passed around like any other value, and new code could be
 // constructed on the fly. Being first suggests it may be one of the easiest
 // ways to get these features. (http://paulgraham.com/rootsoflisp.html)
-// Less code means it's more tractable to find the right narrative, and
-// readers will hopefully require less effort to understand, and be able to
-// make changes faster.
+// Less code hopefully means it's more tractable to find the right narrative,
+// that readers will require less effort to understand it, and that they'll
+// therefore be more quickly able to make changes to it.
 //
 // Later we'll show how to create new notations (lisp macros) on the fly that
 // are as well-supported as the original notations.
