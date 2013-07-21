@@ -139,7 +139,7 @@ cell* new_cell() {
   ++Num_used_cells;
   cell* result = new cell;
   init(result);
-  trace("mem/dump") << "alloc: " << (void*)result;  // segfaults when called from operator<<
+  trace("mem/dump") << "alloc: " << (void*)result;
   return result;
 }
 
