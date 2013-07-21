@@ -42,7 +42,17 @@ void test_tangle_warns_on_unknown_target() {
   CHECK_TRACE_WARNS();
 }
 
+void test_tangle_replace() {
+  istringstream in("a\nb\nc\n:(replace b)\nd\n");
+  list<string> dummy;
+  tangle(in, dummy);
+  CHECK_TRACE_CONTENTS("tangle", "adc");
+  CHECK_TRACE_DOESNT_CONTAIN("tangle", "b");
+}
+
 // todo: include line numbers in tangle errors
+
+
 
 void test_tangle_supports_scenarios() {
   istringstream in(":(scenario does_bar)\nabc def\n+layer1: pqr\n+layer2: xyz");

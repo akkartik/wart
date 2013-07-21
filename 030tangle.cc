@@ -58,7 +58,7 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
     return;
   }
 
-  if (cmd == "before" || cmd == "after") {
+  if (cmd == "before" || cmd == "after" || cmd == "replace") {
     cell* x1 = car(cdr(expr));
     if (x1 == nil) {
       RAISE << "No target for " << cmd << " directive.\n" << die();
@@ -76,6 +76,7 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
 
     if (cmd == "after") ++target;
     out.insert(target, hunk.begin(), hunk.end());
+    if (cmd == "replace") out.erase(target);
     return;
   }
 
