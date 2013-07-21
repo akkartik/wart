@@ -82,15 +82,16 @@ void reclaim(cell* c) {
 :(before "End Types")
 struct lease_cell;
 #define TEMP(var, cell_expr) cell* var = cell_expr; lease_cell lease_##var(var);
-void rmref(cell*);
 // RAII for temporaries
 struct lease_cell {
   cell* value;
-  lease_cell(cell* v) :value(v) {}
-  ~lease_cell() { rmref(value); }
+  lease_cell(cell* v);
+  ~lease_cell();
 };
-
 :(code)
+  lease_cell::lease_cell(cell* v) :value(v) {}
+  lease_cell::~lease_cell() { rmref(value); }
+
 void update(cell*& var, cell* expr) {
   rmref(var);
   var = expr;
