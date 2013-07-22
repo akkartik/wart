@@ -160,7 +160,6 @@ void skip_comment(istream& in) {
   }
 }
 
-
 void skip_whitespace(istream& in) {
   while (isspace(in.peek()) && in.peek() != '\n')
     in.get();

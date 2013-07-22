@@ -37,8 +37,8 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
     }
   }
 
-  TEMP(expr, read(directive.substr(1)));
-  string cmd = to_string(car(expr));
+  istringstream directive_stream(directive.substr(2));  // length of ":("
+  string cmd = next_tangle_token(directive_stream);
 
   if (cmd == "code") {
     out.insert(out.end(), hunk.begin(), hunk.end());
@@ -46,27 +46,27 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
   }
 
   if (cmd == "scenarios") {
-    Toplevel = to_string(car(cdr(expr)));
+    Toplevel = next_tangle_token(directive_stream);
     return;
   }
 
   if (cmd == "scenario") {
     list<string> result;
-    string name = to_string(car(cdr(expr)));
+    string name = next_tangle_token(directive_stream);
     emit_test(name, hunk, result);
     out.insert(out.end(), result.begin(), result.end());
     return;
   }
 
-  if (cmd == "before" || cmd == "after" || cmd == "replace") {
-    cell* x1 = car(cdr(expr));
-    if (x1 == nil) {
+  if (cmd == "before" || cmd == "after" || cmd == "replace" || cmd == "replace{}") {
+    string pat = next_tangle_token(directive_stream);
+    if (pat == "") {
       RAISE << "No target for " << cmd << " directive.\n" << die();
       return;
     }
-    list<string>::iterator target = find_substr(out, to_string(x1));
+    list<string>::iterator target = find_substr(out, pat);
     if (target == out.end()) {
-      RAISE << "Couldn't find target " << x1 << '\n' << die();
+      RAISE << "Couldn't find target " << pat << '\n' << die();
       return;
     }
     string curr_indent = indent(*target);
@@ -77,10 +77,48 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
     if (cmd == "after") ++target;
     out.insert(target, hunk.begin(), hunk.end());
     if (cmd == "replace") out.erase(target);
+    else if (cmd == "replace{}") out.erase(target, balancing_curly(target));
     return;
   }
 
   RAISE << "unknown directive " << cmd << '\n';
+}
+
+string next_tangle_token(istream& in) {
+  in >> std::noskipws;
+  ostringstream out;
+  skip_whitespace(in);
+  if (in.peek() == '"')
+    slurp_tangle_string(in, out);
+  else
+    slurp_word(in, out);
+  return out.str();
+}
+
+void slurp_tangle_string(istream& in, ostream& out) {
+  in.get();
+  char c;
+  while (in >> c) {
+    if (c == '\\')  // only works for double-quotes
+      continue;
+    if (c == '"')
+      break;
+    out << c;
+  }
+}
+
+list<string>::iterator balancing_curly(list<string>::iterator orig) {
+  list<string>::iterator curr = orig;
+  long open_curlies = 0;
+  do {
+    for (string::iterator p = curr->begin(); p != curr->end(); ++p) {
+      if (*p == '{') ++open_curlies;
+      if (*p == '}') --open_curlies;
+    }
+    ++curr;
+    // no guard so far against unbalanced curly
+  } while (open_curlies != 0);
+  return curr;
 }
 
 // A scenario is one or more sessions separated by calls to CLEAR_TRACE ('===')
