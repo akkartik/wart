@@ -6,6 +6,10 @@
 x
 => 3
 
+:(after "Eval Cleanup(fn, expr, result)")
+  for (cell* x = sig(fn); x != nil; x=right(x))
+    end_binding(left(x));
+
 :(before "End Globals")
 unordered_map<cell*, stack<cell*> > Dynamics;
 :(replace{} "lookup(cell*")

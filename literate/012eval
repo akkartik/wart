@@ -59,6 +59,8 @@ cell* eval(cell* expr) {
   result = nil;
   for (cell* form = body(fn); form != nil; form=right(form))
     update(result, eval(left(form)));
+
+  // Eval Cleanup(fn, expr, result)
   trace("eval") << "=> " << result;
   return result;
 }
