@@ -1,3 +1,4 @@
+// Variables in lisp are built by _binding_ values to 'symbol' cells.
 :(code)
 unordered_map<cell*, cell*> Bindings;
 
