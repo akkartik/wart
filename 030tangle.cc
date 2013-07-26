@@ -84,8 +84,22 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
       out.erase(target);
     }
     else if (cmd == "replace{}" || cmd == "delete{}") {
-      out.splice(target, hunk);
-      out.erase(target, balancing_curly(target));
+      if (find_trim(hunk, ":OLD_CONTENTS") == hunk.end()) {
+        out.splice(target, hunk);
+        out.erase(target, balancing_curly(target));
+      }
+      else {
+        list<string>::iterator next = balancing_curly(target);
+        list<string> old_version;
+        old_version.splice(old_version.begin(), out, target, next);
+        old_version.pop_back();  old_version.pop_front();  // contents only please, not surrounding curlies
+
+        list<string>::iterator new_pos = find_trim(hunk, ":OLD_CONTENTS");
+        indent_all(old_version, new_pos);
+        hunk.splice(new_pos, old_version);
+        hunk.erase(new_pos);
+        out.splice(next, hunk);
+      }
     }
     return;
   }
@@ -220,6 +234,13 @@ string expected_not_in_trace(const string& line) {
 list<string>::iterator find_substr(list<string>& in, const string& pat) {
   for (list<string>::iterator p = in.begin(); p != in.end(); ++p)
     if (p->find(pat) != NOT_FOUND)
+      return p;
+  return in.end();
+}
+
+list<string>::iterator find_trim(list<string>& in, const string& pat) {
+  for (list<string>::iterator p = in.begin(); p != in.end(); ++p)
+    if (trim(*p) == pat)
       return p;
   return in.end();
 }
