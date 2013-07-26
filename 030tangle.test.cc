@@ -64,7 +64,7 @@ void test_tangle_replace_range_of_lines() {
   list<string> dummy;
   tangle(in, dummy);
   CHECK_TRACE_CONTENTS("tangle", "ade");
-  CHECK_TRACE_DOESNT_CONTAIN("tangle", "b");
+  CHECK_TRACE_DOESNT_CONTAIN("tangle", "b {");
   CHECK_TRACE_DOESNT_CONTAIN("tangle", "c");
 }
 
