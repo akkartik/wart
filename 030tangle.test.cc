@@ -42,6 +42,15 @@ void test_tangle_warns_on_unknown_target() {
   CHECK_TRACE_WARNS();
 }
 
+void test_tangle_delete_range_of_lines() {
+  istringstream in("a\nb {\nc\n}\n:(delete{} \"b\")\n");
+  list<string> dummy;
+  tangle(in, dummy);
+  CHECK_TRACE_CONTENTS("tangle", "a");
+  CHECK_TRACE_DOESNT_CONTAIN("tangle", "b");
+  CHECK_TRACE_DOESNT_CONTAIN("tangle", "c");
+}
+
 void test_tangle_replace() {
   istringstream in("a\nb\nc\n:(replace b)\nd\n");
   list<string> dummy;
@@ -55,15 +64,6 @@ void test_tangle_replace_range_of_lines() {
   list<string> dummy;
   tangle(in, dummy);
   CHECK_TRACE_CONTENTS("tangle", "ade");
-  CHECK_TRACE_DOESNT_CONTAIN("tangle", "b");
-  CHECK_TRACE_DOESNT_CONTAIN("tangle", "c");
-}
-
-void test_tangle_delete_range_of_lines() {
-  istringstream in("a\nb {\nc\n}\n:(delete{} \"b\")\n");
-  list<string> dummy;
-  tangle(in, dummy);
-  CHECK_TRACE_CONTENTS("tangle", "a");
   CHECK_TRACE_DOESNT_CONTAIN("tangle", "b");
   CHECK_TRACE_DOESNT_CONTAIN("tangle", "c");
 }
