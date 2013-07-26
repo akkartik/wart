@@ -54,3 +54,7 @@ void teardown_dynamics() {
     }
   }
 }
+
+:(delete{} "void teardown_bindings")
+:(delete "teardown_bindings()")
+:(delete "Bindings")
