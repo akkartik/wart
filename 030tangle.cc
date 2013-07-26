@@ -69,10 +69,8 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
       RAISE << "Couldn't find target " << pat << '\n' << die();
       return;
     }
-    string curr_indent = indent(*target);
-    for (list<string>::iterator p = hunk.begin(); p != hunk.end(); ++p)
-      if (!p->empty())
-        p->insert(p->begin(), curr_indent.begin(), curr_indent.end());
+
+    indent_all(hunk, target);
 
     if (cmd == "before") {
       out.insert(target, hunk.begin(), hunk.end());
@@ -93,6 +91,14 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
   }
 
   RAISE << "unknown directive " << cmd << '\n';
+}
+
+// indent all lines in l like indentation at exemplar
+void indent_all(list<string>& l, list<string>::iterator exemplar) {
+  string curr_indent = indent(*exemplar);
+  for (list<string>::iterator p = l.begin(); p != l.end(); ++p)
+    if (!p->empty())
+      p->insert(p->begin(), curr_indent.begin(), curr_indent.end());
 }
 
 string next_tangle_token(istream& in) {
