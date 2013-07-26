@@ -1,0 +1,62 @@
+:(before "End Globals")
+unordered_map<string, cell*> Sym_literals;
+:(before "End Test Teardown")
+  for (unordered_map<string, cell*>::iterator p = Sym_literals.begin(); p != Sym_literals.end(); ++p) {
+    if (!p->second) continue;
+    if (p->second->nrefs > 1)
+      RAISE << "couldn't unintern " << p->first << " (" << p->second->nrefs << " references)\n";
+    free_cell(p->second);
+  }
+  Sym_literals.clear();
+
+:(code)
+cell* new_sym(string x) {
+  if (Sym_literals[x])
+    return Sym_literals[x];
+  Sym_literals[x] = new_cell();
+  Sym_literals[x]->left = (cell*)new string(x);  // todo: can fragment memory
+  Sym_literals[x]->type = SYMBOL;
+  return mkref(Sym_literals[x]);
+}
+
+bool is_sym(cell* x) {
+  return x->type == SYMBOL;
+}
+
+cell* new_string(string x) {   // don't reuse strings
+  cell* result = new_cell();
+  result->left = (cell*)new string(x);
+  result->type = STRING;
+  return result;
+}
+
+bool is_string(cell* x) {
+  return x->type == STRING;
+}
+
+string to_string(cell* x) {
+  if (!is_string(x) && !is_sym(x)) {
+    RAISE << "can't convert to string: " << x << '\n';
+    return "";
+  }
+  return *(string*)x->left;
+}
+
+void test_strings_are_distinct_from_syms() {
+  TEMP(sym, mkref(new_sym("a")));
+  TEMP(str, mkref(new_string("a")));
+  CHECK(sym != str);
+}
+
+void test_syms_are_reused() {
+  TEMP(sym, mkref(new_sym("a")));
+  TEMP(sym2, mkref(new_sym("a")));
+  CHECK_EQ(sym, sym2);
+}
+
+void test_strings_are_not_reused() {
+  TEMP(s1, new_string("abc"));
+  CHECK_EQ(s1->nrefs, 0);
+  TEMP(s2, new_string("abc"));
+  CHECK(s1 != s2);
+}

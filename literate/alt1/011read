@@ -1,0 +1,121 @@
+// construct a parse tree of 'cells' for the next expr in input
+:(code)
+cell* read(istream& in) {
+  return mkref(build_cell(next_ast_node(in)));
+}
+
+:(before "End Types")
+// A cell is a binary tree node in the parse tree. It can also represent lists
+// and other values.
+struct cell {
+  // children
+  cell* left;
+  cell* right;
+
+  int type;           // 'left' contains:
+    #define TREE 0    //   a pointer to another cell
+    #define SYMBOL 1  //   a name
+    #define INTEGER 2 //   a number
+    #define STRING 3  //   a list of characters
+
+  // End Cell Fields
+
+  cell() :left(NULL), right(NULL), type(TREE) {}
+};
+
+:(code)
+void test_cell_child_reuse() {
+  CHECK(sizeof(long) <= sizeof(cell*));
+  CHECK(sizeof(float) <= sizeof(cell*));
+  CHECK(sizeof(size_t) <= sizeof(cell*));
+}
+
+cell* read(string s) {
+  istringstream in(s);
+  return read(in);
+}
+
+//// How cells can represent the different types.
+
+:(before "End Globals")
+cell* nil = new cell;  // special value to indicate false or empty list
+:(before "End Setup")
+setup_nil();
+:(code)
+void setup_nil() {
+  nil->left = nil->right = nil;
+}
+void test_pointers_from_nil_are_always_nil() {
+  CHECK_EQ(nil->left, nil);
+  CHECK_EQ(nil->right, nil);
+}
+
+// Numbers, strings and symbols cram their value into the left child and set
+// the type appropriately.
+void test_number_cell() {
+  TEMP(x, read("4"));
+  CHECK_EQ(x->type, INTEGER);
+  CHECK_EQ((long)x->left, 4);
+  CHECK_EQ(x->right, nil);
+}
+
+void test_symbol_cell() {
+  TEMP(x, read("abc"));
+  CHECK_EQ(x->type, SYMBOL);
+  CHECK_EQ(*(string*)x->left, "abc");
+  CHECK_EQ(x->right, nil);
+}
+
+void test_string_cell() {
+  TEMP(x, read("\"abc\""));
+  CHECK_EQ(x->type, STRING);
+  CHECK_EQ(*(string*)x->left, "abc");
+  CHECK_EQ(x->right, nil);
+}
+
+// A list is a tree where each element stores its value in the left child, and
+// points to the rest of the list in the right.
+void test_list_of_cells() {
+  TEMP(x, read("(1 2 3)"));
+  CHECK_EQ(x->type, TREE);
+  CHECK_EQ(left(x), new_num(1));
+  CHECK_EQ(right(x)->type, TREE);
+  CHECK_EQ(left(right(x)), new_num(2));
+  CHECK_EQ(right(right(x))->type, TREE);
+  CHECK_EQ(left(right(right(x))), new_num(3));
+  CHECK_EQ(right(right(right(x))), nil);
+}
+
+// helper: print cells in traces, scenarios
+// warning: should never call something that calls trace
+// see how sym_quote avoids this
+ostream& operator<<(ostream& os, cell* c) {
+  if (c == NULL) return os << "NULLNULLNULL";  // error
+  if (c == nil) return os << "nil";
+  switch(c->type) {
+  case TREE:
+    if (left(c) == sym_quote)
+      return os << left(c) << right(c);
+    os << "(" << left(c);
+    for (cell* curr = right(c); curr != nil; curr = right(curr)) {
+      if (is_tree(curr))
+        os << " " << left(curr);
+      else
+        os << " ... " << curr;
+    }
+    return os << ")";
+  case INTEGER:
+    return os << to_int(c);
+  case SYMBOL:
+    return os << to_string(c);
+  case STRING:
+    return os << "\"" << to_string(c) << "\"";
+  default:
+    cerr << "Can't print type " << c->type << '\n' << die();
+    return os;
+  }
+}
+:(before "End Globals")
+cell* sym_quote = NULL;
+:(before "End Setup")
+  sym_quote = new_sym("'");

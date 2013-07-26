@@ -23,7 +23,6 @@ cell* lookup(cell* sym) {
 
 :(replace{} "new_binding(cell*")
 void new_binding(cell* sym, cell* val) {
-  if (!Dynamics[sym].empty() && Dynamics[sym].top() == val) return;
   trace("bind") << sym << ": " << val;
   mkref(sym);
   mkref(val);

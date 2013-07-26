@@ -1,0 +1,187 @@
+cell* build_cell(ast_node n) {
+  new_trace_frame("cell");
+  if (n == "") return nil;  // void
+
+  if (is_nil(n)) {
+    trace("cell") << "nil";
+    return nil;
+  }
+
+  if (is_list(n) && n.elems.front() == ")") {
+    if (n.elems.size() > 1) RAISE << "Syntax error: ) not at end of expr\n" << die();
+    trace("cell") << "nil";
+    return nil;
+  }
+
+  if (is_atom(n)) {
+    errno = 0;
+    char* end;
+    long v = strtol(n.atom.c_str(), &end, 0);
+    if (*end == '\0' && errno == 0) {
+      trace("cell") << "num " << v;
+      return new_num(v);
+    }
+
+    if (n.atom.c_str()[0] == '"') {
+      trace("cell") << "string " << n.atom;
+      return new_string(n.atom.substr(1, n.atom.length()-2));
+    }
+
+    trace("cell") << "sym " << n.atom;
+    return new_sym(n.atom);
+  }
+
+  list<ast_node>::iterator first = n.elems.begin();
+  if (*first == "(") {
+    n.elems.pop_front();
+    cell* result = build_cell(n);
+    trace("cell") << result;
+    return result;
+  }
+
+  cell* new_form = new_cell();
+  set_left(new_form, build_cell(n.elems.front()));
+
+  list<ast_node>::iterator next = first; ++next;
+  if (*next == "...") {
+    if (next != --n.elems.end())
+      set_right(new_form, build_cell(*++next));  // dotted pair
+    else
+      set_right(new_form, build_cell(*next));
+  }
+  else if (is_quote_or_unquote(*first) && n.elems.size() == 2) {
+    set_right(new_form, build_cell(*next));  // dotted pair
+  }
+  else {
+    n.elems.pop_front();
+    if (n.elems.empty()) {
+      RAISE << "Error in parsing " << n << '\n' << die();
+      return new_form;
+    }
+    set_right(new_form, build_cell(n));
+  }
+
+  trace("cell") << new_form;
+  return new_form;
+}
+
+:(scenarios read_all)
+
+:(scenario build_nil)
+()
++cell: nil
+
+:(scenario build_nil2)
+nil
++cell: nil
+
+:(scenario build_integer)
+34
++cell: num 34
+
+:(scenario build_symbol)
+a
++cell: sym a
+
+:(scenario build_string)
+"a"
++cell: string "a"
+
+:(code)
+void test_strings_and_syms_are_different() {
+  cell* s = new_string("a");
+  CHECK(s != new_sym("a"));
+}
+
+:(scenario build_handles_quoted_sym)
+'a
++cell: sym '
++cell: sym a
++cell: 'a
+:(code)
+void test_build_handles_quoted_sym2() {
+  list<cell*> result = read_all("'a");
+  cell* c = result.front();
+  CHECK_EQ(left(c), new_sym("'"));
+  CHECK_EQ(right(c), new_sym("a"));
+}
+
+:(scenario build_handles_atoms)
+34
+35
++cell: num 34
++cell: num 35
+
+:(scenario build_handles_form)
+(34 35)
++cell: num 34
++cell: num 35
++cell/4: nil
++cell/3: (35)
++cell/2: (34 35)
+
+:(scenario build_handles_dotted_list)
+(34 ... 35)
++cell: num 34
++cell: num 35
++cell/2: (34 ... 35)
+
+:(scenario build_handles_literal_ellipses)
+'...
++cell: '...
+
+:(scenario build_handles_nested_form)
+(3 7 (33 23))
++cell: num 3
++cell: num 7
++cell: num 33
++cell: num 23
++cell: nil
++cell: ((33 23))
++cell: (7 (33 23))
++cell: (3 7 (33 23))
+
+:(scenario build_handles_strings)
+(3 7 (33 "abc" 23))
++cell: num 3
++cell: num 7
++cell: num 33
++cell: string "abc"
++cell: num 23
++cell: nil
++cell: ((33 "abc" 23))
++cell: (7 (33 "abc" 23))
++cell: (3 7 (33 "abc" 23))
+
+:(scenario build_handles_syms)
+(3 7 (33 "abc" 3de 23))
++cell: num 3
++cell: num 7
++cell: num 33
++cell: string "abc"
++cell: sym 3de
++cell: num 23
++cell: nil
++cell: ((33 "abc" 3de 23))
++cell: (7 (33 "abc" 3de 23))
++cell: (3 7 (33 "abc" 3de 23))
+
+:(code)
+bool is_nil(const ast_node& n) {
+  return n.atom == "nil"
+      || (n.elems.size() == 2 && n.elems.front() == "(" && n.elems.back() == ")");
+}
+
+// helper: convert all exprs in input into cells
+list<cell*> read_all(istream& in) {
+  list<cell*> results;
+  do {
+      results.push_back(read(in));
+  } while (!eof(in));
+  return results;
+}
+
+list<cell*> read_all(string s) {
+  stringstream in(s);
+  return read_all(in);
+}

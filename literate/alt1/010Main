@@ -1,0 +1,75 @@
+// A bare-bones lisp interpreter. Other features of our language will layer
+// atop this versatile core.
+//
+// Lisp was the original dynamic language, where functions could be defined
+// anytime, passed around like any other value, and new code could be
+// constructed on the fly. Being first suggests it may be one of the easiest
+// ways to get these features. (http://paulgraham.com/rootsoflisp.html)
+// Less code hopefully means it's more tractable to find the right narrative,
+// that readers will require less effort to understand it, and that they'll
+// therefore be more quickly able to make changes to it.
+//
+// Later we'll show how to create new notations (lisp macros) on the fly that
+// are as well-supported as the original notations.
+//
+//   "In Lisp, you don't just write your program down toward the language, you
+//   also build the language up toward your program."
+//     -- http://www.paulgraham.com/progbot.html
+
+:(before "End Main")
+load_file("init.wart");
+
+:(code)
+void load_file(const char* filename) {
+  ifstream f(filename);
+  if (f.fail()) return;
+  run(f);
+}
+
+// Lisp programs are run in two stages:
+//  a) _read_ the text of the program into a tree of cells
+//  b) _evaluate_ the tree of cells to yield a result
+cell* run(istream& in) {
+  cell* result = nil;
+  do {
+      // TEMP and 'update' help recycle cells after we're done with them
+      // gotta pay attention to this all the time; see the 'memory' file
+      TEMP(form, read(in));
+      update(result, eval(form));
+  } while (!eof(in));
+  return result;
+}
+
+cell* run(string s) {
+  stringstream in(s);
+  return run(in);
+}
+
+:(scenarios run)
+:(scenario examples)
+# function call; later we'll support a more natural syntax for arithmetic
+(+ 1 1)
+=> 2
+
+# assignment
+(<- x 3)
+x
+=> 3
+
+# list; deliberately looks just like a function call
+'(1 2 3)
+=> (1 2 3)
+
+# the function (fn) doesn't have to be named
+((fn (a b)  # parameters (params)
+    (+ a b))  # body
+   3 4)  # arguments (args) that are bound to params inside this call
+=> 7
+
+:(code)
+// we might be at eof and just not know it if we haven't looked around yet
+bool eof(istream& in) {
+  skip_whitespace_and_comments(in);
+  in.peek();
+  return in.eof();
+}

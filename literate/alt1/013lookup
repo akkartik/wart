@@ -54,3 +54,14 @@ void test_new_binding_increments_refcounts() {
   CHECK_EQ(var->nrefs, 3);
   CHECK_EQ(val->nrefs, 3);
 }
+
+void test_new_binding_is_idempotent() {
+  TEMP(var, mkref(new_sym("a")));
+  TEMP(val, mkref(new_num(34)));
+  new_binding(var, val);
+  CHECK_EQ(var->nrefs, 3);
+  CHECK_EQ(val->nrefs, 3);
+  new_binding(var, val);
+  CHECK_EQ(var->nrefs, 3);
+  CHECK_EQ(val->nrefs, 3);
+}
