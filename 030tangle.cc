@@ -74,10 +74,21 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
       if (!p->empty())
         p->insert(p->begin(), curr_indent.begin(), curr_indent.end());
 
-    if (cmd == "after") ++target;
-    out.insert(target, hunk.begin(), hunk.end());
-    if (cmd == "replace" || cmd == "delete") out.erase(target);
-    else if (cmd == "replace{}" || cmd == "delete{}") out.erase(target, balancing_curly(target));
+    if (cmd == "before") {
+      out.insert(target, hunk.begin(), hunk.end());
+    }
+    else if (cmd == "after") {
+      ++target;
+      out.insert(target, hunk.begin(), hunk.end());
+    }
+    else if (cmd == "replace" || cmd == "delete") {
+      out.insert(target, hunk.begin(), hunk.end());
+      out.erase(target);
+    }
+    else if (cmd == "replace{}" || cmd == "delete{}") {
+      out.insert(target, hunk.begin(), hunk.end());
+      out.erase(target, balancing_curly(target));
+    }
     return;
   }
 
