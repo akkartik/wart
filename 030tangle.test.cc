@@ -59,6 +59,15 @@ void test_tangle_replace_range_of_lines() {
   CHECK_TRACE_DOESNT_CONTAIN("tangle", "c");
 }
 
+void test_tangle_delete_range_of_lines() {
+  istringstream in("a\nb {\nc\n}\n:(delete{} \"b\")\n");
+  list<string> dummy;
+  tangle(in, dummy);
+  CHECK_TRACE_CONTENTS("tangle", "a");
+  CHECK_TRACE_DOESNT_CONTAIN("tangle", "b");
+  CHECK_TRACE_DOESNT_CONTAIN("tangle", "c");
+}
+
 // todo: include line numbers in tangle errors
 
 

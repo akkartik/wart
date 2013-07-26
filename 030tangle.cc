@@ -58,7 +58,7 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
     return;
   }
 
-  if (cmd == "before" || cmd == "after" || cmd == "replace" || cmd == "replace{}") {
+  if (cmd == "before" || cmd == "after" || cmd == "replace" || cmd == "replace{}" || cmd == "delete" || cmd == "delete{}") {
     string pat = next_tangle_token(directive_stream);
     if (pat == "") {
       RAISE << "No target for " << cmd << " directive.\n" << die();
@@ -76,8 +76,8 @@ void process_next_hunk(istream& in, const string& directive, list<string>& out) 
 
     if (cmd == "after") ++target;
     out.insert(target, hunk.begin(), hunk.end());
-    if (cmd == "replace") out.erase(target);
-    else if (cmd == "replace{}") out.erase(target, balancing_curly(target));
+    if (cmd == "replace" || cmd == "delete") out.erase(target);
+    else if (cmd == "replace{}" || cmd == "delete{}") out.erase(target, balancing_curly(target));
     return;
   }
 
