@@ -40,7 +40,7 @@
 // waypoints for future layers to hook into. Often such waypoints will be in
 // comments, capitalized to hint that other layers rely on their presence.
 //
-// A single waypoint might have many different code fragments hooking into 
+// A single waypoint might have many different code fragments hooking into
 // it from all over the codebase. Use 'before' directives to insert
 // code at a location in order, top to bottom, and 'after' directives to
 // insert code in reverse order. By convention waypoints intended for insertion
