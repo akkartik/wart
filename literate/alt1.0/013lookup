@@ -1,0 +1,56 @@
+// Variables in lisp are built by _binding_ values to 'symbol' cells.
+:(code)
+unordered_map<cell*, cell*> Bindings;
+
+cell* lookup(string s) {
+  return lookup(new_sym(s));
+}
+
+cell* lookup(cell* sym) {
+  if (!Bindings[sym]) {
+    RAISE << "No binding for " << to_string(sym) << '\n';
+    return nil;
+  }
+  return Bindings[sym];
+}
+
+void new_binding(string sym, cell* val) {
+  new_binding(new_sym(sym), val);
+}
+
+void new_binding(cell* sym, cell* val) {
+  trace("bind") << sym << ": " << val;
+  if (!Bindings[sym]) mkref(sym);
+  mkref(val);
+  if (Bindings[sym]) rmref(Bindings[sym]);
+  Bindings[sym] = val;
+}
+
+:(before "End Test Teardown")
+  teardown_bindings();
+:(code)
+void teardown_bindings() {
+  for (unordered_map<cell*, cell*>::iterator p = Bindings.begin(); p != Bindings.end(); ++p) {
+    if (!p->second) continue;
+    rmref(p->first);
+    rmref(p->second);
+  }
+  Bindings.clear();
+}
+
+void test_lookup_returns_dynamic_binding() {
+  TEMP(var, mkref(new_sym("a")));
+  TEMP(val, mkref(new_num(34)));
+  new_binding(var, val);
+  CHECK_EQ(lookup(var), val);
+}
+
+void test_new_binding_increments_refcounts() {
+  TEMP(var, mkref(new_sym("a")));
+  TEMP(val, mkref(new_num(34)));
+  CHECK_EQ(var->nrefs, 2);
+  CHECK_EQ(val->nrefs, 2);
+  new_binding(var, val);
+  CHECK_EQ(var->nrefs, 3);
+  CHECK_EQ(val->nrefs, 3);
+}

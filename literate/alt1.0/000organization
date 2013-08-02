@@ -1,0 +1,91 @@
+// You guessed right: the '000' prefix means you should start reading here.
+//
+// This project is setup to load all files with a numeric prefix. Just create
+// a new file and start hacking.
+//
+// The first few files (00*) are independent of what this program does, an
+// experimental skeleton allowing it to be organized in 'layers' of
+// functionality. Along with tests, a layered organization will hopefully make
+// programs more malleable -- easier for outsiders to understand, and easier
+// for veterans to change in arbitrary, radical ways. By making the code more
+// outsider-friendly and rewrite-friendly we hope to avoid tying programmers
+// up in ever-increasing knots as often happens today.
+//
+// This file contains a bare-bones program in legal C++. It doesn't do
+// anything yet; subsequent files will add behaviors by inserting lines into
+// it with directives like:
+//   :(before "pattern")
+// This will insert the following lines before a line in the codebase matching
+// "pattern".
+//
+// An example in color: http://i.imgur.com/0eONnyX.png (directives shaded dark)
+//
+// Patterns are usually in comments (capitalized to hint that you can't change
+// them willy-nilly), but they don't have to be.
+//
+// A single pattern line might have many different code fragments added before
+// or after it from all over the codebase. Use 'before' directives to insert
+// code at a location in load order, and 'after' directives to insert code in
+// reverse order. By convention patterns intended for insertion before begin
+// with 'End'. There's some example patterns lower down.
+//
+// These directives allow the programmer to take control of ordering, and to
+// present his code in the order best suited for reading, rather than the
+// order dictated by the dumb/lazy/ossified language.
+//
+// Layers do more than just shuffle code around. Past the initial skeleton of
+// this program (currently 00*-02*), it ought to be possible to stop loading
+// after any file, build and run the program, and pass all tests for loaded
+// features. (Relevant is http://youtube.com/watch?v=c8N72t7aScY, a scene from
+// "2001: A Space Odyssey".)
+//
+// This 'subsetting guarantee' ensures that this directory contains a
+// cleaned-up narrative of the evolution of this codebase. Organizing the code
+// autobiographically allows a newcomer to rapidly orient himself, to first
+// understand a simple gestalt of a program's core purpose and features, and
+// later to gradually work his way through the complexities on an as-needed
+// basis.
+//
+// Programmers shouldn't need to understand everything about a program to hack
+// on it. But they shouldn't be prevented from a thorough understanding of
+// each aspect either. The ideal organization of a codebase will reward
+// curiosity.
+//
+//   "If I look at any small part of it, I can see what is going on -- I don't
+//   need to refer to other parts to understand what something is doing.
+//
+//   If I look at any large part in overview, I can see what is going on -- I
+//   don't need to know all the details to get it.
+//
+//   Every level of detail is as locally coherent and as well thought-out as
+//   any other level."
+//
+//       -- Richard Gabriel, "The Quality Without A Name"
+//          (http://dreamsongs.com/Files/PatternsOfSoftware.pdf, page 42)
+
+//// Includes
+// End Includes
+
+//// Types
+// End Types
+
+// prototypes are auto-generated; define your functions in any order
+#include "function_list"  // by convention, files ending with '_list' are auto-generated
+
+//// Globals
+// End Globals
+
+//// End Tracing          // hack: tracing code must come before anything else
+
+int main(int argc, char* argv[]) {
+  if (argc > 1) {
+    // Commandline Options
+  }
+
+  setup();
+  return 0;  // End Main
+}
+
+void setup() {
+  // End Setup
+}

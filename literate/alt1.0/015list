@@ -1,0 +1,99 @@
+//// Tree primitives that we'll extend later.
+cell* left(cell* x) {
+  if (x->type != TREE) {
+    RAISE << "cell has no left child: " << x << '\n';
+    return nil;
+  }
+  return x->left;
+}
+
+cell* right(cell* x) {
+  return x->right;
+}
+
+void set_left(cell* x, cell* y) {
+  if (!is_tree(x)) {
+    RAISE << "can't set left of " << x << '\n';
+    return;
+  }
+  mkref(y);
+  rmref(left(x));
+  x->left = y;
+}
+
+void set_right(cell* x, cell* y) {
+  if (!is_tree(x)) {
+    RAISE << "can't set right of " << x << '\n';
+    return;
+  }
+  mkref(y);
+  rmref(right(x));
+  x->right = y;
+}
+
+void test_set_left_updates_nrefs() {
+  TEMP(x, mkref(new_cell()));
+  CHECK_EQ(x->nrefs, 1);
+  TEMP(y, mkref(new_cell()));
+  CHECK_EQ(y->nrefs, 1);
+  set_left(x, y);
+  CHECK_EQ(x->nrefs, 1);
+  CHECK_EQ(x->left, y);
+  // inc y
+  CHECK_EQ(y->nrefs, 2);
+
+  TEMP(z, mkref(new_cell()));
+  CHECK_EQ(z->nrefs, 1);
+  set_left(x, z);
+  CHECK_EQ(x->nrefs, 1);
+  CHECK_EQ(x->left, z);
+  // dec y, inc z
+  CHECK_EQ(y->nrefs, 1);
+  CHECK_EQ(z->nrefs, 2);
+}
+
+void test_set_left_is_idempotent() {
+  TEMP(x, new_cell());
+  cell* y = new_cell();
+  set_left(x, y);
+  CHECK_EQ(y->nrefs, 1);
+  set_left(x, y);
+  CHECK_EQ(y->nrefs, 1);
+}
+
+void test_set_right_is_idempotent() {
+  TEMP(x, new_cell());
+  cell* y = new_cell();
+  set_right(x, y);
+  CHECK_EQ(y->nrefs, 1);
+  set_right(x, y);
+  CHECK_EQ(y->nrefs, 1);
+}
+
+//// Lists are trees when 'sighted along' the right child.
+cell* first(cell* x) {
+  return left(x);
+}
+
+cell* rest(cell* x) {
+  return right(x);
+}
+
+cell* new_cell(cell* left, cell* right) {
+  cell* ans = new_cell();
+  set_left(ans, left);
+  set_right(ans, right);
+  return ans;
+}
+
+cell* new_cell(cell* left) {
+  return new_cell(left, nil);
+}
+
+bool is_tree(cell* x) {  // tree or list
+  return x != nil && x->type == TREE;
+}
+
+bool is_atom(cell* x) {
+  return !is_tree(x);
+}

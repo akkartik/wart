@@ -1,0 +1,194 @@
+// Allocating, deallocating and reusing cells.
+//
+// A cell is brought into being by new_cell(). Each cell tracks the number of
+// other cells pointing to it, growing and shrinking this number as pointers
+// in other cells are modified. When this number subsides back to 0 there's no
+// way for the program to get at it anymore, and it can be safely reclaimed
+// and reused.
+//
+// More info: https://en.wikipedia.org/wiki/Reference_counting
+// The drawback of ref-counting is that if two cells refer to each other we'll
+// never notice that they can be reclaimed, and waste space. So don't do that.
+// The programmer is responsible for managing cycles, and for breaking them
+// before forgetting cells.
+//
+// To avoid memory leaks or worse (see below), don't forget to mkref() or
+// rmref() when you should. Idioms to avoid messing this up:
+// - TEMP() declares temporaries, automatically rmref()'ing them on exiting scope
+// - Most functions that return a new tree are designed to mkref() exactly the
+//   return value along all codepaths. Any intermediates are rmref'd before
+//   exit, often using TEMP. Exceptions are low-level functions that usually
+//   begin with 'new_'.
+
+:(before "End Cell Fields")
+int nrefs;  // number of cells pointing to this one
+:(code)
+// We'd like all our heap allocations to have the same size to avoid
+// fragmentation. Currently some types like strings don't meet this
+// constraint.
+void test_cell_layout() {
+  CHECK((sizeof(cell)%4) == 0);
+}
+
+:(code)
+cell* mkref(cell* c) {
+  if (c == nil) return nil;   // nil is never reclaimed
+  trace("mem") << "mkref";
+  trace("mem/mkref") << c;
+  ++c->nrefs;
+  return c;
+}
+
+void rmref(cell* c) {
+  if (c == nil) return;
+
+  new_trace_frame("rmref");
+  trace("mem") << "rmref";
+  trace("mem/rmref") << c;
+  --c->nrefs;
+  if (c->nrefs == 0)
+    reclaim(c);
+}
+
+void rmref(list<cell*> l) {
+  for (list<cell*>::iterator p = l.begin(); p != l.end(); ++p)
+    rmref(*p);
+}
+
+void reclaim(cell* c) {
+  trace("mem/dump") << "free: " << (void*)c << " " << c << " " << c->nrefs;
+  if (c->type == INTEGER || c->type == SYMBOL)
+    RAISE << "should never reclaim interned atom: " << c << '\n';
+
+  switch (c->type) {
+  case INTEGER:
+    break;  // numbers don't need freeing
+  case STRING:
+  case SYMBOL:
+    delete (string*)c->left; break;
+  case TREE:
+    rmref(c->left); break;
+  default:
+    RAISE << "Can't reclaim type " << c->type << '\n' << die();
+    return;
+  }
+
+  rmref(c->right);
+  free_cell(c);
+}
+
+//// some idioms for managing rmref
+
+:(before "End Types")
+struct lease_cell;
+#define TEMP(var, cell_expr) cell* var = cell_expr; lease_cell lease_##var(var);
+// RAII for temporaries
+struct lease_cell {
+  cell* value;
+  lease_cell(cell* v);
+  ~lease_cell();
+};
+:(code)
+  lease_cell::lease_cell(cell* v) :value(v) {}
+  lease_cell::~lease_cell() { rmref(value); }
+
+void update(cell*& var, cell* expr) {
+  rmref(var);
+  var = expr;
+}
+
+
+
+// All code must call mkref and rmref appropriately as it modifies left/right
+// children. If I forget to rmref when I should I waste space. If I 'leak' too
+// much space the program will die.
+//
+// If I instead forget to *mkref* when I should the consequences are far more
+// insidious: a prematurely-reclaimed cell will cause incoming pointers to
+// clobber or interpret it as the wrong type. Execution may continue for a
+// long time before we realize something is wrong, making debugging difficult.
+//
+// To detect this insidious class of error as immediately as possible, we:
+//  a) initialize child pointers of a cell to nil when it is allocated
+//  b) clear child pointers to NULL when it is reclaimed
+//  c) re-initialize child pointers to nil when it is re-allocated
+// If a cell in use is ever found to have NULL pointers, drop everything else
+// and find the missing mkref.
+void init(cell* c) {
+  c->type = TREE;
+  c->left = c->right = nil;
+  c->nrefs = 0;
+}
+
+void clear(cell* c) {
+  c->type = TREE;
+  c->left = c->right = NULL;
+  c->nrefs = 0;
+}
+
+:(after "void rmref(cell* c")
+  if (!c) {
+    RAISE << "A cell was prematurely reclaimed.\n" << die();
+    return;
+  }
+
+:(before "End Globals")
+long Num_used_cells = 0;
+:(code)
+cell* new_cell() {
+  ++Num_used_cells;
+  cell* result = new cell;
+  init(result);
+  trace("mem/dump") << "alloc: " << (void*)result;
+  return result;
+}
+
+void free_cell(cell* c) {
+  --Num_used_cells;
+  trace("mem") << "free";
+  trace("mem/free") << (void*)c << '\n';
+  clear(c);
+  delete c;
+}
+
+void test_new_cell_has_nil_left_and_right() {
+  TEMP(x, mkref(new_cell()));
+  CHECK_EQ(x->left, nil);
+  CHECK_EQ(x->right, nil);
+}
+
+// doesn't reliably pass; C++ 'delete' sometimes writes to the cell
+// should we do our own allocation?
+void pending_test_freed_cell_has_null_left_and_right() {
+  cell* x = mkref(new_cell());
+  free_cell(x);
+  CHECK_EQ((void*)x->left, NULL);
+  CHECK_EQ((void*)x->right, NULL);
+}
+
+void test_rmref_frees_space() {
+  cell* c = mkref(new_cell());
+  rmref(c);
+  CHECK_EQ(trace_count("mem", "free"), 1);
+}
+
+:(before "End Test Teardown")
+  if (Passed && !Hide_warnings && trace_count("warn") == 0) {
+    if (Num_used_cells > 0)
+      RAISE << Num_used_cells << " leaked cells.\n";
+    continue;
+  }
+
+:(code)
+// useful idiom for growing a list without causing leaks: create a dummy cell
+// p, keep appending to it using add_cell, then return drop_ptr(p) which
+// reclaims returns the accumulated list and reclaims dummy.
+cell* drop_ptr(cell* p) {
+  cell* x = mkref(right(p));
+  rmref(p);
+  return x;
+}
+
+void add_cell(cell* p, cell* x) {
+  set_right(p, new_cell(x));
+}
