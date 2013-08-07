@@ -2,12 +2,15 @@ a.out: makefile wart.cc function_list test_list ../[0-9]*.cc
 	g++ -g -Wall -Wextra -fno-strict-aliasing wart.cc
 	-@a.out test
 
+# To see what the program looks like after all layers have been applied, read
+# wart.cc
 wart.cc: 0* ../wart_bin
 	../wart_bin tangle 0* > wart.cc
 
 ../wart_bin: ../[0-9]*.cc
 	@cd .. && make
 
+# auto-generated files; by convention they end in '_list'.
 function_list: wart.cc
 	@grep -h "^[^ #].*) {" wart.cc |perl -pwe 's/ {.*/;/' > function_list
 

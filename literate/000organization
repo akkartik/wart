@@ -67,9 +67,9 @@
 //
 // Layers do more than just shuffle code around. Past the initial skeleton of
 // this program (currently 00*-02*), it ought to be possible to stop loading
-// after any file, build and run the program, and pass all tests for loaded
-// features. (Relevant is http://youtube.com/watch?v=c8N72t7aScY, a scene from
-// "2001: A Space Odyssey".)
+// after any file/layer, build and run the program, and pass all tests for
+// loaded features. (Relevant is http://youtube.com/watch?v=c8N72t7aScY, a
+// scene from "2001: A Space Odyssey".)
 //
 // This 'subsetting guarantee' ensures that this directory contains a
 // cleaned-up narrative of the evolution of this codebase. Organizing
