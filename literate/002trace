@@ -61,7 +61,7 @@
 //
 // Between layers and domain-driven testing, programming starts to look like a
 // fundamentally different activity. Instead of a) superficial, b) local rules
-// on c) on code [like http://blog.bbv.ch/2013/06/05/clean-code-cheat-sheet],
+// on c) code [like http://blog.bbv.ch/2013/06/05/clean-code-cheat-sheet],
 // we allow programmers to engage with the a) deep, b) global structure of the
 // c) domain. If you can systematically track discontinuities in the domain
 // you don't care if the code used gotos as long as it passed the tests. If
