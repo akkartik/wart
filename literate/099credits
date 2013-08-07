@@ -11,8 +11,8 @@
 // - <a href='http://www.paulgraham.com/rootsoflisp.html'>Lisp</a> for showing the
 //   power of dynamic languages, late binding and providing the right primitives
 //   <em>a la carte</em>;
-// - <a href='http://golang.org'>Go's docs</a> for exemplifying interactive
-//   documentation that doubles as tests;
+// - <a href='http://docs.python.org/2/library/doctest.html'>python doctest</a> for
+//   exemplifying interactive documentation that doubles as tests;
 // - <a href='https://en.wikipedia.org/wiki/ReStructuredText'>ReStructuredText</a>
 //   and <a href='https://en.wikipedia.org/wiki/Setext'>its antecedents</a> for
 //   showing that markup can be clean;
