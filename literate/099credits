@@ -1,0 +1,25 @@
+// Wart builds on many ideas that have come before, especially:
+// - <a href='http://alistair.cockburn.us/ASD+book+extract%3A+%22Naur,+Ehn,+Musashi%22'>Peter Naur</a>
+//   for articulating the paramount problem of programming: communicating a codebase to others;
+// - <a href='http://www.amazon.com/Notes-Synthesis-Form-Harvard-Paperbacks/dp/0674627512'>Christopher Alexander</a>
+//   and <a href='http://dreamsongs.net/Files/PatternsOfSoftware.pdf'>Richard Gabriel</a>
+//   for the intellectual tools for reasoning about the higher order design of a codebase;
+// - <a href='http://www.literateprogramming.com/knuthweb.pdf'>Donald Knuth's literate programming</a>
+//   for liberating "code for humans to read" from the tyranny of compiler order;
+// - <a href='http://www.cs.umd.edu/class/spring2003/cmsc838p/Design/criteria.pdf'>David Parnas</a>
+//   and others for highlighting the value of separating concerns and stepwise refinement;
+// - <a href='http://www.paulgraham.com/rootsoflisp.html'>Lisp</a> for showing the
+//   power of dynamic languages, late binding and providing the right primitives
+//   <em>a la carte</em>;
+// - <a href='http://golang.org'>Go's docs</a> for exemplifying interactive
+//   documentation that doubles as tests;
+// - <a href='https://en.wikipedia.org/wiki/ReStructuredText'>ReStructuredText</a>
+//   and <a href='https://en.wikipedia.org/wiki/Setext'>its antecedents</a> for
+//   showing that markup can be clean;
+// - The folklore of debugging by print and the trace facility in many lisp
+//   systems;
+// - Automated tests for showing the value of building programs inside an
+//   elaborate harness;
+// - BDD for challenging us all to write tests at a higher level;
+// - JavaScript and CSS for demonstrating the power of a DOM for complex
+//   structured documents.
