@@ -365,13 +365,13 @@ cell* eval_all(cell* args) {
   return drop_ptr(p_result);
 }
 
-:(scenario eval_handles_param)
+:(scenario bind_param)
 (<- x 3)
 ===
 ((fn (a)) x)
 +bind: a: 3
 
-:(scenario eval_evals_arg)
+:(scenario eval_arg)
 (<- f (fn (x)
         (x)))
 ===
@@ -379,23 +379,23 @@ cell* eval_all(cell* args) {
      34))
 +eval/1: => 34
 
-:(scenario eval_handles_multiple_params)
+:(scenario multiple_params)
 ((fn (a b) b) 1 2)
 +bind: a: 1
 +bind: b: 2
 +eval/1: => 2
 
-:(scenario eval_binds_missing_param)
+:(scenario missing_param)
 ((fn (a b) b) 1)
 +bind: a: 1
 +bind: b: nil
 +eval/1: => nil
 
-:(scenario eval_handles_vararg_param)   // named param list
+:(scenario vararg_param)  // named param list
 ((fn args) 1 2)
 +bind: args: (1 2)
 
-:(scenario eval_evals_vararg_args)
+:(scenario eval_vararg_args)
 (<- x 3)
 (<- y 4)
 ===
@@ -408,11 +408,11 @@ cell* eval_all(cell* args) {
 +eval: => 4
 +bind: args: (3 4)
 
-:(scenario eval_handles_rest_param)
+:(scenario rest_param)
 ((fn (a b ... c) c) 1 2 3 4 5)
 +eval/1: => (3 4 5)
 
-:(scenario eval_evals_rest_args)
+:(scenario eval_rest_args)
 (<- x 3)
 (<- y 4)
 ===
@@ -420,13 +420,13 @@ cell* eval_all(cell* args) {
 +bind: a: 3
 +bind: b: (4)
 
-:(scenario eval_handles_destructured_params)
+:(scenario destructured_params)
 ((fn ((a b)) b) '(1 2))
 +bind: a: 1
 +bind: b: 2
 +eval: => 2
 
-:(scenario eval_evals_destructured_args)
+:(scenario eval_destructured_args)
 (<- x 3)
 (<- y 4)
 ===
