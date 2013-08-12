@@ -42,7 +42,7 @@ void rmref(cell* c) {
 
   new_trace_frame("rmref");
   --c->nrefs;
-  if (c->nrefs == 0)
+  if (c->nrefs <= 0)
     reclaim(c);
 }
 
