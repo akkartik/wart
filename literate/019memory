@@ -54,7 +54,7 @@ void rmref(list<cell*> l) {
 
 void reclaim(cell* c) {
   if (c->type == INTEGER || c->type == SYMBOL)
-    RAISE << "should never reclaim interned atom: " << c << '\n';
+    RAISE << "atom should be saved for reuse, never reclaimed: " << c << '\n';
 
   switch (c->type) {
   case INTEGER:

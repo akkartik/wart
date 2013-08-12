@@ -4,7 +4,7 @@ unordered_map<string, cell*> Sym_literals;
   for (unordered_map<string, cell*>::iterator p = Sym_literals.begin(); p != Sym_literals.end(); ++p) {
     if (!p->second) continue;
     if (p->second->nrefs > 1)
-      RAISE << "couldn't unintern " << p->first << " (" << p->second->nrefs << " references)\n";
+      RAISE << "couldn't free reused literal " << p->first << " (" << p->second->nrefs << " references)\n";
     free_cell(p->second);
   }
   Sym_literals.clear();
