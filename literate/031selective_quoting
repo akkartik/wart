@@ -1,0 +1,91 @@
+:(scenarios run)
+:(scenario quoted_param)
+((fn('a)) x)
++bind: a: x
+
+:(scenario quoted_param_list)
+((fn '(a)) x)
++bind: a: x
+
+:(scenario quoted_varargs_param)
+((fn 'a) x y)
++bind: a: (x y)
+
+:(scenario quoted_rest_param)
+(<- x 3)
+===
+((fn (a ... 'b)) x y)
++bind: a: 3
++bind: b: (y)
+
+:(scenario quoted_destructured_param)
+((fn ('(a b))) (1 2))
++bind: a: 1
++bind: b: 2
+
+:(replace{} "void eval_bind_all")
+void eval_bind_all(cell* params, cell* args) {
+  if (params == nil)
+    return;
+
+  TEMP(args2, nil);
+  if (is_quoted(params)) {
+    params = strip_quote(params);
+    args2 = quote_all(args);   // already mkref'd
+  }
+  else {
+    args2 = mkref(args);
+  }
+
+  if (is_sym(params)) {
+    TEMP(val, eval_all(args2));
+    bind_params(params, val);
+  }
+
+  else if (!is_tree(params))
+    ;
+
+  else {
+    eval_bind_param(left(params), left(args2));
+    eval_bind_all(right(params), right(args2));
+  }
+}
+
+void eval_bind_param(cell* param, cell* arg) {
+  TEMP(arg2, nil);
+  if (is_quoted(param)) {
+    param = strip_quote(param);
+    arg2 = mkref(new_cell(sym_quote, arg));
+  }
+  else
+    arg2 = mkref(arg);
+
+  TEMP(val, eval(arg2));
+  bind_params(param, val);
+}
+
+:(replace{} "void bind_params")
+void bind_params(cell* params, cell* args) {
+  if (is_quoted(params))
+    bind_params(strip_quote(params), args);
+
+  else if (params == nil)
+    ;
+
+  else if (is_sym(params))
+    new_binding(params, args);
+
+  else if (!is_tree(params))
+    ;
+
+  else if (args != nil && !is_tree(args))
+    bind_params(params, nil);
+
+  else {
+    bind_params(left(params), left(args));
+    bind_params(right(params), right(args));
+  }
+}
+
+:(after "void end_all_bindings")
+  if (params == sym_quote) return;

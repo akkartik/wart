@@ -83,17 +83,28 @@ struct lease_cell;
 #define TEMP(var, cell_expr) cell* var = cell_expr; lease_cell lease_##var(var);
 // RAII for temporaries
 struct lease_cell {
-  cell* value;
-  lease_cell(cell* v);
+  cell*& value;
+  lease_cell(cell*& v);
   ~lease_cell();
 };
 :(code)
-  lease_cell::lease_cell(cell* v) :value(v) {}
+  lease_cell::lease_cell(cell*& v) :value(v) {}
   lease_cell::~lease_cell() { rmref(value); }
 
 void update(cell*& var, cell* expr) {
   rmref(var);
   var = expr;
+}
+
+void test_lease_cell() {
+  TEMP(x, mkref(new_cell()));
+  // no leak
+}
+
+void test_lease_cell_is_mutable() {
+  TEMP(x, nil);
+  x = mkref(new_cell());
+  // no leak
 }
 
 
