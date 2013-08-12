@@ -38,8 +38,20 @@ void end_binding(cell* sym) {
 }
 
 :(after "Eval Cleanup(fn, expr, result)")
-  for (cell* x = sig(fn); x != nil; x=right(x))
-    end_binding(left(x));
+  end_all_bindings(sig(fn));
+:(code)
+void end_all_bindings(cell* params) {
+  if (params == nil) return;
+  if (is_sym(params)) end_binding(params);
+  if (!is_tree(params)) return;
+  end_all_bindings(left(params));
+  end_all_bindings(right(params));
+}
+
+:(scenario cleanup_after_destructured_params)
+((fn((a b))))
++unbind: a
++unbind: b
 
 :(after "Test Teardown")
   teardown_dynamics();
