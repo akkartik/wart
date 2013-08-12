@@ -85,7 +85,10 @@
 
 :(before "End Tracing")
 bool Hide_warnings = false;
+:(before "End Setup")
+Hide_warnings = false;
 
+:(before "End Tracing")
 struct trace_stream {
   vector<pair<string, pair<int, string> > > past_lines;  // [(layer label, frame, line)]
   unordered_map<string, int> frame;
