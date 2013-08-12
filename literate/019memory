@@ -41,6 +41,7 @@ void rmref(cell* c) {
   if (c == nil) return;
 
   new_trace_frame("rmref");
+  if (c->nrefs <= 0) RAISE << c << " has " << c->nrefs << " nrefs\n";
   --c->nrefs;
   if (c->nrefs <= 0)
     reclaim(c);
@@ -178,6 +179,7 @@ void test_rmref_frees_space() {
 // reclaims returns the accumulated list and reclaims dummy.
 cell* drop_ptr(cell* p) {
   cell* x = mkref(right(p));
+  if (p->nrefs == 0) ++p->nrefs;  // disable rmref warning
   rmref(p);
   return x;
 }

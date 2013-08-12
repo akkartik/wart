@@ -53,21 +53,23 @@ void test_set_left_updates_nrefs() {
 }
 
 void test_set_left_is_idempotent() {
-  TEMP(x, new_cell());
-  cell* y = new_cell();
-  set_left(x, y);
+  TEMP(x, mkref(new_cell()));
+  TEMP(y, mkref(new_cell()));
   CHECK_EQ(y->nrefs, 1);
   set_left(x, y);
-  CHECK_EQ(y->nrefs, 1);
+  CHECK_EQ(y->nrefs, 2);
+  set_left(x, y);
+  CHECK_EQ(y->nrefs, 2);  // no change
 }
 
 void test_set_right_is_idempotent() {
-  TEMP(x, new_cell());
-  cell* y = new_cell();
-  set_right(x, y);
+  TEMP(x, mkref(new_cell()));
+  TEMP(y, mkref(new_cell()));
   CHECK_EQ(y->nrefs, 1);
   set_right(x, y);
-  CHECK_EQ(y->nrefs, 1);
+  CHECK_EQ(y->nrefs, 2);
+  set_right(x, y);
+  CHECK_EQ(y->nrefs, 2);  // no change
 }
 
 //// Lists are trees when 'sighted along' the right child.

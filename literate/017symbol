@@ -55,8 +55,7 @@ void test_syms_are_reused() {
 }
 
 void test_strings_are_not_reused() {
-  TEMP(s1, new_string("abc"));
-  CHECK_EQ(s1->nrefs, 0);
-  TEMP(s2, new_string("abc"));
+  TEMP(s1, mkref(new_string("abc")));
+  TEMP(s2, mkref(new_string("abc")));
   CHECK(s1 != s2);
 }
