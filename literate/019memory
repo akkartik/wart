@@ -33,8 +33,6 @@ void test_cell_layout() {
 :(code)
 cell* mkref(cell* c) {
   if (c == nil) return nil;   // nil is never reclaimed
-  trace("mem") << "mkref";
-  trace("mem/mkref") << c;
   ++c->nrefs;
   return c;
 }
@@ -43,8 +41,6 @@ void rmref(cell* c) {
   if (c == nil) return;
 
   new_trace_frame("rmref");
-  trace("mem") << "rmref";
-  trace("mem/rmref") << c;
   --c->nrefs;
   if (c->nrefs == 0)
     reclaim(c);
@@ -56,7 +52,6 @@ void rmref(list<cell*> l) {
 }
 
 void reclaim(cell* c) {
-  trace("mem/dump") << "free: " << (void*)c << " " << c << " " << c->nrefs;
   if (c->type == INTEGER || c->type == SYMBOL)
     RAISE << "should never reclaim interned atom: " << c << '\n';
 
@@ -139,14 +134,12 @@ cell* new_cell() {
   ++Num_used_cells;
   cell* result = new cell;
   init(result);
-  trace("mem/dump") << "alloc: " << (void*)result;
   return result;
 }
 
 void free_cell(cell* c) {
   --Num_used_cells;
   trace("mem") << "free";
-  trace("mem/free") << (void*)c << '\n';
   clear(c);
   delete c;
 }
