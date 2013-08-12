@@ -89,8 +89,9 @@ a
 
 :(code)
 void test_strings_and_syms_are_different() {
-  cell* s = new_string("a");
-  CHECK(s != new_sym("a"));
+  TEMP(str, mkref(new_string("a")));
+  TEMP(sym, mkref(new_sym("a")));
+  CHECK(str != sym);
 }
 
 :(scenario build_handles_quoted_sym)
@@ -101,7 +102,7 @@ void test_strings_and_syms_are_different() {
 :(code)
 void test_build_handles_quoted_sym2() {
   list<cell*> result = read_all("'a");
-  cell* c = result.front();
+  TEMP(c, result.front());
   CHECK_EQ(left(c), new_sym("'"));
   CHECK_EQ(right(c), new_sym("a"));
 }
