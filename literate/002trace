@@ -160,6 +160,12 @@ trace_stream* Trace_stream = NULL;
 // some unfriendly constraints (they delay printing, they can't nest)
 #define RAISE  ((!Trace_stream || !Hide_warnings) ? cerr /*do print*/ : Trace_stream->stream("warn")) << __FILE__ << ":" << __LINE__ << " "
 
+// A separate helper for debugging. We should only trace domain-specific
+// facts. For everything else use log.
+#define xlog if (false) log
+// To turn on logging replace 'xlog' with 'log'.
+#define log cerr
+
 :(before "End Types")
 // RAISE << die exits after printing -- unless Hide_warnings is set.
 struct die {};

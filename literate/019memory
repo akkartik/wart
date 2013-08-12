@@ -33,6 +33,7 @@ void test_cell_layout() {
 :(code)
 cell* mkref(cell* c) {
   if (c == nil) return nil;   // nil is never reclaimed
+  xlog << "mkref " << (void*)c << ": " << c << " " << c->nrefs << '\n';
   ++c->nrefs;
   return c;
 }
@@ -42,6 +43,7 @@ void rmref(cell* c) {
 
   new_trace_frame("rmref");
   if (c->nrefs <= 0) RAISE << c << " has " << c->nrefs << " nrefs\n";
+  xlog << "dec " << (void*)c << ": " << c << " " << c->nrefs << '\n';
   --c->nrefs;
   if (c->nrefs <= 0)
     reclaim(c);
@@ -53,6 +55,7 @@ void rmref(list<cell*> l) {
 }
 
 void reclaim(cell* c) {
+  xlog << "reclaim " << (void*)c << ": " << c << " " << c->nrefs;
   if (c->type == INTEGER || c->type == SYMBOL)
     RAISE << "atom should be saved for reuse, never reclaimed: " << c << '\n';
 
@@ -135,12 +138,14 @@ cell* new_cell() {
   ++Num_used_cells;
   cell* result = new cell;
   init(result);
+  xlog << "alloc " << (void*)result << '\n';
   return result;
 }
 
 void free_cell(cell* c) {
   --Num_used_cells;
   trace("mem") << "free";
+  xlog << "free " << (void*)c << ": " << c << " " << c->nrefs << '\n';
   clear(c);
   delete c;
 }
@@ -179,8 +184,10 @@ void test_rmref_frees_space() {
 // reclaims returns the accumulated list and reclaims dummy.
 cell* drop_ptr(cell* p) {
   cell* x = mkref(right(p));
+  xlog << "drop_ptr: before " << (void*)x << ": " << x << " " << x->nrefs << '\n';
   if (p->nrefs == 0) ++p->nrefs;  // disable rmref warning
   rmref(p);
+  xlog << "drop_ptr: after " << (void*)x << ": " << x << " " << x->nrefs << '\n';
   return x;
 }
 
