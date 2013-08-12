@@ -196,7 +196,7 @@ void test_rmref_frees_space() {
 cell* drop_ptr(cell* p) {
   cell* x = mkref(right(p));
   xlog << "drop_ptr: before " << (void*)x << ": " << x << " " << x->nrefs << '\n';
-  if (p->nrefs == 0) ++p->nrefs;  // disable rmref warning
+  if (p->nrefs == 0) ++p->nrefs;  // suppress rmref warning
   rmref(p);
   xlog << "drop_ptr: after " << (void*)x << ": " << x << " " << x->nrefs << '\n';
   return x;

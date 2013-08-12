@@ -113,7 +113,7 @@ void append(cell* x, cell* y) {
 // then return drop_ptr(p) which GC's the dummy but mkrefs the rest.
 cell* drop_ptr(cell* p) {
   cell* x = mkref(cdr(p));
-  if (p->nrefs == 0) ++p->nrefs;
+  if (p->nrefs == 0) ++p->nrefs;  // suppress rmref warning
   rmref(p);
   return x;
 }
