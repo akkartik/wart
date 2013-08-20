@@ -23,9 +23,16 @@ cell* new_table() {
 }
 
 :(before "End Reclaim Cases(c)")
-  case TABLE:
-    delete reinterpret_cast<cell_map*>(c->left);
+  case TABLE: {
+    cell_map* t = reinterpret_cast<cell_map*>(c->left);
+    for (cell_map::iterator p = t->begin(); p != t->end(); ++p) {
+      if (!p->second) continue;
+      rmref(p->first);
+      rmref(p->second);
+    }
+    delete t;
     break;
+  }
 
 :(code)
 bool is_table(cell* x) {
@@ -73,14 +80,19 @@ void unsafe_set(cell* t, cell* key, cell* val, bool delete_nils) {
 
   cell_map& t2 = *to_table(t);
   if (val == nil && delete_nils) {
-    if (t2[key])
+    if (t2[key]) {
+      rmref(t2[key]);
       t2[key] = NULL;
+      rmref(key);
+    }
     return;
   }
 
   if (val == t2[key]) return;
 
-  t2[key] = val;
+  if (!t2[key]) mkref(key);
+  else rmref(t2[key]);
+  t2[key] = mkref(val);
 }
 
 void unsafe_set(cell* t, string k, cell* val, bool delete_nils) {
@@ -104,4 +116,55 @@ void test_table_non_nil_key() {
   TEMP(t, mkref(new_table()));
   set(t, "a", new_sym("b"));
   CHECK_EQ(new_sym("b"), get(t, "a"));
+}
+
+void test_set_increments_nrefs() {
+  TEMP(t, mkref(new_table()));
+  TEMP(key, mkref(new_sym("a")));
+  TEMP(val, mkref(new_num(34)));
+  CHECK_EQ(key->nrefs, 2);
+  CHECK_EQ(val->nrefs, 2);
+  set(t, key, val);
+  CHECK_EQ(key->nrefs, 3);
+  CHECK_EQ(val->nrefs, 3);
+}
+
+void test_set_decrements_overridden_values() {
+  TEMP(t, mkref(new_table()));
+  TEMP(key, mkref(new_sym("a")));
+  TEMP(val, mkref(new_num(34)));
+  TEMP(val2, mkref(new_num(35)));
+  CHECK_EQ(key->nrefs, 2);
+  CHECK_EQ(val->nrefs, 2);
+  CHECK_EQ(val2->nrefs, 2);
+  set(t, key, val);
+  CHECK_EQ(key->nrefs, 3);
+  CHECK_EQ(val->nrefs, 3);
+  CHECK_EQ(val2->nrefs, 2);
+  set(t, key, val2);
+  CHECK_EQ(key->nrefs, 3);
+  CHECK_EQ(val->nrefs, 2);
+  CHECK_EQ(val2->nrefs, 3);
+}
+
+void test_set_decrements_key_on_delete() {
+  TEMP(t, mkref(new_table()));
+  TEMP(key, mkref(new_sym("a")));
+  TEMP(val, mkref(new_num(34)));
+  CHECK_EQ(key->nrefs, 2);
+  CHECK_EQ(val->nrefs, 2);
+  set(t, key, val);
+  CHECK_EQ(key->nrefs, 3);
+  CHECK_EQ(val->nrefs, 3);
+  set(t, key, nil);
+  CHECK_EQ(key->nrefs, 2);
+  CHECK_EQ(val->nrefs, 2);
+}
+
+void test_set_ignores_nonexistent_key() {
+  TEMP(t, mkref(new_table()));
+  TEMP(k, mkref(new_sym("nonexistent key test")));
+  CHECK_EQ(k->nrefs, 2);
+  set(t, k, nil);
+  CHECK_EQ(k->nrefs, 2);
 }
