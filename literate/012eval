@@ -39,12 +39,14 @@ cell* eval(cell* expr) {
     return mkref(right(expr));
   }
 
+  // Eval Hardcoded Primitive {
   cell* result = eval_primitive(left(expr), right(expr));
   if (result) {
     trace("eval") << "compiled fn";
     trace("eval") << "=> " << result;
     return result;
   }
+  // }
 
   // expr is a call
   TEMP(fn, eval(left(expr)));
@@ -55,10 +57,12 @@ cell* eval(cell* expr) {
   // eval its args, create new bindings
   eval_bind_all(sig(fn), right(expr));
 
+  // Eval Call {
   // eval all forms in body, save result of final form
   result = nil;
   for (cell* form = body(fn); form != nil; form=right(form))
     update(result, eval(left(form)));
+  // }
 
   // Eval Cleanup(fn, expr, result)
   trace("eval") << "=> " << result;
@@ -214,12 +218,12 @@ cell* eval_primitive(cell* f, cell* args) {
 void test_fn_works() {
   TEMP(result, run("(fn(x) x)"));
   // {sig: (x), body: (x)}
-  cell* sig = left(right(result));
-  CHECK_EQ(left(sig), new_sym("x"));
-  CHECK_EQ(right(sig), nil);
-  cell* body = right(right(result));
-  CHECK_EQ(left(body), new_sym("x"));
-  CHECK_EQ(right(body), nil);
+  cell* params = sig(result);
+  CHECK_EQ(left(params), new_sym("x"));
+  CHECK_EQ(right(params), nil);
+  cell* impl = body(result);
+  CHECK_EQ(left(impl), new_sym("x"));
+  CHECK_EQ(right(impl), nil);
 }
 
 :(scenario if_sees_args_in_then_and_else)

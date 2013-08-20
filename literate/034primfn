@@ -1,0 +1,188 @@
+:(delete{} "Eval Hardcoded Primitive")
+:(delete{} "eval_primitive(cell*")
+:(replace{} "Eval Call")
+  // Eval Call {
+  cell* result = nil;
+  if (is_primfn(body(fn))) {
+    trace("eval") << "compiled fn";
+    result = to_primfn(body(fn))();
+  }
+  else {
+    :OLD_CONTENTS
+  }
+  // }
+:(before "End Cell Fields")
+  #define PRIMFN 5
+
+:(before "End Types")
+typedef cell* (*primfn)();
+
+#define COMPILE_FN(op, name, params, body) \
+  cell* name() { body }  // op and params extracted into primfn_list below
+
+struct primfn_metadata {
+  string name;
+  string params;
+  primfn impl;
+};
+
+:(before "End Globals")
+const primfn_metadata Compiledfns[] = {
+  #include "primfn_list"  // auto-generated; see makefile
+};
+
+:(before "End Cell Print Cases(c)")
+  case PRIMFN:
+    return os << "#compiled";
+
+:(before "End Reclaim Cases(c)")
+  case PRIMFN:
+    break;  // compiled functions don't need freeing
+
+:(after "bool is_fn(cell* x)")
+  if (type(x) == new_sym("function")) return true;
+
+:(before "End Setup")
+  setup_primfns();
+:(code)
+void setup_primfns() {
+  for (unsigned long i=0; i < sizeof(Compiledfns)/sizeof(Compiledfns[0]); ++i) {
+    TEMP(f, mkref(new_table()));
+    set(f, new_sym("name"), new_sym(Compiledfns[i].name));
+    istringstream ss(Compiledfns[i].params);
+    TEMP(sig, read(ss));
+    set(f, new_sym("sig"), sig);
+    set(f, new_sym("body"), new_primfn(Compiledfns[i].impl));
+    TEMP(obj, mkref(new_object("function", f)));
+    new_binding(Compiledfns[i].name, obj);
+  }
+}
+
+:(after "Test Teardown")
+  teardown_primfns();
+:(code)
+void teardown_primfns() {
+  for (unsigned long i=0; i < sizeof(Compiledfns)/sizeof(Compiledfns[0]); ++i)
+    end_binding(Compiledfns[i].name);
+}
+
+cell* new_primfn(primfn f) {
+  cell* result = new_cell();
+  result->type = PRIMFN;
+  result->left = (cell*)f;
+  return result;
+}
+
+bool is_primfn(cell* x) {
+  return x->type == PRIMFN;
+}
+
+primfn to_primfn(cell* x) {
+  if (!is_primfn(x))
+    RAISE << "Not a primitive function\n" << die();
+  return (primfn)x->left;
+}
+
+COMPILE_FN(fn, primfn_fn, "'($params ... $body)",
+  TEMP(f, mkref(new_table()));
+  set(f, new_sym("sig"), lookup("$params"));
+  set(f, new_sym("body"), lookup("$body"));
+  return mkref(new_object("function", f));
+)
+
+COMPILE_FN(eval, primfn_eval, "($x)",
+  return eval(lookup("$x"));
+)
+
+COMPILE_FN(if, primfn_if, "($cond '$then '$else)",
+  return lookup("$cond") != nil ? eval(lookup("$then")) : eval(lookup("$else"));
+)
+
+COMPILE_FN(not, primfn_not, "($x)",
+  return lookup("$x") == nil ? mkref(new_num(1)) : nil;
+)
+
+COMPILE_FN(=, primfn_equal, "($x $y)",
+  cell* x = lookup("$x");
+  cell* y = lookup("$y");
+  if (x == nil && y == nil)
+    return mkref(new_num(1));
+  else if (x == nil || y == nil)
+    return nil;
+  else if (x == y)
+    return mkref(x);
+  else if (is_string(x) && is_string(y) && to_string(x) == to_string(y))
+    return mkref(x);
+  else
+    return nil;
+)
+
+COMPILE_FN(cons?, primfn_is_cons, "($x)",
+  cell* x = lookup("$x");
+  if (!is_tree(x)) return nil;
+  return mkref(x);
+)
+
+COMPILE_FN(cons, primfn_cons, "($x $y)",
+  return mkref(new_cell(lookup("$x"), lookup("$y")));
+)
+
+COMPILE_FN(car, primfn_car, "($l)",
+  return mkref(left(lookup("$l")));
+)
+
+COMPILE_FN(cdr, primfn_cdr, "($l)",
+  return mkref(right(lookup("$l")));
+)
+
+COMPILE_FN(+, primfn_add, "($x $y)",
+  cell* x = lookup("$x"); cell* y = lookup("$y");
+  return mkref(new_num(to_int(x) + to_int(y)));
+)
+
+COMPILE_FN(-, primfn_subtract, "($x $y)",
+  cell* x = lookup("$x"); cell* y = lookup("$y");
+  return mkref(new_num(to_int(x) - to_int(y)));
+)
+
+COMPILE_FN(*, primfn_multiply, "($x $y)",
+  cell* x = lookup("$x"); cell* y = lookup("$y");
+  return mkref(new_num(to_int(x) * to_int(y)));
+)
+
+COMPILE_FN(<, compiledfn_lesser, "($x $y)",
+  if (lookup("$x") == nil || lookup("$y") == nil)
+    return nil;
+  return to_int(lookup("$x")) < to_int(lookup("$y")) ? mkref(lookup("$y")) : nil;
+)
+
+COMPILE_FN(<-, primfn_assign, "('$var $val)",
+  cell* var = lookup("$var");
+  cell* val = lookup("$val");
+  assign(var, val);
+  return mkref(val);
+)
+
+void assign(cell* var, cell* val) {
+  if (!is_sym(var)) {
+    RAISE << "can't assign to non-sym " << var << '\n';
+    return;
+  }
+  if (Dynamics[var].empty()) {
+    new_binding(var, val);
+    return;
+  }
+  rmref(Dynamics[var].top());
+  Dynamics[var].pop();
+  Dynamics[var].push(mkref(val));
+}
+
+:(replace{} "cell* sig(cell* fn)")
+cell* sig(cell* fn) {
+  return get(rep(fn), new_sym("sig"));
+}
+
+:(replace{} "cell* body(cell* fn)")
+cell* body(cell* fn) {
+  return get(rep(fn), new_sym("body"));
+}

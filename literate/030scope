@@ -37,6 +37,10 @@ void end_binding(cell* sym) {
   bindings.pop();
 }
 
+void end_binding(const string& sym) {
+  end_binding(new_sym(sym));
+}
+
 :(after "Eval Cleanup(fn, expr, result)")
   end_all_bindings(sig(fn));
 :(code)
