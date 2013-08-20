@@ -55,7 +55,7 @@ void rmref(list<cell*> l) {
 }
 
 void reclaim(cell* c) {
-  xlog << "reclaim " << (void*)c << ": " << c << " " << c->nrefs;
+  xlog << "reclaim " << (void*)c << ": " << c << " " << c->nrefs << '\n';
   if (c->type == INTEGER || c->type == SYMBOL)
     RAISE << "atom should be saved for reuse, never reclaimed: " << c << '\n';
 

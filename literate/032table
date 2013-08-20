@@ -13,7 +13,7 @@
 :(before "End Types")
 typedef unordered_map<cell*, cell*> cell_map;
 
-:(before "End Cell Print Cases")
+:(before "End Cell Print Cases(c)")
 case TABLE:
   os << *to_table(c);
   return os;
