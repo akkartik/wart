@@ -1,0 +1,18 @@
+//// user-defined types
+
+:(code)
+cell* new_object(string type, cell* rep) {
+  return new_cell(new_sym("object"), new_cell(new_sym(type), new_cell(rep)));
+}
+:(after "type(cell* x)")
+  if (is_object(x)) return left(right(x));
+
+:(code)
+bool is_object(cell* x) {
+  return left(x) == new_sym("object");
+}
+
+cell* rep(cell* x) {
+  if (!is_object(x)) return x;
+  return left(right(right(x)));
+}
