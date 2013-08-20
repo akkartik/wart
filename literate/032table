@@ -6,6 +6,10 @@
 :(after "bool is_atom")
   if (x->type == TABLE) return false;
 
+:(before "End Type Cases")
+  case TABLE:
+    return new_sym("table");
+
 :(before "End Types")
 typedef unordered_map<cell*, cell*> cell_map;
 

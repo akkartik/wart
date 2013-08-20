@@ -1,0 +1,18 @@
+:(code)
+cell* type(cell* x) {
+  if (x == nil) return nil;
+  switch(x->type) {
+  case TREE:
+    return new_sym("list");  // weird
+  case INTEGER:
+    return new_sym("number");
+  case SYMBOL:
+    return new_sym("symbol");
+  case STRING:
+    return new_sym("string");
+  // End Type Cases
+  default:
+    RAISE << "Undefined type: " << x->type << '\n' << die();
+    return nil;
+  }
+}
