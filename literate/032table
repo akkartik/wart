@@ -1,0 +1,107 @@
+//// associative arrays
+
+:(before "End Cell Fields")
+  #define TABLE 4
+
+:(after "bool is_atom")
+  if (x->type == TABLE) return false;
+
+:(before "End Types")
+typedef unordered_map<cell*, cell*> cell_map;
+
+:(before "End Cell Print Cases")
+case TABLE:
+  os << *to_table(c);
+  return os;
+
+:(code)
+cell* new_table() {
+  cell* result = new_cell();
+  result->type = TABLE;
+  result->left = reinterpret_cast<cell*>(new cell_map());
+  return result;
+}
+
+:(before "End Reclaim Cases(c)")
+  case TABLE:
+    delete reinterpret_cast<cell_map*>(c->left);
+    break;
+
+:(code)
+bool is_table(cell* x) {
+  return x->type == TABLE;
+}
+
+cell_map* to_table(cell* x) {
+  if (!is_table(x)) return NULL;
+  return reinterpret_cast<cell_map*>(x->left);
+}
+
+ostream& operator<<(ostream& os, cell_map& t) {
+  os << "{";
+  for (cell_map::iterator p = t.begin(); p != t.end(); ++p) {
+    if (!p->second) continue;
+    os << p->first << ", ";
+  }
+  return os << "}";
+}
+
+
+void set(cell* t, string k, cell* val) {
+  unsafe_set(t, new_sym(k), val, true);
+}
+
+void set(cell* t, cell* k, cell* val) {
+  unsafe_set(t, k, val, true);
+}
+
+cell* get(cell* t, cell* k) {
+  cell* result = unsafe_get(t, k);
+  if (!result) return nil;
+  return result;
+}
+
+cell* get(cell* t, string k) {
+  return get(t, new_sym(k));
+}
+
+void unsafe_set(cell* t, cell* key, cell* val, bool delete_nils) {
+  if (!is_table(t)) {
+    RAISE << "set on a non-table: " << t << '\n';
+    return;
+  }
+
+  cell_map& t2 = *to_table(t);
+  if (val == nil && delete_nils) {
+    if (t2[key])
+      t2[key] = NULL;
+    return;
+  }
+
+  if (val == t2[key]) return;
+
+  t2[key] = val;
+}
+
+void unsafe_set(cell* t, string k, cell* val, bool delete_nils) {
+  unsafe_set(t, new_sym(k), val, delete_nils);
+}
+
+cell* unsafe_get(cell* t, cell* key) {
+  if (!is_table(t)) {
+    RAISE << "get on a non-table\n";
+    return nil;
+  }
+  cell_map& t2 = *to_table(t);
+  return t2[key];
+}
+
+cell* unsafe_get(cell* t, string k) {
+  return unsafe_get(t, new_sym(k));
+}
+
+void test_table_non_nil_key() {
+  TEMP(t, mkref(new_table()));
+  set(t, "a", new_sym("b"));
+  CHECK_EQ(new_sym("b"), get(t, "a"));
+}

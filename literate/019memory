@@ -67,6 +67,7 @@ void reclaim(cell* c) {
     delete (string*)c->left; break;
   case TREE:
     rmref(c->left); break;
+  // End Reclaim Cases(c)
   default:
     RAISE << "Can't reclaim type " << c->type << '\n' << die();
     return;

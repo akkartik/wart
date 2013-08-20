@@ -1,4 +1,5 @@
 //// Tree primitives that we'll extend later.
+
 cell* left(cell* x) {
   if (x->type != TREE) {
     RAISE << "cell has no left child: " << x << '\n';

@@ -110,6 +110,7 @@ ostream& operator<<(ostream& os, cell* c) {
     return os << to_string(c);
   case STRING:
     return os << "\"" << to_string(c) << "\"";
+  // End Cell Print Cases
   default:
     cerr << "Can't print type " << c->type << '\n' << die();
     return os;
