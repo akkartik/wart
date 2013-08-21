@@ -47,14 +47,12 @@ const primfn_metadata Compiledfns[] = {
 :(code)
 void setup_primfns() {
   for (unsigned long i=0; i < sizeof(Compiledfns)/sizeof(Compiledfns[0]); ++i) {
-    TEMP(f, mkref(new_table()));
-    set(f, new_sym("name"), new_sym(Compiledfns[i].name));
     istringstream ss(Compiledfns[i].params);
     TEMP(sig, read(ss));
-    set(f, new_sym("sig"), sig);
-    set(f, new_sym("body"), new_primfn(Compiledfns[i].impl));
-    TEMP(obj, mkref(new_object("function", f)));
-    new_binding(Compiledfns[i].name, obj);
+    new_binding(Compiledfns[i].name,
+        new_cell(new_sym("fn"),
+            new_cell(sig,
+                     new_primfn(Compiledfns[i].impl))));
   }
 }
 
@@ -84,10 +82,9 @@ primfn to_primfn(cell* x) {
 }
 
 COMPILE_FN(fn, primfn_fn, "'($params ... $body)",
-  TEMP(f, mkref(new_table()));
-  set(f, new_sym("sig"), lookup("$params"));
-  set(f, new_sym("body"), lookup("$body"));
-  return mkref(new_object("function", f));
+  return mkref(new_cell(new_sym("fn"),
+                   new_cell(lookup("$params"),
+                            lookup("$body"))));
 )
 
 COMPILE_FN(eval, primfn_eval, "($x)",
@@ -175,14 +172,4 @@ void assign(cell* var, cell* val) {
   rmref(Dynamics[var].top());
   Dynamics[var].pop();
   Dynamics[var].push(mkref(val));
-}
-
-:(replace{} "cell* sig(cell* fn)")
-cell* sig(cell* fn) {
-  return get(rep(fn), new_sym("sig"));
-}
-
-:(replace{} "cell* body(cell* fn)")
-cell* body(cell* fn) {
-  return get(rep(fn), new_sym("body"));
 }
