@@ -317,9 +317,7 @@ void test_assign_to_non_sym_warns() {
 +eval/1: => nil
 
 :(code)  //// fn params
-// bind params to args in new_scope, taking into account:
-//  quoted params (eval'ing args as necessary; args is never quoted, though)
-//  destructured params
+// create corresponding bindings from params to args
 void eval_bind_all(cell* params, cell* args) {
   if (params == nil)
     ;
