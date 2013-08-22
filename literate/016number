@@ -1,14 +1,8 @@
+// Cells can also represent numbers. Here's how.
+
 :(before "End Globals")
 // reuse a single cell whenever you encounter say 34
 unordered_map<long, cell*> Int_literals;
-:(before "End Test Teardown")
-  for (unordered_map<long, cell*>::iterator p = Int_literals.begin(); p != Int_literals.end(); ++p) {
-    if (!p->second) continue;
-    if (p->second->nrefs > 1)
-      RAISE << "couldn't free reused literal " << p->first << " (" << p->second->nrefs << " references)\n";
-    free_cell(p->second);
-  }
-  Int_literals.clear();
 
 :(code)
 cell* new_num(long x) {
@@ -36,8 +30,23 @@ long to_int(cell* x) {
   return 0;
 }
 
+void test_numbers() {
+  TEMP(num, mkref(new_num(23)));
+  CHECK(is_num(num));
+  CHECK_EQ(to_int(num), 23);
+}
+
 void test_ints_are_reused() {
   TEMP(num, mkref(new_num(23)));
   TEMP(num2, mkref(new_num(23)));
   CHECK_EQ(num, num2);
 }
+
+:(before "End Test Teardown")
+  for (unordered_map<long, cell*>::iterator p = Int_literals.begin(); p != Int_literals.end(); ++p) {
+    if (!p->second) continue;
+    if (p->second->nrefs > 1)
+      RAISE << "couldn't free reused literal " << p->first << " (" << p->second->nrefs << " references)\n";
+    free_cell(p->second);
+  }
+  Int_literals.clear();
