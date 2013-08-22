@@ -1,4 +1,4 @@
-// user-defined types: (object <type> <value>)
+// User-defined types: (object <type> <value>)
 
 :(code)
 cell* new_object(string type, cell* rep) {
