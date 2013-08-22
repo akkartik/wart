@@ -1,3 +1,8 @@
+// Traditionally lisp functions receive all their arguments implicitly eval'd.
+// But macros (later) need to mess with this. Rather than create special cases
+// for macros we'll provide functions the ability to decide which arguments
+// they'd like eval'd and which not.
+
 :(scenarios run)
 :(scenario quoted_param)
 ((fn('a)) x)

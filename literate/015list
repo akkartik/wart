@@ -1,4 +1,4 @@
-//// Tree primitives that we'll extend later.
+// Tree primitives that we'll extend later.
 
 cell* left(cell* x) {
   if (x->type != TREE) {
@@ -73,7 +73,10 @@ void test_set_right_is_idempotent() {
   CHECK_EQ(y->nrefs, 2);  // no change
 }
 
-//// Lists are trees when 'sighted along' the right child.
+
+
+// Lists are trees when 'sighted along' the right child.
+
 cell* first(cell* x) {
   return left(x);
 }

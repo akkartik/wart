@@ -1,4 +1,4 @@
-// We'd like for function parameters to not override global variables.
+// We'd like function parameters to not override global variables.
 :(scenarios run)
 :(scenario function_params_create_new_scope)
 (<- x 3)

@@ -1,4 +1,4 @@
-//// associative arrays
+// Associative arrays.
 
 :(before "End Cell Fields")
   #define TABLE 4

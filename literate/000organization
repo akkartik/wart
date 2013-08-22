@@ -82,19 +82,19 @@
 // on it. But they shouldn't be prevented from a thorough understanding of
 // each aspect either. The goal of layers is to reward curiosity.
 
-//// Includes
+// Includes
 // End Includes
 
-//// Types
+// Types
 // End Types
 
 // prototypes are auto-generated; define your functions in any order
 #include "function_list"  // by convention, files ending with '_list' are auto-generated
 
-//// Globals
+// Globals
 // End Globals
 
-//// End Tracing          // a special layer later that must come before anything else
+// End Tracing          // a special layer later that must come before anything else
 
 int main(int argc, char* argv[]) {
   if (argc > 1) {

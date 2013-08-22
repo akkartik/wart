@@ -1,5 +1,46 @@
+// Currently our primitives are hard-coded to names. Here we'll turn them into
+// first-class values that can be transferred to new names, over-ridden, etc.
+
+:(scenario primfn_can_be_renamed)
+(<- if2 if)
+(if2 3 4)
+=> 4
+(if2 nil 4)
+=> nil
+
+// This relies on selective quoting; 'if' and many other primitives need to
+// explicitly control how they eval their args for short-circuiting, etc.
+:(code)
+COMPILE_FN(if, primfn_if, "($cond '$then '$else)",
+  return lookup("$cond") != nil ? eval(lookup("$then")) : eval(lookup("$else"));
+)
+
+
+
+// new type of cell and helpers
+:(before "End Cell Types")
+  #define PRIMFN 5
+:(before "End Types")
+typedef cell* (*primfn)();
+:(code)
+bool is_primfn(cell* x) {
+  return x->type == PRIMFN;
+}
+
+cell* new_primfn(primfn f) {
+  cell* result = new_cell();
+  result->type = PRIMFN;
+  result->left = (cell*)f;
+  return result;
+}
+
+primfn to_primfn(cell* x) {
+  if (!is_primfn(x))
+    RAISE << "Not a primitive function\n" << die();
+  return (primfn)x->left;
+}
+
 :(delete{} "Eval Hardcoded Primitive")
-:(delete{} "eval_primitive(cell*")
 :(replace{} "Eval Call")
   // Eval Call {
   cell* result = nil;
@@ -11,12 +52,21 @@
     :OLD_CONTENTS
   }
   // }
-:(before "End Cell Fields")
-  #define PRIMFN 5
 
+:(before "End Cell Print Cases(c)")
+  case PRIMFN:
+    return os << "#compiled";
+
+:(before "End Reclaim Cases(c)")
+  case PRIMFN:
+    break;  // compiled functions don't need freeing
+
+
+
+//// Setup
 :(before "End Types")
-typedef cell* (*primfn)();
-
+// Instead of a single hardcoded switch, we can define new primitives anywhere
+// we want.
 #define COMPILE_FN(op, name, params, body) \
   cell* name() { body }  // op and params extracted into primfn_list below
 
@@ -30,17 +80,6 @@ struct primfn_metadata {
 const primfn_metadata Compiledfns[] = {
   #include "primfn_list"  // auto-generated; see makefile
 };
-
-:(before "End Cell Print Cases(c)")
-  case PRIMFN:
-    return os << "#compiled";
-
-:(before "End Reclaim Cases(c)")
-  case PRIMFN:
-    break;  // compiled functions don't need freeing
-
-:(after "bool is_fn(cell* x)")
-  if (type(x) == new_sym("function")) return true;
 
 :(before "End Setup")
   setup_primfns();
@@ -64,22 +103,10 @@ void teardown_primfns() {
     end_binding(Compiledfns[i].name);
 }
 
-cell* new_primfn(primfn f) {
-  cell* result = new_cell();
-  result->type = PRIMFN;
-  result->left = (cell*)f;
-  return result;
-}
+
 
-bool is_primfn(cell* x) {
-  return x->type == PRIMFN;
-}
-
-primfn to_primfn(cell* x) {
-  if (!is_primfn(x))
-    RAISE << "Not a primitive function\n" << die();
-  return (primfn)x->left;
-}
+//// Replace existing primitives
+:(delete{} "eval_primitive(cell*")
 
 COMPILE_FN(fn, primfn_fn, "'($params ... $body)",
   return mkref(new_cell(new_sym("fn"),
@@ -89,10 +116,6 @@ COMPILE_FN(fn, primfn_fn, "'($params ... $body)",
 
 COMPILE_FN(eval, primfn_eval, "($x)",
   return eval(lookup("$x"));
-)
-
-COMPILE_FN(if, primfn_if, "($cond '$then '$else)",
-  return lookup("$cond") != nil ? eval(lookup("$then")) : eval(lookup("$else"));
 )
 
 COMPILE_FN(not, primfn_not, "($x)",

@@ -1,5 +1,5 @@
-// Allocating, deallocating and reusing cells.
-//
+// Allocating, reclaiming, and reusing cells.
+
 // A cell is brought into being by new_cell(). Each cell tracks the number of
 // other cells pointing to it, growing and shrinking this number as pointers
 // in other cells are modified. When this number subsides back to 0 there's no
@@ -77,7 +77,9 @@ void reclaim(cell* c) {
   free_cell(c);
 }
 
-//// some idioms for managing rmref
+
+
+//// Some idioms for managing rmref:
 
 :(before "End Types")
 struct lease_cell;
@@ -108,7 +110,25 @@ void test_lease_cell_is_mutable() {
   // no leak
 }
 
+// A useful idiom for growing a list without causing leaks: create a dummy
+// cell p, keep appending to it using add_cell, then return drop_ptr(p) which
+// returns the accumulated list and reclaims dummy.
+cell* drop_ptr(cell* p) {
+  cell* x = mkref(right(p));
+  xlog << "drop_ptr: before " << (void*)x << ": " << x << " " << x->nrefs << '\n';
+  if (p->nrefs == 0) ++p->nrefs;  // suppress rmref warning
+  rmref(p);
+  xlog << "drop_ptr: after " << (void*)x << ": " << x << " " << x->nrefs << '\n';
+  return x;
+}
+
+void add_cell(cell* p, cell* x) {
+  set_right(p, new_cell(x));
+}
+
 
+
+//// A sanity check
 
 // All code must call mkref and rmref appropriately as it modifies left/right
 // children. If I forget to rmref when I should I waste space. If I 'leak' too
@@ -189,20 +209,3 @@ void test_rmref_frees_space() {
       RAISE << Num_used_cells << " leaked cells.\n";
     continue;
   }
-
-:(code)
-// useful idiom for growing a list without causing leaks: create a dummy cell
-// p, keep appending to it using add_cell, then return drop_ptr(p) which
-// reclaims returns the accumulated list and reclaims dummy.
-cell* drop_ptr(cell* p) {
-  cell* x = mkref(right(p));
-  xlog << "drop_ptr: before " << (void*)x << ": " << x << " " << x->nrefs << '\n';
-  if (p->nrefs == 0) ++p->nrefs;  // suppress rmref warning
-  rmref(p);
-  xlog << "drop_ptr: after " << (void*)x << ": " << x << " " << x->nrefs << '\n';
-  return x;
-}
-
-void add_cell(cell* p, cell* x) {
-  set_right(p, new_cell(x));
-}

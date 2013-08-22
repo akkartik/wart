@@ -1,5 +1,6 @@
+// Evaluate a tree of cells as code.
+
 :(code)
-// evaluate tree of cells as code
 cell* eval(cell* expr) {
   new_trace_frame("eval");
   if (!expr) {
@@ -316,7 +317,11 @@ void test_assign_to_non_sym_warns() {
 (< 4 3)
 +eval/1: => nil
 
-:(code)  //// fn params
+
+
+//// Binding function params
+
+:(code)
 // create corresponding bindings from params to args
 void eval_bind_all(cell* params, cell* args) {
   if (params == nil)
@@ -436,7 +441,11 @@ cell* eval_all(cell* args) {
 +bind: a: 3
 +bind: b: 4
 
-:(code)   //// internals
+
+
+//// Eval Internals
+
+:(code)
 bool is_quoted(cell* cell) {
   return is_tree(cell) && left(cell) == new_sym("'");
 }
