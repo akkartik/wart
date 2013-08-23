@@ -66,3 +66,14 @@ void run_tests() {
 bool is_equal(char* s, const char* lit) {
   return strncmp(s, lit, strlen(lit)) == 0;
 }
+
+:(before "End Includes")
+#include<iostream>
+using std::istream;
+using std::ostream;
+using std::iostream;
+using std::cin;
+using std::cout;
+using std::cerr;
+
+#include<cstring>
