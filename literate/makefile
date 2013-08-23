@@ -3,6 +3,14 @@ a.out: makefile wart.cc ../[0-9]*.cc
 	g++ -g -Wall -Wextra -fno-strict-aliasing wart.cc
 	-@a.out test
 
+test_all:
+	# Sucks to have to explicitly name files
+	for target in 009 029 030 031 032 033 034; \
+	do \
+		command echo $$target*; \
+		build_and_test_until $$target; \
+	done
+
 # To see what the program looks like after all layers have been applied, read
 # wart.cc
 wart.cc: 0* ../wart_bin
