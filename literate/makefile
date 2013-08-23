@@ -5,7 +5,7 @@ a.out: makefile wart.cc function_list test_list primfn_list ../[0-9]*.cc
 # To see what the program looks like after all layers have been applied, read
 # wart.cc
 wart.cc: 0* ../wart_bin
-	./tangle 0* > wart.cc
+	./tangle 999 > wart.cc
 
 ../wart_bin: ../[0-9]*.cc
 	@echo Building tangle

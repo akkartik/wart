@@ -1,7 +1,12 @@
-void tangle_and_print_all(const int argc, const char* argv[]) {
+#include<sys/param.h>
+
+void tangle_and_print_upto(const char* last) {
   list<string> result;
-  for (int n = 0; n < argc; ++n) {
-    ifstream in(argv[n]);
+  vector<char*> files = sorted_files(".", /*no extension*/ "");
+  for (vector<char*>::iterator p = files.begin(); p != files.end(); ++p) {
+    if ((*p)[0] < '0' || (*p)[0] > '9') continue;
+    if (strncmp(*p, last, MIN(strlen(*p), strlen(last))) > 0) break;
+    ifstream in(*p);
     tangle(in, result);
   }
   for (list<string>::iterator p = result.begin(); p != result.end(); ++p)
