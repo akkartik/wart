@@ -21,6 +21,7 @@ cell* right(cell* x) {
 }
 
 void set_left(cell* x, cell* y) {
+  if (x == nil) return;
   if (!is_tree(x)) {
     RAISE << "can't set left of " << x << '\n';
     return;
@@ -31,6 +32,7 @@ void set_left(cell* x, cell* y) {
 }
 
 void set_right(cell* x, cell* y) {
+  if (x == nil) return;
   if (!is_tree(x)) {
     RAISE << "can't set right of " << x << '\n';
     return;
@@ -38,6 +40,12 @@ void set_right(cell* x, cell* y) {
   mkref(y);
   rmref(right(x));
   x->right = y;
+}
+
+void test_set_on_nil_works() {
+  TEMP(x, mkref(new_cell()));
+  set_left(nil, x);
+  set_right(nil, x);
 }
 
 void test_set_left_updates_nrefs() {
