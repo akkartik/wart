@@ -18,11 +18,3 @@ cell* new_cell(cell* left, cell* right) {
 cell* new_cell(cell* left) {
   return new_cell(left, nil);
 }
-
-bool is_tree(cell* x) {  // tree or list
-  return x != nil && x->type == TREE;
-}
-
-bool is_atom(cell* x) {
-  return !is_tree(x);
-}

@@ -1,5 +1,13 @@
 // The primary use of a cell is to construct trees out of.
 
+bool is_tree(cell* x) {  // tree or list
+  return x != nil && x->type == TREE;
+}
+
+bool is_atom(cell* x) {
+  return !is_tree(x);
+}
+
 cell* left(cell* x) {
   if (x->type != TREE) {
     RAISE << "cell has no left child: " << x << '\n';
