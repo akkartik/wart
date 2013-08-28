@@ -79,8 +79,9 @@ void test_lower_lexical_scopes_are_available() {
 void test_new_dynamic_scope_increments_refcounts() {
   TEMP(var, mkref(new_sym("a")));
   TEMP(val, mkref(new_num(34)));
-  CLEAR_TRACE;
+  int nk=var->nrefs,  nv=val->nrefs;
   new_dynamic_scope(var, val);
-    CHECK_EQ(excess_mkrefs(), 2);  // one for var, one for val
+  CHECK_EQ(nk+1, var->nrefs);
+  CHECK_EQ(nv+1, val->nrefs);
   end_dynamic_scope(var);
 }

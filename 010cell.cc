@@ -131,8 +131,6 @@ struct table {
 
 cell* mkref(cell* c) {
   if (c == nil) return nil;
-  trace("gc") << "mkref";
-  trace("gc/mkref") << c;
   ++c->nrefs;
   return c;
 }
@@ -144,16 +142,11 @@ void rmref(cell* c) {
   }
   if (c == nil) return;
 
-  new_trace_frame("rmref");
-  trace("gc") << "rmref";
-  trace("gc/rmref") << c;
-
   if (c->nrefs <= 0) cerr << 'X' << c << '\n';
   cerr.flush();
   --c->nrefs;
   if (c->nrefs > 0) return;
 
-  trace("gcdump") << "free: " << (void*)c << " " << c << " " << c->nrefs;
   if (c->type == INTEGER || c->type == SYMBOL)
     RAISE << "deleted interned atom: " << c << '\n';
 
@@ -182,10 +175,6 @@ void rmref(cell* c) {
 // helper for tests
 bool is_free(cell* x) {
   return x->car == NULL;
-}
-
-long excess_mkrefs() {
-  return trace_count("gc", "mkref") - trace_count("gc", "rmref");
 }
 
 
