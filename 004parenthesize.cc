@@ -145,12 +145,18 @@ list<token> indent_insensitive_expr(indent_sensitive_stream& in) {
       result.push_back(curr);
     }
     else if (is_open_paren(curr)) {
-      result.push_back(curr);
       ++explicit_open_parens;
+      result.push_back(curr);
     }
     else if (is_close_paren(curr)) {
-      result.push_back(curr);
       --explicit_open_parens;
+      if (explicit_open_parens < 0) {
+        RAISE << "Unbalanced )\n";
+        cin.clear(); fflush(stdin);
+        in.at_start_of_line = true;
+        break;
+      }
+      result.push_back(curr);
       if (explicit_open_parens == 0) break;
     }
     else {  //// word

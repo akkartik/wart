@@ -49,3 +49,9 @@ XI. Implicit parens after explicit
 => 'a
 prn 'a
 => 'a
+
+XII. Expression after Unbalanced )
+(+ 1 2))
+Unbalanced )
+34
+=> 34
