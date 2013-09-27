@@ -1,7 +1,7 @@
 def (test msg pred|should expr|valueof expected)
   if (pred expr expected)
     (err ".")
-    (register_failed_test msg expr)
+    (register_failed_test msg expr expected)
 
 def (pending_test 'msg 'expr|valueof 'pred|should 'expected)
   (err "

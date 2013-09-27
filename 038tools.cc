@@ -4,10 +4,11 @@ COMPILE_FN(addr, compiledfn_addr, "($x)",
   return mkref(new_num((long)lookup("$x")));
 )
 
-COMPILE_FN(register_failed_test, compiledfn_register_failed_test, "($msg $expr)",
+COMPILE_FN(register_failed_test, compiledfn_register_failed_test, "($msg $expr $expected)",
   ++Num_failures;
   cout << "\nF ";  print(lookup("$msg"), cout);
   cout << "\n  got " << lookup("$expr") << '\n';
+  cout << "  expected " << lookup("$expected") << '\n';
   return nil;
 )
 
