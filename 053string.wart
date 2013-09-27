@@ -53,6 +53,9 @@ defcoerce list string
   (fn(_)
     (string @_))
 
+def (rev s) :case string?.s
+  (as string (rev (as list s)))
+
 defcoerce nil string
   (fn() "")
 
