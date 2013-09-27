@@ -78,3 +78,6 @@ def (sum seq)
 
 def (product seq)
   (* @seq)
+
+def (abs n)
+  if (n < 0) -n :else n
