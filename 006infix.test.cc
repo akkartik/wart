@@ -102,6 +102,16 @@ void test_infix_handles_infix_ops_in_unary_prefix() {
   CHECK_TRACE_TOP("infix", "=> (+ a)");
 }
 
+void test_infix_handles_infix_ops_in_unary_prefix2() {
+  read_all("+a");
+  CHECK_TRACE_TOP("infix", "=> (+ a)");
+}
+
+void test_infix_handles_infix_ops_in_unary_prefix3() {
+  read_all("-a");
+  CHECK_TRACE_TOP("infix", "=> (- a)");
+}
+
 void test_infix_handles_infix_ops_in_nested_lists() {
   read_all("((a + b))");
   CHECK_TRACE_TOP("infix", "=> ((+ a b))");

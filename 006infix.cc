@@ -202,9 +202,6 @@ bool is_infix_op(ast_node n) {
 
 bool contains_infix_char(string name) {
   for (string::iterator p = name.begin(); p != name.end(); ++p) {
-    if (p == name.begin() && *p == '-')
-      continue;
-
     if (is_infix_char(*p)) return true;
   }
   return false;
