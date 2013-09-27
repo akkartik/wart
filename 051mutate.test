@@ -4,21 +4,21 @@
              (cons x y))
   :should be '(1 ... 2))
 
-(test "shift works"
+(test "shift! works"
   :valueof (with (x 3 y 4)
-             (shift x y 27)
+             (shift! x y 27)
              (list x y))
   :should be '(4 27))
 
-(test "rotate works"
+(test "rotate! works"
   :valueof (with (x 3 y 4 z 5)
-             (rotate x y z)
+             (rotate! x y z)
              (list x y z))
   :should be '(4 5 3))
 
-(test "swap works"
+(test "swap! works"
   :valueof (with (x 3 y 4)
-             (swap x y)
+             (swap! x y)
              (list x y))
   :should be '(4 3))
 

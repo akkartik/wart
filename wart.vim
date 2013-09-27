@@ -52,6 +52,7 @@ highlight link wartCall Delimiter
 
 " highlight assignment
 syntax match wartAssign /<-/
+syntax match wartAssign /\<\k*!\>/
 highlight link wartAssign Special
 
 syntax match wartSplice /@/

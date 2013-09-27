@@ -38,5 +38,5 @@
 
 (test "& works with macros"
   :valueof (ret x 3
-             (wipe&wipe x))
+             (wipe!&wipe! x))
   :should be nil)

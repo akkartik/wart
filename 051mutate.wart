@@ -1,29 +1,29 @@
-mac (zap f x)
+mac (zap! f x)
   `(,x <- (,f ,x))
 
 # infinite nil generator
 <- nils '(nil)
 <- cdr.nils nils
 
-mac (wipe ... places)
+mac (wipe! ... places)
   `(<- ,@(+ @(zip places nils)))
 
-mac (push x seq)
+mac (push! x seq)
   `(<- ,seq (cons ,x ,seq))
 
-mac (pop seq)
+mac (pop! seq)
   `(do1 (car ,seq)
-     (zap cdr ,seq))
+     (zap! cdr ,seq))
 
-mac (shift ... places)  # multiple-eval to maintain places
+mac (shift! ... places)  # multiple-eval to maintain places
   `(<- ,@(+ @(zip places cdr.places)))
 
-mac (rotate ... places)
+mac (rotate! ... places)
   `(let $tmp ,car.places
-     (shift ,@places $tmp))
+     (shift! ,@places $tmp))
 
-mac (swap x y)
-  `(rotate ,x ,y)
+mac (swap! x y)
+  `(rotate! ,x ,y)
 
 mac (making var val ... body)
   `(between (bind ,var ,val) :and (unbind ,var)

@@ -42,5 +42,5 @@ def (match? a b bindings) :case sym?.a
 def (root x)
   let name (rev+as list string.x)
     while (and name digit?+car.name)
-      (zap cdr name)
+      (zap! cdr name)
     (sym @rev.name)

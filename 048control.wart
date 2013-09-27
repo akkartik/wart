@@ -80,12 +80,12 @@ mac (for var start test update ... body)
        ,update))
 
 mac (each var expr ... body)
-  `(for $i (as list ,expr) $i (zap cdr $i)
+  `(for $i (as list ,expr) $i (zap! cdr $i)
       (let ,var car.$i
         ,@body))
 
 mac (on var expr ... body)
-  `(for ($i index) (list ,expr 0) $i  (do (zap cdr $i) ++index)
+  `(for ($i index) (list ,expr 0) $i  (do (zap! cdr $i) ++index)
      (let ,var car.$i
        ,@body))
 
