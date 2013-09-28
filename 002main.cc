@@ -41,6 +41,7 @@ int main(int argc, const char* argv[]) {
 }
 
 //// read: tokenize, parenthesize, parse, transform infix, build cells, transform $vars
+// simply returns nil on eof
 cell* read(indent_sensitive_stream& in) {
   return mkref(transform_dollar_vars(next_cell(in)));
 }

@@ -100,18 +100,16 @@ cell* read(istream& in) {
 
 COMPILE_FN(read_byte, compiledfn_read_byte, "('$eof)",
   istream& f = to_istream(STDIN);
-  if (f.eof())
-    return mkref(lookup("$eof"));
   char c;
-  f.read(&c, 1);
+  if (!f.read(&c, 1))
+    return mkref(lookup("$eof"));
   return mkref(new_num((long)c));
 )
 
 COMPILE_FN(read_line, compiledfn_read_line, "('$eof)",
   istream& f = to_istream(STDIN);
-  if (f.eof())
-    return mkref(lookup("$eof"));
   string result;
-  getline(f, result);
+  if (!getline(f, result))
+    return mkref(lookup("$eof"));
   return mkref(new_string(result));
 )

@@ -23,6 +23,24 @@ system "rm _x"
              (read_byte))
   :should be 98)
 
+(test "read_byte stops at eof"
+  :valueof (with instring "abc"
+              (with outstring
+                (whilet c (read_byte)
+                  (pr c))))
+  :should be "979899")
+
+(test "read_line stops at eof"
+  :valueof (with instring "abc
+def
+"
+              (with outstring
+                (whilet line (read_line)
+                  (prn line))))
+  :should be "abc
+def
+")
+
 (test "with infile/outfile works"
   :valueof (let f (tmpfile)
              (before (system+join "rm " f)
