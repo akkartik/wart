@@ -1,11 +1,11 @@
 #include<sys/param.h>
 
-void tangle_and_print_upto(const char* last) {
+void tangle_and_print_upto(const string& last) {
   list<string> result;
   vector<char*> files = sorted_files(".", /*no extension*/ "");
   for (vector<char*>::iterator p = files.begin(); p != files.end(); ++p) {
     if ((*p)[0] < '0' || (*p)[0] > '9') continue;
-    if (strncmp(*p, last, MIN(strlen(*p), strlen(last))) > 0) break;
+    if (!last.empty() && *p > last) break;
     ifstream in(*p);
     tangle(in, result);
   }
