@@ -3,10 +3,12 @@ COMPILE_FN(load, compiledfn_load, "($f)",
   return nil;
 )
 
-void load_files(const char* ext) {
+void load_files(const char* ext, const string& bound) {
   vector<char*> files = sorted_files(".", ext);
-  for (vector<char*>::iterator p = files.begin(); p != files.end(); ++p)
+  for (vector<char*>::iterator p = files.begin(); p != files.end(); ++p) {
+    if (!bound.empty() && bound < *p) break;
     load_file(*p);
+  }
 }
 
 

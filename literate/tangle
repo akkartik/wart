@@ -1,1 +1,1 @@
-../wart_bin tangle $*
+../wart_bin tangle --until $*

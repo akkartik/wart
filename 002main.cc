@@ -18,21 +18,30 @@
 bool Interactive = false;
 bool Warn_on_unknown_var = false;
 
+string bound = "";
+
 int main(int argc, const char* argv[]) {
   if (argc > 1) {
     setup();
-    string arg(argv[1]);
-    if (arg == "test")
-      run_tests();
-    else if (arg == "tangle")
-      tangle_and_print_upto(argv[2]);
-    return 0;
+    bool test = false, tangle = false;
+    for (int i = 1; i < argc; ++i) {
+      string arg(argv[i]);
+      if (arg == "test")
+        test = true;
+      else if (arg == "tangle")
+        tangle = true;
+      else if (arg == "--until")
+        bound = argv[++i];
+    }
+    if (test) run_tests();
+    if (tangle) tangle_and_print_upto(bound);
+    if (test || tangle) return 0;
   }
 
   //// Interactive loop: parse commands from user, evaluate them, print the results
   Warn_on_unknown_var = true;
   setup();
-  load_files(".wart");
+  load_files(".wart", bound);
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   Interactive = true;  // stop run on two enters
   while (!cin.eof()) {
@@ -97,8 +106,8 @@ void run_tests() {
 
   setup();
   cerr << '\n';
-  load_files(".wart");  // after GC tests
-  load_files(".test");
+  load_files(".wart", bound);  // after GC tests
+  load_files(".test", bound);
 
   cerr << '\n';
   if (Num_failures > 0)
