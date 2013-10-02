@@ -31,3 +31,6 @@ mac (making var val ... body)
 
 mac (coerce! var type)
   `(,var <- (coerce ,var ,type))
+
+def_assign rep (obj val)
+  <- (car cddr.obj) val
