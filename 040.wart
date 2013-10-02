@@ -6,6 +6,10 @@
                               caller_scope)))
            caller_scope))
 
+mac! (macro_caller_scope)
+  `(table_get (table_get caller_scope 'caller_scope)
+              'caller_scope)
+
 mac! (def! (name ... params) ... body)
   `(,name <- (fn ,params ,@body))
 

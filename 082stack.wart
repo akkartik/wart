@@ -1,0 +1,14 @@
+def (stack)
+  (tag 'stack list.nil)
+
+mac (push! x s) :qcase `(isa stack ,s)
+  `(push! ,x ((rep ,s) 0))
+
+mac (pop! s) :qcase `(isa stack ,s)
+  `(pop! ((rep ,s) 0))
+
+def (empty? s) :case (isa stack s)
+  (empty? rep.s.0)
+
+defcoerce stack list
+  car+rep

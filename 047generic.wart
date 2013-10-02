@@ -1,12 +1,20 @@
 let $mac mac
   mac! (mac (name ... params) ... body)
-    if (car.body ~= :case)
-      `(,$mac (,name ,@params) ,@body)
-      `(let $super ,name
-         (mac! (,name ... ($params | ,params))
-           (if ,cadr.body
-             (do ,@cddr.body)
-             (cons $super $params))))
+    (if
+      (car.body = :case)
+        : `(let $super ,name
+             (mac! (,name ... ($params | ,params))
+               (if ,cadr.body
+                 (do ,@cddr.body)
+                 (cons $super $params))))
+      (car.body = :qcase)
+        : `(let $super ,name
+             (mac! (,name ... ($params | ,params))
+               (if (eval ,cadr.body (macro_caller_scope))
+                 (do ,@cddr.body)
+                 (cons $super $params))))
+      :else
+        : `(,$mac (,name ,@params) ,@body))
 
 mac (def (name ... params) ... body) :case (car.body = :case)
   `(let $old ,name
