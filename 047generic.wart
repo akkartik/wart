@@ -7,7 +7,7 @@ let $mac mac
                (if ,cadr.body
                  (do ,@cddr.body)
                  (cons $super $params))))
-      (car.body = :qcase)
+      (car.body = :qcase)  # to dispatch on values rather than names
         : `(let $super ,name
              (mac! (,name ... ($params | ,params))
                (if (eval ,cadr.body (macro_caller_scope))
