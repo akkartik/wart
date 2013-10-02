@@ -6,6 +6,7 @@
                               caller_scope)))
            caller_scope))
 
+# make the right caller_scope available inside ,@body above
 mac! (macro_caller_scope)
   `(table_get (table_get caller_scope 'caller_scope)
               'caller_scope)
