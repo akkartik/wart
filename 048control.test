@@ -48,3 +48,7 @@
 (test "pipe operator chains"
   :valueof (list.1 -> cons? -> car)
   :should be 1)
+
+(test "transform is varargs pipe"
+  :valueof (transform list.1 :thru cons? car)
+  :should be 1)

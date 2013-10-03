@@ -120,3 +120,8 @@ def (| ... fs)
 
 mac (x -> f)
   `(,f ,x)
+
+mac (transform x ... fs|thru)
+  if no.fs
+    x
+    `(transform (,x -> ,car.fs) ,@cdr.fs)
