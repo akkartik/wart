@@ -89,6 +89,14 @@ def (zip a b)
     (cons (list car.a car.b)
           (zip cdr.a cdr.b))
 
+def (zipwith f a b)
+  if (and a b)
+    (cons (f car.a car.b)
+          (zipwith f cdr.a cdr.b))
+
+def (zip a b ... rest) :case rest
+  (zipwith cons a (zip b @rest))
+
 def (zipmax a b)
   if (or a b)
     (cons (list car.a car.b)
