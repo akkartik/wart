@@ -266,3 +266,7 @@
 (test "map works with multiary functions"
   :valueof (map list '(1 2 3) '(2 4 6) '(3 6 9))
   :should be '((1 2 3) (2 4 6) (3 6 9)))
+
+(test "intersperse works"
+  :valueof (intersperse 3 '(a b c d))
+  :should be '(a 3 b 3 c 3 d))

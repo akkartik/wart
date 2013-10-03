@@ -175,6 +175,11 @@ def (firstn n x)
        (cons (firstn n-1 car.x)
              (firstn n-1 cdr.x))
 
+def (intersperse x ys)
+  if single?.ys
+    ys
+    `(,car.ys ,x ,@(intersperse x cdr.ys))
+
 
 
 ## internals
