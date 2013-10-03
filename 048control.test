@@ -40,3 +40,11 @@
   :valueof (ret x 3
              (wipe!&wipe! x))
   :should be nil)
+
+(test "pipe operator works"
+  :valueof (3 -> (fn(_) (_ * 2)))
+  :should be 6)
+
+(test "pipe operator chains"
+  :valueof (list.1 -> cons? -> car)
+  :should be 1)
