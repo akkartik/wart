@@ -60,8 +60,7 @@ defcoerce nil string
   (fn() "")
 
 def (< a b ... rest) :case (and string?.a no.rest)
-  if (string_lesser a b)
-    b
+  (string_lesser a b)
 
 def (digit? c)
   (and string?.c

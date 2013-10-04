@@ -5,7 +5,12 @@ void test_string_range() {
 
 void test_string_compare() {
   run("(string_lesser \"abc\" \"abd\")");
-  CHECK_TRACE_TOP("eval", "=> 1");
+  CHECK_TRACE_TOP("eval", "=> \"abd\"");
+}
+
+void test_string_compare2() {
+  run("(string_lesser nil \"abd\")");
+  CHECK_TRACE_TOP("eval", "=> nil");
 }
 
 void test_string_split() {

@@ -195,6 +195,14 @@
   :valueof ("a" <= "a")
   :should ~be nil)
 
+(test "<= works on strings - 4"
+  :valueof (nil <= "a")
+  :should be nil)
+
+(test "<= works on strings - 5"
+  :valueof ("z" <= nil)
+  :should be nil)
+
 (test ">= works on strings"
   :valueof ("a" >= "b")
   :should be nil)

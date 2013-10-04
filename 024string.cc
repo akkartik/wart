@@ -64,7 +64,8 @@ COMPILE_FN(string_to_sym, compiledfn_string_to_sym, "($s)",
 COMPILE_FN(string_lesser, compiledfn_string_lesser, "($x $y)",
   cell* x = lookup("$x");
   cell* y = lookup("$y");
-  return to_string(x) < to_string(y) ? mkref(new_num(1)) : nil;
+  if (x == nil || y == nil) return nil;
+  return to_string(x) < to_string(y) ? mkref(y) : nil;
 )
 
 COMPILE_FN(split, compiledfn_split, "($s $delim)",

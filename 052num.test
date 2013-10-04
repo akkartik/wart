@@ -58,6 +58,10 @@
   :valueof (<= 1 4 3)
   :should be nil)
 
+(test "<= fails on nil"
+  :valueof (<= 1 nil 3)
+  :should be nil)
+
 (test ">= works"
   :valueof (>= 3 2 1)
   :should ~be nil)
@@ -68,6 +72,10 @@
 
 (test ">= works - 3"
   :valueof (>= 3 1 2)
+  :should be nil)
+
+(test ">= fails on nil"
+  :valueof (>= 4 nil 3)
   :should be nil)
 
 (test "max works"
