@@ -40,23 +40,30 @@ to be more accessible to non-lispers.
   if (odd? n)
     prn "odd"   # prn = print to screen
 
-Wart provides infix operators (https://github.com/akkartik/wart/blob/master/006infix)
+In order to provide macros, lisp uniformly uses prefix everywhere, including
+for arithmetic. Wart provides infix operators (https://github.com/akkartik/wart/blob/master/006infix)
 in an elegant way without compromising macros.
 
   4 * 3         # same as (* 4 3)
   => 12
 
-Infix operations provide only one precedence rule: operators without
-whitespace are evaluated before operators with whitespace.
+This has historically been hard to do because of the burden of providing
+precedence rules for nested expressions that are both intuitive and
+extensible. Wart's infix operators have only one hard-coded precedence rule:
+operators without whitespace are evaluated before operators with whitespace.
 
   n * n-1       # does what you expect
 
 (The catch: you can't use infix characters like dashes in variable names,
 something lispers are used to.)
 
-All function arguments can be referred to by keyword. Individual calls can
-decide to pass all their arguments in order, or to insert keywords to reorder
-or emphasize specific args.
+A larger example is Bresenham's classic algorithm for drawing a line pixel by
+pixel (https://gist.github.com/akkartik/4320819)
+
+There's a final convenience beyond indentation-sensitivity and infix: All
+function arguments can be referred to by keyword. Individual calls can decide
+to pass all their arguments in order, or to insert keywords to reorder or
+emphasize specific args.
 
   4-3
   => 1
