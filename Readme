@@ -1,71 +1,196 @@
-Wart is a small, thoroughly unit-tested language with an emphasis on
-readability and hackability. The primary goal is to be super easy to
-understand and modify. Everything is extensible, and there is little that
-can't be done as a library.
+Wart is an experimental, dynamic, batshit-liberal (http://plus.google.com/110981030061712822816/posts/KaSKeg4vQtz)
+language designed for small teams of intrinsically-motivated (http://en.wikipedia.org/wiki/Motivation#Intrinsic_and_extrinsic_motivation)
+programmers who want more mastery over their entire software stack. The
+primary goal is to be easy to understand and modify, so that you can be more
+empowered.
 
-Here's factorial in wart:
+  $ git clone http://github.com/akkartik/wart.git
+  $ cd wart
+  $ ./wart      # you'll need gcc and unix
+  ready! type in an expression, then hit enter twice. ctrl-d exits.
+  1+1
+  => 2
 
-  def (fact n)
-    if (n = 0)
-      1
-      (n * (fact n-1))
+## Small core
 
-Parens are used for function calls, not grouping; ((f)) is not the same as (f).
-But functions don't have to come first: (a * b) is a call to function *,
-just like (* a b).
+The best way to be readable is to minimize code (http://www.paulgraham.com/power.html).
+To this end, wart is based on lisp (http://paulgraham.com/lispfaq1.html),
+because it seems the most powerful and extensible core for the lowest
+implementation cost. But that's just the core; read on.
 
-Here's another way to define factorial:
+  (+ 1 1)
+  => 2
 
-  def (fact n)
-    (n * (fact n-1))
+  '(1 2 3)      # lists look like function calls
+  => (1 2 3)    # 'quoting' prevents treating them like calls
 
-  def (fact 0)
-    1
+  (def (foo x)  # define functions using def
+    (+ 1 x))
+  (foo 3)       # call functions using parens
+  => 4
 
-All functions are generic and can be extended or overridden at any time. The
-two definitions above could be in completely different files. The
-implementation uniformly adds features to language primitives by extending
-them in this manner. Related code stays together, and unrelated code in a
-single function keeps from getting entangled together.
+## Clean syntax
 
-  def (len x) :case (isa x queue)
-    (queue_length x)
+The crown jewels of lisp are its macros (http://www.paulgraham.com/progbot.html),
+a massive tool for maximizing density in a readable way. Wart tries to
+question all of lisp's design without compromising the power of macros. It
+can guess parens from indentation (https://github.com/akkartik/wart/blob/master/004optional_parens)
+to be more accessible non-lispers.
 
-Other features: full-strength lisp macros that can be similarly extended and
-passed to other functions/macros without constraint, a cleaner syntax than
-traditional lisp, and function calls that can always add keyword arguments for
-readability.
+  if (odd? n)
+    prn "odd"   # prn = print to screen
+
+Wart provides infix operators (https://github.com/akkartik/wart/blob/master/006infix)
+in an elegant way without compromising macros.
+
+  4 * 3         # same as (* 4 3)
+  => 12
+
+Infix operations provide only one precedence rule: operators without
+whitespace are evaluated before operators with whitespace.
+
+  n * n-1       # does what you expect
+
+(The catch: you can't use infix characters like dashes in variable names,
+something lispers are used to.)
+
+All function arguments can be referred to by keyword. Individual calls can
+decide to pass all their arguments in order, or to insert keywords to reorder
+or emphasize specific args.
 
   4-3
   => 1
 
-  def (subtract a|from b)
+  def (subtract a|from b)   # 'from' is an *alias* for the first arg
     a-b
 
   subtract 4 3
   => 1
-  subtract 3 :from 4
+  subtract 3 :from 4        # refer to 'a' with its alias
   => 1
 
-You'll need linux and gcc.
+Argument aliases can also be used for pattern matching, like haskell's
+as-expressions:
 
-To install it:
-  $ git clone http://github.com/akkartik/wart.git
-  $ cd wart
-  $ ./wart
-  ready! type in an expression, then hit enter twice. ctrl-d exits.
+  def (foo (a | (b c)))     # 'b' and 'c' are aliases for parts of list 'a'
+    (list a b c)
 
-To run its tests:
-  $ wart test
-  $ # success
+  (foo '(1 2))
+  => ((1 2) 1 2)
 
-To learn more, read on: preface (http://github.com/akkartik/wart/blob/master/preface)
+I love feedback on these features: wart@akkartik.com
 
-I love feedback: wart@akkartik.com
+## Names
 
---- Credits
+After succinctness, the biggest lever for readability is a coherent *system*
+of names. It's not enough for names to be well-chosen in isolation, they also
+need to work well together (http://akkartik.name/blog/readable-bad). To
+maintain coherence, wart allows all names to be extended and
+overloaded in arbitrary ways. So you never have to define words like
+'my_malloc' or 'append2' or 'queue_length'.
 
-Wart is an experiment in designing software. Inspirations:
+  def (len x) :case (isa queue x)
+    ..
+
+Such extensions to len can be made at any time, and might be arbitrarily far
+from each other. This makes it easier for all queue-related code to stay
+together, and so on.
+
+Wart's primitives themselves pervasively use this technique. We first build
+def to define simple functions, and support for :case is added later. The 'if'
+primitive at first chooses between just two branches, and is later extended to
+multiple branches.
+
+## Organization
+
+You should be able to do just about everything you want just by writing wart.
+However, wart's internals (https://github.com/akkartik/wart/blob/master/organization)
+are also intended to be extremely readable and hackable. The organization of
+this directory is designed to provide a high-level tour of the codebase. Just
+start reading at the first file and skim the first few files to orient
+yourself. You don't have to read each file to the end; important stuff is at
+the top and internal details further down. Start a new file with a numeric
+prefix, and it'll be loaded when wart starts up. Reimplement a primitive from
+xxx.wart to xxx.cc for speed, and the new version will be picked up when you
+restart.
+
+## Tests
+
+Wart is *thoroughly* unit tested.
+
+  $ ./wart test
+
+The tests can be a valuable tool to interactively improve your understanding.
+Make a tweak, see if existing tests continue to pass. See a line you don't
+understand, or something that seems redundant? Change it, see if the tests
+pass.
+
+## Speed
+
+Wart is currently orders of magnitude slower than anything you're used to.
+I've had some limited success using it for prototyping and then gradually
+rewriting key pieces in C. But even this currently only takes you so far. I'm
+playing with experimental primitives in the core interpreter that will make
+partial evaluation as easy as passing code through eval multiple times. But
+they're still in development.
+
+## Where I came from, where I'm going
+
+Wart started out motivated by an observation: good programmers build clean and
+elegant programs, but programs grow less elegant over time. We start out clean,
+but invariably end up making a mess of things. Requirements shift over time,
+but reorganization is not convenient enough to keep organization in sync.
+Historical accidents don't get cleaned up. Newcomers don't have the
+comprehensive big-picture view of the original authors, and their changes
+gradually dilute the original design. As coherence decays, so does sense of
+ownership. The big picture becomes a neglected commons, too hard to defend and
+nobody's direct responsibility. (More info: http://arclanguage.org/item?id=17598)
+
+How to fight this? Perhaps we can better preserve sense of ownership by
+minimizing constraints.
+
+  * Creating new files is easy, and there are *no* constraints in how a file
+  can be organized. This will hopefully improve the odds that file
+  organization will continue to reflect reality as requirements shift and
+  the architecture evolves.
+
+  * Features are self-contained in files, and it's easier to organize things
+  so a feature can be dropped simply by deleting its files, and the rest of
+  the project will continue to build and pass its tests. (There's a new
+  version of this project in https://github.com/akkartik/wart/tree/master/literate
+  that tries to take this to the limit.)
+
+  * Backwards compatibility is a huge source of constraints that can bleed
+  ownership (http://akkartik.name/blog/libraries2). What would a language
+  ecosystem be like without any backwards-compatibility guarantees, super easy
+  to change and fork promiscuously? Wart has no version numbers, and new
+  versions and forks are free to change all semantics to their hearts' desire.
+  Instead of a spec or frozen interfaces, we rely on automated tests. Wart
+  programs are expected to be as thoroughly tested as wart itself, and to buy
+  in to the investment of hacking when upgrading. The hope is that upgrade
+  effort might be higher than the best-case scenario in other languages, but
+  the worst-case time will remain tightly bounded because clients of libraries
+  will be more likely to understand how they're implemented, and so be more
+  empowered.
+
+The hypotheses are a) that making the global organization easy for outsiders
+to understand will help preserve the big picture, b) that making
+reorganizations more convenient by eliminating constraints will help keep the
+big picture in sync with reality, and c) that understandability and
+rewrite-friendliness are related in a virtuous cycle. Understandable codebases
+help outsiders contribute better organizations, and rewrite-friendly codebases
+help newcomers hone their understanding by attempting lots of reorganizations
+in sandboxes.
+
+These hypotheses are all hard to verify, I don't expected the job to be done
+anytime soon. I'd love feedback from people unafraid to bounce between
+language and implementation. If that's you, check it out and tell me what you
+think: wart@akkartik.com. There's a lot more code here and at Rosetta Code
+(http://rosettacode.org/wiki/Category:Wart#mw-pages).
+
+## Credits
+
+As an experiment in designing software, wart was inspired by:
   Christopher Alexander (http://www.amazon.com/Notes-Synthesis-Form-Harvard-Paperbacks/dp/0674627512)
   David Parnas (http://www.cs.umd.edu/class/spring2003/cmsc838p/Design/criteria.pdf)
   Peter Naur (http://alistair.cockburn.us/ASD+book+extract%3A+%22Naur,+Ehn,+Musashi%22)
