@@ -40,6 +40,11 @@ to be more accessible to non-lispers.
   if (odd? n)
     prn "odd"   # prn = print to screen
 
+Used tastefully, taking out parens can make code markedly more readable. My
+heuristic is to skip parens when I want to highlight side-effects and
+control-flow, and to insert them when I want to highlight functional
+computation.
+
 In order to provide macros, lisp uniformly uses prefix everywhere, including
 for arithmetic. Wart provides infix operators (https://github.com/akkartik/wart/blob/master/006infix)
 in an elegant way without compromising macros.
@@ -57,8 +62,12 @@ operators without whitespace are evaluated before operators with whitespace.
 (The catch: you can't use infix characters like dashes in variable names,
 something lispers are used to.)
 
-A larger example is Bresenham's classic algorithm for drawing a line pixel by
-pixel (https://gist.github.com/akkartik/4320819)
+Infix is most useful in arithmetic-heavy code
+(https://gist.github.com/akkartik/4320819) for graphics and so on. But it has
+uses beyond arithmetic. Sometimes the clearest way to describe a
+sub-computation is as a pipeline of operations (http://rosettacode.org/wiki/Rot-13):
+
+  (c -> downcase -> rot13 -> upcase)
 
 There's a final convenience beyond indentation-sensitivity and infix: All
 function arguments can be referred to by keyword. Individual calls can decide
@@ -110,16 +119,15 @@ multiple branches.
 
 ## Organization
 
-You should be able to do just about everything you want just by writing Wart.
-However, Wart's internals (https://github.com/akkartik/wart/blob/master/organization)
-are also intended to be extremely readable and hackable. The organization of
-this directory is designed to provide a high-level tour of the codebase. Just
-start reading at the first file and skim the first few files to orient
-yourself. You don't have to read each file to the end; important stuff is at
-the top and internal details further down. Start a new file with a numeric
-prefix, and it'll be loaded when Wart starts up. Reimplement a primitive from
-xxx.wart to xxx.cc for speed, and the new version will be picked up when you
-restart.
+You should be able to do just about everything you want in Wart. However,
+Wart's internals are also intended to be extremely readable and hackable if
+you ever need to get into them. Its directory organization (https://github.com/akkartik/wart/blob/master/organization)
+is designed to provide a high-level tour of the codebase. Just start reading
+at the first file and skim the first few files to orient yourself. You don't
+have to read each file to the end; important stuff is at the top and internal
+details further down. Start a new file with a numeric prefix, and it'll be
+loaded when Wart starts up. Reimplement a primitive from xxx.wart to xxx.cc
+for speed, and the new version will be picked up when you restart.
 
 ## Tests
 
