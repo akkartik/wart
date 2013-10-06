@@ -146,19 +146,19 @@ gradually dilute the original design. As coherence decays, so does sense of
 ownership. The big picture becomes a neglected commons, too hard to defend and
 nobody's direct responsibility. (More info: http://arclanguage.org/item?id=17598)
 
-How to fight this? Perhaps we can better preserve sense of ownership by
-minimizing constraints.
+How to fight this tendency? Perhaps we can better preserve sense of ownership
+by minimizing constraints.
 
-  * Creating new files is easy, and there are *no* constraints in how a file
+  * Make creating new files easy, so there are *no* constraints in how a file
   can be organized. This will hopefully improve the odds that file
-  organization will continue to reflect reality as requirements shift and
-  the architecture evolves.
+  organization will continue to reflect reality as requirements shift and the
+  architecture evolves.
 
-  * Features are self-contained in files, and it's easier to organize things
-  so a feature can be dropped simply by deleting its files, and the rest of
-  the project will continue to build and pass its tests. (There's a new
-  version of this project in https://github.com/akkartik/wart/tree/master/literate
-  that tries to take this to the limit.)
+  * Keep features self-contained in files, so a feature can be dropped simply
+  by deleting its files, and the rest of the project will continue to build
+  and pass its tests. (There's a new version of this project in
+  https://github.com/akkartik/wart/tree/master/literate that tries to take
+  this idea to the limit.)
 
   * Backwards compatibility is a huge source of constraints that can bleed
   ownership (http://akkartik.name/blog/libraries2). What would a language
@@ -185,7 +185,7 @@ in sandboxes.
 These hypotheses are all hard to verify, I don't expected the job to be done
 anytime soon. I'd love feedback from people unafraid to bounce between
 language and implementation. If that's you, check it out and tell me what you
-think: wart@akkartik.com. There's a lot more code samples here and at Rosetta
+think: wart@akkartik.com. There are many more code samples here and at Rosetta
 Code (http://rosettacode.org/wiki/Category:Wart#mw-pages).
 
 ## Credits
