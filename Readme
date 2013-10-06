@@ -4,7 +4,7 @@ programmers who want more mastery over their entire software stack. The
 primary goal is to be easy to understand and modify, so that you can be more
 empowered.
 
-  $ git clone http://github.com/akkartik/wart.git
+  $ git clone http://github.com/akkartik/wart
   $ cd wart
   $ ./wart      # you'll need gcc and unix
   ready! type in an expression, then hit enter twice. ctrl-d exits.
@@ -14,7 +14,7 @@ empowered.
 ## Small core
 
 The best way to be readable is to minimize code (http://www.paulgraham.com/power.html).
-To this end, wart is based on lisp (http://paulgraham.com/lispfaq1.html),
+To this end, Wart is based on lisp (http://paulgraham.com/lispfaq1.html),
 because it seems the most powerful and extensible core for the lowest
 implementation cost. But that's just the core; read on.
 
@@ -35,7 +35,7 @@ The crown jewels of lisp are its macros (http://www.paulgraham.com/progbot.html)
 a massive tool for maximizing density in a readable way. Wart tries to
 question all of lisp's design without compromising the power of macros. It
 can guess parens from indentation (https://github.com/akkartik/wart/blob/master/004optional_parens)
-to be more accessible non-lispers.
+to be more accessible to non-lispers.
 
   if (odd? n)
     prn "odd"   # prn = print to screen
@@ -85,7 +85,7 @@ I love feedback on these features: wart@akkartik.com
 After succinctness, the biggest lever for readability is a coherent *system*
 of names. It's not enough for names to be well-chosen in isolation, they also
 need to work well together (http://akkartik.name/blog/readable-bad). To
-maintain coherence, wart allows all names to be extended and
+maintain coherence, Wart allows all names to be extended and
 overloaded in arbitrary ways. So you never have to define words like
 'my_malloc' or 'append2' or 'queue_length'.
 
@@ -103,14 +103,14 @@ multiple branches.
 
 ## Organization
 
-You should be able to do just about everything you want just by writing wart.
-However, wart's internals (https://github.com/akkartik/wart/blob/master/organization)
+You should be able to do just about everything you want just by writing Wart.
+However, Wart's internals (https://github.com/akkartik/wart/blob/master/organization)
 are also intended to be extremely readable and hackable. The organization of
 this directory is designed to provide a high-level tour of the codebase. Just
 start reading at the first file and skim the first few files to orient
 yourself. You don't have to read each file to the end; important stuff is at
 the top and internal details further down. Start a new file with a numeric
-prefix, and it'll be loaded when wart starts up. Reimplement a primitive from
+prefix, and it'll be loaded when Wart starts up. Reimplement a primitive from
 xxx.wart to xxx.cc for speed, and the new version will be picked up when you
 restart.
 
@@ -166,7 +166,7 @@ by minimizing constraints.
   to change and fork promiscuously? Wart has no version numbers, and new
   versions and forks are free to change all semantics to their hearts' desire.
   Instead of a spec or frozen interfaces, we rely on automated tests. Wart
-  programs are expected to be as thoroughly tested as wart itself, and to buy
+  programs are expected to be as thoroughly tested as Wart itself, and to buy
   in to the investment of hacking when upgrading. The hope is that upgrade
   effort might be higher than the best-case scenario in other languages, but
   the worst-case time will remain tightly bounded because clients of libraries
@@ -190,12 +190,12 @@ Code (http://rosettacode.org/wiki/Category:Wart#mw-pages).
 
 ## Credits
 
-As an experiment in designing software, wart was inspired by:
+As an experiment in designing software, Wart was inspired by:
   Christopher Alexander (http://www.amazon.com/Notes-Synthesis-Form-Harvard-Paperbacks/dp/0674627512)
   David Parnas (http://www.cs.umd.edu/class/spring2003/cmsc838p/Design/criteria.pdf)
   Peter Naur (http://alistair.cockburn.us/ASD+book+extract%3A+%22Naur,+Ehn,+Musashi%22)
 
-As a language, wart was inspired by Arc, a dialect of lisp:
+As a language, Wart was inspired by Arc, a dialect of lisp:
   http://www.paulgraham.com/arc.html
 Discussions on the arc forum helped develop many of its features:
   "The wart atop the mountain": http://arclanguage.org/item?id=12814
