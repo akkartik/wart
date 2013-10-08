@@ -23,7 +23,7 @@ bool is_sym(cell* x) {
   return x->type == SYMBOL;
 }
 
-cell* new_string(string x) {   // don't reuse strings
+cell* new_string(string x) {  // don't reuse strings
   cell* result = new_cell();
   result->left = (cell*)new string(x);
   result->type = STRING;

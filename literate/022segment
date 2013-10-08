@@ -1,7 +1,7 @@
 // Tokens for the next top-level expression.
 
 list<token> next_expr(istream& in) {
-  list<token> result;   // emit tokens here
+  list<token> result;  // emit tokens here
 
   long explicit_open_parens = 0;
   for(;;) {

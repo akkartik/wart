@@ -36,7 +36,7 @@ void eval_bind_all(cell* params, cell* args) {
   TEMP(args2, nil);
   if (is_quoted(params)) {
     params = strip_quote(params);
-    args2 = quote_all(args);   // already mkref'd
+    args2 = quote_all(args);  // already mkref'd
   }
   else {
     args2 = mkref(args);

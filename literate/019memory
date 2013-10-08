@@ -32,7 +32,7 @@ void test_cell_layout() {
 
 :(code)
 cell* mkref(cell* c) {
-  if (c == nil) return nil;   // nil is never reclaimed
+  if (c == nil) return nil;  // nil is never reclaimed
   xlog << "mkref " << (void*)c << ": " << c << " " << c->nrefs << '\n';
   ++c->nrefs;
   return c;
