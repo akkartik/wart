@@ -26,7 +26,7 @@ int main(int argc, unused char* argv[]) {
   load_files(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (!cin.eof()) {
-    cout << "=> " << run(cin) << '\n';
+    cout << "=> " << eval(read(cin)) << '\n';
   }
 }
 
@@ -38,8 +38,11 @@ cell* read(istream& in) {
 extern cell* nil;
 
 cell* run(istream& in) {
-  if (eof(in)) return nil;
-  return eval(read(in));
+  cell* result = nil;
+  do {
+      result = eval(read(in));
+  } while (!eof(in));
+  return result;
 }
 
 // parse a paragraph of expressions until empty line

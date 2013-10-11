@@ -32,8 +32,11 @@ cell* read(istream& in) {
 }
 
 cell* run(istream& in) {
-  if (eof(in)) return NULL;
-  return eval(read(in));
+  cell* result = NULL;
+  do {
+      result = eval(read(in));
+  } while (!eof(in));
+  return result;
 }
 
 // parse a paragraph of expressions until empty line

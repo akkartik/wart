@@ -26,7 +26,11 @@ int main(int argc, unused char* argv[]) {
   load_files(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   while (!cin.eof()) {
-    cout << "=> " << run(cin) << '\n';
+    cell* form = read(cin);
+    cell* result = eval(form);
+    cout << "=> " << result << '\n';
+    rmref(result);
+    rmref(form);
   }
 }
 
@@ -38,10 +42,12 @@ cell* read(istream& in) {
 extern cell* nil;
 
 cell* run(istream& in) {
-  if (eof(in)) return nil;
-  cell* form = read(in);
-  cell* result = eval(form);
-  rmref(form);
+  cell* result = nil;
+  do {
+      cell* form = read(in);
+      update(result, eval(form));
+      rmref(form);
+  } while (!eof(in));
   return result;
 }
 
