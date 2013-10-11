@@ -31,15 +31,9 @@ cell* read(istream& in) {
   return next_cell(in);
 }
 
-// In batch mode, evaluate all exprs in input.
-// In interactive mode, evaluate all exprs until empty line.
-// Return value of last expr.
 cell* run(istream& in) {
-  cell* result = NULL;
-  do {
-      result = eval(read(in));
-  } while (!eof(in));
-  return result;
+  if (eof(in)) return NULL;
+  return eval(read(in));
 }
 
 // parse a paragraph of expressions until empty line

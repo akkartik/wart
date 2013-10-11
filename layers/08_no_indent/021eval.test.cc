@@ -33,8 +33,10 @@ void test_sym_evals_to_itself() {
 }
 
 void test_eval_handles_quoted_atoms() {
-  run("'a '34");
-  CHECK_TRACE_CONTENTS("eval", "'aquote=> a'34quote=> 34");
+  run("'a");
+  CHECK_TRACE_CONTENTS("eval", "'aquote=> a");
+  run("'34");
+  CHECK_TRACE_CONTENTS("eval", "'34quote=> 34");
 }
 
 void test_object_expr_evals_to_itself() {

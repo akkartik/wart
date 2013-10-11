@@ -9,7 +9,6 @@ void load_files(const char* ext) {
 //// internals
 
 void load_file(const char* filename) {
-  bool old_interactive = Interactive; Interactive = false;
   ifstream f(filename);
   if (f.fail()) return;
   while (!f.eof()) {
@@ -17,7 +16,6 @@ void load_file(const char* filename) {
     trace("dump ") << form << '\n';  // remove trailing space to track down errors in wart files
     rmref(eval(form));
   }
-  Interactive = old_interactive;
 }
 
 #include<dirent.h>

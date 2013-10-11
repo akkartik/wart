@@ -15,8 +15,6 @@
 // These weren't the reasons lisp was created; they're the reasons I attribute
 // to its power.
 
-bool Interactive = false;
-
 int main(int argc, unused char* argv[]) {
   if (argc > 1) {
     run_tests();
@@ -24,7 +22,6 @@ int main(int argc, unused char* argv[]) {
   }
 
   //// Interactive loop: parse commands from user, evaluate them, print the results
-  Interactive = true;
   setup();
   load_files(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
@@ -40,16 +37,11 @@ cell* read(istream& in) {
 
 extern cell* nil;
 
-// In batch mode, evaluate all exprs in input.
-// In interactive mode, evaluate all exprs until empty line.
-// Return value of last expr.
 cell* run(istream& in) {
-  cell* result = nil;
-  do {
-      cell* form = read(in);
-      update(result, eval(form));
-      rmref(form);
-  } while (!eof(in) && (!Interactive || in.peek() != '\n'));
+  if (eof(in)) return nil;
+  cell* form = read(in);
+  cell* result = eval(form);
+  rmref(form);
   return result;
 }
 

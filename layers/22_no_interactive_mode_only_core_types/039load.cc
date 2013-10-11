@@ -11,7 +11,8 @@ void load_files(const char* ext) {
 void load_file(const char* filename) {
   ifstream f(filename);
   if (f.fail()) return;
-  run(f);
+  while (!f.eof())
+    run(f);
 }
 
 #include<dirent.h>
