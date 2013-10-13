@@ -94,8 +94,6 @@
 // Globals
 // End Globals
 
-// End Tracing          // a special layer later that must come before anything else
-
 int main(int argc, char* argv[]) {
   if (argc > 1) {
     // Commandline Options

@@ -83,6 +83,9 @@
 //   programmers form a mental model, rather than as production of a program."
 //   -- Peter Naur (http://alistair.cockburn.us/ASD+book+extract%3A+%22Naur,+Ehn,+Musashi%22)
 
+:(before "int main")
+// End Tracing  // hack to ensure most code in this layer comes before anything else
+
 :(before "End Tracing")
 bool Hide_warnings = false;
 :(before "End Setup")
