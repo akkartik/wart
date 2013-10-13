@@ -36,6 +36,9 @@ def (ern ... args)
   (with stdout stderr
     (prn @args))
 
+def (prrn ... args)
+  prn @args ""
+
 def (infile fd) :case num?.fd
   infd.fd
 def (outfile fd) :case num?.fd
