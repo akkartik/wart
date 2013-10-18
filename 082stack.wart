@@ -1,8 +1,14 @@
 def (stack)
   (tag 'stack nil)
 
-mac (push! x s) :qcase `(isa stack ,s)
-  `(push! ,x (rep ,s))
+#? mac (push! x s) :qcase `(isa stack ,s)
+#?   `(push! ,x (rep ,s))
+
+let super60 push!
+  mac! (push! ... (| params61 (x s)))
+    `(if ,`(isa stack ,s)
+       ,(do `(push! ,x (rep ,s)))
+       ,(cons super60 params61))
 
 mac (pop! s) :qcase `(isa stack ,s)
   `(pop! (rep ,s))
