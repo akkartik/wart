@@ -33,7 +33,8 @@ def (foofoo2 ... '((name ... params) ... body))
     `(let $super ,name
        (mac! (,name ... ($params | ,params))
          `(if ,,(cons unquote cadr.body)
-            ,,(cons unquote `(do ,@cddr.body))
+            (do ,,@(map (fn(_) (cons unquote _))
+                        cddr.body))
             ,(cons $super $params))))
     `(mac (,name ,@params) ,@body)
 
