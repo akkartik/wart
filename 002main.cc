@@ -16,7 +16,7 @@
 // to its power.
 
 bool Interactive = false;
-bool Warn_on_unknown_var = false;
+bool Warn_on_unknown_var = true;
 
 int main(int argc, const char* argv[]) {
   if (argc > 1) {

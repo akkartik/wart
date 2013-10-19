@@ -692,6 +692,7 @@ void test_eval_handles_assigned_fn_calls() {
 
 void test_eval_on_incomplete_eval_retries() {
   trace("test") << "incomplete eval";
+  Warn_on_unknown_var = false;
   TEMP(attempt1, eval("a"));
   CHECK_TRACE_CONTENTS("lookup", "incomplete_eval");
   CHECK_TRACE_CONTENTS("eval", "=> (object incomplete_eval a)");

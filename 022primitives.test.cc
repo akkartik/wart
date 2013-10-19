@@ -4,6 +4,7 @@ cell* eval(string s) {
 }
 
 void test_fn_works() {
+  Warn_on_unknown_var = false;
   trace("test") << "- primitives";
   TEMP(result, eval("(fn(x) x)"));
   // (object function {sig: (x), body: (x)})
