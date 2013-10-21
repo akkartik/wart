@@ -36,10 +36,12 @@
                (ans <- (cons x ans))))
   :should be '(2 1 0))
 
+mac (fooset x)
+  `(,x <- 4)
 (test "& works with macros"
   :valueof (ret x 3
-             (wipe!&wipe! x))
-  :should be nil)
+             (fooset&fooset x))
+  :should be 4)
 
 (test "pipe operator works"
   :valueof (3 -> (fn(_) (_ * 2)))
