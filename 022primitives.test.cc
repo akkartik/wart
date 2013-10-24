@@ -4,7 +4,7 @@ cell* eval(string s) {
 }
 
 void test_fn_works() {
-  Warn_on_unknown_var = false;
+  Warn_on_unknown_var = true;
   trace("test") << "- primitives";
   TEMP(result, eval("(fn(x) x)"));
   // (object function {sig: (x), body: (x)})
@@ -158,6 +158,8 @@ void test_eval_handles_eval() {
 }
 
 void test_eval_warns_on_missing_binding() {
+  Warn_on_unknown_var = false;
   run("(eval 'x nil)");
   CHECK_TRACE_TOP("eval", "=> (object incomplete_eval x)");
+  Warn_on_unknown_var = true;
 }

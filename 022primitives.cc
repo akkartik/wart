@@ -121,3 +121,15 @@ COMPILE_FN(mac?, compiledfn_is_macro, "($f)",
 COMPILE_FN(uniq, compiledfn_uniq, "($x)",
   return mkref(gensym(lookup("$x")));
 )
+
+//// partial eval
+
+COMPILE_FN(stop_warning_on_undefined_var, compiledfn_stop_warning_on_undefined_var, "()",
+  Warn_on_unknown_var = false;
+  return nil;
+)
+
+COMPILE_FN(warn_on_undefined_var, compiledfn_warn_on_undefined_var, "()",
+  Warn_on_unknown_var = true;
+  return nil;
+)

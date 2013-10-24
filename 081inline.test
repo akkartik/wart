@@ -1,11 +1,13 @@
 (unbind x)
-(test "all operations on unbound vars within 'speculatively get postponed"
-  :valueof (speculatively (if 34 (cons x 3)))
-  :should be (tag 'incomplete_eval_data `(,cons x 3)))
+(skipping_undefined_vars
+  (test "all operations on unbound vars within 'speculatively get postponed"
+    :valueof (speculatively (if 34 (cons x 3)))
+    :should be (tag 'incomplete_eval_data `(,cons x 3)))
 
-(test "speculatively postpones all operations on unbound vars"
-  :valueof (speculatively+eval '(if 34 (cons x 3)))
-  :should be (tag 'incomplete_eval_data `(,if 34 (,cons x 3))))
+  (test "speculatively postpones all operations on unbound vars"
+    :valueof (speculatively+eval '(if 34 (cons x 3)))
+    :should be (tag 'incomplete_eval_data `(,if 34 (,cons x 3))))
+)
 
 (test "freeze replaces syms with their global bindings where possible"
   :valueof (freeze '(if a b))

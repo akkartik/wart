@@ -20,3 +20,9 @@ def (replace_all bindings tree|in)
        :else
          (map (fn(_) (replace_all bindings _))
               tree))
+
+mac (skipping_undefined_vars ... body)
+  `(do
+    (stop_warning_on_undefined_var)
+    (before (warn_on_undefined_var)
+      ,@body))
