@@ -17,7 +17,7 @@ def (compiledfn? _)
 
 
 
-def (tag type val)
+def (tag 'type val)
   (list 'object type val)
 
 def (rep x)

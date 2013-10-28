@@ -1,5 +1,5 @@
 def (stack)
-  (tag 'stack nil)
+  (tag stack nil)
 
 mac (push! x s) :qcase `(isa stack ,s)
   `(push! ,x (rep ,s))

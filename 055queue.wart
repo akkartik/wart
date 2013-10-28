@@ -1,5 +1,5 @@
 def (queue seq)
-  (tag 'queue (list seq lastcons.seq len.seq))
+  (tag queue (list seq lastcons.seq len.seq))
 
 def (enq x q)
   do1 x
