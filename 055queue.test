@@ -13,6 +13,16 @@
   :valueof (len+queue '(1 2 3 4))
   :should be 4)
 
+(test "empty? works on queues"
+  :valueof (empty? (queue))
+  :should ~be nil)
+
+(test "empty? works on queues - 2"
+  :valueof (let q (queue)
+             (enq 1 q)
+             (empty? q))
+  :should be nil)
+
 (test "deq works"
   :valueof (let q (queue '(1 2 3))
              (enq 4 q)

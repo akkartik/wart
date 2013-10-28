@@ -43,7 +43,7 @@ def_assign cdr (seq x)
   (set_cdr seq x)
 
 def (empty? seq)
-  nil?.seq
+  (len.seq = 0)  # could just check nil, but this is a good base case
 
 def (blank? seq)
   (or nil?.seq empty?.seq)
