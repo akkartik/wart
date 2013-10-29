@@ -124,6 +124,10 @@ COMPILE_FN(uniq, compiledfn_uniq, "($x)",
 
 //// partial eval
 
+COMPILE_FN(warning_on_undefined_var?, compiledfn_is_warning_on_undefined_var, "()",
+  return Warn_on_unknown_var ? mkref(new_num(1)) : nil;
+)
+
 COMPILE_FN(stop_warning_on_undefined_var, compiledfn_stop_warning_on_undefined_var, "()",
   Warn_on_unknown_var = false;
   return nil;

@@ -25,7 +25,6 @@ int main(int argc, const char* argv[]) {
   }
 
   //// Interactive loop: parse commands from user, evaluate them, print the results
-  Warn_on_unknown_var = true;
   setup();
   load_files(".wart");
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
