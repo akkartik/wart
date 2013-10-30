@@ -1,0 +1,39 @@
+def (macex call env)
+  let (m ... args) call
+    m <- (eval m env)
+    (replace_unquoted macro_body.m
+                      (table @(+ @(zip (strip_quote (rep.m 'sig))
+                                       args))))
+
+def (replace_unquoted tree bindings)
+  if ~cons?.tree
+       tree
+     backquoted?.tree
+       (replace_unquoted strip_backquote.tree bindings)
+     unquoted?.tree
+       (or bindings+strip_unquote.tree tree)
+     :else
+       (map (fn(_) (replace_unquoted _ bindings))
+            tree)
+
+def (macro_body m)
+  transform (rep.m 'body) :thru
+     _.0  # macro body always has just one expr
+     _.1  # strip away (eval .. caller_scope)
+     _.0  # strip fn call
+     cddr # strip the (fn () ..)
+
+def (strip_quote x)
+  if quoted?.x
+    cdr.x
+    x
+
+def (strip_unquote x)
+  if unquoted?.x
+    cdr.x
+    x
+
+def (strip_backquote x)
+  if backquoted?.x
+    cdr.x
+    x
