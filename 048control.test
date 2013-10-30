@@ -51,6 +51,10 @@ mac (fooset x)
   :valueof (list.1 -> cons? -> car)
   :should be 1)
 
+(test "pipe turns exprs containing _ into fns"
+  :valueof (3 -> _+1)
+  :should be 4)
+
 (test "transform is varargs pipe"
   :valueof (transform list.1 :thru cons? car)
   :should be 1)
