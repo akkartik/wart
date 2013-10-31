@@ -10,3 +10,14 @@ mac (foomex2 x)
 (test "macex has macro-time side-effects"
   :valueof (with outstring (macex '(foomex2 a)))
   :should be "3")
+
+mac (foomex3 ... args)
+  if cdr.args
+    `(+ ,car.args ,cadr.args)
+    `(+ ,car.args 1)
+(test "macex handles conditionals on the structure of the arg"
+  :valueof (macex '(foomex3 a))
+  :should be `(+ a 1))
+(test "macex handles conditionals on the structure of the arg - 2"
+  :valueof (macex '(foomex3 a b))
+  :should be `(+ a b))
