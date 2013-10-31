@@ -3,3 +3,13 @@
              (<- x 1 y 2)
              (cons x y))
   :should be '(1 ... 2))
+
+(test "assigning to car works"
+  :valueof (ret x list.1
+             (car.x <- 2))
+  :should be '(2))
+
+(test "assigning to cdr works"
+  :valueof (ret x list.1
+             (cdr.x <- list.2))
+  :should be '(1 2))
