@@ -2,16 +2,11 @@ mac (foomex x)
   `(+ ,x 1)
 (test "macex works"
   :valueof (macex '(foomex a))
-  :should be '((+ a 1)))
+  :should be '(+ a 1))
 
 mac (foomex2 x)
-  prn 3
+  pr 3
   `(+ ,x 1)
-(test "macex works"
-  :valueof (macex '(foomex2 a))
-  :should be '((prn 3) (+ a 1)))
-
-"macro's env"
-"env at the time of macro expansion"
-"param types"
-"combinations of quote/unquote/splice"
+(test "macex has macro-time side-effects"
+  :valueof (with outstring (macex '(foomex2 a)))
+  :should be "3")
