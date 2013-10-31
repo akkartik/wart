@@ -13,3 +13,21 @@
   :valueof (ret x list.1
              (cdr.x <- list.2))
   :should be '(1 2))
+
+(test "assigning to sig works"
+  :valueof (let f (fn(x) 1)
+             (sig.f <- (list 'y))
+             sig.f)
+  :should be '(y))
+
+(test "assigning to body works"
+  :valueof (let f (fn() 1)
+             (body.f <- list.2)
+             body.f)
+  :should be '(2))
+
+(test "assigning to env works"
+  :valueof (let f (fn(x) 1)
+             (env.f <- 34)
+             env.f)
+  :should be 34)

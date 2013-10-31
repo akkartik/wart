@@ -26,6 +26,13 @@ def_assign (.) '(f x val)
 def_assign (.-) '(f x val)
   (eval `(<- (,f (- ,x)) ,val) caller_scope)
 
+def_assign sig (f params)
+  (<- (rep.f 'sig) params)
+def_assign body (f new_body)
+  (<- (rep.f 'body) new_body)
+def_assign env (f new_env)
+  (<- (rep.f 'env) new_env)
+
 
 
 ## serial assignment
