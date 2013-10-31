@@ -1,8 +1,17 @@
-(test "assignment can process multiple pairs"
-  :valueof (do
-             (<- x 1 y 2)
-             (cons x y))
-  :should be '(1 ... 2))
+(test "zap! works"
+  :valueof (ret x list.1
+             (zap! car x))
+  :should be 1)
+
+(test "zap! handles more args"
+  :valueof (ret x 3
+             (zap! cons x 1))
+  :should be '(3 ... 1))
+
+(test "zap! handles more args"
+  :valueof (ret x 3
+             (zap! (+) x 1))
+  :should be 4)
 
 (test "shift! works"
   :valueof (with (x 3 y 4)

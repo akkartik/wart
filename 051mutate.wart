@@ -1,5 +1,5 @@
-mac (zap! f x)
-  `(,x <- (,f ,x))
+mac (zap! f x ... args)
+  `(,x <- (,f ,x ,@args))
 
 # infinite nil generator
 <- nils '(nil)
@@ -30,7 +30,7 @@ mac (making var val ... body)
      ,@body)
 
 mac (coerce! var type)
-  `(,var <- (coerce ,var ,type))
+  `(zap! coerce ,var ,type)
 
 def_assign rep (obj val)
   <- (car cddr.obj) val
