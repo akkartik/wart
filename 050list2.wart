@@ -112,7 +112,7 @@ def (flatten seq acc)
 
 
 
-def (+ ... args) :case (all list? args)   # ensure there's no functions
+def (+ ... args) :case (all no|list? args)   # ensure there's no functions
   (join @args)
 
 # a non-op to enable compose: system+join, etc.

@@ -211,6 +211,10 @@
   :valueof (join '(1 2 3) nil '(4 5) nil nil '(6 (7 8)))
   :should be '(1 2 3 4 5 6 (7 8)))
 
+(test "+ works on lists"
+  :valueof (+ '(1 2 3) nil '(4 5) nil nil '(6 (7 8)))
+  :should be '(1 2 3 4 5 6 (7 8)))
+
 (test "keep works"
   :valueof (keep num? '(11 a 13))
   :should be '(11 13))
