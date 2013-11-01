@@ -13,6 +13,11 @@
              (zap! (+) x 1))
   :should be 4)
 
+(test "zap! works with _"
+  :valueof (ret x 3
+             (zap! _+1 x))
+  :should be 4)
+
 (test "shift! works"
   :valueof (with (x 3 y 4)
              (shift! x y 27)

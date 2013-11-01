@@ -1,5 +1,5 @@
 mac (zap! f x ... args)
-  `(,x <- (,f ,x ,@args))
+  `(,x <- (,functionize.f ,x ,@args))
 
 # infinite nil generator
 <- nils '(nil)

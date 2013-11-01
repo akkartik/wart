@@ -118,12 +118,14 @@ def (| ... fs)
 
 
 
-mac (x -> f)
-  `(,f ,x)
+def (functionize f)
+  if (and (cons?&car.f ~= 'fn)
+          (mem? '_ f))
+    `(fn(_) ,f)
+    f
 
-mac (x -> f) :case (and (cons?&car.f ~= 'fn)
-                        (mem? '_ f))
-  `((fn(_) ,f) ,x)
+mac (x -> f)
+  `(,functionize.f ,x)
 
 mac (transform x ... fs|thru)
   if no.fs
