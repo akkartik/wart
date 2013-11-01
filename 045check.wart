@@ -27,7 +27,7 @@ let ($=) (=) # ignore later refinements
 
   def! (a = b)
     (or (a $= b)
-        (and cons?.a cons?.b   # default for objects
+        (and cons?.a cons?.b  # default for objects
              (car.a = car.b)
              (cdr.a = cdr.b)))
 

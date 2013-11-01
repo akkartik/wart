@@ -112,7 +112,7 @@ def (flatten seq acc)
 
 
 
-def (+ ... args) :case (all no|list? args)   # ensure there's no functions
+def (+ ... args) :case (all no|list? args)  # ensure there's no functions
   (join @args)
 
 # a non-op to enable compose: system+join, etc.
@@ -153,7 +153,7 @@ def (reduce f seq init)  # f is a binary op
   if no.seq
        init
      ~cdr.seq
-       car.seq   # f on one op is the identity function
+       car.seq  # f on one op is the identity function
      :else
        (reduce f (cons (f car.seq cadr.seq)
                        cddr.seq))

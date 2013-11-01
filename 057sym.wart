@@ -18,7 +18,7 @@ def (match? a b bindings) :case sym?.a
       (and (string.a.0 = "_")  # (_x _x) matches two of anything
            (default bindings.a :to b)
            (bindings.a = b))
-      (and (string.a.-1 = "_")   # p_ matches any $p
+      (and (string.a.-1 = "_")  # p_ matches any $p
            sym?.b
            (let acore (string.a 0 -1)
              (and (acore ~= string.b)  # ..but not p

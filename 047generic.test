@@ -17,7 +17,7 @@ mac (foogen2 a b ... body) :case (a = 'random_sym)
   'went_through_case
 (test "cases with more args shouldn't break the base case"
   :valueof (foogen2 35)
-  :should be (list 35))   # shouldn't insert a nil for b in the :case
+  :should be (list 35))  # shouldn't insert a nil for b in the :case
 
 def (foogen3 'a)
   a
