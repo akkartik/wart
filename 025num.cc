@@ -33,6 +33,11 @@ COMPILE_FN(%, compiledfn_modulo, "($x $y)",
   return mkref(new_num(to_int(lookup("$x")) % to_int(lookup("$y"))));  // what does modulo of floats mean?
 )
 
+#include <math.h>
+COMPILE_FN(^, compiledfn_exp, "($base $exp)",
+  return mkref(new_num(pow(to_float(lookup("$base")), to_float(lookup("$exp")))));
+)
+
 COMPILE_FN(<, compiledfn_lesser, "($x $y)",
   cell* x = lookup("$x");
   cell* y = lookup("$y");
