@@ -1,7 +1,7 @@
-def (test msg pred|should expr|valueof expected)
+def (test msg (| 'qpred pred should) expr|valueof expected)
   if (pred expr expected)
     (err ".")
-    (register_failed_test msg expr expected)
+    (register_failed_test msg expr `(,qpred _ ,expected))
 
 def (pending_test 'msg 'expr|valueof 'pred|should 'expected)
   (err "
