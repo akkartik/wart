@@ -1,7 +1,7 @@
 def (list ... args)
   args
 
-cadr <- car+cdr # alias causes infinite loop via if
+cadr <- car+cdr  # alias causes infinite loop via if
 cddr <- cdr+cdr
 
 def (pair seq)

@@ -23,7 +23,7 @@ mac (and ... args)
          (and ,@cdr.args)
          false)
 
-let ($=) (=) # ignore later refinements
+let ($=) (=)  # ignore later refinements
   def (isa 'Type x)
     ($= type.x Type)
 

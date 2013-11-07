@@ -24,7 +24,7 @@ def! (prn ... args)
 "))
 
 mac! (def (name ... params) ... body)
-  if (bound? name nil) # globals only
+  if (bound? name nil)  # globals only
     (prn "redef: " name)
   `(def! (,name ,@params) ,@body)
 
@@ -33,7 +33,7 @@ mac! (mac (name ... params) ... body)
     (prn "redef: " name)
   `(mac! (,name ,@params) ,@body)
 
-mac (alias new old)  ## include later refinements
+mac (alias new old)  # include later refinements
   `(mac (,new ... $args)
      `(,,old ,@$args))
 
