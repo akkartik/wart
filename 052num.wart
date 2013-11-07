@@ -37,7 +37,7 @@ let ($<) (<)
 
 def (> ... args)
   (aand (all (fn((x y)) (y < x))
-            pairwise.args)
+             pairwise.args)
         (or last.args it))
 
 def (<= ... args)
