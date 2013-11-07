@@ -16,31 +16,31 @@
 
 (test "divides works"
   :valueof (divides 3 2)
-  :should be nil)
+  :should be_false)
 
 (test "divides works - 2"
   :valueof (divides 4 2)
-  :should ~be nil)
+  :should be_true)
 
 (test "comparing anything to nil always returns nil"
   :valueof (< 3 nil)
-  :should be nil)
+  :should be_false)
 
 (test "> works"
   :valueof (> 3 2 1)
-  :should ~be nil)
+  :should be_true)
 
 (test "> works - 2"
   :valueof (> 3 1 2)
-  :should be nil)
+  :should be_false)
 
 (test "< works"
   :valueof (< 3 1 2)
-  :should be nil)
+  :should be_false)
 
 (test "< works - 2"
   :valueof (< 1 2 3)
-  :should ~be nil)
+  :should be_true)
 
 (test "< works inside if"
   :valueof (if (3 < 0) 34 35)
@@ -48,35 +48,35 @@
 
 (test "<= works"
   :valueof (<= 1 2 3)
-  :should ~be nil)
+  :should be_true)
 
 (test "<= works - 2"
   :valueof (<= 1 1 3)
-  :should ~be nil)
+  :should be_true)
 
 (test "<= works - 3"
   :valueof (<= 1 4 3)
-  :should be nil)
+  :should be_false)
 
 (test "<= fails on nil"
   :valueof (<= 1 nil 3)
-  :should be nil)
+  :should be_false)
 
 (test ">= works"
   :valueof (>= 3 2 1)
-  :should ~be nil)
+  :should be_true)
 
 (test ">= works - 2"
   :valueof (>= 3 1 1)
-  :should ~be nil)
+  :should be_true)
 
 (test ">= works - 3"
   :valueof (>= 3 1 2)
-  :should be nil)
+  :should be_false)
 
 (test ">= fails on nil"
   :valueof (>= 4 nil 3)
-  :should be nil)
+  :should be_false)
 
 (test "max works"
   :valueof (max 0 5 7 9 3 4 21 15)
@@ -84,7 +84,7 @@
 
 (test "< works with scorer"
   :valueof ((< (fn(_) _%3)) 4 2)
-  :should ~be nil)
+  :should be_true)
 
 (test "sort works"
   :valueof (sort (<) '(1 12 3))
@@ -96,7 +96,7 @@
 
 (test "floats compare to within a tolerance"
   :valueof (2 >= 2.0000001)
-  :should ~be nil)
+  :should be_true)
 
 (test "sum works with zero args"
   :valueof (sum nil)
@@ -112,8 +112,8 @@
 
 (test "range checks work"
   :valueof (1 <= 1 <= 2)
-  :should ~be nil)
+  :should be_true)
 
 (test "range checks work - 2"
   :valueof (3 >= 2 > 2)
-  :should be nil)
+  :should be_false)

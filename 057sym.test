@@ -4,7 +4,7 @@
 
 (test "sym works on empty string"
   :valueof (sym "")
-  :should be nil)
+  :should be_false)
 
 (test "sym works with multiple args"
   :valueof (string+sym "abc" 42 :def)  # keyword retains colon
@@ -12,11 +12,11 @@
 
 (test "keyword? works"
   :valueof (keyword? 'abc)
-  :should be nil)
+  :should be_false)
 
 (test "keyword? works - 2"
   :valueof (keyword? :abc)
-  :should ~be nil)
+  :should be_true)
 
 (test "sym converts keywords"
   :valueof (sym :abc)
@@ -24,41 +24,41 @@
 
 (test "< works with syms"
   :valueof (< "a" 'b)
-  :should ~be nil)
+  :should be_true)
 
 
 
 (test "match? treats any sym beginning with _ as wildcard"
   :valueof (match? '(1 ... _x) '(1 2 3))
-  :should ~be nil)
+  :should be_true)
 
 (test "match? manages _sym identity"
   :valueof (match? '(1 _x _x) '(1 2 3))
-  :should be nil)
+  :should be_false)
 
 (test "match? manages _sym identity - 2"
   :valueof (match? '(1 _x _x) '(1 2 2))
-  :should ~be nil)
+  :should be_true)
 
 (test "match? matches $vars with their root"
   :valueof (match? 'a_ 'a3)
-  :should ~be nil)
+  :should be_true)
 
 (test "match? matches $vars with their root - 2"
   :valueof (match? 'a_ 'a)
-  :should be nil)
+  :should be_false)
 
 (test "match? manages $var_sym identity"
   :valueof (match? '(a_x a_x) '(a3 a3))
-  :should ~be nil)
+  :should be_true)
 
 (test "match? manages $var_sym identity - 2"
   :valueof (match? '(a_x a_x) '(a2 a3))
-  :should be nil)
+  :should be_false)
 
 (test "match? manages $var_sym identity - 3"
   :valueof (match? '(a_x a_x) '(a a3))
-  :should be nil)
+  :should be_false)
 
 (test "match integrates with test"
   :valueof (list 'a3 'a3)

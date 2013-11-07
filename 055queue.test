@@ -15,13 +15,13 @@
 
 (test "empty? works on queues"
   :valueof (empty? (queue))
-  :should ~be nil)
+  :should be_true)
 
 (test "empty? works on queues - 2"
   :valueof (let q (queue)
              (enq 1 q)
              (empty? q))
-  :should be nil)
+  :should be_false)
 
 (test "deq works"
   :valueof (let q (queue '(1 2 3))
@@ -40,4 +40,4 @@
 
 (test "equality works on queues"
   :valueof ((queue '(1 2 3)) = (queue '(1 2 3)))
-  :should ~be nil)
+  :should be_true)

@@ -41,7 +41,7 @@ void test_if_sees_args_in_then_and_else() {
 
 void test_not_works() {
   run("(not 35)");
-  CHECK_TRACE_TOP("eval", "compiled fn=> nil");
+  CHECK_TRACE_TOP("eval", "compiled fn=> false");
 }
 
 void test_not_works2() {
@@ -110,7 +110,7 @@ void test_unbind_handles_unbound_vars() {
 
 void test_bound_works() {
   run("(bound? 'a)");
-  CHECK_TRACE_TOP("eval", "=> nil");
+  CHECK_TRACE_TOP("eval", "=> false");
   CLEAR_TRACE;
   new_dynamic_scope("a", new_num(3));
   run("(bound? 'a)");
@@ -121,11 +121,11 @@ void test_bound_works() {
 void test_bound_checks_only_dynamic_scope_on_nil() {
   TEMP(call, read("(bound? 'a nil)"));
   TEMP(result1, eval(call));
-  CHECK_EQ(result1, nil);
+  CHECK_EQ(result1, new_sym("false"));
   new_lexical_scope();
   add_lexical_binding("a", new_num(3));
     TEMP(result2, eval(call));
-    CHECK_EQ(result2, nil);
+    CHECK_EQ(result2, new_sym("false"));
   end_lexical_scope();
 }
 
@@ -133,11 +133,20 @@ void test_equal_handles_nil() {
   trace("test") << "=";
   run("(nil = nil)");
   CHECK_TRACE_DOESNT_CONTAIN("eval", 1, "=> nil");
+  CHECK_TRACE_DOESNT_CONTAIN("eval", 1, "=> false");
+}
+
+void test_equal_handles_false() {
+  trace("test") << "=";
+  run("(false = false)");
+  CHECK_TRACE_DOESNT_CONTAIN("eval", 1, "=> nil");
+  CHECK_TRACE_DOESNT_CONTAIN("eval", 1, "=> false");
 }
 
 void test_equal_handles_floats() {
   run("((/ 3.0 2) = 1.5)");
   CHECK_TRACE_DOESNT_CONTAIN("eval", 1, "=> nil");
+  CHECK_TRACE_DOESNT_CONTAIN("eval", 1, "=> false");
 }
 
 void test_equal_handles_float_vs_nil() {

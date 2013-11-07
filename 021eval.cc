@@ -57,6 +57,12 @@ cell* eval(cell* expr, cell* scope) {
     return mkref(expr);
   }
 
+  if (expr == new_sym("false")) {
+    trace("eval") << "false";
+    trace("eval") << "=> " << expr;
+    return mkref(expr);
+  }
+
   if (is_sym(expr)) {
     trace("eval") << "sym";
     cell* result = lookup(expr, scope, keep_already_evald());

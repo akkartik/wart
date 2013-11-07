@@ -6,7 +6,7 @@
 
 (test "compose works - 2"
   :valueof ((compose not cons?) '(1 2))
-  :should be nil)
+  :should be_false)
 
 (mac! (foo x) `(+ 1 ,x))
 (test "compose works with macros"

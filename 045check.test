@@ -1,6 +1,6 @@
 (test "if handles 0 args"
   :valueof (if)
-  :should be nil)
+  :should be_false)
 
 (test "if handles 1 arg"
   :valueof if.3
@@ -43,11 +43,11 @@
 
 (test "or handles 0 args"
   :valueof (or)
-  :should be nil)
+  :should be_false)
 
 (test "or handles nil arg"
   :valueof or.nil
-  :should be nil)
+  :should be_false)
 
 (test "or handles non-nil arg"
   :valueof or.3
@@ -65,7 +65,7 @@
   :valueof (let x nil
              (or 3 (x <- 4))
              x)
-  :should be nil)
+  :should be_false)
 
 (test "or evals each arg at most once"
   :valueof (let x 0
@@ -90,11 +90,11 @@
 
 (test "and handles 0 args"
   :valueof (and)
-  :should ~be nil)
+  :should be_true)
 
 (test "and handles nil arg"
   :valueof and.nil
-  :should be nil)
+  :should be_false)
 
 (test "and handles non-nil arg"
   :valueof and.3
@@ -102,7 +102,7 @@
 
 (test "and handles 2 args"
   :valueof (and nil 3)
-  :should be nil)
+  :should be_false)
 
 (test "and handles 2 non-nil args"
   :valueof (and 3 4)
@@ -110,7 +110,7 @@
 
 (test "and handles lexical scope"
   :valueof ((fn(x) (and 3 x 4)) nil)
-  :should be nil)
+  :should be_false)
 
 (test "and short-circuits"
   :valueof (let x 0
@@ -133,39 +133,39 @@
 
 (test "equality handles nils"
   :valueof (nil = 3)
-  :should be nil)
+  :should be_false)
 
 (test "equality compares nils"
   :valueof (nil = nil)
-  :should ~be nil)
+  :should be_true)
 
 (test "equality handles ints"
   :valueof (3 = 4)
-  :should be nil)
+  :should be_false)
 
 (test "equality handles ints - 2"
   :valueof (3 = 3)
-  :should ~be nil)
+  :should be_true)
 
 (test "equality handles strings"
   :valueof ("a" = "b")
-  :should be nil)
+  :should be_false)
 
 (test "equality handles strings - 2"
   :valueof ("a" = "a")
-  :should ~be nil)
+  :should be_true)
 
 (test "equality handles lists"
   :valueof (list.1 = list.2)
-  :should be nil)
+  :should be_false)
 
 (test "equality handles lists - 2"
   :valueof (list.1 = list.1)
-  :should ~be nil)
+  :should be_true)
 
 (test "equality handles user-defined types"
   :valueof ('(type foo 3) = '(type foo 3))
-  :should ~be nil)
+  :should be_true)
 
 
 
@@ -194,43 +194,43 @@
 
 (test "match? - atom positive"
   :valueof (match? 3 3)
-  :should ~be nil)
+  :should be_true)
 
 (test "match? - atom negative"
   :valueof (match? 3 4)
-  :should be nil)
+  :should be_false)
 
 (test "match? - list positive"
   :valueof (match? '(1 (2 3)) '(1 (2 3)))
-  :should ~be nil)
+  :should be_true)
 
 (test "match? - list negative"
   :valueof (match? '(2 (2 3)) '(1 (2 3)))
-  :should be nil)
+  :should be_false)
 
 (test "match? treats _ as atom wildcard"
   :valueof (match? '_ 3)
-  :should ~be nil)
+  :should be_true)
 
 (test "match? - _ positive"
   :valueof (match? '(1 (_ 3 4)) '(1 (2 3 4)))
-  :should ~be nil)
+  :should be_true)
 
 (test "match? - _ negative"
   :valueof (match? '(2 (_ 3 4)) '(1 (2 3 4)))
-  :should be nil)
+  :should be_false)
 
 (test "match? - _ matches lists"
   :valueof (match? '_ '(3))
-  :should ~be nil)
+  :should be_true)
 
 (test "match? - _ matches lists when dotted"
   :valueof (match? '(1 ... _) '(1 2 3))
-  :should ~be nil)
+  :should be_true)
 
 (test "match? - _ matches nil when dotted"
   :valueof (match? '(1 ... _) '(1))
-  :should ~be nil)
+  :should be_true)
 
 
 

@@ -6,12 +6,12 @@
 (test "matching checks for match"
   :valueof (matching (bar _x) (list 3)
              x)
-  :should be nil)
+  :should be_false)
 
 (test "matching checks for match - 2"
   :valueof (matching (a (_x _y)) (list 'a 3)
              x)
-  :should be nil)
+  :should be_false)
 
 (test "matching checks for match - 3"
   :valueof (matching (a (_x _y)) (list 'a '(3 4))

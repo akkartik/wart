@@ -12,7 +12,7 @@
 
 (test "strings can index past final char"
   :valueof ("abcd" 4)
-  :should be nil)
+  :should be_false)
 
 (test "strings can take negative indices"
   :valueof ("abcd" -3)
@@ -111,114 +111,114 @@
 
 (test "pos works on strings - 3"
   :valueof (pos "ba" "abc")
-  :should be nil)
+  :should be_false)
 
 
 
 (test "< works on strings"
   :valueof ("a" < "b")
-  :should ~be nil)
+  :should be_true)
 
 (test "< works on strings - 2"
   :valueof ("b" < "a")
-  :should be nil)
+  :should be_false)
 
 (test "< works on strings - 3"
   :valueof ("a" < "a")
-  :should be nil)
+  :should be_false)
 
 (test "< works on strings - 4"
   :valueof (< "a" "b" "c")
-  :should ~be nil)
+  :should be_true)
 
 (test "< works on strings - 5"
   :valueof (< "a" "b" "a")
-  :should be nil)
+  :should be_false)
 
 (test "< works on strings - 6"
   :valueof ("a" < "b" < "c")
-  :should ~be nil)
+  :should be_true)
 
 (test "< works on strings - 7"
   :valueof ("a" < "b" < "a")
-  :should be nil)
+  :should be_false)
 
 (test "> works on strings"
   :valueof ("a" > "b")
-  :should be nil)
+  :should be_false)
 
 (test "> works on strings - 2"
   :valueof ("b" > "a")
-  :should ~be nil)
+  :should be_true)
 
 (test "> works on strings - 3"
   :valueof (> "c" "b" "d")
-  :should be nil)
+  :should be_false)
 
 (test "> works on strings - 4"
   :valueof (> "c" "b" "a")
-  :should ~be nil)
+  :should be_true)
 
 (test "> works on strings - 5"
   :valueof (> "a" "b" "a")
-  :should be nil)
+  :should be_false)
 
 (test "> works on strings - 6"
   :valueof ("a" > "a")
-  :should be nil)
+  :should be_false)
 
 (test "> works on strings - 7"
   :valueof (> "c" "b" "a")
-  :should ~be nil)
+  :should be_true)
 
 (test "> works on strings - 8"
   :valueof (> "c" "b" "c")
-  :should be nil)
+  :should be_false)
 
 (test "> works on strings - 9"
   :valueof ("c" > "b" > "a")
-  :should ~be nil)
+  :should be_true)
 
 (test "> works on strings - 7"
   :valueof ("c" > "b" > "c")
-  :should be nil)
+  :should be_false)
 
 (test "<= works on strings"
   :valueof ("a" <= "b")
-  :should ~be nil)
+  :should be_true)
 
 (test "<= works on strings - 2"
   :valueof ("b" <= "a")
-  :should be nil)
+  :should be_false)
 
 (test "<= works on strings - 3"
   :valueof ("a" <= "a")
-  :should ~be nil)
+  :should be_true)
 
 (test "<= works on strings - 4"
   :valueof (nil <= "a")
-  :should be nil)
+  :should be_false)
 
 (test "<= works on strings - 5"
   :valueof ("z" <= nil)
-  :should be nil)
+  :should be_false)
 
 (test ">= works on strings"
   :valueof ("a" >= "b")
-  :should be nil)
+  :should be_false)
 
 (test ">= works on strings - 2"
   :valueof ("b" >= "a")
-  :should ~be nil)
+  :should be_true)
 
 (test ">= works on strings - 4"
   :valueof ("a" >= "a")
-  :should ~be nil)
+  :should be_true)
 
 (test "range checks work on strings"
   :valueof ("a" <= "a" <= "b")
-  :should ~be nil)
+  :should be_true)
 
 (test "range checks work on strings - 2"
   :valueof ("c" >= "b" > "b")
-  :should be nil)
+  :should be_false)

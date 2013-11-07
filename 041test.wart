@@ -16,3 +16,9 @@ alias equal (=)
 
 def (match a b)
   (match? b a)
+
+def (be_true x)
+  x
+
+def (be_false x)
+  no.x
