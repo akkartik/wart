@@ -21,7 +21,7 @@ void test_integer_drops_decimals() {
   CHECK_EQ(result->type, INTEGER);
 }
 
-void test_lesser_always_passes_nil() {
-  run("(< 3 nil)");
-  CHECK_TRACE_TOP("eval", "compiled fn=> nil");
+void test_lesser_always_passes_false() {
+  run("(< 3 false)");
+  CHECK_TRACE_TOP("eval", "compiled fn=> false");
 }

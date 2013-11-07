@@ -45,6 +45,8 @@ def (mem? x tree)
      cons?.tree
        (or (mem? x car.tree)
            (mem? x cdr.tree))
+     :else
+       false
 
 
 

@@ -22,8 +22,8 @@
   :valueof (divides 4 2)
   :should be_true)
 
-(test "comparing anything to nil always returns nil"
-  :valueof (< 3 nil)
+(test "comparing anything to false always fails"
+  :valueof (< 3 false)
   :should be_false)
 
 (test "> works"

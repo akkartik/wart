@@ -9,8 +9,13 @@ void test_string_compare() {
 }
 
 void test_string_compare2() {
-  run("(string_lesser nil \"abd\")");
-  CHECK_TRACE_TOP("eval", "=> nil");
+  run("(string_lesser \"abe\" \"abd\")");
+  CHECK_TRACE_TOP("eval", "=> false");
+}
+
+void test_string_compare_passes_false() {
+  run("(string_lesser false \"abd\")");
+  CHECK_TRACE_TOP("eval", "=> false");
 }
 
 void test_string_split() {

@@ -49,16 +49,21 @@ def (blank? seq)
   (or nil?.seq empty?.seq)
 
 # lexicographic comparison
-# we support comparisons with nil - but at the cost of breaking (a < b < c)
 def (a < b) :case (or list?.a list?.b)
-  if (b = nil)
-       nil
-     (a = nil)
-       b  # nil can be less than other lists; but this breaks (a < b < c)
-     (car.a = car.b)
-       (cdr.a < cdr.b)
-     :else
-       (car.a < car.b)  # good thing we're breaking (a < b < c) anyway
+  let lex_less
+      afn (a b orig_b)  # always return original b for chaining
+        default orig_b :to b
+        if (b = nil)
+             false
+           (a = nil)
+             orig_b
+           (car.a = car.b)
+             (self cdr.a cdr.b orig_b)
+           :else
+             if (car.a < car.b)
+               orig_b
+               false
+    (lex_less a b)
 
 def (copy x)
   if ~cons?.x

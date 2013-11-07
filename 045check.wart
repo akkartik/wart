@@ -12,6 +12,7 @@ mac (or ... args)
        (if $x
          $x
          (or ,@cdr.args)))
+    false
 
 mac (and ... args)
   if no.args
@@ -19,7 +20,8 @@ mac (and ... args)
     if ~cdr.args
       car.args
       `(if ,car.args
-         (and ,@cdr.args))
+         (and ,@cdr.args)
+         false)
 
 let ($=) (=) # ignore later refinements
   def (isa 'Type x)
