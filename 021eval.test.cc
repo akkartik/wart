@@ -759,3 +759,8 @@ void test_eval_handles_incomplete_args_for_aliased_params() {
   TEMP(result, eval("((fn(a|b) a) x)"));
   CHECK_TRACE_TOP("eval", "=> (object incomplete_eval ((object function {sig, body, }) x))");
 }
+
+void test_eval_handles_incomplete_args_for_quoted_aliased_params() {
+  run("((fn ((| 'a b))))");
+  // doesn't die
+}

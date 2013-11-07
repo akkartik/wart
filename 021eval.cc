@@ -640,11 +640,12 @@ cell* ripple_incomplete_eval(cell* f, cell* scope) {
   cell_map table = to_table(scope)->value;
   for (cell* params = strip_quote(sig(f)); params != nil && (!is_cons(params) || !is_object(params)); params=cdr(params), curr=cdr(curr)) {
     cell* param = car(params);
-    if (is_quoted(param))
-      param = strip_quote(param);
     if (is_alias(param))
       param = car(cdr(param));
-    if (!table[param]) continue;
+    if (is_quoted(param))
+      param = strip_quote(param);
+    if (!table[param])
+      RAISE << "No binding for " << param << '\n' << die();
     if (is_incomplete_eval(table[param]))
       add_cons(curr, rep(table[param]));
     else
