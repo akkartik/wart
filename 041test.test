@@ -4,4 +4,4 @@
 
 (test "test using positional args" (=) (+ 1 1) 2)
 
-# todo: verify format of failures
+# pending: verify format of failures
