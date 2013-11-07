@@ -21,10 +21,6 @@ COMPILE_FN(hiding_warnings, compiledfn_hide_warnings, "'$body",
   return nil;
 )
 
-COMPILE_FN(show_warnings, compiledfn_show_warnings, "()",
-  return nil;
-)
-
 COMPILE_FN(mem_usage, compiledfn_mem_usage, "()",
   return mkref(new_num(num_unfreed()));
 )
