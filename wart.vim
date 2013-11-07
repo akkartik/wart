@@ -26,6 +26,9 @@ highlight link wartSalientComment SalientComment
 highlight Comment ctermfg=DarkBlue
 highlight SalientComment ctermfg=Cyan
 
+syntax keyword wartKeyword nil false object caller_scope fn
+highlight link wartKeyword Constant
+
 syntax region wartString start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=@Spell
 highlight link wartString String
 
