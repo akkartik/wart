@@ -115,6 +115,37 @@
 
 
 
+(test "lists compare lexicographically"
+  :valueof (< '(1 2 3) '(1 2 4))
+  :should ~be nil)
+
+(test "lists compare lexicographically - 2"
+  :valueof (< '(1 2 4) '(1 2 3))
+  :should be nil)
+
+(test "shorter list compares with prefix"
+  :valueof (< '(1 2 4) '(1 2 3 4))
+  :should be nil)
+
+(test "shorter list compares with prefix - 2"
+  :valueof (< '(1 2 2) '(1 2 3 4))
+  :should ~be nil)
+
+(test "equal prefixes sort by length"
+  :valueof (< '(1 2 3) '(1 2 3 4))
+  :should ~be nil)
+
+(test "equal prefixes sort by length - 2"
+  :valueof (< '(1 2 3 4) '(1 2 3))
+  :should be nil)
+
+(test "since nil is less than other lists, ranges don't work for lists - http://arclanguage.org/item?id=18136"
+  :valueof (hiding_warnings
+             (list.1 < list.2 < list.3))
+  :should be nil)  # broken; don't chain list comparison
+
+
+
 (test "pos works"
   :valueof (pos 2 '(1 2 3))
   :should ~be nil)
