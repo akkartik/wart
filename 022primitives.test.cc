@@ -121,11 +121,11 @@ void test_bound_works() {
 void test_bound_checks_only_dynamic_scope_on_nil() {
   TEMP(call, read("(bound? 'a nil)"));
   TEMP(result1, eval(call));
-  CHECK_EQ(result1, new_sym("false"));
+  CHECK_EQ(result1, sym_false);
   new_lexical_scope();
   add_lexical_binding("a", new_num(3));
     TEMP(result2, eval(call));
-    CHECK_EQ(result2, new_sym("false"));
+    CHECK_EQ(result2, sym_false);
   end_lexical_scope();
 }
 

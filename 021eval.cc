@@ -57,7 +57,7 @@ cell* eval(cell* expr, cell* scope) {
     return mkref(expr);
   }
 
-  if (expr == new_sym("false")) {
+  if (expr == sym_false) {
     trace("eval") << "false";
     trace("eval") << "=> " << expr;
     return mkref(expr);

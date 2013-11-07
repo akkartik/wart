@@ -64,8 +64,8 @@ COMPILE_FN(string_to_sym, compiledfn_string_to_sym, "($s)",
 COMPILE_FN(string_lesser, compiledfn_string_lesser, "($x $y)",
   cell* x = lookup("$x");
   cell* y = lookup("$y");
-  if (x == new_sym("false") || y == new_sym("false")) return mkref(new_sym("false"));
-  return to_string(x) < to_string(y) ? mkref(y) : mkref(new_sym("false"));
+  if (x == sym_false || y == sym_false) return mkref(sym_false);
+  return to_string(x) < to_string(y) ? mkref(y) : mkref(sym_false);
 )
 
 COMPILE_FN(split, compiledfn_split, "($s $delim)",

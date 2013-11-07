@@ -154,7 +154,7 @@ struct cell_lt_comparator :public std::binary_function<cell*, cell*, bool> {
     TEMP(expr, mkref(new_cons(comparer, new_cons(a, new_cons(b)))));
     TEMP(result, eval(expr));
     return strip_already_evald(result) != nil
-           && strip_already_evald(result) != new_sym("false");
+           && strip_already_evald(result) != sym_false;
   }
 };
 

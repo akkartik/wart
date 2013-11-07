@@ -245,6 +245,7 @@ void teardown_cells() {
 
 // optimize lookups of common symbols
 cell *sym_quote, *sym_backquote, *sym_unquote, *sym_splice, *sym_unquote_splice, *sym_already_evald;
+cell *sym_false;
 cell *sym_list, *sym_number, *sym_symbol, *sym_string, *sym_table;
 cell *sym_object, *sym_Coercions, *sym_incomplete_eval;
 cell *sym_function, *sym_name, *sym_sig, *sym_body, *sym_optimized_body, *sym_env, *sym_compiled, *sym_param_alias;
@@ -256,6 +257,8 @@ void setup_common_syms() {
   sym_splice = new_sym("@");
   sym_unquote_splice = new_sym(",@");
   sym_already_evald = new_sym("''");
+
+  sym_false = new_sym("false");
 
   sym_list = new_sym("list");
   sym_number = new_sym("number");

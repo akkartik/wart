@@ -16,11 +16,11 @@ COMPILE_FN(fn, compiledfn_fn, "'($params ... $body)",
 )
 
 COMPILE_FN(if, compiledfn_if, "($cond '$then '$else)",
-  return (lookup("$cond") != nil && lookup("$cond") != new_sym("false")) ? eval(lookup("$then")) : eval(lookup("$else"));
+  return (lookup("$cond") != nil && lookup("$cond") != sym_false) ? eval(lookup("$then")) : eval(lookup("$else"));
 )
 
 COMPILE_FN(not, compiledfn_not, "($x)",
-  return (lookup("$x") == nil || lookup("$x") == new_sym("false")) ? mkref(new_num(1)) : mkref(new_sym("false"));
+  return (lookup("$x") == nil || lookup("$x") == sym_false) ? mkref(new_num(1)) : mkref(sym_false);
 )
 
 COMPILE_FN(=, compiledfn_equal, "($x $y)",
@@ -29,12 +29,12 @@ COMPILE_FN(=, compiledfn_equal, "($x $y)",
   cell* result = nil;
   if (x == nil && y == nil)
     result = new_num(1);
-  else if (x == new_sym("false") && y == new_sym("false"))
+  else if (x == sym_false && y == sym_false)
     result = new_num(1);
   else if (x == nil || y == nil)
-    result = new_sym("false");
-  else if (x == new_sym("false") || y == new_sym("false"))
-    result = new_sym("false");
+    result = sym_false;
+  else if (x == sym_false || y == sym_false)
+    result = sym_false;
   else if (x == y)
     result = x;
   else if (x->type == FLOAT || y->type == FLOAT)
@@ -42,7 +42,7 @@ COMPILE_FN(=, compiledfn_equal, "($x $y)",
   else if (is_string(x) && is_string(y) && to_string(x) == to_string(y))
     result = x;
   else
-    result = new_sym("false");
+    result = sym_false;
   return mkref(result);
 )
 
@@ -94,9 +94,9 @@ COMPILE_FN(unbind, compiledfn_unbind, "('$var)",
 COMPILE_FN(bound?, compiledfn_is_bound, "($var $scope)",
   cell* var = lookup("$var");
   if (var == nil) return mkref(new_num(1));
-  if (var == new_sym("false")) return mkref(new_num(1));
+  if (var == sym_false) return mkref(new_num(1));
   if (!scope_containing_binding(var, lookup("$scope")))
-    return mkref(new_sym("false"));
+    return mkref(sym_false);
   return mkref(var);
 )
 
@@ -120,7 +120,7 @@ COMPILE_FN(eval, compiledfn_eval, "('$x $scope)",
 
 COMPILE_FN(mac?, compiledfn_is_macro, "($f)",
   cell* f = lookup("$f");
-  return is_macro(f) ? mkref(f) : mkref(new_sym("false"));
+  return is_macro(f) ? mkref(f) : mkref(sym_false);
 )
 
 COMPILE_FN(uniq, compiledfn_uniq, "($x)",
@@ -130,7 +130,7 @@ COMPILE_FN(uniq, compiledfn_uniq, "($x)",
 //// partial eval
 
 COMPILE_FN(warning_on_undefined_var?, compiledfn_is_warning_on_undefined_var, "()",
-  return Warn_on_unknown_var ? mkref(new_num(1)) : mkref(new_sym("false"));
+  return Warn_on_unknown_var ? mkref(new_num(1)) : mkref(sym_false);
 )
 
 COMPILE_FN(stop_warning_on_undefined_var, compiledfn_stop_warning_on_undefined_var, "()",
