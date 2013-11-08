@@ -30,7 +30,9 @@ int main(int argc, const char* argv[]) {
   cout << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   Interactive = true;  // stop run on two enters
   while (!cin.eof()) {
-    cout << "=> " << run(cin) << '\n';
+    cell* curr = run(cin);
+    cout << "=> " << curr << '\n';
+    rmref(curr);
   }
 }
 
