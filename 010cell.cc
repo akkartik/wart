@@ -172,11 +172,6 @@ void rmref(cell* c) {
   free_cell(c);
 }
 
-// helper for tests
-bool is_free(cell* x) {
-  return x->car == NULL;
-}
-
 
 
 //// tracking refcounts
