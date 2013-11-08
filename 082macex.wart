@@ -7,5 +7,5 @@ def (macex call env)
 def (strip_eval exprs)
   transform exprs :thru
     _.0  # macro body always has just one expr
-    _.1  # strip away (eval .. caller_scope)
-    list # add back
+      _.1  # strip away (eval .. caller_scope)
+    list # re-enclose in body
