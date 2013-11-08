@@ -41,6 +41,7 @@ COMPILE_FN(^, compiledfn_exp, "($base $exp)",
 COMPILE_FN(<, compiledfn_lesser, "($x $y)",
   cell* x = lookup("$x");
   cell* y = lookup("$y");
+  // support (a < b < c)
   if (x == sym_false || y == sym_false) return mkref(sym_false);
   return to_float(x) < to_float(y) ? mkref(y) : mkref(sym_false);
 )

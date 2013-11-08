@@ -25,3 +25,13 @@ void test_lesser_always_passes_false() {
   run("(< 3 false)");
   CHECK_TRACE_TOP("eval", "compiled fn=> false");
 }
+
+void test_lesser_chains() {
+  run("(0 < 1 < 2)");
+  CHECK_TRACE_DOESNT_CONTAIN("eval/1", "=> false");
+}
+
+void test_lesser_chains2() {
+  run("(3 < 1 < 2)");
+  CHECK_TRACE_TOP("eval", "=> false");
+}
