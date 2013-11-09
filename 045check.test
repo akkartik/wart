@@ -86,6 +86,10 @@
   :valueof (or @'(nil 1))
   :should be 1)
 
+(test "or always returns false on failure"
+  :valueof (or false nil)
+  :should be false)  # might be worth fixing
+
 
 
 (test "and handles 0 args"
