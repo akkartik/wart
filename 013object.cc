@@ -10,7 +10,7 @@ cell* new_object(string type, cell* rep) {
 }
 
 bool is_object(cell* x) {
-  return car(x) == sym_object;
+  return is_cons(x) && car(x) == sym_object;
 }
 
 cell* rep(cell* x) {

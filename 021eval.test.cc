@@ -764,3 +764,13 @@ void test_eval_handles_incomplete_args_for_quoted_aliased_params() {
   run("((fn ((| 'a b))))");
   // doesn't die
 }
+
+
+
+void test_is_macro_on_primitives() {
+  CHECK(!is_macro(lookup("fn")));
+}
+
+void test_is_macro_on_non_functions() {
+  CHECK(!is_macro(lookup("stdout")));
+}

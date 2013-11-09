@@ -1,8 +1,28 @@
+def (petrify)
+  (update_macroexpansions)
+  (update_optimized_bodies)
+
+def (update_macroexpansions)
+  each (var val) (globals)
+    (update_expansion val)
+
+def (update_macroexpansion val)
+  when (mac? val)
+    (<- (rep.val 'expander)
+        (ret m copy.val
+          (zap! strip_eval body.m)))
+
 def (macex call env)
   let (m ... args) call
-    m <- (copy+eval m env)
-    zap! strip_eval body.m
-    (m @args)
+    let mval (eval m env)
+      unless (rep.mval 'expander)
+        update_macroexpansion mval
+      if (~mac? mval)
+        call
+        ((rep.mval 'expander) @args)
+
+def (macex_all forms)
+  (map macex forms)
 
 def (strip_eval exprs)
   transform exprs :thru

@@ -507,8 +507,10 @@ stack<bool> In_macro;
 // keep sync'd with mac
 bool is_macro(cell* fn) {
   if (!is_object(fn)) return false;
+  if (type(fn) != sym_function) return false;
   if (!is_quoted(sig(fn))) return false;
   cell* forms = body(fn);
+  if (!is_cons(forms)) return false;
   if (cdr(forms) != nil) return false;
   cell* form = car(forms);
   if (car(form) != sym_eval) return false;
