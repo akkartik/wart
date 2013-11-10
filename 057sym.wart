@@ -8,9 +8,6 @@ def (keyword? s)
 def (sym s ... rest) :case (and no.rest keyword?.s)
   (as symbol (string.s 1 nil))
 
-def (< ... args) :case (some sym? args)
-  (< @(map string args))
-
 def (match? a b bindings) :case sym?.a
   default bindings :to (table)
   (or (a = b)
