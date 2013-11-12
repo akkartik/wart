@@ -1,23 +1,23 @@
 mac (foomex x)
   `(+ ,x 1)
-(test "macex works"
-  :valueof (macex '(foomex a))
+(test "macex1 works"
+  :valueof (macex1 '(foomex a))
   :should be '(+ a 1))
 
 mac (foomex2 x)
   pr 3
   `(+ ,x 1)
-(test "macex has macro-time side-effects"
-  :valueof (with outstring (macex '(foomex2 a)))
+(test "macex1 has macro-time side-effects"
+  :valueof (with outstring (macex1 '(foomex2 a)))
   :should be "3")
 
 mac (foomex3 ... args)
   if cdr.args
     `(+ ,car.args ,cadr.args)
     `(+ ,car.args 1)
-(test "macex handles conditionals on the structure of the arg"
-  :valueof (macex '(foomex3 a))
+(test "macex1 handles conditionals on the structure of the arg"
+  :valueof (macex1 '(foomex3 a))
   :should be `(+ a 1))
-(test "macex handles conditionals on the structure of the arg - 2"
-  :valueof (macex '(foomex3 a b))
+(test "macex1 handles conditionals on the structure of the arg - 2"
+  :valueof (macex1 '(foomex3 a b))
   :should be `(+ a b))

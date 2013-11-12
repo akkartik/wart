@@ -13,7 +13,7 @@ def (update_macroexpansion val)
         (ret m copy.val
           (zap! strip_eval body.m)))
 
-def (macex call env)
+def (macex1 call env)
   let (m ... args) call
     let mval (eval m env)
       unless (rep.mval 'expander)
