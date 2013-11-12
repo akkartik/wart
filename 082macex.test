@@ -21,3 +21,7 @@ mac (foomex3 ... args)
 (test "macex1 handles conditionals on the structure of the arg - 2"
   :valueof (macex1 '(foomex3 a b))
   :should be `(+ a b))
+
+(test "macex works"
+  :valueof (macex 'a&~b.c)
+  :should be '((a & ~b) c))

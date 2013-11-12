@@ -13,6 +13,12 @@ def (update_macroexpansion val)
         (ret m copy.val
           (zap! strip_eval body.m)))
 
+def (macex call env)
+  if cons?.call
+    let form (macex1 call env)
+      (map (fn(_) (macex strip_already_evald._ env)) form)
+    call
+
 def (macex1 call env)
   let (m ... args) call
     let mval (eval m env)

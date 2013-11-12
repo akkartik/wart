@@ -127,6 +127,10 @@ COMPILE_FN(uniq, compiledfn_uniq, "($x)",
   return mkref(gensym(lookup("$x")));
 )
 
+COMPILE_FN(strip_already_evald, compiledfn_strip_already_evald, "($x)",
+  return mkref(strip_already_evald(lookup("$x")));
+)
+
 //// partial eval
 
 COMPILE_FN(warning_on_undefined_var?, compiledfn_is_warning_on_undefined_var, "()",
