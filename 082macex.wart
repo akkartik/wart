@@ -3,8 +3,9 @@ def (petrify)
   (update_optimized_bodies)
 
 def (update_macroexpansions)
+  prn "computing expansions"
   each (var val) (globals)
-    (update_expansion val)
+    (update_macroexpansion val)
 
 def (update_macroexpansion val)
   when (mac? val)
