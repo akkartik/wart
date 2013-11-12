@@ -147,7 +147,7 @@ def (keep f seq)
       (keep f cdr.seq)
 
 def (rem f seq)
-  (keep complement+predicate.f seq)
+  (keep (~ predicate.f) seq)
 alias skip rem
 
 def (some f seq)

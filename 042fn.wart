@@ -19,7 +19,5 @@ let ($+ $if ($=)) `(,+ ,if ,=)
         (compose f g)
         ($+ f g)
 
-def (complement f)
+def ~f
   (compose not f)
-
-alias (~) complement
