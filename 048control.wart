@@ -116,6 +116,9 @@ def (| ... fs)
                       :with (fn(f) `(,f ,@args))))
           caller_scope))
 
+mac (&~ f g)
+  `(,f & (~ ,g))
+
 
 
 def (functionize f)
