@@ -20,15 +20,14 @@ def (macex call env)
     call
 
 def (macex1 call env)
-  if (~list? call)
-    call
-    let (m ... args) call
-      let mval (eval m env)
-        unless (rep.mval 'expander)
-          update_macroexpansion mval
-        if (~mac? mval)
-          call
-          ((rep.mval 'expander) @args)
+  backstopped_by call
+    when (list? call)
+      let (m ... args) call
+        let mval (eval m env)
+          unless (rep.mval 'expander)
+            update_macroexpansion mval
+          when (mac? mval)
+            ((rep.mval 'expander) @args)
 
 def (macex_all forms)
   (map macex forms)
