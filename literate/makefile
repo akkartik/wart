@@ -1,6 +1,6 @@
 a.out: makefile wart.cc ../[0-9]*.cc
 	g++ -g -Wall -Wextra -fno-strict-aliasing wart.cc
-	-@a.out test
+	-@./a.out test
 
 test_all:
 	# Sucks to have to explicitly name files
