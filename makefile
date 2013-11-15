@@ -1,6 +1,5 @@
 wart_bin: makefile type_list function_list file_list test_file_list test_list compiledfn_list
-	g++ -O3 -Wall -Wextra -fno-strict-aliasing boot.cc -o wart_bin        # takes 30 seconds
-	@echo
+	g++ -O3 -Wall -Wextra -fno-strict-aliasing boot.cc -o wart_bin        # (takes ~15 seconds)
 
 type_list: boot.cc [0-9]*.cc
 	@# assumes struct decl has space before '{'

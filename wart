@@ -8,6 +8,7 @@
 
 make -q || make >&2 || exit 1
 
+echo "starting up...       (takes ~15 seconds)"
 if command which rlwrap >&/dev/null
 then
   rlwrap -C wart ./wart_bin $*
