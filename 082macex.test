@@ -25,3 +25,11 @@ mac (foomex3 ... args)
 (test "macex works"
   :valueof (macex 'a&~b.c)
   :should be '((a & ~b) c))
+
+(test "macex is robust to non-macros"
+  :valueof (macex 42)
+  :should be 42)
+
+(test "macex is robust to non-macros - 2"
+  :valueof (macex '(car x))
+  :should be '(car x))
