@@ -8,6 +8,7 @@ void load_files(const char* ext) {
   for (vector<char*>::iterator p = files.begin(); p != files.end(); ++p) {
     if (!Last_file.empty() && *p > Last_file) break;
     load_file(*p);
+    free(*p);
   }
 }
 
@@ -38,9 +39,10 @@ vector<char*> sorted_files(const char* dirname, const char* ext) {
     if (n < extn) continue;
     if (strncmp(&files[i]->d_name[n-extn], ext, extn)) continue;
     if (!isdigit(files[i]->d_name[0])) continue;
-    char* s = new char[n+1];  // leak
+    char* s = new char[n+1];
     strncpy(s, files[i]->d_name, n+1);
     result.push_back(s);
+    free(files[i]);
   }
   return result;
 }
