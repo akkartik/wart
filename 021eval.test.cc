@@ -128,6 +128,11 @@ void test_eval_handles_nested_quotes() {
   end_dynamic_scope("b");
 }
 
+void test_eval_handles_backquote_unquote() {
+  run("`(list `,,@'(1 2))");
+  CHECK_TRACE_TOP("eval", "backquote=> (list 1 2)");
+}
+
 
 
 void test_eval_handles_fn_calls() {

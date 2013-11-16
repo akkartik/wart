@@ -604,20 +604,26 @@ cell* maybe_strip_already_evald(bool keep_already_evald, cell* x) {
 }
 
 long unquote_depth(cell* x) {
+  if (is_backquoted(x))
+    return unquote_depth(cdr(x))-1;
   if (is_unquoted(x))
     return unquote_depth(cdr(x))+1;
   return 0;
 }
 
 cell* strip_unquote(cell* x) {
+  if (is_backquoted(x) && is_unquoted(cdr(x)))
+    return strip_unquote(cdr(cdr(x)));
   if (is_unquoted(x))
     return strip_unquote(cdr(x));
   return x;
 }
 
 long unquote_splice_depth(cell* x) {
-  if (is_unquote_spliced(x))
+  if (is_unquote_spliced(x))  // must be innermost unquote
     return 1;
+  if (is_backquoted(x))
+    return unquote_splice_depth(cdr(x))-1;
   if (is_unquoted(x))
     return unquote_splice_depth(cdr(x))+1;
   return 1000;  // never try to splice
