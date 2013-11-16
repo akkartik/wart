@@ -555,7 +555,8 @@ cell* process_unquotes(cell* x, long depth, cell* scope) {
     return mkref(x);
   }
 
-  if (unquote_depth(x) == depth) {
+  if (!has_unquote_splice(x)
+      && unquote_depth(x) == depth) {
     Skipped_already_evald = false;
     cell* result = eval(strip_unquote(x), scope);
     trace("backquote") << "eval: " << result;
@@ -565,8 +566,9 @@ cell* process_unquotes(cell* x, long depth, cell* scope) {
     }
     return result;  // already mkref'd
   }
-  else if (unquote_splice_depth(car(x)) == depth) {
-    TEMP(splice, eval(strip_unquote_splice(car(x)), scope));
+  else if (has_unquote_splice(car(x))
+           && unquote_depth(car(x)) == depth) {
+    TEMP(splice, eval(strip_unquote(car(x)), scope));
     trace("backquote") << "splice: " << splice;
     TEMP(rest, process_unquotes(cdr(x), depth, scope));
     if (splice == nil) return mkref(rest);
@@ -608,29 +610,28 @@ long unquote_depth(cell* x) {
     return unquote_depth(cdr(x))-1;
   if (is_unquoted(x))
     return unquote_depth(cdr(x))+1;
+  if (is_unquote_spliced(x))
+    return unquote_depth(cdr(x))+1;
   return 0;
 }
 
 cell* strip_unquote(cell* x) {
-  if (is_backquoted(x) && is_unquoted(cdr(x)))
+  if (is_backquoted(x) &&
+      (is_unquoted(cdr(x)) || is_unquote_spliced(cdr(x))))
     return strip_unquote(cdr(cdr(x)));
-  if (is_unquoted(x))
+  if (is_unquoted(x) || is_unquote_spliced(x))
     return strip_unquote(cdr(x));
   return x;
 }
 
-long unquote_splice_depth(cell* x) {
-  if (is_unquote_spliced(x))  // must be innermost unquote
-    return 1;
-  if (is_backquoted(x))
-    return unquote_splice_depth(cdr(x))-1;
-  if (is_unquoted(x))
-    return unquote_splice_depth(cdr(x))+1;
-  return 1000;  // never try to splice
-}
-
-cell* strip_unquote_splice(cell* x) {
-  return cdr(strip_unquote(x));
+bool has_unquote_splice(cell* x) {
+  if (is_unquote_spliced(x))
+    return true;
+  if (is_quoted(x)
+      || is_backquoted(x)
+      || is_unquoted(x))
+    return has_unquote_splice(cdr(x));
+  return false;
 }
 
 

@@ -133,6 +133,14 @@ void test_eval_handles_backquote_unquote() {
   CHECK_TRACE_TOP("eval", "backquote=> (list 1 2)");
 }
 
+void test_eval_handles_unquote_splice_unquote() {
+  TEMP(a, read("(x y)"));
+  new_dynamic_scope("a", a);
+  run("`(list `(list ,@,a))");
+  CHECK_TRACE_TOP("eval", "backquote=> (list `(list x y))");
+  end_dynamic_scope("a");
+}
+
 
 
 void test_eval_handles_fn_calls() {
