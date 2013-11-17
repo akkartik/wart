@@ -134,8 +134,7 @@ void test_eval_handles_backquote_unquote() {
 }
 
 void test_eval_handles_unquote_splice_unquote() {
-  TEMP(a, read("(x y)"));
-  new_dynamic_scope("a", a);
+  new_dynamic_scope("a", new_cons(new_sym("x"), new_cons(new_sym("y"))));
   run("`(list `(list ,@,a))");
   CHECK_TRACE_TOP("eval", "backquote=> (list `(list x y))");
   end_dynamic_scope("a");
