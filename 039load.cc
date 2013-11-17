@@ -44,5 +44,6 @@ vector<char*> sorted_files(const char* dirname, const char* ext) {
     result.push_back(s);
     free(files[i]);
   }
+  free(files);
   return result;
 }
