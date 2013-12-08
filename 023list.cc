@@ -151,7 +151,9 @@ struct cell_lt_comparator :public std::binary_function<cell*, cell*, bool> {
   cell* comparer;
   cell_lt_comparator(cell* f) :comparer(f) {}
   bool operator()(cell* a, cell* b) {
-    TEMP(expr, mkref(new_cons(comparer, new_cons(a, new_cons(b)))));
+    // quote args of call; they've already been eval'd inside sort
+    TEMP(expr, mkref(new_cons(comparer, new_cons(new_cons(sym_quote, a),
+                                                 new_cons(new_cons(sym_quote, b))))));
     TEMP(result, eval(expr));
     return strip_already_evald(result) != nil
            && strip_already_evald(result) != sym_false;

@@ -5,6 +5,9 @@ def (keyword? s)
   (and sym?.s
        (string.s.0 = ":"))
 
+def (< a b ... rest) :case (and sym?.a no.rest)
+  (string_lesser a b)
+
 def (sym s ... rest) :case (and no.rest keyword?.s)
   (as symbol (string.s 1 nil))
 

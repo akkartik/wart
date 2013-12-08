@@ -98,6 +98,10 @@
   :valueof (sort (< (fn(_) _%3)) '(5 7 6))  # modulo sort
   :should be '(6 7 5))
 
+(test "sort works on lists"
+  :valueof (sort (< car) '((2 1) (3 2) (1 3)))
+  :should be '((1 3) (2 1) (3 2)))
+
 (test "floats compare to within a tolerance"
   :valueof (2 >= 2.0000001)
   :should be_true)

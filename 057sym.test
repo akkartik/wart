@@ -26,6 +26,10 @@
   :valueof (< "a" 'b)
   :should be_true)
 
+(test "sort works on lists of syms"
+  :valueof (sort (< car) '((b 1) (c 2) (a 3)))
+  :should be '((a 3) (b 1) (c 2)))
+
 
 
 (test "match? treats any sym beginning with _ as wildcard"
