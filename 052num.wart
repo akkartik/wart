@@ -60,7 +60,9 @@ def (max ... args)
 
 def (< scorer) :case fn?.scorer
   (fn(x y)
-    (scorer.x < scorer.y))
+    (aif (scorer.x < scorer.y)
+      y
+      false))
 
 
 
