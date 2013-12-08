@@ -58,7 +58,7 @@ def (min ... args)
 def (max ... args)
   (best (>) args)
 
-def (< scorer) :case fn?.scorer
+def (< scorer ... rest) :case (and fn?.scorer no.rest)
   (fn(x y)
     (aif (scorer.x < scorer.y)
       y
