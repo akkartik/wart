@@ -14,10 +14,8 @@ def (update_macroexpansion val)
           (zap! strip_eval body.m)))
 
 def (macex call env)
-  if cons?.call
-    let form (macex1 call env)
-      (map (fn(_) (macex strip_already_evald._ env)) form)
-    call
+  (converge (fn(_) (macex1 _ env))
+            call)
 
 def (macex1 call env)
   backstopped_by call

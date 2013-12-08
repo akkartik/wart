@@ -23,6 +23,10 @@ mac (foomex3 ... args)
   :should be `(+ a b))
 
 (test "macex works"
+  :valueof (macex 'a.b)
+  :should be '(a b))
+
+(pending_test "macex expands multiple macros"
   :valueof (macex 'a&~b.c)
   :should be '((a & ~b) c))
 
@@ -38,6 +42,6 @@ mac (foomex3 ... args)
   :valueof (macex '(object foo 34))
   :should be '(object foo 34))
 
-(test "macex1 is robust to non-macros - 3"
-  :valueof (macex1 '(a b c))
+(test "macex is robust to non-macros - 3"
+  :valueof (macex '(a b c))
   :should be '(a b c))
