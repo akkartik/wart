@@ -102,8 +102,7 @@ bool process_args(int argc, const char* argv[]) {
 //// test harness
 
 void run_tests() {
-  time_t t;  time(&t);
-  cerr << "C tests: " << ctime(&t);
+  { time_t t;  time(&t); cerr << "C tests: " << ctime(&t); }
   for (unsigned long i=0; i < sizeof(Tests)/sizeof(Tests[0]); ++i) {
     START_TRACING_UNTIL_END_OF_SCOPE;
     setup();
@@ -114,7 +113,7 @@ void run_tests() {
   setup();
   cerr << "\nloading wart files...       (takes ~15 seconds)\n";
   load_files(".wart");  // after GC tests
-  cerr << "wart tests: " << ctime(&t);
+  { time_t t;  time(&t); cerr << "wart tests: " << ctime(&t); }
   load_files(".test");
 
   cerr << '\n';
