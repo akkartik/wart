@@ -58,6 +58,3 @@ def (strip_eval exprs)
     _.0  # macro body always has just one expr
       _.1  # strip away (eval .. caller_scope)
     list # re-enclose in body
-
-#? (update_optimized_body '+ +)
-#? exit 0
