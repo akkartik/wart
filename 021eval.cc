@@ -120,7 +120,7 @@ cell* eval(cell* expr, cell* scope) {
   TEMP(spliced_args, splice_args(cdr(expr), scope, fn));
   TEMP(ordered_args, reorder_keyword_args(spliced_args, sig(fn)));
   TEMP(new_scope, mkref(new_table()));
-  eval_bind_all(sig(fn), ordered_args, scope, new_scope);
+  eval_bind_all(sig(fn), ordered_args, scope, new_scope, is_macro(fn));
 
   if (car(expr) != new_sym("speculatively")
       && any_incomplete_eval(new_scope)) {
@@ -157,7 +157,7 @@ cell* eval(cell* expr, cell* scope) {
 // bind params to args in new_scope, taking into account:
 //  quoted params (eval'ing args as necessary; args is never quoted, though)
 //  destructured params
-void eval_bind_all(cell* params, cell* args, cell* scope, cell* new_scope) {
+void eval_bind_all(cell* params, cell* args, cell* scope, cell* new_scope, bool is_macro) {
   trace("eval/bind/all") << params << " <-> " << args;
   if (params == nil)
     return;
@@ -165,7 +165,7 @@ void eval_bind_all(cell* params, cell* args, cell* scope, cell* new_scope) {
   TEMP(args2, nil);
   if (is_quoted(params)) {
     params = strip_quote(params);
-    args2 = quote_all(args);  // already mkref'd
+    args2 = quote_all(args, is_macro);  // already mkref'd
     trace("eval/bind/all") << "stripping quote: " << params << " <-> " << args2;
   }
   else {
@@ -175,25 +175,25 @@ void eval_bind_all(cell* params, cell* args, cell* scope, cell* new_scope) {
 
   if (is_sym(params)) {
     cell* dummy = NULL;
-    eval_bind_rest(params, args2, &dummy, scope, new_scope);
+    eval_bind_rest(params, args2, &dummy, scope, new_scope, is_macro);
   }
 
   else if (!is_cons(params))
     ;
 
   else if (is_alias(params))
-    eval_bind_rest_aliases(params, args2, scope, new_scope);
+    eval_bind_rest_aliases(params, args2, scope, new_scope, is_macro);
 
   else {
     eval_bind_param(car(params), car(args2), scope, new_scope);
-    eval_bind_all(cdr(params), cdr(args2), scope, new_scope);
+    eval_bind_all(cdr(params), cdr(args2), scope, new_scope, is_macro);
   }
 }
 
-void eval_bind_rest(cell* param, cell* args, cell** cached_val, cell* scope, cell* new_scope) {
+void eval_bind_rest(cell* param, cell* args, cell** cached_val, cell* scope, cell* new_scope, bool is_macro) {
   trace("eval/bind/rest") << param << " <-> " << args;
   if (is_cons(param))
-    eval_bind_all(param, args, scope, new_scope);
+    eval_bind_all(param, args, scope, new_scope, is_macro);
 
   else {
     *cached_val = eval_all(args, scope);
@@ -224,7 +224,7 @@ void eval_bind_param(cell* param, cell* arg, cell* scope, cell* new_scope) {
   }
 }
 
-void eval_bind_rest_aliases(cell* params /* (| ...) */, cell* args, cell* scope, cell* new_scope) {
+void eval_bind_rest_aliases(cell* params /* (| ...) */, cell* args, cell* scope, cell* new_scope, bool is_macro) {
   trace("eval/bind/rest_aliases") << params << " <-> " << args;
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
@@ -233,7 +233,7 @@ void eval_bind_rest_aliases(cell* params /* (| ...) */, cell* args, cell* scope,
     if (cached_val)
       bind_params(car(aliases), cached_val, args, new_scope);
     else
-      eval_bind_rest(car(aliases), args, &cached_val, scope, new_scope);
+      eval_bind_rest(car(aliases), args, &cached_val, scope, new_scope, is_macro);
   }
 }
 
@@ -335,7 +335,7 @@ COMPILE_FN(symbolic_eval_args, compiledfn_symbolic_eval_args, "($expr)",
   TEMP(ordered_args, reorder_keyword_args(spliced_args, sig(fn)));
   Do_symbolic_eval.push(true);
     cell* bindings = mkref(new_table());
-    eval_bind_all(sig(fn), ordered_args, Curr_lexical_scope, bindings);
+    eval_bind_all(sig(fn), ordered_args, Curr_lexical_scope, bindings, is_macro(fn));
   Do_symbolic_eval.pop();
   return bindings;
 )
@@ -513,6 +513,7 @@ bool is_macro(cell* fn) {
   if (!is_cons(forms)) return false;
   if (cdr(forms) != nil) return false;
   cell* form = car(forms);
+  if (!is_cons(form)) return false;
   if (car(form) != sym_eval) return false;
   if (car(cdr(cdr(form))) != sym_caller_scope) return false;
   if (cdr(cdr(cdr(form))) != nil) return false;
@@ -753,9 +754,9 @@ cell* quote(cell* x) {
   return new_cons(sym_quote, x);
 }
 
-cell* quote_all(cell* x) {
+cell* quote_all(cell* x, bool is_macro) {
   cell* result = new_cell(), *curr = result;
   for (cell* iter = x; iter != nil; iter=cdr(iter), curr=cdr(curr))
-    add_cons(curr, quote(car(iter)));
+    add_cons(curr, quote(is_macro ? car(iter) : strip_already_evald(car(iter))));
   return drop_ptr(result);
 }

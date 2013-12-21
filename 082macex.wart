@@ -25,19 +25,9 @@ def (update_optimized_body var val)
         (map macex body.val))
     (rep.val 'optimized_body)
 
-def (tree_transform f x)
-  if ~cons?.x
-    (f x)
-    (cons (tree_transform f car.x)
-          (tree_transform f cdr.x))
-
 def (macex call env)
-  (transform
-    (converge (fn(_) (macex1 _ env))
-              call)
-    :thru
-      # Can a macro body ever legitimately contain ''?
-      (tree_transform strip_already_evald _))
+  (converge (fn(_) (macex1 _ env))
+            call)
 
 def (macex1 call env)
   backstopped_by call
