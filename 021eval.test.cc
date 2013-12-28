@@ -405,6 +405,7 @@ void test_eval_handles_already_evald_arg_quoted_param() {
   cell* arg = tag_already_evald(new_sym("a"));  // ''a but can't go through read
   append(call, new_cons(arg));
   In_macro.push(true);
+  CLEAR_TRACE;
   rmref(eval(call));
   CHECK_TRACE_CONTENTS("bind", "x: a");
   In_macro.pop();
@@ -609,9 +610,8 @@ void test_eval_binds_quoted_as_params() {
   new_dynamic_scope("x", new_num(3));
   run("((fn ('a | ('b)) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: (x)b: x");
-  end_dynamic_scope("x");
-  CHECK_TRACE_CONTENTS("eval", "'x");
   CHECK_TRACE_DOESNT_CONTAIN("eval", "x");
+  end_dynamic_scope("x");
 }
 
 void test_eval_handles_quoted_as_params() {
@@ -667,7 +667,6 @@ void test_eval_only_reorders_when_necessary() {
 void test_fn_evals_arg_only_when_necessary() {
   run("((fn ('a | (| 'b 'c)) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: (x)b: (x)c: (x)");
-  CHECK_TRACE_CONTENTS("eval", "'x");
   CHECK_TRACE_DOESNT_CONTAIN("eval", "x");
 }
 
@@ -676,7 +675,6 @@ void test_fn_evals_arg_only_when_necessary2() {
   run("((fn (| 'a ('b c)) 3) x y)");
   CHECK_TRACE_CONTENTS("bind", "a: (x y)b: xc: 3");
   CHECK_TRACE_DOESNT_CONTAIN("eval", "x");
-  CHECK_TRACE_CONTENTS("eval", "'x");
   CHECK_TRACE_CONTENTS("eval", "y");
   end_dynamic_scope("y");
 }
