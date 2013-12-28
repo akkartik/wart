@@ -244,8 +244,7 @@ void eval_bind_aliases(cell* params /* (| ...) */, cell* arg, cell* scope, cell*
   cell* cached_val = NULL;  // to ensure we don't multiply-eval
   for (cell *aliases=cdr(params), *alias=car(aliases); aliases != nil; aliases=cdr(aliases),alias=car(aliases)) {
     if (is_quoted(alias))
-      // TODO: take out strip_quote?
-      bind_params(strip_quote(alias), arg, NULL, new_scope);
+      bind_params(alias, arg, NULL, new_scope);
     else if (cached_val)
       bind_params(alias, cached_val, arg, new_scope);
     else if (is_alias(alias))
