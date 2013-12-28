@@ -102,7 +102,7 @@ bool process_args(int argc, const char* argv[]) {
 //// test harness
 
 void run_tests() {
-  { time_t t;  time(&t); cerr << "C tests: " << ctime(&t); }
+  cerr << time_string() << " C tests\n";
   for (unsigned long i=0; i < sizeof(Tests)/sizeof(Tests[0]); ++i) {
     START_TRACING_UNTIL_END_OF_SCOPE;
     setup();
@@ -111,9 +111,9 @@ void run_tests() {
   }
 
   setup();
-  cerr << "\nloading wart files...       (takes ~15 seconds)\n";
+  cerr << "\n" << time_string() << " loading wart files       (takes ~15 seconds)\n";
   load_files(".wart");  // after GC tests
-  { time_t t;  time(&t); cerr << "wart tests: " << ctime(&t); }
+  cerr << time_string() << " wart tests\n";
   load_files(".test");
 
   cerr << '\n';
@@ -168,4 +168,13 @@ void run(string s) {
 
 cell* read(string s) {
   return read(*new stringstream(s));
+}
+
+string time_string() {
+  time_t t;
+  time(&t);
+  char buffer[10];
+  if (!strftime(buffer, 10, "%H:%M:%S", localtime(&t)))
+    return "";
+  return buffer;
 }
