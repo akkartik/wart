@@ -27,8 +27,3 @@ mac (skipping_undefined_vars ... body)
        (stop_warning_on_undefined_var)
        (result <- (do ,@body))
        (warn_on_undefined_var)))
-
-(trace "abc" ((fn ('a) a) x))
-(inline `(,(tag function (table 'sig '('a) 'body '(a)))
-          x))
-exit 0

@@ -34,8 +34,13 @@
 
 (test "inline works with quoted rest params"
   :valueof (inline `(,(tag function (table 'sig ''a 'body '(a)))
-                     x))
-  :should be '(('x)))
+                     x y))
+  :should be '('(x y)))
+
+(test "inline works with quoted rest params - 2"
+  :valueof (inline `(,(tag function (table 'sig ''a 'body '((car a))))
+                     x y))
+  :should be '((car '(x y))))
 
 (test "inline works with keyword args"
   :valueof (inline `(,(tag function (table 'sig '(a b) 'body '((cons a b))))

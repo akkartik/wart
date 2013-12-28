@@ -120,12 +120,7 @@ cell* eval(cell* expr, cell* scope) {
   TEMP(spliced_args, splice_args(cdr(expr), scope, fn));
   TEMP(ordered_args, reorder_keyword_args(spliced_args, sig(fn)));
   TEMP(new_scope, mkref(new_table()));
-  trace("abc") << "AA: " << sig(fn) << " " << ordered_args << "\n";
   eval_bind_all(sig(fn), ordered_args, scope, new_scope, is_macro(fn));
-  trace("abc") << "BB: " << new_scope << "\n";
-  cell_map t = to_table(new_scope)->value;
-  for (cell_map::iterator p = t.begin(); p != t.end(); ++p)
-    trace("abc") << "  " << p->first << ": " << p->second << "\n";
 
   if (car(expr) != new_sym("speculatively")
       && any_incomplete_eval(new_scope)) {
@@ -263,11 +258,19 @@ void bind_params(cell* params, cell* args, cell* unevald_args, cell* new_scope, 
   bind_params(params, args, unevald_args, new_scope, is_macro, false);
 }
 
+stack<bool> Do_symbolic_eval;
+
 // unevald_args might be NULL if params is quoted
 void bind_params(cell* params, cell* args, cell* unevald_args, cell* new_scope, bool is_macro, bool params_quoted) {
   trace("eval/bind/one") << params << " <-> " << args;
-  if (is_quoted(params))
-    bind_params(strip_quote(params), unevald_args ? unevald_args : args, NULL, new_scope, is_macro, true);
+  if (is_quoted(params)) {
+    TEMP(correct_args, nil);
+    if (Do_symbolic_eval.empty() || !Do_symbolic_eval.top())
+      correct_args = mkref(unevald_args ? unevald_args : args);
+    else
+      correct_args = mkref(quote(unevald_args ? unevald_args : args));
+    bind_params(strip_quote(params), correct_args, NULL, new_scope, is_macro, true);
+  }
 
   else if (params == nil)
     ;
@@ -319,8 +322,6 @@ cell* eval_all(cell* args, cell* scope) {
   return drop_ptr(p_result);
 }
 
-stack<bool> Do_symbolic_eval;
-
 // eval, but always strip '' regardless of in_macro()
 cell* eval_arg(cell* arg, cell* scope) {
   trace("already_evald") << "eval_arg " << arg;
@@ -341,12 +342,7 @@ COMPILE_FN(symbolic_eval_args, compiledfn_symbolic_eval_args, "($expr)",
   TEMP(ordered_args, reorder_keyword_args(spliced_args, sig(fn)));
   Do_symbolic_eval.push(true);
     cell* bindings = mkref(new_table());
-    cerr << "AA: " << sig(fn) << " " << ordered_args << "\n";
     eval_bind_all(sig(fn), ordered_args, Curr_lexical_scope, bindings, is_macro(fn));
-    cerr << "BB: " << bindings << "\n";
-    cell_map t = to_table(bindings)->value;
-    for (cell_map::iterator p = t.begin(); p != t.end(); ++p)
-      cerr << "  " << p->first << ": " << p->second << "\n";
   Do_symbolic_eval.pop();
   return bindings;
 )
