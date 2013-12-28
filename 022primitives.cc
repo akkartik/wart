@@ -107,6 +107,7 @@ COMPILE_FN(num_bindings, compiledfn_num_bindings, "($var)",
 //// macros
 
 COMPILE_FN(eval, compiledfn_eval, "('$x $scope)",
+  // assuming all calls to eval indicate a macro seems sufficient for now
   In_macro.push(true);
   // sidestep eval_args for x to handle @args
   cell* x = eval(lookup("$x"), Curr_lexical_scope);
