@@ -165,118 +165,117 @@ cell* eval(cell* expr, cell* scope) {
 void eval_bind_all(cell* params, cell* args, cell* scope, cell* new_scope, bool is_macro) {
   trace("eval/bind/all") << params << " <-> " << args;
   if (params == nil)
-    ;
+    return;
 
-  else if (is_sym(strip_quote(params))) {
-    cell* dummy = NULL;
-    eval_bind_rest(params, args, &dummy, scope, new_scope, is_macro);
+  TEMP(args2, nil);
+  if (is_quoted(params)) {
+    params = strip_quote(params);
+    args2 = quote_all(args, is_macro);  // already mkref'd
+    trace("eval/bind/all") << "stripping quote: " << params << " <-> " << args2;
+  }
+  else {
+    args2 = mkref(args);
+    trace("eval/bind/all") << " args nrefs: " << args2->nrefs;
   }
 
-  else if (!is_cons(strip_quote(params)))
+  if (is_sym(params)) {
+    cell* dummy = NULL;
+    eval_bind_rest(params, args2, &dummy, scope, new_scope);
+  }
+
+  else if (!is_cons(params))
     ;
 
-  else if (is_alias(strip_quote(params)))
-    eval_bind_rest_aliases(params, args, scope, new_scope, is_macro);
-
-  else if (is_quoted(params))
-    bind_params(params, args, NULL, new_scope, is_macro);
+  else if (is_alias(params))
+    eval_bind_rest_aliases(params, args2, scope, new_scope);
 
   else {
-    eval_bind_param(car(params), car(args), scope, new_scope, is_macro);
-    eval_bind_all(cdr(params), cdr(args), scope, new_scope, is_macro);
+    eval_bind_param(car(params), car(args2), scope, new_scope);
+    eval_bind_all(cdr(params), cdr(args2), scope, new_scope, false);
   }
 }
 
-void eval_bind_rest(cell* param, cell* args, cell** cached_val, cell* scope, cell* new_scope, bool is_macro) {
+void eval_bind_rest(cell* param, cell* args, cell** cached_val, cell* scope, cell* new_scope) {
   trace("eval/bind/rest") << param << " <-> " << args;
-
-  if (is_quoted(param))
-    bind_params(param, args, NULL, new_scope, is_macro);
-
-  else if (is_cons(param))
-    eval_bind_all(param, args, scope, new_scope, is_macro);
+  if (is_cons(param))
+    eval_bind_all(param, args, scope, new_scope, false);
 
   else {
     *cached_val = eval_all(args, scope);
-    bind_params(param, *cached_val, args, new_scope, is_macro);
+    bind_params(param, *cached_val, args, new_scope);
     rmref(*cached_val);
   }
 }
 
-void eval_bind_param(cell* param, cell* arg, cell* scope, cell* new_scope, bool is_macro) {
+void eval_bind_param(cell* param, cell* arg, cell* scope, cell* new_scope) {
   trace("eval/bind/param") << param << " <-> " << arg;
+  TEMP(arg2, nil);
+  if (is_quoted(param)) {
+    param = strip_quote(param);
+    arg2 = mkref(new_cons(sym_quote, arg));
+  }
+  else
+    arg2 = mkref(arg);
 
-  if (is_quoted(param))
-    bind_params(param, arg, NULL, new_scope, is_macro);
-
-  else if (is_alias(param))
-    eval_bind_aliases(param, arg, scope, new_scope, is_macro);
+  if (is_alias(param))
+    eval_bind_aliases(param, arg2, scope, new_scope);
 
   else {
-    TEMP(val, eval_arg(arg, scope));
+    TEMP(val, eval_arg(arg2, scope));
     if (is_incomplete_eval(val) && is_cons(param))
       add_lexical_binding(param, val, new_scope);
     else
-      bind_params(param, val, arg, new_scope, is_macro);
+      bind_params(param, val, arg2, new_scope);
   }
 }
 
-void eval_bind_rest_aliases(cell* params /* (| ...) */, cell* args, cell* scope, cell* new_scope, bool is_macro) {
+void eval_bind_rest_aliases(cell* params /* (| ...) */, cell* args, cell* scope, cell* new_scope) {
   trace("eval/bind/rest_aliases") << params << " <-> " << args;
-  if (is_quoted(params)) {
-    bind_aliases(strip_quote(params), args, NULL, new_scope, is_macro, /*params quoted*/true);
-    return;
-  }
-
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
   cell* cached_val = NULL;  // to ensure we don't multiply-eval
   for (cell* aliases = cdr(params); aliases != nil; aliases=cdr(aliases)) {
     if (cached_val)
-      bind_params(car(aliases), cached_val, args, new_scope, is_macro);
+      bind_params(car(aliases), cached_val, args, new_scope);
     else
-      eval_bind_rest(car(aliases), args, &cached_val, scope, new_scope, is_macro);
+      eval_bind_rest(car(aliases), args, &cached_val, scope, new_scope);
   }
 }
 
-void eval_bind_aliases(cell* params /* (| ...) */, cell* arg, cell* scope, cell* new_scope, bool is_macro) {
+void eval_bind_aliases(cell* params /* (| ...) */, cell* arg, cell* scope, cell* new_scope) {
   trace("eval/bind/aliases") << params << " <-> " << arg;
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
   cell* cached_val = NULL;  // to ensure we don't multiply-eval
   for (cell *aliases=cdr(params), *alias=car(aliases); aliases != nil; aliases=cdr(aliases),alias=car(aliases)) {
     if (is_quoted(alias))
-      bind_params(alias, arg, NULL, new_scope, is_macro);
+      bind_params(alias, arg, NULL, new_scope);
     else if (cached_val)
-      bind_params(alias, cached_val, arg, new_scope, is_macro);
+      bind_params(alias, cached_val, arg, new_scope);
     else if (is_alias(alias))
-      eval_bind_aliases(alias, arg, scope, new_scope, is_macro);
+      eval_bind_aliases(alias, arg, scope, new_scope);
     else {
       cached_val = eval_arg(arg, scope);
-      bind_params(alias, cached_val, arg, new_scope, is_macro);
+      bind_params(alias, cached_val, arg, new_scope);
       rmref(cached_val);
     }
   }
 }
 
-void bind_params(cell* params, cell* args, cell* unevald_args, cell* new_scope, bool is_macro) {
-  bind_params(params, args, unevald_args, new_scope, is_macro, false);
-}
-
-// unevald_args might be NULL if params is quoted
-void bind_params(cell* params, cell* args, cell* unevald_args, cell* new_scope, bool is_macro, bool params_quoted) {
+void bind_params(cell* params, cell* args, cell* unevald_args, cell* new_scope) {
   trace("eval/bind/one") << params << " <-> " << args;
-  if (is_quoted(params))
-    bind_params(strip_quote(params), unevald_args ? unevald_args : args, NULL, new_scope, is_macro, true);
+  if (is_quoted(params)) {
+    if (unevald_args)
+      bind_params(strip_quote(params), unevald_args, NULL, new_scope);
+    else
+      bind_params(strip_quote(params), args, NULL, new_scope);
+  }
 
   else if (params == nil)
     ;
 
   else if (is_sym(params)) {
     trace("eval/bind/one") << "binding " << params << " to " << args;
-    // don't bother suppressing eval if param is quoted in a non-macro
-    // (it might be a definition generated by macex)
-    if (!is_macro && params_quoted) args = strip_already_evald(args);
     add_lexical_binding(params, args, new_scope);
   }
 
@@ -284,26 +283,26 @@ void bind_params(cell* params, cell* args, cell* unevald_args, cell* new_scope, 
     ;
 
   else if (is_alias(params))
-    bind_aliases(params, args, unevald_args, new_scope, is_macro, params_quoted);
+    bind_aliases(params, args, unevald_args, new_scope);
 
   else if (args != nil && !is_cons(args))
     // cons params and non-cons arg; fall through to next alias
-    bind_params(params, nil, nil, new_scope, is_macro, params_quoted);
+    bind_params(params, nil, nil, new_scope);
 
   else {
     TEMP(ordered_args, reorder_keyword_args(args, params));
-    bind_params(car(params), car(ordered_args), unevald_args && is_cons(unevald_args) ? car(unevald_args) : unevald_args, new_scope, is_macro, params_quoted);
-    bind_params(cdr(params), cdr(ordered_args), unevald_args && is_cons(unevald_args) ? cdr(unevald_args) : unevald_args, new_scope, is_macro, params_quoted);
+    bind_params(car(params), car(ordered_args), unevald_args && is_cons(unevald_args) ? car(unevald_args) : unevald_args, new_scope);
+    bind_params(cdr(params), cdr(ordered_args), unevald_args && is_cons(unevald_args) ? cdr(unevald_args) : unevald_args, new_scope);
   }
 }
 
-void bind_aliases(cell* params /* (| ...) */, cell* arg, cell* unevald_arg, cell* new_scope, bool is_macro, bool params_quoted) {
+void bind_aliases(cell* params /* (| ...) */, cell* arg, cell* unevald_arg, cell* new_scope) {
   trace("eval/bind/one_aliases") << params << " <-> " << arg;
   if (len(params) <= 2)
     RAISE << "just one param alias: " << params << ". Are you sure?\n";
   for (cell* aliases=cdr(params); aliases != nil; aliases=cdr(aliases))
     if (!unsafe_get(new_scope, car(aliases)))  // skip duplicate destructured aliases
-      bind_params(car(aliases), arg, unevald_arg, new_scope, is_macro, params_quoted);
+      bind_params(car(aliases), arg, unevald_arg, new_scope);
 }
 
 //// eval args - while respecting already_evald and Do_symbolic_eval
@@ -610,10 +609,10 @@ cell* process_unquotes(cell* x, long depth, cell* scope) {
 }
 
 cell* maybe_strip_already_evald(bool keep_already_evald, cell* x) {
-  trace("already_evald") << "maybe_strip_already_evald " << keep_already_evald << " " << x;
-  trace("already_evald") << "Skipped_already_evald used to be " << Skipped_already_evald;
+  trace("eval/already_evald") << "maybe_strip_already_evald " << keep_already_evald << " " << x;
+  trace("eval/already_evald") << "Skipped_already_evald used to be " << Skipped_already_evald;
   Skipped_already_evald = is_already_evald(x);
-  trace("already_evald") << "Skipped_already_evald is now " << Skipped_already_evald;
+  trace("eval/already_evald") << "Skipped_already_evald is now " << Skipped_already_evald;
   return keep_already_evald ? x : strip_already_evald(x);
 }
 
@@ -763,4 +762,13 @@ bool is_alias(cell* l) {
 
 cell* quote(cell* x) {
   return new_cons(sym_quote, x);
+}
+
+cell* quote_all(cell* x, bool is_macro) {
+  cell* result = new_cell(), *curr = result;
+  for (cell* iter = x; iter != nil; iter=cdr(iter), curr=cdr(curr))
+    // don't bother suppressing eval if entire sig is quoted in a non-macro
+    // (it might be a definition generated by macex)
+    add_cons(curr, quote(is_macro ? car(iter) : strip_already_evald(car(iter))));
+  return drop_ptr(result);
 }
