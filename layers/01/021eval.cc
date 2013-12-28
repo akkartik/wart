@@ -152,6 +152,7 @@ cell* eval(cell* expr, cell* scope) {
 // bind params to args in new_scope, taking into account:
 //  quoted params (eval'ing args as necessary; args is never quoted, though)
 //  destructured params
+//  aliased params
 void eval_bind_all(cell* params, cell* args, cell* scope, cell* new_scope) {
   trace("eval/bind/all") << params << " <-> " << args;
   if (params == nil)
