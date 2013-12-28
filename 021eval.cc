@@ -277,11 +277,12 @@ void bind_params(cell* params, cell* args, cell* unevald_args, cell* new_scope) 
   else if (!is_cons(params))
     ;
 
-  else if (!is_alias(params) && args != nil && !is_cons(args))
-    bind_params(params, nil, nil, new_scope);
-
   else if (is_alias(params))
     bind_aliases(params, args, unevald_args, new_scope);
+
+  else if (args != nil && !is_cons(args))
+    // cons params and non-cons arg; fall through to next alias
+    bind_params(params, nil, nil, new_scope);
 
   else {
     TEMP(ordered_args, reorder_keyword_args(args, params));
