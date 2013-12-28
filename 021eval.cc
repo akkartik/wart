@@ -322,8 +322,7 @@ stack<bool> Do_symbolic_eval;
 cell* eval_arg(cell* arg, cell* scope) {
   trace("already_evald") << "eval_arg " << arg;
   if (is_already_evald(arg)) return mkref(strip_already_evald(arg));
-  if (Do_symbolic_eval.empty()) Do_symbolic_eval.push(false);
-  if (Do_symbolic_eval.top()) return mkref(arg);
+  if (!Do_symbolic_eval.empty() && Do_symbolic_eval.top()) return mkref(arg);
   return eval(arg, scope);
 }
 
@@ -336,17 +335,17 @@ COMPILE_FN(symbolic_eval_args, compiledfn_symbolic_eval_args, "($expr)",
   }
   TEMP(spliced_args, splice_args(cdr(expr), Curr_lexical_scope, fn));
   TEMP(ordered_args, reorder_keyword_args(spliced_args, sig(fn)));
+  cell* bindings = new_table();
   Do_symbolic_eval.push(true);
-    cell* bindings = mkref(new_table());
     eval_bind_all(sig(fn), ordered_args, Curr_lexical_scope, bindings, is_macro(fn));
   Do_symbolic_eval.pop();
-  return bindings;
+  return mkref(bindings);
 )
 
 cell* pick_and_maybe_quote(cell* args, cell* unevald_args) {
   cell* result = unevald_args ? unevald_args : args;
   if (!Do_symbolic_eval.empty() && Do_symbolic_eval.top())
-    result = quote(result);
+    result = new_cons(sym_quote, result);
   return mkref(result);
 }
 
@@ -727,10 +726,11 @@ bool is_fn(cell* x) {
   return is_cons(x) && type(x) == sym_function;
 }
 
+// x must have a dangling ref which will be moved to the result
 cell* to_fn(cell* x) {
   if (x == nil || is_fn(x)) return x;
   if (is_incomplete_eval(x)) return x;
-  lease_cell lease(x);  // we assume x is already mkref'd
+  lease_cell lease(x);
   if (!lookup_dynamic_binding(sym_Coercions)) {
     RAISE << "tried to call " << x << '\n' << die();
     return nil;
@@ -758,8 +758,4 @@ cell* env(cell* fn) {
 
 bool is_alias(cell* l) {
   return is_cons(l) && car(l) == sym_param_alias;
-}
-
-cell* quote(cell* x) {
-  return new_cons(sym_quote, x);
 }
