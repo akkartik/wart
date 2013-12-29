@@ -399,6 +399,7 @@ void test_eval_handles_already_evald_arg() {
   end_dynamic_scope("a");
 }
 
+// quoted param, deep inside macro call, immediately inside non-macro
 void test_eval_handles_already_evald_arg_quoted_param() {
   new_dynamic_scope("a", new_num(3));
   TEMP(call, read("((fn '(x) 3))"));
@@ -412,11 +413,52 @@ void test_eval_handles_already_evald_arg_quoted_param() {
   end_dynamic_scope("a");
 }
 
+// quoted rest param, deep inside macro call, immediately inside non-macro
 void test_eval_handles_already_evald_arg_quoted_rest_param() {
   new_dynamic_scope("a", new_num(3));
   TEMP(call, read("((fn 'x 3))"));
   cell* arg = tag_already_evald(new_sym("a"));  // ''a but can't go through read
   append(call, new_cons(arg));
+  In_macro.push(true);
+  CLEAR_TRACE;
+  rmref(eval(call));
+  CHECK_TRACE_CONTENTS("bind", "x: (a)");
+  In_macro.pop();
+  end_dynamic_scope("a");
+}
+
+// quoted rest param, deep inside macro call, immediately inside macro
+void test_eval_handles_already_evald_arg_quoted_rest_param2() {
+  new_dynamic_scope("a", new_num(3));
+  TEMP(call, read("((fn 'x (eval 3 caller_scope)))"));
+  cell* arg = tag_already_evald(new_sym("a"));  // ''a but can't go through read
+  append(call, new_cons(arg));
+  In_macro.push(true);
+  CLEAR_TRACE;
+  rmref(eval(call));
+  CHECK_TRACE_CONTENTS("bind", "x: (''a)");
+  In_macro.pop();
+  end_dynamic_scope("a");
+}
+
+void test_eval_handles_already_evald_list_arg_quoted_param() {
+  new_dynamic_scope("a", new_num(3));
+  TEMP(call, read("((fn '(x) 3))"));
+  TEMP(arg, read("(a)"));
+  append(call, new_cons(tag_already_evald(arg)));  // ''(a) but can't go through read
+  In_macro.push(true);
+  CLEAR_TRACE;
+  rmref(eval(call));
+  CHECK_TRACE_CONTENTS("bind", "x: (a)");
+  In_macro.pop();
+  end_dynamic_scope("a");
+}
+
+void test_eval_handles_already_evald_list_arg_unquoted_param() {
+  new_dynamic_scope("a", new_num(3));
+  TEMP(call, read("((fn (x) 3))"));
+  TEMP(arg, read("(a)"));
+  append(call, new_cons(tag_already_evald(arg)));  // ''(a) but can't go through read
   In_macro.push(true);
   CLEAR_TRACE;
   rmref(eval(call));
@@ -452,9 +494,11 @@ void test_eval_splice_on_macros_with_backquote() {
   run("(a <- 3) (b <- 4)");
   run("args <- '(a b)");
   Hide_warnings = true;
+  CLEAR_TRACE;
   run("m @args");
   CHECK_TRACE_TOP("eval", "=> (a ... b)");  // spliced args override quoted params
   CHECK_TRACE_DOESNT_WARN();
+//?   DUMP("abc");
   end_dynamic_scope("args");
   end_dynamic_scope("b");
   end_dynamic_scope("a");
@@ -462,6 +506,7 @@ void test_eval_splice_on_macros_with_backquote() {
 }
 
 void test_eval_splice_on_backquoteless_macros_warns() {
+//?   exit(0);
   run("m <- (fn '(x y) (eval (cons 'cons (cons x (cons y nil))) caller_scope))");
   run("(a <- 3) (b <- 4)");
   run("args <- '(a b)");
