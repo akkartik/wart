@@ -166,10 +166,6 @@ def (map f|with ... seqs|over) :case cdr.seqs
     (cons (f @(map car seqs))
           (map f @(map cdr seqs)))
 
-#? (map list '(1 2 3) '(2 4 6) '(3 6 9))
-#? #? (trace "abc" (map list '(1 2 3) '(2 4 6) '(3 6 9)))
-#? exit 0
-
 def (reduce f seq init)  # f is a binary op
   if no.seq
        init
