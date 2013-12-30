@@ -760,10 +760,8 @@ bool is_alias(cell* l) {
 }
 
 cell* strip_all_already_evald(cell* x) {
-  if (!is_cons(x)) return mkref(x);
-  if (is_quoted(x)) return mkref(x);
-  if (is_object(x)) return mkref(x);
   if (is_already_evald(x)) return mkref(strip_already_evald(x));
+  if (!contains_already_evald(x)) return mkref(x);
   cell* result = new_cell(), *curr = result;
   for (cell* iter = x; iter != nil; iter=cdr(iter), curr=cdr(curr)) {
     if (!is_cons(iter) || is_already_evald(iter)) {
@@ -773,4 +771,13 @@ cell* strip_all_already_evald(cell* x) {
     add_cons(curr, strip_already_evald(car(iter)));
   }
   return drop_ptr(result);
+}
+
+bool contains_already_evald(cell* x) {
+  if (!is_cons(x)) return false;
+  if (is_already_evald(x)) return true;
+  if (is_quoted(x)) return false;
+  if (is_object(x)) return false;
+  return is_already_evald(car(x))
+      || contains_already_evald(cdr(x));
 }
