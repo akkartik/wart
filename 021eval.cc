@@ -440,7 +440,7 @@ cell* args_in_param_order(cell* params, cell* non_keyword_args, cell* keyword_ar
       cell* param = is_alias(params) ? car(cdr(params)) : params;
       cell* keyword_value = unsafe_get(keyword_args, param);
       set_cdr(curr, keyword_value ? keyword_value : non_keyword_args);
-      break;
+      return drop_ptr(p_reconstituted_args);
     }
   }
   if (non_keyword_args != nil)
