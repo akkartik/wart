@@ -106,6 +106,7 @@ void run_tests() {
   for (unsigned long i=0; i < sizeof(Tests)/sizeof(Tests[0]); ++i) {
     START_TRACING_UNTIL_END_OF_SCOPE;
     setup();
+    CLEAR_TRACE;
     (*Tests[i])();
     verify();
   }

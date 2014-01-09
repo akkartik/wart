@@ -36,7 +36,6 @@ void test_tokenize_handles_quote_comma() {
 }
 
 void test_tokenize_handles_quote_comma_paren() {
-  CLEAR_TRACE;
   read_all("(',a)");
   CHECK_TRACE_CONTENTS("tokenize", ":0(',a)");
 }

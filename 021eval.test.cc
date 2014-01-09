@@ -633,13 +633,11 @@ void test_eval_binds_as_params_recursively() {
 }
 
 void test_eval_binds_as_params_recursively_using_keyword_args() {
-  CLEAR_TRACE;
   run("((fn (a | (b ... (c | (d e)))) 3) 1 :e 2 3)");
   CHECK_TRACE_CONTENTS("bind", "a: (1 :e 2 3)b: 1c: (:e 2 3)d: 3e: 2");
 }
 
 void test_eval_binds_quoted_as_params_recursively_using_keyword_args() {
-  CLEAR_TRACE;
   run("((fn ('a | (b|c)) 3) :b 1)");
   CHECK_TRACE_CONTENTS("bind", "a: (1)b: 1");
 }
