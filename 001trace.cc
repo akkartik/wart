@@ -150,6 +150,7 @@ void parse_contents(const string& s, const string& delim, string* prefix, string
 void parse_layer_and_frame(const string& orig, string* layer, string* frame) {
   size_t last_slash = orig.rfind('/');
   if (last_slash == NOT_FOUND
+      || last_slash == orig.size()-1  // trailing slash indicates hierarchical layer
       || orig.find_last_not_of("0123456789") != last_slash) {
     *layer = orig;
     *frame = "";
