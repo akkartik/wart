@@ -30,11 +30,11 @@ let ($=) (=)  # ignore later refinements
   def (isa 'Type x)
     ($= type.x Type)
 
-  def! ($a = $b)
-    (or ($a $= $b)
-        (and cons?.$a cons?.$b  # default for objects
-             (car.$a = car.$b)
-             (cdr.$a = cdr.$b)))
+  def! (a = b)
+    (or (a $= b)
+        (and cons?.a cons?.b  # default for objects
+             (car.a = car.b)
+             (cdr.a = cdr.b)))
 
 # can't use '!=' because '!' is not an infix char
 # '=' signals comparison; '<>' seems similar to '<-'

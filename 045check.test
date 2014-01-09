@@ -171,6 +171,11 @@
   :valueof ('(type foo 3) = '(type foo 3))
   :should be_true)
 
+(test "equality handles keyword syms"
+  :valueof (let x :a  # also a keyword arg for '=
+             (x = x))
+  :should be_true)
+
 
 
 (test "default works"

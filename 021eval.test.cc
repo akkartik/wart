@@ -615,9 +615,38 @@ void test_eval_binds_as_params() {
   CHECK_TRACE_CONTENTS("bind", "a: (1 2)b: 1c: 2");
 }
 
+void test_eval_binds_as_params_with_keyword_args() {
+  run("((fn (a | (b c)) 3) 1 :b 2)");
+  CHECK_TRACE_CONTENTS("bind", "a: (2 1)b: 2c: 1");
+}
+
+void test_eval_warns_on_keyword_args_for_conflicting_aliases() {
+  Hide_warnings = true;
+  run("((fn (a|b c|d) 3) :c 1 :d 2)");
+  CHECK_TRACE_WARNS();
+  CHECK_TRACE_CONTENTS("bind", "a: (:d 1)a: :db: :dc: 1d: 1");
+}
+
 void test_eval_binds_as_params_recursively() {
   run("((fn (a | (b ... (c | (d e)))) 3) 1 2 3)");
   CHECK_TRACE_CONTENTS("bind", "a: (1 2 3)b: 1c: (2 3)d: 2e: 3");
+}
+
+void test_eval_binds_as_params_recursively_using_keyword_args() {
+  CLEAR_TRACE;
+  run("((fn (a | (b ... (c | (d e)))) 3) 1 :e 2 3)");
+  CHECK_TRACE_CONTENTS("bind", "a: (1 :e 2 3)b: 1c: (:e 2 3)d: 3e: 2");
+}
+
+void test_eval_binds_quoted_as_params_recursively_using_keyword_args() {
+  CLEAR_TRACE;
+  run("((fn ('a | (b|c)) 3) :b 1)");
+  CHECK_TRACE_CONTENTS("bind", "a: (1)b: 1");
+}
+
+void test_eval_binds_quoted_rest_as_params_recursively_using_keyword_args() {
+  run("((fn ('a | (b ... (c | (d e)))) 3) 1 :e 2 3)");
+  CHECK_TRACE_CONTENTS("bind", "a: (1 :e 2 3)b: 1c: (:e 2 3)d: 3e: 2");
 }
 
 void test_eval_binds_quoted_as_params() {

@@ -18,26 +18,16 @@ let $mac mac
 
 mac (def (name ... params) ... body) :case (car.body = :case)
   `(let $old ,name
-     (def! (,name ... ($params | ,params))
-       (if ,cadr.body
-         (do ,@cddr.body)
-         ($old @$params))))
-
-
-
-## def with selectively quoted params
-# We could just always use this, but it's faster to avoid the extra eval if
-# possible.
-
-mac (def (name ... params) ... body) :case (and (car.body = :case)
-                                                (mem? quote params))
-  `(let $old ,name
      # keep $params uneval'd in case any params are quoted
      (def! (,name ... ('$params | ,params))
        (let $caller_scope caller_scope
          (if ,cadr.body
            (do ,@cddr.body)
            (eval `(,$old ,@$params) $caller_scope)))))
+
+
+
+## rudimentary pattern matching for symbol constants
 
 def (mem? x tree)
   if (predicate.x tree)
@@ -47,10 +37,6 @@ def (mem? x tree)
            (mem? x cdr.tree))
      :else
        false
-
-
-
-## rudimentary pattern matching for symbol constants
 
 def (literal? x)
   (or backquote?.x
