@@ -1,0 +1,42 @@
+A cross-table of all the different types of params and args wart supports, with
+a test example of each.
+Eventually I'd like to code-generate tests out of this file.
+
+x = 1, y = 2, z = 3
+
+{Param Vararg Rest Quoted Destructured Alias} x {Literal Extra Keyword Unknown-keyword Spliced Incomplete-eval} arg
+
+type    params          args            bindings
+
+P    .  (a)             (x)             a -> 1
+2    .  (a b)           (x y)           a -> 1, b -> 2
+E    .  (a b)           (x y z)         a -> 1, b -> 1, no eval on z
+V    .  args            (x y z)         args -> (1 2 3)
+R    .  (a ... b)       (x y)           a -> 1, b -> (2)
+D    .  ((a b))         ((x y))         a -> 1, b -> 2
+
+PQ   .  '(a)            (x)             a -> x
+2Q   .  '(a b)          (x y)           a -> x, b -> y
+EQ   .  '(a b)          (x y z)         a -> x, b -> y
+VQ   .  'args           (x y z)         args -> (x y z)
+RQ   .  '(a ... b)      (x y)           a -> x, b -> (y)
+DQ   .  '((a b))        ((x y))         a -> x, b -> y
+
+PQK  .  '(a)            (:a x)          a -> x
+2QK  .  '(a b)          (x :a y)        a -> y, b -> x
+EQK  .  '(a b)          (x :a y z)      a -> y, b -> x
+ -   .  '(a b)          (x :a y :b z)   a -> y, b -> z
+VQK  x  'args           (x :args y z)   args -> (y z)
+RQK  .  '(a ... b)      (x :a y)        a -> y, b -> (x)
+DQK  .  '((a b))        ((x :a y))      a -> y, b -> x
+
+PK   .  (a)             (:a x)          a -> 1
+2K   .  (a b)           (x :a y)        a -> 2, b -> 1
+EK   .  (a b)           (x :a y z)      a -> 2, b -> 1
+ -   .  (a b)           (x :a y :b z)   a -> 2, b -> 3, no eval on x
+VK   x  args            (x :args y z)   args -> (2 3)
+RK   .  (a ... b)       (x :a y)        a -> 2, b -> (1)
+DK   .  ((a b))         (`(,x :a ,y))   a -> 2, b -> 1
+ -   x  ((a b))         ('(x :a y))     a -> x, b -> :a
+
+vim:sts=8:ts=8:sw=8:et:tw&
