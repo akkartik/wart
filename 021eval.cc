@@ -745,8 +745,7 @@ cell* to_fn(cell* x) {
     RAISE << "tried to call " << x << '\n' << die();
     return nil;
   }
-  cell* result = coerce_quoted(x, sym_function, lookup(sym_Coercions));
-  return result;
+  return coerce_quoted(x, sym_function, lookup(sym_Coercions));
 }
 
 cell* sig(cell* fn) {
