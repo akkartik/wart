@@ -1,7 +1,0 @@
-(test "pair works"
-  :valueof (pair '(1 2 3 4 5))
-  :should be '((1 2) (3 4) (5)))
-
-(test "map works"
-  :valueof (map num? '(1 2 3))
-  :should be '(number number number))
