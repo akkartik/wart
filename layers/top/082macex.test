@@ -1,0 +1,47 @@
+mac (foomex x)
+  `(+ ,x 1)
+(test "macex1 works"
+  :valueof (macex1 '(foomex a))
+  :should be '(+ a 1))
+
+mac (foomex2 x)
+  pr 3
+  `(+ ,x 1)
+(test "macex1 has macro-time side-effects"
+  :valueof (with outstring (macex1 '(foomex2 a)))
+  :should be "3")
+
+mac (foomex3 ... args)
+  if cdr.args
+    `(+ ,car.args ,cadr.args)
+    `(+ ,car.args 1)
+(test "macex1 handles conditionals on the structure of the arg"
+  :valueof (macex1 '(foomex3 a))
+  :should be `(+ a 1))
+(test "macex1 handles conditionals on the structure of the arg - 2"
+  :valueof (macex1 '(foomex3 a b))
+  :should be `(+ a b))
+
+(test "macex works"
+  :valueof (macex 'a.b)
+  :should be '(a b))
+
+(pending_test "macex expands multiple macros"
+  :valueof (macex 'a&~b.c)
+  :should be '((a & ~b) c))
+
+(test "macex is robust to non-macros"
+  :valueof (macex 42)
+  :should be 42)
+
+(test "macex is robust to non-macros - 2"
+  :valueof (macex '(car x))
+  :should be '(car x))
+
+(test "macex is robust to non-macros - 3"
+  :valueof (macex '(object foo 34))
+  :should be '(object foo 34))
+
+(test "macex is robust to non-macros - 3"
+  :valueof (macex '(a b c))
+  :should be '(a b c))

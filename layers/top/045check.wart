@@ -1,0 +1,96 @@
+let $if if
+  mac! (if ... args)
+    $if ~cdr.args
+      car.args
+      `(,$if ,car.args
+         ,cadr.args
+         (if ,@cddr.args))
+
+mac (or ... args)
+  if args
+    `(let $x ,car.args
+       (if $x
+         $x
+         (or ,@cdr.args)))
+    false
+
+mac (backstopped_by default ... rest)
+  `(or ,@rest ,default)
+
+mac (and ... args)
+  if no.args
+    1
+    if ~cdr.args
+      car.args
+      `(if ,car.args
+         (and ,@cdr.args)
+         false)
+
+let ($=) (=)  # ignore later refinements
+  def (isa 'Type x)
+    ($= type.x Type)
+
+  def! ($a = $b)
+    (or ($a $= $b)
+        (and cons?.$a cons?.$b  # default for objects
+             (car.$a = car.$b)
+             (cdr.$a = cdr.$b)))
+
+# can't use '!=' because '!' is not an infix char
+# '=' signals comparison; '<>' seems similar to '<-'
+alias (~=) ~equal
+
+mac (default var val|to)
+  `(or ,var
+       (,var <- ,val))
+
+def (match? a b bindings)
+  default bindings :to (table)  # used in later refinements
+  (or (a = b)
+      (a = '_)  # _ matches anything
+      (and cons?.a cons?.b  # default for objects
+           (match? car.a car.b bindings)
+           (match? cdr.a cdr.b bindings)))
+
+def (only f)
+  (fn args
+    (if f (f @args)))
+
+mac (check x test else)
+  `(let $x ,x
+     (if (,test $x)
+       $x
+       ,else))
+
+def (maybe f a b|to)
+  if a
+    (f a b)
+    b
+
+mac (in x ... choices)
+  `(let $x ,x
+     (or ,@(map (fn(_) `(,_ = $x))
+                choices)))
+
+def (predicate x)
+  if (isa function x)
+       x
+     (x = :else)
+       (fn() 1)
+     :else
+       (fn(_) (x = _))
+
+mac (caselet var expr ... branches)
+  let expand (afn(branches)
+               (if ~cdr.branches
+                 car.branches
+                 `(if ((predicate ,car.branches) ,var)
+                    ,cadr.branches
+                    ,(self cddr.branches))))
+    `(let ,var ,expr ,expand.branches)
+
+mac (case expr ... branches)
+  `(caselet $x ,expr ,@branches)
+
+mac (acase expr ... branches)
+  `(caselet it ,expr ,@branches)

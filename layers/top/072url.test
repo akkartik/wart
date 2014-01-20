@@ -1,0 +1,11 @@
+(test "parse_url works"
+  :valueof (parse_url "www.google.com")
+  :should be (table 'protocol "http" 'host "www.google.com" 'port 80 'path "/"))
+
+(test "parse_url works - 2"
+  :valueof (parse_url "www.google.com:8080")
+  :should be (table 'protocol "http" 'host "www.google.com" 'port 8080 'path "/"))
+
+(test "parse_url works - 3"
+  :valueof (parse_url "ftp://www.google.com/blah")
+  :should be (table 'protocol "ftp" 'host "www.google.com" 'port 80 'path "/blah"))

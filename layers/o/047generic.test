@@ -1,0 +1,20 @@
+def (foogen ... args)
+  args
+def (foogen s ... rest) :case (and no.rest sym?.s)
+  s
+
+(test "def :case can handle rest params"
+  :valueof foogen.3
+  :should be '(3))
+
+(test "def :case can handle rest params - 2"
+  :valueof (foogen 'a)
+  :should be 'a)
+
+mac (foogen2 ... body)
+  `(list ,@body)
+mac (foogen2 a b ... body) :case (a = 'random_sym)
+  'went_through_case
+(test "cases with more args shouldn't break the base case"
+  :valueof (foogen2 35)
+  :should be (list 35))  # shouldn't insert a nil for b in the :case

@@ -1,0 +1,33 @@
+(test "assignment can process multiple pairs"
+  :valueof (do
+             (<- x 1 y 2)
+             (cons x y))
+  :should be '(1 ... 2))
+
+(test "assigning to car works"
+  :valueof (ret x list.1
+             (car.x <- 2))
+  :should be '(2))
+
+(test "assigning to cdr works"
+  :valueof (ret x list.1
+             (cdr.x <- list.2))
+  :should be '(1 2))
+
+(test "assigning to sig works"
+  :valueof (let f (fn(x) 1)
+             (sig.f <- (list 'y))
+             sig.f)
+  :should be '(y))
+
+(test "assigning to body works"
+  :valueof (let f (fn() 1)
+             (body.f <- list.2)
+             body.f)
+  :should be '(2))
+
+(test "assigning to env works"
+  :valueof (let f (fn(x) 1)
+             (env.f <- 34)
+             env.f)
+  :should be 34)

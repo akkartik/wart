@@ -1,0 +1,51 @@
+<- mac!
+   (fn '((name ... params) ... body)
+     (eval `(,name <- (fn ',params
+                        # remember to update is_macro if you change this
+                        (eval ((fn() ,@body))
+                              caller_scope)))
+           caller_scope))
+
+# make the right caller_scope available inside ,@body above
+mac! (macro_caller_scope)
+  `(table_get (table_get caller_scope 'caller_scope)
+              'caller_scope)
+
+mac! (def! (name ... params) ... body)
+#?   pr `(,name <- (fn ,params ,@body))
+#?   pr "
+#? "
+  `(,name <- (fn ,params ,@body))
+
+def! (prn ... args)
+  if args
+    do (pr car.args)
+       (prn @cdr.args)
+       car.args
+    (pr "
+")
+
+mac! (def (name ... params) ... body)
+  if (bound? name nil)  # globals only
+    (prn "redef: " name)
+  `(def! (,name ,@params) ,@body)
+
+mac! (mac (name ... params) ... body)
+  if (bound? name nil)  # globals only
+    (prn "redef: " name)
+  `(mac! (,name ,@params) ,@body)
+
+mac (alias new old)  # include later refinements
+  `(mac (,new ... $args)
+     `(,,old ,@$args))
+
+def (id _)
+  _
+alias present? id
+alias no not
+
+mac! (let var val ... body)
+  `((fn(,var) ,@body) ,val)
+
+mac! (do ... body)
+  `((fn() ,@body))

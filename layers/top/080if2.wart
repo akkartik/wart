@@ -1,0 +1,19 @@
+# Replace 'if with compiled if to speed things up.
+def (replace_ifs form if2)
+  default if2 :to compiledfns.if.0
+  if ~cons?.form
+       form
+     (and (car.form = 'if) (len.form <= 4)
+          (none (spliced? | unquote_spliced?)
+                cdr.form))
+       (cons if2 (map replace_ifs cdr.form))
+     :else
+       (map replace_ifs form)
+
+def (compiledfns x)
+  collect+each (k v) env.x
+    if compiledfn?.v
+      yield v
+
+def (map f seq) :case sym?.seq
+  f.seq

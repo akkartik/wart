@@ -1,0 +1,23 @@
+mac! f.x
+  `(,f ,x)
+
+mac! f.-x
+  `(,f (- ,x))
+
+<- zero 0  # x.0.1 gets parsed as (x 0.1); use x.zero.1 for '((x 0) 1)
+           # or use -> or transform which are defined later
+
+def (compose f g)
+  fn '$args
+    eval `(,f (,g ,@$args)) caller_scope
+
+let ($+ $if ($=)) `(,+ ,if ,=)
+  def! f+g
+    $if ((type f) $= 'function)
+      (compose f g)
+      $if ((type g) $= 'function)
+        (compose f g)
+        ($+ f g)
+
+def ~f
+  (compose not f)

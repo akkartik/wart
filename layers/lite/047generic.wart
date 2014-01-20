@@ -1,0 +1,35 @@
+let $mac mac
+  mac! (mac (name ... params) ... body)
+    (if
+      (car.body = :case)
+        : `(let $super ,name
+             (mac! (,name ... ($params | ,params))
+               (if ,cadr.body
+                 (do ,@cddr.body)
+                 (cons $super $params))))
+      (car.body = :qcase)  # to dispatch on values rather than names
+        : `(let $super ,name
+             (mac! (,name ... ($params | ,params))
+               (if (eval ,cadr.body (macro_caller_scope))
+                 (do ,@cddr.body)
+                 (cons $super $params))))
+      :else
+        : `(,$mac (,name ,@params) ,@body))
+
+mac (def (name ... params) ... body) :case (car.body = :case)
+  `(let $old ,name
+     # keep $params uneval'd in case any params are quoted
+     (def! (,name ... ('$params | ,params))
+       (let $caller_scope caller_scope
+         (if ,cadr.body
+           (do ,@cddr.body)
+           (eval `(,$old ,@$params) $caller_scope)))))
+
+def (mem? x tree)
+  if (predicate.x tree)
+       1
+     cons?.tree
+       (or (mem? x car.tree)
+           (mem? x cdr.tree))
+     :else
+       false

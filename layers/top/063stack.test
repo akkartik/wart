@@ -1,0 +1,6 @@
+(test "stack ops"
+  :valueof (let s (stack)
+             (each x '(3 4 5)
+               (push! x s))
+             (list pop!.s (as list s)))
+  :should be '(5 (4 3)))

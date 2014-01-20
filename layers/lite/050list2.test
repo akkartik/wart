@@ -1,0 +1,330 @@
+(test "len works on lists"
+  :valueof (len '(1 2 3 4 5))
+  :should be 5)
+
+(test "lists coerce to function"
+  :valueof (type+coerce '(1 2 3) 'function)
+  :should be 'function)
+
+(test "lists work in function position"
+  :valueof ((list 1 2 3) 1)
+  :should be 2)
+
+(test "lists in function position don't leak memory"
+  :valueof (withs (l '(1 2 3)
+                   n0 nrefs.l)
+             l.1  # do the lookup
+             (- nrefs.l n0))
+  :should be 0)
+
+(test "lists work in function position - 2"
+  :valueof (let l '(list 1 2 3) l.3)
+  :should be 3)
+
+(test "compose works with lists"
+  :valueof (let l '(1 (34 3) 2) (car+l 1))
+  :should be 34)
+
+(test "lists can take negative indices"
+  :valueof (let l '(1 2 3) (l -1))
+  :should be 3)
+
+(test "lists can take slices"
+  :valueof (let l '(1 2 3 4 5 6) (l 3 5))
+  :should be '(4 5))
+
+(test "lists can take slices - 2"
+  :valueof (let l '(1 2 3 4 5 6) (l 3 -1))
+  :should be '(4 5))
+
+(test "lists can take slices - explicit nil"
+  :valueof (let l '(1 2 3 4 5 6) (l 3 nil))
+  :should be '(4 5 6))
+
+(test "lists can be assigned to"
+  :valueof (ret l '(1 2 3)
+             (l.1 <- 4))
+  :should be '(1 4 3))
+
+(test "list assignment returns assigned value"
+  :valueof (let l '(1 2 3)
+             (l.1 <- 4))
+  :should be 4)
+
+(test "list slices can be assigned to"
+  :valueof (ret l '(1 2 3 4 5 6 7)
+             ((l 1 3) <- '(16 17 18)))
+  :should be '(1 16 17 18 4 5 6 7))
+
+(test "list slice assignment returns assigned value"
+  :valueof (let l '(1 2 3 4 5 6 7)
+             ((l 1 3) <- '(16 17 18)))
+  :should be '(16 17 18))
+
+(test "list slice assignment returns single assigned value"
+  :valueof (let l '(1 2 3 4 5 6 7)
+             ((l 1 3) <- '(16)))
+  :should be '(16))
+
+(test "list slices can be assigned to - 2"
+  :valueof (ret l '(1 2 3 4 5 6 7)
+             ((l -4 -1) <- '(29 37)))
+  :should be '(1 2 3 29 37 7))
+
+(test "list slices can be assigned to - explicit nil"
+  :valueof (ret l '(1 2 3 4 5 6 7)
+             ((l -4 nil) <- '(29 37)))
+  :should be '(1 2 3 29 37))
+
+(test "list slices can be assigned to - explicit nil var"
+  :valueof (ret l '(1 2 3 4 5 6 7)
+             (let x nil
+               ((l -4 x) <- '(29 37))))
+  :should be '(1 2 3 29 37))
+
+(test "list index can be reset"
+  :valueof (ret l '(1 2 3)
+             (l.1 <- nil))
+  :should be '(1 nil 3))
+
+(test "list slices can be deleted"
+  :valueof (ret l '(1 2 3 4 5 6 7)
+             ((l 1 5) <- nil))
+  :should be '(1 6 7))
+
+(test "list slices can be deleted - 2"
+  :valueof (ret l '(1 2 3 4 5 6 7)
+             ((l -4 -1) <- nil))
+  :should be '(1 2 3 7))
+
+(test "list slice assignment can delete at start of list (by rebinding the var)"
+  :valueof (ret l '(1 2 3 4)
+             ((l 0 2) <- nil))
+  :should be '(3 4))
+
+(test "nested lists can be assigned to"
+  :valueof (ret l '(1 (2 3))
+             (((l 1) 0) <- 3))
+  :should be '(1 (3 3)))
+
+(test "elems of other types can be assigned to"
+  :valueof (let l (tag 'footype '(1 2 3))
+             (rep.l.0 <- 3)
+             rep.l)
+  :should be '(3 2 3))
+
+
+
+(test "lists compare lexicographically"
+  :valueof (< '(1 2 3) '(1 2 4))
+  :should be_true)
+
+(test "lists compare lexicographically - 2"
+  :valueof (< '(1 2 4) '(1 2 3))
+  :should be_false)
+
+(test "shorter list compares with prefix"
+  :valueof (< '(1 2 4) '(1 2 3 4))
+  :should be_false)
+
+(test "shorter list compares with prefix - 2"
+  :valueof (< '(1 2 2) '(1 2 3 4))
+  :should be_true)
+
+(test "equal prefixes sort by length"
+  :valueof (< '(1 2 3) '(1 2 3 4))
+  :should be_true)
+
+(test "equal prefixes sort by length - 2"
+  :valueof (< '(1 2 3 4) '(1 2 3))
+  :should be_false)
+
+(test "overloading < also fixes >"
+  :valueof (> '(1 2 4) '(1 2 3))
+  :should be_true)
+
+(test "overloading < also fixes > - 2"
+  :valueof (> '(1 2 4) nil)
+  :should be_true)
+
+(test "overloading < also fixes > - 3"
+  :valueof (> '(1 2 3) '(1 2 4))
+  :should be_false)
+
+(test "overloading < also fixes > - 4"
+  :valueof (> nil '(1 2 4))
+  :should be_false)
+
+(test "comparing lists to ranges works"
+  :valueof (list.1 < list.2 < list.3)
+  :should be_true)
+
+(test "comparing lists to ranges works - 2"
+  :valueof (list.1 < list.3 < list.2)
+  :should be_false)
+
+(test "comparing lists returns latter arg on success"
+  :valueof ('(1 2 3) < '(1 2 4))
+  :should be '(1 2 4))
+
+
+
+(test "pos works"
+  :valueof (pos 2 '(1 2 3))
+  :should be_true)
+
+(test "pos works - 2"
+  :valueof (pos 4 '(1 2 3))
+  :should be_false)
+
+(test "pos works - 3"
+  :valueof (pos nil '(1 2 3))
+  :should be_false)
+
+(test "pos works - 4"
+  :valueof (pos nil '(1 nil 2 3))
+  :should be_true)
+
+(test "rpos works"
+  :valueof (rpos 3 '(0 1 2 3))
+  :should be 3)
+
+(test "rpos works - 2"
+  :valueof (rpos 3 '(0 1 2))
+  :should be_false)
+
+(test "predicate works with a list"
+  :valueof ((predicate '(1 2 3)) 3)
+  :should be_true)
+
+(test "predicate works with a list - 2"
+  :valueof ((predicate '(1 2 3)) 4)
+  :should be_false)
+
+(test "single? - 1"
+  :valueof (single? nil)
+  :should be_false)
+
+(test "single? - 2"
+  :valueof (single? '(1))
+  :should be_true)
+
+(test "single? - 3"
+  :valueof (single? '(1 2))
+  :should be_false)
+
+(test "single? - 4"
+  :valueof (single? '(1 ... 2))
+  :should be_false)
+
+(test "pair? - 1"
+  :valueof (pair? nil)
+  :should be_false)
+
+(test "pair? - 2"
+  :valueof (pair? '(1))
+  :should be_false)
+
+(test "pair? - 3"
+  :valueof (pair? '(1 2))
+  :should be_true)
+
+(test "pair? - 4"
+  :valueof (pair? '(1 ... 2))
+  :should be_false)
+
+(test "pair? - 5"
+  :valueof (pair? '(1 2 3))
+  :should be_false)
+
+
+
+(test "zip works"
+  :valueof (zip '(1 2) '(3 4 5))
+  :should be '((1 3) (2 4)))
+
+(test "zipmax works"
+  :valueof (zipmax '(1 2) '(3 4 5))
+  :should be '((1 3) (2 4) (nil 5)))
+
+(test "zip works with more than two args"
+  :valueof (zip '(1 2 3) '(4 5 6) '(7 8 9))
+  :should be '((1 4 7) (2 5 8) (3 6 9)))
+
+(test "flatten works"
+  :valueof (flatten '(a b (c d e)))
+  :should be '(a b c d e))
+
+(test "flatten works - 2"
+  :valueof (flatten '(a b (c d e) ... f))
+  :should be '(a b c d e f))
+
+
+
+(test "join works"
+  :valueof (join '(1 2 3) nil '(4 5) nil nil '(6 (7 8)))
+  :should be '(1 2 3 4 5 6 (7 8)))
+
+(test "+ works on lists"
+  :valueof (+ '(1 2 3) nil '(4 5) nil nil '(6 (7 8)))
+  :should be '(1 2 3 4 5 6 (7 8)))
+
+(test "keep works"
+  :valueof (keep num? '(11 a 13))
+  :should be '(11 13))
+
+(test "keep does not convert to predicate"
+  :valueof (keep '(0 1 2 nil 4) '(2 1 3 4))
+  :should be '(2 1 4))
+
+(test "rem works"
+  :valueof (rem no '(1 2 nil 4 nil))
+  :should be '(1 2 4))
+
+(test "rem converts to predicate"
+  :valueof (rem nil '(1 2 nil 4 nil))
+  :should be '(1 2 4))
+
+(test "skip nil works"
+  :valueof (skip nil '(1 2 nil 4))
+  :should be '(1 2 4))
+
+(test "all works with lists"
+  :valueof (all list? '((1) 2))
+  :should be_false)
+
+(test "all does not convert to predicate"
+  :valueof (all (list nil 1 nil 1) '(1 3))
+  :should be_true)
+
+(test "some works"
+  :valueof (some num? '(2 a "b"))
+  :should be_true)
+
+(test "some works - 2"
+  :valueof (some num? '(a "b"))
+  :should be_false)
+
+(test "some does not convert to predicate"
+  :valueof (some (list nil 1 nil nil) '(1 3))
+  :should be_true)
+
+(test "some does not convert to predicate - 2"
+  :valueof (some (list nil 1 nil nil) '(1 2 3))
+  :should be_true)
+
+(test "none works"
+  :valueof (none num? '(2 a "b"))
+  :should be_false)
+
+(test "none works - 2"
+  :valueof (none num? '(a "b"))
+  :should be_true)
+
+(test "map works with multiary functions"
+  :valueof (map list '(1 2 3) '(2 4 6) '(3 6 9))
+  :should be '((1 2 3) (2 4 6) (3 6 9)))
+
+(test "intersperse works"
+  :valueof (intersperse 3 '(a b c d))
+  :should be '(a 3 b 3 c 3 d))

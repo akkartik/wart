@@ -1,0 +1,27 @@
+(test "replace_ifs skips atoms"
+  :valueof (replace_ifs 'if)
+  :should be 'if)
+
+(test "replace_ifs skips lists with >2 branches"
+  :valueof (replace_ifs '(if cond1 branch1 cond2 branch2))
+  :should be '(if cond1 branch1 cond2 branch2))
+
+(test "replace_ifs replaces lists with 2 branches"
+  :valueof (replace_ifs '(if cond1 branch1 branch2))
+  :should be `(,compiledfns.if.0 cond1 branch1 branch2))
+
+(test "replace_ifs skips quoted lists"
+  :valueof (replace_ifs '(list '(if abc)))
+  :should be '(list '(if abc)))
+
+(test "replace_ifs skips quoted lists - 2"
+  :valueof (replace_ifs ''(if abc))
+  :should be ''(if abc))
+
+(test "replace_ifs skips spliced lists"
+  :valueof (replace_ifs '(if @abc))
+  :should be '(if @abc))
+
+(test "replace_ifs skips spliced lists - 2"
+  :valueof (replace_ifs '`(if ,@abc))
+  :should be '`(if ,@abc))

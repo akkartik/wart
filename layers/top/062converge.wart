@@ -1,0 +1,5 @@
+def (converge f x)
+  let y f.x
+    if (x = y)
+      x
+      (converge f y)

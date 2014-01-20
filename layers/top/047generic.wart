@@ -1,0 +1,123 @@
+let $mac mac
+  mac! (mac (name ... params) ... body)
+    (if
+      (car.body = :case)
+        : `(let $super ,name
+             (mac! (,name ... ($params | ,params))
+               (if ,cadr.body
+                 (do ,@cddr.body)
+                 (cons $super $params))))
+      (car.body = :qcase)  # to dispatch on values rather than names
+        : `(let $super ,name
+             (mac! (,name ... ($params | ,params))
+               (if (eval ,cadr.body (macro_caller_scope))
+                 (do ,@cddr.body)
+                 (cons $super $params))))
+      :else
+        : `(,$mac (,name ,@params) ,@body))
+
+mac (def (name ... params) ... body) :case (car.body = :case)
+  `(let $old ,name
+     (def! (,name ... ($params | ,params))
+       (if ,cadr.body
+         (do ,@cddr.body)
+         ($old @$params))))
+
+
+
+## def with selectively quoted params
+# We could just always use this, but it's faster to avoid the extra eval if
+# possible.
+
+mac (def (name ... params) ... body) :case (and (car.body = :case)
+                                                (mem? quote params))
+  `(let $old ,name
+     # keep $params uneval'd in case any params are quoted
+     (def! (,name ... ('$params | ,params))
+       (let $caller_scope caller_scope
+         (if ,cadr.body
+           (do ,@cddr.body)
+           (eval `(,$old ,@$params) $caller_scope)))))
+
+def (mem? x tree)
+  if (predicate.x tree)
+       1
+     cons?.tree
+       (or (mem? x car.tree)
+           (mem? x cdr.tree))
+     :else
+       false
+
+
+
+## rudimentary pattern matching for symbol constants
+
+def (literal? x)
+  (or backquote?.x
+      num?.x
+      string?.x)
+
+mac (def (name ... params) ... body) :case (mem? literal? params)
+  withs (bqvars   literal.params
+         bindings attach_gensyms.bqvars)
+    `(def (,name ,@(unqq params bindings)) :case (and ,@(map (fn((val gsym))
+                                                               `(,gsym = ',val))
+                                                             bindings))
+       ,@body)
+
+mac (mac (name ... params) ... body) :case (mem? literal? params)
+  withs (bqvars   literal.params
+         bindings attach_gensyms.bqvars)
+    `(mac (,name ,@(unqm params bindings)) :case (and ,@(map (fn((val gsym))
+                                                               `(,gsym = ',val))
+                                                             bindings))
+       ,@body)
+
+def (attach_gensyms syms)
+  if syms
+    (cons (list car.syms (uniq))
+          (attach_gensyms cdr.syms))
+
+def (literal tree)
+  if backquoted?.tree
+       (list cdr.tree)
+     (or num?.tree string?.tree)
+       (list tree)
+     cons?.tree
+       (join literal+car.tree
+             literal+cdr.tree)
+
+def (assoc l k)
+  if l
+    if (car+car.l = k)
+      car.l
+      (assoc cdr.l k)
+
+def (unqq tree bindings)
+  if backquoted?.tree
+       with (var (car+assoc bindings cdr.tree)
+             binding (cadr+assoc bindings cdr.tree))
+         if sym?.var
+           (cons quote binding)
+           binding
+     literal?.tree
+      (cadr+assoc bindings tree)
+     ~cons?.tree
+       tree
+     :else
+       (cons (unqq car.tree bindings)
+             (unqq cdr.tree bindings))
+
+# like unqq, but bindings are already quoted
+def (unqm tree bindings)
+  if backquoted?.tree
+       with (var (car+assoc bindings cdr.tree)
+             binding (cadr+assoc bindings cdr.tree))
+         binding
+     literal?.tree
+      (cadr+assoc bindings tree)
+     ~cons?.tree
+       tree
+     :else
+       (cons (unqm car.tree bindings)
+             (unqm cdr.tree bindings))

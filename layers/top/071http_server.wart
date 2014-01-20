@@ -1,0 +1,36 @@
+mac (with `server_socket socket port ... body)
+  `(let ,socket (server_socket ,port)
+     (before (close ,socket)
+       ,@body))
+
+mac (accepting client socket|from ... body)
+  `(repeat :forever
+     (let ,client (accept ,socket)
+       (before (close ,client)
+         ,@body)))  # body must close client socket
+
+def (parse_http_headers client)
+  making stdin infile+fd.client
+    let (verb url) (split+read_line)
+      url
+
+def (server port)
+  with server_socket socket (or port 4040)
+    preforking 6  # handler threads
+      accepting client :from socket
+        let url parse_http_headers.client
+          making stdout outfile+fd.client
+            prn "HTTP/1.0 200 OK"
+            prn "Content-type: text/plain"
+            prn ""
+            prn url
+
+mac (with `socket socket host port ... body)
+  default host :to "127.0.0.1"
+  default port :to 80
+  `(let ,socket (socket ,host ,port)
+     (before (close ,socket)
+       ,@body))
+
+def (fd socket)
+  socket_fd.socket

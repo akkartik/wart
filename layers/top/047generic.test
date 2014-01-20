@@ -1,0 +1,103 @@
+def (foogen ... args)
+  args
+def (foogen s ... rest) :case (and no.rest sym?.s)
+  s
+
+(test "def :case can handle rest params"
+  :valueof foogen.3
+  :should be '(3))
+
+(test "def :case can handle rest params - 2"
+  :valueof (foogen 'a)
+  :should be 'a)
+
+mac (foogen2 ... body)
+  `(list ,@body)
+mac (foogen2 a b ... body) :case (a = 'random_sym)
+  'went_through_case
+(test "cases with more args shouldn't break the base case"
+  :valueof (foogen2 35)
+  :should be (list 35))  # shouldn't insert a nil for b in the :case
+
+def (foogen3 'a)
+  a
+def (foogen3 'a) :case (a = 'z)
+  'went_through_case
+(test "def :case can handle quoted params"
+  :valueof (foogen3 a)
+  :should be 'a)
+(test "def :case can handle quoted params - 2"
+  :valueof (foogen3 z)
+  :should be 'went_through_case)
+
+def (foogen4 'a b)
+  (list a b)
+def (foogen4 'a b) :case (a = 'z)
+  'went_through_case
+let x 3
+  (test "def :case can handle selective param quoting"
+    :valueof (foogen4 a x)
+    :should be '(a 3))
+  (test "def :case can handle selective param quoting - 2"
+    :valueof (foogen4 z x)
+    :should be 'went_through_case)
+
+def (foogen5 a)
+  a
+def (foogen5 `z)
+  'went_through_case
+(test "def :case pattern-matches on backquoted params"
+  :valueof (foogen5 'a)
+  :should be 'a)
+(test "def :case pattern-matches on backquoted params - 2"
+  :valueof (foogen5 z)
+  :should be 'went_through_case)
+
+def (foogen6 a)
+  a
+def (foogen6 `0)
+  'went_through_case
+(test "def :case pattern-matches on backquoted literals"
+  :valueof (foogen6 'a)
+  :should be 'a)
+(test "def :case pattern-matches on backquoted literals - 2"
+  :valueof (foogen6 0)
+  :should be 'went_through_case)
+
+def (foogen7 a)
+  a
+def (foogen7 0)
+  'went_through_case
+(test "def :case pattern-matches on naked literals"
+  :valueof (foogen7 'a)
+  :should be 'a)
+(x <- 0)
+(test "def :case pattern-matches on naked literals - 2"
+  :valueof (foogen7 x)
+  :should be 'went_through_case)
+
+mac (foogen8 n)
+  n
+mac (foogen8 n) :qcase `(> ,n 3)
+  3
+(test "mac :qcase can inspect values of args"
+  :valueof (foogen8 2)
+  :should be 2)
+(test "mac :qcase can inspect values of args - 2"
+  :valueof (foogen8 4)
+  :should be 3)
+(test "mac :qcase can inspect values of args - 3"
+  :valueof (let x 9 (foogen8 x))
+  :should be 3)
+
+let x 243
+  mac (foogen9 n)
+    n
+  mac (foogen9 n) :qcase `(> ,n 3)
+    3
+(test "mac :qcase looks up args in right scope"
+  :valueof (let x 2 (foogen9 x))
+  :should be 2)
+(test "mac :qcase looks up args in right scope - 2"
+  :valueof (let x 9 (foogen9 x))
+  :should be 3)

@@ -1,0 +1,76 @@
+(test "read works"
+  :valueof (making stdin (instring "34 35")
+             (read))
+  :should be '(34 35))
+
+system "echo abc > _x"
+(test "read works on fd"
+  :valueof (making stdin (infd+input_fd "_x")
+             (read))
+  :should be 'abc)
+system "rm _x"
+
+(test "multiple reads work"
+  :valueof (making stdin (instring "34
+35")
+             (read)
+             (read))
+  :should be 35)
+
+(test "read_byte works"
+  :valueof (with instring "ab"
+             (read_byte)
+             (read_byte))
+  :should be 98)
+
+(test "read_byte stops at eof"
+  :valueof (with instring "abc"
+              (with outstring
+                (whilet c (read_byte)
+                  (pr c))))
+  :should be "979899")
+
+(test "read_line stops at eof"
+  :valueof (with instring "abc
+def
+"
+              (with outstring
+                (whilet line (read_line)
+                  (prn line))))
+  :should be "abc
+def
+")
+
+(test "with infile/outfile works"
+  :valueof (let f (tmpfile)
+             (before (system+join "rm " f)
+               (with outfile f
+                 (prn 34))
+               (with infile f
+                 (read))))
+  :should be 34)
+
+(test "with stream macros clean up after themselves"
+  :valueof (let f (tmpfile)
+             (before (system+join "rm " f)
+               (with outfile f
+                 (prn 34))
+               (num_bindings 'stdin)))
+  :should be 1)
+
+(test "drain works"
+  :valueof (with instring "a b
+c d
+e"
+              (drain+read))
+  :should be '((a b) (c d) e))
+
+(test "pr can print multiple args"
+  :valueof (with outstring
+             (pr 1 2 3))
+  :should be "123")
+
+(test "pr returns first arg"
+  :valueof (between (bind stdout (outstring)) :and (close&unbind stdout)
+             (pr 1 2 3))
+  :should be 1)

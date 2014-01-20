@@ -1,0 +1,58 @@
+(test "tables work in function position"
+  :valueof (let h (table)
+             (table_set h 3 4)
+             h.3)
+  :should be 4)
+
+(test "get on tables takes a default"
+  :valueof (let h (table)
+             (h 3 5))
+  :should be 5)
+
+(test "tables can be assigned to"
+  :valueof (let h (table)
+             (h.3 <- 4)
+             h.3)
+  :should be 4)
+
+(test "len works on tables"
+  :valueof (len (table 'a 1 'b 2))
+  :should be 2)
+
+(test "each works on tables"
+  :valueof (ret ans 0
+             (each (k v) (table 1 2 3 4)
+               ++ans))
+  :should be 2)
+
+(test "equality works on tables"
+  :valueof ((table) = (table))
+  :should be_true)
+
+(test "equality works on tables - 2"
+  :valueof ((table 'a 1 'b 2) = (table 'b 2 'a 1))
+  :should be_true)
+
+(test "match? works on table values"
+  :valueof (match? (table 'a '_) (table 'a 'x))
+  :should be_true)
+
+(test "lists coerce to tables"
+  :valueof (as table '((1 2) (3 4)))
+  :should be (ret x (table)
+               (x.1 <- 2)
+               (x.3 <- 4)))
+
+(test "tables coerce to lists"
+  :valueof (as table (as list (table 1 2 3 4)))
+  :should be (table 1 2 3 4))
+
+(test "table constructor takes args"
+  :valueof (table 1 2 3 4)
+  :should be (ret x (table)
+               (x.1 <- 2)
+               (x.3 <- 4)))
+
+(test "copy can take additional args to merge in"
+  :valueof (copy (table 1 2 3 4) 3 5 4 6)
+  :should be (table 1 2 3 5 4 6))

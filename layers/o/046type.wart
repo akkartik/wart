@@ -1,0 +1,86 @@
+alias nil? not
+def (sym? _)
+  (isa 'symbol _)
+def (list? _)
+  (isa 'list _)
+def (num? _)
+  (isa 'number _)
+def (string? _)
+  (isa 'string _)
+def (table? _)
+  (isa 'table _)
+def (fn? _)
+  (isa 'function _)
+def (compiledfn? _)
+  (and (fn? _)
+       (~cons? body._))
+
+
+
+def (tag type val)
+  (list 'object type val)
+
+def (rep x)
+  if (or ~cons?.x (car.x ~= 'object))
+    x
+    car+cddr.x
+
+def (coerce x dest_type)
+  eval `(coerce_quoted ,x ,dest_type)
+<- Coercions (table)
+
+mac (defcoerce src dest f)
+  `(do
+     (if (~table_get Coercions ',dest)
+       (table_set Coercions ',dest (table)))
+     (table_set (table_get Coercions ',dest) ',src ,f))
+
+defcoerce nil list
+  id
+
+# arbitrary types in function position
+mac (defcall type params ... body)
+  `(defcoerce ,type function
+     (fn(,car.params)
+       (fn ,cdr.params
+         ,@body)))
+
+
+
+mac (as type expr)
+  `(coerce ,expr ',type)
+
+def! (compose f g)
+  fn 'args
+    eval `(,(as function f) (,(as function g) ,@args)) caller_scope
+
+def (sig f)
+  (rep.f sig)
+
+def! (body f)
+  (rep.f 'body)
+
+def (env f)
+  (rep.f 'env)
+
+
+
+<- quote (car ''1)
+alias quote? predicate.quote
+alias quoted? (cons? & quote?+car)
+
+<- backquote (car '`(1))
+alias backquote? predicate.backquote
+alias backquoted? (cons? & backquote?+car)
+
+<- unquote (car+cadr '`(,1))
+alias unquote? predicate.unquote
+alias unquoted? (cons? & unquote?+car)
+
+<- unquote_splice (car+cadr '`(,@1))
+alias unquote_splice? predicate.unquote_splice
+alias unquote_spliced? (cons? & unquote_splice?+car)
+
+<- splice (car '@1)
+alias splice? predicate.splice
+alias spliced? (cons? & splice?+car)

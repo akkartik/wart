@@ -1,0 +1,10 @@
+def (http_get url)
+  let purl parse_url.url
+    with socket sock (purl 'host) (purl 'port)
+      with stdout outfile.sock
+        prn "GET " (purl 'path) " HTTP/1.0"
+        prn "Content-Type: text/html; charset=utf-8"
+        prn "Connection: close"
+        prn ""
+      with stdin infile.sock
+        drain (prn+read_line)

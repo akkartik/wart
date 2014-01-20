@@ -1,0 +1,16 @@
+def (parse_url url)
+  ret ans (table 'protocol "http"
+                 'host nil
+                 'port 80
+                 'path "/")
+    awhen (pos "://" url)
+      (<- (ans 'protocol)   (downcase (url 0 it))
+          url   (url it+3 nil))
+    aif (pos "/" url)
+      (<- (ans 'host)   (url 0 it)
+          (ans 'path)   (url it nil))
+      :else
+      (<- (ans 'host)   url)
+    awhen (pos ":" (ans 'host))
+      (<- (ans 'port)   (num ((ans 'host) it+1 nil))
+          (ans 'host)   ((ans 'host) 0 it))

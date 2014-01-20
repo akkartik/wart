@@ -1,0 +1,218 @@
+defcall list (seq idx ... ends)
+  withs (idx    (range_start seq idx)
+         end    (if no.ends
+                      idx+1
+                    ~car.ends
+                      len.seq
+                    :else
+                      (range_bounce seq car.ends))
+         slice  (list_range seq idx end))
+    if ends
+      slice
+      car.slice
+
+defset list ((seq idx ... ends) val)
+  `(withs ($idx (range_start ,seq ,idx)
+           $end ,(if no.ends
+                   `($idx + 1)
+                   `(if (not ,car.ends)
+                      (len ,seq)
+                      (range_bounce ,seq ,car.ends))))
+     ,(if ends
+        `(list_splice ,seq $idx $end ,val)
+        `(car+list_splice ,seq $idx $end (list ,val))))
+
+def (pos x seq n)
+  default n :to 0
+  if seq
+    let (head ... tail) seq
+      if (head = x)
+        n
+        (pos x tail n+1)
+
+def (rpos x seq n)
+  aif (pos x rev.seq n)
+    (len.seq-1 - it)
+
+def (predicate x) :case list?.x
+  (fn(_) (pos _ x))
+
+def_assign car (seq x)
+  (set_car seq x)
+
+def_assign cdr (seq x)
+  (set_cdr seq x)
+
+def (empty? seq)
+  (len.seq = 0)  # could just check nil, but this is a good base case
+
+def (blank? seq)
+  (or nil?.seq empty?.seq)
+
+# lexicographic comparison
+def (a < b) :case (or list?.a list?.b)
+  let lex_less
+      afn (a b orig_b)  # always return original b for chaining
+        default orig_b :to b
+        if (b = nil)
+             false
+           (a = nil)
+             orig_b
+           (car.a = car.b)
+             (self cdr.a cdr.b orig_b)
+           :else
+             if (car.a < car.b)
+               orig_b
+               false
+    (lex_less a b)
+
+def (copy x)
+  if ~cons?.x
+    x
+    (cons copy+car.x copy+cdr.x)  # piecewise copy for objects by default
+
+def (single? x)
+  (and list?.x ~cdr.x)
+
+def (pair? x)
+  (and list?.x
+       cdr.x
+       list?+cdr.x
+       ~cddr.x)
+
+def (rev seq acc)
+  if no.seq
+    acc
+    (rev cdr.seq
+         (cons car.seq acc))
+
+def (lastcons seq)
+  aif cdr.seq
+    lastcons.it
+    seq
+
+def (last seq)
+  car+lastcons.seq
+
+def_assign last (seq x)
+  <- (car lastcons.seq) x
+
+def_assign lastcdr (seq x)
+  <- (cdr lastcons.seq) x
+
+
+
+def (zip a b)
+  if (and a b)
+    (cons (list car.a car.b)
+          (zip cdr.a cdr.b))
+
+def (zipwith f a b)
+  if (and a b)
+    (cons (f car.a car.b)
+          (zipwith f cdr.a cdr.b))
+
+def (zip a b ... rest) :case rest
+  (zipwith cons a (zip b @rest))
+
+def (zipmax a b)
+  if (or a b)
+    (cons (list car.a car.b)
+          (zipmax cdr.a cdr.b))
+
+def (flatten seq acc)
+  if no.seq
+       acc
+     ~list?.seq
+       (cons seq acc)
+     :else
+       (flatten car.seq (flatten cdr.seq acc))
+
+
+
+def (+ ... args) :case (all no|list? args)  # ensure there's no functions
+  (join @args)
+
+# a non-op to enable compose: system+join, etc.
+def (join ... args)
+  if args
+    if car.args
+      (cons car+car.args
+            (join cdr+car.args @cdr.args))
+      (join @cdr.args)
+
+def (keep f seq)
+  if seq
+    if f+car.seq
+      (cons car.seq (keep f cdr.seq))
+      (keep f cdr.seq)
+
+def (rem f seq)
+  (keep (~ predicate.f) seq)
+alias skip rem
+
+def (some f seq)
+  if seq
+    if (f car.seq)
+      1
+      (some f cdr.seq)
+
+def (all f seq)
+  (or no.seq
+      (and (f car.seq)
+           (all f cdr.seq)))
+
+alias any some
+alias none ~some
+
+
+
+def (map f ... seqs) :case cdr.seqs
+  if (all present? seqs)
+    (cons (f @(map car seqs))
+          (map f @(map cdr seqs)))
+
+def (reduce f seq init)  # f is a binary op
+  if no.seq
+       init
+     ~cdr.seq
+       car.seq  # f on one op is the identity function
+     :else
+       (reduce f (cons (f car.seq cadr.seq)
+                       cddr.seq))
+
+def (pairwise seq)
+  (zip seq cdr.seq)
+
+def (best f seq)
+  if seq
+    ret winner car.seq
+      each elem cdr.seq
+        if (f elem winner)
+          winner <- elem
+
+def (firstn n x)
+  if ~list?.x
+       x
+     (n > 0)
+       (cons (firstn n-1 car.x)
+             (firstn n-1 cdr.x))
+
+def (intersperse x ys)
+  if single?.ys
+    ys
+    `(,car.ys ,x ,@(intersperse x cdr.ys))
+
+
+
+## internals
+
+def (range_bounce seq idx)
+  if (idx < 0)
+    (len.seq + idx)
+    idx
+
+def (range_start seq idx)
+  if no.idx
+    0
+    (range_bounce seq idx)

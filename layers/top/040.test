@@ -1,0 +1,66 @@
+(mac! (foo x) `(+ 1 ,x))
+(test "mac! works"
+  :valueof (let x 3 (foo x))
+  :should be 4)
+
+(mac! (foo a b) `(cons ,a ,b))
+(test "macros work with splice when eventually eval'd"
+  :valueof (foo @'(1 (2 3)))
+  :should be '(1 2 3))
+
+(test "macros work with splice when not eventually eval'd"
+  :valueof ((fn() (<- @'(foo 3)) foo))
+  :should be 3)
+
+(mac! (foo a b) `(cons ,a ,b))
+(mac! (bar a b) `(foo ,a ,b))
+(test "nested macros work with splice"
+  :valueof (bar @'(1 (2 3)))
+  :should be '(1 2 3))
+
+(mac! (bar ... args) `(foo ,@args))
+(test "nested macros work with nested splice"
+  :valueof (bar @'(1 (2 3)))
+  :should be '(1 2 3))
+
+(def! (bar ... args) (foo @args))
+(mac! (qux ... args) `(bar ,@args))
+(test "nested functions and macros work with nested splice"
+  :valueof (qux @'(1 (2 3)))
+  :should be '(1 2 3))
+
+(mac! (foo a b) `(if 34 ,(if 34 `(cons ,a ,b))))
+(test "nested backquotes work with splice"
+  :valueof (foo @'(1 (2 3)))
+  :should be '(1 2 3))
+
+(mac! (foo a b) `(cons ,a ,cdr.b))
+(test "compound comma-exprs work with splice"
+  :valueof (foo @'(1 (2 3)))
+  :should be '(1 3))
+
+(hiding_warnings
+  (def! (foo a b) `(cons ,a ,cdr.b))
+  (mac! (bar a b) (foo a b))
+  (test "macros calling function helpers work with splice"
+    :valueof (bar @'(1 (2 3)))
+    :should be '(1 3)))
+
+(test "fn evals rest arg aliases only once"
+  :valueof (ret x 0
+             ((fn (| a b)
+                a)
+              (x <- x+1)))
+  :should be 1)
+
+
+
+(test "do returns last expr"
+  :valueof (do 3 4)
+  :should be 4)
+
+(test "do evals all exprs"
+  :valueof ((fn(a) (do (a <- a+1)
+                       (a <- a+1)))
+               2)
+  :should be 4)

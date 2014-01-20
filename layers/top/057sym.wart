@@ -1,0 +1,46 @@
+def (sym ... args)
+  (as symbol (string @args))
+
+def (keyword? s)
+  (and sym?.s
+       (string.s.0 = ":"))
+
+def (< a b ... rest) :case (and sym?.a no.rest)
+  (string_lesser a b)
+
+def (sym s ... rest) :case (and no.rest keyword?.s)
+  (as symbol (string.s 1 nil))
+
+def (match? a b bindings) :case sym?.a
+  default bindings :to (table)
+  (or (a = b)
+      (a = '_)
+      (and (string.a.0 = "_")  # (_x _x) matches two of anything
+           (default bindings.a :to b)
+           (bindings.a = b))
+      (and (string.a.-1 = "_")  # p_ matches any $p
+           sym?.b
+           (let acore (string.a 0 -1)
+             (and (acore ~= string.b)  # ..but not p
+                  (sym.acore = root.b))))
+      (and sym?.b
+           (digit? string.b.-1)  # (p_x p_x) matches two of any $p
+           (withs (sa   string.a
+                   ai   (pos "_" (as list sa))
+                   acore  (if ai (sa 0 ai)))
+             (and ai
+                  (acore ~= string.b)
+                  (sym.acore = root.b)
+                  (default bindings.a :to b)
+                  (bindings.a = b)))))
+
+
+
+## internals
+
+# ignore the unique numeric suffix in a $sym
+def (root x)
+  let name (rev+as list string.x)
+    while (and name digit?+car.name)
+      (zap! cdr name)
+    (sym @rev.name)

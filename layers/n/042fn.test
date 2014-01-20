@@ -1,0 +1,14 @@
+(test "compose works"
+  :valueof ((compose (fn(_) _+1)
+                     (fn(a b) a+b))
+               3 4)
+  :should be 8)
+
+(test "compose works - 2"
+  :valueof ((compose not cons?) '(1 2))
+  :should be_false)
+
+(mac! (foo x) `(+ 1 ,x))
+(test "compose works with macros"
+  :valueof ((compose foo foo) 1)
+  :should be 3)
