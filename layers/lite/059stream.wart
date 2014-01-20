@@ -33,7 +33,7 @@ mac (with_stdout fd ... body)
      ,@body)
 
 def (ern ... args)
-  (with stdout stderr
+  (with_stdout stderr
     (prn @args))
 
 def (prrn ... args)
