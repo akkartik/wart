@@ -1,0 +1,53 @@
+def (petrify)
+  (update_macroexpansions)
+  (update_optimized_bodies)
+
+def (update_macroexpansions)
+  prn "computing expansions"
+  each (var val) (sort (< car) (as list (globals)))
+    (update_macroexpansion val)
+
+def (update_macroexpansion val)
+  when (mac? val)
+    (<- (rep.val 'expander)
+        (ret m copy.val
+          (zap! strip_eval body.m)))
+
+def (update_optimized_bodies)
+  prn "expanding calls"
+  each (var val) (sort (< car) (as list (globals)))
+    prn "=== " var
+    (update_optimized_body var val)
+
+def (update_optimized_body var val)
+  when (and fn?.val ~compiledfn?.val
+                    ~mac?.val)
+    (<- (rep.val 'optimized_body)
+        (map macex body.val))
+    (rep.val 'optimized_body)
+
+def (macex call env)
+  (converge (fn(_) (macex1 _ env))
+            call)
+
+def (macex1 call env)
+  backstopped_by call
+    when (list? call)
+      let (m ... args) call
+        when (bound? m env)
+          let mval (eval m env)
+            unless (rep.mval 'expander)
+              update_macroexpansion mval
+            when (mac? mval)
+              ((rep.mval 'expander) @args)
+
+def (macex_all forms)
+  (map macex forms)
+
+def (strip_eval exprs)
+  transform exprs :thru
+    _.0  # macro body always has just one expr
+      _.1  # strip away (eval .. caller_scope)
+    list # re-enclose in body
+
+#? (petrify)  # failing at 'all'; even earlier transformations might be wrong

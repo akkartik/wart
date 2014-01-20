@@ -1,0 +1,58 @@
+def (close f) :case (isa infile f)
+  close_infile.f
+
+def (close f) :case (isa outfile f)
+  close_outfile.f
+
+def (close f) :case (isa socket f)
+  close_socket.f
+
+mac (with_infile name ... body)
+  `(between (bind stdin (infile ,name)) :and (close&unbind stdin)
+     ,@body)
+
+mac (with_outfile name ... body)
+  `(between (bind stdout (outfile ,name)) :and (close&unbind stdout)
+     ,@body)
+
+mac (with_instring s ... body)
+  `(between (bind stdin (instring ,s)) :and (close&unbind stdin)
+     ,@body)
+
+mac (with_outstring ... body)
+  `(between (bind stdout (outstring)) :and (close&unbind stdout)
+     ,@body
+     outstring_buffer.stdout)
+
+mac (with_stdin fd ... body)
+  `(between (bind stdin ,fd) :and (close&unbind stdin)
+     ,@body)
+
+mac (with_stdout fd ... body)
+  `(between (bind stdout ,fd) :and (close&unbind stdout)
+     ,@body)
+
+def (ern ... args)
+  (with stdout stderr
+    (prn @args))
+
+def (prrn ... args)
+  prn @args ""
+
+def (infile fd) :case num?.fd
+  infd.fd
+def (outfile fd) :case num?.fd
+  outfd.fd
+
+def (infile s) :case (isa socket s)
+  infd+fd.s
+def (outfile s) :case (isa socket s)
+  outfd+fd.s
+
+mac (drain expr eof)
+  `(collect+awhile ,expr
+     yield.it)
+
+def (pr ... args) :case ~single?.args
+  (map pr args)
+  car.args

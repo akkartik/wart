@@ -1,0 +1,7 @@
+mac (with_nils vars2 ... body2)
+  `((fn ,vars2 ,@body2))
+
+mac (with_tmpfile f ... body)
+  `(let ,f (tmpfile)
+     (before (system+join "rm " ,f)
+       ,@body))
