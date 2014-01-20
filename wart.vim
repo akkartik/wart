@@ -38,11 +38,6 @@ syntax match wartNumber "\(\W\)\@<=-\=\(\.\d\+\|\d\+\(\.\d*\)\=\)\([dDeEfFlL][-+
 syntax match wartNumber "^-\=\(\.\d\+\|\d\+\(\.\d*\)\=\)\([dDeEfFlL][-+]\=\d\+\)\="
 highlight link wartNumber Constant
 
-" :foo a:b a?:b (f :a x) (:b)
-" ^                ^      ^     keywords
-syntax match wartKeyword /^:[a-zA-Z0-9?!_$]\+\|\([^a-zA-Z0-9?!_$]\)\@<=:[a-zA-Z0-9?!_$]\+/
-highlight link wartKeyword Constant
-
 syntax match wartQuote /'/
 highlight link wartQuote Delimiter
 
