@@ -22,7 +22,7 @@ void load_file(const char* filename) {
   if (f.fail()) return;
   while (!f.eof()) {
     TEMP(form, read(f));
-    trace("dump ") << form << '\n';  // remove trailing space to track down errors in wart files
+//?     cerr << form << '\n';  // uncomment to track down errors in wart files
     rmref(eval(form));
   }
   Interactive = old_interactive;
