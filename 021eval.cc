@@ -12,7 +12,7 @@
 //  varargs functions with some named params: ((fn (fmt ... rest) (printf fmt rest)) "%d%d" 34 35) => "3435"
 //  passing in lists to functions: ((fn ((x y)) (+ x y)) '(3 4)) => 7
 //  aliases for naming list args as well as their parts: ((fn (l | (head ... tail)) (prn l " starts with " head)) '(1 2 3))
-//  functions can reorder args using keyords: ((fn (a b c) b) :b 3 1 2) => 3
+//  functions can reorder args using keywords: ((fn (a b c) b) :b 3 1 2) => 3
 //  functions can document keyword args with a different, aliased name: ((fn (a b|returning c) b) :returning 3 1 2) => 3
 //  callers can pass in keyword args to nested functions
 //  callers can pass in just needed args: ((fn (a b c) (list a b)) :b 3) => (nil 3)
