@@ -1,6 +1,6 @@
 #include<sys/param.h>
 
-void tangle_files_in_cwd() {
+int tangle_files_in_cwd() {
   list<string> result;
   vector<char*> files = sorted_files(".", /*no extension*/ "");
   for (vector<char*>::iterator p = files.begin(); p != files.end(); ++p) {
@@ -11,6 +11,7 @@ void tangle_files_in_cwd() {
   }
   for (list<string>::iterator p = result.begin(); p != result.end(); ++p)
     cout << *p << '\n';
+  return 0;
 }
 
 void tangle(istream& in, list<string>& out) {

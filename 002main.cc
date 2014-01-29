@@ -18,11 +18,15 @@
 bool Interactive = false;
 bool Warn_on_unknown_var = true;
 
+// commandline args
+string Last_file = "";
+
 int main(int argc, const char* argv[]) {
-  if (argc > 1) {
-    bool early_exit = process_args(argc, argv);
-    if (early_exit) return 0;
-  }
+  Last_file = flag_value("--until", argc, argv);
+  if (flag("test", argc, argv))
+    return run_tests();
+  if (flag("tangle", argc, argv))
+    return tangle_files_in_cwd();
 
   //// Interactive loop: parse commands from user, evaluate them, print the results
   setup();
@@ -78,30 +82,25 @@ bool at_end_of_line(indent_sensitive_stream& in) {
   return in.fd.peek() == '\n';
 }
 
-string Last_file = "";
+bool flag(const string& flag, int argc, const char* argv[]) {
+  for (int i = 1; i < argc; ++i)
+    if (string(argv[i]) == flag)
+      return true;
+  return false;
+}
 
-bool process_args(int argc, const char* argv[]) {
-  bool test = false, tangle = false;
-  for (int i = 1; i < argc; ++i) {
-    string arg(argv[i]);
-    if (arg == "test")
-      test = true;
-    else if (arg == "tangle")
-      tangle = true;
-    else if (arg == "--until")
-      Last_file = argv[++i];
-  }
-  if (test) run_tests();
-  else if (tangle) tangle_files_in_cwd();
-  else return false;  // keep going
-  return true;  // early exit
+string flag_value(const string& flag, int argc, const char* argv[]) {
+  for (int i = 1; i < argc; ++i)
+    if (string(argv[i]) == flag)
+      return argv[++i];
+  return "";
 }
 
 
 
 //// test harness
 
-void run_tests() {
+int run_tests() {
   cerr << time_string() << " C tests\n";
   for (unsigned long i=0; i < sizeof(Tests)/sizeof(Tests[0]); ++i) {
     START_TRACING_UNTIL_END_OF_SCOPE;
@@ -122,6 +121,7 @@ void run_tests() {
     cerr << Num_failures << " failure"
          << (Num_failures > 1 ? "s" : "")
          << '\n';
+  return Num_failures;
 }
 
 void verify() {
