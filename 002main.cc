@@ -92,7 +92,7 @@ bool flag(const string& flag, int argc, const char* argv[]) {
 string flag_value(const string& flag, int argc, const char* argv[]) {
   for (int i = 1; i < argc-1; ++i)
     if (string(argv[i]) == flag)
-      return argv[++i];
+      return argv[i+1];
   return "";
 }
 
