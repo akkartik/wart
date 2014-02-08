@@ -147,7 +147,7 @@ cell* eval(cell* expr, cell* scope) {
       update(result, eval(car(form)));
   }
 
-  end_lexical_scope();  // implicitly rmrefs new_scope
+  end_lexical_scope();
   end_dynamic_scope(CURR_LEXICAL_SCOPE);
 
   trace("eval") << "=> " << result;
