@@ -4,7 +4,8 @@ Eventually I'd like to code-generate tests out of this file.
 
 x = 1, y = 2, z = 3
 
-{Param Vararg Rest Quoted Destructured Alias} x {Literal Extra Keyword Unknown-keyword Spliced Incomplete-eval} arg
+{Param Vararg Rest Quoted Destructured Alias aS} x {Literal Extra Keyword conflicting-keyword unknown-keyword @spliced Incomplete-eval} arg
+
 
 type    params          args                    bindings
 
