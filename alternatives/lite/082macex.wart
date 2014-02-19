@@ -3,7 +3,7 @@ def (petrify)
   (update_optimized_bodies)
 
 def (update_macroexpansions)
-  prn "computing expansions"
+  prn "computing expansions (takes ~60 seconds)"
   each (var val) (sort (< car) (as list (globals)))
     (update_macroexpansion val)
 
@@ -14,9 +14,8 @@ def (update_macroexpansion val)
           (zap! strip_eval body.m)))
 
 def (update_optimized_bodies)
-  prn "expanding calls"
+  prn "expanding calls (takes ~60 seconds)"
   each (var val) (sort (< car) (as list (globals)))
-    prn "=== " var
     (update_optimized_body var val)
 
 def (update_optimized_body var val)
@@ -50,4 +49,4 @@ def (strip_eval exprs)
       _.1  # strip away (eval .. caller_scope)
     list # re-enclose in body
 
-#? (petrify)  # failing at 'all'; even earlier transformations might be wrong
+#? (petrify)
