@@ -564,27 +564,27 @@ void test_eval_handles_quoted_rest_keyword_arg() {
 }
 
 void test_eval_handles_non_keyword_arg_colon_syms() {
-  exit(0);
   run("((fn (a b) a) :x 1)");
-  CHECK_TRACE_CONTENTS("ordered_args", "=> (:x 1)");
+  CHECK_TRACE_CONTENTS("bind", "a: :xb: 1");
   CHECK_TRACE_TOP("eval", "=> :x");
 }
 
 void test_eval_handles_keyword_args_inside_splice() {
   run("((fn (a b) b) @'(3 :a 4))");
-  CHECK_TRACE_CONTENTS("ordered_args", "=> (''4 ''3)");
+  CHECK_TRACE_CONTENTS("bind", "a: 4b: 3");
   CHECK_TRACE_TOP("eval", "=> 3");
 }
 
 void test_eval_handles_keyword_args_inside_destructured_params() {
   run("((fn ((a b)) b) '(3 :a 4))");
-  CHECK_TRACE_CONTENTS("ordered_args", "=> (4 3)");
+  CHECK_TRACE_CONTENTS("bind", "a: 4b: 3");
   CHECK_TRACE_TOP("eval", "=> 3");
 }
 
 
 
 void test_eval_handles_param_aliases() {
+  exit(0);
   In_macro.push(true);
   run("((fn (x|y) 3) 4)");
   In_macro.pop();
