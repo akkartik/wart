@@ -588,13 +588,13 @@ void test_eval_handles_param_aliases() {
   CHECK_TRACE_CONTENTS("bind", "x: 4y: 4");
 }
 
-void test_eval_handles_keyword_args_for_fns2() {
-  exit(0);
+void test_eval_handles_aliased_keyword_args() {
   run("((fn (a b c|x) c) :x 1 2)");
   CHECK_TRACE_TOP("eval", "=> 1");
 }
 
 void test_eval_handles_body_keyword_synonym() {
+  exit(0);
   run("((fn (a ... body|do) body) 2 :do 1 3)");
   CHECK_TRACE_TOP("eval", "=> (1 3)");
 }

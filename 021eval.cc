@@ -225,6 +225,12 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
 
   if (is_alias(param)) {
     trace("bind") << "alias " << param << '\n';
+    cell* arg =  car(p_args);
+    cell* keyword_arg = find_any_keyword_arg(cdr(param), args);
+    if (keyword_arg)
+      arg = car(cdr(keyword_arg));
+    TEMP(val, nil);
+    bool eval_done = false;
     for (cell* aliases = cdr(param); aliases != nil; aliases=cdr(aliases)) {
       cell* alias = car(aliases);
       if (is_cons(strip_quote(alias)) && cdr(aliases) != nil)
@@ -238,7 +244,10 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
         }
         else {
           trace("bind") << "alias " << alias << '\n';
-          TEMP(val, eval(car(p_args), scope));
+          if (!eval_done) {
+            update(val, eval(arg, scope));
+            eval_done = true;
+          }
           add_lexical_binding(alias, val, new_scope);
         }
       }
@@ -294,6 +303,21 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
     add_lexical_binding(param, val, new_scope);
     eval_bind_one(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
   }
+}
+
+cell* find_any_keyword_arg(cell* aliases, cell* args) {
+  for (; aliases != nil; aliases=cdr(aliases)) {
+    if (!is_cons(strip_quote(car(aliases)))) {
+      cell* result = find_keyword_arg(strip_quote(car(aliases)), args);
+      if (result) return result;
+    }
+    else {
+      if (cdr(aliases) != nil)
+        RAISE << "only the last alias can contain multiple names " << aliases << '\n';
+      // no keyword args for destructured params
+    }
+  }
+  return NULL;
 }
 
 cell* find_keyword_arg(cell* param, cell* args) {
