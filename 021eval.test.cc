@@ -501,84 +501,70 @@ void test_eval_splice_on_backquoteless_macros_warns() {
 
 
 
-void test_eval_keeps_nil_rest_args() {
-  exit(0);
-  run("((fn a 3) nil)");
-  CHECK_TRACE_CONTENTS("ordered_args", "unchanged: (nil)");
-  run("((fn 'a 3) nil)");
-  CHECK_TRACE_CONTENTS("ordered_args", "unchanged: (nil)");
-}
-
-void test_eval_orders_improper_arg_list() {
-  TEMP(args, read("(3 ... 4)"));
-  TEMP(params, read("(a ... b)"));
-  rmref(reorder_keyword_args(args, params));
-  CHECK_TRACE_CONTENTS("ordered_args", "=> (3 ... 4)");
-}
-
-void test_eval_passes_in_excess_args() {
-  run("((fn (a b) 3) 3 4 5)");
-  CHECK_TRACE_CONTENTS("ordered_args", "=> (3 4 5)");
+void test_eval_handles_keyword_arg() {
+  run("((fn (a b) a) 2 :a 1)");
+  CHECK_TRACE_CONTENTS("bind", "a: 1");
 }
 
 void test_eval_handles_nil_keyword_arg() {
   run("((fn (a) a) 2 :a nil)");
-  CHECK_TRACE_CONTENTS("ordered_args", "=> (nil 2)");
+  CHECK_TRACE_CONTENTS("bind", "a: nil");
 }
 
 void test_eval_handles_keyword_args() {
   run("((fn (a b c) c) :c 1 2)");
-  CHECK_TRACE_CONTENTS("ordered_args", "=> (2 nil 1)");
+  CHECK_TRACE_CONTENTS("bind", "a: 2b: nilc: 1");
   CHECK_TRACE_TOP("eval", "=> 1");
 }
 
 void test_eval_handles_quoted_keyword_args() {
   run("((fn (a b 'c) c) :c 1 2)");
-  CHECK_TRACE_CONTENTS("ordered_args", "=> (2 nil 1)");
+  CHECK_TRACE_CONTENTS("bind", "a: 2b: nilc: 1");
   CHECK_TRACE_TOP("eval", "=> 1");
 }
 
 void test_eval_handles_quoted_keyword_args2() {
   run("x <- 1");
   run("((fn (a b 'c) c) :c x 2)");
-  CHECK_TRACE_CONTENTS("ordered_args", "=> (2 nil x)");
+  CHECK_TRACE_CONTENTS("bind", "a: 2b: nilc: x");
   CHECK_TRACE_TOP("eval", "=> x");
   end_dynamic_scope("x");
 }
 
 void test_eval_handles_rest_keyword_arg() {
   run("((fn (a ... b) b) 2 :b 1 3)");
-  CHECK_TRACE_CONTENTS("ordered_args", "=> (2 1 3)");
+  CHECK_TRACE_CONTENTS("bind", "a: 2b: (1 3)");
   CHECK_TRACE_TOP("eval", "=> (1 3)");
 }
 
 void test_eval_handles_rest_keyword_arg2() {
   run("((fn (a ... b) b) :b 1 2 3)");
-  CHECK_TRACE_CONTENTS("ordered_args", "=> (nil 1 2 3)");
+  CHECK_TRACE_CONTENTS("bind", "a: nilb: (1 2 3)");
   CHECK_TRACE_TOP("eval", "=> (1 2 3)");
 }
 
 void test_eval_handles_args_after_rest_keyword() {
   run("((fn (a ... b) b) :b 1 2 :a 3)");
-  CHECK_TRACE_CONTENTS("ordered_args", "=> (3 1 2)");
+  CHECK_TRACE_CONTENTS("bind", "a: 3b: (1 2)");
   CHECK_TRACE_TOP("eval", "=> (1 2)");
 }
 
 void test_eval_handles_args_after_rest_keyword2() {
   run("((fn (a b ... c) b) :c 1 2 :b 3)");
-  CHECK_TRACE_CONTENTS("ordered_args", "=> (nil 3 1 2)");
+  CHECK_TRACE_CONTENTS("bind", "a: nilb: 3c: (1 2)");
   CHECK_TRACE_TOP("eval", "=> 3");
 }
 
 void test_eval_handles_quoted_rest_keyword_arg() {
   run("x <- 2");
   run("((fn (a ... 'b) b) :b 1 x 3)");
-  CHECK_TRACE_CONTENTS("ordered_args", "=> (nil 1 x 3)");
+  CHECK_TRACE_CONTENTS("bind", "a: nilb: (1 x 3)");
   CHECK_TRACE_TOP("eval", "=> (1 x 3)");
   end_dynamic_scope("x");
 }
 
 void test_eval_handles_non_keyword_arg_colon_syms() {
+  exit(0);
   run("((fn (a b) a) :x 1)");
   CHECK_TRACE_CONTENTS("ordered_args", "=> (:x 1)");
   CHECK_TRACE_TOP("eval", "=> :x");
