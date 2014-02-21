@@ -160,18 +160,33 @@ cell* eval(cell* expr, cell* scope) {
 //  destructured params
 //  aliased params
 void eval_bind_all(cell* params, cell* args, cell* scope, cell* new_scope, bool is_macro) {
-  trace("bind/all") << params << " <-> " << args;
+  trace("bind") << params << " <-> " << args;
   eval_bind_one(strip_quote(params), strip_quote(params), is_quoted(params), args, args, scope, new_scope, is_macro);
 }
 
 // Bind the param at p_params inside params to the appropriate arg inside
 // args, and recurse.
 void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* args, cell* p_args, cell* scope, cell* new_scope, bool is_macro) {
-  trace("bind/one") << params << p_params << " <-> " << args << p_args << '\n';
+  trace("bind") << params << p_params << " <-> " << args << p_args << '\n';
   if (p_params == nil) return;
 
+  if (!is_cons(p_args) && p_args != nil) {
+    if (is_cons(strip_quote(p_params)))
+      RAISE << "tried to destructure " << p_params << " <-> " << p_args << '\n';
+    if (is_quoted(p_params)) {
+      trace("bind") << "single quoted (alias) " << p_params << '\n';
+      add_lexical_binding(strip_quote(p_params), p_args, new_scope);
+    }
+    else {
+      trace("bind") << "single (alias) " << p_params << '\n';
+      TEMP(val, eval(p_args, scope));
+      add_lexical_binding(p_params, val, new_scope);
+    }
+    return;
+  }
+
   p_args = skip_keyword_args(p_args, params);
-  trace("bind/") << "skipping ahead to " << p_args << '\n';
+  trace("bind") << "skipping ahead to " << p_args << '\n';
 
   if (is_quoted(p_params) && is_params_quoted) {
     RAISE << "Can't doubly-quote params " << params << '\n';
@@ -181,7 +196,7 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
   if (is_quoted(p_params)
       || (is_sym(p_params) && is_params_quoted)) {
     p_params = strip_quote(p_params);
-    trace("bind/") << "quoted rest " << p_params << '\n';
+    trace("bind") << "quoted rest " << p_params << '\n';
     TEMP(rest_args, mkref(p_args));
     cell* keyword_arg = find_keyword_arg(p_params, args);
     if (keyword_arg) {
@@ -195,7 +210,7 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
   }
 
   if (is_sym(p_params)) {
-    trace("bind/") << "rest " << p_params << '\n';
+    trace("bind") << "rest " << p_params << '\n';
     TEMP(rest_args, mkref(p_args));
     cell* keyword_arg = find_keyword_arg(p_params, args);
     if (keyword_arg) {
@@ -207,16 +222,36 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
     return;
   }
 
+  if (is_alias(p_params)) {
+    trace("bind") << "rest alias " << p_params << '\n';
+    return;
+  }
+
   cell* param = car(p_params);
   if (is_quoted(param) && is_params_quoted) {
-    RAISE << "Can't doubly-quote params " << params << '\n';
+    RAISE << "can't doubly-quote params " << params << '\n';
+    return;
+  }
+
+  if (is_alias(param)) {
+    trace("bind") << "alias " << param << '\n';
+    for (cell* aliases = cdr(param); aliases != nil; aliases=cdr(aliases)) {
+      if (is_cons(strip_quote(car(aliases))) && cdr(aliases) != nil)
+        RAISE << "only the last alias can contain multiple names " << param << '\n';
+      else if (is_params_quoted && is_quoted(car(aliases)))
+        RAISE << "can't doubly-quote param alias " << params << '\n';
+      else {
+        eval_bind_one(strip_quote(car(aliases)), strip_quote(car(aliases)), is_params_quoted || is_quoted(car(aliases)), car(p_args), car(p_args), scope, new_scope, is_macro);
+      }
+      eval_bind_one(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
+    }
     return;
   }
 
   if ((is_quoted(param) && is_sym(strip_quote(param)))
       || (is_sym(param) && is_params_quoted)) {
     param = strip_quote(param);
-    trace("bind/") << "quoted " << param << '\n';
+    trace("bind") << "quoted " << param << '\n';
     // TODO: should we strip_already_evald on arg if !macro?
     cell* keyword_arg = find_keyword_arg(param, args);
     if (keyword_arg) {
@@ -230,24 +265,25 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
     return;
   }
 
+  // destructured params don't support keywords on the outside
   if ((is_quoted(param) && is_cons(strip_quote(param)))
       || (is_cons(param) && is_params_quoted)) {
     param = strip_quote(param);
-    trace("bind/") << "quoted destructured " << param << '\n';
+    trace("bind") << "quoted destructured " << param << '\n';
     eval_bind_one(param, param, true, car(p_args), car(p_args), scope, new_scope, is_macro);
     eval_bind_one(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
     return;
   }
 
   if (is_cons(param)) {
-    trace("bind/") << "destructured " << param << '\n';
+    trace("bind") << "destructured " << param << '\n';
     TEMP(val, eval_arg(car(p_args), scope));
     eval_bind_one(param, param, true, val, val, scope, new_scope, is_macro);
     eval_bind_one(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
     return;
   }
 
-  trace("bind/") << "regular " << param << '\n';
+  trace("bind") << "regular " << param << '\n';
   cell* keyword_arg = find_keyword_arg(param, args);
   if (keyword_arg) {
     TEMP(val, eval_arg(car(cdr(keyword_arg)), scope));

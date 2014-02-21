@@ -584,14 +584,12 @@ void test_eval_handles_keyword_args_inside_destructured_params() {
 
 
 void test_eval_handles_param_aliases() {
-  exit(0);
-  In_macro.push(true);
   run("((fn (x|y) 3) 4)");
-  In_macro.pop();
   CHECK_TRACE_CONTENTS("bind", "x: 4y: 4");
 }
 
 void test_eval_handles_keyword_args_for_fns2() {
+  exit(0);
   run("((fn (a b c|x) c) :x 1 2)");
   CHECK_TRACE_TOP("eval", "=> 1");
 }
