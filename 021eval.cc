@@ -188,10 +188,10 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
     p_params = strip_quote(p_params);
     trace("bind") << "quoted rest " << p_params << '\n';
     TEMP(rest_args, mkref(p_args));
-    cell* keyword_arg = find_keyword_arg(p_params, args);
-    if (keyword_arg) {
-      update(rest_args, snip(cdr(keyword_arg),
-                             next_keyword(keyword_arg, params)));
+    cell* p_keyword_arg = find_keyword_arg(p_params, args);
+    if (p_keyword_arg) {
+      update(rest_args, snip(cdr(p_keyword_arg),
+                             next_keyword(p_keyword_arg, params)));
     }
     if (!is_macro)
       update(rest_args, strip_all_already_evald(rest_args));
@@ -202,10 +202,10 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
   if (is_sym(p_params)) {
     trace("bind") << "rest " << p_params << '\n';
     TEMP(rest_args, mkref(p_args));
-    cell* keyword_arg = find_keyword_arg(p_params, args);
-    if (keyword_arg) {
-      update(rest_args, snip(cdr(keyword_arg),
-                             next_keyword(keyword_arg, params)));
+    cell* p_keyword_arg = find_keyword_arg(p_params, args);
+    if (p_keyword_arg) {
+      update(rest_args, snip(cdr(p_keyword_arg),
+                             next_keyword(p_keyword_arg, params)));
     }
     TEMP(val, eval_all(rest_args, scope));
     add_lexical_binding(p_params, val, new_scope);
@@ -226,9 +226,9 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
   if (is_alias(param)) {
     trace("bind") << "alias " << param << '\n';
     cell* arg =  car(p_args);
-    cell* keyword_arg = find_any_keyword_arg(cdr(param), args);
-    if (keyword_arg)
-      arg = car(cdr(keyword_arg));
+    cell* p_keyword_arg = find_any_keyword_arg(cdr(param), args);
+    if (p_keyword_arg)
+      arg = car(cdr(p_keyword_arg));
     TEMP(val, nil);
     bool eval_done = false;
     for (cell* aliases = cdr(param); aliases != nil; aliases=cdr(aliases)) {
@@ -261,9 +261,9 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
     param = strip_quote(param);
     trace("bind") << "quoted " << param << '\n';
     // TODO: should we strip_already_evald on arg if !macro?
-    cell* keyword_arg = find_keyword_arg(param, args);
-    if (keyword_arg) {
-      add_lexical_binding(param, car(cdr(keyword_arg)), new_scope);
+    cell* p_keyword_arg = find_keyword_arg(param, args);
+    if (p_keyword_arg) {
+      add_lexical_binding(param, car(cdr(p_keyword_arg)), new_scope);
       eval_bind_one(params, cdr(p_params), is_params_quoted, args, p_args, scope, new_scope, is_macro);
     }
     else {
@@ -292,9 +292,9 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
   }
 
   trace("bind") << "regular " << param << '\n';
-  cell* keyword_arg = find_keyword_arg(param, args);
-  if (keyword_arg) {
-    TEMP(val, eval_arg(car(cdr(keyword_arg)), scope));
+  cell* p_keyword_arg = find_keyword_arg(param, args);
+  if (p_keyword_arg) {
+    TEMP(val, eval_arg(car(cdr(p_keyword_arg)), scope));
     add_lexical_binding(param, val, new_scope);
     eval_bind_one(params, cdr(p_params), is_params_quoted, args, p_args, scope, new_scope, is_macro);
   }
