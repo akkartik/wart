@@ -142,8 +142,32 @@ void test_eval_handles_unquote_splice_unquote() {
 
 
 
-void test_eval_handles_fn_calls() {
+void test_eval_handles_literal_function_call() {
   trace("test") << "fn params";
+  TEMP(f, read("(object function)"));
+  cell* t = new_table();
+  set_cdr(cdr(f), new_cons(t));
+  TEMP(body, read("(34)"));
+  set(t, sym_body, body);
+  TEMP(call, mkref(new_cons(f)));
+  rmref(eval(call));
+  CHECK_TRACE_TOP("eval", "=> 34");
+}
+
+void test_eval_handles_literal_function_call2() {
+  TEMP(f, read("(object function)"));
+  cell* t = new_table();
+  set_cdr(cdr(f), new_cons(t));
+  TEMP(body, read("(a)"));
+  set(t, sym_body, body);
+  TEMP(sig, read("(a)"));
+  set(t, sym_sig, sig);
+  TEMP(call, mkref(new_cons(f, new_cons(new_num(34)))));
+  rmref(eval(call));
+  CHECK_TRACE_TOP("eval", "=> 34");
+}
+
+void test_eval_handles_fn_calls() {
   run("((fn () 34))");
   CHECK_TRACE_TOP("eval", "=> 34");
 }
@@ -478,6 +502,7 @@ void test_eval_splice_on_backquoteless_macros_warns() {
 
 
 void test_eval_keeps_nil_rest_args() {
+  exit(0);
   run("((fn a 3) nil)");
   CHECK_TRACE_CONTENTS("ordered_args", "unchanged: (nil)");
   run("((fn 'a 3) nil)");

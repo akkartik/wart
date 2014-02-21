@@ -118,9 +118,10 @@ cell* eval(cell* expr, cell* scope) {
 
   // eval its args in the caller's lexical environment
   TEMP(spliced_args, splice_args(cdr(expr), scope, fn));
-  TEMP(ordered_args, reorder_keyword_args(spliced_args, sig(fn)));
+//?   TEMP(ordered_args, reorder_keyword_args(spliced_args, sig(fn)));
   TEMP(new_scope, mkref(new_table()));
-  eval_bind_all(sig(fn), ordered_args, scope, new_scope, is_macro(fn));
+  eval_bind_all(sig(fn), spliced_args, scope, new_scope, is_macro(fn));
+  trace("bind/") << "eval2 " << new_scope << '\n';
 
   if (car(expr) != new_sym("speculatively")
       && any_incomplete_eval(new_scope)) {
@@ -159,29 +160,100 @@ cell* eval(cell* expr, cell* scope) {
 //  destructured params
 //  aliased params
 void eval_bind_all(cell* params, cell* args, cell* scope, cell* new_scope, bool is_macro) {
-  trace("eval/bind/all") << params << " <-> " << args;
-  if (params == nil)
-    ;
-
-  else if (is_sym(strip_quote(params))) {
-    cell* dummy = NULL;
-    eval_bind_rest(params, args, &dummy, scope, new_scope, is_macro);
-  }
-
-  else if (!is_cons(strip_quote(params)))
-    ;
-
-  else if (is_alias(strip_quote(params)))
-    eval_bind_rest_aliases(params, args, scope, new_scope, is_macro);
-
-  else if (is_quoted(params))
-    bind_params(params, args, NULL, new_scope, is_macro, false, true);
-
-  else {
-    eval_bind_param(car(params), car(args), scope, new_scope, is_macro);
-    eval_bind_all(cdr(params), cdr(args), scope, new_scope, is_macro);
-  }
+  trace("bind/all") << params << " <-> " << args;
+  eval_bind_one(strip_quote(params), strip_quote(params), is_quoted(params), args, args, scope, new_scope, is_macro);
 }
+
+// Bind the param at p_params inside params to the appropriate arg inside
+// args, and recurse.
+void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* args, cell* p_args, cell* scope, cell* new_scope, bool is_macro) {
+  trace("bind/one") << params << p_params << " <-> " << args << p_args << '\n';
+  if (p_params == nil) return;
+
+  if (is_quoted(p_params) && is_params_quoted) {
+    RAISE << "Can't doubly-quote params " << params << '\n';
+    return;
+  }
+
+  if (is_quoted(p_params)
+      || (is_sym(p_params) && is_params_quoted)) {
+    p_params = strip_quote(p_params);
+    trace("bind/") << "quoted rest " << p_params << '\n';
+    TEMP(correct_args, mkref(p_args));
+    if (!is_macro)
+      update(correct_args, strip_all_already_evald(correct_args));
+    add_lexical_binding(p_params, correct_args, new_scope);
+    return;
+  }
+
+  if (is_sym(p_params)) {
+    trace("bind/") << "rest " << p_params << '\n';
+    TEMP(val, eval_all(p_args, scope));
+    add_lexical_binding(p_params, val, new_scope);
+    return;
+  }
+
+  cell* param = car(p_params);
+  if (is_quoted(param) && is_params_quoted) {
+    RAISE << "Can't doubly-quote params " << params << '\n';
+    return;
+  }
+
+  if ((is_quoted(param) && is_sym(strip_quote(param)))
+      || (is_sym(param) && is_params_quoted)) {
+    param = strip_quote(param);
+    trace("bind/") << "quoted " << param << '\n';
+    // TODO: should we strip_quotes on car(p_args) if !macro?
+    add_lexical_binding(param, car(p_args), new_scope);
+    eval_bind_one(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
+    return;
+  }
+
+  if ((is_quoted(param) && is_cons(strip_quote(param)))
+      || (is_cons(param) && is_params_quoted)) {
+    param = strip_quote(param);
+    trace("bind/") << "quoted destructured " << param << '\n';
+    eval_bind_one(param, param, true, car(p_args), car(p_args), scope, new_scope, is_macro);
+    eval_bind_one(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
+    return;
+  }
+
+  if (is_cons(param)) {
+    TEMP(val, eval_arg(car(p_args), scope));
+    eval_bind_one(param, param, true, val, val, scope, new_scope, is_macro);
+    eval_bind_one(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
+    return;
+  }
+
+  trace("bind/") << "regular " << param << '\n';
+  TEMP(val, eval_arg(car(p_args), scope));
+  add_lexical_binding(param, val, new_scope);
+  eval_bind_one(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
+}
+
+//? 
+//?   if (params == nil)
+//?     ;
+//? 
+//?   else if (is_sym(strip_quote(params))) {
+//?     cell* dummy = NULL;
+//?     eval_bind_rest(params, args, &dummy, scope, new_scope, is_macro);
+//?   }
+//? 
+//?   else if (!is_cons(strip_quote(params)))
+//?     ;
+//? 
+//?   else if (is_alias(strip_quote(params)))
+//?     eval_bind_rest_aliases(params, args, scope, new_scope, is_macro);
+//? 
+//?   else if (is_quoted(params))
+//?     bind_params(params, args, NULL, new_scope, is_macro, false, true);
+//? 
+//?   else {
+//?     eval_bind_param(car(params), car(args), scope, new_scope, is_macro);
+//?     eval_bind_all(cdr(params), cdr(args), scope, new_scope, is_macro);
+//?   }
+//? }
 
 void eval_bind_rest(cell* param, cell* args, cell** cached_val, cell* scope, cell* new_scope, bool is_macro) {
   trace("eval/bind/rest") << param << " <-> " << args;
