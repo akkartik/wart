@@ -170,18 +170,8 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
   trace("bind") << params << p_params << " <-> " << args << p_args << '\n';
   if (p_params == nil) return;
 
-  if (!is_cons(p_args) && p_args != nil) {
-    if (is_cons(strip_quote(p_params)))
-      RAISE << "tried to destructure " << p_params << " <-> " << p_args << '\n';
-    if (is_quoted(p_params)) {
-      trace("bind") << "single quoted (alias) " << p_params << '\n';
-      add_lexical_binding(strip_quote(p_params), p_args, new_scope);
-    }
-    else {
-      trace("bind") << "single (alias) " << p_params << '\n';
-      TEMP(val, eval(p_args, scope));
-      add_lexical_binding(p_params, val, new_scope);
-    }
+  if (p_args != nil && !is_cons(p_args)) {
+    RAISE << "trying to bind against non-cons " << p_args << '\n';
     return;
   }
 
@@ -236,12 +226,21 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
   if (is_alias(param)) {
     trace("bind") << "alias " << param << '\n';
     for (cell* aliases = cdr(param); aliases != nil; aliases=cdr(aliases)) {
-      if (is_cons(strip_quote(car(aliases))) && cdr(aliases) != nil)
+      cell* alias = car(aliases);
+      if (is_cons(strip_quote(alias)) && cdr(aliases) != nil)
         RAISE << "only the last alias can contain multiple names " << param << '\n';
-      else if (is_params_quoted && is_quoted(car(aliases)))
+      else if (is_params_quoted && is_quoted(alias))
         RAISE << "can't doubly-quote param alias " << params << '\n';
       else {
-        eval_bind_one(strip_quote(car(aliases)), strip_quote(car(aliases)), is_params_quoted || is_quoted(car(aliases)), car(p_args), car(p_args), scope, new_scope, is_macro);
+        if (is_quoted(alias)) {
+          trace("bind") << "quoted alias " << alias << '\n';
+          add_lexical_binding(strip_quote(alias), car(p_args), new_scope);
+        }
+        else {
+          trace("bind") << "alias " << alias << '\n';
+          TEMP(val, eval(car(p_args), scope));
+          add_lexical_binding(alias, val, new_scope);
+        }
       }
       eval_bind_one(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
     }
