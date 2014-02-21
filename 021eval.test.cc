@@ -593,13 +593,13 @@ void test_eval_handles_aliased_keyword_args() {
   CHECK_TRACE_TOP("eval", "=> 1");
 }
 
-void test_eval_handles_body_keyword_synonym() {
+void test_eval_handles_aliased_rest_keyword_args() {
   exit(0);
   run("((fn (a ... body|do) body) 2 :do 1 3)");
   CHECK_TRACE_TOP("eval", "=> (1 3)");
 }
 
-void test_eval_handles_body_keyword_synonym2() {
+void test_eval_handles_aliased_rest_keyword_args2() {
   run("((fn (a b ... body|do) `(,a ,b ,body)) 2 :do 1 3)");
   CHECK_TRACE_TOP("eval", "=> (2 nil (1 3))");
 }
