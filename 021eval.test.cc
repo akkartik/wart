@@ -593,6 +593,13 @@ void test_eval_handles_aliased_keyword_args() {
   CHECK_TRACE_TOP("eval", "=> 1");
 }
 
+void test_eval_handles_quoted_param_aliases() {
+  new_dynamic_scope("x", new_num(3));
+  run("((fn ((a | 'b)) 3) x)");
+  CHECK_TRACE_CONTENTS("bind", "a: 3b: x");
+  end_dynamic_scope("x");
+}
+
 void test_eval_handles_aliased_rest_keyword_args() {
   exit(0);
   run("((fn (a ... body|do) body) 2 :do 1 3)");
@@ -602,13 +609,6 @@ void test_eval_handles_aliased_rest_keyword_args() {
 void test_eval_handles_aliased_rest_keyword_args2() {
   run("((fn (a b ... body|do) `(,a ,b ,body)) 2 :do 1 3)");
   CHECK_TRACE_TOP("eval", "=> (2 nil (1 3))");
-}
-
-void test_eval_handles_quoted_param_aliases() {
-  new_dynamic_scope("x", new_num(3));
-  run("((fn ((a | 'b)) 3) x)");
-  CHECK_TRACE_CONTENTS("bind", "a: 3b: x");
-  end_dynamic_scope("x");
 }
 
 void test_eval_handles_quoted_rest_param_aliases() {
