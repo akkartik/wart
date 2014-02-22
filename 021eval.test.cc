@@ -613,7 +613,6 @@ void test_eval_handles_aliased_rest_keyword_args2() {
 }
 
 void test_eval_handles_quoted_rest_param_aliases() {
-  exit(0);
   new_dynamic_scope("x", new_num(3));
   run("((fn (a | 'b) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: (3)b: (x)");
@@ -622,6 +621,7 @@ void test_eval_handles_quoted_rest_param_aliases() {
 
 // param aliases also stand in for as-params like in haskell
 void test_eval_binds_as_params() {
+  exit(0);
   run("((fn (a | (b c)) 3) 1 2)");
   CHECK_TRACE_CONTENTS("bind", "a: (1 2)b: 1c: 2");
 }

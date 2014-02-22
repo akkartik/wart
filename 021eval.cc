@@ -234,11 +234,11 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
         RAISE << "can't doubly-quote param alias " << p_params << '\n';
       else {
         if (is_quoted(alias)) {
-          trace("bind") << "quoted alias " << alias << '\n';
-          add_lexical_binding(strip_quote(alias), car(p_args), new_scope);
+          trace("bind") << "quoted rest alias " << alias << '\n';
+          add_lexical_binding(strip_quote(alias), rest_args, new_scope);
         }
         else {
-          trace("bind") << "alias " << alias << '\n';
+          trace("bind") << "rest alias " << alias << '\n';
           if (!eval_done) {
             update(val, eval_all(rest_args, scope));
             eval_done = true;
