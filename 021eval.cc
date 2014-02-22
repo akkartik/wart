@@ -354,10 +354,12 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
 }
 
 cell* find_any_keyword_arg(cell* aliases, cell* args) {
+  cell* result = NULL;
   for (; aliases != nil; aliases=cdr(aliases)) {
     if (!is_cons(strip_quote(car(aliases)))) {
-      cell* result = find_keyword_arg(strip_quote(car(aliases)), args);
-      if (result) return result;
+      cell* curr = find_keyword_arg(strip_quote(car(aliases)), args);
+      if (curr && result) RAISE << "conflicting keyword args in " << args << '\n';
+      if (curr) result = curr;
     }
     else {
       if (cdr(aliases) != nil)
@@ -365,7 +367,7 @@ cell* find_any_keyword_arg(cell* aliases, cell* args) {
       // no keyword args for destructured params
     }
   }
-  return NULL;
+  return result;
 }
 
 cell* find_keyword_arg(cell* param, cell* args) {
@@ -378,9 +380,11 @@ cell* find_keyword_arg(cell* param, cell* args) {
 }
 
 cell* skip_keyword_args(cell* args, cell* params) {
+  trace("bind") << "skip keyword? " << args << "\n";
   if (!is_keyword_sym(car(args))) return args;
   TEMP(maybe_param, mkref(new_sym(to_string(car(args)).substr(1))));
   if (!contains_non_destructured_param(params, maybe_param)) {
+    trace("bind") << "done skipping " << args << '\n';
     return args;
   }
   if (is_rest_param(maybe_param, params)) {
@@ -397,7 +401,18 @@ bool contains_non_destructured_param(cell* params, cell* sym) {
   if (is_quoted(params)) params = strip_quote(params);
   if (params == sym) return true;
   if (!is_cons(params)) return false;
-  if (sym == strip_quote(car(params))) return true;
+  if (is_alias(params)) {
+    trace("bind") << "match rest alias\n";
+    return param_alias_match(cdr(params), sym)
+           || contains_non_destructured_param(cdr(params), sym);
+  }
+  cell* param = strip_quote(car(params));
+  if (sym == param) return true;
+  if (is_alias(param)) {
+    trace("bind") << "match alias\n";
+    return param_alias_match(cdr(param), sym)
+           || contains_non_destructured_param(cdr(params), sym);
+  }
   return contains_non_destructured_param(cdr(params), sym);
 }
 

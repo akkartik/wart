@@ -636,11 +636,10 @@ void test_eval_binds_as_params_with_keyword_args2() {
 }
 
 void test_eval_warns_on_keyword_args_for_conflicting_aliases() {
-  exit(0);
   Hide_warnings = true;
-  run("((fn (a|b c|d) 3) :c 1 :d 2)");
+  run("((fn (a|b c|d) (cons a (cons b (cons c d)))) :c 1 :d 2)");
   CHECK_TRACE_WARNS();
-  CHECK_TRACE_CONTENTS("bind", "a: (:d 1)a: :db: :dc: 1d: 1");
+  CHECK_TRACE_CONTENTS("eval", "=> (nil nil 2 ... 2)");
 }
 
 void test_eval_binds_as_params_recursively() {
@@ -655,7 +654,7 @@ void test_eval_binds_as_params_recursively_using_keyword_args() {
 
 void test_eval_binds_quoted_as_params_recursively_using_keyword_args() {
   run("((fn ('a | (b|c)) 3) :b 1)");
-  CHECK_TRACE_CONTENTS("bind", "a: (1)b: 1");
+  CHECK_TRACE_CONTENTS("bind", "a: (:b 1)b: 1");
 }
 
 void test_eval_binds_quoted_rest_as_params_recursively_using_keyword_args() {
@@ -664,6 +663,7 @@ void test_eval_binds_quoted_rest_as_params_recursively_using_keyword_args() {
 }
 
 void test_eval_binds_quoted_as_params() {
+  exit(0);
   new_dynamic_scope("x", new_num(3));
   run("((fn ('a | ('b)) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: (x)b: x");
