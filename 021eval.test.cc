@@ -626,17 +626,17 @@ void test_eval_binds_as_params() {
 }
 
 void test_eval_binds_as_params_with_keyword_args() {
-  exit(0);
   run("((fn (a | (b c)) 3) 1 :b 2)");
-  CHECK_TRACE_CONTENTS("bind", "a: (2 1)b: 2c: 1");
+  CHECK_TRACE_CONTENTS("bind", "a: (1 :b 2)b: 2c: 1");
 }
 
 void test_eval_binds_as_params_with_keyword_args2() {
   run("((fn (a | (b c d)) 3) 1 :b 2 3)");
-  CHECK_TRACE_CONTENTS("bind", "a: (2 1 3)b: 2c: 1d: 3");
+  CHECK_TRACE_CONTENTS("bind", "a: (1 :b 2 3)b: 2c: 1d: 3");
 }
 
 void test_eval_warns_on_keyword_args_for_conflicting_aliases() {
+  exit(0);
   Hide_warnings = true;
   run("((fn (a|b c|d) 3) :c 1 :d 2)");
   CHECK_TRACE_WARNS();
