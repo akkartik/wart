@@ -216,6 +216,37 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
 
   if (is_alias(p_params)) {
     trace("bind") << "rest alias " << p_params << '\n';
+    TEMP(rest_args, mkref(p_args));
+    cell* p_keyword_arg = find_any_keyword_arg(cdr(p_params), args);
+    if (p_keyword_arg) {
+      trace("bind") << "until next keyword after " << p_keyword_arg << '\n';
+      update(rest_args, snip(cdr(p_keyword_arg),
+                             next_keyword(cdr(p_keyword_arg), params)));
+      trace("bind") << "rest alias keyword " << rest_args << '\n';
+    }
+    TEMP(val, nil);
+    bool eval_done = false;
+    for (cell* aliases = cdr(p_params); aliases != nil; aliases=cdr(aliases)) {
+      cell* alias = car(aliases);
+      if (is_cons(strip_quote(alias)) && cdr(aliases) != nil)
+        RAISE << "only the last alias can contain multiple names " << p_params << '\n';
+      else if (is_params_quoted && is_quoted(alias))
+        RAISE << "can't doubly-quote param alias " << p_params << '\n';
+      else {
+        if (is_quoted(alias)) {
+          trace("bind") << "quoted alias " << alias << '\n';
+          add_lexical_binding(strip_quote(alias), car(p_args), new_scope);
+        }
+        else {
+          trace("bind") << "alias " << alias << '\n';
+          if (!eval_done) {
+            update(val, eval_all(rest_args, scope));
+            eval_done = true;
+          }
+          add_lexical_binding(alias, val, new_scope);
+        }
+      }
+    }
     return;
   }
 
@@ -253,8 +284,8 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
           add_lexical_binding(alias, val, new_scope);
         }
       }
-      eval_bind_one(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
     }
+    eval_bind_one(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
     return;
   }
 
@@ -374,8 +405,11 @@ cell* next_keyword_arg(cell* args, cell* params) {
 bool is_rest_param(cell* param, cell* params) {
   if (param == nil) return false;
   cell* curr = params;
-  while (curr != nil && !is_sym(curr))
+  while (is_cons(curr) && !is_alias(curr)) {
     curr = cdr(curr);
+  }
+  if (is_alias(curr))
+    return param_alias_match(cdr(curr), param);
   return curr == param;
 }
 
