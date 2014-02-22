@@ -621,12 +621,12 @@ void test_eval_handles_quoted_rest_param_aliases() {
 
 // param aliases also stand in for as-params like in haskell
 void test_eval_binds_as_params() {
-  exit(0);
   run("((fn (a | (b c)) 3) 1 2)");
   CHECK_TRACE_CONTENTS("bind", "a: (1 2)b: 1c: 2");
 }
 
 void test_eval_binds_as_params_with_keyword_args() {
+  exit(0);
   run("((fn (a | (b c)) 3) 1 :b 2)");
   CHECK_TRACE_CONTENTS("bind", "a: (2 1)b: 2c: 1");
 }

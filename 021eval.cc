@@ -234,8 +234,14 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
         RAISE << "can't doubly-quote param alias " << p_params << '\n';
       else {
         if (is_quoted(alias)) {
-          trace("bind") << "quoted rest alias " << alias << '\n';
-          add_lexical_binding(strip_quote(alias), rest_args, new_scope);
+          if (is_cons(strip_quote(alias)) && is_cons(rest_args)) {
+            trace("bind") << "quoted destructured rest alias (as-param) " << alias << '\n';
+            eval_bind_one(alias, alias, true, rest_args, rest_args, scope, new_scope, is_macro);
+          }
+          else {
+            trace("bind") << "quoted rest alias " << alias << '\n';
+            add_lexical_binding(strip_quote(alias), rest_args, new_scope);
+          }
         }
         else {
           trace("bind") << "rest alias " << alias << '\n';
@@ -243,7 +249,13 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
             update(val, eval_all(rest_args, scope));
             eval_done = true;
           }
-          add_lexical_binding(alias, val, new_scope);
+          if (is_cons(alias) && is_cons(val)) {
+            trace("bind") << "destructured rest alias (as-param) " << alias << '\n';
+            eval_bind_one(alias, alias, true, val, val, scope, new_scope, is_macro);
+          }
+          else {
+            add_lexical_binding(alias, val, new_scope);
+          }
         }
       }
     }
