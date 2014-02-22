@@ -121,7 +121,6 @@ cell* eval(cell* expr, cell* scope) {
 //?   TEMP(ordered_args, reorder_keyword_args(spliced_args, sig(fn)));
   TEMP(new_scope, mkref(new_table()));
   eval_bind_all(sig(fn), spliced_args, scope, new_scope, is_macro(fn));
-  trace("bind/") << "eval2 " << new_scope << '\n';
 
   if (car(expr) != new_sym("speculatively")
       && any_incomplete_eval(new_scope)) {
@@ -342,10 +341,10 @@ cell* skip_keyword_args(cell* args, cell* params) {
     return args;
   }
   if (is_rest_param(maybe_param, params)) {
-    trace("bind/") << "skipping rest keyword args";
+    trace("bind") << "skipping rest keyword args";
     return skip_keyword_args(next_keyword_arg(cdr(args), params), params);
   }
-  trace("bind/") << "skipping keyword arg" << car(args) << ' ' << car(cdr(args));
+  trace("bind") << "skipping keyword arg" << car(args) << ' ' << car(cdr(args));
   return skip_keyword_args(cdr(cdr(args)), params);
 }
 
