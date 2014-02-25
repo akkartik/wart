@@ -679,14 +679,56 @@ void test_eval_binds_quoted_as_params2() {
 
 // gotcha: a|(b c) won't work
 void test_eval_warns_on_unary_as() {
-  Trace_stream->dump_layer = "bind";
-  exit(0);
   Hide_warnings = true;
   run("((fn (| a) 3) 1 2)");
   CHECK_TRACE_WARNS();
 }
 
+void test_eval_warns_on_unary_as2() {
+  Hide_warnings = true;
+  run("((fn ((| a)) 3) 1 2)");
+  CHECK_TRACE_WARNS();
+}
+
+void test_eval_warns_on_conflicting_as_params() {
+  Hide_warnings = true;
+  run("((fn (| (a b) c)) 1 2)");
+  CHECK_TRACE_WARNS();
+}
+
+void test_eval_warns_on_double_quoting() {
+  Hide_warnings = true;
+  run("((fn (''a)) 1)");
+  CHECK_TRACE_WARNS();
+}
+
+void test_eval_warns_on_double_quoting2() {
+  Hide_warnings = true;
+  run("((fn ''a) 1)");
+  CHECK_TRACE_WARNS();
+}
+
+void test_eval_warns_on_double_quoting3() {
+  Hide_warnings = true;
+  run("((fn '('a)) 1)");
+  CHECK_TRACE_WARNS();
+}
+
+void test_eval_warns_on_double_quoting4() {
+  Hide_warnings = true;
+  run("((fn '(a 'b)) 1 2)");
+  CHECK_TRACE_WARNS();
+}
+
+void test_eval_warns_on_double_quoting5() {
+  Hide_warnings = true;
+  run("((fn '((| a 'b))) 1)");
+  CHECK_TRACE_WARNS();
+}
+
 void test_eval_binds_missing_as_params_to_nil() {
+  Trace_stream->dump_layer = "bind";
+  exit(0);
   run("((fn ((a | (b c))) 3) 1)");
   CHECK_TRACE_CONTENTS("bind", "a: 1b: nilc: nil");
 }

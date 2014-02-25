@@ -216,6 +216,8 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
 
   if (is_alias(p_params)) {
     trace("bind") << "rest alias " << p_params << '\n';
+    if (cdr(cdr(p_params)) == nil)
+      RAISE << "just one param alias: " << p_params << ". Are you sure?\n";
     TEMP(rest_args, mkref(p_args));
     cell* p_keyword_arg = find_any_keyword_arg(cdr(p_params), args);
     if (p_keyword_arg) {
@@ -272,6 +274,8 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
 
   if (is_alias(param)) {
     trace("bind") << "alias " << param << '\n';
+    if (cdr(cdr(param)) == nil)
+      RAISE << "just one param alias: " << param << ". Are you sure?\n";
     cell* arg =  car(p_args);
     cell* p_keyword_arg = find_any_keyword_arg(cdr(param), args);
     if (p_keyword_arg)
