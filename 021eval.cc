@@ -302,7 +302,7 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
         else if (is_sym(alias)) {
           trace("bind") << "alias sym " << alias << '\n';
           if (!eval_done) {
-            update(val, eval(arg, scope));
+            update(val, eval_arg(arg, scope));
             eval_done = true;
           }
           if (!unsafe_get(new_scope, alias))  // skip duplicate aliases without warning
