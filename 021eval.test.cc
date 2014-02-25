@@ -816,8 +816,6 @@ void test_fn_evals_destructured_arg_only_when_necessary3() {
 
 
 void test_eval_handles_assigned_fn_calls() {
-  Trace_stream->dump_layer = "bind";
-  exit(0);
   run("(<- f (fn () 34))");
   CLEAR_TRACE;
   run("(f)");

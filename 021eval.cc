@@ -304,7 +304,9 @@ void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* a
     }
     else {
       add_lexical_binding(param, car(p_args), new_scope);
+      trace("bind") << "AAA"; cerr.flush();
       bind_params_at(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
+      trace("bind") << "BBB"; cerr.flush();
     }
     return;
   }

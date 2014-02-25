@@ -6,10 +6,6 @@
                               caller_scope)))
            caller_scope))
 
-trace "bind" (mac! (foodef (name) ... body2)
-               34)
-exit 0
-
 # make the right caller_scope available inside ,@body above
 mac! (macro_caller_scope)
   `(table_get (table_get caller_scope 'caller_scope)
@@ -17,6 +13,9 @@ mac! (macro_caller_scope)
 
 mac! (def! (name ... params) ... body)
   `(,name <- (fn ,params ,@body))
+
+(trace "bind" (def! (prn ... args)))
+exit 0
 
 def! (prn ... args)
   if args
