@@ -773,8 +773,6 @@ void test_eval_handles_args_with_cycles() {
 }
 
 void test_fn_evals_arg_only_when_necessary() {
-  Trace_stream->dump_layer = "bind";
-  exit(0);
   run("((fn ('a | (| 'b 'c)) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: (x)b: (x)c: (x)");
   CHECK_TRACE_DOESNT_CONTAIN("eval", "x");
@@ -813,6 +811,8 @@ void test_fn_evals_destructured_arg_only_when_necessary3() {
 
 
 void test_eval_handles_assigned_fn_calls() {
+  Trace_stream->dump_layer = "bind";
+  exit(0);
   run("(<- f (fn () 34))");
   CLEAR_TRACE;
   run("(f)");

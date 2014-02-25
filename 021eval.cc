@@ -308,6 +308,9 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
           if (!unsafe_get(new_scope, alias))  // skip duplicate aliases without warning
             add_lexical_binding(alias, val, new_scope);
         }
+        else if (is_alias(alias)) {
+          trace("bind") << "nested alias (as-param) " << alias << '\n';
+        }
         else if (is_cons(alias)) {
           trace("bind") << "destructured alias (as-param) " << alias << '\n';
           if (!is_cons(arg)) {
