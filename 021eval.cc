@@ -153,10 +153,12 @@ cell* eval(cell* expr, cell* scope) {
   return result;  // already mkref'd
 }
 
-// bind params to args in new_scope, taking into account:
-//  quoted params (eval'ing args as necessary; args is never quoted, though)
+// bind params in sequence to args in new_scope, taking into account:
+//  keyword args
+//  quoted params (eval'ing args in scope as necessary)
 //  destructured params
 //  aliased params
+//  as-params naming whole and parts
 void bind_params(cell* params, cell* args, cell* scope, cell* new_scope, bool is_macro) {
   trace("bind") << params << " <-> " << args;
   bind_params_at(strip_quote(params), strip_quote(params), is_quoted(params), args, args, scope, new_scope, is_macro);
