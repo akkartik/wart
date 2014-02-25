@@ -737,13 +737,13 @@ void test_eval_binds_missing_as_params_to_nil() {
 }
 
 void test_eval_handles_duplicate_destructured_aliases() {
-  Trace_stream->dump_layer = "bind";
-  exit(0);
   run("((fn ((a b|x) (c d|x)) 3) '(1 :x 2) '(3 :x 4))");
   CHECK_TRACE_CONTENTS("bind", "a: 1b: 2c: 3d: 4");  // x might end up bound as either 2 or 4
 }
 
 void test_eval_handles_already_evald_aliased_arg() {
+  Trace_stream->dump_layer = "bind";
+  exit(0);
   new_dynamic_scope("a", new_num(3));
   // construct ((fn (x|y) 3) ''a)
   TEMP(call, read("((fn (x|y) 3))"));

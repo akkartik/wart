@@ -305,7 +305,8 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
             update(val, eval(arg, scope));
             eval_done = true;
           }
-          add_lexical_binding(alias, val, new_scope);
+          if (!unsafe_get(new_scope, alias))  // skip duplicate aliases without warning
+            add_lexical_binding(alias, val, new_scope);
         }
         else if (is_cons(alias)) {
           trace("bind") << "destructured alias (as-param) " << alias << '\n';
