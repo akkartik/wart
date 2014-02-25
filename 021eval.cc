@@ -285,46 +285,7 @@ void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* a
     cell* p_keyword_arg = find_any_keyword_arg(cdr(param), args);
     if (p_keyword_arg)
       arg = car(cdr(p_keyword_arg));
-    TEMP(val, nil);
-    bool eval_done = false;
-    for (cell* aliases = cdr(param); aliases != nil; aliases=cdr(aliases)) {
-      cell* alias = car(aliases);
-      if (is_cons(strip_quote(alias)) && cdr(aliases) != nil)
-        RAISE << "only the last alias can contain multiple names " << param << '\n';
-      else if (is_params_quoted && is_quoted(alias))
-        RAISE << "can't doubly-quote param alias " << params << '\n';
-      else {
-        if (is_quoted(alias)) {
-          trace("bind") << "quoted alias " << alias << '\n';
-          add_lexical_binding(strip_quote(alias), car(p_args), new_scope);
-        }
-        else if (is_sym(alias)) {
-          trace("bind") << "alias sym " << alias << '\n';
-          if (!eval_done) {
-            update(val, eval_arg(arg, scope));
-            eval_done = true;
-          }
-          if (!unsafe_get(new_scope, alias))  // skip duplicate aliases without warning
-            add_lexical_binding(alias, val, new_scope);
-        }
-        else if (is_alias(alias)) {
-          trace("bind") << "nested alias (as-param) " << alias << '\n';
-        }
-        else if (is_cons(alias)) {
-          trace("bind") << "destructured alias (as-param) " << alias << '\n';
-          if (!is_cons(arg)) {
-            bind_params_at(alias, alias, true, nil, nil, scope, new_scope, is_macro);
-          }
-          else {
-            TEMP(val, eval_arg(arg, scope));
-            bind_params_at(alias, alias, true, val, val, scope, new_scope, is_macro);
-          }
-        }
-        else {
-          RAISE << "unknown alias in " << param << '\n';
-        }
-      }
-    }
+    bind_aliases(param, is_params_quoted, arg, scope, new_scope, is_macro);
     bind_params_at(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
     return;
   }
@@ -378,6 +339,49 @@ void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* a
     trace("bind") << "after eval " << val << '\n';
     add_lexical_binding(param, val, new_scope);
     bind_params_at(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
+  }
+}
+
+void bind_aliases(cell* param, bool is_params_quoted, cell* arg, cell* scope, cell* new_scope, bool is_macro) {
+  TEMP(val, nil);
+  bool eval_done = false;
+  for (cell* aliases = cdr(param); aliases != nil; aliases=cdr(aliases)) {
+    cell* alias = car(aliases);
+    if (is_cons(strip_quote(alias)) && cdr(aliases) != nil)
+      RAISE << "only the last alias can contain multiple names " << param << '\n';
+    else if (is_params_quoted && is_quoted(alias))
+      RAISE << "can't doubly-quote param alias " << param << '\n';
+    else {
+      if (is_quoted(alias)) {
+        trace("bind") << "quoted alias " << alias << '\n';
+        add_lexical_binding(strip_quote(alias), arg, new_scope);
+      }
+      else if (is_sym(alias)) {
+        trace("bind") << "alias sym " << alias << '\n';
+        if (!eval_done) {
+          update(val, eval_arg(arg, scope));
+          eval_done = true;
+        }
+        if (!unsafe_get(new_scope, alias))  // skip duplicate aliases without warning
+          add_lexical_binding(alias, val, new_scope);
+      }
+      else if (is_alias(alias)) {
+        trace("bind") << "nested alias (as-param) " << alias << '\n';
+      }
+      else if (is_cons(alias)) {
+        trace("bind") << "destructured alias (as-param) " << alias << '\n';
+        if (!is_cons(arg)) {
+          bind_params_at(alias, alias, true, nil, nil, scope, new_scope, is_macro);
+        }
+        else {
+          TEMP(val, eval_arg(arg, scope));
+          bind_params_at(alias, alias, true, val, val, scope, new_scope, is_macro);
+        }
+      }
+      else {
+        RAISE << "unknown alias in " << param << '\n';
+      }
+    }
   }
 }
 
