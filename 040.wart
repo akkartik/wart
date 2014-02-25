@@ -6,6 +6,10 @@
                               caller_scope)))
            caller_scope))
 
+trace "bind" (mac! (foodef (name) ... body2)
+               34)
+exit 0
+
 # make the right caller_scope available inside ,@body above
 mac! (macro_caller_scope)
   `(table_get (table_get caller_scope 'caller_scope)

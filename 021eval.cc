@@ -409,7 +409,7 @@ cell* find_keyword_arg(cell* param, cell* args) {
   if (!is_sym(param)) return NULL;
   cell* keyword_sym = new_sym(":"+to_string(param));
   for (; args != nil; args=cdr(args))
-    if (car(args) == keyword_sym)
+    if (keyword_sym == (is_cons(args) ? car(args) : args))
       return args;
   return NULL;
 }

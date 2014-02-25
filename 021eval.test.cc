@@ -326,6 +326,11 @@ void test_eval_handles_quoted_destructured_params() {
   CHECK_TRACE_CONTENTS("bind", "a: 1b: 2");
 }
 
+void test_eval_handles_improper_list_in_destructured_arg() {
+  run("((fn '((a))) (x ... y))");
+  CHECK_TRACE_CONTENTS("bind", "a: x");
+}
+
 
 
 void test_eval_splices_args() {
