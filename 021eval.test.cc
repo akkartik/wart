@@ -759,15 +759,13 @@ void test_eval_handles_already_evald_aliased_arg() {
   end_dynamic_scope("a");
 }
 
-void test_eval_only_reorders_when_necessary() {
-  Trace_stream->dump_layer = "bind";
-  exit(0);
+void test_eval_handles_args_with_cycles() {
   trace_stream* old = Trace_stream;  Trace_stream = NULL;  // trace can't handle cycles yet
   TEMP(x, read("(3)"));
   set_cdr(x, x);  // cycle
   new_dynamic_scope("x", x);
 
-  run("((fn (x|y) 3)    ((fn args args) x))");  // arg is (list x)
+  run("((fn (a|b) 3)  x)");
   // should terminate
   set_cdr(x, nil);
   end_dynamic_scope("x");
@@ -775,6 +773,8 @@ void test_eval_only_reorders_when_necessary() {
 }
 
 void test_fn_evals_arg_only_when_necessary() {
+  Trace_stream->dump_layer = "bind";
+  exit(0);
   run("((fn ('a | (| 'b 'c)) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: (x)b: (x)c: (x)");
   CHECK_TRACE_DOESNT_CONTAIN("eval", "x");
