@@ -663,7 +663,6 @@ void test_eval_binds_quoted_rest_as_params_recursively_using_keyword_args() {
 }
 
 void test_eval_binds_quoted_as_params() {
-  exit(0);
   new_dynamic_scope("x", new_num(3));
   run("((fn ('a | ('b)) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: (x)b: x");
@@ -671,7 +670,7 @@ void test_eval_binds_quoted_as_params() {
   end_dynamic_scope("x");
 }
 
-void test_eval_handles_quoted_as_params() {
+void test_eval_binds_quoted_as_params2() {
   new_dynamic_scope("x", new_num(3));
   run("((fn (a | ('b)) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: (3)b: x");
@@ -680,6 +679,8 @@ void test_eval_handles_quoted_as_params() {
 
 // gotcha: a|(b c) won't work
 void test_eval_warns_on_unary_as() {
+  Trace_stream->dump_layer = "bind";
+  exit(0);
   Hide_warnings = true;
   run("((fn (| a) 3) 1 2)");
   CHECK_TRACE_WARNS();

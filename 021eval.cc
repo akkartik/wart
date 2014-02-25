@@ -243,19 +243,21 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
             add_lexical_binding(strip_quote(alias), rest_args, new_scope);
           }
         }
-        else {
-          trace("bind") << "rest alias " << alias << '\n';
+        else if (is_sym(alias)) {
+          trace("bind") << "rest alias sym " << alias << '\n';
           if (!eval_done) {
             update(val, eval_all(rest_args, scope));
             eval_done = true;
           }
-          if (is_cons(alias) && is_cons(val)) {
-            trace("bind") << "destructured rest alias (as-param) " << alias << '\n';
-            eval_bind_one(alias, alias, true, val, val, scope, new_scope, is_macro);
-          }
-          else {
-            add_lexical_binding(alias, val, new_scope);
-          }
+          add_lexical_binding(alias, val, new_scope);
+        }
+        else {
+          trace("bind") << "multiple rest aliases " << alias << '\n';
+          // subtly distinct from a destructured alias that's not in rest
+          // position. In (a ... (| b (c d))) you don't eval an arg before
+          // destructuring its components like in (a (| b (c d)))
+          trace("bind") << "destructured rest alias (as-param) " << alias << '\n';
+          eval_bind_one(alias, alias, is_params_quoted, rest_args, rest_args, scope, new_scope, is_macro);
         }
       }
     }
