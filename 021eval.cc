@@ -367,6 +367,7 @@ void bind_aliases(cell* param, bool is_params_quoted, cell* arg, cell* scope, ce
       }
       else if (is_alias(alias)) {
         trace("bind") << "nested alias (as-param) " << alias << '\n';
+        bind_aliases(alias, is_params_quoted, arg, scope, new_scope, is_macro);
       }
       else if (is_cons(alias)) {
         trace("bind") << "destructured alias (as-param) " << alias << '\n';
