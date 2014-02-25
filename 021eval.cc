@@ -253,13 +253,19 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
           }
           add_lexical_binding(alias, val, new_scope);
         }
-        else {
+        else if (is_cons(alias)) {
           trace("bind") << "multiple rest aliases " << alias << '\n';
           // subtly distinct from a destructured alias that's not in rest
           // position. In (a ... (| b (c d))) you don't eval an arg before
           // destructuring its components like in (a (| b (c d)))
-          trace("bind") << "destructured rest alias (as-param) " << alias << '\n';
-          eval_bind_one(alias, alias, is_params_quoted, rest_args, rest_args, scope, new_scope, is_macro);
+          trace("bind") << "rest alias cons (as-param) " << alias << '\n';
+          if (!is_cons(rest_args))
+            eval_bind_one(alias, alias, is_params_quoted, nil, nil, scope, new_scope, is_macro);
+          else
+            eval_bind_one(alias, alias, is_params_quoted, rest_args, rest_args, scope, new_scope, is_macro);
+        }
+        else {
+          RAISE << "unknown alias in " << p_params << '\n';
         }
       }
     }
@@ -293,13 +299,26 @@ void eval_bind_one(cell* params, cell* p_params, bool is_params_quoted, cell* ar
           trace("bind") << "quoted alias " << alias << '\n';
           add_lexical_binding(strip_quote(alias), car(p_args), new_scope);
         }
-        else {
-          trace("bind") << "alias " << alias << '\n';
+        else if (is_sym(alias)) {
+          trace("bind") << "alias sym " << alias << '\n';
           if (!eval_done) {
             update(val, eval(arg, scope));
             eval_done = true;
           }
           add_lexical_binding(alias, val, new_scope);
+        }
+        else if (is_cons(alias)) {
+          trace("bind") << "destructured alias (as-param) " << alias << '\n';
+          if (!is_cons(arg)) {
+            eval_bind_one(alias, alias, true, nil, nil, scope, new_scope, is_macro);
+          }
+          else {
+            TEMP(val, eval_arg(arg, scope));
+            eval_bind_one(alias, alias, true, val, val, scope, new_scope, is_macro);
+          }
+        }
+        else {
+          RAISE << "unknown alias in " << param << '\n';
         }
       }
     }

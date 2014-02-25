@@ -677,6 +677,11 @@ void test_eval_binds_quoted_as_params2() {
   end_dynamic_scope("x");
 }
 
+void test_eval_binds_destructured_as_params() {
+  run("((fn ((a | (b c))) 3) '(1 2))");
+  CHECK_TRACE_CONTENTS("bind", "a: (1 2)b: 1c: 2");
+}
+
 // gotcha: a|(b c) won't work
 void test_eval_warns_on_unary_as() {
   Hide_warnings = true;
@@ -727,13 +732,13 @@ void test_eval_warns_on_double_quoting5() {
 }
 
 void test_eval_binds_missing_as_params_to_nil() {
-  Trace_stream->dump_layer = "bind";
-  exit(0);
   run("((fn ((a | (b c))) 3) 1)");
   CHECK_TRACE_CONTENTS("bind", "a: 1b: nilc: nil");
 }
 
 void test_eval_handles_duplicate_destructured_aliases() {
+  Trace_stream->dump_layer = "bind";
+  exit(0);
   run("((fn ((a b|x) (c d|x)) 3) '(1 :x 2) '(3 :x 4))");
   CHECK_TRACE_CONTENTS("bind", "a: 1b: 2c: 3d: 4");  // x might end up bound as either 2 or 4
 }
