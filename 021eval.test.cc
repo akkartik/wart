@@ -506,20 +506,20 @@ void test_eval_splice_on_backquoteless_macros_warns() {
 
 
 
-void test_eval_handles_keyword_arg() {
+void test_eval_handles_keyword_args() {
   run("((fn (a b) a) 2 :a 1)");
   CHECK_TRACE_CONTENTS("bind", "a: 1");
+}
+
+void test_eval_handles_keyword_args2() {
+  run("((fn (a b c) c) :c 1 2)");
+  CHECK_TRACE_CONTENTS("bind", "a: 2b: nilc: 1");
+  CHECK_TRACE_TOP("eval", "=> 1");
 }
 
 void test_eval_handles_nil_keyword_arg() {
   run("((fn (a) a) 2 :a nil)");
   CHECK_TRACE_CONTENTS("bind", "a: nil");
-}
-
-void test_eval_handles_keyword_args() {
-  run("((fn (a b c) c) :c 1 2)");
-  CHECK_TRACE_CONTENTS("bind", "a: 2b: nilc: 1");
-  CHECK_TRACE_TOP("eval", "=> 1");
 }
 
 void test_eval_handles_quoted_keyword_args() {

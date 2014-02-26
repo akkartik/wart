@@ -170,13 +170,10 @@ void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* a
   trace("bind") << params << p_params << " <-> " << args << p_args << '\n';
   if (p_params == nil) return;
 
-  if (p_args != nil && !is_cons(p_args)) {
-    RAISE << "trying to bind against non-cons " << p_args << '\n';
-    return;
+  if (is_cons(p_args)) {
+    p_args = skip_keyword_args(p_args, params);
+    trace("bind") << "skipping ahead to " << p_args << '\n';
   }
-
-  p_args = skip_keyword_args(p_args, params);
-  trace("bind") << "skipping ahead to " << p_args << '\n';
 
   if (is_quoted(p_params) && is_params_quoted) {
     RAISE << "Can't doubly-quote params " << params << '\n';
@@ -270,6 +267,11 @@ void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* a
         }
       }
     }
+    return;
+  }
+
+  if (p_args != nil && !is_cons(p_args)) {
+    RAISE << "trying to bind against non-cons " << p_args << '\n';
     return;
   }
 

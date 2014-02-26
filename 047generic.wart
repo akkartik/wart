@@ -25,6 +25,9 @@ mac (def (name ... params) ... body) :case (car.body = :case)
            (do ,@cddr.body)
            (eval `(,$old ,@$params) $caller_scope)))))
 
+def (foo)
+exit 0
+
 
 
 ## rudimentary pattern matching for symbol constants
