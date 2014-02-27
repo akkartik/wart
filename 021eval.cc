@@ -174,7 +174,7 @@ void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* a
   if (p_params == nil) return;
 
   if (p_args != nil && !is_cons(p_args)) {
-    RAISE << "trying to bind against non-cons " << p_args << " like a cons";
+    RAISE << "trying to bind against non-cons " << p_args << " like a cons\n";
     return;
   }
 
