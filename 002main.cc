@@ -30,6 +30,7 @@ int main(int argc, const char* argv[]) {
 
   //// Interactive loop: parse commands from user, evaluate them, print the results
   setup();
+  START_TRACING_UNTIL_END_OF_SCOPE;
   cerr << "starting up...       (takes ~15 seconds)\n";
   load_files(".wart");
   cerr << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
