@@ -14,10 +14,6 @@ mac! (macro_caller_scope)
 mac! (def! (name ... params) ... body)
   `(,name <- (fn ,params ,@body))
 
-trace "bind"
-  def! (foo ... args)
-exit 0
-
 def! (prn ... args)
   if args
     do (pr car.args)

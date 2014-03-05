@@ -624,6 +624,11 @@ void test_eval_handles_quoted_rest_param_aliases() {
   end_dynamic_scope("x");
 }
 
+void test_eval_handles_quoted_rest_param_aliases2() {
+  run("((fn '(a | b) 3) x)");
+  CHECK_TRACE_CONTENTS("bind", "a: (x)b: (x)");
+}
+
 // param aliases also stand in for as-params like in haskell
 void test_eval_binds_as_params() {
   run("((fn (a | (b c)) 3) 1 2)");

@@ -252,7 +252,10 @@ void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* a
         else if (is_sym(alias)) {
           trace("bind") << "rest alias sym " << alias << '\n';
           if (!eval_done) {
-            update(val, eval_all(rest_args, scope));
+            if (is_params_quoted)
+              update(val, mkref(rest_args));
+            else
+              update(val, eval_all(rest_args, scope));
             eval_done = true;
           }
           add_lexical_binding(alias, val, new_scope);
