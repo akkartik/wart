@@ -331,7 +331,10 @@ void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* a
   if (is_cons(param)) {
     trace("bind") << "destructured " << param << '\n';
     TEMP(val, eval_arg(car(p_args), scope));
-    bind_params(param, true, val, scope, new_scope, is_macro);
+    if (is_incomplete_eval(val))
+      add_lexical_binding(param, val, new_scope);
+    else
+      bind_params(param, true, val, scope, new_scope, is_macro);
     bind_params_at(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
     return;
   }
