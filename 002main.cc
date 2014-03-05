@@ -91,6 +91,7 @@ int run_tests() {
     START_TRACING_UNTIL_END_OF_SCOPE;
     setup();
     CLEAR_TRACE;
+//?     Trace_stream->dump_layer = "test";  // uncomment to segment test output
     (*Tests[i])();
     verify();
   }
