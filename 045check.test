@@ -204,7 +204,6 @@
 (test "match? - atom positive"
   :valueof (match? 3 3)
   :should be_true)
-exit 0
 
 (test "match? - atom negative"
   :valueof (match? 3 4)

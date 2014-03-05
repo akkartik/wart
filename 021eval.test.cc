@@ -645,6 +645,14 @@ void test_eval_binds_as_params() {
   CHECK_TRACE_CONTENTS("bind", "a: (1 2)b: 1c: 2");
 }
 
+void test_eval_binds_as_params2() {
+  TEMP(val, read("(1 2)"));
+  new_dynamic_scope("x", val);
+  run("((fn ((a | (b c))) 3) x)");
+  CHECK_TRACE_CONTENTS("bind", "a: (1 2)b: 1c: 2");
+  end_dynamic_scope("x");
+}
+
 void test_eval_binds_as_params_with_keyword_args() {
   run("((fn (a | (b c)) 3) 1 :b 2)");
   CHECK_TRACE_CONTENTS("bind", "a: (1 :b 2)b: 2c: 1");

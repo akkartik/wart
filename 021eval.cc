@@ -382,13 +382,11 @@ void bind_aliases(cell* param, bool is_params_quoted, cell* arg, cell* scope, ce
       }
       else if (is_cons(alias)) {
         trace("bind") << "destructured alias (as-param) " << alias << '\n';
-        if (!is_cons(arg)) {
-          bind_params(alias, true, nil, scope, new_scope, is_macro);
+        if (!eval_done) {
+          update(val, eval_arg(arg, scope));
+          eval_done = true;
         }
-        else {
-          TEMP(val, eval_arg(arg, scope));
-          bind_params(alias, true, val, scope, new_scope, is_macro);
-        }
+        bind_params(alias, true, is_cons(val) ? val : nil, scope, new_scope, is_macro);
       }
       else {
         RAISE << "unknown alias in " << param << '\n';

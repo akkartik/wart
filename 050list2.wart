@@ -27,7 +27,11 @@ def (pos x (seq | (head ... tail)) n)
   if seq
     if (head = x)
       n
-      (pos x tail n+1)
+      trace "bind"
+        (pos x tail n+1)
+
+prn (pos 2 '(1 2 3))
+exit 0
 
 def (rpos x seq n)
   aif (pos x rev.seq n)
