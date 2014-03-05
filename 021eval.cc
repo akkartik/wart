@@ -199,7 +199,8 @@ void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* a
     }
     if (!is_macro)
       update(rest_args, strip_all_already_evald(rest_args));
-    add_lexical_binding(p_params, rest_args, new_scope);
+    TEMP(rest_args2, maybe_quote(rest_args));
+    add_lexical_binding(p_params, rest_args2, new_scope);
     return;
   }
 
@@ -305,11 +306,13 @@ void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* a
     // TODO: should we strip_already_evald on arg if !macro?
     cell* p_keyword_arg = find_keyword_arg(param, args);
     if (p_keyword_arg) {
-      add_lexical_binding(param, car(cdr(p_keyword_arg)), new_scope);
+      TEMP(arg, maybe_quote(car(cdr(p_keyword_arg))));
+      add_lexical_binding(param, arg, new_scope);
       bind_params_at(params, cdr(p_params), is_params_quoted, args, p_args, scope, new_scope, is_macro);
     }
     else {
-      add_lexical_binding(param, car(p_args), new_scope);
+      TEMP(arg, maybe_quote(car(p_args)));
+      add_lexical_binding(param, arg, new_scope);
       if (cdr(p_args) != nil && !is_cons(cdr(p_args)))
         bind_param(cdr(p_params), is_params_quoted, cdr(p_args), scope, new_scope);
       else
@@ -537,7 +540,8 @@ stack<bool> Do_symbolic_eval;
 cell* eval_arg(cell* arg, cell* scope) {
   trace("already_evald") << "eval_arg " << arg;
   if (is_already_evald(arg)) return mkref(strip_already_evald(arg));
-  if (!Do_symbolic_eval.empty() && Do_symbolic_eval.top()) return mkref(arg);
+  if (!Do_symbolic_eval.empty() && Do_symbolic_eval.top())
+    return mkref(arg);
   return eval(arg, scope);
 }
 
@@ -555,6 +559,12 @@ COMPILE_FN(symbolic_eval_args, compiledfn_symbolic_eval_args, "($expr)",
   Do_symbolic_eval.pop();
   return mkref(bindings);
 )
+
+cell* maybe_quote(cell* arg) {
+  return !Do_symbolic_eval.empty() && Do_symbolic_eval.top()
+    ? mkref(new_cons(sym_quote, arg))
+    : mkref(arg);
+}
 
 
 
