@@ -172,7 +172,6 @@
 (test "pos works"
   :valueof (pos 2 '(1 2 3))
   :should be_true)
-exit 0
 
 (test "pos works - 2"
   :valueof (pos 4 '(1 2 3))
