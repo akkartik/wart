@@ -598,6 +598,11 @@ void test_eval_handles_aliased_keyword_args() {
   CHECK_TRACE_TOP("eval", "=> 1");
 }
 
+void test_eval_handles_aliased_keyword_args2() {
+  run("((fn (a|x b) b) :x 1 2)");
+  CHECK_TRACE_TOP("eval", "=> 2");
+}
+
 void test_eval_handles_quoted_param_aliases() {
   new_dynamic_scope("x", new_num(3));
   run("((fn ((a | 'b)) 3) x)");

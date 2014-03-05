@@ -286,12 +286,15 @@ void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* a
     trace("bind") << "alias " << param << '\n';
     if (cdr(cdr(param)) == nil)
       RAISE << "just one param alias: " << param << ". Are you sure?\n";
-    cell* arg =  car(p_args);
     cell* p_keyword_arg = find_any_keyword_arg(cdr(param), args);
-    if (p_keyword_arg)
-      arg = car(cdr(p_keyword_arg));
-    bind_aliases(param, is_params_quoted, arg, scope, new_scope, is_macro);
-    bind_params_at(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
+    if (p_keyword_arg) {
+      bind_aliases(param, is_params_quoted, car(cdr(p_keyword_arg)), scope, new_scope, is_macro);
+      bind_params_at(params, cdr(p_params), is_params_quoted, args, p_args, scope, new_scope, is_macro);
+    }
+    else {
+      bind_aliases(param, is_params_quoted, car(p_args), scope, new_scope, is_macro);
+      bind_params_at(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope, is_macro);
+    }
     return;
   }
 
