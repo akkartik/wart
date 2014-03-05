@@ -327,8 +327,8 @@ void test_eval_handles_quoted_destructured_params() {
 }
 
 void test_eval_handles_improper_list_in_destructured_arg() {
-  run("((fn '((a))) (x ... y))");
-  CHECK_TRACE_CONTENTS("bind", "a: x");
+  run("((fn '((a ... b))) (x ... y))");
+  CHECK_TRACE_CONTENTS("bind", "a: xb: y");
 }
 
 
