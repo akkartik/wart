@@ -371,7 +371,8 @@ void bind_aliases(cell* param, bool is_params_quoted, cell* arg, cell* scope, ce
     else {
       if (is_quoted(alias) || is_params_quoted) { // TODO: !is_sym(alias)
         trace("bind") << "quoted alias " << alias << '\n';
-        add_lexical_binding(strip_quote(alias), arg, new_scope);
+        if (!unsafe_get(new_scope, strip_quote(alias)))  // skip duplicate aliases without warning
+          add_lexical_binding(strip_quote(alias), arg, new_scope);
       }
       else if (is_sym(alias)) {
         trace("bind") << "alias sym " << alias << '\n';
