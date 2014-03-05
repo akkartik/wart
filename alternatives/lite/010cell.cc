@@ -7,8 +7,6 @@
 //  avoid fragmentation
 //    so all cells try to have the same size (exceptions: strings, tables)
 
-unsigned long Num_allocs = 0;
-
 struct cell {
   cell* car;  // aliased to long or float
   cell* cdr;

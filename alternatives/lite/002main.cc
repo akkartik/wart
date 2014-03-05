@@ -18,6 +18,8 @@
 bool Interactive = false;
 bool Warn_on_unknown_var = true;
 
+unsigned long Num_allocs = 0;
+
 int main(int argc, const char* argv[]) {
   if (argc > 1) {
     bool early_exit = process_args(argc, argv);
@@ -26,13 +28,13 @@ int main(int argc, const char* argv[]) {
 
   //// Interactive loop: parse commands from user, evaluate them, print the results
   setup();
-  cerr << "starting up...       (takes ~15 seconds)\n";
+  cerr << "starting up...\n";
   load_files(".wart");
   cerr << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   Interactive = true;  // stop run on two enters
   while (!cin.eof()) {
     cell* curr = run(cin);
-    cout << "=> " << curr << '\n';
+    cout << num_unfreed() << ' ' << Num_allocs << " => " << curr << '\n';
     rmref(curr);
   }
 }
