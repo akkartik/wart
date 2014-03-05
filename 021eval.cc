@@ -363,7 +363,7 @@ void bind_aliases(cell* param, bool is_params_quoted, cell* arg, cell* scope, ce
     else if (is_params_quoted && is_quoted(alias))
       RAISE << "can't doubly-quote param alias " << param << '\n';
     else {
-      if (is_quoted(alias)) {
+      if (is_quoted(alias) || is_params_quoted) { // TODO: !is_sym(alias)
         trace("bind") << "quoted alias " << alias << '\n';
         add_lexical_binding(strip_quote(alias), arg, new_scope);
       }

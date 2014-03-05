@@ -22,10 +22,3 @@ def (be_true x)
 
 def (be_false x)
   no.x
-
-def a~=b
-  (not a=b)
-(test "foo" (=) 2+2 4)
-trace "bind"
-  (test "foo" :valueof 2+2 :should be 4)
-exit 0

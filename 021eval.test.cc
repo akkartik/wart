@@ -610,6 +610,11 @@ void test_eval_handles_quoted_param_aliases() {
   end_dynamic_scope("x");
 }
 
+void test_eval_handles_quoted_param_aliases2() {
+  run("((fn '(x|y) 3) a)");
+  CHECK_TRACE_CONTENTS("bind", "x: ay: a");
+}
+
 void test_eval_handles_aliased_rest_keyword_args() {
   run("((fn (a ... body|do) body) 2 :do 1 3)");
   CHECK_TRACE_CONTENTS("bind", "a: 2body: (1 3)");
