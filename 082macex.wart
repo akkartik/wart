@@ -15,7 +15,7 @@ def (update_macroexpansion val)
 
 def (update_optimized_bodies)
   prn "expanding calls"
-  each (var val) (sort (< car) (as list (globals)))
+  each (var val) (firstn 7 (sort (< car) (as list (globals))))
     prn "=== " var
     (update_optimized_body var val)
 
@@ -51,3 +51,4 @@ def (strip_eval exprs)
     list # re-enclose in body
 
 #? (petrify)  # failing at 'all'; even earlier transformations might be wrong
+#? exit 0

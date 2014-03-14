@@ -441,19 +441,6 @@ void test_eval_handles_already_evald_arg_quoted_param() {
   end_dynamic_scope("a");
 }
 
-void test_eval_handles_already_evald_arg_quoted_rest_param() {
-  new_dynamic_scope("a", new_num(3));
-  TEMP(call, read("((fn 'x 3))"));
-  cell* arg = tag_already_evald(new_sym("a"));
-  append(call, new_cons(arg));
-  In_macro.push(true);
-  CLEAR_TRACE;
-  rmref(eval(call));
-  CHECK_TRACE_CONTENTS("bind", "x: (a)");  // stripped already-evald
-  In_macro.pop();
-  end_dynamic_scope("a");
-}
-
 void test_eval_handles_multiply_already_evald_arg() {
   TEMP(call, read("((fn (x) 3))"));
   cell* arg = tag_already_evald(tag_already_evald(new_sym("a")));  // ''''a
