@@ -216,7 +216,10 @@ void test_eval_handles_multiple_body_exprs() {
   CHECK_TRACE_TOP("eval", "=> 2");
 }
 
+long n = 0;
+
 void test_eval_evals_arg() {
+  cerr << "- " << n++ << " test_eval_evals_arg\n";
   new_dynamic_scope("x", new_num(3));
   CLEAR_TRACE;
   run("((fn (a)) x)");
@@ -225,16 +228,19 @@ void test_eval_evals_arg() {
 }
 
 void test_eval_evals_arg2() {
+  cerr << "- " << n++ << " test_eval_evals_arg2\n";
   run("((fn (f) (f)) (fn () 34))");
   CHECK_TRACE_TOP("eval", "=> 34");
 }
 
 void test_eval_handles_multiple_args() {
+  cerr << "- " << n++ << " test_eval_handles_multiple_args\n";
   run("((fn (a b) b) 1 2)");
   CHECK_TRACE_TOP("eval", "=> 2");
 }
 
 void test_eval_binds_missing_params() {
+  cerr << "- " << n++ << " test_eval_binds_missing_params\n";
   new_dynamic_scope("x", new_num(3));
   CLEAR_TRACE;
   run("((fn (a b)) x)");
@@ -243,11 +249,13 @@ void test_eval_binds_missing_params() {
 }
 
 void test_eval_binds_quoted_param() {
+  cerr << "- " << n++ << " test_eval_binds_quoted_param\n";
   run("((fn ('a)) x)");
   CHECK_TRACE_CONTENTS("bind", "a: x");
 }
 
 void test_eval_handles_quoted_param_list() {
+  cerr << "- " << n++ << " test_eval_handles_quoted_param_list\n";
   new_dynamic_scope("a", new_num(23));
   run("((fn '(arg1) arg1) a)");
   CHECK_TRACE_CONTENTS("bind", "arg1: a");
@@ -256,11 +264,13 @@ void test_eval_handles_quoted_param_list() {
 }
 
 void test_eval_handles_vararg_param() {
+  cerr << "- " << n++ << " test_eval_handles_vararg_param\n";
   run("((fn args args) 1)");
   CHECK_TRACE_TOP("eval", "=> (1)");
 }
 
 void test_eval_evals_vararg_args() {
+  cerr << "- " << n++ << " test_eval_evals_vararg_args\n";
   new_dynamic_scope("x", new_num(3));
   new_dynamic_scope("y", new_num(4));
   CLEAR_TRACE;
@@ -272,6 +282,7 @@ void test_eval_evals_vararg_args() {
 }
 
 void test_eval_binds_quoted_varargs_param() {
+  cerr << "- " << n++ << " test_eval_binds_quoted_varargs_param\n";
   new_dynamic_scope("x", new_num(3));
   new_dynamic_scope("y", new_num(4));
   CLEAR_TRACE;
@@ -282,11 +293,13 @@ void test_eval_binds_quoted_varargs_param() {
 }
 
 void test_eval_handles_rest_params() {
+  cerr << "- " << n++ << " test_eval_handles_rest_params\n";
   run("((fn (a b ... c) c) 1 2 3 4 5)");
   CHECK_TRACE_TOP("eval", "=> (3 4 5)");
 }
 
 void test_eval_evals_rest_args() {
+  cerr << "- " << n++ << " test_eval_evals_rest_args\n";
   new_dynamic_scope("x", new_num(3));
   new_dynamic_scope("y", new_num(4));
   CLEAR_TRACE;
@@ -297,6 +310,7 @@ void test_eval_evals_rest_args() {
 }
 
 void test_eval_binds_quoted_rest_param() {
+  cerr << "- " << n++ << " test_eval_binds_quoted_rest_param\n";
   new_dynamic_scope("x", new_num(3));
   new_dynamic_scope("y", new_num(4));
   CLEAR_TRACE;
@@ -307,11 +321,13 @@ void test_eval_binds_quoted_rest_param() {
 }
 
 void test_eval_handles_destructured_params() {
+  cerr << "- " << n++ << " test_eval_handles_destructured_params\n";
   run("((fn ((a b)) b) '(1 2))");
   CHECK_TRACE_CONTENTS("bind", "a: 1b: 2");
 }
 
 void test_eval_evals_destructured_args() {
+  cerr << "- " << n++ << " test_eval_evals_destructured_args\n";
   new_dynamic_scope("x", new_num(3));
   new_dynamic_scope("y", new_num(4));
   CLEAR_TRACE;
@@ -322,11 +338,13 @@ void test_eval_evals_destructured_args() {
 }
 
 void test_eval_handles_quoted_destructured_params() {
+  cerr << "- " << n++ << " test_eval_handles_quoted_destructured_params\n";
   run("((fn ('(a b)) b) (1 2))");
   CHECK_TRACE_CONTENTS("bind", "a: 1b: 2");
 }
 
 void test_eval_handles_improper_list_in_destructured_arg() {
+  cerr << "- " << n++ << " test_eval_handles_improper_list_in_destructured_arg\n";
   run("((fn '((a ... b))) (x ... y))");
   CHECK_TRACE_CONTENTS("bind", "a: xb: y");
 }
@@ -334,6 +352,7 @@ void test_eval_handles_improper_list_in_destructured_arg() {
 
 
 void test_eval_splices_args() {
+  cerr << "- " << n++ << " test_eval_splices_args\n";
   trace("test") << "fn args";
   TEMP(val, read("(3 4)"));
   new_dynamic_scope("b", val);
@@ -344,6 +363,7 @@ void test_eval_splices_args() {
 }
 
 void test_eval_splices_args2() {
+  cerr << "- " << n++ << " test_eval_splices_args2\n";
   new_dynamic_scope("a", new_num(3));
   TEMP(b, read("(4 5)"));
   new_dynamic_scope("b", b);
@@ -354,6 +374,7 @@ void test_eval_splices_args2() {
 }
 
 void test_eval_splices_args3() {
+  cerr << "- " << n++ << " test_eval_splices_args3\n";
   run("f <- (fn (x y) (cons x y))");
   run("(a <- 3) (b <- 4)");
   run("args <- '(a b)");
@@ -367,6 +388,7 @@ void test_eval_splices_args3() {
 }
 
 void test_eval_splices_nil_args() {
+  cerr << "- " << n++ << " test_eval_splices_nil_args\n";
   new_dynamic_scope("a", new_num(3));
   new_dynamic_scope("b", nil);
   run("((fn nil 3) a @b a)");
@@ -376,6 +398,7 @@ void test_eval_splices_nil_args() {
 }
 
 void test_eval_splices_keyword_syms_into_args() {
+  cerr << "- " << n++ << " test_eval_splices_keyword_syms_into_args\n";
   new_dynamic_scope("a", new_num(3));
   TEMP(b, read("(4 :x)"));
   new_dynamic_scope("b", b);
@@ -386,11 +409,13 @@ void test_eval_splices_keyword_syms_into_args() {
 }
 
 void test_eval_handles_splice_inside_fn_body() {
+  cerr << "- " << n++ << " test_eval_handles_splice_inside_fn_body\n";
   run("((fn x (cons @x)) 1 2)");
   CHECK_TRACE_TOP("eval", "=> (1 ... 2)");
 }
 
 void test_eval_handles_splice_and_selective_quoting() {
+  cerr << "- " << n++ << " test_eval_handles_splice_and_selective_quoting\n";
   run("f <- (fn ('x y) (cons x y))");
   run("(a <- 3) (b <- 4)");
   run("args <- '(b)");
@@ -404,6 +429,7 @@ void test_eval_handles_splice_and_selective_quoting() {
 }
 
 void test_eval_overrides_quoted_params_with_spliced_args() {
+  cerr << "- " << n++ << " test_eval_overrides_quoted_params_with_spliced_args\n";
   run("f <- (fn (x 'y) (cons x y))");
   run("(a <- 3) (b <- 4)");
   run("args <- '(a b)");
@@ -417,6 +443,7 @@ void test_eval_overrides_quoted_params_with_spliced_args() {
 }
 
 void test_eval_handles_already_evald_arg() {
+  cerr << "- " << n++ << " test_eval_handles_already_evald_arg\n";
   new_dynamic_scope("a", new_num(3));
   TEMP(call, read("((fn (x) 3))"));
   cell* arg = tag_already_evald(new_sym("a"));  // ''a but can't go through read
@@ -429,6 +456,7 @@ void test_eval_handles_already_evald_arg() {
 }
 
 void test_eval_handles_already_evald_arg_quoted_param() {
+  cerr << "- " << n++ << " test_eval_handles_already_evald_arg_quoted_param\n";
   new_dynamic_scope("a", new_num(3));
   TEMP(call, read("((fn '(x) 3))"));
   cell* arg = tag_already_evald(new_sym("a"));
@@ -442,6 +470,7 @@ void test_eval_handles_already_evald_arg_quoted_param() {
 }
 
 void test_eval_handles_multiply_already_evald_arg() {
+  cerr << "- " << n++ << " test_eval_handles_multiply_already_evald_arg\n";
   TEMP(call, read("((fn (x) 3))"));
   cell* arg = tag_already_evald(tag_already_evald(new_sym("a")));  // ''''a
   append(call, new_cons(arg));
@@ -452,6 +481,7 @@ void test_eval_handles_multiply_already_evald_arg() {
 }
 
 void test_eval_handles_already_evald_rest_arg() {
+  cerr << "- " << n++ << " test_eval_handles_already_evald_rest_arg\n";
   new_dynamic_scope("a", new_num(3));
   TEMP(call, read("((fn x 3))"));
   cell* arg = tag_already_evald(new_sym("a"));  // ''a but can't go through read
@@ -464,6 +494,7 @@ void test_eval_handles_already_evald_rest_arg() {
 }
 
 void test_eval_splice_on_macros_with_backquote() {
+  cerr << "- " << n++ << " test_eval_splice_on_macros_with_backquote\n";
   run("m <- (fn '(x y) (eval `(cons ,x ,y) caller_scope))");
   run("(a <- 3) (b <- 4)");
   run("args <- '(a b)");
@@ -479,6 +510,7 @@ void test_eval_splice_on_macros_with_backquote() {
 }
 
 void test_eval_splice_on_backquoteless_macros_warns() {
+  cerr << "- " << n++ << " test_eval_splice_on_backquoteless_macros_warns\n";
   run("m <- (fn '(x y) (eval (cons 'cons (cons x (cons y nil))) caller_scope))");
   run("(a <- 3) (b <- 4)");
   run("args <- '(a b)");
@@ -494,28 +526,33 @@ void test_eval_splice_on_backquoteless_macros_warns() {
 
 
 void test_eval_handles_keyword_args() {
+  cerr << "- " << n++ << " test_eval_handles_keyword_args\n";
   run("((fn (a b) a) 2 :a 1)");
   CHECK_TRACE_CONTENTS("bind", "a: 1");
 }
 
 void test_eval_handles_keyword_args2() {
+  cerr << "- " << n++ << " test_eval_handles_keyword_args2\n";
   run("((fn (a b c) c) :c 1 2)");
   CHECK_TRACE_CONTENTS("bind", "a: 2b: nilc: 1");
   CHECK_TRACE_TOP("eval", "=> 1");
 }
 
 void test_eval_handles_nil_keyword_arg() {
+  cerr << "- " << n++ << " test_eval_handles_nil_keyword_arg\n";
   run("((fn (a) a) 2 :a nil)");
   CHECK_TRACE_CONTENTS("bind", "a: nil");
 }
 
 void test_eval_handles_quoted_keyword_args() {
+  cerr << "- " << n++ << " test_eval_handles_quoted_keyword_args\n";
   run("((fn (a b 'c) c) :c 1 2)");
   CHECK_TRACE_CONTENTS("bind", "a: 2b: nilc: 1");
   CHECK_TRACE_TOP("eval", "=> 1");
 }
 
 void test_eval_handles_quoted_keyword_args2() {
+  cerr << "- " << n++ << " test_eval_handles_quoted_keyword_args2\n";
   run("x <- 1");
   run("((fn (a b 'c) c) :c x 2)");
   CHECK_TRACE_CONTENTS("bind", "a: 2b: nilc: x");
@@ -524,30 +561,35 @@ void test_eval_handles_quoted_keyword_args2() {
 }
 
 void test_eval_handles_rest_keyword_arg() {
+  cerr << "- " << n++ << " test_eval_handles_rest_keyword_arg\n";
   run("((fn (a ... b) b) 2 :b 1 3)");
   CHECK_TRACE_CONTENTS("bind", "a: 2b: (1 3)");
   CHECK_TRACE_TOP("eval", "=> (1 3)");
 }
 
 void test_eval_handles_rest_keyword_arg2() {
+  cerr << "- " << n++ << " test_eval_handles_rest_keyword_arg2\n";
   run("((fn (a ... b) b) :b 1 2 3)");
   CHECK_TRACE_CONTENTS("bind", "a: nilb: (1 2 3)");
   CHECK_TRACE_TOP("eval", "=> (1 2 3)");
 }
 
 void test_eval_handles_args_after_rest_keyword() {
+  cerr << "- " << n++ << " test_eval_handles_args_after_rest_keyword\n";
   run("((fn (a ... b) b) :b 1 2 :a 3)");
   CHECK_TRACE_CONTENTS("bind", "a: 3b: (1 2)");
   CHECK_TRACE_TOP("eval", "=> (1 2)");
 }
 
 void test_eval_handles_args_after_rest_keyword2() {
+  cerr << "- " << n++ << " test_eval_handles_args_after_rest_keyword2\n";
   run("((fn (a b ... c) b) :c 1 2 :b 3)");
   CHECK_TRACE_CONTENTS("bind", "a: nilb: 3c: (1 2)");
   CHECK_TRACE_TOP("eval", "=> 3");
 }
 
 void test_eval_handles_quoted_rest_keyword_arg() {
+  cerr << "- " << n++ << " test_eval_handles_quoted_rest_keyword_arg\n";
   run("x <- 2");
   run("((fn (a ... 'b) b) :b 1 x 3)");
   CHECK_TRACE_CONTENTS("bind", "a: nilb: (1 x 3)");
@@ -556,18 +598,21 @@ void test_eval_handles_quoted_rest_keyword_arg() {
 }
 
 void test_eval_handles_non_keyword_arg_colon_syms() {
+  cerr << "- " << n++ << " test_eval_handles_non_keyword_arg_colon_syms\n";
   run("((fn (a b) a) :x 1)");
   CHECK_TRACE_CONTENTS("bind", "a: :xb: 1");
   CHECK_TRACE_TOP("eval", "=> :x");
 }
 
 void test_eval_handles_keyword_args_inside_splice() {
+  cerr << "- " << n++ << " test_eval_handles_keyword_args_inside_splice\n";
   run("((fn (a b) b) @'(3 :a 4))");
   CHECK_TRACE_CONTENTS("bind", "a: 4b: 3");
   CHECK_TRACE_TOP("eval", "=> 3");
 }
 
 void test_eval_handles_keyword_args_inside_destructured_params() {
+  cerr << "- " << n++ << " test_eval_handles_keyword_args_inside_destructured_params\n";
   run("((fn ((a b)) b) '(3 :a 4))");
   CHECK_TRACE_CONTENTS("bind", "a: 4b: 3");
   CHECK_TRACE_TOP("eval", "=> 3");
@@ -576,21 +621,25 @@ void test_eval_handles_keyword_args_inside_destructured_params() {
 
 
 void test_eval_handles_param_aliases() {
+  cerr << "- " << n++ << " test_eval_handles_param_aliases\n";
   run("((fn (x|y) 3) 4)");
   CHECK_TRACE_CONTENTS("bind", "x: 4y: 4");
 }
 
 void test_eval_handles_aliased_keyword_args() {
+  cerr << "- " << n++ << " test_eval_handles_aliased_keyword_args\n";
   run("((fn (a b c|x) c) :x 1 2)");
   CHECK_TRACE_TOP("eval", "=> 1");
 }
 
 void test_eval_handles_aliased_keyword_args2() {
+  cerr << "- " << n++ << " test_eval_handles_aliased_keyword_args2\n";
   run("((fn (a|x b) b) :x 1 2)");
   CHECK_TRACE_TOP("eval", "=> 2");
 }
 
 void test_eval_handles_quoted_param_aliases() {
+  cerr << "- " << n++ << " test_eval_handles_quoted_param_aliases\n";
   new_dynamic_scope("x", new_num(3));
   run("((fn ((a | 'b)) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: 3b: x");
@@ -598,23 +647,27 @@ void test_eval_handles_quoted_param_aliases() {
 }
 
 void test_eval_handles_quoted_param_aliases2() {
+  cerr << "- " << n++ << " test_eval_handles_quoted_param_aliases2\n";
   run("((fn '(x|y) 3) a)");
   CHECK_TRACE_CONTENTS("bind", "x: ay: a");
 }
 
 void test_eval_handles_aliased_rest_keyword_args() {
+  cerr << "- " << n++ << " test_eval_handles_aliased_rest_keyword_args\n";
   run("((fn (a ... body|do) body) 2 :do 1 3)");
   CHECK_TRACE_CONTENTS("bind", "a: 2body: (1 3)");
   CHECK_TRACE_TOP("eval", "=> (1 3)");
 }
 
 void test_eval_handles_aliased_rest_keyword_args2() {
+  cerr << "- " << n++ << " test_eval_handles_aliased_rest_keyword_args2\n";
   run("((fn (a b ... body|do) `(,a ,b ,body)) 2 :do 1 3)");
   CHECK_TRACE_CONTENTS("bind", "a: 2b: nilbody: (1 3)");
   CHECK_TRACE_TOP("eval", "=> (2 nil (1 3))");
 }
 
 void test_eval_handles_quoted_rest_param_aliases() {
+  cerr << "- " << n++ << " test_eval_handles_quoted_rest_param_aliases\n";
   new_dynamic_scope("x", new_num(3));
   run("((fn (a | 'b) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: (3)b: (x)");
@@ -622,17 +675,20 @@ void test_eval_handles_quoted_rest_param_aliases() {
 }
 
 void test_eval_handles_quoted_rest_param_aliases2() {
+  cerr << "- " << n++ << " test_eval_handles_quoted_rest_param_aliases2\n";
   run("((fn '(a | b) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: (x)b: (x)");
 }
 
 // param aliases also stand in for as-params like in haskell
 void test_eval_binds_as_params() {
+  cerr << "- " << n++ << " test_eval_binds_as_params\n";
   run("((fn (a | (b c)) 3) 1 2)");
   CHECK_TRACE_CONTENTS("bind", "a: (1 2)b: 1c: 2");
 }
 
 void test_eval_binds_as_params2() {
+  cerr << "- " << n++ << " test_eval_binds_as_params2\n";
   TEMP(val, read("(1 2)"));
   new_dynamic_scope("x", val);
   run("((fn ((a | (b c))) 3) x)");
@@ -641,16 +697,19 @@ void test_eval_binds_as_params2() {
 }
 
 void test_eval_binds_as_params_with_keyword_args() {
+  cerr << "- " << n++ << " test_eval_binds_as_params_with_keyword_args\n";
   run("((fn (a | (b c)) 3) 1 :b 2)");
   CHECK_TRACE_CONTENTS("bind", "a: (1 :b 2)b: 2c: 1");
 }
 
 void test_eval_binds_as_params_with_keyword_args2() {
+  cerr << "- " << n++ << " test_eval_binds_as_params_with_keyword_args2\n";
   run("((fn (a | (b c d)) 3) 1 :b 2 3)");
   CHECK_TRACE_CONTENTS("bind", "a: (1 :b 2 3)b: 2c: 1d: 3");
 }
 
 void test_eval_warns_on_keyword_args_for_conflicting_aliases() {
+  cerr << "- " << n++ << " test_eval_warns_on_keyword_args_for_conflicting_aliases\n";
   Hide_warnings = true;
   run("((fn (a|b c|d) (cons a (cons b (cons c d)))) :c 1 :d 2)");
   CHECK_TRACE_WARNS();
@@ -658,26 +717,31 @@ void test_eval_warns_on_keyword_args_for_conflicting_aliases() {
 }
 
 void test_eval_binds_as_params_recursively() {
+  cerr << "- " << n++ << " test_eval_binds_as_params_recursively\n";
   run("((fn (a | (b ... (c | (d e)))) 3) 1 2 3)");
   CHECK_TRACE_CONTENTS("bind", "a: (1 2 3)b: 1c: (2 3)d: 2e: 3");
 }
 
 void test_eval_binds_as_params_recursively_using_keyword_args() {
+  cerr << "- " << n++ << " test_eval_binds_as_params_recursively_using_keyword_args\n";
   run("((fn (a | (b ... (c | (d e)))) 3) 1 :e 2 3)");
   CHECK_TRACE_CONTENTS("bind", "a: (1 :e 2 3)b: 1c: (:e 2 3)d: 3e: 2");
 }
 
 void test_eval_binds_quoted_as_params_recursively_using_keyword_args() {
+  cerr << "- " << n++ << " test_eval_binds_quoted_as_params_recursively_using_keyword_args\n";
   run("((fn ('a | (b|c)) 3) :b 1)");
   CHECK_TRACE_CONTENTS("bind", "a: (:b 1)b: 1");
 }
 
 void test_eval_binds_quoted_rest_as_params_recursively_using_keyword_args() {
+  cerr << "- " << n++ << " test_eval_binds_quoted_rest_as_params_recursively_using_keyword_args\n";
   run("((fn ('a | (b ... (c | (d e)))) 3) 1 :e 2 3)");
   CHECK_TRACE_CONTENTS("bind", "a: (1 :e 2 3)b: 1c: (:e 2 3)d: 3e: 2");
 }
 
 void test_eval_binds_quoted_as_params() {
+  cerr << "- " << n++ << " test_eval_binds_quoted_as_params\n";
   new_dynamic_scope("x", new_num(3));
   run("((fn ('a | ('b)) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: (x)b: x");
@@ -686,6 +750,7 @@ void test_eval_binds_quoted_as_params() {
 }
 
 void test_eval_binds_quoted_as_params2() {
+  cerr << "- " << n++ << " test_eval_binds_quoted_as_params2\n";
   new_dynamic_scope("x", new_num(3));
   run("((fn (a | ('b)) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: (3)b: x");
@@ -693,75 +758,88 @@ void test_eval_binds_quoted_as_params2() {
 }
 
 void test_eval_binds_destructured_as_params() {
+  cerr << "- " << n++ << " test_eval_binds_destructured_as_params\n";
   run("((fn ((a | (b c))) 3) '(1 2))");
   CHECK_TRACE_CONTENTS("bind", "a: (1 2)b: 1c: 2");
 }
 
 // gotcha: a|(b c) won't work
 void test_eval_warns_on_unary_as() {
+  cerr << "- " << n++ << " test_eval_warns_on_unary_as\n";
   Hide_warnings = true;
   run("((fn (| a) 3) 1 2)");
   CHECK_TRACE_WARNS();
 }
 
 void test_eval_warns_on_unary_as2() {
+  cerr << "- " << n++ << " test_eval_warns_on_unary_as2\n";
   Hide_warnings = true;
   run("((fn ((| a)) 3) 1 2)");
   CHECK_TRACE_WARNS();
 }
 
 void test_eval_warns_on_conflicting_as_params() {
+  cerr << "- " << n++ << " test_eval_warns_on_conflicting_as_params\n";
   Hide_warnings = true;
   run("((fn (| (a b) c)) 1 2)");
   CHECK_TRACE_WARNS();
 }
 
 void test_eval_warns_on_double_quoting() {
+  cerr << "- " << n++ << " test_eval_warns_on_double_quoting\n";
   Hide_warnings = true;
   run("((fn (''a)) 1)");
   CHECK_TRACE_WARNS();
 }
 
 void test_eval_warns_on_double_quoting2() {
+  cerr << "- " << n++ << " test_eval_warns_on_double_quoting2\n";
   Hide_warnings = true;
   run("((fn ''a) 1)");
   CHECK_TRACE_WARNS();
 }
 
 void test_eval_warns_on_double_quoting3() {
+  cerr << "- " << n++ << " test_eval_warns_on_double_quoting3\n";
   Hide_warnings = true;
   run("((fn '('a)) 1)");
   CHECK_TRACE_WARNS();
 }
 
 void test_eval_warns_on_double_quoting4() {
+  cerr << "- " << n++ << " test_eval_warns_on_double_quoting4\n";
   Hide_warnings = true;
   run("((fn '(a 'b)) 1 2)");
   CHECK_TRACE_WARNS();
 }
 
 void test_eval_warns_on_double_quoting5() {
+  cerr << "- " << n++ << " test_eval_warns_on_double_quoting5\n";
   Hide_warnings = true;
   run("((fn '((| a 'b))) 1)");
   CHECK_TRACE_WARNS();
 }
 
 void test_eval_binds_missing_as_params_to_nil() {
+  cerr << "- " << n++ << " test_eval_binds_missing_as_params_to_nil\n";
   run("((fn ((a | (b c))) 3) 1)");
   CHECK_TRACE_CONTENTS("bind", "a: 1b: nilc: nil");
 }
 
 void test_eval_handles_duplicate_destructured_aliases() {
+  cerr << "- " << n++ << " test_eval_handles_duplicate_destructured_aliases\n";
   run("((fn ((a b|x) (c d|x)) 3) '(1 :x 2) '(3 :x 4))");
   CHECK_TRACE_CONTENTS("bind", "a: 1b: 2c: 3d: 4");  // x might end up bound as either 2 or 4
 }
 
 void test_eval_handles_duplicate_destructured_aliases2() {
+  cerr << "- " << n++ << " test_eval_handles_duplicate_destructured_aliases2\n";
   run("((fn ((a b|x) (c d|x)) 3) '(1 :x 2) '(3 :x 4))");
   CHECK_TRACE_CONTENTS("bind", "a: 1b: 2c: 3d: 4");  // x might end up bound as either 2 or 4
 }
 
 void test_eval_handles_already_evald_aliased_arg() {
+  cerr << "- " << n++ << " test_eval_handles_already_evald_aliased_arg\n";
   new_dynamic_scope("a", new_num(3));
   // construct ((fn (x|y) 3) ''a)
   TEMP(call, read("((fn (x|y) 3))"));
@@ -775,6 +853,7 @@ void test_eval_handles_already_evald_aliased_arg() {
 }
 
 void test_eval_handles_args_with_cycles() {
+  cerr << "- " << n++ << " test_eval_handles_args_with_cycles\n";
   trace_stream* old = Trace_stream;  Trace_stream = NULL;  // trace can't handle cycles yet
   TEMP(x, read("(3)"));
   set_cdr(x, x);  // cycle
@@ -788,12 +867,14 @@ void test_eval_handles_args_with_cycles() {
 }
 
 void test_fn_evals_arg_only_when_necessary() {
+  cerr << "- " << n++ << " test_fn_evals_arg_only_when_necessary\n";
   run("((fn ('a | (| 'b 'c)) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: (x)b: (x)c: (x)");
   CHECK_TRACE_DOESNT_CONTAIN("eval", "x");
 }
 
 void test_fn_evals_arg_only_when_necessary2() {
+  cerr << "- " << n++ << " test_fn_evals_arg_only_when_necessary2\n";
   new_dynamic_scope("y", new_num(3));
   run("((fn (| 'a ('b c)) 3) x y)");
   CHECK_TRACE_CONTENTS("bind", "a: (x y)b: xc: 3");
@@ -803,6 +884,7 @@ void test_fn_evals_arg_only_when_necessary2() {
 }
 
 void test_fn_evals_destructured_arg_only_when_necessary() {
+  cerr << "- " << n++ << " test_fn_evals_destructured_arg_only_when_necessary\n";
   run("((fn (('a | 'b)) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: xb: x");
   CHECK_TRACE_DOESNT_CONTAIN("eval", "x");
@@ -810,6 +892,7 @@ void test_fn_evals_destructured_arg_only_when_necessary() {
 }
 
 void test_fn_evals_destructured_arg_only_when_necessary2() {
+  cerr << "- " << n++ << " test_fn_evals_destructured_arg_only_when_necessary2\n";
   run("((fn (('a | (| 'b 'c))) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: xb: xc: x");
   CHECK_TRACE_DOESNT_CONTAIN("eval", "x");
@@ -817,6 +900,7 @@ void test_fn_evals_destructured_arg_only_when_necessary2() {
 }
 
 void test_fn_evals_destructured_arg_only_when_necessary3() {
+  cerr << "- " << n++ << " test_fn_evals_destructured_arg_only_when_necessary3\n";
   new_dynamic_scope("x", new_num(3));
   run("((fn ((| 'a (| 'b c))) 3) x)");
   CHECK_TRACE_CONTENTS("bind", "a: xb: xc: 3");
@@ -826,6 +910,7 @@ void test_fn_evals_destructured_arg_only_when_necessary3() {
 
 
 void test_eval_handles_assigned_fn_calls() {
+  exit(0);
   run("(<- f (fn () 34))");
   CLEAR_TRACE;
   run("(f)");

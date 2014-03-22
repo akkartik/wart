@@ -7,7 +7,9 @@ struct trace_stream {
   ostringstream* curr_stream;
   string curr_layer;
   string dump_layer;
-  trace_stream() :curr_stream(NULL) {}
+  trace_stream() :curr_stream(NULL) {
+    dump_layer = "bind";
+  }
   ~trace_stream() { if (curr_stream) delete curr_stream; }
 
   ostringstream& stream(string layer) {

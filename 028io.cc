@@ -42,14 +42,14 @@ ostream& operator<<(ostream& os, table* t) {
   os << "{";
   // order common keys deterministically for tracing tests
   if (t->value[sym_name]) os << t->value[sym_name] << ": ";
-  if (t->value[sym_sig]) os << sym_sig << ", ";
-  if (t->value[sym_body]) os << sym_body << ", ";
-  if (t->value[sym_env]) os << sym_env << ", ";
+  if (t->value[sym_sig]) os << sym_sig << ':' << t->value[sym_sig] << ", ";
+  if (t->value[sym_body]) os << sym_body << ':' << t->value[sym_body] << ", ";
+  if (t->value[sym_env]) os << sym_env << ':' << t->value[sym_env] << ", ";
   for (cell_map::iterator p = t->value.begin(); p != t->value.end(); ++p) {
     if (!p->second) continue;
     if (p->first == sym_name || p->first == sym_sig || p->first == sym_body || p->first == sym_env)
       continue;
-    os << (cell*)p->first << ", ";
+    os << (cell*)p->first << ':' << (cell*)p->second << ", ";
   }
   return os << "}";
 }

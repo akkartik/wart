@@ -165,6 +165,7 @@ void bind_params(cell* params, bool is_params_quoted, cell* args, cell* scope, c
     bind_param(params, is_params_quoted, args, scope, new_scope);
   else
     bind_params_at(params, params, is_params_quoted, args, args, scope, new_scope);
+  trace("bind") << "=> " << new_scope;
 }
 
 // Bind the param at p_params inside params to the appropriate arg inside
@@ -249,12 +250,15 @@ void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* a
           }
         }
         else if (is_sym(alias)) {
-          trace("bind") << "rest alias sym " << alias << '\n';
           if (!eval_done) {
-            if (is_params_quoted)
+            if (is_params_quoted) {
+              trace("bind") << "quoted rest alias sym " << alias << '\n';
               update(val, mkref(rest_args));
-            else
+            }
+            else {
+              trace("bind") << "rest alias sym " << alias << '\n';
               update(val, eval_all(rest_args, scope));
+            }
             eval_done = true;
           }
           add_lexical_binding(alias, val, new_scope);
@@ -287,10 +291,12 @@ void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* a
       RAISE << "just one param alias: " << param << ". Are you sure?\n";
     cell* p_keyword_arg = find_any_keyword_arg(cdr(param), args);
     if (p_keyword_arg) {
+      trace("bind") << "keyword arg\n";
       bind_aliases(param, is_params_quoted, car(cdr(p_keyword_arg)), scope, new_scope);
       bind_params_at(params, cdr(p_params), is_params_quoted, args, p_args, scope, new_scope);
     }
     else {
+      trace("bind") << "positional arg\n";
       bind_aliases(param, is_params_quoted, car(p_args), scope, new_scope);
       bind_params_at(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope);
     }
@@ -303,17 +309,23 @@ void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* a
     trace("bind") << "quoted " << param << '\n';
     cell* p_keyword_arg = find_keyword_arg(param, args);
     if (p_keyword_arg) {
+      trace("bind") << "keyword arg\n";
       TEMP(arg, maybe_quote(car(cdr(p_keyword_arg))));
       add_lexical_binding(param, arg, new_scope);
       bind_params_at(params, cdr(p_params), is_params_quoted, args, p_args, scope, new_scope);
     }
     else {
+      trace("bind") << "positional arg\n";
       TEMP(arg, maybe_quote(car(p_args)));
       add_lexical_binding(param, arg, new_scope);
-      if (cdr(p_args) != nil && !is_cons(cdr(p_args)))
+      if (cdr(p_args) != nil && !is_cons(cdr(p_args))) {
+        trace("bind") << "non-cons arg\n";
         bind_param(cdr(p_params), is_params_quoted, cdr(p_args), scope, new_scope);
-      else
+      }
+      else {
+        trace("bind") << "regular arg\n";
         bind_params_at(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope);
+      }
     }
     return;
   }
@@ -331,10 +343,14 @@ void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* a
   if (is_cons(param)) {
     trace("bind") << "destructured " << param << '\n';
     TEMP(val, eval_arg(car(p_args), scope));
-    if (is_incomplete_eval(val))
+    if (is_incomplete_eval(val)) {
+      trace("bind") << "incomplete arg\n";
       add_lexical_binding(param, val, new_scope);
-    else
+    }
+    else {
+      trace("bind") << "regular arg\n";
       bind_params(param, true, val, scope, new_scope);
+    }
     bind_params_at(params, cdr(p_params), is_params_quoted, args, cdr(p_args), scope, new_scope);
     return;
   }
@@ -374,6 +390,7 @@ void bind_aliases(cell* param, bool is_params_quoted, cell* arg, cell* scope, ce
       else if (is_sym(alias)) {
         trace("bind") << "alias sym " << alias << '\n';
         if (!eval_done) {
+          trace("bind") << "eval arg\n";
           update(val, eval_arg(arg, scope));
           eval_done = true;
         }
@@ -387,6 +404,7 @@ void bind_aliases(cell* param, bool is_params_quoted, cell* arg, cell* scope, ce
       else if (is_cons(alias)) {
         trace("bind") << "destructured alias (as-param) " << alias << '\n';
         if (!eval_done) {
+          trace("bind") << "eval arg\n";
           update(val, eval_arg(arg, scope));
           eval_done = true;
         }
