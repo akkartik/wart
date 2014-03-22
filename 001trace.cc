@@ -25,6 +25,10 @@ struct trace_stream {
     past_lines.push_back(pair<string, pair<int, string> >(curr_layer, pair<int, string>(frame[curr_layer], curr_stream->str())));
     if (curr_layer == "dump")
       cerr << with_newline(curr_stream->str());
+    else if (dump_layer == "bind" && prefix_match(dump_layer, curr_layer)) {
+      extern int Eval_layer_index;
+      cerr << curr_layer << '/' << Eval_layer_index << '/' << frame[curr_layer] << ": " << with_newline(curr_stream->str());
+    }
     else if ((!dump_layer.empty() && prefix_match(dump_layer, curr_layer))
         || (!Hide_warnings && curr_layer == "warn"))
       cerr << curr_layer << "/" << frame[curr_layer] << ": " << with_newline(curr_stream->str());

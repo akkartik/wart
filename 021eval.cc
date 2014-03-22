@@ -37,7 +37,14 @@ cell* eval(cell* expr) {
   return eval(expr, Curr_lexical_scope);
 }
 
+int Eval_layer_index = 0;
+struct lease_eval_layer {
+  lease_eval_layer() { ++Eval_layer_index; }
+  ~lease_eval_layer() { assert(Eval_layer_index > 0); --Eval_layer_index; }
+};
+
 cell* eval(cell* expr, cell* scope) {
+  lease_eval_layer leased_eval_layer;
   new_trace_frame("eval");
   if (!expr) {
     RAISE << "eval: cell should never be NULL\n" << die();
@@ -160,6 +167,7 @@ cell* eval(cell* expr, cell* scope) {
 //  aliased params
 //  as-params naming whole and parts
 void bind_params(cell* params, bool is_params_quoted, cell* args, cell* scope, cell* new_scope) {
+  new_trace_frame("bind");
   trace("bind") << params << " <-> " << args;
   if (args != nil && !is_cons(args))
     bind_param(params, is_params_quoted, args, scope, new_scope);
@@ -171,6 +179,7 @@ void bind_params(cell* params, bool is_params_quoted, cell* args, cell* scope, c
 // Bind the param at p_params inside params to the appropriate arg inside
 // args, and recurse.
 void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* args, cell* p_args, cell* scope, cell* new_scope) {
+  new_trace_frame("bind");
   trace("bind") << params << p_params << " <-> " << args << p_args << '\n';
   if (p_params == nil) return;
 
@@ -373,6 +382,7 @@ void bind_params_at(cell* params, cell* p_params, bool is_params_quoted, cell* a
 }
 
 void bind_aliases(cell* param, bool is_params_quoted, cell* arg, cell* scope, cell* new_scope) {
+  new_trace_frame("bind");
   TEMP(val, nil);
   bool eval_done = false;
   for (cell* aliases = cdr(param); aliases != nil; aliases=cdr(aliases)) {
