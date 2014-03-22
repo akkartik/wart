@@ -554,6 +554,7 @@ void test_eval_handles_quoted_keyword_args() {
 void test_eval_handles_quoted_keyword_args2() {
   cerr << "- " << n++ << " test_eval_handles_quoted_keyword_args2\n";
   run("x <- 1");
+  CLEAR_TRACE;
   run("((fn (a b 'c) c) :c x 2)");
   CHECK_TRACE_CONTENTS("bind", "a: 2b: nilc: x");
   CHECK_TRACE_TOP("eval", "=> x");
@@ -591,6 +592,7 @@ void test_eval_handles_args_after_rest_keyword2() {
 void test_eval_handles_quoted_rest_keyword_arg() {
   cerr << "- " << n++ << " test_eval_handles_quoted_rest_keyword_arg\n";
   run("x <- 2");
+  CLEAR_TRACE;
   run("((fn (a ... 'b) b) :b 1 x 3)");
   CHECK_TRACE_CONTENTS("bind", "a: nilb: (1 x 3)");
   CHECK_TRACE_TOP("eval", "=> (1 x 3)");
@@ -861,7 +863,7 @@ void test_eval_handles_args_with_cycles() {
 
   run("((fn (a|b) 3)  x)");
   // should terminate
-  set_cdr(x, nil);
+  set_cdr(x, nil);  // break cycle
   end_dynamic_scope("x");
   Trace_stream = old;
 }
