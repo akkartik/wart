@@ -29,6 +29,12 @@ mac (rfn name params ... body)
 mac (afn params ... body)
   `(rfn self ,params ,@body)
 
+mac (loop vars_vals ... body)
+  let bindings (pair vars_vals)
+    `((rfn recur ,(map car bindings)
+        ,@body)
+      ,@(map cadr bindings))
+
 mac (before_calling (f ... params) ... body)
   `(let $old ,f
      (def! (,f ,@params)

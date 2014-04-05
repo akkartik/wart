@@ -18,3 +18,11 @@ let foo_calls 0
 (test "after_calling works"
   :valueof (do (foo 3) (bar))
   :should be 1)
+
+(test "loop works"
+  :valueof (collect
+             (loop (x '(1 2 3))
+               (when x
+                 (yield x)
+                 (recur cdr.x))))
+  :should be '((1 2 3) (2 3) (3)))

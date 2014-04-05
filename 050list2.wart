@@ -50,20 +50,19 @@ def (blank? seq)
 
 # lexicographic comparison
 def (a < b) :case (or list?.a list?.b)
-  let lex_less
-      afn (a b orig_b)  # always return original b for chaining
-        default orig_b :to b
-        if (b = nil)
-             false
-           (a = nil)
-             orig_b
-           (car.a = car.b)
-             (self cdr.a cdr.b orig_b)
-           :else
-             if (car.a < car.b)
-               orig_b
-               false
-    (lex_less a b)
+  loop (a a
+        b b
+        orig_b b)  # always return original b for chaining
+    if (b = nil)
+         false
+       (a = nil)
+         orig_b
+       (car.a = car.b)
+         (recur cdr.a cdr.b orig_b)
+       :else
+         if (car.a < car.b)
+           orig_b
+           false
 
 def (copy x)
   if ~cons?.x
