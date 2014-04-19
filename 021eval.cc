@@ -37,14 +37,7 @@ cell* eval(cell* expr) {
   return eval(expr, Curr_lexical_scope);
 }
 
-int Eval_layer_index = 0;
-struct lease_eval_layer {
-  lease_eval_layer() { ++Eval_layer_index; }
-  ~lease_eval_layer() { assert(Eval_layer_index > 0); --Eval_layer_index; }
-};
-
 cell* eval(cell* expr, cell* scope) {
-  lease_eval_layer leased_eval_layer;
   new_trace_frame("eval");
   if (!expr) {
     RAISE << "eval: cell should never be NULL\n" << die();
