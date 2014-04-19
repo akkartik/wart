@@ -30,6 +30,10 @@
   :valueof ("abcd" 1 nil)
   :should be "bcd")
 
+(test "strings can take slices - overflow"
+  :valueof ("abcd" 1 10)
+  :should be "bcd")
+
 (test "string indices can be assigned to"
   :valueof (ret s "abc"
              (s.1 <- "z"))

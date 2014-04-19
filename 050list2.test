@@ -41,6 +41,10 @@
   :valueof (let l '(1 2 3 4 5 6) (l 3 nil))
   :should be '(4 5 6))
 
+(test "lists can take slices - overflow"
+  :valueof (let l '(1 2 3 4 5 6) (l 3 10))
+  :should be '(4 5 6))
+
 (test "lists can be assigned to"
   :valueof (ret l '(1 2 3)
              (l.1 <- 4))
