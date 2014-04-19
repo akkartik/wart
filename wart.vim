@@ -44,7 +44,6 @@ highlight link wartQuote Delimiter
 syntax match wartCons /\.\.\./
 highlight link wartCons Delimiter
 
-" deemphasize period operator
 syntax match wartCall /\./
 highlight link wartCall Delimiter
 
