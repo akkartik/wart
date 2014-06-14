@@ -1,9 +1,10 @@
 def (petrify)
+  prn "Petrifying macros for performance"
   (update_macroexpansions)
   (update_optimized_bodies)
 
 def (update_macroexpansions)
-  prn "computing expansions (takes ~60 seconds)"
+  prn "  computing expansions (takes ~60 seconds)"
   each (var val) (sort (< car) (as list (globals)))
     (update_macroexpansion val)
 
@@ -14,7 +15,7 @@ def (update_macroexpansion val)
           (zap! strip_eval body.m)))
 
 def (update_optimized_bodies)
-  prn "expanding calls (takes ~60 seconds)"
+  prn "  expanding calls (takes ~60 seconds)"
   each (var val) (sort (< car) (as list (globals)))
     (update_optimized_body var val)
 
