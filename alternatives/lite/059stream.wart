@@ -56,3 +56,7 @@ mac (drain expr eof)
 def (pr ... args) :case ~single?.args
   (map pr args)
   car.args
+
+def (log ... args)
+  (date)
+  (prn @args)
