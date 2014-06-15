@@ -15,9 +15,9 @@ int main(int argc, const char* argv[]) {
 
   //// Interactive loop: parse commands from user, evaluate them, print the results
   setup();
-  cerr << "starting up...       (takes ~15 seconds)\n";
+  cerr << time_string() << " loading wart files       (takes ~15 seconds)\n";
   load_files(".wart");
-  cerr << "ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
+  cerr << time_string() << " ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   Interactive = true;  // stop run on two enters
   while (!cin.eof()) {
     cell* curr = run(cin);

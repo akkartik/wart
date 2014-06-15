@@ -30,9 +30,8 @@ COMPILE_FN(nrefs, compiledfn_nrefs, "($x)",
 )
 
 COMPILE_FN(date, compiledfn_date, "()",
-  time_t t = time(NULL);
-  char buf[1024];
-  if (strftime(buf, sizeof(buf)/sizeof(char), "%Y-%m-%d %H:%M:%S", localtime(&t)))
+  string buf(time_string());
+  if (!buf.empty())
     cerr << buf << ' ';
   else
     cerr << "strftime buffer too small\n";
