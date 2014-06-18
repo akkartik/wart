@@ -59,7 +59,7 @@ def (pr ... args) :case ~single?.args
 
 # print with timestamp
 def (log ... args)
-  (date)
+  (prntime)
   (prn @args)
 
 # during debugging, print a value with a distinguishing label

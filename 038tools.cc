@@ -29,7 +29,7 @@ COMPILE_FN(nrefs, compiledfn_nrefs, "($x)",
   return mkref(new_num(lookup("$x")->nrefs));
 )
 
-COMPILE_FN(date, compiledfn_date, "()",
+COMPILE_FN(prntime, compiledfn_prntime, "()",
   string buf(time_string());
   if (!buf.empty())
     cerr << buf << ' ';
