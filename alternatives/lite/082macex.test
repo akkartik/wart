@@ -54,44 +54,44 @@ mac (foomex3 ... args)
   :valueof (macex '(car (let x 3 x+2)))
   :should be '(car ((fn (x) x+2) 3)))
 
-def (foomex3 'x)
+def (foomex4 'x)
   x
 (test "macex ignores quoted params"
-  :valueof (macex '(foomex3 (let x 3 x+2)))
-  :should be '(foomex3 (let x 3 x+2)))
+  :valueof (macex '(foomex4 (let x 3 x+2)))
+  :should be '(foomex4 (let x 3 x+2)))
 
-def (foomex4 ... args)
+def (foomex5 ... args)
   args
 (test "macex reaches inside vararg calls"
-  :valueof (macex '(foomex4 (let x 3 x+2)))
-  :should be '(foomex4 ((fn (x) x+2) 3)))
+  :valueof (macex '(foomex5 (let x 3 x+2)))
+  :should be '(foomex5 ((fn (x) x+2) 3)))
 
-def (foomex5 ... 'args)
+def (foomex6 ... 'args)
   args
 (test "macex ignores quoted vararg params"
-  :valueof (macex '(foomex5 (let x 3 x+2)))
-  :should be '(foomex5 (let x 3 x+2)))
+  :valueof (macex '(foomex6 (let x 3 x+2)))
+  :should be '(foomex6 (let x 3 x+2)))
 
-def (foomex6 a|b)
+def (foomex7 a|b)
   a
 (test "macex reaches inside aliased params"
-  :valueof (macex '(foomex6 (let x 3 x+2)))
-  :should be '(foomex6 ((fn (x) x+2) 3)))
-
-def (foomex7 (| 'a b))
-  a
-(test "macex reaches inside aliased params - 2"
   :valueof (macex '(foomex7 (let x 3 x+2)))
   :should be '(foomex7 ((fn (x) x+2) 3)))
 
-def (foomex8 (| 'a 'b))
+def (foomex8 (| 'a b))
+  a
+(test "macex reaches inside aliased params - 2"
+  :valueof (macex '(foomex8 (let x 3 x+2)))
+  :should be '(foomex8 ((fn (x) x+2) 3)))
+
+def (foomex9 (| 'a 'b))
   a
 (test "macex reaches ignores params where all aliases are quoted"
-  :valueof (macex '(foomex8 (let x 3 x+2)))
-  :should be '(foomex8 (let x 3 x+2)))
+  :valueof (macex '(foomex9 (let x 3 x+2)))
+  :should be '(foomex9 (let x 3 x+2)))
 
-def (foomex9 a 'b)  # test fn with some quoted param
+def (foomex10 a 'b)  # test fn with some quoted param
   (list a b)
 (pending_test "macex understands keyword args in combination with quoted params"
-  :valueof (macex '(foomex9 (let x 3 x+2) :b 23))
-  :should be '(foomex9 ((fn (x) x+2) 3) :b 23))
+  :valueof (macex '(foomex10 (let x 3 x+2) :b 23))
+  :should be '(foomex10 ((fn (x) x+2) 3) :b 23))
