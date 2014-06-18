@@ -56,3 +56,13 @@ mac (drain expr eof)
 def (pr ... args) :case ~single?.args
   (map pr args)
   car.args
+
+# print with timestamp
+def (log ... args)
+  (date)
+  (prn @args)
+
+# during debugging, print a value with a distinguishing label
+def (dbg msg ... args)
+  (pr msg)  # don't return the label like prn would
+  (prn @args)
