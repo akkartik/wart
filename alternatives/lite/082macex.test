@@ -45,3 +45,53 @@ mac (foomex3 ... args)
 (test "macex is robust to non-macros - 3"
   :valueof (macex '(a b c))
   :should be '(a b c))
+
+(test "macex ignores unknown bindings"
+  :valueof (macex '(foomexundef (let x 3 x+2)))
+  :should be '(foomexundef (let x 3 x+2)))
+
+(test "macex expands inner macros"
+  :valueof (macex '(car (let x 3 x+2)))
+  :should be '(car ((fn (x) x+2) 3)))
+
+def (foomex3 'x)
+  x
+(test "macex ignores quoted params"
+  :valueof (macex '(foomex3 (let x 3 x+2)))
+  :should be '(foomex3 (let x 3 x+2)))
+
+def (foomex4 ... args)
+  args
+(test "macex reaches inside vararg calls"
+  :valueof (macex '(foomex4 (let x 3 x+2)))
+  :should be '(foomex4 ((fn (x) x+2) 3)))
+
+def (foomex5 ... 'args)
+  args
+(test "macex ignores quoted vararg params"
+  :valueof (macex '(foomex5 (let x 3 x+2)))
+  :should be '(foomex5 (let x 3 x+2)))
+
+def (foomex6 a|b)
+  a
+(test "macex reaches inside aliased params"
+  :valueof (macex '(foomex6 (let x 3 x+2)))
+  :should be '(foomex6 ((fn (x) x+2) 3)))
+
+def (foomex7 (| 'a b))
+  a
+(test "macex reaches inside aliased params - 2"
+  :valueof (macex '(foomex7 (let x 3 x+2)))
+  :should be '(foomex7 ((fn (x) x+2) 3)))
+
+def (foomex8 (| 'a 'b))
+  a
+(test "macex reaches ignores params where all aliases are quoted"
+  :valueof (macex '(foomex8 (let x 3 x+2)))
+  :should be '(foomex8 (let x 3 x+2)))
+
+def (foomex9 a 'b)  # test fn with some quoted param
+  (list a b)
+(pending_test "macex understands keyword args in combination with quoted params"
+  :valueof (macex '(foomex9 (let x 3 x+2) :b 23))
+  :should be '(foomex9 ((fn (x) x+2) 3) :b 23))

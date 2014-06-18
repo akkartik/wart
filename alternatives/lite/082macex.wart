@@ -28,8 +28,35 @@ def (update_optimized_body var val)
     (rep.val 'optimized_body)
 
 def (macex call env)
-  (converge (fn(_) (macex1 _ env))
-            call)
+  let outer (macex1 call env)
+    backstopped_by outer
+      when list?.outer
+        let (f ... args) outer
+          when (isa 'symbol f)
+            whenlet fval (hiding_warnings (eval f env))  # todo: side-effects
+              when ~quoted?+sig.fval
+                if (or ~cons?+sig.fval
+                       (all param_will_be_evald? sig.fval))
+                     : `(,f ,@(map (fn(_) (macex _ env)) args))
+                   (some keyword? args)
+                     # todo
+                     : nil
+                   :else
+                     : collect yield.f
+                         each (param arg) (zip sig.fval args)
+                           if (param_will_be_evald? param)
+                             yield (macex arg env)
+                             yield arg
+
+def (param_will_be_evald? param)
+  (and ~quoted?.param
+       (or ~list?.param
+           ~aliased?.param
+           (some ~quoted? cdr.param)))
+
+def (aliased? param)
+  (and list?.param
+       (car.param = '|))
 
 def (macex1 call env)
   backstopped_by call
@@ -41,9 +68,6 @@ def (macex1 call env)
               update_macroexpansion mval
             when (mac? mval)
               ((rep.mval 'expander) @args)
-
-def (macex_all forms)
-  (map macex forms)
 
 def (strip_eval exprs)
   transform exprs :thru
