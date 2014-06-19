@@ -2,7 +2,6 @@ proc (petrify)
   log "Petrifying macros for performance (takes ~2 minutes)"
   (update_macroexpansions)
   (update_optimized_bodies)
-  log "done."
 
 def (update_macroexpansions)
   log "  computing expansions"
