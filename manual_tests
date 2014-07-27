@@ -48,6 +48,7 @@ XI. Implicit parens after explicit
 (prn 'a)
 => 'a
 prn 'a
+
 => 'a
 
 XII. Expression after Unbalanced )
