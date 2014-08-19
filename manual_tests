@@ -56,3 +56,14 @@ XII. Expression after Unbalanced )
 Unbalanced )
 34
 => 34
+
+XIII. Unparenthesized expr
++ 1 2
+
+=> 3
+
+XIV. Unparenthesized expr followed immediately by another expr on next line
++ 1 2
+34
+=> 3
+=> 34

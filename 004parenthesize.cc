@@ -94,9 +94,6 @@ list<token> next_expr(indent_sensitive_stream& in) {
       if (is_indent(curr)) restore_indent(this_line_indent, in);
       if (is_indent(curr) || curr.newline || curr == ")") break;
     }
-    // a secondary prompt would go here
-//?     if (Interactive && curr.newline)
-//?       cout << "    ";
     if (Interactive && curr.newline && explicit_open_parens == 0 && in.fd.peek() == '\n')
       break;
   }

@@ -20,8 +20,6 @@ int main(int argc, const char* argv[]) {
   cerr << time_string() << " ready! type in an expression, then hit enter twice. ctrl-d exits.\n";
   Interactive = true;  // stop run on two enters
   while (!cin.eof()) {
-    cout << "--\n";
-//?     cout << "    ";  // primary prompt
     cell* curr = run(cin);
     cout << "=> " << curr << '\n';
     rmref(curr);
