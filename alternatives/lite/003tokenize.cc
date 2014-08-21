@@ -87,7 +87,7 @@ token next_token(indent_sensitive_stream& in) {
     slurp_word(in.fd, out);
 
   if (out.str() == ":") {
-    trace("skip during tokenize") << "comment token";
+    trace("tokenize") << "skip comment token";
     return next_token(in);
   }
 

@@ -40,8 +40,7 @@ void test_tokenize_suppresses_comments() {
 
 void test_tokenize_suppresses_comments2() {
   read_all("a : b\n  : c\n#abc\ndef :\n  ghi\n\njkl");
-  CHECK_TRACE_CONTENTS("tokenize", "abcdefghijkl");
-  CHECK_EQ(trace_count("skip during tokenize", "comment token"), 3);
+  CHECK_TRACE_CONTENTS("tokenize", "askip comment tokenbskip comment tokencdefskip comment tokenghijkl");
 }
 
 void test_tokenize_suppresses_trailing_whitespace() {

@@ -5,7 +5,7 @@ const string Quote_and_unquote_chars = "'`,@";  // controlling eval and macros
 // Design considered the following:
 //  doing the minimum necessary to support macros later
 //    so backquote and unquote and splice are supported
-//    so infix ops and implicit gensyms are ignored
+//    so implicit gensyms are ignored
 //  supporting whitespace sensitivity
 //    preserve indent information because later passes can't recreate it
 //    skip indent in empty lines
@@ -77,7 +77,7 @@ token next_token(indent_sensitive_stream& in) {
     slurp_word(in.fd, out);
 
   if (out.str() == ":") {
-    trace("skip during tokenize") << "comment token";
+    trace("tokenize") << "skip comment token";
     return next_token(in);
   }
 

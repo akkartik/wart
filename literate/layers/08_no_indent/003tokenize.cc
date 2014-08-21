@@ -5,7 +5,7 @@ const string Quote_and_unquote_chars = "'`,@";  // controlling eval and macros
 // Design considered the following:
 //  doing the minimum necessary to support macros later
 //    so backquote and unquote and splice are supported
-//    so infix ops and implicit gensyms are ignored
+//    so implicit gensyms are ignored
 //  avoid modifying strings
 //    so parse them here and make them easy for later passes to detect
 
@@ -32,7 +32,7 @@ token next_token(istream& in) {
     slurp_word(in, out);
 
   if (out.str() == ":") {
-    trace("skip during tokenize") << "comment token";
+    trace("tokenize") << "skip comment token";
     return next_token(in);
   }
 
