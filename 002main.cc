@@ -10,7 +10,7 @@ int main(int argc, const char* argv[]) {
   Last_file = flag_value("--until", argc, argv);
   if (flag("test", argc, argv))
     return run_tests();
-  if (flag("tangle", argc, argv))
+  if (flag("tangle", argc, argv))  // http://akkartik.name/post/wart-layers
     return tangle_files_in_cwd();
 
   //// Interactive loop: parse commands from user, evaluate them, print the results
