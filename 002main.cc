@@ -2,11 +2,10 @@
 
 bool Interactive = false;
 bool Warn_on_unknown_var = true;
-
-// commandline args
 string Last_file = "";
 
 int main(int argc, const char* argv[]) {
+  // Stop loading wart files early for faster startup.
   Last_file = flag_value("--until", argc, argv);
   if (flag("test", argc, argv))
     return run_tests();
