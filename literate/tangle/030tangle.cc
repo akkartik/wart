@@ -317,3 +317,23 @@ string trim(const string& s) {
   ++last;
   return string(first, last);
 }
+
+#include<dirent.h>
+
+vector<char*> sorted_files(const char* dirname, const char* ext) {
+  vector<char*> result;
+  dirent** files;
+  int num_files = scandir(dirname, &files, NULL, alphasort);
+  for (int i = 0; i < num_files; ++i) {
+    unsigned long n = strlen(files[i]->d_name), extn = strlen(ext);
+    if (n < extn) continue;
+    if (strncmp(&files[i]->d_name[n-extn], ext, extn)) continue;
+    if (!isdigit(files[i]->d_name[0])) continue;
+    char* s = new char[n+1];
+    strncpy(s, files[i]->d_name, n+1);
+    result.push_back(s);
+    free(files[i]);
+  }
+  free(files);
+  return result;
+}

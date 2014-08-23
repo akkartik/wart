@@ -1,1 +1,0 @@
-../wart_bin tangle --until $*

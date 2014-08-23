@@ -1,97 +1,5 @@
-// The goal of this skeleton is to make programs more easy to understand and
-// more malleable, easy to rewrite in radical ways without accidentally
-// breaking some corner case. Tests further both goals. They help
-// understandability by letting one make small changes and get feedback. What
-// if I wrote this line like so? What if I removed this function call, is it
-// really necessary? Just try it, see if the tests pass. Want to explore
-// rewriting this bit in this way? Tests put many refactorings on a firmer
-// footing.
-//
-// But the usual way we write tests seems incomplete. Refactorings tend to
-// work in the small, but don't help with changes to function boundaries. If
-// you want to extract a new function you have to manually test-drive it to
-// create tests for it. If you want to inline a function its tests are no
-// longer valid. In both cases you end up having to reorganize code as well as
-// tests, an error-prone activity.
-//
-// This file tries to fix this problem by supporting domain-driven testing
-// rather than coverage-driven testing. The goal isn't to test all possible
-// paths in the code any longer, but to focus on the domain of inputs the
-// program should work on. All tests invoke the program in a single way: by
-// calling run() with different inputs. The program operates on the input and
-// logs _facts_ it deduces to a trace:
-//   trace("label") << "fact 1: " << val;
-//
-// The tests check for facts:
-//   :(scenario foo)
-//   34  # call run() with this input
-//   +label: fact 1: 34  # trace should have logged this at the end
-//   -label: fact 1: 35  # trace should never contain such a line
-//
-// Since we never call anything but the run() function directly, we never have
-// to rewrite the tests when we reorganize the internals of the program. We
-// just have to make sure our rewrite deduces the same facts about the domain,
-// and that's something we're going to have to do anyway.
-//
-// To avoid the combinatorial explosion of integration tests, we organize the
-// program into different layers, and each fact is logged to the trace with a
-// specific label. Individual tests can focus on specific labels. In essence,
-// validating the facts logged with a specific label is identical to calling
-// some internal subsystem.
-//
-// Traces interact salubriously with layers. Thanks to our ordering
-// directives, each layer can contain its own tests. They may rely on other
-// layers, but when a test fails its usually due to breakage in the same
-// layer. When multiple tests fail, it's usually useful to debug the very
-// first test to fail. This is in contrast with the traditional approach,
-// where changes can cause breakages in faraway subsystems, and picking the
-// right test to debug can be an important skill to pick up.
-//
-// A final wrinkle is for recursive functions; it's often useful to segment
-// calls of different depth in the trace:
-//   +eval/1: => 34  # the topmost call to eval should have logged this line
-// (look at new_trace_frame below)
-//
-// To build robust tests, trace facts about your domain rather than details of
-// how you computed them.
-//
-// More details: http://akkartik.name/blog/tracing-tests
-//
-// ---
-//
-// Between layers and domain-driven testing, programming starts to look like a
-// fundamentally different activity. Instead of a) superficial, b) local rules
-// on c) code [like http://blog.bbv.ch/2013/06/05/clean-code-cheat-sheet],
-// we allow programmers to engage with the a) deep, b) global structure of the
-// c) domain. If you can systematically track discontinuities in the domain
-// you don't care if the code used gotos as long as it passed the tests. If
-// tests become more robust to run it becomes easier to try out radically
-// different implementations for the same program. If code is super-easy to
-// rewrite, it becomes less important what indentation style it uses, or that
-// the objects are appropriately encapsulated, or that the functions are
-// referentially transparent.
-//
-// Instead of plumbing, programming becomes building and gradually refining a
-// map of the environment the program must operate under. Whether a program is
-// 'correct' at a given point in time is a red herring; what matters is
-// avoiding regression by monotonically nailing down the more 'eventful' parts
-// of the terrain. It helps readers new and old and rewards curiosity to
-// organize large programs in self-similar hiearchies of example scenarios
-// colocated with the code that makes them work.
-//
-//   "Programming properly should be regarded as an activity by which
-//   programmers form a mental model, rather than as production of a program."
-//   -- Peter Naur (http://alistair.cockburn.us/ASD+book+extract%3A+%22Naur,+Ehn,+Musashi%22)
-
-:(before "int main")
-// End Tracing  // hack to ensure most code in this layer comes before anything else
-
-:(before "End Tracing")
 bool Hide_warnings = false;
-:(before "End Setup")
-Hide_warnings = false;
 
-:(before "End Tracing")
 struct trace_stream {
   vector<pair<string, pair<int, string> > > past_lines;  // [(layer label, frame, line)]
   unordered_map<string, int> frame;
@@ -113,14 +21,15 @@ struct trace_stream {
   void newline() {
     if (!curr_stream) return;
     past_lines.push_back(pair<string, pair<int, string> >(curr_layer, pair<int, string>(frame[curr_layer], curr_stream->str())));
-    if (curr_layer == dump_layer || curr_layer == "dump" ||
-        (!Hide_warnings && curr_layer == "warn"))
-      cerr << frame[curr_layer] << ": " << with_newline(curr_stream->str());
+    if (curr_layer == "dump")
+      cerr << with_newline(curr_stream->str());
+    else if ((!dump_layer.empty() && prefix_match(dump_layer, curr_layer))
+        || (!Hide_warnings && curr_layer == "warn"))
+      cerr << curr_layer << "/" << frame[curr_layer] << ": " << with_newline(curr_stream->str());
     delete curr_stream;
     curr_stream = NULL;
   }
 
-  // Useful for debugging.
   string readable_contents(string layer) {  // missing layer = everything, frame, hierarchical layers
     newline();
     ostringstream output;
@@ -132,7 +41,6 @@ struct trace_stream {
     return output.str();
   }
 
-  // Useful for a newcomer to visualize the program at work.
   void dump_browseable_contents(string layer) {
     ofstream dump("dump");
     dump << "<div class='frame' frame_index='1'>start</div>\n";
@@ -162,21 +70,14 @@ trace_stream* Trace_stream = NULL;
 // Warnings should go straight to cerr by default since calls to trace() have
 // some unfriendly constraints (they delay printing, they can't nest)
 #define RAISE  ((!Trace_stream || !Hide_warnings) ? cerr /*do print*/ : Trace_stream->stream("warn")) << __FILE__ << ":" << __LINE__ << " "
+// Just debug logging without any test support.
+#define dbg cerr << __FUNCTION__ << '(' << __FILE__ << ':' << __LINE__ << ") "
 
-// A separate helper for debugging. We should only trace domain-specific
-// facts. For everything else use log.
-#define xlog if (false) log
-// To turn on logging replace 'xlog' with 'log'.
-#define log cerr
-
-:(before "End Types")
 // RAISE << die exits after printing -- unless Hide_warnings is set.
 struct die {};
-:(before "End Tracing")
 ostream& operator<<(ostream& os, unused die) {
   if (Hide_warnings) return os;
   os << "dying";
-  if (Trace_stream) Trace_stream->newline();
   exit(1);
 }
 
@@ -191,10 +92,7 @@ struct lease_tracer {
 };
 
 #define START_TRACING_UNTIL_END_OF_SCOPE  lease_tracer leased_tracer;
-:(before "End Test Setup")
-  START_TRACING_UNTIL_END_OF_SCOPE
 
-:(before "End Tracing")
 void trace_all(const string& label, const list<string>& in) {
   for (list<string>::const_iterator p = in.begin(); p != in.end(); ++p)
     trace(label) << *p;
@@ -255,6 +153,7 @@ void parse_contents(const string& s, const string& delim, string* prefix, string
 void parse_layer_and_frame(const string& orig, string* layer, string* frame) {
   size_t last_slash = orig.rfind('/');
   if (last_slash == NOT_FOUND
+      || last_slash == orig.size()-1  // trailing slash indicates hierarchical layer
       || orig.find_last_not_of("0123456789") != last_slash) {
     *layer = orig;
     *frame = "";
@@ -437,42 +336,3 @@ bool headmatch(const string& s, const string& pat) {
   if (pat.size() > s.size()) return false;
   return std::mismatch(pat.begin(), pat.end(), s.begin()).first == pat.end();
 }
-
-:(before "End Includes")
-#include<cstdlib>
-
-#include<string>
-using std::string;
-#define NOT_FOUND string::npos
-
-#include<vector>
-using std::vector;
-#include<list>
-using std::list;
-#include<utility>
-using std::pair;
-
-#include<tr1/unordered_map>
-using std::tr1::unordered_map;
-#include<tr1/unordered_set>
-using std::tr1::unordered_set;
-#include<algorithm>
-
-#include<iostream>
-using std::istream;
-using std::ostream;
-using std::iostream;
-using std::cin;
-using std::cout;
-using std::cerr;
-
-#include<sstream>
-using std::stringstream;
-using std::istringstream;
-using std::ostringstream;
-
-#include<fstream>
-using std::ifstream;
-using std::ofstream;
-
-#define unused  __attribute__((unused))

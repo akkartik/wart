@@ -1,6 +1,8 @@
 " Highlighting wart's literate directives in C++ sources.
 function! HighlightTangledFile()
-  set ft=cpp
+  if &ft == ""
+    set ft=cpp
+  endif
   syntax region wartTangle start=+:(+ skip=+".*"+ end=+)+
   highlight link wartTangle Delimiter
   syntax region wartTrace start="^+" end="$"
