@@ -23,7 +23,7 @@ def (replace_all bindings tree|in)
 
 mac (skipping_undefined_vars ... body)
   `(do
-     (ret result nil
+     (ret $result nil
        (stop_warning_on_undefined_var)
-       (result <- (do ,@body))
+       ($result <- (do ,@body))
        (warn_on_undefined_var)))

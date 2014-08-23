@@ -65,9 +65,12 @@ mac (while test ... body)
        ,@body))
 
 mac (whilet var test ... body)
-  `(let ,var nil
-     (while (,var <- ,test)
-       ,@body))
+  `(let $var ,test
+     (when $var
+       (let ,var $var
+         ,@body)
+       (whilet ,var ,test
+         ,@body)))
 
 mac (awhile test ... body)
   `(whilet it ,test

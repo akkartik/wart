@@ -30,6 +30,20 @@
                  (x <- x+1))))
   :should be '(2 1 0))
 
+(test "whilet works"
+  :valueof (ret ans nil
+             (let x '(1 2 3)
+               (whilet y (zap! cdr x)
+                 (ans <- car.y))))
+  :should be 3)
+
+(test "whilet destructures like let"
+  :valueof (ret ans nil
+             (let x '(1 2 3)
+               (whilet (y ... _) (zap! cdr x)
+                 (ans <- y))))
+  :should be 3)
+
 (test "for works"
   :valueof (ret ans nil
              (for x 0 (x < 3) (x <- x+1)
