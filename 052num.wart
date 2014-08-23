@@ -85,3 +85,15 @@ def (product seq)
 
 def (abs n)
   if (n < 0) -n :else n
+
+mac (add! x|to y)
+  `(,x <- (+ ,x ,y))
+
+mac (sub! x|from y)
+  `(,x <- (- ,x ,y))
+
+mac (mul! x y|by)
+  `(,x <- (* ,x ,y))
+
+mac (div! x y|by)
+  `(,x <- (/ ,x ,y))
