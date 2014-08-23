@@ -124,6 +124,7 @@ void verify() {
 }
 
 void setup() {
+  grow_stack();
   setup_cells();
   setup_common_syms();
   setup_scopes();
@@ -132,6 +133,19 @@ void setup() {
   Interactive = false;
   Hide_warnings = false;
   Passed = true;
+}
+
+#include <sys/resource.h>
+void grow_stack() {
+  static bool already_called = false;
+  if (already_called) return;
+  already_called = true;
+
+  // Modern machines have gigabytes of memory; spare one for the stack.
+  rlimit limit;
+  getrlimit(RLIMIT_STACK, &limit);
+  limit.rlim_cur = 1024*1024*1024;
+  setrlimit(RLIMIT_STACK, &limit);
 }
 
 
