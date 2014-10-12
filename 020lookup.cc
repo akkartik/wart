@@ -17,6 +17,8 @@ cell* lookup(string s) {
   return lookup(new_sym(s));
 }
 
+bool Warn_on_unknown_var = true;
+
 // keep_already_evald is for supporting @args in macro calls
 cell* lookup(cell* sym, cell* scope, bool keep_already_evald) {
   trace("already_evald") << "lookup " << sym << " " << keep_already_evald;

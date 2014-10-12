@@ -1,7 +1,6 @@
 //// run unit tests or interactive interpreter
 
 bool Interactive = false;
-bool Warn_on_unknown_var = true;
 string Last_file = "";
 
 int main(int argc, const char* argv[]) {
