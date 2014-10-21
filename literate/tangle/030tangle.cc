@@ -144,6 +144,22 @@ void slurp_tangle_string(istream& in, ostream& out) {
   }
 }
 
+void slurp_word(istream& in, ostream& out) {
+  char c;
+  while (in >> c) {
+    if (isspace(c) || c == ')') {
+      in.putback(c);
+      break;
+    }
+    out << c;
+  }
+}
+
+void skip_whitespace(istream& in) {
+  while (isspace(in.peek()))
+    in.get();
+}
+
 list<string>::iterator balancing_curly(list<string>::iterator orig) {
   list<string>::iterator curr = orig;
   long open_curlies = 0;
