@@ -6,10 +6,6 @@ int main(int argc, const char* argv[]) {
   return tangle_files_in_cwd();
 }
 
-cell* read(istream& in) {
-  return mkref(next_cell(in));
-}
-
 bool eof(istream& in) {
   in.peek();
   return in.eof();
@@ -53,34 +49,13 @@ int run_tests() {
 
 void verify() {
   Hide_warnings = false;
-  teardown_cells();
   if (!Passed)
     ;
-  else if (num_unfreed() > 0)
-    dump_unfreed();
   else
     cerr << ".";
 }
 
 void setup() {
-  setup_cells();
-  setup_common_syms();
   Hide_warnings = false;
   Passed = true;
-}
-
-
-
-//// helpers for tests
-
-void read_all(string s) {
-  stringstream in(s);
-  do {
-      rmref(read(in));
-  } while (!eof(in));
-  // return nothing; we'll just verify the trace
-}
-
-cell* read(string s) {
-  return read(*new stringstream(s));
 }
