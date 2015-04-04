@@ -2,11 +2,12 @@
 
 int tangle_files_in_cwd() {
   list<string> result;
-  vector<char*> files = sorted_files(".", /*no extension*/ "");
-  for (vector<char*>::iterator p = files.begin(); p != files.end(); ++p) {
-    if ((*p)[0] < '0' || (*p)[0] > '9') continue;
-    if (!Last_file.empty() && *p > Last_file) break;
-    ifstream in(*p);
+  vector<string> files = sorted_files(".");
+  for (vector<string>::iterator p = files.begin(); p != files.end(); ++p) {
+    string curr_file = *p;
+    if (!isdigit(curr_file[0])) continue;
+    if (!Last_file.empty() && curr_file > Last_file) break;
+    ifstream in(curr_file.c_str());
     tangle(in, result);
   }
   for (list<string>::iterator p = result.begin(); p != result.end(); ++p)
@@ -336,18 +337,12 @@ string trim(const string& s) {
 
 #include<dirent.h>
 
-vector<char*> sorted_files(const char* dirname, const char* ext) {
-  vector<char*> result;
+vector<string> sorted_files(const char* dirname) {
+  vector<string> result;
   dirent** files;
   int num_files = scandir(dirname, &files, NULL, alphasort);
   for (int i = 0; i < num_files; ++i) {
-    unsigned long n = strlen(files[i]->d_name), extn = strlen(ext);
-    if (n < extn) continue;
-    if (strncmp(&files[i]->d_name[n-extn], ext, extn)) continue;
-    if (!isdigit(files[i]->d_name[0])) continue;
-    char* s = new char[n+1];
-    strncpy(s, files[i]->d_name, n+1);
-    result.push_back(s);
+    result.push_back(files[i]->d_name);
     free(files[i]);
   }
   free(files);
