@@ -6,7 +6,7 @@ implicitly grouped with later indented lines:
     n * (n - 1)
 =>
   (if (n > 0)
-    (n * (- n 1)))
+    (n * (n - 1)))
 
 No indented lines after? They're grouped in isolation:
   a b
@@ -50,6 +50,18 @@ Putting these rules together, parens are not required around 'if' in:
   :else
   'even               # wrong
 
+Indentation-sensitivity is disabled inside parens. This rule is useful if you
+want multiple expressions on a single line:
+  (if test1 body1     # outer parens required to avoid grouping test2 and body2
+      test2 body2
+            else-expr)
+
+It also implies that backquoted expressions must be fully parenthesized:
+  mac (when cond ... body)
+    `(if ,cond
+       (do ,@body))   # parens before 'do' are required
+This helps make explicit the syntax trees being manipulated.
+
 --- "But I hate significant whitespace!"
 
 I'm not trying to minimize parens typed; I'm trying to make lisp code more
@@ -61,15 +73,3 @@ If you don't like this approach, just use parens everywhere:
   (def (foo) 34)
   (def (foo)
     34)
-
-Indentation-sensitivity is disabled inside parens. This rule is useful if you
-want multiple expressions on a single line:
-  (if test1 body1     # parens required to avoid grouping test2 and body2
-      test2 body2
-            else-expr)
-
-It also implies that backquoted expressions must be fully parenthesized:
-  mac (when cond ... body)
-    `(if ,cond
-       (do ,@body))   # parens before 'do' are required
-This helps make explicit the syntax trees being manipulated.
