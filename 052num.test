@@ -86,9 +86,21 @@
   :valueof ((< (fn(_) _%3)) 4 2)
   :should be_true)
 
+(test "< works with scorer - 2"
+  :valueof ((< (fn(_) _%3)) 2 4)
+  :should be_false)
+
 (test "< returns unscored value on success"
   :valueof ((< car) '(1 2) '(3 4))
   :should be '(3 4))
+
+(test "> works with scorer"
+  :valueof ((> abs) -6 2)
+  :should be_true)
+
+(test "> works with scorer - 2"
+  :valueof ((> abs) 3 -6)
+  :should be_false)
 
 (test "sort works"
   :valueof (sort (<) '(1 12 3))

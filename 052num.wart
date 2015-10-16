@@ -64,6 +64,12 @@ def (< scorer ... rest) :case (and fn?.scorer no.rest)
       y
       false))
 
+def (> scorer ... rest) :case (and fn?.scorer no.rest)
+  (fn(x y)
+    (aif (scorer.x > scorer.y)
+      y
+      false))
+
 
 
 def (zero? n)
@@ -88,12 +94,20 @@ def (abs n)
 
 mac (add! x|to y)
   `(,x <- (+ ,x ,y))
+mac! (a += b)
+  `(add! ,a ,b)
 
 mac (sub! x|from y)
   `(,x <- (- ,x ,y))
+mac! (a -= b)
+  `(sub! ,a ,b)
 
 mac (mul! x y|by)
   `(,x <- (* ,x ,y))
+mac! (a *= b)
+  `(mul! ,a ,b)
 
 mac (div! x y|by)
   `(,x <- (/ ,x ,y))
+mac! (a /= b)
+  `(div! ,a ,b)
