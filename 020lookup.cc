@@ -1,7 +1,7 @@
 //// symbol bindings
 
 // Dynamic scopes are for rebinding global variables, and for undoing bindings.
-unordered_map<cell*, stack<cell*> > Dynamics;
+map<cell*, stack<cell*> > Dynamics;
 
 // The current lexical scope is a first-class dynamic variable, usually bound
 // to a table of bindings.
@@ -139,7 +139,7 @@ void add_lexical_binding(cell* sym, cell* val, cell* scope) {
   if (unsafe_get(scope, sym))
     RAISE << "Can't rebind within a lexical scope: " << sym << '\n';
   trace("bind") << sym << ": " << val;
-  unsafe_set(scope, sym, val, false);  // deleting nil might expose a shadowed binding
+  unsafe_put(scope, sym, val, false);  // deleting nil might expose a shadowed binding
 }
 
 void add_lexical_binding(cell* sym, cell* val) {

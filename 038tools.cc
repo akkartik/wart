@@ -53,9 +53,9 @@ COMPILE_FN(exit, compiledfn_exit, "($status)",
 
 COMPILE_FN(globals, compiledfn_globals, "()",
   cell* ans = new_table();
-  for (unordered_map<cell*, stack<cell*> >::iterator p = Dynamics.begin(); p != Dynamics.end(); ++p)
+  for (map<cell*, stack<cell*> >::iterator p = Dynamics.begin(); p != Dynamics.end(); ++p)
     if (!p->second.empty())
-      set(ans, p->first, p->second.top());
+      put(ans, p->first, p->second.top());
   return mkref(ans);
 )
 

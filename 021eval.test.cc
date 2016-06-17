@@ -148,7 +148,7 @@ void test_eval_handles_literal_function_call() {
   cell* t = new_table();
   set_cdr(cdr(f), new_cons(t));
   TEMP(body, read("(34)"));
-  set(t, sym_body, body);
+  put(t, sym_body, body);
   TEMP(call, mkref(new_cons(f)));
   rmref(eval(call));
   CHECK_TRACE_TOP("eval", "=> 34");
@@ -159,9 +159,9 @@ void test_eval_handles_literal_function_call2() {
   cell* t = new_table();
   set_cdr(cdr(f), new_cons(t));
   TEMP(body, read("(a)"));
-  set(t, sym_body, body);
+  put(t, sym_body, body);
   TEMP(sig, read("(a)"));
-  set(t, sym_sig, sig);
+  put(t, sym_sig, sig);
   TEMP(call, mkref(new_cons(f, new_cons(new_num(34)))));
   rmref(eval(call));
   CHECK_TRACE_TOP("eval", "=> 34");

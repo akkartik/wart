@@ -16,13 +16,13 @@ using std::vector;
 using std::list;
 #include<stack>
 using std::stack;
+#include<set>
+using std::set;
+#include<map>
+using std::map;
 #include<utility>
 using std::pair;
 
-#include<tr1/unordered_map>
-using std::tr1::unordered_map;
-#include<tr1/unordered_set>
-using std::tr1::unordered_set;
 #include<algorithm>
 
 #include<string>
