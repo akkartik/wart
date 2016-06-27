@@ -79,8 +79,9 @@ To use an infix op in a higher-level function, wrap it in parens:
   (map (++) '(1 2 3))                   # hello haskell!
   => (2 3 4)
 
-In addition to the usual arithmetic, wart defines a few infix ops:
+In addition to the usual arithmetic, wart defines a few standard infix ops:
   a.b                 # => (a b) unless a and b are all digits; 2.4 is a number
+  (a -> f)            # => (f a)
   f:g                 # => (compose f g)
   ~f                  # => (complement f)
 
