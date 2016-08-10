@@ -1,5 +1,6 @@
 Wart is an experimental, dynamic, batshit-liberal (http://plus.google.com/110981030061712822816/posts/KaSKeg4vQtz)
-language designed for small teams of intrinsically-motivated (http://en.wikipedia.org/wiki/Motivation#Intrinsic_and_extrinsic_motivation)
+language designed to eventually be used by small teams of intrinsically-motivated
+(http://en.wikipedia.org/wiki/Motivation#Intrinsic_and_extrinsic_motivation)
 programmers who want more mastery over their entire software stack. The
 primary goal is to be easy to understand and modify, so that you can be more
 empowered.
