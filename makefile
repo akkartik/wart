@@ -8,7 +8,7 @@ type_list: boot.cc [0-9]*.cc
 
 function_list: boot.cc [0-9]*.cc
 	@# assumes function decl has space before '{'
-	@grep -h "^[^ #].*) {" [0-9]*.cc |perl -pwe 's/ {.*/;/' > function_list
+	@grep -h "^[^ #].*) {" [0-9]*.cc |perl -pwe 's/ \{.*/;/' > function_list
 	@grep -h "^COMPILE_FN" [0-9]*.cc |perl -pwe 's/.*COMPILE_FN\(([^,]*), ([^,]*), ([^,]*),$$/cell* $$2();/' >> function_list
 
 file_list: boot.cc [0-9]*.cc
@@ -18,7 +18,7 @@ test_file_list: [0-9]*.test.cc
 	@ls [0-9]*.test.cc |perl -pwe 's/.*/#include "$$&"/' > test_file_list
 
 test_list: [0-9]*.cc
-	@grep -h "^[[:space:]]*void test_" [0-9]*.cc |perl -pwe 's/^\s*void (.*)\(\) {$$/$$1,/' > test_list
+	@grep -h "^[[:space:]]*void test_" [0-9]*.cc |perl -pwe 's/^\s*void (.*)\(\) \{$$/$$1,/' > test_list
 
 compiledfn_list: [0-9]*.cc
 	@grep -h "^COMPILE_FN" [0-9]*.cc |perl -pwe 's/.*COMPILE_FN\(([^,]*), ([^,]*), ([^,]*),$$/{ "$$1", $$3, $$2 },/' > compiledfn_list
