@@ -29,7 +29,7 @@ fail.
 
 C often has extra constraints in ordering code. This codebase sidesteps many
 of them by autogenerating various lists during compilation. There are lists of
-files to compile, tests to run, wart's compiled primitives. You can start
+files to compile, tests to run, Wart's compiled primitives. You can start
 writing code in a new file, and it'll be compiled in as long as it starts with
 a numeric prefix and has the right extension (.cc or .wart or .test). You can
 create new C test functions anywhere as long as they start with 'test_', and

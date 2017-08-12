@@ -64,7 +64,7 @@ This helps make explicit the syntax trees being manipulated.
 
 --- "But I hate significant whitespace!"
 
-I'm not trying to minimize parens typed; I'm trying to make lisp code more
+I'm not trying to minimize parens typed; I'm trying to make Lisp code more
 readable to non-lispers. Wart's codebase tastefully removes parens from just
 control-flow operators (def/mac/if/while/..), leaving them alone everywhere
 else. When in doubt, I insert parens.

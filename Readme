@@ -15,7 +15,7 @@ empowered.
 ## Small core
 
 The best way to be readable is to minimize code (http://www.paulgraham.com/power.html).
-To this end, Wart is based on lisp (http://paulgraham.com/lispfaq1.html),
+To this end, Wart is based on Lisp (http://paulgraham.com/lispfaq1.html),
 because it seems the most powerful and extensible core for the lowest
 implementation cost. But that's just the core; read on.
 
@@ -32,9 +32,9 @@ implementation cost. But that's just the core; read on.
 
 ## Clean syntax
 
-The crown jewels of lisp are its macros (http://www.paulgraham.com/progbot.html),
+The crown jewels of Lisp are its macros (http://www.paulgraham.com/progbot.html),
 a massive tool for maximizing density in a readable way. Wart tries to
-question all of lisp's design without compromising the power of macros. It
+question all of Lisp's design without compromising the power of macros. It
 can guess parens from indentation (https://github.com/akkartik/wart/blob/master/004optional_parens)
 to be more accessible to non-lispers.
 
@@ -46,7 +46,7 @@ heuristic is to skip parens when I want to highlight side-effects and
 control-flow, and to insert them when I want to highlight functional
 computation.
 
-In order to provide macros, lisp uniformly uses prefix everywhere, including
+In order to provide macros, Lisp uniformly uses prefix everywhere, including
 for arithmetic. Wart provides infix operators (https://github.com/akkartik/wart/blob/master/006infix)
 in an elegant way without compromising macros.
 
@@ -211,14 +211,14 @@ As an experiment in designing software, Wart was inspired by:
   David Parnas (http://www.cs.umd.edu/class/spring2003/cmsc838p/Design/criteria.pdf)
   Peter Naur (http://alistair.cockburn.us/ASD+book+extract%3A+%22Naur,+Ehn,+Musashi%22)
 
-As a language, Wart was inspired by Arc, a dialect of lisp:
+As a language, Wart was inspired by Arc, a dialect of Lisp:
   http://www.paulgraham.com/arc.html
 Discussions on the arc forum helped develop many of its features:
   "The wart atop the mountain": http://arclanguage.org/item?id=12814
   Generic functions: http://arclanguage.org/item?id=11779, http://arclanguage.org/item?id=13790
   Python-style keyword args: http://arclanguage.org/item?id=12657
-  Why wart has no modules: http://arclanguage.org/item?id=12777
-  Why wart has just one kind of equality: http://arclanguage.org/item?id=13690
+  Why Wart has no modules: http://arclanguage.org/item?id=12777
+  Why Wart has just one kind of equality: http://arclanguage.org/item?id=13690
   In praise of late binding: http://arclanguage.org/item?id=15655
   Libraries suck: http://www.arclanguage.org/item?id=13283
   Making macros even more first-class: http://arclanguage.org/item?id=16378

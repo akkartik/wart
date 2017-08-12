@@ -8,8 +8,8 @@
 //    so ignore indent inside parens
 //    so no way to disable this pass
 //  introduce no new operators
-//    so wart doesn't use nested lists like scheme's cond
-//    so lines with one word are never wrapped in parens, like x or ,f.sym
+//    so Wart doesn't use nested lists like Scheme's `cond`
+//    so lines with one word are never wrapped in parens, like `x` or `,f.sym`
 //  encourage macros to fully parenthesize
 //    so ignore indent inside backquote
 //  support interactive repls

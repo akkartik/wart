@@ -1,5 +1,5 @@
 //// split input into tokens separated by newlines, indent, and the following boundaries:
-const string Punctuation_chars = "()#\"";  // the skeleton of a wart program
+const string Punctuation_chars = "()#\"";  // the skeleton of a Wart program
 const string Quote_and_unquote_chars = "'`,@";  // controlling eval and macros
 
 // Design considered the following:

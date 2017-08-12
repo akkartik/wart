@@ -1,6 +1,6 @@
 --- Infix operators
 
-Unlike other lisps, wart supports infix operators.
+Unlike other Lisps, Wart supports infix operators.
   3 + 1
   => 4
 
@@ -8,7 +8,7 @@ You don't need spaces around infix ops.
   3+1
   => 4
 
-Infix ops don't compromise homoiconicity; wart parses them into lisp forms so
+Infix ops don't compromise homoiconicity; Wart parses them into Lisp forms so
 your macros don't have to worry about them:
   'a+b
   => (+ a b)
@@ -27,7 +27,7 @@ success (because of left-associativity) and pass nils through:
   (34 < nil)
   => nil                 # should always be nil
 
-You can mix infix ops with regular prefix lisp:
+You can mix infix ops with regular prefix Lisp:
   '(a + (f b))
   => (+ a (f b))
 
@@ -48,9 +48,9 @@ You can create your own infix ops:
   (1 <> 2)
   => 1
 
-To permit arbitrary infix ops, wart makes them distinct from regular symbols.
+To permit arbitrary infix ops, Wart makes them distinct from regular symbols.
 The sets of 'infix chars' and 'symbol chars' are disjoint. This implies that
-wart won't let you define some traditional lisp names that you might be used
+Wart won't let you define some traditional Lisp names that you might be used
 to:
 
   '*global*
@@ -79,7 +79,7 @@ To use an infix op in a higher-level function, wrap it in parens:
   (map (++) '(1 2 3))                   # hello haskell!
   => (2 3 4)
 
-In addition to the usual arithmetic, wart defines a few standard infix ops:
+In addition to the usual arithmetic, Wart defines a few standard infix ops:
   a.b                 # => (a b) unless a and b are all digits; 2.4 is a number
   (a -> f)            # => (f a)
   f:g                 # => (compose f g)

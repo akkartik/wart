@@ -1,5 +1,5 @@
 " Vim syntax file
-" Language:    wart
+" Language:    Wart
 " Maintainer:  Kartik Agaram <wart@akkartik.com>
 " URL:         http://github.com/akkartik/wart
 " License:     public domain

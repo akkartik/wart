@@ -1,7 +1,7 @@
 Wart's garbage collection was designed around one consideration:
   minimize memory use at all times
 
-To minimize memory use, wart uses reference counting.  Every cell tracks the
+To minimize memory use, Wart uses reference counting.  Every cell tracks the
 number of incoming pointers to it using a field called nrefs. Cycles must be
 explicitly broken to be collected. Unused cells are immediately reclaimed.
 
@@ -20,6 +20,6 @@ longer rely on what it contains; they may clobber or try to interpret
 arbitrary data as the wrong type. All bets are off. Wart tries to loudly
 detect this insidious class of error as immediately as possible. Every time a
 cell is freed it resets its pointers to NULL; when it's reused its pointers
-are initialized to nil. If wart ever complains that it ran across NULL, it
+are initialized to nil. If Wart ever complains that it ran across NULL, it
 means you forgot to decrement nrefs somewhere. All bets are off until it is
 fixed.
