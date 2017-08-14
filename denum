@@ -8,7 +8,7 @@
 
 for file in [0-9]*.{cc,wart,test}
 do
-  newfile=`echo $file |perl -pwe 's/^[0-9]*//g'`
+  newfile=`echo $file |sed 's/^[0-9]*//g'`
   if [[ $newfile != "."* ]]
   then
     ln -s "$file" "$newfile"

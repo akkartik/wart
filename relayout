@@ -20,7 +20,7 @@ fi
 #
 
 index=0
-ls [0-9](^*test.)cc [0-9]*.wart |sort -n |perl -pwe 's/\..*//' |
+ls [0-9](^*test.)cc [0-9]*.wart |sort -n |sed 's/\..*//' |
   while read file
   do
     while [[ $file != `printf "%03d" $index`* ]]
@@ -37,7 +37,7 @@ vim -c "set nu" .layout
 #
 
 root() {
-  echo $1 |perl -pwe 's/^[0-9]*//' |perl -pwe 's/\..*//'
+  echo $1 |sed 's/^[0-9]*//' |sed 's/\..*//'
 }
 
 index=0
