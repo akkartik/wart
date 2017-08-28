@@ -1,0 +1,2 @@
+*.wart linguist-language=python
+*.test linguist-language=python
