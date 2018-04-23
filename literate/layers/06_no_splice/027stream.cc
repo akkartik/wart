@@ -125,7 +125,7 @@ public:
       return *(unsigned char*)gptr();
    }
 
-   int overflow(unused int c) {
+   int overflow(vestigial int c) {
       return EOF;
    }
 

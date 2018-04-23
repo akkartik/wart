@@ -173,7 +173,7 @@ trace_stream* Trace_stream = NULL;
 // RAISE << die exits after printing -- unless Hide_warnings is set.
 struct die {};
 :(before "End Tracing")
-ostream& operator<<(ostream& os, unused die) {
+ostream& operator<<(ostream& os, vestigial die) {
   if (Hide_warnings) return os;
   os << "dying";
   if (Trace_stream) Trace_stream->newline();
@@ -475,4 +475,4 @@ using std::ostringstream;
 using std::ifstream;
 using std::ofstream;
 
-#define unused  __attribute__((unused))
+#define vestigial  __attribute__((unused))

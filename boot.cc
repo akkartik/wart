@@ -2,7 +2,7 @@
 //  no pointers except cell*
 //  use long as the default integer type; it's always large enough to hold pointers
 
-#define unused __attribute__((unused))
+#define vestigial __attribute__((unused))
 
 #include<cstdio>
 #include<cstring>

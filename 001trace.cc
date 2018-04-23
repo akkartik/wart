@@ -75,7 +75,7 @@ trace_stream* Trace_stream = NULL;
 
 // RAISE << die exits after printing -- unless Hide_warnings is set.
 struct die {};
-ostream& operator<<(ostream& os, unused die) {
+ostream& operator<<(ostream& os, vestigial die) {
   if (Hide_warnings) return os;
   os << "dying";
   exit(1);

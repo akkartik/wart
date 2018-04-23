@@ -44,4 +44,4 @@ using std::ostringstream;
 using std::ifstream;
 using std::ofstream;
 
-#define unused  __attribute__((unused))
+#define vestigial  __attribute__((unused))
