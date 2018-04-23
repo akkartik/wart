@@ -1,4 +1,4 @@
-#define unused __attribute__((unused))
+#define vestigial __attribute__((unused))
 
 #include<cstdio>
 #include<cstring>

@@ -17,7 +17,7 @@
 
 bool Interactive = false;
 
-int main(int argc, unused char* argv[]) {
+int main(int argc, vestigial char* argv[]) {
   if (argc > 1) {
     run_tests();
     return 0;

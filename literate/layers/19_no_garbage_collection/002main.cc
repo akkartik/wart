@@ -15,7 +15,7 @@
 // These weren't the reasons lisp was created; they're the reasons I attribute
 // to its power.
 
-int main(int argc, unused char* argv[]) {
+int main(int argc, vestigial char* argv[]) {
   if (argc > 1) {
     run_tests();
     return 0;

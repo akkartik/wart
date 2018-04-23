@@ -236,6 +236,6 @@ bool is_parseable_as_float(string s) {
 
 const char* skip_float(const char* s) {
   char* end = NULL;
-  unused float dummy = strtof(s, &end);
+  vestigial float dummy = strtof(s, &end);
   return end;
 }
