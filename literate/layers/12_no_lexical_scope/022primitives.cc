@@ -8,8 +8,8 @@
 
 COMPILE_FN(fn, compiledfn_fn, "'($params ... $body)",
   cell* f = new_table();
-  set(f, sym_sig, lookup("$params"));
-  set(f, sym_body, lookup("$body"));
+  put(f, sym_sig, lookup("$params"));
+  put(f, sym_body, lookup("$body"));
   return mkref(new_object("function", f));
 )
 

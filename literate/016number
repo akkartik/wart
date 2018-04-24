@@ -2,7 +2,7 @@
 
 :(before "End Globals")
 // reuse a single cell whenever you encounter say 34
-unordered_map<long, cell*> Int_literals;
+map<long, cell*> Int_literals;
 
 :(code)
 cell* new_num(long x) {
@@ -43,7 +43,7 @@ void test_ints_are_reused() {
 }
 
 :(before "End Test Teardown")
-  for (unordered_map<long, cell*>::iterator p = Int_literals.begin(); p != Int_literals.end(); ++p) {
+  for (map<long, cell*>::iterator p = Int_literals.begin(); p != Int_literals.end(); ++p) {
     if (!p->second) continue;
     if (p->second->nrefs > 1)
       RAISE << "couldn't free reused literal " << p->first << " (" << p->second->nrefs << " references)\n";

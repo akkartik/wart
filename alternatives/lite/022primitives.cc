@@ -9,9 +9,9 @@
 
 COMPILE_FN(fn, compiledfn_fn, "'($params ... $body)",
   TEMP(f, mkref(new_table()));
-  set(f, sym_sig, lookup("$params"));
-  set(f, sym_body, lookup("$body"));
-  set(f, sym_env, cdr(Curr_lexical_scope));
+  put(f, sym_sig, lookup("$params"));
+  put(f, sym_body, lookup("$body"));
+  put(f, sym_env, cdr(Curr_lexical_scope));
   cell* res = mkref(new_object("function", f));
   return res;
 )
@@ -78,7 +78,7 @@ void assign(cell* var, cell* val) {
   else if (scope == nil)
     assign_dynamic_var(var, val);
   else
-    unsafe_set(scope, var, val, false);
+    unsafe_put(scope, var, val, false);
 }
 
 COMPILE_FN(bind, compiledfn_bind, "'($var $val)",

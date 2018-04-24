@@ -7,7 +7,7 @@ x
 => 3
 
 :(before "End Globals")
-unordered_map<cell*, stack<cell*> > Dynamics;
+map<cell*, stack<cell*> > Dynamics;
 :(replace{} "lookup(cell*")
 cell* lookup(cell* sym) {
   if (Dynamics[sym].empty()) {
@@ -61,7 +61,7 @@ void end_all_bindings(cell* params) {
   teardown_dynamics();
 :(code)
 void teardown_dynamics() {
-  for (unordered_map<cell*, stack<cell*> >::iterator p = Dynamics.begin(); p != Dynamics.end(); ++p) {
+  for (map<cell*, stack<cell*> >::iterator p = Dynamics.begin(); p != Dynamics.end(); ++p) {
     while (!p->second.empty()) {
       rmref(p->first);
       rmref(p->second.top());

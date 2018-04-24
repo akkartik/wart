@@ -92,7 +92,7 @@ void test_set_increments_nrefs() {
   TEMP(key, mkref(new_sym("a")));
   TEMP(val, mkref(new_num(34)));
   CLEAR_TRACE;
-  set(t, key, val);
+  put(t, key, val);
   CHECK_EQ(trace_count("gc", "mkref"), 2);
 }
 
@@ -101,9 +101,9 @@ void test_set_decrements_overridden_values() {
   TEMP(key, mkref(new_sym("a")));
   TEMP(val, mkref(new_num(34)));
   TEMP(val2, mkref(new_num(35)));
-  set(t, key, val);
+  put(t, key, val);
   CLEAR_TRACE;
-  set(t, key, val2);
+  put(t, key, val2);
   CHECK_EQ(trace_count("gc", "rmref"), 1);
   CHECK_TRACE_CONTENTS("gc/rmref", "34");
   CHECK_EQ(trace_count("gc", "mkref"), 1);
@@ -114,9 +114,9 @@ void test_set_decrements_key_on_delete() {
   TEMP(t, mkref(new_table()));
   TEMP(key, mkref(new_sym("a")));
   TEMP(val, mkref(new_num(34)));
-  set(t, key, val);
+  put(t, key, val);
   CLEAR_TRACE;
-  set(t, key, nil);
+  put(t, key, nil);
   CHECK_EQ(trace_count("gc", "rmref"), 2);
   CHECK_TRACE_CONTENTS("gc/rmref", "a");
   CHECK_TRACE_CONTENTS("gc/rmref", "34");
@@ -127,7 +127,7 @@ void test_set_ignores_nonexistent_key() {
   TEMP(t, mkref(new_table()));
   TEMP(k, mkref(new_sym("nonexistent key test")));
   CLEAR_TRACE;
-  set(t, k, nil);
+  put(t, k, nil);
   CHECK_TRACE_DOESNT_CONTAIN("gc", "mkref");
   CHECK_TRACE_DOESNT_CONTAIN("gc", "rmref");
 }

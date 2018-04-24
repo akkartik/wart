@@ -76,8 +76,8 @@ cell* eval(cell* expr) {
 cell* eval_primitive(cell* f, cell* args) {
   if (f == new_sym("fn")) {
     cell* f = new_table();
-    set(f, sym_sig, car(args));
-    set(f, sym_body, cdr(args));
+    put(f, sym_sig, car(args));
+    put(f, sym_body, cdr(args));
     return mkref(f);
   }
 

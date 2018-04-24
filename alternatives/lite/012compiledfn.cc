@@ -19,14 +19,14 @@ void setup_compiledfns() {
   new_dynamic_scope(sym_compiled, new_table());
   for (unsigned long i=0; i < sizeof(Compiledfns)/sizeof(Compiledfns[0]); ++i) {
     TEMP(f, mkref(new_table()));
-    set(f, sym_name, new_sym(Compiledfns[i].name));
+    put(f, sym_name, new_sym(Compiledfns[i].name));
     indent_sensitive_stream ss(Compiledfns[i].params);
-    set(f, sym_sig, next_cell(ss));
-    set(f, sym_body, new_compiledfn(Compiledfns[i].impl));
+    put(f, sym_sig, next_cell(ss));
+    put(f, sym_body, new_compiledfn(Compiledfns[i].impl));
     TEMP(obj, mkref(new_object("function", f)));
     new_dynamic_scope(Compiledfns[i].name, obj);
     // save to a second, immutable place
-    set(lookup(sym_compiled), Compiledfns[i].name, obj);
+    put(lookup(sym_compiled), Compiledfns[i].name, obj);
   }
 }
 

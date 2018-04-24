@@ -43,7 +43,7 @@ cell* new_cons(cell* car) {
 
 //// numbers
 
-unordered_map<long, cell*> Int_literals;
+map<long, cell*> Int_literals;
 
 cell* new_num(long x) {
   if (Int_literals[x])
@@ -100,7 +100,7 @@ bool equal_floats(float x, float y) {
 
 //// symbols
 
-unordered_map<string, cell*> Sym_literals;
+map<string, cell*> Sym_literals;
 
 cell* new_sym(string x) {
   if (Sym_literals[x])
@@ -138,7 +138,7 @@ string to_string(cell* x) {
 
 //// associative arrays
 
-typedef unordered_map<cell*, cell*> cell_map;
+typedef map<cell*, cell*> cell_map;
 
 cell* new_table() {
   cell* result = new_cell();
@@ -156,12 +156,12 @@ cell_map* to_table(cell* x) {
   return (cell_map*)x->car;
 }
 
-void set(cell* t, string k, cell* val) {
-  unsafe_set(t, new_sym(k), val, true);
+void put(cell* t, string k, cell* val) {
+  unsafe_put(t, new_sym(k), val, true);
 }
 
-void set(cell* t, cell* k, cell* val) {
-  unsafe_set(t, k, val, true);
+void put(cell* t, cell* k, cell* val) {
+  unsafe_put(t, k, val, true);
 }
 
 cell* get(cell* t, cell* k) {
@@ -174,7 +174,7 @@ cell* get(cell* t, string k) {
   return get(t, new_sym(k));
 }
 
-void unsafe_set(cell* t, cell* key, cell* val, bool delete_nils) {
+void unsafe_put(cell* t, cell* key, cell* val, bool delete_nils) {
   if (!is_table(t)) {
     RAISE << "set on a non-table: " << t << '\n';
     return;
@@ -192,8 +192,8 @@ void unsafe_set(cell* t, cell* key, cell* val, bool delete_nils) {
   t2[key] = val;
 }
 
-void unsafe_set(cell* t, string k, cell* val, bool delete_nils) {
-  unsafe_set(t, new_sym(k), val, delete_nils);
+void unsafe_put(cell* t, string k, cell* val, bool delete_nils) {
+  unsafe_put(t, new_sym(k), val, delete_nils);
 }
 
 cell* unsafe_get(cell* t, cell* key) {

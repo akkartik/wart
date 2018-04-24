@@ -385,9 +385,9 @@ cell* extract_keyword_args(cell* params, cell* args, cell* keyword_args) {
 void set_all_aliases(cell* keyword_args, cell* param, cell* arg) {
   if (is_alias(param))
     for (cell* p = cdr(param); p != nil; p=cdr(p))
-      unsafe_set(keyword_args, car(p), arg, false);
+      unsafe_put(keyword_args, car(p), arg, false);
   else
-    unsafe_set(keyword_args, param, arg, false);
+    unsafe_put(keyword_args, param, arg, false);
 }
 
 cell* next_keyword(cell* args, cell* params) {

@@ -1,6 +1,6 @@
 //// symbol bindings
 
-unordered_map<cell*, cell*> Bindings;
+map<cell*, cell*> Bindings;
 
 cell* lookup(string s) {
   return lookup(new_sym(s));
@@ -27,7 +27,7 @@ void new_binding(cell* sym, cell* val) {
 }
 
 void teardown_bindings() {
-  for (unordered_map<cell*, cell*>::iterator p = Bindings.begin(); p != Bindings.end(); ++p) {
+  for (map<cell*, cell*>::iterator p = Bindings.begin(); p != Bindings.end(); ++p) {
     if (!p->second) continue;
     rmref(p->first);
     rmref(p->second);

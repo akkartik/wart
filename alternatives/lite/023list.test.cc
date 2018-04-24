@@ -99,7 +99,7 @@ void test_nth_cdr() {
 }
 
 void test_contains_handles_circular_lists() {
-  unordered_set<cell*> done;
+  set<cell*> done;
   TEMP(x, mkref(new_cons(new_num(1))));
   set_cdr(x, x);
   CHECK(!contains(x, new_sym("a"), done));

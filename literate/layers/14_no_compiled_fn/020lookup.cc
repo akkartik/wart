@@ -1,7 +1,7 @@
 //// symbol bindings
 
 // Dynamic scopes are for rebinding global variables, and for undoing bindings.
-unordered_map<cell*, stack<cell*> > Dynamics;
+map<cell*, stack<cell*> > Dynamics;
 
 cell* lookup(string s) {
   return lookup(new_sym(s));

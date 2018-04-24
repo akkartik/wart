@@ -92,7 +92,7 @@ void test_set_increments_nrefs() {
   TEMP(key, mkref(new_sym("a")));
   TEMP(val, mkref(new_num(34)));
   int nk=key->nrefs,  nv=val->nrefs;
-  set(t, key, val);
+  put(t, key, val);
   CHECK_EQ(nk+1, key->nrefs);
   CHECK_EQ(nv+1, val->nrefs);
 }
@@ -102,9 +102,9 @@ void test_set_decrements_overridden_values() {
   TEMP(key, mkref(new_sym("a")));
   TEMP(val, mkref(new_num(34)));
   TEMP(val2, mkref(new_num(35)));
-  set(t, key, val);
+  put(t, key, val);
   int nv=val->nrefs;
-  set(t, key, val2);
+  put(t, key, val2);
   CHECK_EQ(nv-1, val->nrefs);
 }
 
@@ -112,9 +112,9 @@ void test_set_decrements_key_on_delete() {
   TEMP(t, mkref(new_table()));
   TEMP(key, mkref(new_sym("a")));
   TEMP(val, mkref(new_num(34)));
-  set(t, key, val);
+  put(t, key, val);
   int nv=val->nrefs;
-  set(t, key, nil);
+  put(t, key, nil);
   CHECK_EQ(nv-1, val->nrefs);
 }
 
@@ -122,6 +122,6 @@ void test_set_ignores_nonexistent_key() {
   TEMP(t, mkref(new_table()));
   TEMP(k, mkref(new_sym("nonexistent key test")));
   int nk = k->nrefs;
-  set(t, k, nil);
+  put(t, k, nil);
   CHECK_EQ(nk, k->nrefs);
 }

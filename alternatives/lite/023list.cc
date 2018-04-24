@@ -131,7 +131,7 @@ cell* push_cons(cell* p, cell* l) {
   return mkref(result);
 }
 
-bool contains(cell* tree, cell* a, unordered_set<cell*>& done) {
+bool contains(cell* tree, cell* a, set<cell*>& done) {
   // guard against cycles
   if (done.find(tree) != done.end()) return false;
   done.insert(tree);
@@ -143,7 +143,7 @@ bool contains(cell* tree, cell* a, unordered_set<cell*>& done) {
 }
 
 bool contains(cell* tree, cell* a) {
-  unordered_set<cell*> done;
+  set<cell*> done;
   return contains(tree, a, done);
 }
 

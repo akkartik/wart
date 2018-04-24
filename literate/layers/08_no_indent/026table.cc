@@ -9,7 +9,7 @@ COMPILE_FN(table_set, compiledfn_table_set, "($table $key $val)",
   cell* key = lookup("$key");
   cell* val = lookup("$val");
   if (is_table(table))
-    set(table, key, val);
+    put(table, key, val);
   else
     RAISE << "can't set in a non-table: " << table << '\n';
   return mkref(val);

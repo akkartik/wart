@@ -11,7 +11,7 @@
     return new_sym("table");
 
 :(before "End Types")
-typedef unordered_map<cell*, cell*> cell_map;
+typedef map<cell*, cell*> cell_map;
 
 :(before "End Cell Print Cases(c)")
 case TABLE:
@@ -58,12 +58,12 @@ ostream& operator<<(ostream& os, cell_map& t) {
 }
 
 
-void set(cell* t, string k, cell* val) {
-  unsafe_set(t, new_sym(k), val, true);
+void put(cell* t, string k, cell* val) {
+  unsafe_put(t, new_sym(k), val, true);
 }
 
-void set(cell* t, cell* k, cell* val) {
-  unsafe_set(t, k, val, true);
+void put(cell* t, cell* k, cell* val) {
+  unsafe_put(t, k, val, true);
 }
 
 cell* get(cell* t, cell* k) {
@@ -76,7 +76,7 @@ cell* get(cell* t, string k) {
   return get(t, new_sym(k));
 }
 
-void unsafe_set(cell* t, cell* key, cell* val, bool delete_nils) {
+void unsafe_put(cell* t, cell* key, cell* val, bool delete_nils) {
   if (!is_table(t)) {
     RAISE << "set on a non-table: " << t << '\n';
     return;
@@ -99,8 +99,8 @@ void unsafe_set(cell* t, cell* key, cell* val, bool delete_nils) {
   t2[key] = mkref(val);
 }
 
-void unsafe_set(cell* t, string k, cell* val, bool delete_nils) {
-  unsafe_set(t, new_sym(k), val, delete_nils);
+void unsafe_put(cell* t, string k, cell* val, bool delete_nils) {
+  unsafe_put(t, new_sym(k), val, delete_nils);
 }
 
 cell* unsafe_get(cell* t, cell* key) {
@@ -118,7 +118,7 @@ cell* unsafe_get(cell* t, string k) {
 
 void test_table_non_nil_key() {
   TEMP(t, mkref(new_table()));
-  set(t, "a", new_sym("b"));
+  put(t, "a", new_sym("b"));
   CHECK_EQ(new_sym("b"), get(t, "a"));
 }
 
@@ -128,7 +128,7 @@ void test_set_increments_nrefs() {
   TEMP(val, mkref(new_num(34)));
   CHECK_EQ(key->nrefs, 2);
   CHECK_EQ(val->nrefs, 2);
-  set(t, key, val);
+  put(t, key, val);
   CHECK_EQ(key->nrefs, 3);
   CHECK_EQ(val->nrefs, 3);
 }
@@ -141,11 +141,11 @@ void test_set_decrements_overridden_values() {
   CHECK_EQ(key->nrefs, 2);
   CHECK_EQ(val->nrefs, 2);
   CHECK_EQ(val2->nrefs, 2);
-  set(t, key, val);
+  put(t, key, val);
   CHECK_EQ(key->nrefs, 3);
   CHECK_EQ(val->nrefs, 3);
   CHECK_EQ(val2->nrefs, 2);
-  set(t, key, val2);
+  put(t, key, val2);
   CHECK_EQ(key->nrefs, 3);
   CHECK_EQ(val->nrefs, 2);
   CHECK_EQ(val2->nrefs, 3);
@@ -157,10 +157,10 @@ void test_set_decrements_key_on_delete() {
   TEMP(val, mkref(new_num(34)));
   CHECK_EQ(key->nrefs, 2);
   CHECK_EQ(val->nrefs, 2);
-  set(t, key, val);
+  put(t, key, val);
   CHECK_EQ(key->nrefs, 3);
   CHECK_EQ(val->nrefs, 3);
-  set(t, key, nil);
+  put(t, key, nil);
   CHECK_EQ(key->nrefs, 2);
   CHECK_EQ(val->nrefs, 2);
 }
@@ -169,6 +169,6 @@ void test_set_ignores_nonexistent_key() {
   TEMP(t, mkref(new_table()));
   TEMP(k, mkref(new_sym("nonexistent key test")));
   CHECK_EQ(k->nrefs, 2);
-  set(t, k, nil);
+  put(t, k, nil);
   CHECK_EQ(k->nrefs, 2);
 }

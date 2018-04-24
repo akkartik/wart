@@ -1,6 +1,6 @@
 //// symbol bindings
 
-unordered_map<cell*, cell*> Bindings;
+map<cell*, cell*> Bindings;
 
 cell* lookup(string s) {
   return lookup(new_sym(s));

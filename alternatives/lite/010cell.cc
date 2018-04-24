@@ -110,7 +110,7 @@ void free_cell(cell* c) {
 
 
 
-typedef unordered_map<cell*, cell*> cell_map;
+typedef map<cell*, cell*> cell_map;
 
 struct table {
   cell_map value;
@@ -211,7 +211,7 @@ long num_unfreed() {
 }
 
 void dump_unfreed() {
-  unordered_map<cell*, long> num_refs_remaining;
+  map<cell*, long> num_refs_remaining;
   for (heap* h = First_heap; h; h=h->next)
     for (cell* x = &h->cells[0]; x < &h->cells[CELLS_PER_HEAP]; ++x)
       if (x->car)
@@ -227,7 +227,7 @@ void dump_unfreed() {
     }
 }
 
-void mark_all_cells(cell* x, unordered_map<cell*, long>& mark) {
+void mark_all_cells(cell* x, map<cell*, long>& mark) {
   if (x == nil) return;
   ++mark[x];
   switch (x->type) {

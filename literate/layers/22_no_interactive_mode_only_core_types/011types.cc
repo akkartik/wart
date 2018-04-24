@@ -43,7 +43,7 @@ cell* new_cons(cell* car) {
 
 //// numbers
 
-unordered_map<long, cell*> Int_literals;
+map<long, cell*> Int_literals;
 
 cell* new_num(long x) {
   if (Int_literals[x])
@@ -74,7 +74,7 @@ long to_int(cell* x) {
 
 //// symbols
 
-unordered_map<string, cell*> Sym_literals;
+map<string, cell*> Sym_literals;
 
 cell* new_sym(string x) {
   if (Sym_literals[x])

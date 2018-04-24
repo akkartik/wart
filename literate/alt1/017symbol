@@ -1,7 +1,7 @@
 :(before "End Globals")
-unordered_map<string, cell*> Sym_literals;
+map<string, cell*> Sym_literals;
 :(before "End Test Teardown")
-  for (unordered_map<string, cell*>::iterator p = Sym_literals.begin(); p != Sym_literals.end(); ++p) {
+  for (map<string, cell*>::iterator p = Sym_literals.begin(); p != Sym_literals.end(); ++p) {
     if (!p->second) continue;
     if (p->second->nrefs > 1)
       RAISE << "couldn't unintern " << p->first << " (" << p->second->nrefs << " references)\n";

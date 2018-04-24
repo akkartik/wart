@@ -239,13 +239,13 @@ cell* extract_keyword_args(cell* params, cell* args, cell* keyword_args) {
     }
     args = cdr(args);  // skip keyword arg
     if (!is_rest) {
-      unsafe_set(keyword_args, kparam, car(args), false);
+      unsafe_put(keyword_args, kparam, car(args), false);
       args = cdr(args);
     }
     else {
       cell* end_rest = next_keyword(args, params);
       TEMP(rest_args, snip(args, end_rest));
-      unsafe_set(keyword_args, kparam, rest_args, false);
+      unsafe_put(keyword_args, kparam, rest_args, false);
       args = end_rest;
     }
   }
