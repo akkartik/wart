@@ -2,38 +2,38 @@
 </script>
 <script>
   $(document).ready(function() {
-    $('.level').map(function() {
+    $('.frame').map(function() {
       addExpandHint($(this));
     })
-    $('.level').click(function() {
+    $('.frame').click(function() {
       toggleNextIndentedSiblings($(this));
     });
     for (x = 1; x <= 9; ++x)
-      $('[level_index='+x+']').css('padding-left', (x*2)+'em');
+      $('[frame_index='+x+']').css('padding-left', (x*2)+'em');
   });
 
   function toggleIndentedSiblings(elem) {
-    var level = parseInt(elem.attr('level_index'));
+    var level = parseInt(elem.attr('frame_index'));
     var toggle = (elem.next().css('display') == 'none') ? function(curr) { curr.show(); }
                                                         : function(curr) { curr.hide(); };
-    for (curr=elem.next(); parseInt(curr.attr('level_index')) > level; curr=curr.next())
+    for (curr=elem.next(); parseInt(curr.attr('frame_index')) > level; curr=curr.next())
       toggle(curr);
   }
 
   function toggleNextIndentedSiblings(elem) {
-    var level = parseInt(elem.attr('level_index'));
+    var level = parseInt(elem.attr('frame_index'));
     var next = nextLevel(elem).toString();
-    var toggle = (elem.next().css('display') == 'none') ? function(curr) { if (curr.attr('level_index') == next) curr.show(); }
+    var toggle = (elem.next().css('display') == 'none') ? function(curr) { if (curr.attr('frame_index') == next) curr.show(); }
                                                         : function(curr) { curr.hide(); };
-    for (var curr=elem.next(); (currLevel = parseInt(curr.attr('level_index'))) > level; curr=curr.next())
+    for (var curr=elem.next(); (currLevel = parseInt(curr.attr('frame_index'))) > level; curr=curr.next())
       toggle(curr);
   }
 
   function nextLevel(elem) {
-    var level = parseInt(elem.attr('level_index'));
+    var level = parseInt(elem.attr('frame_index'));
     var next = level;
     var currLevel = -1;
-    for (var curr=elem.next(); (currLevel = parseInt(curr.attr('level_index'))) > level; curr=curr.next()) {
+    for (var curr=elem.next(); (currLevel = parseInt(curr.attr('frame_index'))) > level; curr=curr.next()) {
       if (next <= level || currLevel < next)
         next = currLevel;
       if (next == level+1) break;
@@ -42,7 +42,7 @@
   }
 
   function addExpandHint(elem) {
-    if (parseInt(elem.next().attr('level_index')) > parseInt(elem.attr('level_index'))) {
+    if (parseInt(elem.next().attr('frame_index')) > parseInt(elem.attr('frame_index'))) {
       //elem.append(' &#9166;');
       elem.append(' &#8629;');
       elem.addClass('clickable');
